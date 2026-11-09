@@ -1,0 +1,114 @@
+{
+  "schema_version": 1,
+  "batch_id": "c6final-tag-b02",
+  "reviewer": "/root/final_validation_delivery/c4_full_review_coordinator/c6final_tag_b02",
+  "review_type": "independent focused FINAL C6 affected-tag visual review",
+  "run_id": "a2f53f0c33db",
+  "round": 5,
+  "manifest_sha256": "aa389850a0c5c2f41c266307964ffc95faa9b4b1a3247ab568ed5833c8b2547e",
+  "inventory_sha256": "029ca8231c5c230f4240dcd5be69e71cf1b41302c56c52e736e06d0dcc3a2cc6",
+  "freeze_tuple": {
+    "source_file_count": 227,
+    "source_sha256": "adafa23e6e1e4906990c3162025dd26d85e20e2f2bb4bed2f21c980bc4d565f5",
+    "binary_sha256": "baafaf4b29a7a6629e8ef95da9dae38da323adccaa89288a92afe3bc4318e0ee",
+    "harness_sha256": "8811746a09e761bfff55879a018d71f98d1d957d5ba79e8f008bdcaf90d5f55e",
+    "capture_plan_sha256": "b3adabbf4f2d33789f381dc2ac55474d89fcd210d58ce9e5083c0d818d547eec",
+    "reference_scope_sha256": "c910bed9f02ed17b2ca0a54aca1beeeeb6caabc5a17a91afe764ddd3e7b0d33c",
+    "reference_sha256": "e7b49b456255432d74cfe41346f9d44c1a9c55bf67c5d55483e4ae3029547d18",
+    "capture_helper_sha256": {
+      "verify-ui.py": "470872e6fd22a78b474c0f862164875ad9c7237bd2f3f164512864580ac1e90d",
+      "verify-fullscreen.py": "4a6c48cef771e66e9b3058edd888dcf2d4bce02e2720b5cc00c7a5b987bc9670",
+      "handoff_c4_business.py": "6197f375b247962e3ce9acdd3779468073f11e0002ac3c7ce876a7b1a0d0d9be",
+      "handoff_c5_ui.py": "fa30ef2bf8ab512e9705f43933ff6acaf32993e5aa1dbc62be330d4c97b481f2",
+      "handoff_c5_reader.py": "5b88a0c1b8e1151a3f96decef1a3a06f98a0d9de99908709bafbfb02cea490d5"
+    },
+    "qualification_driver_sha256": "7cd32588578edff343a33dc2a70b99cb6f838f6063de175c4e269935c53eb0b6",
+    "qualification_pixels_sha256": "f97014cfca910b30a75cea484e57dcd9e4566ca1401785b096ab5851add979a1"
+  },
+  "identity_basis": "Owner immutable FINAL C6 inventory identities, corroborated by static case round/run/source/binary and metadata reads; no local rehash or automated validation performed.",
+  "reviewed_case_ids": ["sc-browse--filter", "scribe--content-stress--filter-tag-page-1", "scribe--c6-tag-excluded"],
+  "actual_image_opens": 4,
+  "candidate_image_opens": 3,
+  "original_reference_image_opens": 1,
+  "cases": [
+    {
+      "case_id": "sc-browse--filter",
+      "png": {"path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate6/ui-tag-qualification-final-01/sc-browse--filter.png", "sha256": "c59137d7540ad38edaa7d3a019fce0b3fe5b70b29cf69e58b2210da8e7c1ae6c"},
+      "case_json_sha256": "51be18b7b24d417bd53d05f706f8d03bd929ab226bfc911b1c15b7fd8a396bd1",
+      "state_sha256": "8074081c40cf8cfd243ab5fe01b7d7ca87b0c46d7cd29d0e3b40e60cf85a5a6f",
+      "action_sha256": "97498c0a800999be91f169be14fc8b046abbbe6d353122c462bc1e06a5f0adfc",
+      "metadata_sha256": "e413b23811092852d7d2dc1999e3a2b1c65f55c2fbbb4e19ba2c469883d5a940",
+      "log_sha256": "7e68a4176710a866675a6b95bcf7bed2d96c58a8fd7996a4d48f3679514483a9",
+      "actual_view": {"tool": "tools.view_image", "original_png_opened": true, "native_size": [930, 1240]},
+      "observations": [
+        "Nine neutral two-character Chinese labels are readable in six chips on the first row and three on the second. Each label is horizontally centered within a compact content-width outline, with balanced side padding and no empty leading marker gutter.",
+        "All neutral chip frames are complete, with white interiors, dark text, no marker, no clipped glyph, and no collision between text and frame or adjacent chips.",
+        "The filter trigger is outlined and neutral while the displayed apply action reads 128 loaded results. The actual image supports the neutral treatment independently of the zero-active-filter state field."
+      ],
+      "interaction_context": "The static action record opens catalog filter at 650 ms. State and metadata identify catalog/catalog-filter, Scribe desktop, demo MangaDex, and zero active filters; the log records a ready 930x1240 desktop window.",
+      "intentional_check": "No intentional differences are declared. The related original export supplies tag alignment and marker-style evidence; different visible tag inventory and selection are not treated as an exact data-state match.",
+      "capability_check": "Desktop Scribe rendering only. Physical hardware and hardware dithering are explicitly unqualified in the declaration; no hardware interaction claim is made.",
+      "verdict": "pass_for_focused_neutral_tag_visual_scope",
+      "limits": ["Visual centering and content-fit judgment only; no pixel measurement or runtime interaction was performed.", "The neutral export comparison does not extend to an exact catalog data match or all reference controls."]
+    },
+    {
+      "case_id": "scribe--content-stress--filter-tag-page-1",
+      "png": {"path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate6/ui-tag-qualification-final-01/scribe--content-stress--filter-tag-page-1.png", "sha256": "55c803aea04e76244c89b6046664773b4b50cd88b342487252fedceaa29885f1"},
+      "case_json_sha256": "e3bfedf29ca41fa32920f989f15a25cff54377b9701e6fd3794fb69e028aad79",
+      "state_sha256": "2ca5d5e7616a5091d697d1d3d5dca6629048b10645ce0af55fa3ba40b7aa21b5",
+      "action_sha256": "9901e3832bf4a261896ea2d0c9ba506e2cdd770646f937874127802f0046c4d0",
+      "metadata_sha256": "15f3e0340ed3cde2e77085b1021ca5a912990e1ca27ba2846acfb6f99cfe862e",
+      "log_sha256": "7e68a4176710a866675a6b95bcf7bed2d96c58a8fd7996a4d48f3679514483a9",
+      "actual_view": {"tool": "tools.view_image", "original_png_opened": true, "native_size": [930, 1240]},
+      "observations": [
+        "Six black selected chips form three columns and two rows. Each has a distinct white check before the label, and the complete visible strings Actual tag 00, Actual tag 01, Actual tag 02, Actual tag 03, Actual tag 04, and Actual tag 05 were read from the PNG.",
+        "Every check and two-digit suffix stays within its chip with visible separation from text and edges. Black chip boundaries remain complete and adjacent chips remain separate; no label or marker is clipped.",
+        "The tag folio visibly reads 1 / 6 below the chip rows, with a gray previous control and dark next control. This supports three columns and six pages for this dense fixture only."
+      ],
+      "interaction_context": "The static action record opens Komga, opens and resets the filter, then presses/releases all six measured chip positions. State records six selected tags and 20 results. These records corroborate context; the white checks, suffixes, and folio were judged from the actual PNG.",
+      "intentional_check": "No intentional differences are declared. The original Chinese export is a related style reference for black selected fill and a white check, not an exact reference for these English fixture labels or their page count.",
+      "capability_check": "Desktop Scribe capture, configured local Komga fixture, demo false. The action record documents pointer interaction; this review only inspects its final captured result. Physical hardware and hardware dithering remain unqualified.",
+      "verdict": "pass_for_focused_selected_tag_visual_scope",
+      "limits": ["Only the visible first tag page was reviewed.", "The dense fixture observation is not a capacity expectation for basic short Chinese labels, C5, or the old C4 Paperwhite baseline."]
+    },
+    {
+      "case_id": "scribe--c6-tag-excluded",
+      "png": {"path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate6/ui-tag-qualification-final-01/scribe--c6-tag-excluded.png", "sha256": "afd1b86eab9d2aea61d66cd00d212f376f0f8fa0e7d922bd50ac9e1e2703b34c"},
+      "case_json_sha256": "eee9f3efb559bf345a8a15a3cb50c92a933e3f6dbf93b6af968bb34620489213",
+      "state_sha256": "605d49970a259727f7341798fe48badad9dc68982e0a75b291d092f8df01b5fe",
+      "action_sha256": "d40ee2d3f0ad5f709fb8979078ebc39d88095b3d6ba020ea7f38691711ec9466",
+      "metadata_sha256": "13100ec50a5241660f4cce007d13e257c8ff59edfc5f797b213cad3f7e3220b5",
+      "log_sha256": "7e68a4176710a866675a6b95bcf7bed2d96c58a8fd7996a4d48f3679514483a9",
+      "actual_view": {"tool": "tools.view_image", "original_png_opened": true, "native_size": [930, 1240]},
+      "observations": [
+        "The first chip visibly contains a gray cross, the readable string Actual tag 00, a horizontal strike through the label, and a complete dashed frame. The cross is distinct from the label and neither cross nor suffix touches or escapes the frame.",
+        "Actual tag 01 and Actual tag 02 remain neutral beside the excluded chip; Actual tag 03, Actual tag 04, and Actual tag 05 remain neutral on the next row. Their labels are centered in content-width solid outlines without a reserved marker gutter.",
+        "The tag folio visibly reads 1 / 6, and the apply action visibly reports 0 loaded results. The excluded treatment remains identifiable through glyph, dashed boundary, and strike in addition to gray tone."
+      ],
+      "interaction_context": "The static action record opens and resets the Komga filter, then performs two press/release cycles at 377.5,620. State records Actual tag 00 as excluded and one active filter. This establishes recorded interaction context, while the actual PNG independently proves visible exclusion styling and suffix readability.",
+      "intentional_check": "No intentional differences are declared. Exclusion is a supplemental actual state without an exact exported reference; its treatment is assessed against the supplied gray-cross/dashed-frame/strike requirement.",
+      "capability_check": "Desktop Scribe final capture from the configured Komga fixture, demo false. Pointer actions are recorded evidence rather than a newly executed interaction. Physical hardware and hardware dithering remain unqualified.",
+      "verdict": "pass_for_focused_excluded_tag_visual_scope",
+      "limits": ["Only the final captured exclusion state was visually reviewed; transition timing and repeated interaction were not exercised.", "No separate readable crop was required because the cross, strike, frame, and 00 suffix were discernible in the original PNG view."]
+    }
+  ],
+  "reference_actual_view": {
+    "reference_id": "sc-browse--filter",
+    "path": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/screens/states/sc-browse--filter.png",
+    "sha256": "fc4e1eb1a853240fc1f6019ffb447cd1a04b85fd4ddfe1af8d233e113195532e",
+    "tool": "tools.view_image",
+    "original_png_opened": true,
+    "original_dimensions": [1860, 2480],
+    "viewer_display_dimensions": [1368, 1824],
+    "observations": "The exported filter shows centered compact Chinese neutral chips with complete light outlines, plus a black selected Fantasy chip with a white check before its label. This was used for related tag geometry and selected-state styling, not an invented exact dense or excluded-state reference.",
+    "limits": "The image tool resized the original for display; no crop or image processing was performed by this reviewer. Native C6 images were viewed at 930x1240."
+  },
+  "suggestions": [],
+  "new_actionable_findings": [],
+  "gaps": [
+    "This sealed batch covers three affected-tag captures and one related original reference only; it is not the full FINAL C6 manual or final36 qualification.",
+    "Only supplied immutable identities and static evidence were read. No local or remote runtime, test, build, probe, hash, SQL, SSH, copy, crop, or image-processing operation was performed.",
+    "No physical Kindle hardware, e-ink behavior, touch reliability, or unseen tag page is qualified by this visual batch."
+  ],
+  "conclusion": "All three reviewed cases pass their bounded affected-tag visual scope. No new actionable tag issue or unreadable required suffix/marker was observed. Broader qualification remains partial."
+}

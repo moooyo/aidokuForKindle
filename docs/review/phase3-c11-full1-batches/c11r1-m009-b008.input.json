@@ -1,0 +1,1034 @@
+{
+  "schema_version": 1,
+  "kind": "C11-full1-immutable-module-fresh-small-review-input",
+  "batch_id": "c11r1-m009-b008",
+  "record_date": "2026-11-07",
+  "round": 1,
+  "run_id": "55c498296d35",
+  "module_id": "009-pw-reader-complete",
+  "focus": "actual Library imports, odd-final source span and webtoon source step",
+  "module_snapshot": {
+    "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate11/ui-round-1/snapshots/ui-round-1-snapshot-009-pw-reader-complete/inventory.json",
+    "sha256": "3952e2a5147e6b874ec071829696e4226be5f8567cfcb7ae704f4ad0c6fe9224",
+    "archive_sha256": "b570ac6235aae1e02dbea581e424f0f9f984f7ca0b92b58e8733ba443bef2613",
+    "transfer_accounting_path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate11/ui-round-1/snapshots/ui-round-1-snapshot-009-pw-reader-complete/transfer-accounting.json",
+    "transfer_accounting_sha256": "5085f4cbf88148b2fad930b5a8e6c2d3f724e0e62b646bb6d8ceb65b66d4e80c",
+    "owner_matched_files": 282,
+    "changed_existing_files": [],
+    "capture_count": 32,
+    "manual_review_count": 32,
+    "reference_id_count": 0,
+    "excluded_prerequisite_case_ids": [],
+    "after_case_exclusive": "scribe--content-stress--category-capability",
+    "terminal_case": "pw5-portrait--webtoon-step",
+    "next_run": "scribe-portrait--rtl-page-input",
+    "full_manifest_pending": true
+  },
+  "freeze_tuple": {
+    "run_id": "55c498296d35",
+    "source_sha256": "33a2d049307c398da8bfbf196d1bf8e086412c117c194b592f4a93b5bfaedb3f",
+    "binary_sha256": "1e60db345cbd6fbe580258a4a309bf42361781061dc2033f78a8a5eb4446ad72",
+    "binary": "/root/aidoku-phase3/candidate11/desktop/aidoku",
+    "source_root": "/root/aidoku-phase3/candidate11/source-snapshot",
+    "source_file_count": 227,
+    "reference_root": "/root/aidoku-phase3/reference",
+    "reference_sha256": "e7b49b456255432d74cfe41346f9d44c1a9c55bf67c5d55483e4ae3029547d18",
+    "capture_plan_sha256": "b201d4ac36df8023fb12f07e0adae91f4c63201cdd441add6ddd0a0d535ca368",
+    "reference_scope_sha256": "c910bed9f02ed17b2ca0a54aca1beeeeb6caabc5a17a91afe764ddd3e7b0d33c",
+    "main_harness_sha256": "f7e2d3dc3c66479715a7d5d094a7b9165379c3e1f4b1b8ecad092b78b924a892",
+    "helper_sha256": {
+      "scripts/handoff_c10_search.py": "a4272a78b00feced845e028b14cdcef90dafc5f748868b52dcc23df007055ecc",
+      "scripts/handoff_c11_search.py": "627b562433ebc4b13491197c81e22f12a765d3d005884ae4c07c07067f72e1c8",
+      "scripts/handoff_c4_business.py": "6197f375b247962e3ce9acdd3779468073f11e0002ac3c7ce876a7b1a0d0d9be",
+      "scripts/handoff_c5_reader.py": "5b88a0c1b8e1151a3f96decef1a3a06f98a0d9de99908709bafbfb02cea490d5",
+      "scripts/handoff_c5_ui.py": "fa30ef2bf8ab512e9705f43933ff6acaf32993e5aa1dbc62be330d4c97b481f2",
+      "scripts/handoff_c9_search.py": "2dfd2342293ccdf5d0c488e3651be714c492ae1775ece7ad3f01cba86cba5534",
+      "scripts/verify-fullscreen.py": "4a6c48cef771e66e9b3058edd888dcf2d4bce02e2720b5cc00c7a5b987bc9670",
+      "scripts/verify-handoff-c11.py": "d7c4242f4fbec37f68cb0647310179b9cd7bca2df5e7d66a5bdcddffec0549c9",
+      "scripts/verify-handoff-tags.py": "7cd32588578edff343a33dc2a70b99cb6f838f6063de175c4e269935c53eb0b6",
+      "scripts/verify-ui.py": "470872e6fd22a78b474c0f862164875ad9c7237bd2f3f164512864580ac1e90d"
+    },
+    "execution_input_sha256": {
+      "scripts/handoff_c10_search.py": "a4272a78b00feced845e028b14cdcef90dafc5f748868b52dcc23df007055ecc",
+      "scripts/handoff_c11_search.py": "627b562433ebc4b13491197c81e22f12a765d3d005884ae4c07c07067f72e1c8",
+      "scripts/handoff_c4_business.py": "6197f375b247962e3ce9acdd3779468073f11e0002ac3c7ce876a7b1a0d0d9be",
+      "scripts/handoff_c5_reader.py": "5b88a0c1b8e1151a3f96decef1a3a06f98a0d9de99908709bafbfb02cea490d5",
+      "scripts/handoff_c5_ui.py": "fa30ef2bf8ab512e9705f43933ff6acaf32993e5aa1dbc62be330d4c97b481f2",
+      "scripts/handoff_c9_search.py": "2dfd2342293ccdf5d0c488e3651be714c492ae1775ece7ad3f01cba86cba5534",
+      "scripts/verify-fullscreen.py": "4a6c48cef771e66e9b3058edd888dcf2d4bce02e2720b5cc00c7a5b987bc9670",
+      "scripts/verify-handoff-c11.py": "d7c4242f4fbec37f68cb0647310179b9cd7bca2df5e7d66a5bdcddffec0549c9",
+      "scripts/verify-handoff-tags.py": "7cd32588578edff343a33dc2a70b99cb6f838f6063de175c4e269935c53eb0b6",
+      "scripts/verify-handoff-ui.py": "f7e2d3dc3c66479715a7d5d094a7b9165379c3e1f4b1b8ecad092b78b924a892",
+      "scripts/verify-ui.py": "470872e6fd22a78b474c0f862164875ad9c7237bd2f3f164512864580ac1e90d",
+      "docs/review/phase3-handoff-capture-plan.json": "b201d4ac36df8023fb12f07e0adae91f4c63201cdd441add6ddd0a0d535ca368",
+      "docs/review/phase3-reference-scope.json": "c910bed9f02ed17b2ca0a54aca1beeeeb6caabc5a17a91afe764ddd3e7b0d33c",
+      "docs/review/phase3-c11-author-boundary-plan.json": "a77dd5d517fb647d1437aac4d7e8359152cbe5eb0ea9118d5a03ba1f142bcfa8"
+    },
+    "gate_manifest_sha256": "5e353b5686ec70f89bb367e8f5ff99ef2e6a2b533e43218acffeed278e5d52d2"
+  },
+  "source_manifest": {
+    "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate11/ui-round-1/snapshots/ui-round-1-snapshot-009-pw-reader-complete/files/output/source-files.json",
+    "sha256": "e332086df1f552ae7d7c7d434491f6886a167095a86789d6e0ec93ca47975e9e",
+    "bytes": 37172,
+    "owner_source_path": "/root/aidoku-phase3/evidence/candidate11/ui-round-1/source-files.json"
+  },
+  "reference_manifest": {
+    "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate11/ui-round-1/snapshots/ui-round-1-snapshot-009-pw-reader-complete/files/output/reference-files.json",
+    "sha256": "caad04a243ecbaac22c790d7918f50c8678985b9e58a9f963694fe7d69e2775a",
+    "bytes": 32291,
+    "owner_source_path": "/root/aidoku-phase3/evidence/candidate11/ui-round-1/reference-files.json"
+  },
+  "image_budget": {
+    "assigned_new_candidates": 4,
+    "assigned_original_references": 1,
+    "assigned_raw_source_originals": 0,
+    "assigned_retained_processed_source_inputs": 2,
+    "assigned_oracle_image_opens": 0,
+    "planned_total_opens": 7,
+    "planned_reference_pairs": 4,
+    "max_total_opens": 8,
+    "max_reference_pairs": 4,
+    "no_additional_case_images_allowed": true
+  },
+  "cases": [
+    {
+      "case_id": "pw5-portrait--odd-cbz-import",
+      "device": "pw5",
+      "screen": "library",
+      "initial_screen": "library",
+      "manual_review_required": true,
+      "prerequisite": false,
+      "reference_id": null,
+      "reference_sha256": null,
+      "reference_applicability": null,
+      "comparison_reference_ids": [
+        "Main--default"
+      ],
+      "comparison_source_inputs": [],
+      "reference_comparison_status": "related-logical-contract-only-no-exact-state-reference",
+      "comparison_role": "Related active Library contract after local import; this is not a Reader screenshot.",
+      "original_png": {
+        "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate11/ui-round-1/snapshots/ui-round-1-snapshot-009-pw-reader-complete/files/output/pw5-portrait--odd-cbz-import.png",
+        "sha256": "c7cf99da139f712c1bd0bb77b208db660ac43fe6270ff282d8e2a58c2f027552",
+        "bytes": 52238,
+        "owner_source_path": "/root/aidoku-phase3/evidence/candidate11/ui-round-1/pw5-portrait--odd-cbz-import.png"
+      },
+      "case_json": {
+        "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate11/ui-round-1/snapshots/ui-round-1-snapshot-009-pw-reader-complete/files/output/cases/pw5-portrait--odd-cbz-import.json",
+        "sha256": "6c27334051ee9353d297c5d8d1d93b68b3a88dad8919142e68d3e509963460bd",
+        "bytes": 21471,
+        "owner_source_path": "/root/aidoku-phase3/evidence/candidate11/ui-round-1/cases/pw5-portrait--odd-cbz-import.json"
+      },
+      "state": {
+        "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate11/ui-round-1/snapshots/ui-round-1-snapshot-009-pw-reader-complete/files/output/pw5-portrait--odd-cbz-import.state.json",
+        "sha256": "a56ea8c6d15e7bf8b4da3eee6b25a7c83fe391961c0b864748b61ae892e322c4",
+        "bytes": 10545,
+        "owner_source_path": "/root/aidoku-phase3/evidence/candidate11/ui-round-1/pw5-portrait--odd-cbz-import.state.json"
+      },
+      "metadata": {
+        "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate11/ui-round-1/snapshots/ui-round-1-snapshot-009-pw-reader-complete/files/output/pw5-portrait--odd-cbz-import.metadata.json",
+        "sha256": "0a73df9535c1cd4875e34b797c5f8b773d625455273d1fd2b88a218abc2097d3",
+        "bytes": 673,
+        "owner_source_path": "/root/aidoku-phase3/evidence/candidate11/ui-round-1/pw5-portrait--odd-cbz-import.metadata.json"
+      },
+      "actions": {
+        "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate11/ui-round-1/snapshots/ui-round-1-snapshot-009-pw-reader-complete/files/output/actions/pw5-portrait--odd-cbz-import.json",
+        "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+        "bytes": 3,
+        "owner_source_path": "/root/aidoku-phase3/evidence/candidate11/ui-round-1/actions/pw5-portrait--odd-cbz-import.json"
+      },
+      "log": {
+        "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate11/ui-round-1/snapshots/ui-round-1-snapshot-009-pw-reader-complete/files/output/pw5-portrait--odd-cbz-import.log",
+        "sha256": "dc121ceea011a63c29b404d6c6b75bbe2db32b326923b8fa99759f457bfd709f",
+        "bytes": 68,
+        "owner_source_path": "/root/aidoku-phase3/evidence/candidate11/ui-round-1/pw5-portrait--odd-cbz-import.log"
+      },
+      "native_dimensions": [
+        618,
+        824
+      ],
+      "expected_physical_dimensions": [
+        1236,
+        1648
+      ],
+      "reference_physical_scale": 2,
+      "state_route": "library",
+      "state_modal": "",
+      "active_state_summary": {
+        "case_id": "pw5-portrait--odd-cbz-import",
+        "state_route": "library",
+        "state_modal": "",
+        "modal_context": "",
+        "menu": null,
+        "displayed_reader_menu_open": null,
+        "reader_panel": "",
+        "reader_toc_tab": "chapters",
+        "reader_page": null,
+        "visible_reader_page": 1,
+        "reader_total": null,
+        "display_landscape": false,
+        "display_rotation_degrees": 0,
+        "page_layout_mode": "automatic",
+        "displayed_reader_session": null
+      },
+      "intentional_differences": [],
+      "supplemental_artifacts": [],
+      "raw_original_source_status": "No raw-original page source record exists in this module inventory; identity and direct raw-original inspection remain pending."
+    },
+    {
+      "case_id": "pw5-portrait--odd-final-spread",
+      "device": "pw5",
+      "screen": "reader",
+      "initial_screen": "reader",
+      "manual_review_required": true,
+      "prerequisite": false,
+      "reference_id": null,
+      "reference_sha256": null,
+      "reference_applicability": null,
+      "comparison_reference_ids": [],
+      "comparison_source_inputs": [
+        {
+          "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate11/ui-round-1/snapshots/ui-round-1-snapshot-009-pw-reader-complete/files/output/processed/pw5-portrait--odd-final-spread/first_path.png",
+          "sha256": "5515ad8af41975f9376aaaf246b12876e8f65ead323aa8bef2bca0ede5c305c8",
+          "bytes": 17739,
+          "owner_source_path": "/root/aidoku-phase3/evidence/candidate11/ui-round-1/processed/pw5-portrait--odd-final-spread/first_path.png",
+          "role": "retained-processed-source-artwork-input",
+          "case_id": "pw5-portrait--odd-final-spread",
+          "field": "first_path",
+          "dimensions": [
+            1206,
+            1648
+          ],
+          "owner_application_path": "/root/aidoku-phase3/evidence/candidate11/ui-round-1/data/55c498296d35/pw5-portrait--odd-cbz-import/cache/shared-v1/processed/27/2733f59a28a99327e9bcc20e34a93f3b1530ac65fc5ba0574ca94e799c8d618b.png",
+          "owner_declared_input_sha256": "5515ad8af41975f9376aaaf246b12876e8f65ead323aa8bef2bca0ede5c305c8",
+          "owner_geometry": {
+            "source_size": [
+              1206,
+              1648
+            ],
+            "slot": [
+              0,
+              0,
+              618,
+              824
+            ],
+            "destination": [
+              8,
+              0,
+              611,
+              824
+            ],
+            "dx8": 512,
+            "dy8": 512,
+            "sample_origin": [
+              0,
+              0
+            ],
+            "sample_center_offset": 0
+          },
+          "assigned_image_open": true,
+          "raw_original_source": false
+        }
+      ],
+      "reference_comparison_status": "retained-processed-source-artwork-comparison-only-no-independent-exact-state-reference",
+      "comparison_role": "Direct current candidate and retained committed processed source artwork input; owner oracle metadata remains separate from manual appearance.",
+      "original_png": {
+        "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate11/ui-round-1/snapshots/ui-round-1-snapshot-009-pw-reader-complete/files/output/pw5-portrait--odd-final-spread.png",
+        "sha256": "cc5f960b896e7b1f8dff01a6cf1766f5c4f6f6c5f4a0e683baa79545e1f3993d",
+        "bytes": 27680,
+        "owner_source_path": "/root/aidoku-phase3/evidence/candidate11/ui-round-1/pw5-portrait--odd-final-spread.png"
+      },
+      "case_json": {
+        "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate11/ui-round-1/snapshots/ui-round-1-snapshot-009-pw-reader-complete/files/output/cases/pw5-portrait--odd-final-spread.json",
+        "sha256": "2b50d058b3b05cebbb3fd7881d9f056a288a40214b390912f083d2bb65c4c7a6",
+        "bytes": 30368,
+        "owner_source_path": "/root/aidoku-phase3/evidence/candidate11/ui-round-1/cases/pw5-portrait--odd-final-spread.json"
+      },
+      "state": {
+        "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate11/ui-round-1/snapshots/ui-round-1-snapshot-009-pw-reader-complete/files/output/pw5-portrait--odd-final-spread.state.json",
+        "sha256": "66711ce2917d8e0c4a973544b4238f1de0d976198fdb589a06e0aa443476372e",
+        "bytes": 12800,
+        "owner_source_path": "/root/aidoku-phase3/evidence/candidate11/ui-round-1/pw5-portrait--odd-final-spread.state.json"
+      },
+      "metadata": {
+        "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate11/ui-round-1/snapshots/ui-round-1-snapshot-009-pw-reader-complete/files/output/pw5-portrait--odd-final-spread.metadata.json",
+        "sha256": "fab181b6b27b6f37ba9015323fd9a5ee9975aa8b5ac09686118de95799d3ba18",
+        "bytes": 677,
+        "owner_source_path": "/root/aidoku-phase3/evidence/candidate11/ui-round-1/pw5-portrait--odd-final-spread.metadata.json"
+      },
+      "actions": {
+        "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate11/ui-round-1/snapshots/ui-round-1-snapshot-009-pw-reader-complete/files/output/actions/pw5-portrait--odd-final-spread.json",
+        "sha256": "7adac00d0da1b058fb43f75d99144978c85ab9f3bb309c4f56c06af902ff6fd8",
+        "bytes": 95,
+        "owner_source_path": "/root/aidoku-phase3/evidence/candidate11/ui-round-1/actions/pw5-portrait--odd-final-spread.json"
+      },
+      "log": {
+        "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate11/ui-round-1/snapshots/ui-round-1-snapshot-009-pw-reader-complete/files/output/pw5-portrait--odd-final-spread.log",
+        "sha256": "dc121ceea011a63c29b404d6c6b75bbe2db32b326923b8fa99759f457bfd709f",
+        "bytes": 68,
+        "owner_source_path": "/root/aidoku-phase3/evidence/candidate11/ui-round-1/pw5-portrait--odd-final-spread.log"
+      },
+      "native_dimensions": [
+        618,
+        824
+      ],
+      "expected_physical_dimensions": [
+        1236,
+        1648
+      ],
+      "reference_physical_scale": 2,
+      "state_route": "reader",
+      "state_modal": "",
+      "active_state_summary": {
+        "case_id": "pw5-portrait--odd-final-spread",
+        "state_route": "reader",
+        "state_modal": "",
+        "modal_context": "",
+        "menu": false,
+        "displayed_reader_menu_open": false,
+        "reader_panel": "",
+        "reader_toc_tab": "chapters",
+        "reader_page": 3,
+        "visible_reader_page": 3,
+        "reader_total": 3,
+        "display_landscape": false,
+        "display_rotation_degrees": 0,
+        "page_layout_mode": "automatic",
+        "displayed_reader_session": {
+          "book_id": "5:local:003898b63f38a1f6c6be6be65c49e05c5db05f734b0f5877fbf6f715a5f28114",
+          "chapter_id": "5:local:003898b63f38a1f6c6be6be65c49e05c5db05f734b0f5877fbf6f715a5f28114/0",
+          "landscape": false,
+          "menu_open": false,
+          "page": 3,
+          "scaled_height": 0,
+          "spread": false,
+          "total": 3,
+          "vertical_offset": 0,
+          "viewport_height": 0,
+          "zoom": 1
+        }
+      },
+      "intentional_differences": [],
+      "supplemental_artifacts": [
+        {
+          "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate11/ui-round-1/snapshots/ui-round-1-snapshot-009-pw-reader-complete/files/output/processed/pw5-portrait--odd-final-spread/first_path.png",
+          "sha256": "5515ad8af41975f9376aaaf246b12876e8f65ead323aa8bef2bca0ede5c305c8",
+          "bytes": 17739,
+          "owner_source_path": "/root/aidoku-phase3/evidence/candidate11/ui-round-1/processed/pw5-portrait--odd-final-spread/first_path.png",
+          "role": "retained-processed-source-artwork-input",
+          "case_id": "pw5-portrait--odd-final-spread",
+          "field": "first_path",
+          "dimensions": [
+            1206,
+            1648
+          ],
+          "owner_application_path": "/root/aidoku-phase3/evidence/candidate11/ui-round-1/data/55c498296d35/pw5-portrait--odd-cbz-import/cache/shared-v1/processed/27/2733f59a28a99327e9bcc20e34a93f3b1530ac65fc5ba0574ca94e799c8d618b.png",
+          "owner_declared_input_sha256": "5515ad8af41975f9376aaaf246b12876e8f65ead323aa8bef2bca0ede5c305c8",
+          "owner_geometry": {
+            "source_size": [
+              1206,
+              1648
+            ],
+            "slot": [
+              0,
+              0,
+              618,
+              824
+            ],
+            "destination": [
+              8,
+              0,
+              611,
+              824
+            ],
+            "dx8": 512,
+            "dy8": 512,
+            "sample_origin": [
+              0,
+              0
+            ],
+            "sample_center_offset": 0
+          },
+          "assigned_image_open": true,
+          "raw_original_source": false
+        },
+        {
+          "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate11/ui-round-1/snapshots/ui-round-1-snapshot-009-pw-reader-complete/files/output/oracle/pw5-portrait--odd-final-spread.expected.png",
+          "sha256": "3b6f8907570d11b2329835a0cca2d6e108f5fba8e09ac72a4a22bcd179fbbb0b",
+          "bytes": 4699,
+          "owner_source_path": "/root/aidoku-phase3/evidence/candidate11/ui-round-1/oracle/pw5-portrait--odd-final-spread.expected.png",
+          "role": "owner-expected-composition-static-identity",
+          "assigned_image_open": false
+        },
+        {
+          "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate11/ui-round-1/snapshots/ui-round-1-snapshot-009-pw-reader-complete/files/output/oracle/pw5-portrait--odd-final-spread.diff.png",
+          "sha256": "e07893c2865cbde667151149a6a0df29c2c80b57275f62a7e9ac463001fa18a0",
+          "bytes": 1561,
+          "owner_source_path": "/root/aidoku-phase3/evidence/candidate11/ui-round-1/oracle/pw5-portrait--odd-final-spread.diff.png",
+          "role": "owner-difference-artifact-static-identity",
+          "assigned_image_open": false
+        }
+      ],
+      "raw_original_source_status": "No raw-original page source record exists in this module inventory; identity and direct raw-original inspection remain pending.",
+      "owner_recorded_artwork_content_contract": "Committed source identity and strict whole-viewport pixel composition; legitimate bright or white source pages need no dark-ink quota.",
+      "owner_recorded_pure_reader_oracle": {
+        "sampler_contract": "slint-software-1.17.1-shared-rgb8-fixed8-v1",
+        "metrics": {
+          "exact_match": true,
+          "changed_pixels": 0,
+          "maximum_channel_difference": 0,
+          "rgb_mae_diagnostic_only": 0,
+          "difference_bbox": null,
+          "regions_diagnostic_only": {
+            "top_96": {
+              "rectangle": [
+                0,
+                0,
+                618,
+                96
+              ],
+              "changed_pixels": 0
+            },
+            "bottom_96": {
+              "rectangle": [
+                0,
+                728,
+                618,
+                824
+              ],
+              "changed_pixels": 0
+            },
+            "left_32": {
+              "rectangle": [
+                0,
+                0,
+                32,
+                824
+              ],
+              "changed_pixels": 0
+            },
+            "right_32": {
+              "rectangle": [
+                586,
+                0,
+                618,
+                824
+              ],
+              "changed_pixels": 0
+            },
+            "center_seam_8": {
+              "rectangle": [
+                305,
+                0,
+                313,
+                824
+              ],
+              "changed_pixels": 0
+            }
+          },
+          "pixel_error_tolerance": 0,
+          "ignored_pixels": 0
+        },
+        "processed_inputs": [
+          {
+            "field": "first_path",
+            "application_path": "/root/aidoku-phase3/evidence/candidate11/ui-round-1/data/55c498296d35/pw5-portrait--odd-cbz-import/cache/shared-v1/processed/27/2733f59a28a99327e9bcc20e34a93f3b1530ac65fc5ba0574ca94e799c8d618b.png",
+            "retained_path": "/root/aidoku-phase3/evidence/candidate11/ui-round-1/processed/pw5-portrait--odd-final-spread/first_path.png",
+            "sha256": "5515ad8af41975f9376aaaf246b12876e8f65ead323aa8bef2bca0ede5c305c8",
+            "geometry": {
+              "source_size": [
+                1206,
+                1648
+              ],
+              "slot": [
+                0,
+                0,
+                618,
+                824
+              ],
+              "destination": [
+                8,
+                0,
+                611,
+                824
+              ],
+              "dx8": 512,
+              "dy8": 512,
+              "sample_origin": [
+                0,
+                0
+              ],
+              "sample_center_offset": 0
+            }
+          }
+        ],
+        "expected": "/root/aidoku-phase3/evidence/candidate11/ui-round-1/oracle/pw5-portrait--odd-final-spread.expected.png",
+        "difference": "/root/aidoku-phase3/evidence/candidate11/ui-round-1/oracle/pw5-portrait--odd-final-spread.diff.png",
+        "original_capture_unchanged": true
+      },
+      "owner_oracle_interpretation": "Owner-captured static declaration only; no local/remote metric recomputation or manual appearance verdict is claimed."
+    },
+    {
+      "case_id": "pw5-portrait--webtoon-import",
+      "device": "pw5",
+      "screen": "library",
+      "initial_screen": "library",
+      "manual_review_required": true,
+      "prerequisite": false,
+      "reference_id": null,
+      "reference_sha256": null,
+      "reference_applicability": null,
+      "comparison_reference_ids": [
+        "Main--default"
+      ],
+      "comparison_source_inputs": [],
+      "reference_comparison_status": "related-logical-contract-only-no-exact-state-reference",
+      "comparison_role": "Related active Library contract after local import; this is not a Reader screenshot.",
+      "original_png": {
+        "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate11/ui-round-1/snapshots/ui-round-1-snapshot-009-pw-reader-complete/files/output/pw5-portrait--webtoon-import.png",
+        "sha256": "991334140eb6b193b46f273cc9fb417c197ab502f6cbe8e23dfd74a65ee33407",
+        "bytes": 54554,
+        "owner_source_path": "/root/aidoku-phase3/evidence/candidate11/ui-round-1/pw5-portrait--webtoon-import.png"
+      },
+      "case_json": {
+        "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate11/ui-round-1/snapshots/ui-round-1-snapshot-009-pw-reader-complete/files/output/cases/pw5-portrait--webtoon-import.json",
+        "sha256": "b7b580b781ab7458e7b8014344abac146ed2429aec72635e92a5b4f51efd5a0b",
+        "bytes": 21471,
+        "owner_source_path": "/root/aidoku-phase3/evidence/candidate11/ui-round-1/cases/pw5-portrait--webtoon-import.json"
+      },
+      "state": {
+        "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate11/ui-round-1/snapshots/ui-round-1-snapshot-009-pw-reader-complete/files/output/pw5-portrait--webtoon-import.state.json",
+        "sha256": "3ee652f3de966c506b08177ad8dd4fa956bdc4c93900a7f52717dd656864c60b",
+        "bytes": 10541,
+        "owner_source_path": "/root/aidoku-phase3/evidence/candidate11/ui-round-1/pw5-portrait--webtoon-import.state.json"
+      },
+      "metadata": {
+        "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate11/ui-round-1/snapshots/ui-round-1-snapshot-009-pw-reader-complete/files/output/pw5-portrait--webtoon-import.metadata.json",
+        "sha256": "1f0c62bfce02990bdaf843cd0ef80d08f9a8bb7a8d3666039badf2a1d86eb7d8",
+        "bytes": 673,
+        "owner_source_path": "/root/aidoku-phase3/evidence/candidate11/ui-round-1/pw5-portrait--webtoon-import.metadata.json"
+      },
+      "actions": {
+        "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate11/ui-round-1/snapshots/ui-round-1-snapshot-009-pw-reader-complete/files/output/actions/pw5-portrait--webtoon-import.json",
+        "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+        "bytes": 3,
+        "owner_source_path": "/root/aidoku-phase3/evidence/candidate11/ui-round-1/actions/pw5-portrait--webtoon-import.json"
+      },
+      "log": {
+        "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate11/ui-round-1/snapshots/ui-round-1-snapshot-009-pw-reader-complete/files/output/pw5-portrait--webtoon-import.log",
+        "sha256": "dc121ceea011a63c29b404d6c6b75bbe2db32b326923b8fa99759f457bfd709f",
+        "bytes": 68,
+        "owner_source_path": "/root/aidoku-phase3/evidence/candidate11/ui-round-1/pw5-portrait--webtoon-import.log"
+      },
+      "native_dimensions": [
+        618,
+        824
+      ],
+      "expected_physical_dimensions": [
+        1236,
+        1648
+      ],
+      "reference_physical_scale": 2,
+      "state_route": "library",
+      "state_modal": "",
+      "active_state_summary": {
+        "case_id": "pw5-portrait--webtoon-import",
+        "state_route": "library",
+        "state_modal": "",
+        "modal_context": "",
+        "menu": null,
+        "displayed_reader_menu_open": null,
+        "reader_panel": "",
+        "reader_toc_tab": "chapters",
+        "reader_page": null,
+        "visible_reader_page": 1,
+        "reader_total": null,
+        "display_landscape": false,
+        "display_rotation_degrees": 0,
+        "page_layout_mode": "automatic",
+        "displayed_reader_session": null
+      },
+      "intentional_differences": [],
+      "supplemental_artifacts": [],
+      "raw_original_source_status": "No raw-original page source record exists in this module inventory; identity and direct raw-original inspection remain pending."
+    },
+    {
+      "case_id": "pw5-portrait--webtoon-step",
+      "device": "pw5",
+      "screen": "reader",
+      "initial_screen": "reader",
+      "manual_review_required": true,
+      "prerequisite": false,
+      "reference_id": null,
+      "reference_sha256": null,
+      "reference_applicability": null,
+      "comparison_reference_ids": [],
+      "comparison_source_inputs": [
+        {
+          "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate11/ui-round-1/snapshots/ui-round-1-snapshot-009-pw-reader-complete/files/output/processed/pw5-portrait--webtoon-step/first_path.png",
+          "sha256": "48896ace2f33b5012766d421291279a9e0ddfa2fe2ffc750437906f79491e5f2",
+          "bytes": 25029,
+          "owner_source_path": "/root/aidoku-phase3/evidence/candidate11/ui-round-1/processed/pw5-portrait--webtoon-step/first_path.png",
+          "role": "retained-processed-source-artwork-input",
+          "case_id": "pw5-portrait--webtoon-step",
+          "field": "first_path",
+          "dimensions": [
+            1236,
+            1648
+          ],
+          "owner_application_path": "/root/aidoku-phase3/evidence/candidate11/ui-round-1/data/55c498296d35/pw5-portrait--webtoon-import/cache/shared-v1/processed/da/da37a42c35ef40b67ef5bc6892f6fcc6b6fb4c7570401c5cb9a0bfd859145cb0.png",
+          "owner_declared_input_sha256": "48896ace2f33b5012766d421291279a9e0ddfa2fe2ffc750437906f79491e5f2",
+          "owner_geometry": {
+            "source_size": [
+              1236,
+              1648
+            ],
+            "slot": [
+              0,
+              0,
+              618,
+              824
+            ],
+            "destination": [
+              0,
+              0,
+              618,
+              824
+            ],
+            "dx8": 512,
+            "dy8": 512,
+            "sample_origin": [
+              0,
+              0
+            ],
+            "sample_center_offset": 0
+          },
+          "assigned_image_open": true,
+          "raw_original_source": false
+        }
+      ],
+      "reference_comparison_status": "retained-processed-source-artwork-comparison-only-no-independent-exact-state-reference",
+      "comparison_role": "Direct current candidate and retained committed processed source artwork input; owner oracle metadata remains separate from manual appearance.",
+      "original_png": {
+        "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate11/ui-round-1/snapshots/ui-round-1-snapshot-009-pw-reader-complete/files/output/pw5-portrait--webtoon-step.png",
+        "sha256": "9ad9eac9f7b65e24259642ec04101e1f83fa06bf44700b4781a7a144db599463",
+        "bytes": 33420,
+        "owner_source_path": "/root/aidoku-phase3/evidence/candidate11/ui-round-1/pw5-portrait--webtoon-step.png"
+      },
+      "case_json": {
+        "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate11/ui-round-1/snapshots/ui-round-1-snapshot-009-pw-reader-complete/files/output/cases/pw5-portrait--webtoon-step.json",
+        "sha256": "daa0933c35de08cb85f8a5a86c9fa1d30f9dd5a10dfae505ac75793d4fcde101",
+        "bytes": 28888,
+        "owner_source_path": "/root/aidoku-phase3/evidence/candidate11/ui-round-1/cases/pw5-portrait--webtoon-step.json"
+      },
+      "state": {
+        "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate11/ui-round-1/snapshots/ui-round-1-snapshot-009-pw-reader-complete/files/output/pw5-portrait--webtoon-step.state.json",
+        "sha256": "add924c7cc41d64d065763d83ea6eeb7a83ca60c47f03f90fdfd6f24352bc269",
+        "bytes": 12855,
+        "owner_source_path": "/root/aidoku-phase3/evidence/candidate11/ui-round-1/pw5-portrait--webtoon-step.state.json"
+      },
+      "metadata": {
+        "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate11/ui-round-1/snapshots/ui-round-1-snapshot-009-pw-reader-complete/files/output/pw5-portrait--webtoon-step.metadata.json",
+        "sha256": "615927147602f98946be301add452bac2f9dc22431f92b1e6ada9f29654131c1",
+        "bytes": 677,
+        "owner_source_path": "/root/aidoku-phase3/evidence/candidate11/ui-round-1/pw5-portrait--webtoon-step.metadata.json"
+      },
+      "actions": {
+        "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate11/ui-round-1/snapshots/ui-round-1-snapshot-009-pw-reader-complete/files/output/actions/pw5-portrait--webtoon-step.json",
+        "sha256": "5b948715c9fe65a191e37fa667b9aa2b40540bec2b506d594eb4b2ea28cb8b7b",
+        "bytes": 428,
+        "owner_source_path": "/root/aidoku-phase3/evidence/candidate11/ui-round-1/actions/pw5-portrait--webtoon-step.json"
+      },
+      "log": {
+        "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate11/ui-round-1/snapshots/ui-round-1-snapshot-009-pw-reader-complete/files/output/pw5-portrait--webtoon-step.log",
+        "sha256": "dc121ceea011a63c29b404d6c6b75bbe2db32b326923b8fa99759f457bfd709f",
+        "bytes": 68,
+        "owner_source_path": "/root/aidoku-phase3/evidence/candidate11/ui-round-1/pw5-portrait--webtoon-step.log"
+      },
+      "native_dimensions": [
+        618,
+        824
+      ],
+      "expected_physical_dimensions": [
+        1236,
+        1648
+      ],
+      "reference_physical_scale": 2,
+      "state_route": "reader",
+      "state_modal": "",
+      "active_state_summary": {
+        "case_id": "pw5-portrait--webtoon-step",
+        "state_route": "reader",
+        "state_modal": "",
+        "modal_context": "",
+        "menu": false,
+        "displayed_reader_menu_open": false,
+        "reader_panel": "",
+        "reader_toc_tab": "chapters",
+        "reader_page": 1,
+        "visible_reader_page": 1,
+        "reader_total": 1,
+        "display_landscape": false,
+        "display_rotation_degrees": 0,
+        "page_layout_mode": "automatic",
+        "displayed_reader_session": {
+          "book_id": "5:local:727c9d8f6b509f4c30c3071e87c0bbe0ebe3cdeeb728353a4e0529cb05224e17",
+          "chapter_id": "5:local:727c9d8f6b509f4c30c3071e87c0bbe0ebe3cdeeb728353a4e0529cb05224e17/0",
+          "landscape": false,
+          "menu_open": false,
+          "page": 1,
+          "scaled_height": 7543,
+          "spread": false,
+          "total": 1,
+          "vertical_offset": 1401,
+          "viewport_height": 1648,
+          "zoom": 1
+        }
+      },
+      "intentional_differences": [],
+      "supplemental_artifacts": [
+        {
+          "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate11/ui-round-1/snapshots/ui-round-1-snapshot-009-pw-reader-complete/files/output/processed/pw5-portrait--webtoon-step/first_path.png",
+          "sha256": "48896ace2f33b5012766d421291279a9e0ddfa2fe2ffc750437906f79491e5f2",
+          "bytes": 25029,
+          "owner_source_path": "/root/aidoku-phase3/evidence/candidate11/ui-round-1/processed/pw5-portrait--webtoon-step/first_path.png",
+          "role": "retained-processed-source-artwork-input",
+          "case_id": "pw5-portrait--webtoon-step",
+          "field": "first_path",
+          "dimensions": [
+            1236,
+            1648
+          ],
+          "owner_application_path": "/root/aidoku-phase3/evidence/candidate11/ui-round-1/data/55c498296d35/pw5-portrait--webtoon-import/cache/shared-v1/processed/da/da37a42c35ef40b67ef5bc6892f6fcc6b6fb4c7570401c5cb9a0bfd859145cb0.png",
+          "owner_declared_input_sha256": "48896ace2f33b5012766d421291279a9e0ddfa2fe2ffc750437906f79491e5f2",
+          "owner_geometry": {
+            "source_size": [
+              1236,
+              1648
+            ],
+            "slot": [
+              0,
+              0,
+              618,
+              824
+            ],
+            "destination": [
+              0,
+              0,
+              618,
+              824
+            ],
+            "dx8": 512,
+            "dy8": 512,
+            "sample_origin": [
+              0,
+              0
+            ],
+            "sample_center_offset": 0
+          },
+          "assigned_image_open": true,
+          "raw_original_source": false
+        },
+        {
+          "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate11/ui-round-1/snapshots/ui-round-1-snapshot-009-pw-reader-complete/files/output/oracle/pw5-portrait--webtoon-step.expected.png",
+          "sha256": "6c66953e9554403c60b392bd8bae1dd2c180b887eed2843e7ab6cfb5a0751409",
+          "bytes": 5447,
+          "owner_source_path": "/root/aidoku-phase3/evidence/candidate11/ui-round-1/oracle/pw5-portrait--webtoon-step.expected.png",
+          "role": "owner-expected-composition-static-identity",
+          "assigned_image_open": false
+        },
+        {
+          "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate11/ui-round-1/snapshots/ui-round-1-snapshot-009-pw-reader-complete/files/output/oracle/pw5-portrait--webtoon-step.diff.png",
+          "sha256": "e07893c2865cbde667151149a6a0df29c2c80b57275f62a7e9ac463001fa18a0",
+          "bytes": 1561,
+          "owner_source_path": "/root/aidoku-phase3/evidence/candidate11/ui-round-1/oracle/pw5-portrait--webtoon-step.diff.png",
+          "role": "owner-difference-artifact-static-identity",
+          "assigned_image_open": false
+        }
+      ],
+      "raw_original_source_status": "No raw-original page source record exists in this module inventory; identity and direct raw-original inspection remain pending.",
+      "owner_recorded_artwork_content_contract": "Committed source identity and strict whole-viewport pixel composition; legitimate bright or white source pages need no dark-ink quota.",
+      "owner_recorded_pure_reader_oracle": {
+        "sampler_contract": "slint-software-1.17.1-shared-rgb8-fixed8-v1",
+        "metrics": {
+          "exact_match": true,
+          "changed_pixels": 0,
+          "maximum_channel_difference": 0,
+          "rgb_mae_diagnostic_only": 0,
+          "difference_bbox": null,
+          "regions_diagnostic_only": {
+            "top_96": {
+              "rectangle": [
+                0,
+                0,
+                618,
+                96
+              ],
+              "changed_pixels": 0
+            },
+            "bottom_96": {
+              "rectangle": [
+                0,
+                728,
+                618,
+                824
+              ],
+              "changed_pixels": 0
+            },
+            "left_32": {
+              "rectangle": [
+                0,
+                0,
+                32,
+                824
+              ],
+              "changed_pixels": 0
+            },
+            "right_32": {
+              "rectangle": [
+                586,
+                0,
+                618,
+                824
+              ],
+              "changed_pixels": 0
+            },
+            "center_seam_8": {
+              "rectangle": [
+                305,
+                0,
+                313,
+                824
+              ],
+              "changed_pixels": 0
+            }
+          },
+          "pixel_error_tolerance": 0,
+          "ignored_pixels": 0
+        },
+        "processed_inputs": [
+          {
+            "field": "first_path",
+            "application_path": "/root/aidoku-phase3/evidence/candidate11/ui-round-1/data/55c498296d35/pw5-portrait--webtoon-import/cache/shared-v1/processed/da/da37a42c35ef40b67ef5bc6892f6fcc6b6fb4c7570401c5cb9a0bfd859145cb0.png",
+            "retained_path": "/root/aidoku-phase3/evidence/candidate11/ui-round-1/processed/pw5-portrait--webtoon-step/first_path.png",
+            "sha256": "48896ace2f33b5012766d421291279a9e0ddfa2fe2ffc750437906f79491e5f2",
+            "geometry": {
+              "source_size": [
+                1236,
+                1648
+              ],
+              "slot": [
+                0,
+                0,
+                618,
+                824
+              ],
+              "destination": [
+                0,
+                0,
+                618,
+                824
+              ],
+              "dx8": 512,
+              "dy8": 512,
+              "sample_origin": [
+                0,
+                0
+              ],
+              "sample_center_offset": 0
+            }
+          }
+        ],
+        "expected": "/root/aidoku-phase3/evidence/candidate11/ui-round-1/oracle/pw5-portrait--webtoon-step.expected.png",
+        "difference": "/root/aidoku-phase3/evidence/candidate11/ui-round-1/oracle/pw5-portrait--webtoon-step.diff.png",
+        "original_capture_unchanged": true
+      },
+      "owner_oracle_interpretation": "Owner-captured static declaration only; no local/remote metric recomputation or manual appearance verdict is claimed."
+    }
+  ],
+  "original_references": [
+    {
+      "reference_id": "Main--default",
+      "path": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/screens/Main.png",
+      "sha256": "5bfcaf7ba4498c67521496470e127e402adea0f4d7aec77510d6c51226b53927",
+      "bytes": 78782,
+      "owner_source_path": "/root/aidoku-phase3/reference/screens/Main.png",
+      "dimensions": [
+        1236,
+        1648
+      ],
+      "comparison_kind": "Related logical screen/state contract only; no independent exact-state reference exists for these assigned supplemental cases.",
+      "comparison_role": "Related active Library contract after local import; this is not a Reader screenshot.",
+      "comparison_for_case_ids": [
+        "pw5-portrait--odd-cbz-import",
+        "pw5-portrait--webtoon-import"
+      ]
+    }
+  ],
+  "comparison_scope": "Related active contracts and committed source artwork: actual Library imports, odd-final source span and webtoon source step",
+  "root_contracts": [
+    "Use only this new full1 run/source/binary and exact immutable module paths; no C7/C9/C10/C11 qualification candidate substitutes.",
+    "Actually open every assigned current manual PNG and its necessary assigned original reference within the eight-open/four-pair budget.",
+    "Content/title/art/count/date/capacity differences do not waive geometry, legibility, borders, folio allocation or truthful feedback.",
+    "Closed Reader is source artwork only: no app footer/ribbon/page/debug/download notice; source-art borders/text are not app chrome when backed by original source/oracle identity.",
+    "Root accepted software-only truthful disabled/fixed-on controls and manual orientation where sensors are unavailable; no new hardware/auth feature wish.",
+    "Odd-final span1 is legitimate. Toast follows HANDOFF4.6 temporary placement. Numeric sort labels follow HANDOFF166 direction contract.",
+    "Dataset-specific tag capacity is not a universal old-C4 profile expectation. Main More list glyph is accepted; tiny dots alone are a bounded limitation, not a new patch.",
+    "History/read/migration/source/keyboard conclusions separate actual existing action/Store/provider evidence from static image appearance.",
+    "Old historical dispositions must be rechecked against actual new current case evidence and recorded separately as historical/regression_closures, never current new suggestions.",
+    "C10 false-positive dense-draft adjudication is historical; do not invent a source change from it. Current images still require direct reading."
+  ],
+  "review_rules": [
+    "Chinese communication; English compact report.",
+    "Read and announce the UI/UX Pro Max skill and read docs/review/phase3-full-fresh-worker-contract.md; do not execute its program.",
+    "Only local static text reads and tools.view_image. No local/remote tests/build/probes/validators/hashes/SQL/App/SSH/copy/crop/production/harness/plan/raw/old-report edits.",
+    "This is one new fork_turns=none job. Do not spawn or continue a queue of further PNGs after completion.",
+    "No contact sheet/thumbnail/old image/mechanical result/state string substitutes for actual current originals.",
+    "Supplemental queue states have a related contract comparison, not a manufactured exact-state reference.",
+    "Additional oracle/processed/fixture paths are supplied for static identity/provenance support; do not open unassigned additional images beyond the current budget. If an essential source/detail cannot be resolved within budget, keep that check pending and request a separate owner-generated crop or fresh bounded evidence job.",
+    "All file hashes are owner declarations; do not claim local rehash or new metric/runtime execution.",
+    "Immediately send the coordinator any evidence-backed actionable, identity mismatch or required unreadable detail with exact actual current case/PNG/reference SHA.",
+    "Preserve every captured PNG/state/action/log. Do not record-review or declare full/clean based on a partial module.",
+    "After the full run, all actual-viewed module records must reconcile to its final required IDs/source/bin/reference/tool hashes before complete acceptance.",
+    "These supplemental cases have no separately captured exact-state reference. Use only assigned related logical contracts and current case evidence; never mark a missing exact reference passed.",
+    "Actually open each assigned retained processed source artwork input at its exact module path/SHA as well as each current candidate and needed original design reference. Include all opens in the same eight-open budget.",
+    "Expected and difference PNGs are static identity/provenance artifacts only in this batch; do not open them as extra images.",
+    "Retained processed source artwork inputs are the owner oracle's committed render inputs. They do not establish missing raw-original source identity or raw-original direct inspection; keep that remaining check pending.",
+    "Record owner pure_reader_oracle metrics as owner declarations separately from direct manual appearance and source-art attribution. No zero-pixel declaration substitutes for opening current candidate and assigned source input.",
+    "Active state.route/state.modal/state.menu choose the contract; a stale displayed_reader.session or initial screen does not override the active Detail/Library/Reader menu state.",
+    "Native bitmap dimensions and static orientation metadata do not qualify physical native scale, 270-degree rotation, leases or performance."
+  ],
+  "output_schema": {
+    "top_level": [
+      "batch_id",
+      "round",
+      "run_id",
+      "module_id",
+      "module_snapshot",
+      "freeze_tuple",
+      "reviewed_case_ids",
+      "actual_original_image_opens",
+      "references",
+      "cases",
+      "new_actionable",
+      "pending",
+      "limitations"
+    ],
+    "case_fields": [
+      "case_id",
+      "png_sha256",
+      "case_json_sha256",
+      "state_sha256",
+      "metadata_sha256",
+      "actions_sha256",
+      "log_sha256",
+      "reference_sha256",
+      "actual_image_opened",
+      "observation",
+      "static_verdict",
+      "actual_comparison_source_input_opened",
+      "comparison_source_input_sha256",
+      "owner_oracle_separate_from_appearance",
+      "raw_original_source_pending"
+    ],
+    "historical_field": "historical_findings/regression_closures separate from current suggestions"
+  },
+  "output_report_path": "D:/Code/aidokuForKindle/docs/review/phase3-c11-full1-batches/c11r1-m009-b008.review.json",
+  "source_path_policy": "Original case/state bytes and remote source paths remain untouched; all local mappings exist only in this review input.",
+  "preparation_status": {
+    "kind": "metadata-only-preparation",
+    "actual_original_image_opens": 0,
+    "actual_reviewed_case_ids": [],
+    "visual_review_pending": true,
+    "counts_toward_actual_coverage": false,
+    "all_sha256_are_owner_declarations": true,
+    "new_input_sha256": "pending owner declaration; no local hash was run",
+    "raw_original_source_inspection_pending": true
+  },
+  "assigned_source_artwork_inputs": [
+    {
+      "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate11/ui-round-1/snapshots/ui-round-1-snapshot-009-pw-reader-complete/files/output/processed/pw5-portrait--odd-final-spread/first_path.png",
+      "sha256": "5515ad8af41975f9376aaaf246b12876e8f65ead323aa8bef2bca0ede5c305c8",
+      "bytes": 17739,
+      "owner_source_path": "/root/aidoku-phase3/evidence/candidate11/ui-round-1/processed/pw5-portrait--odd-final-spread/first_path.png",
+      "role": "retained-processed-source-artwork-input",
+      "case_id": "pw5-portrait--odd-final-spread",
+      "field": "first_path",
+      "dimensions": [
+        1206,
+        1648
+      ],
+      "owner_application_path": "/root/aidoku-phase3/evidence/candidate11/ui-round-1/data/55c498296d35/pw5-portrait--odd-cbz-import/cache/shared-v1/processed/27/2733f59a28a99327e9bcc20e34a93f3b1530ac65fc5ba0574ca94e799c8d618b.png",
+      "owner_declared_input_sha256": "5515ad8af41975f9376aaaf246b12876e8f65ead323aa8bef2bca0ede5c305c8",
+      "owner_geometry": {
+        "source_size": [
+          1206,
+          1648
+        ],
+        "slot": [
+          0,
+          0,
+          618,
+          824
+        ],
+        "destination": [
+          8,
+          0,
+          611,
+          824
+        ],
+        "dx8": 512,
+        "dy8": 512,
+        "sample_origin": [
+          0,
+          0
+        ],
+        "sample_center_offset": 0
+      },
+      "assigned_image_open": true,
+      "raw_original_source": false
+    },
+    {
+      "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate11/ui-round-1/snapshots/ui-round-1-snapshot-009-pw-reader-complete/files/output/processed/pw5-portrait--webtoon-step/first_path.png",
+      "sha256": "48896ace2f33b5012766d421291279a9e0ddfa2fe2ffc750437906f79491e5f2",
+      "bytes": 25029,
+      "owner_source_path": "/root/aidoku-phase3/evidence/candidate11/ui-round-1/processed/pw5-portrait--webtoon-step/first_path.png",
+      "role": "retained-processed-source-artwork-input",
+      "case_id": "pw5-portrait--webtoon-step",
+      "field": "first_path",
+      "dimensions": [
+        1236,
+        1648
+      ],
+      "owner_application_path": "/root/aidoku-phase3/evidence/candidate11/ui-round-1/data/55c498296d35/pw5-portrait--webtoon-import/cache/shared-v1/processed/da/da37a42c35ef40b67ef5bc6892f6fcc6b6fb4c7570401c5cb9a0bfd859145cb0.png",
+      "owner_declared_input_sha256": "48896ace2f33b5012766d421291279a9e0ddfa2fe2ffc750437906f79491e5f2",
+      "owner_geometry": {
+        "source_size": [
+          1236,
+          1648
+        ],
+        "slot": [
+          0,
+          0,
+          618,
+          824
+        ],
+        "destination": [
+          0,
+          0,
+          618,
+          824
+        ],
+        "dx8": 512,
+        "dy8": 512,
+        "sample_origin": [
+          0,
+          0
+        ],
+        "sample_center_offset": 0
+      },
+      "assigned_image_open": true,
+      "raw_original_source": false
+    }
+  ]
+}

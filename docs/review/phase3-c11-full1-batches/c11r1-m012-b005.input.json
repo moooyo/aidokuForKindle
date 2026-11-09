@@ -1,0 +1,975 @@
+{
+  "schema_version": 1,
+  "kind": "C11-full1-immutable-module-fresh-small-review-input",
+  "batch_id": "c11r1-m012-b005",
+  "record_date": "2026-11-07",
+  "round": 1,
+  "run_id": "55c498296d35",
+  "module_id": "012-c4-c5-reader-controls",
+  "focus": "Actual orientation choices and cover layout choices on open Reader surfaces",
+  "module_snapshot": {
+    "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate11/ui-round-1/snapshots/ui-round-1-snapshot-012-c4-c5-reader-controls/inventory.json",
+    "sha256": "2709353f3d330bb2ff599c5f0e3cb62e718d0b33a8516ba45a0d737edae9ebad",
+    "archive_sha256": "4fd3a9bd97eb0d96c35e9720d860616947829290571017ced9a7e7b109c2a158",
+    "transfer_accounting_path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate11/ui-round-1/snapshots/ui-round-1-snapshot-012-c4-c5-reader-controls/transfer-accounting.json",
+    "transfer_accounting_sha256": "7ee6387c13c4fa59293ae4a623a9634d72d9f20049983d7aacb5ce40550736f3",
+    "owner_matched_files": 330,
+    "changed_existing_files": [],
+    "capture_count": 35,
+    "manual_review_count": 34,
+    "reference_id_count": 0,
+    "excluded_prerequisite_case_ids": [
+      "scribe--c4-cover--import"
+    ],
+    "terminal_case": "scribe--c5-cold-management-to-browse",
+    "next_run": "capability--no-frontlight-settings",
+    "full_manifest_pending": false
+  },
+  "freeze_tuple": {
+    "run_id": "55c498296d35",
+    "source_sha256": "33a2d049307c398da8bfbf196d1bf8e086412c117c194b592f4a93b5bfaedb3f",
+    "binary_sha256": "1e60db345cbd6fbe580258a4a309bf42361781061dc2033f78a8a5eb4446ad72",
+    "binary": "/root/aidoku-phase3/candidate11/desktop/aidoku",
+    "source_root": "/root/aidoku-phase3/candidate11/source-snapshot",
+    "source_file_count": 227,
+    "reference_root": "/root/aidoku-phase3/reference",
+    "reference_sha256": "e7b49b456255432d74cfe41346f9d44c1a9c55bf67c5d55483e4ae3029547d18",
+    "capture_plan_sha256": "b201d4ac36df8023fb12f07e0adae91f4c63201cdd441add6ddd0a0d535ca368",
+    "reference_scope_sha256": "c910bed9f02ed17b2ca0a54aca1beeeeb6caabc5a17a91afe764ddd3e7b0d33c",
+    "main_harness_sha256": "f7e2d3dc3c66479715a7d5d094a7b9165379c3e1f4b1b8ecad092b78b924a892",
+    "helper_sha256": {
+      "scripts/handoff_c10_search.py": "a4272a78b00feced845e028b14cdcef90dafc5f748868b52dcc23df007055ecc",
+      "scripts/handoff_c11_search.py": "627b562433ebc4b13491197c81e22f12a765d3d005884ae4c07c07067f72e1c8",
+      "scripts/handoff_c4_business.py": "6197f375b247962e3ce9acdd3779468073f11e0002ac3c7ce876a7b1a0d0d9be",
+      "scripts/handoff_c5_reader.py": "5b88a0c1b8e1151a3f96decef1a3a06f98a0d9de99908709bafbfb02cea490d5",
+      "scripts/handoff_c5_ui.py": "fa30ef2bf8ab512e9705f43933ff6acaf32993e5aa1dbc62be330d4c97b481f2",
+      "scripts/handoff_c9_search.py": "2dfd2342293ccdf5d0c488e3651be714c492ae1775ece7ad3f01cba86cba5534",
+      "scripts/verify-fullscreen.py": "4a6c48cef771e66e9b3058edd888dcf2d4bce02e2720b5cc00c7a5b987bc9670",
+      "scripts/verify-handoff-c11.py": "d7c4242f4fbec37f68cb0647310179b9cd7bca2df5e7d66a5bdcddffec0549c9",
+      "scripts/verify-handoff-tags.py": "7cd32588578edff343a33dc2a70b99cb6f838f6063de175c4e269935c53eb0b6",
+      "scripts/verify-ui.py": "470872e6fd22a78b474c0f862164875ad9c7237bd2f3f164512864580ac1e90d"
+    },
+    "execution_input_sha256": {
+      "scripts/handoff_c10_search.py": "a4272a78b00feced845e028b14cdcef90dafc5f748868b52dcc23df007055ecc",
+      "scripts/handoff_c11_search.py": "627b562433ebc4b13491197c81e22f12a765d3d005884ae4c07c07067f72e1c8",
+      "scripts/handoff_c4_business.py": "6197f375b247962e3ce9acdd3779468073f11e0002ac3c7ce876a7b1a0d0d9be",
+      "scripts/handoff_c5_reader.py": "5b88a0c1b8e1151a3f96decef1a3a06f98a0d9de99908709bafbfb02cea490d5",
+      "scripts/handoff_c5_ui.py": "fa30ef2bf8ab512e9705f43933ff6acaf32993e5aa1dbc62be330d4c97b481f2",
+      "scripts/handoff_c9_search.py": "2dfd2342293ccdf5d0c488e3651be714c492ae1775ece7ad3f01cba86cba5534",
+      "scripts/verify-fullscreen.py": "4a6c48cef771e66e9b3058edd888dcf2d4bce02e2720b5cc00c7a5b987bc9670",
+      "scripts/verify-handoff-c11.py": "d7c4242f4fbec37f68cb0647310179b9cd7bca2df5e7d66a5bdcddffec0549c9",
+      "scripts/verify-handoff-tags.py": "7cd32588578edff343a33dc2a70b99cb6f838f6063de175c4e269935c53eb0b6",
+      "scripts/verify-handoff-ui.py": "f7e2d3dc3c66479715a7d5d094a7b9165379c3e1f4b1b8ecad092b78b924a892",
+      "scripts/verify-ui.py": "470872e6fd22a78b474c0f862164875ad9c7237bd2f3f164512864580ac1e90d",
+      "docs/review/phase3-handoff-capture-plan.json": "b201d4ac36df8023fb12f07e0adae91f4c63201cdd441add6ddd0a0d535ca368",
+      "docs/review/phase3-reference-scope.json": "c910bed9f02ed17b2ca0a54aca1beeeeb6caabc5a17a91afe764ddd3e7b0d33c",
+      "docs/review/phase3-c11-author-boundary-plan.json": "a77dd5d517fb647d1437aac4d7e8359152cbe5eb0ea9118d5a03ba1f142bcfa8"
+    },
+    "gate_manifest_sha256": "5e353b5686ec70f89bb367e8f5ff99ef2e6a2b533e43218acffeed278e5d52d2"
+  },
+  "final_capture_scope": {
+    "kind": "owner-declared-final-capture-scope-only",
+    "manifest": {
+      "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate11/ui-round-1/manifest.json",
+      "sha256": "ff5fad60889a430ef0ae78e0f5c52a08e6a8d57a5785f306b303e56857a1079d"
+    },
+    "inventory": {
+      "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate11/ui-round-1/final-inventory.json",
+      "sha256": "6cd76cd5c6638159f226b38b38d1f9f49c5e9c778528e2f5939136f3bf63fd51",
+      "original_members": 4101,
+      "copied_with_inventory": 4102
+    },
+    "reconciliation": {
+      "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate11/ui-round-1/snapshot-reconciliation.json",
+      "sha256": "a6ea83a4d67e8cc050f1cb6466353440bf5ab824b11f839f8c419422f3f17692"
+    },
+    "transfer_accounting": {
+      "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate11/ui-round-1.transfer-accounting.json",
+      "sha256": "6407bef9560dc48b39e9fcd3eb5b3855f0ba3172bb2c0b3da7a5edd25122620c",
+      "archive_sha256": "be66cd266e5b051262ee43ff3e0e09b37a0a8942bf2df5f438591e0c7f012ed1"
+    },
+    "captured_case_count": 598,
+    "required_manual_review_count": 554,
+    "prerequisite_count": 44,
+    "actual_visual_review_inferred": false,
+    "clean_round_credit": 0,
+    "accepted": false
+  },
+  "source_manifest": {
+    "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate11/ui-round-1/snapshots/ui-round-1-snapshot-012-c4-c5-reader-controls/files/output/source-files.json",
+    "sha256": "e332086df1f552ae7d7c7d434491f6886a167095a86789d6e0ec93ca47975e9e",
+    "bytes": 37172,
+    "owner_source_path": "/root/aidoku-phase3/evidence/candidate11/ui-round-1/source-files.json"
+  },
+  "reference_manifest": {
+    "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate11/ui-round-1/snapshots/ui-round-1-snapshot-012-c4-c5-reader-controls/files/output/reference-files.json",
+    "sha256": "caad04a243ecbaac22c790d7918f50c8678985b9e58a9f963694fe7d69e2775a",
+    "bytes": 32291,
+    "owner_source_path": "/root/aidoku-phase3/evidence/candidate11/ui-round-1/reference-files.json"
+  },
+  "image_budget": {
+    "assigned_new_candidates": 4,
+    "assigned_original_references": 3,
+    "assigned_processed_source_images": 0,
+    "assigned_oracle_images": 0,
+    "planned_total_opens": 7,
+    "max_total_opens": 8,
+    "max_reference_pairs": 4,
+    "planned_reference_pairs": 4,
+    "no_additional_case_images_allowed": true
+  },
+  "cases": [
+    {
+      "case_id": "pw5--c4-reader--reverse-controls",
+      "device": "pw5",
+      "screen": "reader",
+      "captured_route": "reader",
+      "manual_review_required": true,
+      "prerequisite": false,
+      "reference_id": null,
+      "reference_sha256": null,
+      "reference_applicability": null,
+      "comparison_reference_ids": [
+        "pw-reader--rotate"
+      ],
+      "reference_comparison_status": "related-logical-contract-only-no-exact-state-reference",
+      "comparison_mapping_basis": "Untouched actual route, modal, Reader panel, menu state and native dimensions. The initial screen and case-name prefix do not select the contract.",
+      "original_png": {
+        "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate11/ui-round-1/snapshots/ui-round-1-snapshot-012-c4-c5-reader-controls/files/output/pw5--c4-reader--reverse-controls.png",
+        "sha256": "380c505198683a6280472d1a276d92618d1cfd882977911a6d0a8af77e1be6d2",
+        "bytes": 102275,
+        "owner_source_path": "/root/aidoku-phase3/evidence/candidate11/ui-round-1/pw5--c4-reader--reverse-controls.png"
+      },
+      "case_json": {
+        "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate11/ui-round-1/snapshots/ui-round-1-snapshot-012-c4-c5-reader-controls/files/output/cases/pw5--c4-reader--reverse-controls.json",
+        "sha256": "9330e28818f66539c9c0a9646a99018a84fa242b02ae36ced1ecb69a32abf019",
+        "bytes": 26402,
+        "owner_source_path": "/root/aidoku-phase3/evidence/candidate11/ui-round-1/cases/pw5--c4-reader--reverse-controls.json"
+      },
+      "state": {
+        "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate11/ui-round-1/snapshots/ui-round-1-snapshot-012-c4-c5-reader-controls/files/output/pw5--c4-reader--reverse-controls.state.json",
+        "sha256": "43661dcf59ca66a8332ef3268e35b36d930f57b1d5134456687c5b05b624b63c",
+        "bytes": 14658,
+        "owner_source_path": "/root/aidoku-phase3/evidence/candidate11/ui-round-1/pw5--c4-reader--reverse-controls.state.json"
+      },
+      "metadata": {
+        "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate11/ui-round-1/snapshots/ui-round-1-snapshot-012-c4-c5-reader-controls/files/output/pw5--c4-reader--reverse-controls.metadata.json",
+        "sha256": "b88fc2126d84fb2f8c404f788c0d317e585c835f482123d05d271c52db01b14c",
+        "bytes": 673,
+        "owner_source_path": "/root/aidoku-phase3/evidence/candidate11/ui-round-1/pw5--c4-reader--reverse-controls.metadata.json"
+      },
+      "actions": {
+        "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate11/ui-round-1/snapshots/ui-round-1-snapshot-012-c4-c5-reader-controls/files/output/actions/pw5--c4-reader--reverse-controls.json",
+        "sha256": "93188ed3c528aff113c522158ca9766de069fee6200096f554c6ef7b694fa9c5",
+        "bytes": 313,
+        "owner_source_path": "/root/aidoku-phase3/evidence/candidate11/ui-round-1/actions/pw5--c4-reader--reverse-controls.json"
+      },
+      "log": {
+        "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate11/ui-round-1/snapshots/ui-round-1-snapshot-012-c4-c5-reader-controls/files/output/pw5--c4-reader--reverse-controls.log",
+        "sha256": "dc121ceea011a63c29b404d6c6b75bbe2db32b326923b8fa99759f457bfd709f",
+        "bytes": 68,
+        "owner_source_path": "/root/aidoku-phase3/evidence/candidate11/ui-round-1/pw5--c4-reader--reverse-controls.log"
+      },
+      "native_dimensions": [
+        824,
+        618
+      ],
+      "reference_physical_scale": 2,
+      "state_modal": "choices",
+      "intentional_differences": [],
+      "static_capture_context": {
+        "route": "reader",
+        "modal": "choices",
+        "modal_context": "reader-orientation",
+        "menu": true,
+        "reader_panel": "orientation",
+        "page": 1,
+        "page_count": 1,
+        "reader_page": 12,
+        "reader_total": 40,
+        "reader_visible_pages": [
+          12
+        ],
+        "reader_effective": {
+          "brightness": 12,
+          "contrast": 0,
+          "cover_alone": false,
+          "crop_borders": true,
+          "dither": true,
+          "double_tap_zoom": false,
+          "flash_on_close": true,
+          "footer_mode": 0,
+          "incognito": false,
+          "keep_awake": true,
+          "landscape": true,
+          "night_mode": false,
+          "reading_direction": "rtl",
+          "refresh_every": 6,
+          "reverse_landscape": true,
+          "reverse_taps": false,
+          "spread": false,
+          "tap_layout": "thirds",
+          "warmth": 8
+        },
+        "displayed_reader": {
+          "first_path": "/root/aidoku-phase3/evidence/candidate11/ui-round-1/data/55c498296d35/pw5--c4-reader--reverse-controls/demo/cache/shared-v1/processed/f5/f5b3e7604e4b3449c0067da5de89d1a376c54e4dd567d6248992842a11b09779.png",
+          "preferences": {
+            "brightness": 12,
+            "contrast": 0,
+            "cover_alone": false,
+            "crop_borders": true,
+            "dither": true,
+            "double_tap_zoom": false,
+            "flash_on_close": true,
+            "footer_mode": 0,
+            "incognito": false,
+            "keep_awake": true,
+            "landscape": true,
+            "night_mode": false,
+            "reading_direction": "rtl",
+            "refresh_every": 6,
+            "reverse_landscape": true,
+            "reverse_taps": false,
+            "spread": false,
+            "tap_layout": "thirds",
+            "warmth": 8
+          },
+          "second_path": null,
+          "session": {
+            "book_id": "8:mangadex:demo-00",
+            "chapter_id": "8:mangadex:demo-00-chapter-034",
+            "landscape": true,
+            "menu_open": false,
+            "page": 12,
+            "scaled_height": 0,
+            "spread": false,
+            "total": 40,
+            "vertical_offset": 0,
+            "viewport_height": 0,
+            "zoom": 1
+          }
+        },
+        "display_landscape": true,
+        "display_rotation_degrees": 270,
+        "page_layout_mode": "automatic",
+        "reader_landscape_spread": false,
+        "cover_alone": false,
+        "visible_cover_alone": false,
+        "settings_section": "",
+        "settings_status": "",
+        "capability_declaration": {
+          "backend": "desktop",
+          "frontlight_control_exposed": true,
+          "hardware_dither_qualified": false,
+          "orientation_profile_declared": false,
+          "pairing_endpoint_running": false,
+          "pen_input_implemented": false,
+          "physical_hardware_qualified": false,
+          "profile": "pw5",
+          "scope": "selected design profile and implemented application controls",
+          "server_configuration_implemented": true,
+          "software_dither": true,
+          "tracking_authorization_implemented": false,
+          "warmth_control_exposed": true
+        },
+        "has_frontlight": true,
+        "has_warmth": true,
+        "has_orientation": false,
+        "reader_recovery": null,
+        "meaning": "Untouched owner-captured static context only; not a substitute for actually opening the assigned current candidate PNG."
+      },
+      "pure_reader_static_support": {
+        "applicable": false,
+        "owner_original_capture_unchanged": true,
+        "owner_oracle_check_present": false,
+        "owner_metric_values_adopted": false,
+        "new_oracle_or_metric_execution": false,
+        "expected_artifact": null,
+        "difference_artifact": null,
+        "processed_artifacts": [],
+        "actual_render_source_binding_basis": "Each retained first_path or second_path is linked to the untouched displayed_reader field by the owner snapshot inventory. The application data path is identity text only and must not be read.",
+        "assigned_representative_source_image_paths": [],
+        "no_original_raw_source_page_copy_or_view_claim": true,
+        "metrics_location": "Untouched case JSON only. Zero-pixel or exact-match oracle declarations are static owner support, never direct visual reading."
+      },
+      "supplemental_artifacts": []
+    },
+    {
+      "case_id": "scribe--c4-reader--reverse-controls",
+      "device": "scribe",
+      "screen": "reader",
+      "captured_route": "reader",
+      "manual_review_required": true,
+      "prerequisite": false,
+      "reference_id": null,
+      "reference_sha256": null,
+      "reference_applicability": null,
+      "comparison_reference_ids": [
+        "sc-reader-portrait--orientation"
+      ],
+      "reference_comparison_status": "related-logical-contract-only-no-exact-state-reference",
+      "comparison_mapping_basis": "Untouched actual route, modal, Reader panel, menu state and native dimensions. The initial screen and case-name prefix do not select the contract.",
+      "original_png": {
+        "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate11/ui-round-1/snapshots/ui-round-1-snapshot-012-c4-c5-reader-controls/files/output/scribe--c4-reader--reverse-controls.png",
+        "sha256": "00890fe8c2d3de2d0156b20102c7f4a2a7ea99f275d3a528d17be205a449fe53",
+        "bytes": 591366,
+        "owner_source_path": "/root/aidoku-phase3/evidence/candidate11/ui-round-1/scribe--c4-reader--reverse-controls.png"
+      },
+      "case_json": {
+        "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate11/ui-round-1/snapshots/ui-round-1-snapshot-012-c4-c5-reader-controls/files/output/cases/scribe--c4-reader--reverse-controls.json",
+        "sha256": "5b7f42090b5db1d1bbd32cf0e247055707049aaf7cbed479899aef1334229d00",
+        "bytes": 26927,
+        "owner_source_path": "/root/aidoku-phase3/evidence/candidate11/ui-round-1/cases/scribe--c4-reader--reverse-controls.json"
+      },
+      "state": {
+        "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate11/ui-round-1/snapshots/ui-round-1-snapshot-012-c4-c5-reader-controls/files/output/scribe--c4-reader--reverse-controls.state.json",
+        "sha256": "25532e2a2c74eabb40d20157cbd8d459cdfcae6778817ac358d573341380b309",
+        "bytes": 15110,
+        "owner_source_path": "/root/aidoku-phase3/evidence/candidate11/ui-round-1/scribe--c4-reader--reverse-controls.state.json"
+      },
+      "metadata": {
+        "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate11/ui-round-1/snapshots/ui-round-1-snapshot-012-c4-c5-reader-controls/files/output/scribe--c4-reader--reverse-controls.metadata.json",
+        "sha256": "7d75a20a4b0d5562f559c786ad0c5c8273711ec99a2fba5543edf6f7c2c9bb14",
+        "bytes": 682,
+        "owner_source_path": "/root/aidoku-phase3/evidence/candidate11/ui-round-1/scribe--c4-reader--reverse-controls.metadata.json"
+      },
+      "actions": {
+        "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate11/ui-round-1/snapshots/ui-round-1-snapshot-012-c4-c5-reader-controls/files/output/actions/scribe--c4-reader--reverse-controls.json",
+        "sha256": "93188ed3c528aff113c522158ca9766de069fee6200096f554c6ef7b694fa9c5",
+        "bytes": 313,
+        "owner_source_path": "/root/aidoku-phase3/evidence/candidate11/ui-round-1/actions/scribe--c4-reader--reverse-controls.json"
+      },
+      "log": {
+        "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate11/ui-round-1/snapshots/ui-round-1-snapshot-012-c4-c5-reader-controls/files/output/scribe--c4-reader--reverse-controls.log",
+        "sha256": "7e68a4176710a866675a6b95bcf7bed2d96c58a8fd7996a4d48f3679514483a9",
+        "bytes": 72,
+        "owner_source_path": "/root/aidoku-phase3/evidence/candidate11/ui-round-1/scribe--c4-reader--reverse-controls.log"
+      },
+      "native_dimensions": [
+        1240,
+        930
+      ],
+      "reference_physical_scale": 2,
+      "state_modal": "choices",
+      "intentional_differences": [],
+      "static_capture_context": {
+        "route": "reader",
+        "modal": "choices",
+        "modal_context": "reader-orientation",
+        "menu": true,
+        "reader_panel": "orientation",
+        "page": 1,
+        "page_count": 1,
+        "reader_page": 12,
+        "reader_total": 40,
+        "reader_visible_pages": [
+          12,
+          13
+        ],
+        "reader_effective": {
+          "brightness": 12,
+          "contrast": 0,
+          "cover_alone": false,
+          "crop_borders": true,
+          "dither": true,
+          "double_tap_zoom": false,
+          "flash_on_close": true,
+          "footer_mode": 0,
+          "incognito": false,
+          "keep_awake": true,
+          "landscape": true,
+          "night_mode": false,
+          "reading_direction": "rtl",
+          "refresh_every": 6,
+          "reverse_landscape": true,
+          "reverse_taps": false,
+          "spread": true,
+          "tap_layout": "thirds",
+          "warmth": 8
+        },
+        "displayed_reader": {
+          "first_path": "/root/aidoku-phase3/evidence/candidate11/ui-round-1/data/55c498296d35/scribe--c4-reader--reverse-controls/demo/cache/shared-v1/processed/75/75e8e21f40ac2fdf460756eec903d889d0895e7209cc37bde37c39301eba5158.png",
+          "preferences": {
+            "brightness": 12,
+            "contrast": 0,
+            "cover_alone": false,
+            "crop_borders": true,
+            "dither": true,
+            "double_tap_zoom": false,
+            "flash_on_close": true,
+            "footer_mode": 0,
+            "incognito": false,
+            "keep_awake": true,
+            "landscape": true,
+            "night_mode": false,
+            "reading_direction": "rtl",
+            "refresh_every": 6,
+            "reverse_landscape": true,
+            "reverse_taps": false,
+            "spread": true,
+            "tap_layout": "thirds",
+            "warmth": 8
+          },
+          "second_path": "/root/aidoku-phase3/evidence/candidate11/ui-round-1/data/55c498296d35/scribe--c4-reader--reverse-controls/demo/cache/shared-v1/processed/a4/a495ff8c13fad5c84db6defdc6c0b1aa140b898af35f6d48463bbffce22b9377.png",
+          "session": {
+            "book_id": "8:mangadex:demo-00",
+            "chapter_id": "8:mangadex:demo-00-chapter-034",
+            "landscape": true,
+            "menu_open": false,
+            "page": 12,
+            "scaled_height": 0,
+            "spread": true,
+            "total": 40,
+            "vertical_offset": 0,
+            "viewport_height": 0,
+            "zoom": 1
+          }
+        },
+        "display_landscape": true,
+        "display_rotation_degrees": 270,
+        "page_layout_mode": "automatic",
+        "reader_landscape_spread": true,
+        "cover_alone": false,
+        "visible_cover_alone": false,
+        "settings_section": "screen-refresh",
+        "settings_status": "",
+        "capability_declaration": {
+          "backend": "desktop",
+          "frontlight_control_exposed": true,
+          "hardware_dither_qualified": false,
+          "orientation_profile_declared": true,
+          "pairing_endpoint_running": false,
+          "pen_input_implemented": false,
+          "physical_hardware_qualified": false,
+          "profile": "scribe",
+          "scope": "selected design profile and implemented application controls",
+          "server_configuration_implemented": true,
+          "software_dither": true,
+          "tracking_authorization_implemented": false,
+          "warmth_control_exposed": true
+        },
+        "has_frontlight": true,
+        "has_warmth": true,
+        "has_orientation": true,
+        "reader_recovery": null,
+        "meaning": "Untouched owner-captured static context only; not a substitute for actually opening the assigned current candidate PNG."
+      },
+      "pure_reader_static_support": {
+        "applicable": false,
+        "owner_original_capture_unchanged": true,
+        "owner_oracle_check_present": false,
+        "owner_metric_values_adopted": false,
+        "new_oracle_or_metric_execution": false,
+        "expected_artifact": null,
+        "difference_artifact": null,
+        "processed_artifacts": [],
+        "actual_render_source_binding_basis": "Each retained first_path or second_path is linked to the untouched displayed_reader field by the owner snapshot inventory. The application data path is identity text only and must not be read.",
+        "assigned_representative_source_image_paths": [],
+        "no_original_raw_source_page_copy_or_view_claim": true,
+        "metrics_location": "Untouched case JSON only. Zero-pixel or exact-match oracle declarations are static owner support, never direct visual reading."
+      },
+      "supplemental_artifacts": []
+    },
+    {
+      "case_id": "scribe--c4-cover--layout-controls",
+      "device": "scribe",
+      "screen": "reader",
+      "captured_route": "reader",
+      "manual_review_required": true,
+      "prerequisite": false,
+      "reference_id": null,
+      "reference_sha256": null,
+      "reference_applicability": null,
+      "comparison_reference_ids": [
+        "sc-reader--layout"
+      ],
+      "reference_comparison_status": "related-logical-contract-only-no-exact-state-reference",
+      "comparison_mapping_basis": "Untouched actual route, modal, Reader panel, menu state and native dimensions. The initial screen and case-name prefix do not select the contract.",
+      "original_png": {
+        "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate11/ui-round-1/snapshots/ui-round-1-snapshot-012-c4-c5-reader-controls/files/output/scribe--c4-cover--layout-controls.png",
+        "sha256": "c79231b185ded7b5259b98f9fed146b7224584f651f3c35138487ca27f4268a0",
+        "bytes": 72153,
+        "owner_source_path": "/root/aidoku-phase3/evidence/candidate11/ui-round-1/scribe--c4-cover--layout-controls.png"
+      },
+      "case_json": {
+        "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate11/ui-round-1/snapshots/ui-round-1-snapshot-012-c4-c5-reader-controls/files/output/cases/scribe--c4-cover--layout-controls.json",
+        "sha256": "dc02e947c8656bd20eeb81d1de9aada3429f5d52568ce2ad86b23387408518f3",
+        "bytes": 23982,
+        "owner_source_path": "/root/aidoku-phase3/evidence/candidate11/ui-round-1/cases/scribe--c4-cover--layout-controls.json"
+      },
+      "state": {
+        "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate11/ui-round-1/snapshots/ui-round-1-snapshot-012-c4-c5-reader-controls/files/output/scribe--c4-cover--layout-controls.state.json",
+        "sha256": "f6bef927552c9cd226e900f70b956f1e3a49d0d3d1cf2b1869d98bf621aa5c51",
+        "bytes": 13218,
+        "owner_source_path": "/root/aidoku-phase3/evidence/candidate11/ui-round-1/scribe--c4-cover--layout-controls.state.json"
+      },
+      "metadata": {
+        "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate11/ui-round-1/snapshots/ui-round-1-snapshot-012-c4-c5-reader-controls/files/output/scribe--c4-cover--layout-controls.metadata.json",
+        "sha256": "166f2824909527a43e8c7e14af88a3210506100ec9397f00ebdfd4d6acbda0d0",
+        "bytes": 679,
+        "owner_source_path": "/root/aidoku-phase3/evidence/candidate11/ui-round-1/scribe--c4-cover--layout-controls.metadata.json"
+      },
+      "actions": {
+        "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate11/ui-round-1/snapshots/ui-round-1-snapshot-012-c4-c5-reader-controls/files/output/actions/scribe--c4-cover--layout-controls.json",
+        "sha256": "a17ce87fbe2120b7081edc9ee29c89d91d290bbd02d21722e8d6dda2b02fc11b",
+        "bytes": 187,
+        "owner_source_path": "/root/aidoku-phase3/evidence/candidate11/ui-round-1/actions/scribe--c4-cover--layout-controls.json"
+      },
+      "log": {
+        "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate11/ui-round-1/snapshots/ui-round-1-snapshot-012-c4-c5-reader-controls/files/output/scribe--c4-cover--layout-controls.log",
+        "sha256": "1b7cf8ed4ce4958b8e7f6e907802f7378c8d9d65c978e103ca66ffd8026e83b8",
+        "bytes": 72,
+        "owner_source_path": "/root/aidoku-phase3/evidence/candidate11/ui-round-1/scribe--c4-cover--layout-controls.log"
+      },
+      "native_dimensions": [
+        1240,
+        930
+      ],
+      "reference_physical_scale": 2,
+      "state_modal": "choices",
+      "intentional_differences": [],
+      "static_capture_context": {
+        "route": "reader",
+        "modal": "choices",
+        "modal_context": "reader-layout",
+        "menu": true,
+        "reader_panel": "layout",
+        "page": 1,
+        "page_count": 1,
+        "reader_page": 1,
+        "reader_total": 5,
+        "reader_visible_pages": [
+          1
+        ],
+        "reader_effective": {
+          "brightness": 12,
+          "contrast": 0,
+          "cover_alone": true,
+          "crop_borders": false,
+          "dither": false,
+          "double_tap_zoom": false,
+          "flash_on_close": true,
+          "footer_mode": 0,
+          "incognito": false,
+          "keep_awake": true,
+          "landscape": true,
+          "night_mode": false,
+          "reading_direction": "rtl",
+          "refresh_every": 6,
+          "reverse_landscape": false,
+          "reverse_taps": false,
+          "spread": true,
+          "tap_layout": "thirds",
+          "warmth": 8
+        },
+        "displayed_reader": {
+          "first_path": "/root/aidoku-phase3/evidence/candidate11/ui-round-1/data/55c498296d35/scribe--c4-cover--import/cache/shared-v1/processed/a7/a722a40935d1c99084a89f191f2b77b97d1effc4eb122d5f28690d952e7dff68.png",
+          "preferences": {
+            "brightness": 12,
+            "contrast": 0,
+            "cover_alone": true,
+            "crop_borders": false,
+            "dither": false,
+            "double_tap_zoom": false,
+            "flash_on_close": true,
+            "footer_mode": 0,
+            "incognito": false,
+            "keep_awake": true,
+            "landscape": true,
+            "night_mode": false,
+            "reading_direction": "rtl",
+            "refresh_every": 6,
+            "reverse_landscape": false,
+            "reverse_taps": false,
+            "spread": true,
+            "tap_layout": "thirds",
+            "warmth": 8
+          },
+          "second_path": null,
+          "session": {
+            "book_id": "5:local:01f1a0658a0cb21184b4a3ecdd3cd44e452454e559c13292acb58a6ae49d5381",
+            "chapter_id": "5:local:01f1a0658a0cb21184b4a3ecdd3cd44e452454e559c13292acb58a6ae49d5381/0",
+            "landscape": true,
+            "menu_open": false,
+            "page": 1,
+            "scaled_height": 0,
+            "spread": true,
+            "total": 5,
+            "vertical_offset": 0,
+            "viewport_height": 0,
+            "zoom": 1
+          }
+        },
+        "display_landscape": true,
+        "display_rotation_degrees": 90,
+        "page_layout_mode": "double",
+        "reader_landscape_spread": true,
+        "cover_alone": true,
+        "visible_cover_alone": true,
+        "settings_section": "screen-refresh",
+        "settings_status": "",
+        "capability_declaration": {
+          "backend": "desktop",
+          "frontlight_control_exposed": true,
+          "hardware_dither_qualified": false,
+          "orientation_profile_declared": true,
+          "pairing_endpoint_running": false,
+          "pen_input_implemented": false,
+          "physical_hardware_qualified": false,
+          "profile": "scribe",
+          "scope": "selected design profile and implemented application controls",
+          "server_configuration_implemented": true,
+          "software_dither": true,
+          "tracking_authorization_implemented": false,
+          "warmth_control_exposed": true
+        },
+        "has_frontlight": true,
+        "has_warmth": true,
+        "has_orientation": true,
+        "reader_recovery": null,
+        "meaning": "Untouched owner-captured static context only; not a substitute for actually opening the assigned current candidate PNG."
+      },
+      "pure_reader_static_support": {
+        "applicable": false,
+        "owner_original_capture_unchanged": true,
+        "owner_oracle_check_present": false,
+        "owner_metric_values_adopted": false,
+        "new_oracle_or_metric_execution": false,
+        "expected_artifact": null,
+        "difference_artifact": null,
+        "processed_artifacts": [],
+        "actual_render_source_binding_basis": "Each retained first_path or second_path is linked to the untouched displayed_reader field by the owner snapshot inventory. The application data path is identity text only and must not be read.",
+        "assigned_representative_source_image_paths": [],
+        "no_original_raw_source_page_copy_or_view_claim": true,
+        "metrics_location": "Untouched case JSON only. Zero-pixel or exact-match oracle declarations are static owner support, never direct visual reading."
+      },
+      "supplemental_artifacts": []
+    },
+    {
+      "case_id": "scribe--c5-orientation-portrait-automatic",
+      "device": "scribe",
+      "screen": "reader",
+      "captured_route": "reader",
+      "manual_review_required": true,
+      "prerequisite": false,
+      "reference_id": null,
+      "reference_sha256": null,
+      "reference_applicability": null,
+      "comparison_reference_ids": [
+        "sc-reader-portrait--orientation"
+      ],
+      "reference_comparison_status": "related-logical-contract-only-no-exact-state-reference",
+      "comparison_mapping_basis": "Untouched actual route, modal, Reader panel, menu state and native dimensions. The initial screen and case-name prefix do not select the contract.",
+      "original_png": {
+        "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate11/ui-round-1/snapshots/ui-round-1-snapshot-012-c4-c5-reader-controls/files/output/scribe--c5-orientation-portrait-automatic.png",
+        "sha256": "75077359120690df3938a1e3ffa6fad3c738ac325fbe2c33b216c31616760a46",
+        "bytes": 657269,
+        "owner_source_path": "/root/aidoku-phase3/evidence/candidate11/ui-round-1/scribe--c5-orientation-portrait-automatic.png"
+      },
+      "case_json": {
+        "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate11/ui-round-1/snapshots/ui-round-1-snapshot-012-c4-c5-reader-controls/files/output/cases/scribe--c5-orientation-portrait-automatic.json",
+        "sha256": "e6f592b5b546fa34316a70b43508a12c11b1542f4308153691cc7a554931833c",
+        "bytes": 43505,
+        "owner_source_path": "/root/aidoku-phase3/evidence/candidate11/ui-round-1/cases/scribe--c5-orientation-portrait-automatic.json"
+      },
+      "state": {
+        "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate11/ui-round-1/snapshots/ui-round-1-snapshot-012-c4-c5-reader-controls/files/output/scribe--c5-orientation-portrait-automatic.state.json",
+        "sha256": "3eb1025af26edba3f9d9341add17047312f4ab9c1de76b68c0924216b261732c",
+        "bytes": 14719,
+        "owner_source_path": "/root/aidoku-phase3/evidence/candidate11/ui-round-1/scribe--c5-orientation-portrait-automatic.state.json"
+      },
+      "metadata": {
+        "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate11/ui-round-1/snapshots/ui-round-1-snapshot-012-c4-c5-reader-controls/files/output/scribe--c5-orientation-portrait-automatic.metadata.json",
+        "sha256": "03d3730e7306e3ed88caef4cdde41272caf645aef0121c2b27979116dbe8ede1",
+        "bytes": 680,
+        "owner_source_path": "/root/aidoku-phase3/evidence/candidate11/ui-round-1/scribe--c5-orientation-portrait-automatic.metadata.json"
+      },
+      "actions": {
+        "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate11/ui-round-1/snapshots/ui-round-1-snapshot-012-c4-c5-reader-controls/files/output/actions/scribe--c5-orientation-portrait-automatic.json",
+        "sha256": "4ea10e60b47ead8dd04fa9df04ee9b8306682155b462c2c0fef9d6a0108f3329",
+        "bytes": 858,
+        "owner_source_path": "/root/aidoku-phase3/evidence/candidate11/ui-round-1/actions/scribe--c5-orientation-portrait-automatic.json"
+      },
+      "log": {
+        "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate11/ui-round-1/snapshots/ui-round-1-snapshot-012-c4-c5-reader-controls/files/output/scribe--c5-orientation-portrait-automatic.log",
+        "sha256": "7e68a4176710a866675a6b95bcf7bed2d96c58a8fd7996a4d48f3679514483a9",
+        "bytes": 72,
+        "owner_source_path": "/root/aidoku-phase3/evidence/candidate11/ui-round-1/scribe--c5-orientation-portrait-automatic.log"
+      },
+      "native_dimensions": [
+        930,
+        1240
+      ],
+      "reference_physical_scale": 2,
+      "state_modal": "choices",
+      "intentional_differences": [],
+      "static_capture_context": {
+        "route": "reader",
+        "modal": "choices",
+        "modal_context": "reader-orientation",
+        "menu": true,
+        "reader_panel": "orientation",
+        "page": 1,
+        "page_count": 1,
+        "reader_page": 12,
+        "reader_total": 40,
+        "reader_visible_pages": [
+          12
+        ],
+        "reader_effective": {
+          "brightness": 12,
+          "contrast": 0,
+          "cover_alone": false,
+          "crop_borders": true,
+          "dither": true,
+          "double_tap_zoom": false,
+          "flash_on_close": true,
+          "footer_mode": 0,
+          "incognito": false,
+          "keep_awake": true,
+          "landscape": false,
+          "night_mode": false,
+          "reading_direction": "rtl",
+          "refresh_every": 6,
+          "reverse_landscape": false,
+          "reverse_taps": false,
+          "spread": false,
+          "tap_layout": "thirds",
+          "warmth": 8
+        },
+        "displayed_reader": {
+          "first_path": "/root/aidoku-phase3/evidence/candidate11/ui-round-1/data/55c498296d35/scribe--c5-orientation-portrait-automatic/demo/cache/shared-v1/processed/66/6604b8bb6127cfb451b19437f98f90ae337844c5a086b8747209adb27a48ddad.png",
+          "preferences": {
+            "brightness": 12,
+            "contrast": 0,
+            "cover_alone": false,
+            "crop_borders": true,
+            "dither": true,
+            "double_tap_zoom": false,
+            "flash_on_close": true,
+            "footer_mode": 0,
+            "incognito": false,
+            "keep_awake": true,
+            "landscape": false,
+            "night_mode": false,
+            "reading_direction": "rtl",
+            "refresh_every": 6,
+            "reverse_landscape": false,
+            "reverse_taps": false,
+            "spread": false,
+            "tap_layout": "thirds",
+            "warmth": 8
+          },
+          "second_path": null,
+          "session": {
+            "book_id": "8:mangadex:demo-00",
+            "chapter_id": "8:mangadex:demo-00-chapter-034",
+            "landscape": false,
+            "menu_open": false,
+            "page": 12,
+            "scaled_height": 0,
+            "spread": false,
+            "total": 40,
+            "vertical_offset": 0,
+            "viewport_height": 0,
+            "zoom": 1
+          }
+        },
+        "display_landscape": false,
+        "display_rotation_degrees": 0,
+        "page_layout_mode": "automatic",
+        "reader_landscape_spread": true,
+        "cover_alone": false,
+        "visible_cover_alone": false,
+        "settings_section": "screen-refresh",
+        "settings_status": "",
+        "capability_declaration": {
+          "backend": "desktop",
+          "frontlight_control_exposed": true,
+          "hardware_dither_qualified": false,
+          "orientation_profile_declared": true,
+          "pairing_endpoint_running": false,
+          "pen_input_implemented": false,
+          "physical_hardware_qualified": false,
+          "profile": "scribe",
+          "scope": "selected design profile and implemented application controls",
+          "server_configuration_implemented": true,
+          "software_dither": true,
+          "tracking_authorization_implemented": false,
+          "warmth_control_exposed": true
+        },
+        "has_frontlight": true,
+        "has_warmth": true,
+        "has_orientation": true,
+        "reader_recovery": null,
+        "meaning": "Untouched owner-captured static context only; not a substitute for actually opening the assigned current candidate PNG."
+      },
+      "pure_reader_static_support": {
+        "applicable": false,
+        "owner_original_capture_unchanged": true,
+        "owner_oracle_check_present": false,
+        "owner_metric_values_adopted": false,
+        "new_oracle_or_metric_execution": false,
+        "expected_artifact": null,
+        "difference_artifact": null,
+        "processed_artifacts": [],
+        "actual_render_source_binding_basis": "Each retained first_path or second_path is linked to the untouched displayed_reader field by the owner snapshot inventory. The application data path is identity text only and must not be read.",
+        "assigned_representative_source_image_paths": [],
+        "no_original_raw_source_page_copy_or_view_claim": true,
+        "metrics_location": "Untouched case JSON only. Zero-pixel or exact-match oracle declarations are static owner support, never direct visual reading."
+      },
+      "supplemental_artifacts": [
+        {
+          "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate11/ui-round-1/snapshots/ui-round-1-snapshot-012-c4-c5-reader-controls/files/output/fixtures/scribe--c5-orientation-portrait-automatic--reader-identity.json",
+          "sha256": "22a9fd6f616af438626983b6f5421234b259ea9daf07554ff23cfc4c8a553ddb",
+          "bytes": 2500,
+          "owner_source_path": "/root/aidoku-phase3/evidence/candidate11/ui-round-1/fixtures/scribe--c5-orientation-portrait-automatic--reader-identity.json",
+          "evidence_key": "owner-fixture-identity",
+          "review_use": "Static owner fixture identity only; no runtime evidence was re-executed."
+        },
+        {
+          "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate11/ui-round-1/snapshots/ui-round-1-snapshot-012-c4-c5-reader-controls/files/output/fixtures/scribe--c5-orientation-portrait-automatic--native-orientation-controls.json",
+          "sha256": "fabb43d20f1a1bee39ce62b22cf81f23a73a28716d4498faaab32b655a526401",
+          "bytes": 1660,
+          "owner_source_path": "/root/aidoku-phase3/evidence/candidate11/ui-round-1/fixtures/scribe--c5-orientation-portrait-automatic--native-orientation-controls.json",
+          "evidence_key": "owner-fixture-identity",
+          "review_use": "Static owner fixture identity only; no runtime evidence was re-executed."
+        }
+      ]
+    }
+  ],
+  "original_references": [
+    {
+      "reference_id": "pw-reader--rotate",
+      "path": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/screens/states/pw-reader--rotate.png",
+      "sha256": "e53b7cced39e13d9a4c597c847a54a55d643675530cc71e6b37855fa047e3b16",
+      "bytes": 44370,
+      "owner_source_path": "/root/aidoku-phase3/reference/screens/states/pw-reader--rotate.png",
+      "dimensions": [
+        1236,
+        1648
+      ],
+      "comparison_kind": "Related actual logical surface contract only. No independent exact-state HANDOFF reference exists for this supplemental input; native orientation/profile differences are retained and must not be resized away.",
+      "comparison_for_case_ids": [
+        "pw5--c4-reader--reverse-controls"
+      ]
+    },
+    {
+      "reference_id": "sc-reader-portrait--orientation",
+      "path": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/screens/states/sc-reader-portrait--orientation.png",
+      "sha256": "ebbe1249f7d355eebc5eaca682880f398fa0d9cb1ced5b42c93a2c66d487736e",
+      "bytes": 80761,
+      "owner_source_path": "/root/aidoku-phase3/reference/screens/states/sc-reader-portrait--orientation.png",
+      "dimensions": [
+        1860,
+        2480
+      ],
+      "comparison_kind": "Related actual logical surface contract only. No independent exact-state HANDOFF reference exists for this supplemental input; native orientation/profile differences are retained and must not be resized away.",
+      "comparison_for_case_ids": [
+        "scribe--c4-reader--reverse-controls",
+        "scribe--c5-orientation-portrait-automatic"
+      ]
+    },
+    {
+      "reference_id": "sc-reader--layout",
+      "path": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/screens/states/sc-reader--layout.png",
+      "sha256": "b1b897b31bf421080f4669a36a2d903271d31dbf98245a5d3cf3ab244ac9d055",
+      "bytes": 92054,
+      "owner_source_path": "/root/aidoku-phase3/reference/screens/states/sc-reader--layout.png",
+      "dimensions": [
+        2480,
+        1860
+      ],
+      "comparison_kind": "Related actual logical surface contract only. No independent exact-state HANDOFF reference exists for this supplemental input; native orientation/profile differences are retained and must not be resized away.",
+      "comparison_for_case_ids": [
+        "scribe--c4-cover--layout-controls"
+      ]
+    }
+  ],
+  "assigned_processed_source_images": [],
+  "comparison_scope": "Actual orientation choices and cover layout choices on open Reader surfaces; current whole native captures and related original contracts only",
+  "root_contracts": [
+    "Use only this new full1 run/source/binary and exact immutable module paths; no C7/C9/C10/C11 qualification candidate substitutes.",
+    "Actually open every assigned current manual PNG and its necessary assigned original reference within the eight-open/four-pair budget.",
+    "Content/title/art/count/date/capacity differences do not waive geometry, legibility, borders, folio allocation or truthful feedback.",
+    "Closed Reader is source artwork only: no app footer/ribbon/page/debug/download notice; source-art borders/text are not app chrome when backed by original source/oracle identity.",
+    "Root accepted software-only truthful disabled/fixed-on controls and manual orientation where sensors are unavailable; no new hardware/auth feature wish.",
+    "Odd-final span1 is legitimate. Toast follows HANDOFF4.6 temporary placement. Numeric sort labels follow HANDOFF166 direction contract.",
+    "Dataset-specific tag capacity is not a universal old-C4 profile expectation. Main More list glyph is accepted; tiny dots alone are a bounded limitation, not a new patch.",
+    "History/read/migration/source/keyboard conclusions separate actual existing action/Store/provider evidence from static image appearance.",
+    "Old historical dispositions must be rechecked against actual new current case evidence and recorded separately as historical/regression_closures, never current new suggestions.",
+    "C10 false-positive dense-draft adjudication is historical; do not invent a source change from it. Current images still require direct reading."
+  ],
+  "review_rules": [
+    "Chinese communication; English compact report.",
+    "Read and announce the UI/UX Pro Max skill and read docs/review/phase3-full-fresh-worker-contract.md; do not execute its program.",
+    "Only local static text reads and tools.view_image. No local/remote tests/build/probes/validators/hashes/SQL/App/SSH/copy/crop/production/harness/plan/raw/old-report edits.",
+    "This is one new fork_turns=none job. Do not spawn or continue a queue of further PNGs after completion.",
+    "No contact sheet/thumbnail/old image/mechanical result/state string substitutes for actual current originals.",
+    "Supplemental queue states have a related contract comparison, not a manufactured exact-state reference.",
+    "Additional oracle/processed/fixture paths are supplied for static identity/provenance support; do not open unassigned additional images beyond the current budget. If an essential source/detail cannot be resolved within budget, keep that check pending and request a separate owner-generated crop or fresh bounded evidence job.",
+    "All file hashes are owner declarations; do not claim local rehash or new metric/runtime execution.",
+    "Immediately send the coordinator any evidence-backed actionable, identity mismatch or required unreadable detail with exact actual current case/PNG/reference SHA.",
+    "Preserve every captured PNG/state/action/log. Do not record-review or declare full/clean based on a partial module.",
+    "After the full run, all actual-viewed module records must reconcile to its final required IDs/source/bin/reference/tool hashes before complete acceptance.",
+    "These supplemental cases have no separately captured exact-state reference. Use only assigned related logical contracts and current case evidence; never mark a missing exact reference passed.",
+    "case.screen retains the harness initial route. captured_route is the untouched owner-captured state route; use that current surface when comparing an action-result image.",
+    "The final manifest is complete. This input is still metadata-only preparation with zero actual image opens and no acceptance or clean-round credit.",
+    "Use actual route/modal/menu/reader_panel and native dimensions. reverse-restore and cover restore can have initial screen library while the captured route is reader; cold-to-browse images are catalog.",
+    "PW reverse-landscape captures are 824 x 618 and Scribe landscape captures are 1240 x 930. The retained related HANDOFF references may have a different profile or orientation; never resize or present them as independent exact-state references.",
+    "Orientation choices use the actual orientation panel contract. The sc-reader--layout image is assigned only to an actual layout panel; matching landscape dimensions do not make a different panel an exact reference.",
+    "Every closed Reader viewport must be source artwork only, with no application footer, page counter, ribbon, debug label or download notice. Borders or text may be source art only when tied to the actual retained render-source identity.",
+    "Retained processed first_path and second_path declarations bind to untouched displayed_reader identity. The referenced application data directory is not copied here and must not be read.",
+    "Zero-pixel/exact-match oracle support remains an owner declaration. Do not count oracle/processed images as independent exact HANDOFF references or use an oracle result in place of direct reading.",
+    "No processed or oracle image is assigned to open in this input. Static render-source identity may support attribution, but unreadable or ambiguous source/chrome detail must remain pending for a separate bounded evidence job.",
+    "Desktop captures qualify only the declared software design profile. No physical hardware, native physical lease/lifecycle timing or performance claim follows from image review.",
+    "Report historical closure observations separately from new actionable suggestions; retain all original artifacts and do not modify source, harness, plans, raw files or prior reports."
+  ],
+  "output_schema": {
+    "top_level": [
+      "batch_id",
+      "round",
+      "run_id",
+      "module_id",
+      "module_snapshot",
+      "freeze_tuple",
+      "reviewed_case_ids",
+      "actual_original_image_opens",
+      "references",
+      "cases",
+      "new_actionable",
+      "pending",
+      "limitations",
+      "final_capture_scope",
+      "source_artwork_image_opens"
+    ],
+    "case_fields": [
+      "case_id",
+      "png_sha256",
+      "case_json_sha256",
+      "state_sha256",
+      "metadata_sha256",
+      "actions_sha256",
+      "log_sha256",
+      "reference_sha256",
+      "actual_image_opened",
+      "observation",
+      "static_verdict",
+      "actual_render_source_images_opened",
+      "source_artwork_attribution_basis"
+    ],
+    "historical_field": "historical_findings/regression_closures separate from current suggestions"
+  },
+  "output_report_path": "D:/Code/aidokuForKindle/docs/review/phase3-c11-full1-batches/c11r1-m012-b005.review.json",
+  "source_path_policy": "Original case/state bytes and remote source paths remain untouched; all local mappings exist only in this review input.",
+  "preparation_status": {
+    "kind": "metadata-only-preparation",
+    "actual_original_image_opens": 0,
+    "actual_reviewed_case_ids": [],
+    "visual_review_pending": true,
+    "counts_toward_actual_coverage": false,
+    "all_sha256_are_owner_declarations": true,
+    "new_input_sha256": "pending owner declaration; no local hash was run",
+    "actual_processed_source_image_opens": 0
+  }
+}

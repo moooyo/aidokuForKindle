@@ -1,0 +1,62 @@
+{
+  "schema_version": 1,
+  "phase": "Phase3-C11",
+  "status": "Static preparation complete; GUI execution pending the parent's separate GO",
+  "verification_executed": false,
+  "preparation_scope": "Host file copies, immutable production links, file hashes and executable path lookup only; no App, Python verification, tests, VM or QMP execution",
+  "companion_root": "/root/aidoku-phase3/candidate11/lease-verifier",
+  "component_origin": "/root/aidoku-phase3/evidence/candidate7/live-reader-lease/run-20261106T195136Z-1105008/executed-tools",
+  "component_policy": "Reuse the existing versioned eight-file producer; do not read or modify the UI owner's synchronized script tree; no C7 PNG or prepared page/lease data is reused",
+  "source": {
+    "root": "/root/aidoku-phase3/candidate11/source-snapshot",
+    "sha256": "33a2d049307c398da8bfbf196d1bf8e086412c117c194b592f4a93b5bfaedb3f",
+    "file_count": 227,
+    "official_manifest": "/root/aidoku-phase3/evidence/candidate11/build/source-after-gate-01.json",
+    "official_manifest_sha256": "8260f450ac76cbf1a0b2fa27f607c0667d414fe3175125cf666d5befbd57992a",
+    "main_sha256": "13be1461c7d59cbc58b5870a3eb94df4db457480e65f7a9635ccc5fe13fbed46",
+    "search_sha256": "b93a4c59b5a278a247cf7d2d06923de7a5e7a6f4955a44decfa31418443b1789"
+  },
+  "binary": {"path": "/root/aidoku-phase3/candidate11/desktop/aidoku", "bytes": 257505496, "sha256": "1e60db345cbd6fbe580258a4a309bf42361781061dc2033f78a8a5eb4446ad72"},
+  "production_links": {
+    "target_root": "/root/aidoku-phase3/candidate11/source-snapshot",
+    "members": ["src", "ui", "assets", "vendor", "examples", "Cargo.toml", "Cargo.lock", "build.rs"],
+    "absent_optional_members_preserved": ["rust-toolchain.toml", ".cargo/config.toml"]
+  },
+  "tool_freeze": {
+    "files_mode": "0444",
+    "scripts_directory_mode": "0555",
+    "before_record": "/root/aidoku-phase3/candidate11/lease-verifier/tool-sha256-before.txt",
+    "before_record_sha256": "5c042fcde858401a0594352d78287f486bdf1b13dfb6869c6d0ea8a1ffe13315",
+    "files": [
+      {"name": "verify-live-reader-lease.py", "bytes": 31523, "sha256": "7ad4d50909f0f2fd3d9398a36c3d4dc1d80e8cc2cf7b7676735dd465bdfd4dd7"},
+      {"name": "verify-handoff-ui.py", "bytes": 191213, "sha256": "94ccc78d3c11b97791618527350ce59dacf458bfc57f8f04aabec045dd544a74"},
+      {"name": "verify-ui.py", "bytes": 91497, "sha256": "470872e6fd22a78b474c0f862164875ad9c7237bd2f3f164512864580ac1e90d"},
+      {"name": "verify-fullscreen.py", "bytes": 28086, "sha256": "4a6c48cef771e66e9b3058edd888dcf2d4bce02e2720b5cc00c7a5b987bc9670"},
+      {"name": "handoff_c4_business.py", "bytes": 35483, "sha256": "6197f375b247962e3ce9acdd3779468073f11e0002ac3c7ce876a7b1a0d0d9be"},
+      {"name": "verify-cache-ui.py", "bytes": 28971, "sha256": "cec852dbe2ebc52ed13fbc959bbe43258d4049bff3528df2a778406d99e55612"},
+      {"name": "handoff_c5_ui.py", "bytes": 14042, "sha256": "fa30ef2bf8ab512e9705f43933ff6acaf32993e5aa1dbc62be330d4c97b481f2"},
+      {"name": "handoff_c5_reader.py", "bytes": 21861, "sha256": "5b88a0c1b8e1151a3f96decef1a3a06f98a0d9de99908709bafbfb02cea490d5"}
+    ]
+  },
+  "dependencies": {
+    "resolved_programs": ["/usr/bin/python3", "/usr/bin/xvfb-run", "/usr/bin/Xvfb", "/usr/bin/xdotool", "/usr/bin/xauth"],
+    "pillow_file": "/usr/lib/python3/dist-packages/PIL/Image.py",
+    "xlib": "/usr/lib/x86_64-linux-gnu/libX11.so.6",
+    "path": "/usr/bin:/bin",
+    "display": "A new xvfb-run auto-selected server with 930x1240x24; no current display is adopted",
+    "runtime_probe_performed": false
+  },
+  "planned_output": "/root/aidoku-phase3/evidence/candidate11/live-reader-lease/run-01",
+  "planned_output_directory_created": false,
+  "working_directory": "/root/aidoku-phase3/candidate11/lease-verifier",
+  "argv": ["/usr/bin/env", "PATH=/usr/bin:/bin", "PYTHONDONTWRITEBYTECODE=1", "/usr/bin/xvfb-run", "-a", "-s", "-screen 0 930x1240x24", "/usr/bin/python3", "/root/aidoku-phase3/candidate11/lease-verifier/scripts/verify-live-reader-lease.py", "--binary", "/root/aidoku-phase3/candidate11/desktop/aidoku", "--expected-sha256", "1e60db345cbd6fbe580258a4a309bf42361781061dc2033f78a8a5eb4446ad72", "--source-root", "/root/aidoku-phase3/candidate11/source-snapshot", "--expected-source-sha256", "33a2d049307c398da8bfbf196d1bf8e086412c117c194b592f4a93b5bfaedb3f", "--expected-source-file-count", "227", "--output", "/root/aidoku-phase3/evidence/candidate11/live-reader-lease/run-01", "--timeout", "90"],
+  "strict_gates": [
+    "Fresh real non-demo provider download creates pages and pins; no SQL page/lease manufacture",
+    "Before 15 s: owned live X11 Reader pixels and a fresh accepted page-2-of-6 production progress write",
+    "Before 20 s: actual book removal completes; primary jobs absent, downloaded flag 0, durable pins absent, all six raw records retained",
+    "Same App clear: accepted raw and derivative unchanged, real leases >= 2, five unshown raw siblings reclaimed",
+    "After actual Reader process exit: a fresh settings process clears both former protected files; leases 0 and at least two evictions"
+  ],
+  "limits": "No same-process reader/back reclamation, concurrent independent GUI retention, continuous physical display, launcher or VM acceptance; zero clean visual-round credit",
+  "preparation_notes": ["An initial file-only preflight stopped before creating the companion because optional snapshot files are absent; their absence was preserved.", "Remote rg is unavailable; grep was used only for static official-manifest reading. No verification producer has been executed."]
+}

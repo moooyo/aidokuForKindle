@@ -1,0 +1,184 @@
+{
+  "schema_version": 2,
+  "phase": 2,
+  "round": 1,
+  "reviewer": "phase2_fidelity_review",
+  "supporting_reviewer": "expanded_ui_readonly",
+  "status": "changes_required",
+  "review_kind": "independent manual screenshot and static source review",
+  "review_complete": true,
+  "manual_ui_review_complete": true,
+  "complete_round_qualified": false,
+  "artifact_directory": "artifacts/phase2/ui-round-1",
+  "frozen_candidate_sha256": "a9b80c9a1d8320b4090fa503d6e6550c1fff19a436303a0a07c39ac48ae2f30b",
+  "new_suggestion_count": 2,
+  "new_findings": [
+    {
+      "id": "P2-R1-I001",
+      "priority": 3,
+      "title": "Cross-chapter recovery labels do not identify their chapters",
+      "actual": "artifacts/phase2/recovery-round-1/manifest-failure-visible.png",
+      "sidecar": "artifacts/phase2/recovery-round-1/manifest-failure-visible.state.json",
+      "evidence": "The displayed session is chapter c01 page 1 and the failed retry target is chapter c02 page 1. The title and both recovery actions identify only page 1, so their two different chapter destinations are not visible.",
+      "suggestion": "Include chapter identity in the failure title and recovery destinations when the retry chapter differs from the displayed chapter. Keep same-chapter recovery concise.",
+      "disposition": "Root accepted the suggestion for candidate 3; candidate 2 remains the before evidence."
+    },
+    {
+      "id": "P2-R1-I002",
+      "priority": 3,
+      "title": "Fullscreen reveals horizontal joins in the second bundled comic page",
+      "actual": "artifacts/phase2/ui-round-1/reader-seek-commit.png",
+      "source": "assets/demo/page-01.png",
+      "retained_source_before": "artifacts/phase2/demo-art-repair/page-01-before.png",
+      "reference": "tmp/design/reference-12.png",
+      "evidence": "The page-35 screenshot contains obvious repeated strips near screenshot rows 45 and 652. Direct inspection of the bundled source image shows the same top repeat and duplicated lower speech bubble near source rows 92 and 1304. These are source-image joins, not a containment or renderer defect. The former menu covered the affected areas; default fullscreen exposes them.",
+      "suggestion": "Repair the bundled page artwork without changing the viewport, fitting, renderer or genuine comic content.",
+      "disposition": "Root accepted a source-asset repair for candidate 3. The before artifact and hash are retained. The first geometry-only repair removed the repeated strips and split speech bubble, but Root found a subtle upper-panel tone boundary that the initial independent preview missed. The tone-corrected complete image and top crop were subsequently viewed: the gray background now appears continuous, with no further visible issue. Candidate 3 application captures remain required.",
+      "source_repair_preflight": {
+        "after": "artifacts/phase2/demo-art-repair/tone-fixed/page-01-after.png",
+        "report": "artifacts/phase2/demo-art-repair/tone-fixed/repair-report.json",
+        "source_before_sha256": "b927049af19f5a1141e428c63d24c6147b22755ffe22c49cf54d431ebee020d3",
+        "first_geometry_only_after_sha256": "70ff2f0079b00df4c4a7830893542b243c90af604835cf21e9b83db2fc06762d",
+        "repaired_after_sha256": "c3d4f78ed7bbf21ef683c4af9f37de28a7d808c8e554d57d6253cf6d1f33260a",
+        "reviewed_images": ["artifacts/phase2/demo-art-repair/page-01-after.png", "artifacts/phase2/demo-art-repair/top-after.png", "artifacts/phase2/demo-art-repair/bottom-after.png", "artifacts/phase2/demo-art-repair/tone-fixed/page-01-after.png", "artifacts/phase2/demo-art-repair/tone-fixed/top-after.png"],
+        "tone_evidence_note": "The first top-boundary-analysis copy retained first-version measurements. It was subsequently regenerated with predecessor, first-pass and tone-fixed fields and the SHA-256 of all three images. The final tone-fixed gap samples at rows 85 through 92 are reported as gray value 221, rather than treating the old first-pass data as final evidence.",
+        "reported_unchanged_core_clip": "The remote repair report records zero mismatched pixels in the original [0,92,1172,1304) clip, unchanged 1172 by 1648 dimensions and sixteen gray levels. These calculations were read, not rerun locally."
+      }
+    }
+  ],
+  "remaining_previous_findings": [],
+  "qualifies_as_clean_round": false,
+  "consecutive_clean_rounds": 0,
+  "scope_note": "All twelve fresh candidate 2 baseline screenshots, default fullscreen, expanded Reader/session states, recovery states and a real-worker closed-menu notification image listed below were directly inspected. A supporting reviewer independently inspected 35 queue/cache/selection/notice states and six capability states. This completes the independent manual UI review with 48 primary and 41 supporting fresh captures. Two new actionable suggestions were accepted for the next candidate, so the clean streak remains zero and the complete round is not qualified. Automated totals do not represent a count of individually inspected images. Historical rounds 6 and 7 are not counted toward phase 2.",
+  "baseline_coverage": [
+    {"screen": "pw5-library", "reference": "tmp/design/reference-01.png", "actual": "artifacts/phase2/ui-round-1/pw5-library.png", "reviewed": true, "checks": "Title hierarchy, continuation card, four-by-two covers, captions, badges, continuous selected-tab rule, stable pager and bottom navigation.", "new_findings": 0},
+    {"screen": "pw5-detail", "reference": "tmp/design/reference-02.png", "actual": "artifacts/phase2/ui-round-1/pw5-detail.png", "reviewed": true, "checks": "Synopsis, continuation and secondary actions, directory heading, six chapter rows, dotted leaders, independent download targets and true fifteen-page count.", "new_findings": 0},
+    {"screen": "pw5-reader", "reference": "tmp/design/reference-03.png", "actual": "artifacts/phase2/ui-round-1/pw5-reader.png", "reviewed": true, "checks": "Explicitly opened menu, settled page 12, header, book and chapter labels, page information, seek control, chapter controls and anchored tools. Previously accepted separate touch bands remain.", "new_findings": 0},
+    {"screen": "pw5-sources", "reference": "tmp/design/reference-04.png", "actual": "artifacts/phase2/ui-round-1/pw5-sources.png", "reviewed": true, "checks": "Built-in and extension groups, installed/unavailable appearance, connection labels, uninstall, pairing card and navigation.", "new_findings": 0},
+    {"screen": "pw5-catalog", "reference": "tmp/design/reference-05.png", "actual": "artifacts/phase2/ui-round-1/pw5-catalog.png", "reviewed": true, "checks": "Source metadata and actions, selected-tab rule, five rows with context artwork and complete metadata, dividers and stable pager.", "new_findings": 0},
+    {"screen": "pw5-search", "reference": "tmp/design/reference-06.png", "actual": "artifacts/phase2/ui-round-1/pw5-search.png", "reviewed": true, "checks": "Search field and scope controls, truthful source counts, result grouping, complete inner titles, completion and volume metadata, visible retry and navigation. The existing generic failed-source copy remains unchanged from the prior accepted candidate.", "new_findings": 0},
+    {"screen": "pw5-history", "reference": "tmp/design/reference-07.png", "actual": "artifacts/phase2/ui-round-1/pw5-history.png", "reviewed": true, "checks": "Privacy and deletion controls, date grouping, real summary, progress bars, row deletion targets and stable pager.", "new_findings": 0},
+    {"screen": "pw5-settings", "reference": "tmp/design/reference-08.png", "actual": "artifacts/phase2/ui-round-1/pw5-settings.png", "reviewed": true, "checks": "Device card, storage and Wi-Fi labels, icon semantics, typography, section and row rhythm, footer pager and navigation.", "new_findings": 0},
+    {"screen": "scribe-library", "reference": "tmp/design/reference-09.png", "actual": "artifacts/phase2/ui-round-1/scribe-library.png", "reviewed": true, "checks": "Six-by-three cover grid, captions and badges, continuation and daily-update cards, tab rule, stable pager and bottom navigation.", "new_findings": 0},
+    {"screen": "scribe-detail", "reference": "tmp/design/reference-10.png", "actual": "artifacts/phase2/ui-round-1/scribe-detail.png", "reviewed": true, "checks": "Two-column proportions, cover and continuation block, synopsis and tags, full directory rule, sixteen visible rows, action targets and pager.", "new_findings": 0},
+    {"screen": "scribe-sources", "reference": "tmp/design/reference-11.png", "actual": "artifacts/phase2/ui-round-1/scribe-sources.png", "reviewed": true, "checks": "Labeled actions, source cards and selected state, search and filter regions, context metadata, five-by-two grid, complete captions and stable pager.", "new_findings": 0},
+    {"screen": "scribe-landscape-reader", "reference": "tmp/design/reference-12.png", "actual": "artifacts/phase2/ui-round-1/scribe-landscape-reader.png", "reviewed": true, "checks": "Explicitly opened menu, settled pages 12 and 13, RTL spread order, truthful locked-direction label, tool anchors and separate seek/chapter targets. No decorative spread gutter is added.", "new_findings": 0}
+  ],
+  "additional_direct_manual_coverage": [
+    {"screen": "pw5-reader-fullscreen", "actual": "artifacts/phase2/ui-round-1/pw5-reader-fullscreen.png", "checks": "The whole viewport contains comic artwork and its fitting background. No status row, navigation, footer, page counter, bookmark corner, notice or decorative gutter is visible. The top and bottom of the comic use the former chrome area.", "new_findings": 0}
+  ],
+  "supporting_direct_manual_coverage": [
+    {"screen": "pw6-library", "actual": "artifacts/phase2/ui-round-1/pw6-library.png", "checks": "The 632 by 840 viewport retains complete title, continuation card, grid, captions, pager and navigation. Sidecar reports library page 1 of 6.", "new_findings": 0},
+    {"screen": "scribe2-library", "actual": "artifacts/phase2/ui-round-1/scribe2-library.png", "checks": "The 930 by 1240 viewport retains complete title, cards, grid, captions, pager and navigation. Sidecar reports library page 1 of 3.", "new_findings": 0},
+    {"screen": "scribe3-library", "actual": "artifacts/phase2/ui-round-1/scribe3-library.png", "checks": "The 990 by 1320 viewport retains complete title, cards, grid, captions, pager and navigation. Sidecar reports library page 1 of 3.", "new_findings": 0},
+    {"screen": "scribe3-nofrontlight-reader", "actual": "artifacts/phase2/ui-round-1/scribe3-nofrontlight-reader.png", "checks": "The 990 by 1320 Reader is image-only without a page counter, corner mark or status row. Reader, visible, displayed and committed page are 12; menu and busy are false. This closed-menu image does not visually certify capability-dependent menu buttons.", "new_findings": 0},
+    {"screen": "scribe3-nofrontlight-settings", "actual": "artifacts/phase2/ui-round-1/scribe3-nofrontlight-settings.png", "checks": "The device description identifies the lack of frontlight. The visible settings exclude frontlight and warmth, both values are zero, and the page-1-of-2 pager and navigation remain complete.", "new_findings": 0},
+    {"screen": "reader-menu-blank-does-not-turn", "actual": "artifacts/phase2/ui-round-1/reader-menu-blank-does-not-turn.png", "checks": "The final Reader returns to pure imagery. Sidecar records menu false and Reader, visible, displayed and committed page all 12 with no inflight job, matching the menu-open then blank-area close intent.", "new_findings": 0}
+  ],
+  "sidecar_observations": {
+    "pw5_reader_menu": "Reader, visible label and committed page are all 12; menu is open; busy and Reader inflight are false.",
+    "pw5_reader_fullscreen": "Reader, visible label and committed page are all 12; menu is closed; busy and Reader inflight are false; viewport is 618 by 824.",
+    "scribe_landscape_reader": "Reader, visible label and committed page are all 12; menu is open; busy and Reader inflight are false; viewport is 1240 by 930.",
+    "font_initializations": "The inspected Reader capture metadata records one initialization per process; desktop metadata does not establish native retained-process wake behavior."
+  },
+  "additional_reader_and_session_manual_coverage": {
+    "artifact_directory": "artifacts/phase2/ui-round-1",
+    "images_read": [
+      "reader-seek-preview.png", "reader-seek-commit.png",
+      "reader-panel-close-pure.png", "reader-escape-panel-pure.png",
+      "reader-bottom-right-rtl.png", "reader-bottom-right-ltr.png",
+      "reader-escape-closes-menu.png", "reader-toc-chapter-pure.png",
+      "session-library-checkpoint.png", "session-library-restored.png",
+      "session-cross-book-checkpoint.png", "session-cross-book-restored.png",
+      "session-reader-checkpoint.png", "session-reader-restored.png",
+      "session-vertical-checkpoint.png", "session-vertical-restored.png",
+      "lifecycle-reader-baseline.png", "lifecycle-reader-resumed.png",
+      "lifecycle-doubletap-reset.png", "lifecycle-seek-reset.png"
+    ],
+    "supplementary_image_read": "artifacts/phase2/ui-round-1-vertical-ready/reader-bottom-right-vertical.png",
+    "observations": [
+      "Seek preview shows page 35 while retaining the accepted image; release commits page 35 and closes the menu. The only visible defect is the independently reported source-art join.",
+      "Panel close, Escape and table-of-contents selection return to comic-only imagery. Bottom-right RTL, LTR and the ready vertical sample perform ordinary reading navigation.",
+      "The library retains its Reading filter and page 2 of 2 after restart. The cross-book detail pair retains the second book rather than the previous Reader's book.",
+      "Reader restart preserves its pure image. The vertical pair retains page 1, offset 1401 and zoom 2, with matching visible image framing.",
+      "The desktop lifecycle baseline and resumed pair both retain page 20 and two image jobs started. The double-tap reset ends at its intended page 13 with zoom 1; the cancelled seek ends at page 12. These desktop observations are not native park evidence."
+    ]
+  },
+  "recovery_manual_coverage": {
+    "artifact_directory": "artifacts/phase2/recovery-round-1",
+    "images_read": [
+      "failed-next-visible.png", "retry-failed-target.png",
+      "first-page-visible.png", "first-page-retry.png",
+      "manifest-failure-visible.png", "manifest-retrying-visible.png",
+      "manifest-retry-target.png", "pending-menu-displayed.png",
+      "slow-first-image-loading.png", "slow-first-action-visible.png",
+      "slow-first-action-dismiss.png", "pending-bookmark-save.png", "pending-set-cover.png"
+    ],
+    "observations": [
+      "The failed page-8 request rolls state, visible label and displayed image back to page 7 while retaining retry target 8. Retrying accepts page 8, clears recovery and restores pure imagery.",
+      "A missing first image shows a persistent recovery panel with retry and return actions. Successful first-page retry restores pure imagery.",
+      "A slow first image has a centered loading label. An attempted action before any frame is displayed presents an explicit wait-for-image panel; dismissing it returns to loading.",
+      "A pending page-8 request projects menu metadata for the displayed page 7. Bookmark, export and cover targets remain bound to displayed page 7.",
+      "Manifest retry retains chapter c02 while the visible rollback is chapter c01; retry-in-progress is disabled with loading feedback, then accepts c02. The two chapter identities need the separately reported label improvement.",
+      "Failure reason labels are safe categories. Raw source errors and credentials are not used in the reviewed panel text."
+    ]
+  },
+  "supporting_expanded_review": {
+    "report": "docs/review/phase2-round-1-expanded-support.json",
+    "additional_expanded_images_read": 35,
+    "capability_images_read": 6,
+    "new_suggestions_in_supporting_subset": 0,
+    "scope": "Chapter selection, bulk acceptance and empty feedback, first/last queue pages, applicable global actions, completed removal, cache information/clear, online/offline cover continuity, summary tag context, status-strip expiry and modal/menu notice placement."
+  },
+  "closed_worker_notice_manual_coverage": {
+    "actual": "artifacts/phase2/fullscreen-round-1/pw5-rtl-background-notification.png",
+    "sidecar": "artifacts/phase2/fullscreen-round-1/pw5-rtl-background-notification.state.json",
+    "case_report": "artifacts/phase2/fullscreen-round-1/pw5-rtl-background-notification.case.json",
+    "reviewed": true,
+    "observation": "An actual queued chapter-86 job creates an active success message while menu=false. The whole visible viewport still contains only the comic. Nine retained completed jobs and one queued job are present; Reader, visible and displayed page remain 12.",
+    "oracle_observation": "The case records zero changed pixels against both the pure-image oracle and default closed-image baseline, with zero ignored pixels and zero error tolerance.",
+    "new_findings": 0
+  },
+  "reported_remote_verification": {
+    "ui_report": "artifacts/phase2/ui-round-1/report.json",
+    "ui_passed": 152,
+    "ui_failed_or_invalid_samples": 1,
+    "ui_failed_case": "reader-bottom-right-vertical",
+    "supplemental_vertical_report": "artifacts/phase2/ui-round-1-vertical-ready/report.json",
+    "supplemental_vertical_passed": 1,
+    "supplemental_vertical_failed": 0,
+    "vertical_disposition": "The original cold-preparation sample is retained. The fresh sample waits for actual image readiness and passes without a product or tap-semantics change.",
+    "recovery_report": "artifacts/phase2/recovery-round-1/report.json",
+    "recovery_passed": 32,
+    "recovery_failed": 0,
+    "raw_report": "artifacts/phase2/raw-round-1/report.md",
+    "raw_passed": 11,
+    "raw_failed": 0,
+    "initial_fullscreen_report": "artifacts/phase2/fullscreen-round-1/report.json",
+    "initial_fullscreen_passed": 42,
+    "initial_fullscreen_failed_preconditions": 2,
+    "fullscreen_precondition_cases": ["scribe-landscape-rtl-bookmark-toggle", "scribe-landscape-ltr-bookmark-toggle"],
+    "fullscreen_disposition": "The two initial samples fail the assertion that the bookmark state actually changed. They cannot establish changed-bookmark pixel invariance and are retained for transparent readiness requalification. The inspected worker-notice case passes both exact image comparisons.",
+    "binary_unchanged_in_both_reports": true,
+    "firmware_disposition": "Native qualification is tracked separately by Root. Candidate 2 observations are preflight evidence because candidate 3 will contain the accepted fixes."
+  },
+  "preflight_repairs": {
+    "record": "docs/review/phase2-integration-independent.json",
+    "P2-I001": "Static modal-first arrow routing verified. The fresh eleven-case real-input report includes Reader modal left, right and Escape and download-modal paging; all pass.",
+    "P2-I002": "First-image loading and persistent recovery UI verified in source and the fresh failure, retry and slow-image screenshots.",
+    "P2-I003": "Displayed-session page actions, current-job rollback, full retry target and displayed metadata projection verified in source and the fresh page-7/page-8, chapter and pending-action evidence. Cross-chapter labels require the separate R1 clarification."
+  },
+  "accepted_reference_variations": [
+    "The latest user instruction makes default closed-menu reading image-only. The PDF Reader examples are compared against an explicitly opened menu.",
+    "Fixture records determine source and history counts, chapter dates and page totals. The Paperwhite directory retains fifteen pages for 86 chapters at six rows per page.",
+    "One canonical comic page is shared between device examples, rather than inventing the PDF's alternate artwork.",
+    "The orientation control truthfully describes manual locked direction.",
+    "Previously accepted seek-control placement retains independent physical touch targets."
+  ],
+  "pending_requirements": [
+    "Candidate 3 verification of both accepted suggestions.",
+    "Complete valid pixel-oracle readiness coverage on the final candidate.",
+    "Two new complete clean rounds on the final candidate, including native sleep/wake and integration qualification."
+  ],
+  "verification_note": "Local work is limited to reading source, retained JSON metadata and screenshots. Application execution, tests, builds and runtime probes occur only on the designated remote worker or isolated firmware guest. Automated case totals are not represented as a count of individually inspected images."
+}

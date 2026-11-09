@@ -1,0 +1,155 @@
+{
+  "batch_id": "supplemental-11",
+  "reviewer": "fresh-independent-supplemental-11",
+  "run_id": "a1baf3fe3dc2",
+  "round": 1,
+  "binary_sha256": "94d7f3bbcab475ad8833a2f3c486138f7b49bead231851c2d8eab2f0c3d2ac51",
+  "source_sha256": "aef9db4e111165016a10a2a95e111f3155860b8510c7f6207ec9c79fbec5082c",
+  "scope": "Independent visual review of the eight assigned candidate PNGs, their case metadata, and the applicable textual design contracts. No independent reference PNG was supplied or viewed.",
+  "identity_checks": {
+    "all_candidate_hashes_match_input_and_case_evidence": true,
+    "all_cases_match_run_binary_source_and_round": true,
+    "viewed_candidate_count": 8,
+    "basis": [
+      "docs/DESIGN_HANDOFF.md",
+      "docs/review/phase3-reference-scope.json",
+      "docs/review/phase3-prototype-reference-support.json"
+    ]
+  },
+  "reviewed_case_ids": [
+    "pw5--real-migration--candidates",
+    "pw5--real-migration--committed",
+    "pw5--real-migration--selected",
+    "pw5--search-source-scope",
+    "pw5--selection-all-page",
+    "pw5--selection-cancel",
+    "pw5--selection-category",
+    "pw5--selection-mark-read"
+  ],
+  "reviewed_cases": [
+    {
+      "case_id": "pw5--real-migration--candidates",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/pw5--real-migration--candidates.png",
+      "candidate_sha256": "5c2e8aa31eeb6bc067b7be94321d21a70b718d9b1b292c601ebba77e26450aca",
+      "viewed_candidate": true,
+      "outcome": "pass",
+      "observations": [
+        "The actual detail route has a migration choices sheet open. Its three visible alternate-source records match the case metadata's actual loopback candidate identities and titles, rather than a claimed completed migration.",
+        "Each target has a clear empty square selector, a small cover, a readable title, and an alternate-source subtitle. The source detail above remains visible with deliberate title and synopsis ellipses.",
+        "Read-state preservation, category preservation, and original-download removal are separate controls. Their visible on/on/off states agree with the captured migration flags.",
+        "Cancel remains outlined and enabled, while Start migration is visibly muted, consistent with an empty selected target and migration_can_start=false.",
+        "The full-width white sheet fits the three records, option rows, and equal-width action allocation without cropped labels, shadow, stippled backdrop, or dimming. Its top edge follows the content rather than an invented PW migration reference height."
+      ],
+      "intentional_differences": []
+    },
+    {
+      "case_id": "pw5--real-migration--committed",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/pw5--real-migration--committed.png",
+      "candidate_sha256": "51f09d107704b8325d9871abf1492aeb71b78fbb703d69d8bdba9568e0d5e64b",
+      "viewed_candidate": true,
+      "outcome": "pass",
+      "observations": [
+        "The migration sheet is closed and the detail source line now identifies Alternate local Komga fixture. The filled library action is consistent with the new current_book identity 15:komga-alternate:series-000.",
+        "The existing case check reports durable membership moved to the alternate-source book and removed from the original book. This is separate evidence from the visible source-label change, not a conclusion inferred from a success-looking screenshot.",
+        "The detail page shows eight chapters, eight unread, zero downloaded, six first-page rows, and a 1/2 folio with a next-page action. Long chapter titles end in ellipses before the dotted leaders and dates.",
+        "The continue-reading, library, tracking, ordering, and download controls remain distinct and unobscured. This secondary detail route correctly omits the main navigation."
+      ],
+      "intentional_differences": []
+    },
+    {
+      "case_id": "pw5--real-migration--selected",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/pw5--real-migration--selected.png",
+      "candidate_sha256": "b88da334cb7c1ce5114f6c492ab4b75e5b8909db2b553f6e2b3f2bab61a416ff",
+      "viewed_candidate": true,
+      "outcome": "pass",
+      "observations": [
+        "Only the first target's square selector is filled, matching migration_selected_id=15:komga-alternate:series-000 and the corresponding native candidate's selected=true state.",
+        "Start migration changes to a solid black button with white text, while Cancel stays white and outlined. This agrees with migration_can_start=true without implying that the operation has already completed.",
+        "All three candidate titles and source subtitles remain legible. The preservation and removal switches retain their independent states and do not obscure the target choice.",
+        "The content-sized white bottom sheet keeps both actions fully visible and uses a clean top rule with no shadow or background mask."
+      ],
+      "intentional_differences": []
+    },
+    {
+      "case_id": "pw5--search-source-scope",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/pw5--search-source-scope.png",
+      "candidate_sha256": "435b18a6641435fca40461e7cd06190a7d492c170ac659cd61dc19f2e596684d",
+      "viewed_candidate": true,
+      "outcome": "pass",
+      "observations": [
+        "MangaDex is the sole inverted scope chip, matching search_scope=mangadex. All sources, Local files, and Komga remain white outlined alternatives.",
+        "The pending-search hint explicitly says one source, while the all-sources chip retains its separate total of four. The empty field remains a search placeholder rather than a fabricated result state.",
+        "The keyboard replaces the dock. Its Pinyin hint, three letter rows, shift, backspace, numeric toggle, language toggle, space, and Search action are all visible without overlapping key labels.",
+        "The outlined search field, Cancel action, scope row, and keyboard boundary are clearly separated on white surfaces. No source result or network completion is claimed by this capture."
+      ],
+      "intentional_differences": []
+    },
+    {
+      "case_id": "pw5--selection-all-page",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/pw5--selection-all-page.png",
+      "candidate_sha256": "2aeb61673cb41ff5a2b318149acfc10f2b4ab0eefcbffcf65bc0d19d1cedd4e4",
+      "viewed_candidate": true,
+      "outcome": "pass",
+      "observations": [
+        "The selected-count header says eight, and all eight cards in the 4x2 first-page grid carry black check indicators. This agrees with the eight captured selected identities and selection_mode=true.",
+        "Select current page and Done remain clearly visible in the header. The continue-reading card is absent, as required for PW selection mode.",
+        "The normal navigation is replaced by four evenly allocated bulk actions: mark read, download unread, move category, and remove from library. Each icon has a readable text label.",
+        "The 1/6 folio and next-page control remain above the bulk bar, with no first-page previous control. Card titles and checkbox outlines remain clear against the actual cover artwork."
+      ],
+      "intentional_differences": []
+    },
+    {
+      "case_id": "pw5--selection-cancel",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/pw5--selection-cancel.png",
+      "candidate_sha256": "fc37f360ba9d0c7ac18d345fbe63e55257fbb687c23114c8add630ad6d6b2603",
+      "viewed_candidate": true,
+      "outcome": "pass",
+      "observations": [
+        "The normal shelf heading, white outlined continue-reading card, and five-item bottom navigation are restored. No selection count, card checks, or bulk bar remain.",
+        "The captured state confirms selection_mode=false and selected=[], agreeing with the visible exit from selection mode.",
+        "The 4x2 grid, title-adjacent update badges and download indicators, category counts, and 1/6 folio remain readable without covering the artwork.",
+        "The active library navigation marker and next-page action remain distinct. The white continuation surface has no offset shadow or gray card fill."
+      ],
+      "intentional_differences": []
+    },
+    {
+      "case_id": "pw5--selection-category",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/pw5--selection-category.png",
+      "candidate_sha256": "a9ccd28dff0bb5970ebc5caa8081e2eee14b2d169a19310ade3296a02553b288",
+      "viewed_candidate": true,
+      "outcome": "pass",
+      "observations": [
+        "The underlying selection header still says eight and all eight visible books remain checked, consistent with the captured selection state.",
+        "The category sheet exposes three fully visible destination rows: Reading, Planned, and Completed. These match the enabled category:reading, category:planned, and category:completed metadata items.",
+        "The sheet's Done action is visible at the upper right, while the underlying selection Done action remains visually separate in the page header.",
+        "The bottom sheet begins directly below the visible grid and follows its title and three rows, with a white surface, thin row rules, and a clean black top edge. It has no clipped row, shadow, dimmed backdrop, or unsupported create/rename success state."
+      ],
+      "intentional_differences": []
+    },
+    {
+      "case_id": "pw5--selection-mark-read",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/pw5--selection-mark-read.png",
+      "candidate_sha256": "fc37f360ba9d0c7ac18d345fbe63e55257fbb687c23114c8add630ad6d6b2603",
+      "viewed_candidate": true,
+      "outcome": "pass",
+      "observations": [
+        "The capture shows the normal library after the bulk action: selection checks and bulk controls are absent, while the continuation card and normal navigation have returned. Captured selection_mode=false and selected=[] agree with this visible state.",
+        "The existing action evidence selects 8:mangadex:demo-00 before batch-read. The existing case check reports that 86 actual chapter records were marked read; this review did not rerun or independently inspect that database operation.",
+        "The PNG is byte-identical to selection-cancel. The visible badge of three is a demo cover-update badge supplied by demo::badge_for, independently of chapter unread counts, as documented in src/demo.rs and projected by src/app/view.rs. It therefore does not establish a stale unread projection.",
+        "The preserved 12/40 continuation position alone does not contradict chapter read flags. The snapshot contains no separate durable read-state display or operation feedback that would independently establish the result.",
+        "The restored shelf layout remains legible, with title-adjacent badges, unobscured artwork, and a stable 1/6 folio. No confirmed visual defect is established in this assigned capture."
+      ],
+      "intentional_differences": []
+    }
+  ],
+  "suggestions": [],
+  "limitations": [
+    "Only the eight assigned candidate PNGs were viewed, individually through view_image. No independent reference PNG was supplied, and no other PNG was opened. Supplemental states were assessed against textual scope, handoff, prototype state contracts, and actual case metadata rather than invented pixel references.",
+    "Current PNG SHA256 values match both the batch expectations and case screenshot evidence. All cases identify the assigned run, round, binary hash, and source hash. These identity checks do not independently reproduce the capture or operation.",
+    "Migration membership and mark-read record changes are supported by existing case checks. Static images alone cannot establish durable writes, network correctness, outside-tap behavior, touch hit regions, keyboard dispatch, disabled-control behavior, or category-move completion.",
+    "The mark-read PNG is identical to the cancel PNG. Demo cover-update badges and saved continuation position are independent of chapter read flags; a separate operation-state capture or durable-state evidence is needed to demonstrate mark-read completion visually. Existing metadata reports 86 updated chapter records.",
+    "Category create and rename controls are not represented in these assigned captures. This batch does not establish their required honest disabled treatment elsewhere.",
+    "No application, build, test, smoke check, or runtime probe was executed locally or remotely for this review. Only existing artifacts, source text, design text, and file hashes were read; the requested review JSON was written.",
+    "This batch does not establish physical-device capability behavior, retained-scene wake correctness, performance, memory use including 512 MiB operation, or closed-reader artwork purity. No conclusion about a complete review round follows from these eight cases."
+  ]
+}

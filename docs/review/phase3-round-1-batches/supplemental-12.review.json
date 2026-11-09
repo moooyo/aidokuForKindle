@@ -1,0 +1,166 @@
+{
+  "batch_id": "supplemental-12",
+  "reviewer": "codex-independent-supplemental-12",
+  "run_id": "a1baf3fe3dc2",
+  "binary_sha256": "94d7f3bbcab475ad8833a2f3c486138f7b49bead231851c2d8eab2f0c3d2ac51",
+  "source_sha256": "aef9db4e111165016a10a2a95e111f3155860b8510c7f6207ec9c79fbec5082c",
+  "reviewed_case_ids": [
+    "pw5--selection-remove",
+    "pw5--server-address-keyboard",
+    "pw5--server-secret-keyboard",
+    "pw5--settings-about",
+    "pw5--settings-auto-update",
+    "pw5--settings-backup",
+    "pw5--settings-categories",
+    "pw5--settings-default-direction"
+  ],
+  "reviewed_cases": [
+    {
+      "case_id": "pw5--selection-remove",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/pw5--selection-remove.png",
+      "candidate_sha256": "8c71e78e879039813e6f7342ccc538c730f0c1a6850785548c82b88322315bf0",
+      "viewed_candidate": true,
+      "outcome": "no_visual_issue_found",
+      "observations": [
+        "The normal bookshelf is visible after removal, with 45 books, the All tab selected, and a 1/6 folio. No selection count, selection marks, or bulk action bar remains.",
+        "The continuation card and eight readable cover tiles fit above the ordinary navigation dock, whose bookshelf item is active. The removed title is absent from the visible grid.",
+        "The supplied case state records route=library, selection_mode=false, selected=[], and library_count=45. Its existing removal check records the targeted book with in_library=false, which corroborates the captured post-removal identity without rerunning that check.",
+        "The current PNG SHA-256 matches both the input expectation and the case screenshot evidence hash. The case run, binary, and source identities match this review."
+      ],
+      "intentional_differences": []
+    },
+    {
+      "case_id": "pw5--server-address-keyboard",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/pw5--server-address-keyboard.png",
+      "candidate_sha256": "c05b0e8bf2ebea0fc111a60c5225d6673c85f5f915ca7d004dc4ba7f8544c075",
+      "viewed_candidate": true,
+      "outcome": "no_visual_issue_found",
+      "observations": [
+        "The catalog header identifies Komga as an unconfigured self-hosted server. The large empty catalog area does not claim connected content or a successful connection.",
+        "A labeled, empty server-address input strip and close action remain visible above the English keyboard. The keyboard occupies the bottom area and replaces the navigation dock; its completion action and bottom row fit within the viewport.",
+        "The form and keys use white surfaces and thin outlines without a dimmed backdrop, shadow, or stippled panel fill.",
+        "The supplied state records route=catalog, modal=keyboard, modal_context=pairing, keyboard_target=server-address, keyboard_mode=english, and an empty address. The current PNG matches both expected and evidence SHA-256 values, and all supplied run identities match."
+      ],
+      "intentional_differences": [
+        "The server is unconfigured; this is the actual address entry rather than a connected mock."
+      ]
+    },
+    {
+      "case_id": "pw5--server-secret-keyboard",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/pw5--server-secret-keyboard.png",
+      "candidate_sha256": "80ca1612d6150445e22229f1c054f0f09c2982ba911bfce6b4c4282e804d0795",
+      "viewed_candidate": true,
+      "outcome": "no_visual_issue_found",
+      "observations": [
+        "The password input contains only masking dots. No credential text, composition text, or candidate suggestions are visible.",
+        "The password label, outlined input, close action, English keyboard, and completion button are legible and remain inside the viewport. The keyboard replaces the dock while editing.",
+        "The underlying Komga header still reports an unconfigured server; the capture does not imply successful authorization or connection.",
+        "The supplied state identifies modal_context=server-credentials, keyboard_target=server-password, keyboard_is_secret=true, empty composition and candidates, and a masked 23-character keyboard value. The current PNG matches both expected and evidence SHA-256 values, and all supplied run identities match."
+      ],
+      "intentional_differences": []
+    },
+    {
+      "case_id": "pw5--settings-about",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/pw5--settings-about.png",
+      "candidate_sha256": "02593f92888b6921fa285be655c13e348465fc4bc97ad099f31729e25ff7edad",
+      "viewed_candidate": true,
+      "outcome": "no_visual_issue_found",
+      "observations": [
+        "The About secondary page has a labeled Settings back action, a large serif title, the retained settings dock, and no root-list pager.",
+        "Four separated read-only data rows show version 0.1.0, Kindle Paperwhite 5, GPL-3.0-or-later, and a dash for the absent homepage value. Values are readable and do not overlap their labels or the screen edge.",
+        "The supplied state identifies settings_section=about and contains the same four data values. The page does not display a fabricated homepage, connection, or external-action success.",
+        "The current PNG SHA-256 matches both the input expectation and the case screenshot evidence hash. The case run, binary, and source identities match this review."
+      ],
+      "intentional_differences": [
+        "Any unavailable hardware or external integration is the application's actual state; no success is simulated."
+      ]
+    },
+    {
+      "case_id": "pw5--settings-auto-update",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/pw5--settings-auto-update.png",
+      "candidate_sha256": "449d86bcf988a5b1029749f7065ec18b36190e8a301ee8fea402f27fb3412122",
+      "viewed_candidate": true,
+      "outcome": "no_visual_issue_found",
+      "observations": [
+        "The automatic library update page shows the Off, Daily, and Weekly choices and the Wi-Fi, charging, and completed-title conditions in a compact form that fits without clipping.",
+        "All frequency choices and condition switches are visibly disabled. A readable unavailable status appears beside the frequency heading, so the page does not imply that automatic updates are scheduled or active.",
+        "The secondary-page back action and dock are present, the root-list pager is absent, and the form uses plain white surfaces with outlined controls.",
+        "The supplied state identifies settings_section=auto-update and an unavailable settings_status. The current PNG matches both expected and evidence SHA-256 values, and all supplied run identities match."
+      ],
+      "intentional_differences": [
+        "Any unavailable hardware or external integration is the application's actual state; no success is simulated."
+      ]
+    },
+    {
+      "case_id": "pw5--settings-backup",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/pw5--settings-backup.png",
+      "candidate_sha256": "dc2c881d488abd9a0cfe20842b18d3afabf96b9c639b327d49b670765dbc854c",
+      "viewed_candidate": true,
+      "outcome": "no_visual_issue_found",
+      "observations": [
+        "The backup and restore page shows distinct disabled Backup Now and Restore from Backup actions. The recent-backup area explicitly reports unavailable rather than showing a fabricated dated backup or successful operation.",
+        "The two outlined action buttons, recent-backup heading, and status are readable without overlap. The remaining page is plain white rather than a fixed-height decorative sheet.",
+        "The labeled Settings back action and settings dock remain visible, and the root-list pager is absent.",
+        "The supplied state identifies settings_section=backup and an unavailable settings_status, with no backup detail rows. The current PNG matches both expected and evidence SHA-256 values, and all supplied run identities match."
+      ],
+      "intentional_differences": [
+        "Any unavailable hardware or external integration is the application's actual state; no success is simulated."
+      ]
+    },
+    {
+      "case_id": "pw5--settings-categories",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/pw5--settings-categories.png",
+      "candidate_sha256": "0baa48469d118aeddde5f4a3144c5180766abadddbab80f36b0c24bd2eda7df8",
+      "viewed_candidate": true,
+      "outcome": "issue_found",
+      "observations": [
+        "The categories page shows readable counts of 12 Reading, 9 Planned, 25 Completed, and 0 Uncategorized, matching the supplied settings details. Their total is the supplied library count of 46.",
+        "The New Category action is gray and disabled. All category rows are static, with no inline-rename affordance, and the page has no visible explanation that creation and renaming are unavailable.",
+        "The supplied state identifies settings_section=categories, an empty settings_status, and enabled=false for every category detail row. The intentional external-integration difference does not explain the missing unavailable message for these category operations.",
+        "The secondary-page title, labeled back action, separators, and retained settings dock fit correctly, with no root-list pager. The current PNG matches both expected and evidence SHA-256 values, and all supplied run identities match."
+      ],
+      "intentional_differences": [
+        "Any unavailable hardware or external integration is the application's actual state; no success is simulated."
+      ]
+    },
+    {
+      "case_id": "pw5--settings-default-direction",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/pw5--settings-default-direction.png",
+      "candidate_sha256": "16a2da9064ab2aae602c36f4dc1c20dce15d97ed96c98cf0243727f1a81aa0a7",
+      "viewed_candidate": true,
+      "outcome": "no_visual_issue_found",
+      "observations": [
+        "All four direction options fit on one row: right-to-left, left-to-right, vertical page turning, and webtoon scrolling. The right-to-left option uses the expected black selected surface and white label.",
+        "Per-title direction memory is visibly on and double-tap zoom is visibly off. The switches and their labels fit within separated rows without clipping.",
+        "The labeled Settings back action, serif secondary-page title, and retained settings dock are present, with no root-list pager or decorative shadow.",
+        "The supplied state identifies settings_section=default-direction, reading_direction=rtl, remember_book_direction=true, and double_tap_zoom=false. The current PNG matches both expected and evidence SHA-256 values, and all supplied run identities match."
+      ],
+      "intentional_differences": [
+        "Any unavailable hardware or external integration is the application's actual state; no success is simulated."
+      ]
+    }
+  ],
+  "suggestions": [
+    {
+      "id": "P3R1-SUP12-1",
+      "case_id": "pw5--settings-categories",
+      "priority": "P2",
+      "description": "The disabled category creation and renaming operations have no visible unavailable explanation.",
+      "evidence": [
+        "The viewed candidate shows four static category rows and a gray New Category button around x=22..114, y=358..406, with no unavailable status anywhere in the content area.",
+        "The supplied case state has settings_section=categories, settings_status empty, and enabled=false for all four category detail rows.",
+        "docs/review/phase3-reference-scope.json:1187 requires category counts, inline rename, immutable Uncategorized, and add category; line 1752 applies all settings sections to PW and SC. docs/DESIGN_HANDOFF.md:578 requires each visible control to have concrete behavior or an honest unavailable state. The supplied review instructions explicitly require visible unavailable messaging for unimplemented category creation and renaming."
+      ],
+      "recommendation": "Add a concise visible message beside the disabled creation action or directly below the category list stating that category creation and renaming are currently unavailable. Keep actual counts and the immutable Uncategorized row. If these operations are implemented instead, expose real creation and rename affordances with their actual behavior.",
+      "status": "open",
+      "introduced_round": 1
+    }
+  ],
+  "limitations": [
+    "This review actually viewed only the eight candidate PNGs listed in supplemental-12.input.json. No independent reference image was supplied or loaded; layout and state honesty were assessed against the relevant scope, handoff, prototype text, and explicit review requirements.",
+    "All eight current PNG hashes match their input expected hashes and case evidence screenshot hashes. All case metadata identifies run a1baf3fe3dc2 and the binary and source hashes recorded above. Existing metadata checks were read as evidence, not executed again.",
+    "The images are 618x824 desktop captures for the selected PW5 design profile. They cannot establish physical Kindle wake, sleep, refresh, touch, frontlight, or orientation behavior, nor a 512 MiB memory qualification.",
+    "A still screenshot cannot establish submission behavior, persistence, back navigation, or successful real server communication. The supplied state corroborates captured identities and values; this review did not execute the application, builds, tests, validation suites, smoke tests, or runtime probes.",
+    "The no-issue outcomes are limited to these captured states and do not certify the complete review round or unshown interaction states."
+  ]
+}

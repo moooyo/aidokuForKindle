@@ -1,0 +1,162 @@
+{
+  "batch_id": "reference-19",
+  "reviewer": "/root/phase3_round1_review/reference_19",
+  "run_id": "a1baf3fe3dc2",
+  "round": 1,
+  "review_type": "Fresh independent static visual reference comparison",
+  "outcome": "changes_requested",
+  "identity": {
+    "candidate": "candidate3",
+    "binary_sha256": "94d7f3bbcab475ad8833a2f3c486138f7b49bead231851c2d8eab2f0c3d2ac51",
+    "source_sha256": "aef9db4e111165016a10a2a95e111f3155860b8510c7f6207ec9c79fbec5082c",
+    "supplied_reference_set_sha256": "e7b49b456255432d74cfe41346f9d44c1a9c55bf67c5d55483e4ae3029547d18",
+    "case_identity_verification": "All four case metadata files match the assigned case name, round 1, run ID, binary SHA-256, source SHA-256, Scribe profile, detail route, and portrait 930 x 1240 logical capture.",
+    "png_identity_verification": "Get-FileHash SHA256 was applied to the unmodified candidate and reference PNG bytes. Each candidate hash matches its case evidence_hashes.screenshot.sha256, and each reference hash matches its case reference_sha256.",
+    "comparison_scale": "Candidate native captures are logical 1x at 930 x 1240. References are physical 2x at 1860 x 2480 and were compared at equivalent logical proportions.",
+    "viewing_method": "Each of the eight original PNG files was separately opened with tools.view_image and visually examined."
+  },
+  "reviewed_case_ids": [
+    "sc-manga--default",
+    "sc-manga--migrate",
+    "sc-manga--more",
+    "sc-manga--tracking"
+  ],
+  "reviewed_cases": [
+    {
+      "case_id": "sc-manga--default",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/sc-manga--default.png",
+      "candidate_sha256": "8e7ab43ffb125c3788ab4ed34b14bfaab1aa85e53dd6f3c6f9b835bb898fdf01",
+      "reference_png": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/screens/sc-manga.png",
+      "reference_sha256": "33b5f4cb64428dc8e54237bdcad03c44e556da6570b234556c0b60f8d7c1e082",
+      "viewed_candidate": true,
+      "viewed_reference": true,
+      "outcome": "pass_with_intentional_differences",
+      "observations": [
+        "The 384 logical-pixel information column and remaining-width directory retain the reference proportions. The cover occupies approximately 306 x 420 logical pixels at the same left/top placement.",
+        "Sixteen directory rows remain visible with approximately 60 logical-pixel spacing. The last row, page folio, and Next page action remain inside the viewport; no bottom dock is present.",
+        "The title uses a bold serif face, while synopsis text uses regular serif with approximately 31 logical-pixel line spacing. The synopsis wraps to four fully readable lines and does not collide with the tag chips.",
+        "Primary actions remain solid black with white text, secondary actions use thin outlines, and metadata remains gray. No clipped label, unexpected surface texture, or floating-surface shadow is visible."
+      ],
+      "intentional_differences": [
+        "The cover's raster pattern and actual book values are permitted content differences.",
+        "The candidate tracking action omits the reference's linked-service count because this capture has no configured external tracking service."
+      ],
+      "related_suggestion_ids": []
+    },
+    {
+      "case_id": "sc-manga--migrate",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/sc-manga--migrate.png",
+      "candidate_sha256": "5601731b5e56ec655e28791335b769dc3108dcd6edd742effe2f623d3e453176",
+      "reference_png": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/screens/states/sc-manga--migrate.png",
+      "reference_sha256": "2d78b2d3388c7052e0e1b656877ffb06daac31ca7d4d0dc107417fb66722ca3d",
+      "viewed_candidate": true,
+      "viewed_reference": true,
+      "outcome": "pass_with_intentional_differences",
+      "observations": [
+        "The migration sheet remains a separate white outlined surface, approximately 680 logical pixels wide, with its serif heading, divider, retention controls, cancellation action, and start area fully inside the viewport.",
+        "The actual empty offline result is clearly stated in the candidate with a search affordance. No fabricated destination rows or selected migration destination are shown.",
+        "The three separate toggles remain visible: preserve read state, preserve category, and remove original-source downloads. The first two are on and the third is off, matching the recorded state.",
+        "The Start migration action is visibly disabled, consistent with an empty migration_candidates array, empty migration_selected_id, and migration_can_start=false. The screenshot does not imply a successful operation.",
+        "The sheet has a clean white background with a thin black perimeter and no shadow or stippled backdrop. Surrounding directory content remains geometrically consistent with the default page."
+      ],
+      "intentional_differences": [
+        "The reference shows illustrative destination candidates; the candidate has an actual empty offline-cache result.",
+        "The candidate preserves category without claiming to preserve an externally linked tracker that is not configured.",
+        "The missing destination selection controls and disabled start state follow the actual empty results rather than being treated as an implemented successful migration."
+      ],
+      "related_suggestion_ids": []
+    },
+    {
+      "case_id": "sc-manga--more",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/sc-manga--more.png",
+      "candidate_sha256": "4f578bdb1f16e8308e43b31e27682eea4494d3e712cbb3ae823098b6276d52c7",
+      "reference_png": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/screens/states/sc-manga--more.png",
+      "reference_sha256": "c343694e9a3125c40202fad53e4e0319dcbe4e88626877fd36120f7557bcf49e",
+      "viewed_candidate": true,
+      "viewed_reference": true,
+      "outcome": "changes_requested",
+      "observations": [
+        "The menu remains anchored beneath the top-right More trigger. Its approximately 342 logical-pixel width, white fill, thin black outline, and top-left placement agree with the reference.",
+        "The candidate displays four text-only rows, while the reference displays five icon-led actions. The final reference action for deleting all downloads is absent.",
+        "The candidate labels begin at approximately logical x=588; the reference uses that area for a monochrome action icon and begins labels around x=626. Every candidate row consequently loses the reference icon and text alignment.",
+        "The unavailable screensaver action is gray and explicitly marked unavailable, which truthfully distinguishes it from enabled actions.",
+        "No menu label is clipped. The shorter menu height is a consequence of the missing action and is not reported as an independent fixed-height defect."
+      ],
+      "intentional_differences": [
+        "The screensaver action is explicitly unavailable rather than pretending that a device-specific operation is supported.",
+        "Action wording may describe the actual supported refresh and category operations."
+      ],
+      "related_suggestion_ids": [
+        "P3R1-REF19-1",
+        "P3R1-REF19-2"
+      ]
+    },
+    {
+      "case_id": "sc-manga--tracking",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/sc-manga--tracking.png",
+      "candidate_sha256": "3f6470f88e86b64b309281f7f6d90468cf0152af1dc2ae5076915a3047021d70",
+      "reference_png": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/screens/states/sc-manga--tracking.png",
+      "reference_sha256": "100ff18148f4d1ba2866f10d8ebf0af9b655bb14e18997467958085a29e29eb6",
+      "viewed_candidate": true,
+      "viewed_reference": true,
+      "outcome": "pass_with_intentional_differences",
+      "observations": [
+        "The separate tracking sheet retains the reference's approximately 640 logical-pixel width, white fill, thin outline, serif heading, and visible Done action.",
+        "AniList and MyAnimeList are each shown as unconfigured with a configuration action. No linked book, reading progress, score, or successful external authorization is fabricated.",
+        "The two compact service cards and their configuration buttons are fully visible. Their reduced height is consistent with the unconfigured content; the linked reference card has additional controls and therefore requires more height.",
+        "The card labels, state text, and button labels are readable without overlap or clipping. The sheet has no shadow or stippled background.",
+        "The case metadata declares tracking_authorization_implemented=false and documents the unavailable/configuration entry as intentional; the visual state is consistent with that bound."
+      ],
+      "intentional_differences": [
+        "The reference's linked AniList reading controls are replaced by the actual unconfigured state.",
+        "Both service cards offer configuration entry rather than simulated login or authorization.",
+        "Sheet and card heights follow the reduced unconfigured content."
+      ],
+      "related_suggestion_ids": []
+    }
+  ],
+  "suggestions": [
+    {
+      "id": "P3R1-REF19-1",
+      "case_id": "sc-manga--more",
+      "priority": "P2",
+      "description": "Restore the contextual Delete all downloads action in the manga More menu.",
+      "evidence": "The reference contains a fifth row for deleting all downloads beneath the screensaver action. The candidate stops after four rows, and its modal_items contains only reload, migrate, category, and screensaver. The same case state records downloaded_count=9, so this is not explained by an absence of downloaded chapters.",
+      "recommendation": "Expose a contextual deletion entry for the current book when downloads exist, wired to the actual supported operation and any required confirmation. If the operation is unavailable, retain a clearly disabled action with an accurate reason instead of omitting the reference action.",
+      "status": "open",
+      "introduced_round": 1
+    },
+    {
+      "id": "P3R1-REF19-2",
+      "case_id": "sc-manga--more",
+      "priority": "P2",
+      "description": "Restore the leading action icons and matching text gutter in the manga More menu.",
+      "evidence": "All candidate menu rows are text-only and begin around logical x=588. The reference places the refresh, migration, folder, screensaver, and deletion icons at that location and starts labels around x=626. The candidate therefore loses the reference's action iconography and shifts all row labels left by approximately 38 logical pixels.",
+      "recommendation": "Render the corresponding monochrome action icon in a consistent leading slot and align row labels with the reference gutter, while preserving the explicit gray unavailable state where applicable.",
+      "status": "open",
+      "introduced_round": 1
+    }
+  ],
+  "prior_finding_rechecks": [
+    {
+      "id": "P3D-006",
+      "case_ids": [
+        "sc-manga--default",
+        "sc-manga--migrate",
+        "sc-manga--more",
+        "sc-manga--tracking"
+      ],
+      "outcome": "fixed_in_reviewed_evidence",
+      "observation": "Fresh viewing shows regular serif synopsis text, approximately 31 logical-pixel line spacing, four readable wrapped lines, and tag chips below the paragraph. The prior overly heavy or compressed synopsis treatment is not present in this batch."
+    }
+  ],
+  "limitations": [
+    "This review covers only the four assigned pairs and eight original PNGs; it does not assert that the entire review round is clean.",
+    "Only existing PNG and JSON files were read, SHA-256 values were collected with Get-FileHash, and the review JSON was written. No application, build, test, smoke test, runtime probe, Git operation, or product modification was performed.",
+    "Visual reachability is limited to the controls visible within the captured viewport. The provided static evidence cannot establish click behavior, configuration navigation, or successful migration execution.",
+    "No migration destination exists in the supplied candidate state, so candidate-row selection, a nonempty enabled migration start state, and migration completion were not demonstrated.",
+    "External tracking authorization is explicitly unimplemented. This review accepts truthful unconfigured/configuration-entry content and does not qualify external authorization or linked-service behavior.",
+    "The reference-set identity was supplied by the coordinator. Individual reference PNG hashes were independently checked against each case metadata file; the aggregate reference-set hash was not recomputed.",
+    "Reference PNGs were displayed by tools.view_image at its reported resized presentation. Geometry was compared at equivalent logical proportions, and hashes refer to the unchanged original files."
+  ]
+}

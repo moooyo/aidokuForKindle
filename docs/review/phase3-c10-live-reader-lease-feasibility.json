@@ -1,0 +1,56 @@
+{
+  "schema_version": 1,
+  "phase": "Phase3-C10",
+  "status": "Prepared; C10 execution not performed by this task",
+  "evidence_kind": "Read-only review of the existing C7 GUI driver and original report",
+  "driver": "scripts/verify-live-reader-lease.py",
+  "driver_identity": "Read-only git diff --no-index found no content difference from the C7 executed-tools copy.",
+  "c7_driver_sha256_recorded_by_report": "7ad4d50909f0f2fd3d9398a36c3d4dc1d80e8cc2cf7b7676735dd465bdfd4dd7",
+  "c7_report": "D:/Code/aidokuForKindle/artifacts/phase3/candidate7/live-reader-lease/run-20261106T195136Z-1105008/report.json",
+  "c10_inputs": {
+    "binary": "/root/aidoku-phase3/candidate10/desktop/aidoku",
+    "expected_sha256": "9ff5f18c03d1ce9c53d260f4e9619cba7f18233e0bed98669329863f2aa8239d",
+    "source_root": "/root/aidoku-phase3/candidate10/source-snapshot",
+    "expected_source_sha256": "5dca4c420996df4d4c4556430724350f33af4223dd8edb5e91626290813008df",
+    "expected_source_file_count": 227,
+    "output": "A new owned directory under /root/aidoku-phase3/evidence/candidate10/live-reader-lease; never reuse C7 output"
+  },
+  "cli": {
+    "wrapper": ["xvfb-run", "-a", "-s", "-screen 0 930x1240x24"],
+    "driver_argv": ["python3", "/root/aidoku-phase3/source/scripts/verify-live-reader-lease.py", "--binary", "/root/aidoku-phase3/candidate10/desktop/aidoku", "--expected-sha256", "9ff5f18c03d1ce9c53d260f4e9619cba7f18233e0bed98669329863f2aa8239d", "--source-root", "/root/aidoku-phase3/candidate10/source-snapshot", "--expected-source-sha256", "5dca4c420996df4d4c4556430724350f33af4223dd8edb5e91626290813008df", "--expected-source-file-count", "227", "--output", "FRESH_OWNED_OUTPUT_DIRECTORY"],
+    "entry_contract": "Linux worker only; existing DISPLAY, Xvfb and xdotool; output must not exist; default per-stage timeout 90 s"
+  },
+  "tool_dependencies": [
+    "Python 3, Pillow, Xvfb/xvfb-run, xdotool, libX11.so.6; real non-demo Scribe at scale 1 and winit-software backend",
+    "verify-handoff-ui.py, verify-cache-ui.py, verify-ui.py, verify-fullscreen.py, handoff_c4_business.py, handoff_c5_ui.py, handoff_c5_reader.py",
+    "The current verify-handoff-ui.py also imports handoff_c10_search.py; preserve that existing transitive helper. The driver records its existing eight direct tool files before and after."
+  ],
+  "conclusions": [
+    {
+      "id": 1,
+      "finding": "Reuse the existing driver without a new production hook, endpoint, or replay design. Bind the C10 frozen binary and 227-member source manifest using the explicit CLI arguments.",
+      "gates": "The driver checks expected binary and source identities before work, binary identity around every owned application stage, and unchanged source/tool identities at completion. C7 results do not establish C10 execution results."
+    },
+    {
+      "id": 2,
+      "finding": "The existing observer obtains real midrun GUI, filesystem and read-only DB evidence, despite main's terminal-only --capture path.",
+      "held_stage": "App acquires actual raw/processed CacheLease guards when an accepted current Reader frame is published at src/app.rs:1025-1034. The driver uses external XGetImage pixels, not a synthetic lease.",
+      "live_gate": "Before 15 s: exactly one visible xdotool window matching the owned PID and title, 930x1240 geometry, exact full-window baseline pixels, and a fresh production progress write for page 2 of 6 with updated_at greater than the prior baseline process.",
+      "cleanup_actions": "At 15 s: settings/detail value=storage-book:{book}; detail/remove-all-downloads value=empty; panel/choose value=book-downloads-remove-confirm; detail/continue value=empty. At 20 s: settings/detail value=clear-cache.",
+      "owner_gate": "Before 20 s: the process must remain alive; actual downloads rows for the book must disappear, chapter downloaded flag must be 0, pins must be empty, and all six raw records must still match. Timed actions and polling sleeps do not substitute for these completion observations.",
+      "fixture_policy": "Only the fresh isolated loopback source configuration is direct SQL input; pages, downloads, pins, progress and leases come from ordinary application paths. No production or lease SQL writes."
+    },
+    {
+      "id": 3,
+      "finding": "The five stages cover same-App cleanup retention followed by actual Reader process exit and forced reclamation; they do not cover reader/back release within the same process.",
+      "five_stages": [
+        "lease-provider--fixture-seed: actual application initializes isolated data; only public loopback source inputs are configured",
+        "actual-exclusive-download: one actual completed six-page download, managed raw paths and exactly its download pin owner",
+        "accepted-reader-baseline: pure page-2 Reader, exact processed-artwork oracle, one displayed image and leased_entries >= 2",
+        "same-app-reader-cleanup-and-clear: live/owner gates, one finalized successful removal, no durable pins/jobs, unchanged accepted raw/derivative bytes, leases >= 2 and five unshown raw siblings evicted",
+        "clear-after-reader-process-exit: after the main Reader PID has exited, a fresh non-Reader settings process clears; leases == 0, both former protected files absent and evictions >= 2"
+      ],
+      "limits": "No concurrent independent GUI-process retention, continuous physical-display observation, or same-process reader/back reclamation claim. Standalone captures have zero visual-round credit. The existing CacheLease unit-test evidence scope is unchanged."
+    }
+  ]
+}

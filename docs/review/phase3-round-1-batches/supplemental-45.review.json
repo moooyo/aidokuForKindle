@@ -1,0 +1,144 @@
+{
+  "batch_id": "supplemental-45",
+  "reviewer": "/root/phase3_round1_review/supplemental_45",
+  "run_id": "a1baf3fe3dc2",
+  "round": 1,
+  "binary_sha256": "94d7f3bbcab475ad8833a2f3c486138f7b49bead231851c2d8eab2f0c3d2ac51",
+  "source_sha256": "aef9db4e111165016a10a2a95e111f3155860b8510c7f6207ec9c79fbec5082c",
+  "review_method": "Fresh independent visual inspection of exactly the five candidate PNGs listed in the batch input, using tools.view_image once per original file. Existing case JSON, scope, handoff and prototype text were read. Get-FileHash was used to compare each current candidate with both the batch expected hash and the case screenshot evidence hash. No application, build, test, runtime probe or product edit was performed.",
+  "reference_basis": [
+    "D:/Code/aidokuForKindle/docs/review/phase3-reference-scope.json",
+    "D:/Code/aidokuForKindle/docs/DESIGN_HANDOFF.md",
+    "D:/Code/aidokuForKindle/docs/review/phase3-prototype-reference-support.json",
+    "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/HANDOFF.md",
+    "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/prototype/sc-sources.dc.html"
+  ],
+  "reviewed_case_ids": [
+    "scribe3--stretch-library",
+    "scribe3--stretch-reader",
+    "scribe3--stretch-search",
+    "scribe3--stretch-settings",
+    "scribe3--stretch-sources"
+  ],
+  "reviewed_cases": [
+    {
+      "case_id": "scribe3--stretch-library",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/scribe3--stretch-library.png",
+      "candidate_sha256": "84cf643b5c4d8344fa75521d02d2b1f7a6b3c179863b0fe1e142cbb4ceb4d9fc",
+      "viewed_candidate": true,
+      "outcome": "no_visible_issue_observed",
+      "observations": [
+        "The existing case record identifies run a1baf3fe3dc2, round 1, the specified binary and source hashes, the library route, portrait Scribe3, a 990 x 1320 native viewport, no menu and no modal. Its 30 recorded checks have no failures. The current PNG hash matches both expected and case evidence hashes.",
+        "Eighteen covers form six columns and three rows. Book names and adjacent unread/download indicators remain beneath the covers, without visible collisions or clipped grid rows.",
+        "The continuation card and daily-update card sit side by side on white outlined surfaces. The continuation title, chapter, progress bar, 12/40 count and arrow remain readable; the update card has three visible chapter rows.",
+        "The folio reads 1/3 above the five-item dock. The next-page action is visible at the right and the first-page previous allocation remains empty. The book grid and folio do not overlap the dock.",
+        "Page-title and book-title emphasis are visually distinct from secondary captions. No UI shadow, gray card fill, dimmed mask or decorative screen-tone overlay is visible; patterned pixels belong to the supplied cover artwork."
+      ],
+      "intentional_differences": [
+        "The original native 990 x 1320 Scribe3 viewport is reviewed as a stretched SC profile. It is not resized to match the Scribe1/2 reference canvas.",
+        "The displayed titles, covers, chapter counts, update counts, download size and clock values are fixture data; their difference from handoff sample content is not a visual defect."
+      ]
+    },
+    {
+      "case_id": "scribe3--stretch-reader",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/scribe3--stretch-reader.png",
+      "candidate_sha256": "e2a56b7fef550c172f162ace05b6d1d2650a49fd363e915e42fdc7772747e07e",
+      "viewed_candidate": true,
+      "outcome": "no_visible_issue_observed",
+      "observations": [
+        "The existing case record identifies the specified run, binary, source and round, reader route, portrait Scribe3, menu=true, no modal, ready artwork and page 12 of 40. Its 29 recorded checks have no failures. The current PNG hash matches both expected and case evidence hashes.",
+        "The menu-open state is visually explicit: the integrated top header contains a labeled chapter title, back, bookmark and contents controls plus clock/battery text. The artwork extends beneath the menu regions, and the header remains separate from the page image.",
+        "The lower menu shows chapter-remaining information, the 12/40 count, a horizontal scrubber and adjacent-chapter actions. Their labels remain within the viewport and do not collide with the tool strip.",
+        "Five evenly distributed portrait tools are visible for reading mode, image treatment, brightness, orientation and more. There is no pen tool, consistent with the case capability declaration that pen input is not implemented.",
+        "No extra app dock, notification or bookmark ribbon appears on the artwork. Artwork margins and panel boundaries are treated as image content; this menu-open capture does not establish a closed-reader viewport-inset defect."
+      ],
+      "intentional_differences": [
+        "The original native 990 x 1320 Scribe3 viewport is not a resized Scribe1/2 exact-reference capture.",
+        "Actual page artwork, title, chapter, clock and progress may differ from the handoff examples. Open-menu chrome is required in this default state; the artwork-only override applies when the menu is closed."
+      ]
+    },
+    {
+      "case_id": "scribe3--stretch-search",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/scribe3--stretch-search.png",
+      "candidate_sha256": "16d13e6bfd0a8a7daa282cbd9bd7d8f2b7797df7e788e0ecc7166e057a1cac9c",
+      "viewed_candidate": true,
+      "outcome": "no_visible_issue_observed",
+      "observations": [
+        "The existing case record identifies the specified run, binary, source and round, search route, portrait Scribe3, a submitted nonempty query, four groups, four results, no active keyboard target and no modal. Its 30 recorded checks have no failures. The current PNG hash matches both expected and case evidence hashes.",
+        "The submitted query is readable in a white outlined search field with separate clear and cancel controls. The selected all-sources scope uses inverse styling and the other visible scope controls remain outlined.",
+        "MangaDex presents three result covers and Komga one, each under a source heading with a count and view-all action. The first result has its library-membership marker beside the title rather than over its cover.",
+        "The local group has a visible empty-result label; the failed extension group has an operation-not-completed label and a separate retry action. These states match the case's independent empty and error group records without claiming a timeout or successful operation.",
+        "The restored bottom dock has search selected, consistent with result mode and an empty keyboard target. All result sections fit above it without cover, label or navigation clipping. The editing keyboard replacement state is not shown in this case."
+      ],
+      "intentional_differences": [
+        "The native 990 x 1320 Scribe3 canvas is reviewed independently of the Scribe1/2 exact-reference dimensions.",
+        "Real or fixture query text, source names, result counts, artwork and operation messages can differ from sample reference data. Four results are not required to fill the six-cover per-source maximum."
+      ]
+    },
+    {
+      "case_id": "scribe3--stretch-settings",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/scribe3--stretch-settings.png",
+      "candidate_sha256": "cd11f6b3f25e0c3a797422fa14de5be5d374eeb629541498b8db75468ad6e972",
+      "viewed_candidate": true,
+      "outcome": "no_visible_issue_observed",
+      "observations": [
+        "The existing case record identifies the specified run, binary, source and round, settings route, portrait Scribe3, screen-refresh section, no modal and one settings-details page. Its 30 recorded checks have no failures. The current PNG hash matches both expected and case evidence hashes.",
+        "The navigation divider is at the fixed 320-pixel column boundary. The grouped navigation labels all remain visible, the screen-refresh row is black with white content, and no settings-list pager is drawn.",
+        "The title header includes the device name and a compact summary, with free-space and Wi-Fi information at the right. The long capability caption uses an ellipsis without overlapping the device name or right-hand status block.",
+        "The right pane has a distinct serif heading, five outlined refresh choices with six pages selected, three muted unavailable quality cards, three switch rows and a grayscale strip. Controls remain inside the pane and none extends into the dock.",
+        "The unavailable quality choices have an explicit unavailable caption and muted indicators. The pen navigation item is absent, consistent with pen_input_implemented=false; frontlight/warmth remains present in line with the declared exposed controls. The image does not qualify physical hardware behavior."
+      ],
+      "intentional_differences": [
+        "The fixed navigation column is retained within the wider native 990 x 1320 Scribe3 viewport; no overall-size difference from Scribe1/2 is reported as a defect.",
+        "Device version, storage and clock are data-dependent. Honest unavailable software controls and the absent unimplemented pen item are assessed according to declared capability bounds rather than simulated reference success."
+      ]
+    },
+    {
+      "case_id": "scribe3--stretch-sources",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/scribe3--stretch-sources.png",
+      "candidate_sha256": "3ea3cfcebdf4ce2060a117fafa8be8a7b9f10588549204ff5d810202c2134fbe",
+      "viewed_candidate": true,
+      "outcome": "visible_issue_found",
+      "observations": [
+        "The existing case record identifies the specified run, binary, source and round, sources route, portrait Scribe3, no modal, seven installed sources, two updates and right-side folio 1/13. Its 30 recorded checks have no failures. The current PNG hash matches both expected and case evidence hashes.",
+        "The installed-source pane retains the fixed 400-pixel column and its four built-in plus three extension rows. The right pane has separate available/update tabs, language filters and ten source records; its 1/13 folio and next action stay inside that pane above the dock.",
+        "Header back navigation, source-list and add-source actions remain readable. Update and install actions are aligned with their corresponding right-column records, and the browse dock item is selected.",
+        "The unavailable extension has a warning tile, muted name and an uninstall action, but its single-line explanatory subtitle is ellipsized immediately after the word Kindle. The essential unavailable conclusion at the end of the case subtitle is not visible. This is recorded as P3R1-SUP45-1.",
+        "Other installed-source subtitles and right-side version labels are readable. The source-list surfaces remain white and outlined, and no shadow or screen-tone capture mask is present."
+      ],
+      "intentional_differences": [
+        "The original native 990 x 1320 Scribe3 viewport is reviewed without resizing to the Scribe1/2 reference canvas.",
+        "Source names, counts, versions and connection fixtures may differ from the handoff examples. Those data differences do not excuse truncating the essential unavailable status."
+      ]
+    }
+  ],
+  "suggestions": [
+    {
+      "id": "P3R1-SUP45-1",
+      "case_id": "scribe3--stretch-sources",
+      "priority": "P2",
+      "description": "The blocked installed-source subtitle truncates the explicit unavailable conclusion.",
+      "evidence": [
+        "In the original 990 x 1320 PNG, the last extension row in the installed pane shows the verification reason followed by Kindle and an ellipsis, around x=100..290, y=744..762. The unavailable phrase is not visible, although the warning tile and uninstall control are visible.",
+        "The case state marks source id demo-b as available=false and provides a longer subtitle whose unavailable conclusion comes after Kindle. The source row's text allocation therefore hides the status that explains why the source cannot be opened.",
+        "HANDOFF.md section 5.4 requires a verification-dependent unavailable source to show a concise verification/unavailable label with uninstall. The sc-sources.dc.html declaration at line 71 preserves both the reason and the unavailable word in its short status text. DESIGN_HANDOFF.md also requires browser-verification-dependent sources to show an unavailable state."
+      ],
+      "recommendation": "Keep the 400-pixel installed column and uninstall action, but shorten this status or place the unavailable conclusion first so it remains visible within the row. Preserve the longer explanation in source details if needed; do not rely on a warning icon or muted text to convey unavailability.",
+      "status": "open",
+      "introduced_round": 1
+    }
+  ],
+  "coverage_gaps": [
+    "Scribe3 has no independent exact reference PNG in this batch. Geometry is assessed against the documented SC layout contracts and the native candidate; no resized Scribe1/2 pixel-match verdict is claimed.",
+    "The reader case has its menu open. Closed-reader artwork-only behavior, absence of an invisible footer-cycle hit region, overlays, orientation variants and menu transitions are not exercised by these five still images.",
+    "The search case is the submitted-results state. Keyboard replacement of the dock while editing, candidate paging and actual text input are not shown.",
+    "Only the first library page, first source-manager page and default screen-refresh settings section are present. Later-page edge behavior, source popups, other settings sections and other named states require their own evidence."
+  ],
+  "limitations": [
+    "Exactly the five input-listed candidate PNGs were opened. No other image or independent reference PNG was loaded.",
+    "Static screenshots establish visible layout and wording only. They do not prove touch-hit dimensions, inverse press feedback, dismissal, disabled input handling, page navigation or business-operation results.",
+    "The case sidecars and their existing mechanical checks were read as capture evidence; no local verification suite, application execution, build, smoke test or runtime probe was run.",
+    "The declared backend is desktop and physical_hardware_qualified=false. No conclusion is made about e-ink waveforms, sensor behavior, physical sleep/wake, pen hardware, lighting or a 512 MiB memory limit.",
+    "This supplemental batch contains four cases without an observed visible issue and one case with an open suggestion. It does not establish a complete clean review round."
+  ]
+}

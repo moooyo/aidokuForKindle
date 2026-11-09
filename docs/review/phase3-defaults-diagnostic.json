@@ -1,0 +1,493 @@
+{
+  "schemaVersion": 1,
+  "kind": "partial-defaults-visual-diagnostic",
+  "recordDate": "2026-11-06",
+  "reviewer": "/root/phase3_defaults_review",
+  "status": "changes-required; default-pages-only; not-a-clean-round",
+  "round": 1,
+  "run_id": "ddffe2857768",
+  "binary_sha256": "9f433920b44b1e17dfeef8da75c35e05fca7839d291f6bc13944edf6dee86038",
+  "source_sha256": "4452d2890c237d2aabda8cdcb945af15f72c434e03aaa7de3aa172c34b775d4e",
+  "reference_sha256": "e7b49b456255432d74cfe41346f9d44c1a9c55bf67c5d55483e4ae3029547d18",
+  "candidate": {
+    "id": "phase3-candidate1",
+    "evidenceRoot": "D:/Code/aidokuForKindle/artifacts/phase3/candidate1/ui-defaults-diagnostic",
+    "evidenceManifest": "artifacts/phase3/candidate1/ui-defaults-diagnostic/manifest.json",
+    "backend": "desktop",
+    "provenance": "Pre-existing remote-produced captures supplied by the parent coordinator. No application was executed during this review."
+  },
+  "reference": {
+    "root": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff",
+    "designVersion": "1793901158-6c09",
+    "scope": "docs/review/phase3-reference-scope.json",
+    "handoffSummary": "docs/DESIGN_HANDOFF.md",
+    "precedence": [
+      "The November handoff supersedes historical PDF and C5 reviews.",
+      "Closed readers contain artwork only under the user's override. All three default reader references have menus open.",
+      "Real titles, counts, dates, capacities and covers may differ; geometry, typography, clipping and honest operation states still apply.",
+      "Absent pen and unexposed hardware dither controls are hidden; unavailable quality modes may remain explicitly disabled."
+    ]
+  },
+  "scope": {
+    "productReferenceImages": 101,
+    "defaultsReviewed": 17,
+    "stateImagesNotReviewed": 84,
+    "inspectedPairs": 17,
+    "inspectedImages": 34,
+    "mechanicalPassesReportedByExistingManifest": 17,
+    "mechanicalFailuresReportedByExistingManifest": 0,
+    "allApplicableStatesReviewed": false,
+    "runtimeControlsVerified": false,
+    "cleanRound": false,
+    "cleanRoundStreak": 0,
+    "comparison": "Reference PNGs are exported at 2x; native desktop captures are logical 1x. Observations compare matching logical proportions. Regions are approximate logical pixels, not automated pixel measurements.",
+    "limitations": [
+      "This is a static pixel diagnostic of the 17 default captures only.",
+      "Mechanical PASS does not establish visual fidelity or working interactions.",
+      "No tests, builds, runtime probes, application launches or Git operations were performed.",
+      "Known C2 work was excluded from new findings and was not retested here.",
+      "No C2 binary or capture is approved by this C1 review."
+    ],
+    "assignments": [
+      {
+        "reviewer": "/root/phase3_defaults_review/pw_primary",
+        "boards": [
+          "Main",
+          "pw-manga",
+          "pw-reader",
+          "pw-browse"
+        ],
+        "imageCount": 8
+      },
+      {
+        "reviewer": "/root/phase3_defaults_review/pw_secondary",
+        "boards": [
+          "pw-source",
+          "pw-search",
+          "pw-history",
+          "pw-settings"
+        ],
+        "imageCount": 8
+      },
+      {
+        "reviewer": "/root/phase3_defaults_review/sc_primary",
+        "boards": [
+          "sc-library",
+          "sc-manga",
+          "sc-browse"
+        ],
+        "imageCount": 6
+      },
+      {
+        "reviewer": "/root/phase3_defaults_review/sc_reader_sources",
+        "boards": [
+          "sc-reader-portrait",
+          "sc-reader",
+          "sc-sources"
+        ],
+        "imageCount": 6
+      },
+      {
+        "reviewer": "/root/phase3_defaults_review/sc_secondary",
+        "boards": [
+          "sc-search",
+          "sc-history",
+          "sc-settings"
+        ],
+        "imageCount": 6
+      }
+    ]
+  },
+  "reviewed_case_ids": [
+    "Main--default",
+    "pw-manga--default",
+    "pw-reader--default",
+    "pw-browse--default",
+    "pw-source--default",
+    "pw-search--default",
+    "pw-history--default",
+    "pw-settings--default",
+    "sc-library--default",
+    "sc-manga--default",
+    "sc-browse--default",
+    "sc-reader-portrait--default",
+    "sc-reader--default",
+    "sc-sources--default",
+    "sc-search--default",
+    "sc-history--default",
+    "sc-settings--default"
+  ],
+  "summary": {
+    "uniqueNewFindings": 7,
+    "priorities": {
+      "P2": 4,
+      "P3": 3
+    },
+    "affectedBoards": 7,
+    "conclusion": "Correct the seven findings and capture a new frozen candidate. This partial review cannot contribute to the required two complete clean rounds."
+  },
+  "findings": [
+    {
+      "id": "P3D-001",
+      "boards": [
+        "pw-history",
+        "sc-history"
+      ],
+      "state": "default",
+      "priority": "P2",
+      "confidence": "high",
+      "owner": "History UI (ui/history.slint)",
+      "reference": [
+        "screens/pw-history.png",
+        "screens/sc-history.png"
+      ],
+      "evidence": [
+        "artifacts/phase3/candidate1/ui-defaults-diagnostic/pw-history--default.png",
+        "artifacts/phase3/candidate1/ui-defaults-diagnostic/sc-history--default.png"
+      ],
+      "logicalRegion": {
+        "pw-history": {
+          "x": 22,
+          "y": 201,
+          "width": 536,
+          "height": 464
+        },
+        "sc-history": {
+          "x": 36,
+          "y": 282,
+          "width": 858,
+          "height": 118
+        }
+      },
+      "observation": "Record covers and text have an extra row-level left inset. PW covers begin near x=49 instead of x=22 and text near x=111 instead of x=84. Scribe covers begin near x=69 and x=513 instead of x=36 and x=480. Date headings, row separators and trailing remove actions retain their reference allocations.",
+      "expected": "Align covers with each date group's column edge. Retain the 14 px PW and 16 px Scribe cover-to-text gaps.",
+      "impact": "Records detach from their date groups and lose usable title and metadata width.",
+      "recommendation": "Remove the additional inner record inset while preserving the column gap and trailing remove actions.",
+      "retest": "On the next remote frozen candidate, compare both default history captures at logical scale and include a long-title record."
+    },
+    {
+      "id": "P3D-002",
+      "boards": [
+        "sc-history"
+      ],
+      "state": "default",
+      "priority": "P2",
+      "confidence": "high",
+      "owner": "History progress renderer (ui/history.slint)",
+      "reference": [
+        "screens/sc-history.png"
+      ],
+      "evidence": [
+        "artifacts/phase3/candidate1/ui-defaults-diagnostic/sc-history--default.png"
+      ],
+      "logicalRegion": {
+        "x": 150,
+        "y": 350,
+        "width": 230,
+        "height": 30
+      },
+      "observation": "Partial progress foregrounds are horizontally centered within their tracks. For the 12/40 record, the track spans approximately x=158..248 while the black segment spans x=189..217.",
+      "expected": "A 12/40 record fills the leftmost 30% of its track.",
+      "impact": "The bar does not visually represent accumulated reading progress.",
+      "recommendation": "Anchor the foreground at the track's left edge and derive only its width from the actual progress ratio.",
+      "retest": "Compare incomplete and complete records on the next remote frozen candidate; verify the fill starts at the track's left edge."
+    },
+    {
+      "id": "P3D-003",
+      "boards": [
+        "pw-reader"
+      ],
+      "state": "default/menu-open",
+      "priority": "P2",
+      "confidence": "high",
+      "owner": "Reader status composition (ui/reader.slint)",
+      "reference": [
+        "screens/pw-reader.png"
+      ],
+      "evidence": [
+        "artifacts/phase3/candidate1/ui-defaults-diagnostic/pw-reader--default.png"
+      ],
+      "logicalRegion": {
+        "x": 0,
+        "y": 0,
+        "width": 618,
+        "height": 26
+      },
+      "observation": "The reserved menu-open status row is completely blank.",
+      "expected": "Display time, Wi-Fi and battery in the 26 px menu-open status row. The artwork-only override applies to closed readers.",
+      "impact": "The reader menu omits the required device-status information.",
+      "recommendation": "Restore status content within the existing row without adding decoration to the closed reader.",
+      "retest": "Capture menu-open and menu-closed PW reader states on the next remote frozen candidate; status must be visible only in the open menu."
+    },
+    {
+      "id": "P3D-004",
+      "boards": [
+        "pw-reader",
+        "sc-reader-portrait",
+        "sc-reader"
+      ],
+      "state": "default/menu-open",
+      "priority": "P3",
+      "confidence": "high",
+      "owner": "Shared reader tools (ui/reader.slint)",
+      "reference": [
+        "screens/pw-reader.png",
+        "screens/sc-reader-portrait.png",
+        "screens/sc-reader.png"
+      ],
+      "evidence": [
+        "artifacts/phase3/candidate1/ui-defaults-diagnostic/pw-reader--default.png",
+        "artifacts/phase3/candidate1/ui-defaults-diagnostic/sc-reader-portrait--default.png",
+        "artifacts/phase3/candidate1/ui-defaults-diagnostic/sc-reader--default.png"
+      ],
+      "logicalRegion": {
+        "pw-reader": {
+          "x": 537,
+          "y": 768,
+          "width": 38,
+          "height": 26
+        },
+        "sc-reader-portrait": {
+          "x": 802,
+          "y": 1177,
+          "width": 26,
+          "height": 26
+        },
+        "sc-reader": {
+          "x": 1007,
+          "y": 865,
+          "width": 26,
+          "height": 26
+        }
+      },
+      "observation": "The More tool retains its label but its ellipsis icon is absent in all three readers.",
+      "expected": "Center the ellipsis above the label within the existing icon allocation.",
+      "impact": "The fifth tool appears incomplete and loses consistent icon recognition.",
+      "recommendation": "Restore the ellipsis in the shared tool renderer.",
+      "retest": "Compare the three default reader tool rows on the next remote frozen candidate."
+    },
+    {
+      "id": "P3D-005",
+      "boards": [
+        "pw-reader",
+        "sc-reader-portrait",
+        "sc-reader"
+      ],
+      "state": "default/menu-open",
+      "priority": "P3",
+      "confidence": "high",
+      "owner": "Shared reader chapter actions (ui/reader.slint)",
+      "reference": [
+        "screens/pw-reader.png",
+        "screens/sc-reader-portrait.png",
+        "screens/sc-reader.png"
+      ],
+      "evidence": [
+        "artifacts/phase3/candidate1/ui-defaults-diagnostic/pw-reader--default.png",
+        "artifacts/phase3/candidate1/ui-defaults-diagnostic/sc-reader-portrait--default.png",
+        "artifacts/phase3/candidate1/ui-defaults-diagnostic/sc-reader--default.png"
+      ],
+      "logicalRegion": {
+        "pw-reader": {
+          "x": 0,
+          "y": 728,
+          "width": 618,
+          "height": 4
+        },
+        "sc-reader-portrait": {
+          "x": 0,
+          "y": 1133,
+          "width": 930,
+          "height": 4
+        },
+        "sc-reader": {
+          "x": 0,
+          "y": 823,
+          "width": 1240,
+          "height": 5
+        }
+      },
+      "observation": "Black horizontal rules extend through the empty portions of the chapter-navigation row. PW is most obvious between approximately x=162 and x=456.",
+      "expected": "The chapter-action row has a continuous white background. Retain the intended divider above the bottom tools.",
+      "impact": "Unintended rules interrupt the reference layout and visually connect unrelated actions.",
+      "recommendation": "Remove the stray chapter-row border or divider.",
+      "retest": "Compare chapter-action rows in all three default reader captures on the next remote frozen candidate."
+    },
+    {
+      "id": "P3D-006",
+      "boards": [
+        "sc-manga"
+      ],
+      "state": "default",
+      "priority": "P2",
+      "confidence": "high",
+      "owner": "Scribe detail synopsis (ui/detail.slint)",
+      "reference": [
+        "screens/sc-manga.png",
+        "docs/DESIGN_HANDOFF.md: Detail"
+      ],
+      "evidence": [
+        "artifacts/phase3/candidate1/ui-defaults-diagnostic/sc-manga--default.png"
+      ],
+      "logicalRegion": {
+        "x": 40,
+        "y": 870,
+        "width": 314,
+        "height": 112
+      },
+      "observation": "The synopsis uses a visibly heavy serif face and approximately 24 px line spacing. The reference uses regular serif text and approximately 31 px line spacing. The compressed paragraph leaves excess space above the tags.",
+      "expected": "Regular 17 px serif body text with 31 px line height.",
+      "impact": "The synopsis loses its body-text hierarchy and differs visibly from the reference.",
+      "recommendation": "Apply the regular serif face and explicit 31 px line height.",
+      "retest": "Compare the Scribe detail synopsis and tag boundary on the next remote frozen candidate, retaining the 384 px information column."
+    },
+    {
+      "id": "P3D-007",
+      "boards": [
+        "pw-manga"
+      ],
+      "state": "default",
+      "priority": "P3",
+      "confidence": "high",
+      "owner": "PW detail description link (ui/detail.slint)",
+      "reference": [
+        "screens/pw-manga.png"
+      ],
+      "evidence": [
+        "artifacts/phase3/candidate1/ui-defaults-diagnostic/pw-manga--default.png"
+      ],
+      "logicalRegion": {
+        "x": 176,
+        "y": 271,
+        "width": 120,
+        "height": 23
+      },
+      "observation": "The description-link chevron is near x=284 instead of reference x=255. Identical label text leaves approximately 29 additional pixels of spacing.",
+      "expected": "Place the chevron approximately 10 px after the label.",
+      "impact": "The inline link geometry visibly differs from the reference.",
+      "recommendation": "Size the link to its content and apply the reference label-to-chevron gap.",
+      "retest": "Compare the first-page PW description link on the next remote frozen candidate."
+    }
+  ],
+  "outcomes": [
+    {
+      "board": "Main",
+      "findingIds": [],
+      "outcome": "No new high-confidence finding beyond known C2 exclusions."
+    },
+    {
+      "board": "pw-manga",
+      "findingIds": [
+        "P3D-007"
+      ],
+      "outcome": "New P3 inline-link spacing finding."
+    },
+    {
+      "board": "pw-reader",
+      "findingIds": [
+        "P3D-003",
+        "P3D-004",
+        "P3D-005"
+      ],
+      "outcome": "New menu-open status and shared tool-row findings."
+    },
+    {
+      "board": "pw-browse",
+      "findingIds": [],
+      "outcome": "No new high-confidence finding."
+    },
+    {
+      "board": "pw-source",
+      "findingIds": [],
+      "outcome": "No new high-confidence finding; five-row geometry and absence of dock match."
+    },
+    {
+      "board": "pw-search",
+      "findingIds": [],
+      "outcome": "No new high-confidence finding. Empty composition does not establish populated candidate rendering."
+    },
+    {
+      "board": "pw-history",
+      "findingIds": [
+        "P3D-001"
+      ],
+      "outcome": "New record-inset finding."
+    },
+    {
+      "board": "pw-settings",
+      "findingIds": [],
+      "outcome": "Known C2 title and bounds symptoms excluded. The absent first-page device card was forwarded for deduplication against that work; resolution is not established by this C1 capture."
+    },
+    {
+      "board": "sc-library",
+      "findingIds": [],
+      "outcome": "No new high-confidence finding beyond known C2 exclusions."
+    },
+    {
+      "board": "sc-manga",
+      "findingIds": [
+        "P3D-006"
+      ],
+      "outcome": "New synopsis typography finding; 384 px information column and sixteen chapter rows match."
+    },
+    {
+      "board": "sc-browse",
+      "findingIds": [],
+      "outcome": "No new high-confidence finding; five-by-three grid, search row and dock match."
+    },
+    {
+      "board": "sc-reader-portrait",
+      "findingIds": [
+        "P3D-004",
+        "P3D-005"
+      ],
+      "outcome": "New shared reader tool-row findings."
+    },
+    {
+      "board": "sc-reader",
+      "findingIds": [
+        "P3D-004",
+        "P3D-005"
+      ],
+      "outcome": "New shared reader tool-row findings."
+    },
+    {
+      "board": "sc-sources",
+      "findingIds": [],
+      "outcome": "No counted new high-confidence finding. Truncated long reason retains a warning icon and gray state, so missing availability semantics was not established."
+    },
+    {
+      "board": "sc-search",
+      "findingIds": [],
+      "outcome": "No new high-confidence finding."
+    },
+    {
+      "board": "sc-history",
+      "findingIds": [
+        "P3D-001",
+        "P3D-002"
+      ],
+      "outcome": "New record-inset and progress-anchor findings."
+    },
+    {
+      "board": "sc-settings",
+      "findingIds": [],
+      "outcome": "Known C2 title, section bounds and translation issues excluded. Capability-driven hidden and disabled controls accepted within this static scope."
+    }
+  ],
+  "deferredForDeduplication": [
+    {
+      "board": "pw-settings",
+      "logicalRegion": { "x": 16, "y": 105, "width": 586, "height": 84 },
+      "observation": "The first-page device card is absent along with the known header/bounds symptoms. It was forwarded to the parent coordinator but is not counted independently until deduplicated against the C2 bounds work.",
+      "retest": "Confirm that device, free-space and connection information is visible in the next remote frozen capture."
+    }
+  ],
+  "excludedKnownC2Work": [
+    "Settings header positioning and missing section x/y/bounds.",
+    "Sidebar category translation and shortened direction, download and tracking labels.",
+    "Fresh-library real progress/timestamps and download metadata, canonical sort arrows, and removal of reused covers belonging to different extra-demo titles.",
+    "Generic first-thumbnail zero-progress presentation without changing the main reader page number."
+  ],
+  "nextRequiredReview": "After fixes, freeze and capture the full applicable matrix from the 101-reference product inventory remotely, apply explicit capability and user overrides, and perform independent visual and interaction review. A complete clean round is required before increasing the zero clean-round streak."
+}

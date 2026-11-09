@@ -1,0 +1,82 @@
+{
+  "kind": "prior-finding-recheck-only",
+  "reviewer": "/root/phase3_round1_review/prior_pw_closure",
+  "case_id": "pw-reader--default",
+  "candidate_id": "candidate3",
+  "round": 1,
+  "candidate": {
+    "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/pw-reader--default.png",
+    "sha256": "f110a73a39ce7a666afc49ce22a0d9f5cba6f5a5238278a319429c3b8db2e50e",
+    "matches_case_screenshot_evidence": true,
+    "logical_size": [618, 824],
+    "capture_scale": 1
+  },
+  "reference": {
+    "path": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/screens/pw-reader.png",
+    "sha256": "b67b1618519e877e60ab4ac4ad20306fb33bd48f0af6a8b129926900ae98e16d",
+    "matches_case_reference_sha256": true,
+    "physical_size": [1236, 1648],
+    "physical_reference_scale": 2
+  },
+  "case_metadata": {
+    "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/cases/pw-reader--default.json",
+    "run_id": "a1baf3fe3dc2",
+    "binary_sha256": "94d7f3bbcab475ad8833a2f3c486138f7b49bead231851c2d8eab2f0c3d2ac51",
+    "source_sha256": "aef9db4e111165016a10a2a95e111f3155860b8510c7f6207ec9c79fbec5082c",
+    "matches_assigned_candidate_identity": true
+  },
+  "viewed_candidate": true,
+  "viewed_reference": true,
+  "view_method": "Both specified original files were visually inspected with tools.view_image. File hashes were read with Get-FileHash.",
+  "comparison_basis": "Candidate pixels represent the 618 by 824 logical viewport at 1x. The reference represents the same logical viewport at 2x; visual size comparisons account for this scale difference.",
+  "prior_finding_rechecks": [
+    {
+      "id": "P3D-003",
+      "status": "resolved",
+      "closure_scope": "static_visual",
+      "observed": {
+        "candidate": "The reader menu has a visible top status row: 18:46 at the left, and a Wi-Fi symbol, 87% text, and an outlined battery icon at the right.",
+        "reference": "The reference presents the same time and the Wi-Fi, battery percentage, and battery icon in its top status row.",
+        "conclusion": "All four previously requested status elements are visible in the candidate."
+      }
+    },
+    {
+      "id": "P3D-004",
+      "status": "resolved",
+      "closure_scope": "static_visual",
+      "observed": {
+        "candidate": "The rightmost bottom toolbar action has three distinct horizontal dots above its More label.",
+        "reference": "The reference More action also uses three horizontal dots above the label.",
+        "conclusion": "The bottom More ellipsis is visibly present."
+      }
+    },
+    {
+      "id": "P3D-005",
+      "status": "resolved",
+      "closure_scope": "static_visual",
+      "observed": {
+        "candidate": "The bottom chapter-navigation row shows the chapter 35 action at the left and the chapter 33 action at the right, with clear whitespace between them and no extra central short horizontal stroke.",
+        "reference": "The reference chapter-navigation row likewise has open whitespace between its left and right chapter actions.",
+        "conclusion": "The unwanted stroke between the bottom chapter-navigation buttons is absent. This observation concerns that row only."
+      }
+    },
+    {
+      "id": "P3R-001",
+      "status": "resolved",
+      "closure_scope": "static_visual",
+      "observed": {
+        "candidate": "The upper-right header Table of Contents action is a visibly bulleted list: three separate dots precede three horizontal strokes. Its visual width is approximately 18 logical pixels, rather than a compact unbulleted 11-pixel mark.",
+        "reference": "After accounting for the reference's 2x scale, its upper-right header action has the same recognizable bulleted-list form and comparable logical size.",
+        "conclusion": "The header action now has the requested bulleted-list appearance. No panel opening was needed or performed."
+      }
+    }
+  ],
+  "required_case_coverage_increment": 0,
+  "coverage_note": "This case belongs to the full review already. This supplementary prior-finding recheck adds no required reviewed case IDs.",
+  "limitations": [
+    "Only the two assigned screenshots and the assigned case metadata were inspected.",
+    "Conclusions cover the four specified prior visual findings only; they do not establish that the full case or review round is clean.",
+    "Screenshot appearance does not establish interaction behavior, application runtime correctness, or physical hardware behavior.",
+    "No application, build, test, runtime probe, Table of Contents panel interaction, or hardware check was performed for this recheck."
+  ]
+}

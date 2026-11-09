@@ -1,0 +1,117 @@
+{
+  "schema_version": 1,
+  "batch_id": "c11r1-m013-b001",
+  "reviewer": "c11r1_tail_m013_b001",
+  "round": 1,
+  "run_id": "55c498296d35",
+  "module_id": "013-hardware-capabilities",
+  "input": {
+    "path": "D:/Code/aidokuForKindle/docs/review/phase3-c11-full1-batches/c11r1-m013-b001.input.json",
+    "sha256": null,
+    "sha256_status": "pending owner declaration in the assigned input; no local hash was run"
+  },
+  "module_snapshot": {
+    "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate11/ui-round-1/snapshots/ui-round-1-snapshot-013-hardware-capabilities/inventory.json",
+    "sha256": "76912a74dd8c08d7d91df6d6ac3758b211e3301091b3465a140205c9170c62f6"
+  },
+  "freeze_tuple": {
+    "source_sha256": "33a2d049307c398da8bfbf196d1bf8e086412c117c194b592f4a93b5bfaedb3f",
+    "binary_sha256": "1e60db345cbd6fbe580258a4a309bf42361781061dc2033f78a8a5eb4446ad72",
+    "reference_sha256": "e7b49b456255432d74cfe41346f9d44c1a9c55bf67c5d55483e4ae3029547d18"
+  },
+  "hash_basis": "All SHA-256 values are owner declarations from the assigned input and frozen case records. The input retains the full capture and tool tuple.",
+  "reviewed_case_ids": [
+    "capability--no-frontlight-settings",
+    "capability--no-frontlight-reader-menu"
+  ],
+  "actual_original_image_opens": 4,
+  "image_open_counts": {
+    "candidates": 2,
+    "references": 2,
+    "reference_pairs": 2,
+    "additional_images": 0
+  },
+  "references": [
+    {
+      "reference_id": "sc-settings--default",
+      "path": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/screens/sc-settings.png",
+      "sha256": "d662725b6151b4cd4ac8d869e9548f98edfa9ee32a1b6e5906356507bdcd32fb",
+      "native_dimensions": [1860, 2480],
+      "actual_image_opened": true,
+      "tool": "tools.view_image",
+      "scope": "Related Settings logical contract only; not an exact profile, size or state reference."
+    },
+    {
+      "reference_id": "sc-reader-portrait--default",
+      "path": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/screens/sc-reader-portrait.png",
+      "sha256": "a435bacd0c94da82f96f49904136f271b7500709c42609eb727a4f104dba5f45",
+      "native_dimensions": [1860, 2480],
+      "actual_image_opened": true,
+      "tool": "tools.view_image",
+      "scope": "Related open portrait Reader menu logical contract only; not an exact profile, size or state reference."
+    }
+  ],
+  "cases": [
+    {
+      "case_id": "capability--no-frontlight-settings",
+      "png_path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate11/ui-round-1/snapshots/ui-round-1-snapshot-013-hardware-capabilities/files/output/capability--no-frontlight-settings.png",
+      "png_sha256": "2475e2a75d610669974f64c65f430ac8de5dd035327d78798f9a477fcf6e0830",
+      "case_json_sha256": "99d37ef99d201faba197f135237e40f76b1a566cd8d9fb02315791aa37b4d6df",
+      "state_sha256": "5a896aad9ee61eae4b6cd5506213eee5e47ed088c7b9ee4e99490c855b1cd5ad",
+      "metadata_sha256": "90128550b429e94208bcd91f06bcd266d5a5953b533a3cc07ab19e352da68f12",
+      "actions_sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "log_sha256": "f2af43b42280ddd64ce192741de5fa5de4938b1516a7be771606c170351cd4aa",
+      "reference_sha256": null,
+      "comparison_reference_id": "sc-settings--default",
+      "comparison_reference_sha256": "d662725b6151b4cd4ac8d869e9548f98edfa9ee32a1b6e5906356507bdcd32fb",
+      "actual_image_opened": true,
+      "native_dimensions": [990, 1320],
+      "captured_route": "settings",
+      "observation": "The Screen & Refresh row is selected. The sidebar has no frontlight/warmth or pen entry. Refresh interval buttons, the disabled unavailable page-quality group, the explicitly fixed-on chapter refresh, the menu-close refresh switch, night mode and grayscale strip are visually separated and legible. The profile name uses an ellipsis, while its subtitle visibly states no frontlight. The sidebar, right panel and five-tab bottom bar retain clear rules and bounds without visible control clipping.",
+      "state_action_support": "The frozen state declares desktop, scribe3-nofrontlight, has_frontlight=false, has_warmth=false and physical_hardware_qualified=false. Its visible_setting_ids omit lighting. The actions file is empty, so this is the captured initial Settings surface and does not prove any control operation.",
+      "intentional_capability_check": "Absent lighting controls, disabled page-quality choices and the labelled fixed-on refresh are truthful software capability presentation under the supplied contract. Profile specifications, including the orientation wording in the header, are treated only as design-profile declarations; no sensor, physical display or pen qualification is claimed.",
+      "static_verdict": "Related logical contract reviewed; no new evidence-backed visual actionable found. Exact-state comparison remains unavailable."
+    },
+    {
+      "case_id": "capability--no-frontlight-reader-menu",
+      "png_path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate11/ui-round-1/snapshots/ui-round-1-snapshot-013-hardware-capabilities/files/output/capability--no-frontlight-reader-menu.png",
+      "png_sha256": "53cc5975c1228aa440619daadd7750dd5e23d00191dbda8821ed2524fd1dfe41",
+      "case_json_sha256": "2835922692f071c2cdbfe28c69a00a8a9540c3e3aeb06da50ef3cfe6a123cd51",
+      "state_sha256": "b5ef81e1d08489b939873638d581058c96e85e8ff096515af2d46bfb5a44432f",
+      "metadata_sha256": "ebef7321272b6053517feacad4e7efa419766258eb792194f3a0335a13b6fc6e",
+      "actions_sha256": "76085aef49204005c143960870f8e6256d7286b70dd34967e2508509a165485d",
+      "log_sha256": "f2af43b42280ddd64ce192741de5fa5de4938b1516a7be771606c170351cd4aa",
+      "reference_sha256": null,
+      "comparison_reference_id": "sc-reader-portrait--default",
+      "comparison_reference_sha256": "a435bacd0c94da82f96f49904136f271b7500709c42609eb727a4f104dba5f45",
+      "actual_image_opened": true,
+      "native_dimensions": [990, 1320],
+      "captured_route": "reader",
+      "observation": "The Reader menu is visibly open. The top bar shows the book/chapter hierarchy, back control, filled bookmark, contents icon and time/battery text. The bottom panel shows 12/40, 28 remaining pages, a separated slider and adjacent chapter controls. Its four tool slots are Reading Mode, Image, Direction and More; there is no brightness or warmth tool. Visible text and control boundaries are clear, and the slider and chapter row do not overlap. The tiny More dots remain the supplied bounded icon limitation.",
+      "state_action_support": "The assigned action opens the Reader menu at 3500 ms. The frozen state has menu=true, no reader panel, reader_page=12, reader_total=40, reader_bookmarked=true and both light capabilities false. This supports the captured open-menu surface and selected software profile, not unrecorded light, direction, chapter or slider interactions.",
+      "intentional_capability_check": "Removing the unavailable brightness tool preserves the remaining menu hierarchy and matches the declared no-frontlight software capability. The artwork extent is not assessed against a nonexistent exact source-art reference. The artwork-only closed-Reader restriction does not apply to this open menu.",
+      "static_verdict": "Related open-menu logical contract reviewed; no new evidence-backed visual actionable found. Exact-state comparison remains unavailable."
+    }
+  ],
+  "new_actionable": [],
+  "suggestions": [],
+  "pending": [
+    {
+      "id": "owner-input-sha-declaration",
+      "scope": "identity reconciliation only; not a new visual defect",
+      "reason": "The assigned input explicitly leaves its own SHA-256 pending owner declaration. No local rehash is permitted.",
+      "required_followup": "The coordinator must bind the final record to the owner's input SHA and full final-run tuple before acceptance."
+    }
+  ],
+  "new_visual_pending": [],
+  "historical_findings": [],
+  "regression_closures": [],
+  "limitations": [
+    "Only these two current candidates and two assigned original references were opened through tools.view_image. No additional image, crop, contact sheet, old report or production code was used.",
+    "The original 990 x 1320 candidates and 1860 x 2480 references were opened by their assigned paths without creating resized files. The viewer automatically fitted the reference presentation to 1368 x 1824. All comparisons are logical; no exact pixel or scale match is claimed.",
+    "No independent exact-state HANDOFF reference exists for this selected profile. The related comparisons are not recorded as missing exact-reference passes.",
+    "The frozen case/state/action text was read statically. Existing mechanical pass fields and capture metrics were not used as visual acceptance or rerun.",
+    "This report qualifies only visible controls and the declared software profile. It does not qualify physical hardware, sensors, input regions, e-ink performance, operation timing or lifecycle behavior.",
+    "This partial module review grants no full-round acceptance or clean-round credit. Final owner reconciliation remains required."
+  ]
+}

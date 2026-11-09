@@ -1,0 +1,190 @@
+{
+  "batch_id": "supplemental-32",
+  "reviewer": "/root/phase3_round1_review/supplemental_32",
+  "run_id": "a1baf3fe3dc2",
+  "binary_sha256": "94d7f3bbcab475ad8833a2f3c486138f7b49bead231851c2d8eab2f0c3d2ac51",
+  "source_sha256": "aef9db4e111165016a10a2a95e111f3155860b8510c7f6207ec9c79fbec5082c",
+  "review_scope": {
+    "candidate_count": 8,
+    "reference_png_count": 0,
+    "method": "Each of the eight listed candidate PNGs was opened individually with view_image. Existing case metadata and textual design contracts were read. Get-FileHash was used only for the explicitly requested PNG evidence identity check.",
+    "identity": "All eight current PNG SHA-256 values match both the batch expected hashes and case evidence hashes. All case records identify the requested run, binary, source, Scribe profile, and 930 by 1240 native capture size.",
+    "text_sources": [
+      "docs/review/phase3-reference-scope.json: sharedContract, capabilityBounds, and Scribe page-state entries",
+      "docs/review/phase3-prototype-reference-support.json: acceptance conditions and static-evidence limitations",
+      "docs/DESIGN_HANDOFF.md: foundations, navigation, folio, library overlays, keyboard, and settings",
+      "Original HANDOFF.md: form inputs, library sort/filter, and unconfigured server requirements",
+      "Original prototype/sc-settings.dc.html: lines 40-103",
+      "Original prototype/sc-library.dc.html: lines 182-199",
+      "Original prototype/Main.dc.html: lines 282-293, including adopted non-title direction labels",
+      "Original prototype/sc-browse.dc.html: labeled server fields and phone-entry action declarations",
+      "ui-ux-pro-max/SKILL.md: general interface review priorities; project-specific design rules retain precedence"
+    ]
+  },
+  "reviewed_case_ids": [
+    "scribe--server-address-keyboard",
+    "scribe--server-secret-keyboard",
+    "scribe--settings-first-boundary",
+    "scribe--settings-last-page",
+    "scribe--sort-added-at",
+    "scribe--sort-chapter-count",
+    "scribe--sort-cold-persistence",
+    "scribe--sort-descending"
+  ],
+  "reviewed_cases": [
+    {
+      "case_id": "scribe--server-address-keyboard",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/scribe--server-address-keyboard.png",
+      "candidate_sha256": "487278e12c4b40584970d3ad4d39d610bbf86735459102eb8762591de34e7b11",
+      "viewed_candidate": true,
+      "outcome": "no_visual_issue_found",
+      "observations": [
+        "The Komga catalog is visibly unconfigured, with labeled server-address and API-key or username/password fields and a disabled test/connect action.",
+        "A bottom address editor is labeled for the server address and contains an empty outlined input. The English QWERTY keyboard has shift, backspace, numbers, language, space, and an inverse Done key.",
+        "The keyboard occupies the bottom navigation area; no dock remains underneath it. Labels, key rows, and the completion control fit inside the viewport.",
+        "The keyboard and form use white surfaces and outlines without a dimmed background, offset shadow, or stippled interface mask.",
+        "Existing state identifies catalog, keyboard, server-address, English mode, and an empty draft, matching the visible capture."
+      ],
+      "intentional_differences": [
+        "The server is unconfigured; this is the actual address entry rather than a connected mock."
+      ]
+    },
+    {
+      "case_id": "scribe--server-secret-keyboard",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/scribe--server-secret-keyboard.png",
+      "candidate_sha256": "6e6e075f1e2beac94c953b7d252d14454562755672d59f76b699f2ce621c2667",
+      "viewed_candidate": true,
+      "outcome": "no_visual_issue_found",
+      "observations": [
+        "The editor heading identifies password entry. The draft is rendered entirely as masking dots, with no plaintext secret visible in the editor or underlying form.",
+        "English QWERTY keys and the inverse Done action remain legible and unclipped. The keyboard replaces the dock rather than stacking above a retained navigation bar.",
+        "The underlying Komga setup still shows unconfigured state and a disabled test/connect action, without implying a successful connection.",
+        "Existing metadata identifies server-credentials context, server-password target, secret input, and a passed masking-character check; these agree with the visible state."
+      ],
+      "intentional_differences": []
+    },
+    {
+      "case_id": "scribe--settings-first-boundary",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/scribe--settings-first-boundary.png",
+      "candidate_sha256": "e35dca2ac34da2d37d880f7341eac759cf54e830ab975fc275bdcbabf3137338",
+      "viewed_candidate": true,
+      "outcome": "no_visual_issue_found",
+      "observations": [
+        "The settings page has the required 320-pixel navigation column, separated from the right detail area, with the current screen/refresh row inverse and grouped entries down through About.",
+        "The header contains version and device information. The right pane has a heavy serif title, five refresh choices with six pages selected, switch rows, and a grayscale test strip.",
+        "Unsupported page-quality cards are visibly disabled and accompanied by an unavailable label; no unsupported quality mode is presented as selected and usable.",
+        "All navigation entries fit above the five-destination dock. There is no settings list folio, consistent with the Scribe settings contract.",
+        "Existing state identifies settings, screen-refresh, page 1 of 1, and all 17 applicable navigation entries."
+      ],
+      "intentional_differences": []
+    },
+    {
+      "case_id": "scribe--settings-last-page",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/scribe--settings-last-page.png",
+      "candidate_sha256": "e35dca2ac34da2d37d880f7341eac759cf54e830ab975fc275bdcbabf3137338",
+      "viewed_candidate": true,
+      "outcome": "no_visual_issue_found",
+      "observations": [
+        "This separately opened candidate has the same pixels as the first-boundary capture: the complete grouped settings navigation remains visible beside the refresh detail pane.",
+        "The last navigation item, About, is fully visible with clear space above the dock, so the bottom of the navigation is not clipped.",
+        "The active settings dock item, 320-pixel divider, selected six-page refresh choice, and disabled unavailable quality cards remain consistent.",
+        "Its page 1 of 1 metadata and identical hash do not indicate a missing Scribe list page: the textual Scribe contract explicitly has no settings list pager."
+      ],
+      "intentional_differences": []
+    },
+    {
+      "case_id": "scribe--sort-added-at",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/scribe--sort-added-at.png",
+      "candidate_sha256": "1c3563957a367802b3b33d5c0fb9ea748e98197a39c8ce70b0b9b61845655c9c",
+      "viewed_candidate": true,
+      "outcome": "no_visual_issue_found",
+      "observations": [
+        "The right-anchored sort popup begins at the specified 112-pixel top offset and uses a white outlined surface with no shadow or background dimming.",
+        "All eight sort choices fit in two columns. Added date is the only inverse sort choice; the Old to new direction is inverse, which agrees with library_sort added-at and ascending true.",
+        "The four neutral filter controls and full-width Done control fit beneath the sort/direction choices. The popup grows with these additional product controls rather than clipping to the shorter prototype-only sort content.",
+        "The underlying library retains its six-column grid, title-adjacent state markers, dock, centered 1/3 folio, and right-side Next action. The unavailable Previous action leaves its allocation empty.",
+        "Existing checks record the selected sort indicator and persisted sort/direction. The PNG itself does not establish added-date SQL ordering."
+      ],
+      "intentional_differences": []
+    },
+    {
+      "case_id": "scribe--sort-chapter-count",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/scribe--sort-chapter-count.png",
+      "candidate_sha256": "05f7344fb3ec743c234aab0a982a5a6a3be2e41dcbb92b5ab6937819b9e3daea",
+      "viewed_candidate": true,
+      "outcome": "no_visual_issue_found_with_optional_observation",
+      "observations": [
+        "Total chapters is the only inverse sort choice, matching library_sort chapter-count. All eight choices, filters, and Done remain visible within the outlined popup.",
+        "The selected direction is labeled Old to new, with New to old as the alternative, while metadata records ascending true. This follows the adopted handoff and original Main prototype direction labels for non-title sorts. A possible future numeric-label improvement is recorded separately as an optional inference, not an implementation defect.",
+        "The popup location, content-driven height, clear undimmed background, and visible 1/3 folio with its right-side Next action match the shared Scribe layout.",
+        "Existing checks report the selected indicator and persisted numeric sort/direction. Decorative demo badges are not used to infer actual chapter totals or SQL correctness."
+      ],
+      "intentional_differences": []
+    },
+    {
+      "case_id": "scribe--sort-cold-persistence",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/scribe--sort-cold-persistence.png",
+      "candidate_sha256": "fe5dc167140413f20a3772945fe420c064ad8abca1132307eafdeeeb4018cfcf",
+      "viewed_candidate": true,
+      "outcome": "no_visual_issue_found",
+      "observations": [
+        "The library is restored without an open popup. Continuation and daily-update cards share the upper row, followed by tabs and a six-by-three book grid.",
+        "Titles, available badges/download markers, and progress indicators remain below or beside cover content rather than being moved into an interface overlay mask.",
+        "The visible first row begins with Bronze Age, The Cat of Fog Harbor, Fog Harbor Tales, and Fog Harbor Nocturne; the same leading sequence remains visible behind the descending-sort popup in the separately supplied descending case.",
+        "The centered 1/3 folio and right-side Next action remain above the dock, with the first-page Previous allocation empty.",
+        "Existing metadata records title sorting and descending direction. With the sort popup closed, this image provides a restored layout observation but no direct view of the selected sort controls or of the process restart."
+      ],
+      "intentional_differences": []
+    },
+    {
+      "case_id": "scribe--sort-descending",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/scribe--sort-descending.png",
+      "candidate_sha256": "a8ef57f7932d3d449d45195134da060c862dcff0a27fa0ca54b15662ba1638a2",
+      "viewed_candidate": true,
+      "outcome": "no_visual_issue_found",
+      "observations": [
+        "Title is the single inverse sort choice. Descending is inverse and Ascending is outlined, making the chosen title-sort direction explicit and consistent with library_ascending false.",
+        "The eight choices, direction row, four neutral filter controls, and Done action remain fully visible in a content-sized white popup.",
+        "The popup does not add a shadow or dimmed scrim; underlying books and the first-page 1/3 folio remain visible without moving the dock.",
+        "The leading visible book sequence agrees with the cold-persistence candidate. This agreement is visual evidence of the supplied states, not an independent SQL collation or persistence test."
+      ],
+      "intentional_differences": []
+    }
+  ],
+  "suggestions": [
+    {
+      "id": "P3R1-SUP32-1",
+      "case_id": "scribe--sort-chapter-count",
+      "priority": "P3",
+      "kind": "optional_ux_observation",
+      "basis": "inference",
+      "blocking": false,
+      "implementation_defect": false,
+      "description": "Optional future UX refinement: numeric chapter-count sorting could use count-oriented direction labels. Temporal direction wording may be less immediately clear for a numeric field, but the capture matches the adopted handoff and prototype wording.",
+      "evidence": [
+        "In scribe--sort-chapter-count.png, the Total chapters choice is inverse, while the direction row still offers New to old and Old to new with Old to new inverse.",
+        "The case state records library_sort chapter-count and library_ascending true. The direction row is approximately x438-878, y447-498 in the 930 by 1240 capture.",
+        "The separately supplied title descending candidate already uses explicit Descending and Ascending labels, demonstrating a visible distinction for non-date ordering.",
+        "HANDOFF section 5.1 specifies New to old and Old to new for the combined sort panel. Original prototype/Main.dc.html line 288 uses these labels for non-title sorts, including chapter-count. Therefore this is an optional semantic inference about a future design change, not a confirmed implementation mismatch or a claim that the SQL order is wrong."
+      ],
+      "recommendation": "If the adopted design is revised in the future, consider Fewer to more and More to fewer for chapter-count and unread-count sorts, or consistently use Ascending and Descending. Keep the inverse selection tied to the actual numeric direction. No change is required to meet this round's handoff-matching objective.",
+      "status": "open",
+      "introduced_round": 1
+    }
+  ],
+  "coverage_gaps": [
+    "No independent reference PNG was assigned to this supplemental batch. Layout was assessed against the supplied textual handoff, scope, and prototype declarations.",
+    "The two settings boundary files have identical verified hashes and page 1 of 1 state. They cover the full unpaginated Scribe navigation, not two distinct settings list pages.",
+    "The cold-persistence capture has no open sort popup and cannot directly display its selected sort/direction. The existing metadata records title and descending; this static review did not execute a restart or durable-storage check.",
+    "The sort captures show page 1 of 3 only. Library last-page boundary behavior and popup interactions are outside these eight images.",
+    "Phone-entry endpoint behavior, connection operations, key input, masking during editing, outside dismissal, touch target size, and navigation behavior cannot be established from these still images. The visible phone-entry action is not evidence that an endpoint is running."
+  ],
+  "limitations": [
+    "Exactly the eight input-listed candidate PNGs were viewed, including both separately named settings files. No other candidate or reference image was loaded.",
+    "Case checks are pre-existing capture evidence. The reviewer did not rerun them and did not treat mechanical_passed as a substitute for image inspection.",
+    "Current PNG hashes were checked against both expected and screenshot evidence hashes. Binary/source identity is taken from the matched case records, not from executing the product.",
+    "Screenshots and demo cover badges do not independently prove true SQL sort order, actual unread totals, or cold persistence. No such functional correctness conclusion is made.",
+    "No application, build, tests, validation suite, smoke test, runtime probe, Git operation, or product modification was performed on the local machine. This artifact contains review documentation only.",
+    "No physical e-ink, sleep/wake, sensor, refresh waveform, or 512 MiB hardware qualification is implied. This limited batch is not a declaration that the complete round is clean."
+  ]
+}

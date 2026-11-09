@@ -1,0 +1,99 @@
+{
+  "schema_version": 2,
+  "round": 6,
+  "reviewer": "final_fidelity_review",
+  "status": "clean",
+  "review_kind": "independent_static_visual_and_source_review",
+  "review_complete": true,
+  "artifact_directory": "artifacts/ui-round-6-final",
+  "frozen_candidate_sha256": "1c9f1d4633c8f6b190e6069f627aeb4f0beaec5bf82c619c3c2503fe3a72b05a",
+  "new_suggestion_count": 0,
+  "remaining_previous_finding_count": 0,
+  "new_findings": [],
+  "remaining_previous_findings": [],
+  "qualifies_as_clean_round": true,
+  "consecutive_clean_rounds": 1,
+  "scope_note": "All twelve fresh baseline screens and the listed expanded selection, queue, cache, completed-job, empty-batch, and notice states were manually reviewed. The consolidated final directory reuses the inspected ui-round-6 and ui-round-6-feedback captures. The remote 119-case matrix is not represented as 119 separate manual image inspections.",
+  "closed_this_round": [
+    {
+      "id": "R3-D001",
+      "independent_alias": "R4-I003",
+      "result": "The continuous divider remains visible and the selected marker is solid. Static reads of the Paperwhite catalog marker at x=50,y=190..192 and history marker at x=50,y=154..156 are now 0,0,0 rather than 0,221,0. Scribe browse shows the same corrected marker treatment.",
+      "evidence": ["artifacts/ui-round-6-final/pw5-catalog.png", "artifacts/ui-round-6-final/pw5-history.png", "artifacts/ui-round-6-final/scribe-sources.png", "ui/sources.slint", "ui/history.slint"]
+    },
+    {
+      "id": "R4-I006",
+      "result": "The temporary notice occupies the existing top status strip, or the existing clock slot in a wide reader menu. Chapter 81, its download target, all page controls, and Settings rows remain fully visible. The notice expires, has no hit area, and is hidden while a modal is open. The remote feedback report also confirms no changed pixels outside the status/clock slot.",
+      "evidence": ["artifacts/ui-round-6-final/detail-chapter-download-selected.png", "artifacts/ui-round-6-final/batch-all.png", "artifacts/ui-round-6-final/storage-clear-cache.png", "artifacts/ui-round-6-final/status-strip-notice.png", "artifacts/ui-round-6-final/status-strip-expired.png", "artifacts/ui-round-6-final/status-strip-modal-hidden.png", "artifacts/ui-round-6-final/status-strip-wide-reader-notice.png", "artifacts/ui-round-6-feedback/report.json"]
+    },
+    {
+      "id": "R5-I001",
+      "result": "Last-chapter Next Five, an empty explicit selection, and a batch containing only valid completed chapters all show no downloads needed. Each sidecar retains the nine completed jobs without a new queued job. Non-empty ordinary batches continue to use accepted transaction results.",
+      "evidence": ["artifacts/ui-round-6-final/batch-last-chapter-empty.png", "artifacts/ui-round-6-final/batch-empty-selected.png", "artifacts/ui-round-6-final/batch-completed-only.png", "artifacts/ui-round-6-final/batch-last-chapter-empty.state.json", "artifacts/ui-round-6-final/batch-empty-selected.state.json", "artifacts/ui-round-6-final/batch-completed-only.state.json", "src/app/actions.rs", "src/app.rs", "src/downloads.rs"]
+    }
+  ],
+  "previous_repairs_rechecked": [
+    {"id": "R4-I001", "result": "Cache and About summaries remain tag-free with a tagged current book; the book synopsis still displays its tags.", "evidence": ["summary-cache-info-tagged", "summary-about-tagged", "summary-book-tags"]},
+    {"id": "R4-D002", "independent_alias": "R4-I002", "result": "Completed-job menus offer reading and explicit confirmed removal. All-completed global controls are disabled; a failed-only queue enables Resume alone.", "evidence": ["completed-job-menu", "completed-job-read", "completed-remove-confirmation", "completed-remove-cancel", "completed-remove-apply", "downloads-disabled-global", "downloads-failed-controls"]},
+    {"id": "R4-I004", "result": "Library filtering and source preferences retain the sliders symbol; catalog filtering and Settings navigation retain their distinct symbols.", "evidence": ["pw5-library", "scribe-library", "pw5-catalog"]},
+    {"id": "R4-I005", "result": "The targeted direct source and reader hit regions retain the device touch token. The accepted reader control-band adaptation remains present without overlapping seek and chapter actions.", "evidence": ["scribe-sources", "pw5-reader", "scribe-landscape-reader", "reader-seek-preview", "reader-seek-commit"]},
+    {"id": "R4-D001", "result": "Paperwhite selection actions end before the first chapter row; the Scribe two-column selection state also retains clear separation.", "evidence": ["detail-chapter-hold-600", "detail-chapter-select-two", "detail-chapter-select-all", "scribe-chapter-select-two"]},
+    {"id": "R4-D003", "result": "First and one-row last download pages retain the same dialog frame and pager coordinates, with appropriate first/last disabled controls.", "evidence": ["downloads-lazy-pagination-01", "downloads-lazy-pagination-12"]},
+    {"id": "R4-D004", "result": "Batch All retains nine completed and queues 77; Batch Unread retains nine completed and queues 51. Existing usable completed content is preserved.", "evidence": ["batch-all.state.json", "batch-unread.state.json", "downloads-lazy-pagination-01"]},
+    {"id": "R4-D005", "result": "Online and offline Komga captures show localized status labels and matching provider-defined tab labels.", "evidence": ["cache-cover-online", "cache-cover-offline"]}
+  ],
+  "baseline_coverage": [
+    {"screen": "pw5-library", "reference": "tmp/design/reference-01.png", "actual": "artifacts/ui-round-6-final/pw5-library.png", "reviewed": true, "new_findings": 0, "checks": "Title hierarchy, continuation card, progress, four-by-two covers, captions, badges, solid tab rule, pagination, navigation."},
+    {"screen": "pw5-detail", "reference": "tmp/design/reference-02.png", "actual": "artifacts/ui-round-6-final/pw5-detail.png", "reviewed": true, "new_findings": 0, "checks": "Synopsis, actions, directory heading, six chapter rows, dots, dates, independent targets, true fifteen-page count."},
+    {"screen": "pw5-reader", "reference": "tmp/design/reference-03.png", "actual": "artifacts/ui-round-6-final/pw5-reader.png", "reviewed": true, "new_findings": 0, "checks": "Settled page 12, panel boundaries, header and toolbar rules, progress, chapter controls, accepted touch adaptation."},
+    {"screen": "pw5-sources", "reference": "tmp/design/reference-04.png", "actual": "artifacts/ui-round-6-final/pw5-sources.png", "reviewed": true, "new_findings": 0, "checks": "Installed and unavailable states, row labels, uninstall, pairing card, grayscale, navigation."},
+    {"screen": "pw5-catalog", "reference": "tmp/design/reference-05.png", "actual": "artifacts/ui-round-6-final/pw5-catalog.png", "reviewed": true, "new_findings": 0, "checks": "Context artwork, source metadata, action symbols, solid tab rule, update ages, dividers, pagination."},
+    {"screen": "pw5-search", "reference": "tmp/design/reference-06.png", "actual": "artifacts/ui-round-6-final/pw5-search.png", "reviewed": true, "new_findings": 0, "checks": "Real source counts, result grouping, complete inner titles, completion and volume metadata, retry state, navigation."},
+    {"screen": "pw5-history", "reference": "tmp/design/reference-07.png", "actual": "artifacts/ui-round-6-final/pw5-history.png", "reviewed": true, "new_findings": 0, "checks": "Privacy and clear controls, solid tab rule, date groups, real summary, progress, row deletion, pagination."},
+    {"screen": "pw5-settings", "reference": "tmp/design/reference-08.png", "actual": "artifacts/ui-round-6-final/pw5-settings.png", "reviewed": true, "new_findings": 0, "checks": "Device card, icon meanings, labels, gray values, row spacing, page controls, navigation."},
+    {"screen": "scribe-library", "reference": "tmp/design/reference-09.png", "actual": "artifacts/ui-round-6-final/scribe-library.png", "reviewed": true, "new_findings": 0, "checks": "Six-by-three cover grid, captions, continuation card, intrinsic preview dots, real counts, tab rule, pagination."},
+    {"screen": "scribe-detail", "reference": "tmp/design/reference-10.png", "actual": "artifacts/ui-round-6-final/scribe-detail.png", "reviewed": true, "new_findings": 0, "checks": "Two-column proportions, cover, regular synopsis, tags, full directory rule, sixteen rows, actions, pagination."},
+    {"screen": "scribe-sources", "reference": "tmp/design/reference-11.png", "actual": "artifacts/ui-round-6-final/scribe-sources.png", "reviewed": true, "new_findings": 0, "checks": "Labeled actions, source cards, context, 56-pixel search/filter regions, solid tab rule, five-by-two covers, pagination."},
+    {"screen": "scribe-landscape-reader", "reference": "tmp/design/reference-12.png", "actual": "artifacts/ui-round-6-final/scribe-landscape-reader.png", "reviewed": true, "new_findings": 0, "checks": "Settled page 12, spread order, canonical artwork boundaries, locked-direction label, progress, unchanged chapter/tool anchors."}
+  ],
+  "expanded_manual_coverage": {
+    "selection": ["detail-chapter-hold-600", "detail-chapter-select-two", "detail-chapter-select-all", "detail-chapter-download-selected", "detail-chapter-cancel", "scribe-chapter-select-two"],
+    "summaries": ["summary-cache-info-tagged", "summary-about-tagged", "summary-book-tags"],
+    "completed_jobs": ["completed-job-menu", "completed-job-read", "completed-remove-confirmation", "completed-remove-cancel", "completed-remove-apply"],
+    "queue_and_cache": ["downloads-disabled-global", "downloads-failed-controls", "downloads-lazy-pagination-01", "downloads-lazy-pagination-12", "batch-all", "batch-unread", "storage-clear-cache", "cache-cover-online", "cache-cover-offline"],
+    "feedback_conditions": ["batch-last-chapter-empty", "batch-empty-selected", "batch-completed-only", "status-strip-notice", "status-strip-expired", "status-strip-modal-hidden", "status-strip-wide-reader-notice"],
+    "reader_and_capabilities": ["reader-seek-preview", "reader-seek-commit", "scribe3-nofrontlight-reader", "scribe3-nofrontlight-settings"],
+    "raw_modal": "artifacts/raw-round-6/raw-reader-hold-600.png",
+    "new_findings": 0
+  },
+  "accepted_geometry_adaptation": {
+    "reason": "Separate 48/56-pixel seek and chapter targets do not fit the original 120/132-pixel band at the original centers without overlap.",
+    "paperwhite": "Description and seeking move up 16 pixels in a 136-pixel band; chapter buttons and tools keep their absolute positions.",
+    "scribe": "Description and seeking move up 24 pixels in a 156-pixel band; chapter buttons and tools keep their absolute positions.",
+    "assessment": "The observed adaptation is accepted and retains the required physical target sizes."
+  },
+  "cross_cutting_assessment": {
+    "typography_and_grayscale": "No newly observed clipping, weight regression, unsupported color treatment, or inconsistent title/body hierarchy.",
+    "touch_and_feedback": "The targeted 48/56-pixel controls remain usable; notices are non-interactive and do not cover content or controls in the reviewed states.",
+    "paging_and_motion": "Lists and dialogs retain paging, stable multi-page controls, direct state changes, stipple masks, and solid offset shadows. No scrolling or animation was introduced.",
+    "real_state": "Queue transitions, retained completed content, localized provider status, summary context, and no-work feedback are consistent with the fresh sidecars."
+  },
+  "accepted_source_variations": ["True fixtures determine counts, dates, progress, and page totals.", "The 86-chapter Paperwhite directory retains fifteen pages at six rows per page.", "One canonical comic page remains shared between device profiles.", "Manual orientation is truthfully labeled as locked direction.", "Previously documented platform gaps are not newly reported visual issues."],
+  "reported_remote_verification": {
+    "ui_report": "artifacts/ui-round-6/report.json",
+    "ui_passed": 107,
+    "ui_failed": 0,
+    "feedback_report": "artifacts/ui-round-6-feedback/report.json",
+    "feedback_passed": 12,
+    "feedback_failed": 0,
+    "consolidated_report": "artifacts/ui-round-6-final/report.json",
+    "consolidated_passed": 119,
+    "consolidated_failed": 0,
+    "raw_report": "artifacts/raw-round-6/report.md",
+    "raw_passed": 6,
+    "raw_failed": 0,
+    "product_binary_unchanged": true
+  },
+  "clean_round_scope": "This is the first complete UI/UX clean round for this frozen candidate. It does not by itself establish the requested second clean round or overall native/project acceptance.",
+  "verification_note": "Only fresh remote screenshots and sidecars, reference images, source text, existing reports, and static PNG pixels were read. No local application, build, test suite, smoke test, or runtime probe was executed."
+}

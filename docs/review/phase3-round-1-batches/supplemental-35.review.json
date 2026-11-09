@@ -1,0 +1,175 @@
+{
+  "batch_id": "supplemental-35",
+  "reviewer": "/root/phase3_round1_review/supplemental_35",
+  "run_id": "a1baf3fe3dc2",
+  "round": 1,
+  "binary_sha256": "94d7f3bbcab475ad8833a2f3c486138f7b49bead231851c2d8eab2f0c3d2ac51",
+  "source_sha256": "aef9db4e111165016a10a2a95e111f3155860b8510c7f6207ec9c79fbec5082c",
+  "review_method": "Fresh manual inspection of each of the eight assigned original candidate PNGs with tools.view_image. No other PNG or independent reference image was loaded. The input, case metadata, current PNG hashes, reference scope, handoff text, and relevant static prototype text were read without running the application or its prototype.",
+  "reviewed_case_ids": [
+    "scribe-landscape--menu-suppresses-page-turn",
+    "scribe-landscape--reader-panel-close-pure",
+    "scribe-landscape--rtl-page-input",
+    "scribe-landscape--toc-bookmarks",
+    "scribe-portrait--bookmark-baseline",
+    "scribe-portrait--bookmark-cold-persistence",
+    "scribe-portrait--bookmark-toggle-pure",
+    "scribe-portrait--first-page"
+  ],
+  "reviewed_cases": [
+    {
+      "case_id": "scribe-landscape--menu-suppresses-page-turn",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/scribe-landscape--menu-suppresses-page-turn.png",
+      "candidate_sha256": "51d17444f10f121e64d13d2b833439bdf7869b3692c52a729395a907a2cb3708",
+      "viewed_candidate": true,
+      "outcome": "pass",
+      "observations": [
+        "The 1240 by 930 landscape image visibly has an open reader menu: a full-width header with back, title, direction, bookmark, contents, time, and battery controls, plus a bottom progress and tool section.",
+        "The chapter heading, 12-13 / 40 spread indicator, remaining-page text, slider, adjacent-chapter controls, and five tool labels are readable without overlap or clipping. The artwork remains exposed between the white menu bars.",
+        "The filled bookmark control agrees with the recorded reader_bookmarked=true. The sidecar records menu=true and reader_page=committed_reader_page=visible_reader_page=12, and its explicit page-12 and menu-open checks pass. The still image alone does not establish that a menu-open input was suppressed.",
+        "The current PNG SHA-256 matches both the input expected hash and case evidence screenshot hash. Run, binary, and source identities match the assigned round. No recorded check failed."
+      ],
+      "intentional_differences": []
+    },
+    {
+      "case_id": "scribe-landscape--reader-panel-close-pure",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/scribe-landscape--reader-panel-close-pure.png",
+      "candidate_sha256": "91ceb9e8a9b560e178d234248902dc249c94f21c6c7da60c0057ce780d16ea37",
+      "viewed_candidate": true,
+      "outcome": "pass",
+      "observations": [
+        "The landscape frame shows only the two-page artwork composition, including the radial left panel, lined skyline, dotted panels, and crosshatched right panel. The former menu and reading-direction panel leave no visible header, sheet, selection control, or notification residue.",
+        "No page numeral, footer, status bar, or bookmark ribbon appears, including at the upper-right and lower-right corners, although the sidecar records reader_bookmarked=true.",
+        "White space above and below the artwork and the artwork panel borders are not treated as application viewport insets. The retained artwork oracle records exact_match=true and zero changed pixels, which supports the visible pure-reader observation without replacing this manual inspection.",
+        "The sidecar records menu=false, modal='', reader_panel='', and the displayed page at 12. The current hash agrees with both expected and evidence hashes; run, binary, and source identities match, and all recorded checks pass."
+      ],
+      "intentional_differences": [
+        "The accepted artwork-only closed-reader requirement overrides the prototype's persistent bookmark ribbon and footer decorations; their absence is required."
+      ]
+    },
+    {
+      "case_id": "scribe-landscape--rtl-page-input",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/scribe-landscape--rtl-page-input.png",
+      "candidate_sha256": "91ceb9e8a9b560e178d234248902dc249c94f21c6c7da60c0057ce780d16ea37",
+      "viewed_candidate": true,
+      "outcome": "pass",
+      "observations": [
+        "This assigned PNG was viewed independently despite sharing a hash with the panel-close case. It shows the same clean landscape artwork arrangement with no visible controls, page count, ribbon, or bottom-corner overlay.",
+        "The recorded reading_direction is rtl, reader_page=committed_reader_page=visible_reader_page=14, menu=false, and reader_bookmarked=false. The recorded page-14 and closed-reader checks pass; the image itself cannot prove input direction, page-turn routing, or the absence of an invisible footer-cycle hit zone.",
+        "The identical artwork across two recorded page states is not reported as a rendering defect: no distinct source-image expectation was supplied, and the retained oracle records zero differing pixels against this case's actual processed artwork.",
+        "The current PNG hash matches the input and evidence hashes. Run, binary, and source identities match the assigned round, and no recorded check failed."
+      ],
+      "intentional_differences": [
+        "The accepted closed reader remains artwork-only even when the prototype permits a footer or page folio."
+      ]
+    },
+    {
+      "case_id": "scribe-landscape--toc-bookmarks",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/scribe-landscape--toc-bookmarks.png",
+      "candidate_sha256": "641d2b2bc7a91589d79dc8f4c54cabc5681d1bd64ea6ace87a1d3eaff65698c0",
+      "viewed_candidate": true,
+      "outcome": "issues_found",
+      "observations": [
+        "The contents panel is open above the landscape reader progress section. Its Bookmarks tab is visibly selected with bold text and a black underline, and the header contents control has a matching active underline.",
+        "The entire list area beneath the tabs is blank. There is no message explaining that the book has no bookmarks and no labeled action or instruction explaining how to add one. The outlined bookmark icon in the header does not explain the empty list or identify the next step within the panel.",
+        "The blank panel agrees with the sidecar's reader_toc_tab=bookmarks, bookmark_count=0, reader_bookmarked=false, and empty modal_items. It is an empty-state presentation defect rather than an expectation that fabricated fixture bookmarks must be present.",
+        "The white full-width reader sheet has no dimmed backdrop or shadow; the visible dot and crosshatch patterns belong to the artwork. The progress text and 12-13 / 40 indicator remain readable.",
+        "The current PNG hash agrees with expected and evidence hashes. The sidecar identifies reader-toc with choices modal, the assigned run, binary, and source, and no recorded check failed. The passing mechanical checks do not address the missing empty-state explanation."
+      ],
+      "intentional_differences": [
+        "Real bookmark records may produce zero rows rather than the prototype's fixed sample bookmarks. The zero count is permitted; the missing empty-state explanation and next step are not."
+      ]
+    },
+    {
+      "case_id": "scribe-portrait--bookmark-baseline",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/scribe-portrait--bookmark-baseline.png",
+      "candidate_sha256": "f019cd0ad046560f83be742a1cfe87e3ea9108a62a28975242909dfaaac8f9f5",
+      "viewed_candidate": true,
+      "outcome": "pass",
+      "observations": [
+        "The 930 by 1240 portrait frame shows a single artwork page with a lined skyline across the top, dotted and radial panels down the left, and a tall crosshatched panel on the right.",
+        "Although the sidecar records reader_bookmarked=true and bookmark_count=1 at page 12, the image has no persistent bookmark ribbon. No header, footer, status bar, page badge, or notification overlays the artwork.",
+        "The narrow white side space and artwork borders are allowed content fitting, not evidence of an added reader gutter. The recorded pure-reader oracle has exact_match=true and zero changed pixels.",
+        "The current hash matches both expected and evidence hashes. Portrait orientation, reader route, menu=false, run, binary, and source identity agree with the assigned case; all recorded checks pass."
+      ],
+      "intentional_differences": [
+        "A bookmarked closed page intentionally omits the prototype's persistent ribbon under the explicit artwork-only requirement."
+      ]
+    },
+    {
+      "case_id": "scribe-portrait--bookmark-cold-persistence",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/scribe-portrait--bookmark-cold-persistence.png",
+      "candidate_sha256": "f019cd0ad046560f83be742a1cfe87e3ea9108a62a28975242909dfaaac8f9f5",
+      "viewed_candidate": true,
+      "outcome": "pass",
+      "observations": [
+        "This cold-persistence candidate was separately viewed. The single portrait artwork page is intact, with its skyline, left dotted and radial panels, and right crosshatched panel visible to the frame edges.",
+        "There is no menu residue, bookmark notification, ribbon, footer, or status bar. The displayed pure-reader image is visually unchanged from the baseline despite the recorded bookmark state changing to reader_bookmarked=false and bookmark_count=0.",
+        "The sidecar records page 12 and a closed reader, and its artwork oracle reports zero changed pixels. A static image and final state do not independently establish a cold restart or persisted database transition; no persistence success is inferred from this visual result.",
+        "The current hash matches expected and evidence hashes, and the assigned run, binary, and source identities agree. No recorded check failed."
+      ],
+      "intentional_differences": [
+        "Closed-reader artwork remains unchanged by bookmark state, as required by the accepted omission of persistent decorations."
+      ]
+    },
+    {
+      "case_id": "scribe-portrait--bookmark-toggle-pure",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/scribe-portrait--bookmark-toggle-pure.png",
+      "candidate_sha256": "f019cd0ad046560f83be742a1cfe87e3ea9108a62a28975242909dfaaac8f9f5",
+      "viewed_candidate": true,
+      "outcome": "pass",
+      "observations": [
+        "This toggle-result PNG was viewed separately. The portrait single-page artwork retains the complete top skyline and lower panel arrangement with no visible application decoration.",
+        "No ribbon or transient bookmark message remains at the upper-right or lower edge. The final sidecar records reader_bookmarked=false, bookmark_count=0, page 12, menu=false, and no open modal or reader panel.",
+        "The identical baseline, toggle, and persistence image hashes are consistent with the accepted artwork-only presentation across bookmark states. The recorded zero-pixel oracle supports the visible result but cannot prove that the toggle action executed correctly.",
+        "The current PNG SHA-256 matches both expected and evidence hashes. The run, binary, and source identifiers agree with the batch, and all recorded checks pass."
+      ],
+      "intentional_differences": [
+        "Bookmark toggling is not represented by a persistent closed-reader ribbon; bookmark controls belong in the open menu."
+      ]
+    },
+    {
+      "case_id": "scribe-portrait--first-page",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/scribe-portrait--first-page.png",
+      "candidate_sha256": "6c77b3b52c54b347e072eded1bbf4585202ab448efeb90b1e5a95657267d5ccd",
+      "viewed_candidate": true,
+      "outcome": "pass",
+      "observations": [
+        "The portrait first-page capture visibly differs from page 12: it has a tall radial panel on the upper-left, a dotted panel and dark halftone panel on the upper-right, and a full-width vertically lined lower panel.",
+        "The page is artwork-only, with no first-page label, page number, bookmark ribbon, menu bar, status bar, or footer. White space within and around the actual drawing is not misclassified as application chrome.",
+        "The sidecar records page=committed_reader_page=visible_reader_page=1, reader_bookmarked=false, and menu=false. The explicit first-page check and all other recorded checks pass; the retained oracle reports exact artwork equality with zero changed pixels.",
+        "The current PNG hash matches both expected and evidence hashes, and run, binary, and source identity match the assigned round. A still capture does not establish boundary-input behavior at page one."
+      ],
+      "intentional_differences": [
+        "The first-page closed reader intentionally omits the prototype's optional folio and footer decorations."
+      ]
+    }
+  ],
+  "suggestions": [
+    {
+      "id": "P3R1-SUP35-1",
+      "case_id": "scribe-landscape--toc-bookmarks",
+      "priority": "P2",
+      "description": "The empty Bookmarks tab presents a blank list without an empty-state explanation or an understandable next step.",
+      "evidence": "In the assigned 1240 by 930 PNG, the selected Bookmarks tab is around y=640 and the white list body beneath its underline remains completely empty until the progress section begins around y=720. No text or labeled action identifies the zero-bookmark state. The case metadata records bookmark_count=0, reader_toc_tab=bookmarks, reader_bookmarked=false, and modal_items=[]. The current PNG SHA-256 is 641d2b2bc7a91589d79dc8f4c54cabc5681d1bd64ea6ace87a1d3eaff65698c0, matching the expected and evidence hashes.",
+      "recommendation": "Render a concise no-bookmarks message and a clear next step, such as a labeled action to bookmark the current page or a brief instruction identifying the header bookmark control. Keep the content-sized white reader sheet, existing outline treatment, and undimmed artwork backdrop.",
+      "status": "open",
+      "introduced_round": 1
+    }
+  ],
+  "coverage_gaps": [
+    "No independent reference PNG was assigned or viewed; fine visual parity is assessed only against the supplied scope, handoff, relevant static prototype declarations, and explicit user requirements.",
+    "The menu-open final capture and page-12 state do not independently demonstrate input suppression across an action sequence.",
+    "The RTL final capture and page-14 state do not prove physical touch routing or the absence of an invisible lower-right footer-cycle target.",
+    "Bookmark baseline, toggle, and cold-persistence captures are visually identical by design. Their final metadata is distinguishable, but these still images do not independently demonstrate bookmark mutation or persistence across process restarts.",
+    "The assigned contents capture covers an empty Bookmarks tab. Populated bookmark rows, bookmark selection, and chapter-tab pagination are outside these eight images.",
+    "First-page appearance is covered; first-page input boundaries are not established by its still capture."
+  ],
+  "limitations": [
+    "This review covers only supplemental-35's eight assigned candidate PNGs and does not declare the complete review round clean.",
+    "All eight current PNG hashes match their input expected hashes and case evidence hashes. Case metadata for all eight identifies run a1baf3fe3dc2, binary 94d7f3bbcab475ad8833a2f3c486138f7b49bead231851c2d8eab2f0c3d2ac51, and source aef9db4e111165016a10a2a95e111f3155860b8510c7f6207ec9c79fbec5082c.",
+    "Recorded mechanical checks and zero-difference artwork oracles are supporting existing evidence, not substitutes for manual image inspection or newly executed verification.",
+    "No application, build, test, smoke test, prototype runtime, or device probe was executed. No product file or Git state was changed; only this review artifact was written.",
+    "Static PNGs cannot qualify physical Kindle wake restoration, refresh behavior, hardware capability absence, invisible hit targets, or the 512 MiB operating envelope."
+  ]
+}

@@ -1,0 +1,45 @@
+{
+  "schema_version": 1,
+  "phase": "Phase3-C12",
+  "status": "Text and command preparation only; host materialization and GUI execution pending",
+  "worker_contacted_in_this_task": false,
+  "verification_executed": false,
+  "companion_root": "/root/aidoku-phase3/candidate12/lease-verifier",
+  "component_origin": "/root/aidoku-phase3/candidate11/lease-verifier/scripts",
+  "identity_origin": "Eight tool hashes are from the unchanged C11 executed producer and its verified full raw copy. C12 source and binary identities are parent-provided inputs, not rehashed in this task.",
+  "source": {"root": "/root/aidoku-phase3/candidate12/source-snapshot", "file_count": 227, "expected_sha256": "c3c0e5776e620d469adb98576549efb7589e4b4c3f82828ecc96346cc43741cc"},
+  "binary": {"path": "/root/aidoku-phase3/candidate12/desktop/aidoku", "bytes": 257511328, "expected_sha256": "3c7de4c4ef442f424ed9e7814e1b74bf76a718565f8f465f9f566a7e75d71543"},
+  "frozen_tools": [
+    {"name": "verify-live-reader-lease.py", "bytes": 31523, "sha256": "7ad4d50909f0f2fd3d9398a36c3d4dc1d80e8cc2cf7b7676735dd465bdfd4dd7"},
+    {"name": "verify-handoff-ui.py", "bytes": 191213, "sha256": "94ccc78d3c11b97791618527350ce59dacf458bfc57f8f04aabec045dd544a74"},
+    {"name": "verify-ui.py", "bytes": 91497, "sha256": "470872e6fd22a78b474c0f862164875ad9c7237bd2f3f164512864580ac1e90d"},
+    {"name": "verify-fullscreen.py", "bytes": 28086, "sha256": "4a6c48cef771e66e9b3058edd888dcf2d4bce02e2720b5cc00c7a5b987bc9670"},
+    {"name": "handoff_c4_business.py", "bytes": 35483, "sha256": "6197f375b247962e3ce9acdd3779468073f11e0002ac3c7ce876a7b1a0d0d9be"},
+    {"name": "verify-cache-ui.py", "bytes": 28971, "sha256": "cec852dbe2ebc52ed13fbc959bbe43258d4049bff3528df2a778406d99e55612"},
+    {"name": "handoff_c5_ui.py", "bytes": 14042, "sha256": "fa30ef2bf8ab512e9705f43933ff6acaf32993e5aa1dbc62be330d4c97b481f2"},
+    {"name": "handoff_c5_reader.py", "bytes": 21861, "sha256": "5b88a0c1b8e1151a3f96decef1a3a06f98a0d9de99908709bafbfb02cea490d5"}
+  ],
+  "host_preparation_argv": ["bash", "-s"],
+  "host_preparation_script": "set -eu\nimmutable=/root/aidoku-phase3/candidate12/source-snapshot\ncompanion=/root/aidoku-phase3/candidate12/lease-verifier\ncomponents=/root/aidoku-phase3/candidate11/lease-verifier/scripts\ntest ! -e \"$companion\"\ntest ! -L \"$companion\"\ntest ! -e /root/aidoku-phase3/evidence/candidate12/live-reader-lease/run-01\nmkdir -m 0755 \"$companion\"\nmkdir -m 0755 \"$companion/scripts\"\nfor name in verify-live-reader-lease.py verify-handoff-ui.py verify-ui.py verify-fullscreen.py handoff_c4_business.py verify-cache-ui.py handoff_c5_ui.py handoff_c5_reader.py; do\n  cp -p \"$components/$name\" \"$companion/scripts/$name\"\n  chmod 0444 \"$companion/scripts/$name\"\ndone\nfor name in src ui assets vendor examples Cargo.toml Cargo.lock build.rs; do\n  test -e \"$immutable/$name\"\n  ln -s \"$immutable/$name\" \"$companion/$name\"\ndone\nif [ -e \"$immutable/rust-toolchain.toml\" ]; then\n  ln -s \"$immutable/rust-toolchain.toml\" \"$companion/rust-toolchain.toml\"\nfi\nif [ -e \"$immutable/.cargo/config.toml\" ]; then\n  mkdir -m 0755 \"$companion/.cargo\"\n  ln -s \"$immutable/.cargo/config.toml\" \"$companion/.cargo/config.toml\"\n  chmod 0555 \"$companion/.cargo\"\nfi\nchmod 0555 \"$companion/scripts\"\n",
+  "production_link_policy": "Only C12 source-snapshot members are linked. Optional production files retain their actual snapshot presence or absence. No C11 production resource, PNG, report or prepared Data tree is reused.",
+  "tool_freeze_policy": "Copy the eight existing producer components unchanged into the independent C12 companion; preserve files as 0444 and scripts directory as 0555. Record actual before/after byte hashes after resource release.",
+  "planned_output": "/root/aidoku-phase3/evidence/candidate12/live-reader-lease/run-01",
+  "planned_output_directory_created": false,
+  "working_directory": "/root/aidoku-phase3/candidate12/lease-verifier",
+  "argv": ["/usr/bin/env", "PATH=/usr/bin:/bin", "PYTHONDONTWRITEBYTECODE=1", "/usr/bin/xvfb-run", "-a", "-s", "-screen 0 930x1240x24", "/usr/bin/python3", "/root/aidoku-phase3/candidate12/lease-verifier/scripts/verify-live-reader-lease.py", "--binary", "/root/aidoku-phase3/candidate12/desktop/aidoku", "--expected-sha256", "3c7de4c4ef442f424ed9e7814e1b74bf76a718565f8f465f9f566a7e75d71543", "--source-root", "/root/aidoku-phase3/candidate12/source-snapshot", "--expected-source-sha256", "c3c0e5776e620d469adb98576549efb7589e4b4c3f82828ecc96346cc43741cc", "--expected-source-file-count", "227", "--output", "/root/aidoku-phase3/evidence/candidate12/live-reader-lease/run-01", "--timeout", "90"],
+  "launch_command_powershell": "ssh test-env 'env PATH=/usr/bin:/bin PYTHONDONTWRITEBYTECODE=1 /usr/bin/xvfb-run -a -s \"-screen 0 930x1240x24\" /usr/bin/python3 /root/aidoku-phase3/candidate12/lease-verifier/scripts/verify-live-reader-lease.py --binary /root/aidoku-phase3/candidate12/desktop/aidoku --expected-sha256 3c7de4c4ef442f424ed9e7814e1b74bf76a718565f8f465f9f566a7e75d71543 --source-root /root/aidoku-phase3/candidate12/source-snapshot --expected-source-sha256 c3c0e5776e620d469adb98576549efb7589e4b4c3f82828ecc96346cc43741cc --expected-source-file-count 227 --output /root/aidoku-phase3/evidence/candidate12/live-reader-lease/run-01 --timeout 90'",
+  "pending_resources": [
+    "Native C12 first-cold timing window: no worker connection, source/binary bulk hash, syntax/import check, GUI process or copy has been started by this task",
+    "Wait for first Marker RELEASE and the parent's separate host/runtime GO",
+    "Materialize the independent C12 companion, then check source/binary/tool identities and imports on test-env before actual execution",
+    "Use the parent's short exclusive Desktop start window; later full-round concurrency is controlled by the parent"
+  ],
+  "strict_existing_contract": [
+    "Real fresh non-demo provider actions create all downloaded pages, pins, progress and Reader leases; no SQL page or lease manufacture",
+    "Before 15 s: owned exact X11 Reader frame and fresh accepted page-2-of-6 progress",
+    "Before 20 s: real cleanup removes jobs and durable pins while all six raw records remain intact",
+    "Same App force clear retains two genuinely leased raw/processed files and reclaims five unshown raw siblings",
+    "After actual Reader process exit, a fresh settings process clears and reclaims the two formerly protected files"
+  ],
+  "limits": "No new concurrent multi-GUI, physical continuous-display or same-process reader/back contract; zero visual-round credit. C11's original executed result remains a separate unchanged record."
+}

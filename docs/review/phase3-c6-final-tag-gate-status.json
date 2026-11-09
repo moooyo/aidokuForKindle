@@ -1,0 +1,153 @@
+{
+  "schema_version": 1,
+  "kind": "FINAL-C6-focused-affected-tag-review-status",
+  "round": 5,
+  "run_id": "a2f53f0c33db",
+  "capture_manifest": {
+    "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate6/ui-tag-qualification-final-01/manifest.json",
+    "sha256": "aa389850a0c5c2f41c266307964ffc95faa9b4b1a3247ab568ed5833c8b2547e"
+  },
+  "inventory": {
+    "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate6/ui-tag-qualification-final-01/qualification-final-inventory.json",
+    "sha256": "029ca8231c5c230f4240dcd5be69e71cf1b41302c56c52e736e06d0dcc3a2cc6",
+    "files": 312
+  },
+  "freeze_tuple": {
+    "source_file_count": 227,
+    "source_sha256": "adafa23e6e1e4906990c3162025dd26d85e20e2f2bb4bed2f21c980bc4d565f5",
+    "binary_sha256": "baafaf4b29a7a6629e8ef95da9dae38da323adccaa89288a92afe3bc4318e0ee",
+    "harness_sha256": "8811746a09e761bfff55879a018d71f98d1d957d5ba79e8f008bdcaf90d5f55e",
+    "capture_plan_sha256": "b3adabbf4f2d33789f381dc2ac55474d89fcd210d58ce9e5083c0d818d547eec",
+    "reference_scope_sha256": "c910bed9f02ed17b2ca0a54aca1beeeeb6caabc5a17a91afe764ddd3e7b0d33c",
+    "reference_sha256": "e7b49b456255432d74cfe41346f9d44c1a9c55bf67c5d55483e4ae3029547d18",
+    "capture_helper_sha256": {
+      "verify-ui.py": "470872e6fd22a78b474c0f862164875ad9c7237bd2f3f164512864580ac1e90d",
+      "verify-fullscreen.py": "4a6c48cef771e66e9b3058edd888dcf2d4bce02e2720b5cc00c7a5b987bc9670",
+      "handoff_c4_business.py": "6197f375b247962e3ce9acdd3779468073f11e0002ac3c7ce876a7b1a0d0d9be",
+      "handoff_c5_ui.py": "fa30ef2bf8ab512e9705f43933ff6acaf32993e5aa1dbc62be330d4c97b481f2",
+      "handoff_c5_reader.py": "5b88a0c1b8e1151a3f96decef1a3a06f98a0d9de99908709bafbfb02cea490d5"
+    },
+    "qualification_driver_sha256": "7cd32588578edff343a33dc2a70b99cb6f838f6063de175c4e269935c53eb0b6",
+    "qualification_pixels_sha256": "f97014cfca910b30a75cea484e57dcd9e4566ca1401785b096ab5851add979a1"
+  },
+  "focused_original_candidates_viewed": 12,
+  "original_references_opened": 4,
+  "total_image_opens": 16,
+  "fresh_workers": 4,
+  "all_qualification_manual_cases": 24,
+  "focused_selection_only": true,
+  "remaining_qualification_frames_not_claimed_as_manually_viewed": 12,
+  "reports": [
+    {
+      "batch_id": "c6final-tag-b01",
+      "case_ids": [
+        "pw-source--filter",
+        "pw5--content-stress--filter-tag-page-1",
+        "pw5--c6-tag-excluded"
+      ],
+      "report": "D:/Code/aidokuForKindle/docs/review/phase3-c6-final-tag-batches/c6final-tag-b01.review.json",
+      "actual_viewing_reported_complete": true
+    },
+    {
+      "batch_id": "c6final-tag-b02",
+      "case_ids": [
+        "sc-browse--filter",
+        "scribe--content-stress--filter-tag-page-1",
+        "scribe--c6-tag-excluded"
+      ],
+      "report": "D:/Code/aidokuForKindle/docs/review/phase3-c6-final-tag-batches/c6final-tag-b02.review.json",
+      "actual_viewing_reported_complete": true
+    },
+    {
+      "batch_id": "c6final-tag-b03",
+      "case_ids": [
+        "pw5--c6-tag-long-neutral",
+        "pw5--c6-tag-long-excluded",
+        "pw5--content-stress--filter-tag-page-6"
+      ],
+      "report": "D:/Code/aidokuForKindle/docs/review/phase3-c6-final-tag-batches/c6final-tag-b03.review.json",
+      "actual_viewing_reported_complete": true
+    },
+    {
+      "batch_id": "c6final-tag-b04",
+      "case_ids": [
+        "scribe--c6-tag-long-neutral",
+        "scribe--c6-tag-long-excluded",
+        "scribe--content-stress--filter-tag-page-6"
+      ],
+      "report": "D:/Code/aidokuForKindle/docs/review/phase3-c6-final-tag-batches/c6final-tag-b04.review.json",
+      "actual_viewing_reported_complete": true
+    }
+  ],
+  "observed_passes": [
+    "Chinese neutral intrinsic width and centering; no empty marker gutter in the focused basic frames.",
+    "Selected black fill/white check and excluded cross/dash/strike remain readable.",
+    "Actual DISTINCT-SUFFIX-00 is readable in neutral/excluded long labels for both profiles.",
+    "The ordinary34-tag fixture's real6/6 last page displays the final four selected members and preserves its frame/white space."
+  ],
+  "new_issue": {
+    "id": "C6-UI-TAG-01",
+    "family": "C4-C5-G04",
+    "status": "Root-accepted; next-source minimal repair and fresh verification required",
+    "scope": "Long overflow ellipsis background masks the parent tag outline",
+    "root_authority": "Root direct acceptance from two independent original-image observations and exact source/x correlation on2026-11-07",
+    "root_cause": "The full-height background rectangle for the overflow ellipsis covers top/bottom frame at the label start. Root's sole ui/tag-flow.slint writer applied a symmetric vertical inset into the frame while preserving the center.",
+    "source_repair_file": "ui/tag-flow.slint",
+    "next_file_freeze": "Root reported fe12 prefix; complete next-source/binary tuple is still owner-provided and not invented from a prefix.",
+    "fresh_evidence": [
+      {
+        "case_id": "pw5--c6-tag-long-neutral",
+        "png_sha256": "af67525758a2da77ffdaf6475a9fdaff01258eea13c2144ac2022eb297b350d7",
+        "visible_gap": "Near native x38-54 on top/bottom solid rules; first tag starts near x22, y583-625."
+      },
+      {
+        "case_id": "scribe--c6-tag-long-neutral",
+        "png_sha256": "a16beb7d6fc5ed229d76547177ada858408766a5cb279b412e597280c377ac1c",
+        "visible_gap": "Near native x328-345 on top/bottom solid rules; first tag starts near x310, y597-643."
+      }
+    ],
+    "related_excluded_case": {
+      "case_id": "pw5--c6-tag-long-excluded",
+      "png_sha256": "8dfa95b4da595d2207da01a7e35a594750367fce59e4e3d523f24367e4fed02e",
+      "disposition": "Same mask/frame cause, not a second business defect; validate normal dashed rhythm under the next source."
+    },
+    "old_source_crop_package": {
+      "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate6/ui-tag-border-review-01",
+      "provenance_sha256": "df4a749fe2676d69f4a8dd3d2d5ee36b902332c8f18e2ab7109a9afdbdd44543",
+      "generator_sha256": "d2a66bf8ca571624ac2a68131ba9ed633060783bb675e9241ac62a26fc1748e4",
+      "actually_viewed_by_coordinator_or_new_crop_worker": false,
+      "role": "Retained authorized derivative provenance; not a prerequisite for Root's already accepted defect and not a claim of extra visual coverage.",
+      "actual_ROIs_LTRB": {
+        "PW_neutral": [
+          12,
+          575,
+          110,
+          682
+        ],
+        "SC_neutral": [
+          300,
+          589,
+          402,
+          704
+        ],
+        "PW_excluded": [
+          12,
+          575,
+          180,
+          682
+        ]
+      },
+      "matches_coordinator_proposed_exact_ROIs": false
+    },
+    "next_gate": "Fresh next-source affected long-neutral/excluded frames only, plus needed reference images, in a new small fork-none job. Original markers/suffixes and solid/dashed closure must remain readable. FVD then authorizes full directly if clear."
+  },
+  "gate_passed": false,
+  "full_start_allowed_by_this_record": false,
+  "qualification_mechanical_result_retained": "36/36 PASS/0FAIL under the final qualification; raw handoff capture remains partial/exit1. Visual issue is separately retained, not used to rewrite the mechanical result.",
+  "old_source_policy": "The pre-touch700c35/1 remains failed and is not substituted or relabeled. Candidate5/892 images are not used.",
+  "local_rehash_or_runtime_verification": false,
+  "originals_modified": false,
+  "full_complete": false,
+  "clean_round": false,
+  "clean_round_streak": 0
+}

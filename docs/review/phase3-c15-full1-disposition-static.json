@@ -1,0 +1,274 @@
+{
+  "schema_version": 1,
+  "report_id": "phase3-c15-full1-disposition-static",
+  "status": "Static proposal only; final image adjudication pending",
+  "owner": "/root/c15_ui_disposition_static",
+  "reference_root": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff",
+  "source_snapshot_supplied_by_parent": {
+    "file_count": 229,
+    "fingerprint": "c48c94852772b28294738a93b8590529c9e1e289441f1f5db361d8e84ee0196b",
+    "recomputed_by_this_task": false
+  },
+  "current_raw_r1": {
+    "run": "run201dd995b7c6",
+    "worker": "DT87f9",
+    "capture_owner": "Parent-designated sole remote owner",
+    "source_frozen": true,
+    "new_source_repair_frames_may_be_added": false
+  },
+  "execution_scope": {
+    "method": "Static source/specification reads and directory enumeration",
+    "production_or_test_files_edited": 0,
+    "existing_reports_edited": 0,
+    "images_inspected": 0,
+    "ssh_calls": 0,
+    "test_build_hash_runtime_python_search_calls": 0,
+    "clean_review_rounds_asserted": 0,
+    "only_authored_file": "D:/Code/aidokuForKindle/docs/review/phase3-c15-full1-disposition-static.json"
+  },
+  "skill_guidance": {
+    "path": "C:/Users/moooyo/.codex/skills/ui-ux-pro-max/SKILL.md",
+    "mode": "Static built-in guidance for shared geometry, stable interactions, and decorative accessibility only; no skill search or verification program was run"
+  },
+  "candidates": [
+    {
+      "id": "C15-candidate-01",
+      "surface_reported_by_parent": "PW reader light panel",
+      "disposition": "Static specification supports a reader-specific title; visual defect confirmation remains with Root",
+      "expected_ui_text": "亮度与色温",
+      "current_source_ui_text": "前光与色温",
+      "source_evidence": [
+        {
+          "path": "D:/Code/aidokuForKindle/ui/panels-reader.slint",
+          "line": 477,
+          "fact": "The visible ReaderPanelTitle binds Strings.frontlight-warmth."
+        },
+        {
+          "path": "D:/Code/aidokuForKindle/src/app/actions.rs",
+          "line": 2895,
+          "fact": "open_reader_panel brightness also sets modal-title from tr(frontlight_warmth)."
+        },
+        {
+          "path": "D:/Code/aidokuForKindle/assets/i18n/zh-CN.json",
+          "line": 23,
+          "fact": "frontlight_warmth is the existing settings-group label."
+        },
+        {
+          "path": "D:/Code/aidokuForKindle/build.rs",
+          "line": 11,
+          "fact": "The translation map generates Strings properties, replacing underscores with hyphens at line 16."
+        }
+      ],
+      "specification_evidence": [
+        {
+          "path": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/HANDOFF.md",
+          "line": 220,
+          "fact": "PW light-panel title is explicitly specified.",
+          "quoted_ui_text": "亮度与色温"
+        },
+        {
+          "path": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/prototype/pw-reader.dc.html",
+          "line": 234,
+          "fact": "The PW light-panel h3 uses the same reader title.",
+          "quoted_ui_text": "亮度与色温"
+        },
+        {
+          "path": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/prototype/sc-reader-portrait.dc.html",
+          "line": 194,
+          "fact": "The Scribe portrait light-panel h3 uses the same reader title.",
+          "quoted_ui_text": "亮度与色温"
+        },
+        {
+          "path": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/prototype/sc-reader.dc.html",
+          "line": 229,
+          "fact": "The Scribe landscape light-panel h3 uses the same reader title.",
+          "quoted_ui_text": "亮度与色温"
+        },
+        {
+          "path": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/HANDOFF.md",
+          "line": 280,
+          "fact": "The settings device group remains a frontlight group.",
+          "quoted_ui_text": "前光与色温"
+        },
+        {
+          "path": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/HANDOFF.md",
+          "line": 288,
+          "fact": "The Scribe settings group also remains a frontlight group.",
+          "quoted_ui_text": "前光与色温"
+        }
+      ],
+      "minimal_change": "Add reader_brightness_title to the existing translation map and replace the two reader-only title references. The shared reader title can follow all three prototypes without a profile conditional.",
+      "patch_draft_not_applied": "--- a/assets/i18n/zh-CN.json\n+++ b/assets/i18n/zh-CN.json\n@@\n   \"reader_mode\": \"阅读方式\", \"picture\": \"画面\", \"brightness\": \"亮度\", \"warmth\": \"色温\", \"orientation\": \"方向\", \"layout\": \"布局\",\n+  \"reader_brightness_title\": \"亮度与色温\",\n--- a/ui/panels-reader.slint\n+++ b/ui/panels-reader.slint\n@@\n-        ReaderPanelTitle { x: 0px; y: 0px; width: parent.width; height: root.title-height; text: Strings.frontlight-warmth; }\n+        ReaderPanelTitle { x: 0px; y: 0px; width: parent.width; height: root.title-height; text: Strings.reader-brightness-title; }\n--- a/src/app/actions.rs\n+++ b/src/app/actions.rs\n@@\n-                            .set_modal_title(tr(\"frontlight_warmth\").into());\n+                            .set_modal_title(tr(\"reader_brightness_title\").into());",
+      "affected_scope": [
+        "PW5/PW6 reader-brightness title",
+        "Scribe portrait/landscape reader-brightness title",
+        "Reader modal-title state"
+      ],
+      "preserved_contracts": [
+        "The existing frontlight_warmth settings translation and every settings reference remain unchanged.",
+        "Frontlight/warmth capability gates, slider bounds, values, geometry, and settings callbacks remain unchanged.",
+        "No-light profiles continue to omit the panel."
+      ],
+      "later_check_suggestions": [
+        "New-candidate PW and Scribe light panels",
+        "Settings frontlight headings",
+        "No-light and no-warmth capability branches"
+      ]
+    },
+    {
+      "id": "C15-candidate-02",
+      "surface_reported_by_parent": "PW reader reverse-landscape preview",
+      "disposition": "Static prototype path supports removing the PW-only added arrow; final screenshot disposition remains with Root",
+      "source_evidence": [
+        {
+          "path": "D:/Code/aidokuForKindle/ui/panels-reader.slint",
+          "line": 506,
+          "fact": "The reverse-landscape path already has the right-shifted screen at x=14 and then appends an arrow path.",
+          "arrow_path": "M22 15l-3 3 3 3M19 18h10"
+        },
+        {
+          "path": "D:/Code/aidokuForKindle/ui/panels-reader.slint",
+          "line": 510,
+          "fact": "Selection is separately derived from State.landscape and State.reverse-landscape."
+        },
+        {
+          "path": "D:/Code/aidokuForKindle/ui/panels-reader.slint",
+          "line": 511,
+          "fact": "The click callback sends orientation=<selected value>."
+        },
+        {
+          "path": "D:/Code/aidokuForKindle/ui/panels-reader.slint",
+          "line": 14,
+          "fact": "ReaderChoiceCard owns common card geometry, accessibility selection, pressed styling, and the expanded touch area."
+        },
+        {
+          "path": "D:/Code/aidokuForKindle/src/app/orientation.rs",
+          "line": 36,
+          "fact": "Manual reverse landscape maps to 270 degrees; ordinary landscape maps to 90 degrees."
+        }
+      ],
+      "specification_evidence": [
+        {
+          "path": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/prototype/pw-reader.dc.html",
+          "line": 378,
+          "fact": "The reverse-landscape ROTS entry ends after the right-shifted screen rectangle and has no arrow.",
+          "prototype_path": "M6 8h36a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V10a2 2 0 0 1 2-2zM14 11h27v12H14z"
+        },
+        {
+          "path": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/prototype/pw-reader.dc.html",
+          "line": 263,
+          "fact": "Rotation preview uses a 48x32 viewbox with an independent visible label."
+        },
+        {
+          "path": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/HANDOFF.md",
+          "line": 221,
+          "fact": "Paperwhite retains portrait, landscape, and reverse-landscape choices."
+        },
+        {
+          "path": "D:/Code/aidokuForKindle/docs/DESIGN_HANDOFF.md",
+          "line": 353,
+          "fact": "The local reader contract retains explicit PW manual orientation choices."
+        }
+      ],
+      "minimal_change": "Keep the right-shifted screen path as-is. Place the existing arrow behind State.large-screen so only PW drops it. Do not change ReaderChoiceCard, tap-layout cards, selection expressions, spread dividers, or orientation callbacks.",
+      "patch_draft_not_applied": "--- a/ui/panels-reader.slint\n+++ b/ui/panels-reader.slint\n@@\n-                (orientation == \"landscape\" ? \"M6 8h36a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V10a2 2 0 0 1 2-2zM7 11h27v12H7z\" : \"M6 8h36a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V10a2 2 0 0 1 2-2zM14 11h27v12H14zM22 15l-3 3 3 3M19 18h10\")\n+                (orientation == \"landscape\" ? \"M6 8h36a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V10a2 2 0 0 1 2-2zM7 11h27v12H7z\" : \"M6 8h36a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V10a2 2 0 0 1 2-2zM14 11h27v12H14z\" + (State.large-screen ? \"M22 15l-3 3 3 3M19 18h10\" : \"\"))\n                 + (parent.landscape-spread ? (orientation == \"landscape\" ? \"M20.5 11v12\" : \"M27.5 11v12\") : \"\");",
+      "affected_scope": [
+        "PW5/PW6 reverse-landscape diagram only"
+      ],
+      "preserved_contracts": [
+        "Large-screen manual-orientation preview paths remain byte-for-byte equivalent after string composition.",
+        "All card layout coordinates, labels, touch bounds, selected/pressed styling, and callbacks remain unchanged.",
+        "The actual manual 0/90/270-degree orientation model remains unchanged.",
+        "The reading-mode, reader-layout, and settings tap-layout cards receive no component change."
+      ],
+      "later_check_suggestions": [
+        "New-candidate PW rotate previews",
+        "Selection/callback behavior for all three manual orientations",
+        "Scribe manual-orientation preview preservation"
+      ]
+    },
+    {
+      "id": "C15-candidate-03",
+      "surface_reported_by_parent": "PW browse add-source waiting row",
+      "disposition": "Static prototype supports the missing decorative circle with profile-specific dimensions; final screenshot disposition remains with Root",
+      "source_evidence": [
+        {
+          "path": "D:/Code/aidokuForKindle/ui/panels-sources.slint",
+          "line": 48,
+          "fact": "pairing-waiting is currently a text-only Caption."
+        },
+        {
+          "path": "D:/Code/aidokuForKindle/ui/panels-sources.slint",
+          "line": 31,
+          "fact": "PW pairing-details and QR row heights depend on the actual waiting-caption height."
+        },
+        {
+          "path": "D:/Code/aidokuForKindle/ui/panels.slint",
+          "line": 200,
+          "fact": "Both profiles dispatch State.modal=pairing to the shared PairingPanel."
+        },
+        {
+          "path": "D:/Code/aidokuForKindle/docs/review/phase3-panels-implementation.md",
+          "line": 22,
+          "fact": "The real pairing QR/address/code flow is preserved."
+        },
+        {
+          "path": "D:/Code/aidokuForKindle/docs/review/phase3-panels-implementation.md",
+          "line": 52,
+          "fact": "Pairing codes and connection state come from application models."
+        }
+      ],
+      "specification_evidence": [
+        {
+          "path": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/prototype/pw-browse.dc.html",
+          "line": 146,
+          "fact": "The waiting line contains an 8x8 solid black circle, radius 4, followed by gap 8.",
+          "quoted_ui_text": "等待连接…"
+        },
+        {
+          "path": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/prototype/sc-sources.dc.html",
+          "line": 158,
+          "fact": "The waiting line contains a 10x10 solid black circle, radius 5, followed by gap 10.",
+          "quoted_ui_text": "等待连接…"
+        },
+        {
+          "path": "D:/Code/aidokuForKindle/docs/DESIGN_HANDOFF.md",
+          "line": 374,
+          "fact": "PW browse is source management while SC browse is catalog; the shared SC add-source reference belongs to sc-sources."
+        }
+      ],
+      "minimal_change": "Add a decorative Rectangle at the current waiting-caption vertical center only for a nonempty pairing URL. Use size/radius 8/4 on PW and 10/5 on Scribe, move the Caption to x=16 or x=20, and subtract that allocation from its width.",
+      "patch_draft_not_applied": "--- a/ui/panels-sources.slint\n+++ b/ui/panels-sources.slint\n@@\n-        pairing-waiting := Caption { x: 0px; y: State.large-screen ? 169px : pairing-token.y + pairing-token.height + 8px; width: parent.width; height: State.large-screen ? 24px : (State.pairing-url == \"\" ? 0px : self.preferred-height); text: State.pairing-url == \"\" ? \"\" : Strings.waiting-connection; font-size: State.large-screen ? 16px : 14px; font-weight: 700; color: Theme.ink; wrap: State.large-screen ? no-wrap : word-wrap; }\n+        if State.pairing-url != \"\": Rectangle {\n+            x: 0px; y: pairing-waiting.y + (pairing-waiting.height - self.height) / 2;\n+            width: State.large-screen ? 10px : 8px; height: self.width;\n+            border-radius: State.large-screen ? 5px : 4px; background: Theme.ink;\n+            accessible-role: none;\n+        }\n+        pairing-waiting := Caption { x: State.large-screen ? 20px : 16px; y: State.large-screen ? 169px : pairing-token.y + pairing-token.height + 8px; width: max(0px, parent.width - self.x); height: State.large-screen ? 24px : (State.pairing-url == \"\" ? 0px : self.preferred-height); text: State.pairing-url == \"\" ? \"\" : Strings.waiting-connection; font-size: State.large-screen ? 16px : 14px; font-weight: 700; color: Theme.ink; wrap: State.large-screen ? no-wrap : word-wrap; }",
+      "affected_scope": [
+        "PW5/PW6 browse add-source sheet",
+        "Scribe sources add-source float",
+        "Shared pairing panel nonempty/empty URL branches"
+      ],
+      "preserved_contracts": [
+        "The status remains the existing waiting-connection translation.",
+        "Empty pairing URLs do not display a waiting circle.",
+        "The decorative circle has accessible-role none and introduces no touch area.",
+        "QR content, real endpoint, real pairing token, URL entry, existing heights, and callbacks remain unchanged.",
+        "The actual pairing-code row remains visible even though the prototype omits it."
+      ],
+      "later_check_suggestions": [
+        "New-candidate PW add-source waiting row",
+        "Scribe sources add-source waiting row",
+        "Empty pairing URL branch",
+        "Long endpoint/wrapped-caption layout"
+      ]
+    }
+  ],
+  "integration_gate": {
+    "production_edit_authorization_in_this_task": false,
+    "root_must_adjudicate_reported_candidates_before_source_change": true,
+    "any_accepted_repair_requires_a_new_source_candidate": true,
+    "current_raw_r1_must_keep_its_original_frozen_source_and_frames": true
+  },
+  "limitations": [
+    "No images were opened or inspected.",
+    "No production defect or clean visual round is asserted.",
+    "No source fingerprint, test result, build result, runtime result, or capture result was computed.",
+    "Patch snippets are unapplied drafts and were not compiled or executed."
+  ]
+}

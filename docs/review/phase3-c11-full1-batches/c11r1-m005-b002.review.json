@@ -1,0 +1,121 @@
+{
+  "schema_version": 1,
+  "batch_id": "c11r1-m005-b002",
+  "reviewer": "c11r1_m005_b002",
+  "round": 1,
+  "run_id": "55c498296d35",
+  "module_id": "005-pw-sources-search-content",
+  "immutable_input_inventory": "D:/Code/aidokuForKindle/docs/review/phase3-c11-full1-batches/c11r1-m005-b002.input.json",
+  "identity_policy": "All SHA256 values are owner declarations. Remaining case JSON, metadata, log, reference, tool and path identities bind to the exact case records and freeze_tuple in the immutable input inventory; no local rehash was performed.",
+  "module_snapshot": {
+    "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate11/ui-round-1/snapshots/ui-round-1-snapshot-005-pw-sources-search-content/inventory.json",
+    "sha256": "9097f57f4d544d5230118fbb2511f6c1ab32e6939bcfef33a3cbae027469937b",
+    "archive_sha256": "78480343b6eccc753be9ca9751c3bf74850dcaf7086d045a11641aef19c4ef89",
+    "transfer_accounting_sha256": "63539a8e3fccbd311ec2c55bca1f12ae60909d44afd06b823a3e8560cce08cdc",
+    "source_manifest_sha256": "e332086df1f552ae7d7c7d434491f6886a167095a86789d6e0ec93ca47975e9e",
+    "reference_manifest_sha256": "caad04a243ecbaac22c790d7918f50c8678985b9e58a9f963694fe7d69e2775a",
+    "full_manifest_pending": true
+  },
+  "freeze_tuple": {
+    "run_id": "55c498296d35",
+    "source_sha256": "33a2d049307c398da8bfbf196d1bf8e086412c117c194b592f4a93b5bfaedb3f",
+    "binary_sha256": "1e60db345cbd6fbe580258a4a309bf42361781061dc2033f78a8a5eb4446ad72",
+    "remaining_identity_ref": "immutable_input_inventory.freeze_tuple"
+  },
+  "reviewed_case_ids": [
+    "pw5--real-migration--origin-selector-cancel",
+    "pw5--http-search-success--view-all",
+    "pw5--http-search-success--server-connect",
+    "pw5--http-search-success--cached-unverified"
+  ],
+  "actual_original_image_opens": 5,
+  "image_open_record": {
+    "method": "tools.view_image on each assigned unmodified original",
+    "candidate_opens": 4,
+    "reference_opens": 1,
+    "related_comparisons": 4,
+    "native_dimensions": [618, 824],
+    "reference_dimensions": [1236, 1648],
+    "reference_physical_scale": 2,
+    "additional_images_opened": 0
+  },
+  "references": [
+    {
+      "reference_id": "pw-source--default",
+      "path": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/screens/pw-source.png",
+      "sha256": "47ea9827f59640d1c13cce5693c0e4d9ba9db5d44c50cefc3549107c5053daf6",
+      "actual_image_opened": true,
+      "opens": 1,
+      "comparison_kind": "Related logical catalog contract only; no independent exact-state reference exists for the four supplemental cases.",
+      "observation": "Bold serif source and card titles, gray metadata, a separate cover column, five ruled rows, top navigation and catalog controls, and a distinct bottom folio establish the related hierarchy and geometry."
+    }
+  ],
+  "cases": [
+    {
+      "case_id": "pw5--real-migration--origin-selector-cancel",
+      "png_sha256": "85c24664c27339291e19517d09a525a8a7aa7f6c69cd850c2fbaa5244742d3be",
+      "state_sha256": "dda737b666a56f0af112344e83e9f715fdb821a5fa36c9f6e6bf1c8f071ba838",
+      "actions_sha256": "551f995d40f0caa5d9aace77e88419063de9676b304c06052e38241b9382ac4d",
+      "remaining_identity_ref": "immutable_input_inventory.cases[case_id=pw5--real-migration--origin-selector-cancel]",
+      "comparison_reference_id": "pw-source--default",
+      "actual_image_opened": true,
+      "observation": "The canceled origin picker leaves the catalog toolbar and legible Local komga fixture heading. A dashed source mark and unavailable subtitle agree with the centered warning, unavailable heading, and two separated migration/uninstall buttons. No picker, stale selected book, migration success notice, or clipped control remains.",
+      "static_evidence": "The recorded open/migrate/panel-page/close actions end at catalog with modal empty, source_available false, migration_selected_id empty, and migration_loading/migration_committing false. The owner-recorded cancel check reports no arbitrary remembered-book migration; the origin request delta records an empty new_origin_requests list. Library count 17 is a diagnostic, not a fresh Store query.",
+      "supporting_inventory_ref": "module_snapshot.files[files/output/fixtures/pw5--real-migration--origin-request-delta.json]",
+      "intentional_capability_check": "Unavailable source behavior is truthful. Its empty-state content is a supplemental state, so the absent populated list and folio are not judged against a manufactured exact reference.",
+      "static_verdict": "No new actionable finding in the related-contract comparison."
+    },
+    {
+      "case_id": "pw5--http-search-success--view-all",
+      "png_sha256": "119d069df9f67876d3b409e71999b65a457adcab23c5114f064096ca347ecc02",
+      "state_sha256": "c4da8aa85884892059865c9b5dba3eba65ee4c60c5df1e5d3822875b1c0e631e",
+      "actions_sha256": "aeea72c83cf70307cbc14083b6c911b3f1108a34b72b069ec48e78fc21dc8b5a",
+      "remaining_identity_ref": "immutable_input_inventory.cases[case_id=pw5--http-search-success--view-all]",
+      "comparison_reference_id": "pw-source--default",
+      "actual_image_opened": true,
+      "observation": "The catalog shows the configured source and loaded count 40, five real result rows 020 through 024, and folio 5/8 with previous/next controls. Bold serif titles, gray two-line metadata, cover bounds, rule starts, tab underline, and footer allocation follow the related catalog structure. All titles and controls fit visibly; no setup gate contradicts the results.",
+      "static_evidence": "Recorded query/all/page-turn actions end at catalog with 40 catalog results, remote page 2 and visible IDs 020 through 024. The assigned provider record contains authorized POST requests for fullTextSearch fixture on remote pages 0 and 1 plus thumbnails for the displayed rows. The existing Store check records persisted server verification before View all; this review neither executed HTTP nor queried Store.",
+      "supporting_inventory_ref": "module_snapshot.files[files/output/fixtures/pw5--http-search-success--view-all.requests.json]",
+      "intentional_capability_check": "Provider title, art and count differences remain bounded content differences. Visible geometry, readable fonts, borders and folio were checked directly. The case JSON initial screen search and captured final route catalog describe the recorded transition.",
+      "static_verdict": "No new actionable finding in the related-contract comparison."
+    },
+    {
+      "case_id": "pw5--http-search-success--server-connect",
+      "png_sha256": "de8ec143b731557c7771236a3426f74008838730dee629cd888c7caa7cc73100",
+      "state_sha256": "45de6256844f887f0a98175f0275b12d87ca5d190fc4e1564f79e5ad2452d865",
+      "actions_sha256": "e266dfdb2a32b37ea1148a99a1706f7a6e083355b0c6b42047314ed3fa149eee",
+      "remaining_identity_ref": "immutable_input_inventory.cases[case_id=pw5--http-search-success--server-connect]",
+      "comparison_reference_id": "pw-source--default",
+      "actual_image_opened": true,
+      "observation": "The settled catalog contains the configured source and loaded count 20, rows 000 through 004, and folio 1/5 with the next control. The settings overlay has closed. The source title, cover column, metadata, separators, tab underline and bottom allocation stay legible and aligned with the related catalog contract; no clipped title or contradictory unavailable state is visible.",
+      "static_evidence": "Recorded source-open/catalog-settings/test-connect actions end with modal empty, source_available true, source_needs_setup false and connection status Connected. The assigned cumulative provider record includes the case-relevant authorized series-list requests at 20.2924 and 22.1682 seconds with fixture_failure false. Prior entries in that cumulative record are not credited as additional reviewed cases or newly executed requests.",
+      "supporting_inventory_ref": "module_snapshot.files[files/output/fixtures/pw5--http-search-success--server-connect.requests.json]",
+      "intentional_capability_check": "Implemented server configuration and real provider evidence support the settled configured catalog. Screenshots alone do not establish transport success or hidden hit-region behavior; no hardware or authorization feature is requested.",
+      "static_verdict": "No new actionable finding in the related-contract comparison."
+    },
+    {
+      "case_id": "pw5--http-search-success--cached-unverified",
+      "png_sha256": "afbf8c88c6d6eae08f9ed28e1ff604f3e6eb4d8902739388a4d549cd29827edc",
+      "state_sha256": "0328bd3ffe6ac9cf13654f4d18c2a0a73258371022b54a8544c9925f7ab05fa0",
+      "actions_sha256": "a70e3c423d471e69d43f9e13419572a116672f8359a188dfb5aadb28e3a212a3",
+      "remaining_identity_ref": "immutable_input_inventory.cases[case_id=pw5--http-search-success--cached-unverified]",
+      "comparison_reference_id": "pw-source--default",
+      "actual_image_opened": true,
+      "observation": "The subtitle explicitly says the connection has not been verified while retaining the configured server and loaded count 40. Five cached rows 000 through 004 and folio 1/8 remain visible. Native outlined title placeholders preserve the cover column and borders. The longer subtitle fits before the right edge; titles, metadata, row rules and next control remain readable and unclipped. No Connected label or success toast appears.",
+      "static_evidence": "Recorded edit-address/keyboard-done/reopen actions persist the unverified-cache address. Final diagnostics show offline true, source_needs_setup true, unverified connection status, 40 cached results and five settled visible cover failures. Existing case checks record _connection_verified false and zero new HTTP requests; the original log records unavailable offline cover cache for all five rows. These are static owner records, not fresh network or Store verification.",
+      "intentional_capability_check": "The declared failed-cover backoff remains truthful native placeholder content. Cached availability does not imply verified connectivity, and content differences do not waive the directly checked bounds and fonts.",
+      "static_verdict": "No new actionable finding in the related-contract comparison."
+    }
+  ],
+  "new_actionable": [],
+  "pending": [],
+  "historical_findings": [],
+  "regression_closures": [],
+  "limitations": [
+    "All four cases have a related logical contract comparison only; no missing independent exact-state reference is marked passed.",
+    "Static original-image viewing and frozen text reads only. No application, test, build, probe, validator, SQL, SSH, hash command, copy, crop or image processing was performed.",
+    "Existing action, provider and Store-check evidence is scoped to the frozen capture and is not newly executed business verification. Pixels alone do not prove HTTP execution, database mutation, hidden control bounds or physical input.",
+    "Capability declarations remain bounded to implemented software controls; physical hardware, framebuffer rotation, sleep/wake and e-ink effects are outside these captures.",
+    "The module and final full-run identities still require owner reconciliation. This four-case report is neither full-round acceptance nor a clean-round claim."
+  ]
+}

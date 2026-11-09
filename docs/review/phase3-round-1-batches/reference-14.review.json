@@ -1,0 +1,137 @@
+{
+  "batch_id": "reference-14",
+  "reviewer": "/root/phase3_round1_review/reference_14",
+  "run_id": "a1baf3fe3dc2",
+  "round": 1,
+  "outcome": "changes-requested",
+  "reviewed_case_ids": [
+    "sc-browse--default",
+    "sc-browse--blocked-source",
+    "sc-browse--filter",
+    "sc-browse--server-setup"
+  ],
+  "identity": {
+    "binary_sha256": "94d7f3bbcab475ad8833a2f3c486138f7b49bead231851c2d8eab2f0c3d2ac51",
+    "source_sha256": "aef9db4e111165016a10a2a95e111f3155860b8510c7f6207ec9c79fbec5082c",
+    "reference_bundle_sha256_provided": "e7b49b456255432d74cfe41346f9d44c1a9c55bf67c5d55483e4ae3029547d18",
+    "case_metadata_identity_match": true,
+    "candidate_evidence_hash_match": true,
+    "reference_png_hash_match": true,
+    "hash_basis": "SHA-256 of unmodified on-disk PNG bytes using Get-FileHash",
+    "comparison_basis": "Candidate 930 x 1240 at logical scale 1; reference 1860 x 2480 at physical scale 2, compared in the same 930 x 1240 logical coordinate system."
+  },
+  "reviewed_cases": [
+    {
+      "case_id": "sc-browse--default",
+      "case_metadata": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/cases/sc-browse--default.json",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/sc-browse--default.png",
+      "candidate_sha256": "9b0baedfdac5540acd8c3709f2a61624c52a1b347067de67b5436f92dfcd6e2b",
+      "reference_png": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/screens/sc-browse.png",
+      "reference_sha256": "7c411218fec402c436953ffae701611203207719241797caeaac154e114d7fae",
+      "viewed_candidate": true,
+      "viewed_reference": true,
+      "outcome": "pass-with-intentional-differences",
+      "observations": [
+        "The catalog retains five columns and three rows of approximately 150 x 202 logical-pixel cover frames. Cover rows, title lines, metadata lines, pagination, and bottom dock align with the reference at logical scale.",
+        "The current-source badge, display heading, source switch, settings icon, tab underline, search field, and filter button retain the reference hierarchy and geometry. All visible controls and the last catalog row fit above the dock without clipping.",
+        "Display headings and book titles retain the serif treatment; secondary labels remain lighter and readable. The interface uses white surfaces, outlined controls, and grayscale contrast without panel shadows or stippled surfaces.",
+        "The metadata identifies the available MangaDex source and 128 catalog items. The first ten covers contain artwork and the final five use readable title fallbacks within the same cover frames. No cover-work or visible-cover failure was reported by the existing case evidence."
+      ],
+      "intentional_differences": [
+        "Actual catalog titles, artwork availability, ordering, chapter counts, and source update wording differ from the reference; these content differences do not alter the five-by-three geometry."
+      ]
+    },
+    {
+      "case_id": "sc-browse--blocked-source",
+      "case_metadata": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/cases/sc-browse--blocked-source.json",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/sc-browse--blocked-source.png",
+      "candidate_sha256": "d3d6787ba75ba43162bb1f2e7d39aed446a757d5afe375531c02c6fa8528cecf",
+      "reference_png": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/screens/states/sc-browse--blocked-source.png",
+      "reference_sha256": "8ca93f7d743439653907d6c16d3b011489fe10e7225a1b632a2301c83a0684f6",
+      "viewed_candidate": true,
+      "viewed_reference": true,
+      "outcome": "changes-requested",
+      "observations": [
+        "The metadata records the actual unavailable source demo-b. The page truthfully explains that web verification is unavailable on Kindle and replaces the catalog with a centered warning state.",
+        "The current-source switch, settings affordance, header divider, warning circle, headline, action row, and bottom dock remain visible and unclipped. The warning circle and action row occupy approximately the same logical positions and sizes as the reference.",
+        "The primary recovery action is labeled as source management, while the reference and assigned expected state expose migration to another source. Uninstall remains visible, but direct migration is absent from this failure surface.",
+        "The white, outlined warning circle deliberately removes the reference stipple. This complies with the required surface treatment and is not reported as a defect."
+      ],
+      "intentional_differences": [
+        "The unavailable-source explanation includes the actual Kindle capability boundary and can be longer than the reference while remaining centered and fully readable.",
+        "The warning circle uses a white interior and a clean outline without stipple or shadow."
+      ]
+    },
+    {
+      "case_id": "sc-browse--filter",
+      "case_metadata": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/cases/sc-browse--filter.json",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/sc-browse--filter.png",
+      "candidate_sha256": "4a909d819c448132f8d8f7dbd089705f8128ea65c67a78997cfb3a49da38e4aa",
+      "reference_png": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/screens/states/sc-browse--filter.png",
+      "reference_sha256": "fc4e1eb1a853240fc1f6019ffb447cd1a04b85fd4ddfe1af8d233e113195532e",
+      "viewed_candidate": true,
+      "viewed_reference": true,
+      "outcome": "pass-with-intentional-differences",
+      "observations": [
+        "The filter surface retains the reference logical left edge near x=282, top near y=282, and width near 620 pixels. Its small height difference is consistent with the actual content; no defect is inferred from its top position or height alone.",
+        "The heading, reset action, sort row, publication-status row, two rows of tags, and full-width results action are visible inside the outlined white surface. No text or control is clipped, and no shadow or stippled overlay is present.",
+        "The source metadata exposes four sort options, four publication statuses, and nine actual tags. Unsupported follows and rating sorts are visibly disabled. The results action accurately says it will show the 128 loaded items rather than inventing the reference estimate.",
+        "The captured tags are all neutral, consistent with catalog_active_filter_count=0. This image establishes the neutral tag layout but does not demonstrate include and exclude rendering or cycling."
+      ],
+      "intentional_differences": [
+        "The actual source tag names and count differ from the reference, so the candidate uses six chips on the first row and three on the second.",
+        "The reference shows selected status and tag values, while this capture opens the actual unfiltered state. The loaded-results count and disabled unsupported sorts reflect the available source behavior."
+      ]
+    },
+    {
+      "case_id": "sc-browse--server-setup",
+      "case_metadata": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/cases/sc-browse--server-setup.json",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/sc-browse--server-setup.png",
+      "candidate_sha256": "7057f55c6ef0bbe06990e6261efaf0722203832452c00cea1dbe3cbc4f1609dd",
+      "reference_png": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/screens/states/sc-browse--server-setup.png",
+      "reference_sha256": "5fd0250e5dc6d2e26b1a70ba5a2ed07cf72ad802874abfe8b36e425ca5017803",
+      "viewed_candidate": true,
+      "viewed_reference": true,
+      "outcome": "changes-requested",
+      "observations": [
+        "The actual unconfigured Komga source is identified in both the screenshot and metadata. Address and credential fields are empty, and the disabled test/connect action truthfully avoids claiming an available connection.",
+        "The labeled fields retain the reference logical left edge near x=36, width near 640, and vertical positions. The phone-entry and test/connect controls are fully visible, and the dock stays reachable.",
+        "The action row departs from the reference equal-width split: the phone-entry button is approximately 359 logical pixels wide and the test/connect button approximately 269, versus approximately 314 each in the reference. The same row height and total width make the unequal division directly visible.",
+        "No plaintext credential or fabricated server address is displayed. The credential placeholder, white input surfaces, border treatment, type hierarchy, and grayscale disabled treatment are readable and unclipped.",
+        "The existing capability declaration says pairing_endpoint_running=false. The image contains a phone-entry affordance but no QR payload, so endpoint truthfulness after activation cannot be established from this pair alone."
+      ],
+      "intentional_differences": [
+        "The candidate uses the actual Komga source instead of the reference Kavita source.",
+        "An empty address, empty credential, explicit unconfigured status, disabled test/connect action, source count, clock, and battery value reflect the actual captured state."
+      ]
+    }
+  ],
+  "suggestions": [
+    {
+      "id": "P3R1-REF14-1",
+      "case_id": "sc-browse--blocked-source",
+      "priority": "P2",
+      "description": "Expose migration directly in the blocked-source recovery state.",
+      "evidence": "The candidate warning state offers source management and uninstall. The assigned expected state and the reference pair expose migration to another source alongside uninstall; the candidate metadata also records migration_available=true. The direct migration affordance is missing from this surface.",
+      "recommendation": "Restore an explicit migration-to-another-source action in the blocked-source action row, routing to the real migration flow. If the current source has no migratable library entries, explain or disable that action truthfully while retaining the top-level source switch and uninstall.",
+      "status": "open",
+      "introduced_round": 1
+    },
+    {
+      "id": "P3R1-REF14-2",
+      "case_id": "sc-browse--server-setup",
+      "priority": "P3",
+      "description": "Restore equal widths for the two server-setup actions.",
+      "evidence": "At the shared logical scale, the candidate divides the roughly 640-pixel action row into approximately 359 and 269 pixels, while the reference divides it into approximately 314 and 314 pixels with the same gap. The button labels are equivalent in length and the row has no clipping pressure.",
+      "recommendation": "Give phone entry and test/connect equal flexible widths within the existing form width and preserve the current gap, row height, and truthful disabled state.",
+      "status": "open",
+      "introduced_round": 1
+    }
+  ],
+  "limitations": [
+    "This independent review covers only the four assigned pairs and eight viewed PNGs. It does not declare the complete round clean.",
+    "Only existing JSON metadata, original PNGs, and their file hashes were read. No local application, build, test suite, Git operation, or runtime probe was invoked.",
+    "The source and binary identities were checked against the four case metadata records. The reference bundle digest was supplied by the coordinator; this batch verified the four individual reference PNG digests rather than recomputing the bundle digest.",
+    "Static screenshots establish visible layout and affordances. They do not prove source-picker activation, migration navigation, tag include/exclude cycling, QR endpoint reachability, connection execution, or masking after a nonempty credential is entered."
+  ]
+}

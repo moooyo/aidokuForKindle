@@ -1,0 +1,190 @@
+{
+  "batch_id": "supplemental-31",
+  "reviewer": "/root/phase3_round1_review/supplemental_31",
+  "run_id": "a1baf3fe3dc2",
+  "binary_sha256": "94d7f3bbcab475ad8833a2f3c486138f7b49bead231851c2d8eab2f0c3d2ac51",
+  "source_sha256": "aef9db4e111165016a10a2a95e111f3155860b8510c7f6207ec9c79fbec5082c",
+  "review_scope": "Fresh independent visual review of only the eight candidate PNGs listed in supplemental-31.input.json. No independent reference PNG was supplied or viewed.",
+  "evidence_integrity": {
+    "method": "Read the batch input and case metadata, and use PowerShell Get-FileHash on each current candidate PNG.",
+    "all_current_png_hashes_match_expected": true,
+    "all_current_png_hashes_match_case_evidence": true,
+    "all_case_run_binary_and_source_identifiers_match": true,
+    "all_case_intentional_differences_empty": true
+  },
+  "reference_basis": [
+    "docs/review/phase3-reference-scope.json",
+    "docs/review/phase3-prototype-reference-support.json",
+    "docs/DESIGN_HANDOFF.md",
+    "The supplied handoff HANDOFF.md, especially sections 3.4, 4.4, 5.1, 5.2 and 5.5.",
+    "Static source excerpts from prototype/sc-manga.dc.html and prototype/sc-search.dc.html. These files were not executed.",
+    "ui-ux-pro-max/SKILL.md priority guidance for observable readability, state distinction, interaction labels and feedback; project-specific handoff rules take precedence."
+  ],
+  "reviewed_case_ids": [
+    "scribe--real-migration--committed",
+    "scribe--real-migration--selected",
+    "scribe--search-source-scope",
+    "scribe--selection-all-page",
+    "scribe--selection-cancel",
+    "scribe--selection-category",
+    "scribe--selection-mark-read",
+    "scribe--selection-remove"
+  ],
+  "reviewed_cases": [
+    {
+      "case_id": "scribe--real-migration--committed",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/scribe--real-migration--committed.png",
+      "candidate_sha256": "66667fe0991c8ad7413b8548ffc979d684eaf2faffa73f826fc74b647313ebed",
+      "viewed_candidate": true,
+      "outcome": "issues_found",
+      "observations": [
+        "The portrait detail scene has the narrow left information pane, a separate right directory with eight newest-first chapter rows, and a one-page folio. The main dock is absent. The cover, author, continuation button and three book actions remain distinguishable.",
+        "The visible source line identifies the alternate Komga provider. Metadata identifies current_book as 15:komga-alternate:series-000; its supplied durable-membership check records the alternate identity in the library and the original identity removed. This supports the committed-state identity without treating the PNG alone as operation proof.",
+        "The actual loopback-provider cover, long title, dates and eight-chapter count are accepted as record-driven content. Ellipsis keeps the long title and source within their individual lines.",
+        "The bottom-left tag strip is defective: Adventure extends beyond its narrow outline, and Local, Long metadata and Mystery become crowded together across neighboring outlines. The metadata has five tag items, while only four compressed chips and no continuation affordance are visible. See P3R1-SUP31-1.",
+        "Visible surfaces are white and outlined, without a dimmed background or shadow."
+      ],
+      "intentional_differences": []
+    },
+    {
+      "case_id": "scribe--real-migration--selected",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/scribe--real-migration--selected.png",
+      "candidate_sha256": "6ea326d58d0898bc39fe4bb63ad44176f16774221f8884c1f3a41544fedb5863",
+      "viewed_candidate": true,
+      "outcome": "issues_found",
+      "observations": [
+        "The bounded migration panel has a clear heading, three readable real candidate titles and provider/author subtitles, separate retention/removal controls, and equal Cancel/Start columns. Its white outlined surface has no shadow or scrim, and its content fits inside the panel.",
+        "The first candidate has a filled square selection indicator, matching metadata migration_selected_id 15:komga-alternate:series-000 and migration_can_start=true. The other two indicators are empty. This remains a selected candidate state rather than a claimed completed operation.",
+        "Keep-read and keep-category switches are visibly on; removal of original downloads is visibly off. The switches and candidate selection occupy separate sections.",
+        "The white candidate row with a square indicator follows the migration-list declaration in prototype/sc-manga.dc.html. That list uses transparent row backgrounds; it is not the fully inverted radio-card component.",
+        "The same overflow and crowding of the underlying detail tags remains visible below the panel. This is the repeated manifestation of P3R1-SUP31-1."
+      ],
+      "intentional_differences": []
+    },
+    {
+      "case_id": "scribe--search-source-scope",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/scribe--search-source-scope.png",
+      "candidate_sha256": "634969ffb79a0e7f9c7d6d066db8c0d5ae119bd58ec888d75a1617700f226cbb",
+      "viewed_candidate": true,
+      "outcome": "no_visible_issue",
+      "observations": [
+        "The MangaDex scope is clearly black with white text, while the other scope choices are white outlined controls. This agrees with metadata search_scope=mangadex.",
+        "The empty search field shows its input purpose and a separate Cancel control. The local-library section supplies visible no-match feedback rather than a blank unlabeled area.",
+        "The keyboard replaces the main dock. The Pinyin strip, three QWERTY rows, shift, backspace, number/language toggles, space and primary Search key have distinct readable labels without visible clipping or collisions.",
+        "This capture shows scope selection while editing an empty query. It does not show submitted network results or establish that a source-specific request was executed."
+      ],
+      "intentional_differences": []
+    },
+    {
+      "case_id": "scribe--selection-all-page",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/scribe--selection-all-page.png",
+      "candidate_sha256": "0081ec2afb88121e0fdf51738f1f33111842392dfaf8393363cc56a8dddbaea4",
+      "viewed_candidate": true,
+      "outcome": "no_visible_issue",
+      "observations": [
+        "The heading reports 18 selected books, and every cover in the visible six-column by three-row page carries a clear black checkbox with a white check. The supplied check confirms that selection is exactly the actual visible page membership.",
+        "Select current page and Done remain readable at the top. The continuation and daily-update cards are retained, as specified for Scribe selection mode.",
+        "Four equally allocated bulk actions replace the dock: mark read, download unread, move category and remove from library. Each has a distinct icon and complete label.",
+        "The folio remains at page 1 of 3 with a readable next-page action and preserved empty previous-page allocation. No visible caption or action is clipped."
+      ],
+      "intentional_differences": []
+    },
+    {
+      "case_id": "scribe--selection-cancel",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/scribe--selection-cancel.png",
+      "candidate_sha256": "a272a0763ace9d782671578c0598fa3f4bc96e8a242957ff480ef7f517cad464",
+      "viewed_candidate": true,
+      "outcome": "no_visible_issue",
+      "observations": [
+        "The regular library heading and update/sort/more actions are restored. The six-by-three grid has no selection checks, matching selection_mode=false and an empty selected set.",
+        "The five-destination dock is restored with the library destination visibly active. The library remains at 46 records and page 1 of 3.",
+        "Unread/update badges and downloaded icons sit beside captions below covers rather than over artwork. The continuation card and daily-update card remain white outlined surfaces with readable content."
+      ],
+      "intentional_differences": []
+    },
+    {
+      "case_id": "scribe--selection-category",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/scribe--selection-category.png",
+      "candidate_sha256": "f487a9018b0f3de66f22cbae7255da21b6afeadb9d3266ce7e0f5608fa62a74a",
+      "viewed_candidate": true,
+      "outcome": "no_visible_issue",
+      "observations": [
+        "The category picker is a bounded white outlined panel with a readable Category heading, Done action and three clearly separated destination rows: Reading, Planned and Completed.",
+        "Its three visible enabled choices agree with modal_context=category and the case metadata item identities. No category assignment result is implied by this still-open picker.",
+        "The 18-selected heading, selected-cover checks and four-action bar remain visible behind the panel, preserving the selection context. The panel height follows its short content and has no large empty fixed-height extension, shadow or dimmed mask.",
+        "No row label or panel action is visibly clipped."
+      ],
+      "intentional_differences": []
+    },
+    {
+      "case_id": "scribe--selection-mark-read",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/scribe--selection-mark-read.png",
+      "candidate_sha256": "a272a0763ace9d782671578c0598fa3f4bc96e8a242957ff480ef7f517cad464",
+      "viewed_candidate": true,
+      "outcome": "no_visible_issue",
+      "observations": [
+        "The finished scene is the regular 46-record library with selection cleared and the five-destination dock restored. It has no leftover selection checks or bulk action bar.",
+        "The supplied case check records that the selected book's actual 86 chapter records were marked read. This is metadata-backed operation evidence; the PNG alone does not establish that mutation.",
+        "The PNG hash matches the cancel capture. This is not treated as stale projection: the demo BookItem.unread badge represents the independent demo update badge, and mark-read does not necessarily rewrite saved continuation progress. The visible badge and 12/40 continuation therefore do not establish an error.",
+        "Captions, title-adjacent markers, the folio and the restored dock remain readable without visible overlap."
+      ],
+      "intentional_differences": []
+    },
+    {
+      "case_id": "scribe--selection-remove",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/scribe--selection-remove.png",
+      "candidate_sha256": "7b3236ed4da17494523f5f955534ab6112ac98895d45c591533a29ad52ae495c",
+      "viewed_candidate": true,
+      "outcome": "no_visible_issue",
+      "observations": [
+        "The library count is visibly 45 and the Reading category count is 11. The former first book is absent; the grid now begins with the next actual book and fills the last slot with a new readable title plate.",
+        "The continuation card also changes to the next book with its 1/22 progress. These visible changes agree with the new current_book and library_count in metadata.",
+        "The supplied removal check records the removed book with in_library=false, supporting a real membership change rather than only clearing selection decoration.",
+        "Selection checks and the bulk bar are absent, while the normal active library dock and page-1-of-3 folio are restored. The title-only missing-cover plate is readable, and no clipped caption or overlapping marker is apparent."
+      ],
+      "intentional_differences": []
+    }
+  ],
+  "suggestions": [
+    {
+      "id": "P3R1-SUP31-1",
+      "case_id": "scribe--real-migration--committed",
+      "priority": "P2",
+      "description": "Scribe detail tags overflow their outlines and lose readable separation with real long metadata.",
+      "evidence": {
+        "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/scribe--real-migration--committed.png",
+        "candidate_sha256": "66667fe0991c8ad7413b8548ffc979d684eaf2faffa73f826fc74b647313ebed",
+        "region_design_px": {
+          "x": 28,
+          "y": 1065,
+          "width": 270,
+          "height": 38
+        },
+        "visible_effect": "Adventure extends left of its outline; Local, Long metadata and Mystery crowd or cross neighboring outlines. Only four compressed chips are visible, with no continuation affordance for the fifth metadata tag.",
+        "metadata_context": "The case book_tag_items are Adventure, Local, Long metadata, Mystery and Pagination.",
+        "related_case_ids": [
+          "scribe--real-migration--selected"
+        ],
+        "reference_basis": "HANDOFF section 5.2 keeps readable tags in the Scribe information pane. The prototype/sc-manga.dc.html tag container uses wrapping, an 8-pixel gap, and content-width labels with horizontal padding."
+      },
+      "recommendation": "Size each chip to its rendered label plus horizontal padding and wrap chips within the information pane. Preserve distinct gaps and all record tags; expose a clear continuation only if the complete set cannot fit. Keep the white outlined tag surface and specified height.",
+      "status": "open",
+      "introduced_round": 1
+    }
+  ],
+  "coverage_gaps": [
+    "This supplemental batch has no independent reference PNGs. The review uses actual candidate images plus the handoff, scope and static prototype text; it is not a pixel-comparison result.",
+    "The category capture ends with the picker open. It does not cover a selected destination's durable assignment, mixed-category result, or post-assignment feedback.",
+    "The search capture covers the visible MangaDex scope selection and empty-query keyboard scene. It does not prove request scoping, submitted results, timeout/retry behavior, or concurrent source completion.",
+    "Only page 1 selection is shown. Cross-page selection retention, deselection, disabled actions for zero selection, and the download-unread result are not covered by these eight PNGs.",
+    "Migration, mark-read and removal result claims rely on the supplied case checks and state. No independent database query or operation replay was performed.",
+    "Static images cannot establish whole-control pressed inversion, actual expanded hit areas, keyboard focus navigation, transparent outside-tap dismissal, or update timing."
+  ],
+  "limitations": [
+    "Exactly the eight listed candidate PNGs were individually opened with tools.view_image; no other PNG or reference image was loaded.",
+    "The review was limited to reading existing PNG/JSON/text evidence and hashing current PNGs. No application, build, test suite, runtime probe, Git operation or product modification was performed.",
+    "These are native 930 by 1240 desktop-profile captures. Physical e-ink behavior, wake restoration, hardware capabilities and the 512 MiB memory requirement cannot be qualified from them.",
+    "No issue is inferred solely from record-driven differences in titles, counts, dates, covers or progress, or from the shared cancel/mark-read PNG hash.",
+    "The findings apply only to supplemental-31 and do not assert that the complete round is clean."
+  ]
+}

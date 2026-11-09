@@ -1,0 +1,139 @@
+{
+  "batch_id": "reference-27",
+  "reviewer": "independent-reference-27",
+  "run_id": "a1baf3fe3dc2",
+  "round": 1,
+  "binary_sha256": "94d7f3bbcab475ad8833a2f3c486138f7b49bead231851c2d8eab2f0c3d2ac51",
+  "source_sha256": "aef9db4e111165016a10a2a95e111f3155860b8510c7f6207ec9c79fbec5082c",
+  "expected_reference_tree_sha256": "e7b49b456255432d74cfe41346f9d44c1a9c55bf67c5d55483e4ae3029547d18",
+  "reviewed_case_ids": [
+    "sc-settings--categories",
+    "sc-settings--download",
+    "sc-settings--image",
+    "sc-settings--language"
+  ],
+  "evidence_identity": {
+    "candidate_capture_method": "native Slint application --capture; unmodified original PNG",
+    "candidate_logical_size": [930, 1240],
+    "candidate_scale": 1,
+    "reference_physical_size": [1860, 2480],
+    "reference_scale": 2,
+    "comparison_basis": "Compare at the same logical dimensions. Reference coordinates are interpreted at half their physical pixel values.",
+    "metadata_identity_result": "All four case sidecars exactly match round 1, the requested run ID, binary SHA-256, source SHA-256, case name, settings route, and requested settings section.",
+    "png_identity_result": "Get-FileHash SHA256 on all eight original PNG files matches each case's screenshot evidence hash and reference hash.",
+    "aggregate_reference_identity": "The expected reference tree SHA-256 is recorded from the task. This batch independently verified the four individual reference PNG hashes, not the aggregate tree digest."
+  },
+  "reviewed_cases": [
+    {
+      "case_id": "sc-settings--categories",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/sc-settings--categories.png",
+      "candidate_sha256": "c7ca18149a936998b62f2ab40e32de56fa15dc89a89452b0a447d12bf662d570",
+      "reference_png": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/screens/states/sc-settings--categories.png",
+      "reference_sha256": "6c2f648e6df840e533da066ae20a9fcc049464b595122972baa0b98eebdebed0",
+      "viewed_candidate": true,
+      "viewed_reference": true,
+      "outcome": "needs_revision",
+      "observations": [
+        "Both originals were individually inspected with tools.view_image. Candidate PNG bytes match the screenshot evidence SHA-256 in the case sidecar; reference PNG bytes match its reference SHA-256.",
+        "The candidate preserves the approximately 320-logical-pixel navigation column, 46-pixel current navigation row, 80-pixel dock, and content left edge near x=356. The black selected row, white page surface, thin neutral rules, serif section heading, and sans-serif form labels are coherent with the reference.",
+        "All four category labels and counts 12, 9, 25, and 0 are visible. The four content rows retain approximately 60-logical-pixel height. Uncategorized has no rename action, preserving its immutable presentation.",
+        "The first three candidate rows have only a label and far-right count. The corresponding reference rows retain a trailing Rename button with the count immediately before it. The candidate sidecar reports all four category detail rows as enabled=false, but the unavailable rename action is not represented visibly.",
+        "New category is visibly disabled through its muted label and border. No list pager, shadow, stippled background, overlapping content, or clipped category label is visible.",
+        "The shared device subtitle ends in an ellipsis around logical x=760, hiding the end of a capability label. The reference subtitle is complete. This is recorded as a readability limitation of the longer captured descriptor rather than an automatic defect."
+      ],
+      "intentional_differences": [
+        "The unsupported pen navigation entry is omitted consistently with pen_input_implemented=false; subsequent navigation groups appear earlier while column width and row height remain stable.",
+        "Captured time, version, device name, and capability wording differ from the reference's illustrative values.",
+        "New category remains disabled instead of suggesting a successful unsupported category-creation action. This accepted capability bound does not justify omitting the reference's rename affordances."
+      ]
+    },
+    {
+      "case_id": "sc-settings--download",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/sc-settings--download.png",
+      "candidate_sha256": "c48cb5b88e2a80f57ef6e5fc0689a80281927deb34533bebc43d070171964e7b",
+      "reference_png": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/screens/states/sc-settings--download.png",
+      "reference_sha256": "5d31eb6b00a22ecb6934232c8b9358006ea2a2c1147cea5be9383f4cffbb921d",
+      "viewed_candidate": true,
+      "viewed_reference": true,
+      "outcome": "pass_with_observations",
+      "observations": [
+        "Both originals were individually inspected with tools.view_image. Candidate PNG bytes match the screenshot evidence SHA-256 in the case sidecar; reference PNG bytes match its reference SHA-256.",
+        "The candidate retains the same logical navigation width, content edges, selected-row tokens, five-item dock, and white surface as the reference. The four prefetch choices and two switch rows remain aligned and fully within the content column.",
+        "The prefetch choices and resizing/grayscale controls are visibly muted; an unavailable status accompanies the prefetch row. These controls do not visually claim to be enabled as in the illustrative reference.",
+        "The destination value begins with the actual captured data directory rather than the reference's sample device path. It is ellipsized in the value cell near logical x=890, so the final case directory and demo suffix cannot be read from this still image. The sidecar supplies the complete value: /tmp/aidoku-phase3-ui-round-1/data/a1baf3fe3dc2/sc-settings--download/demo.",
+        "The additional Download management button fits below the destination row without clipping or overlap. Static evidence does not establish its click outcome.",
+        "The shared header subtitle is ellipsized as in the other three candidates. No content shadow, stipple, pager, or unreachable row caused by clipping is visible."
+      ],
+      "intentional_differences": [
+        "The actual captured download destination differs from the reference's sample documents directory. A long runtime path may legitimately require ellipsis; this batch does not infer a full-path wrapping requirement from the shorter reference value.",
+        "Unavailable download preferences are presented in a disabled visual state instead of claiming active reference settings.",
+        "The unsupported pen navigation entry is omitted under the declared capability bound, and captured header values differ from illustrative reference values."
+      ]
+    },
+    {
+      "case_id": "sc-settings--image",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/sc-settings--image.png",
+      "candidate_sha256": "85a40efa2a84aefa7dc1370101508e243c5bb19365d52c62134791df2f5ff21d",
+      "reference_png": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/screens/states/sc-settings--image.png",
+      "reference_sha256": "8fa5c45dea8c9bf2d7f78ea4b870712f734aed44989c91c1dd77beeb32614722",
+      "viewed_candidate": true,
+      "viewed_reference": true,
+      "outcome": "pass_with_observations",
+      "observations": [
+        "Both originals were individually inspected with tools.view_image. Candidate PNG bytes match the screenshot evidence SHA-256 in the case sidecar; reference PNG bytes match its reference SHA-256.",
+        "All five contrast positions are visible in one aligned row, and Standard is the sole black selected segment, consistent with preferences.contrast=0. Section geometry, logical navigation width, dock height, thin rules, and white surface follow the reference.",
+        "Crop borders and 16-level grayscale dithering are visibly on, consistent with crop_borders=true, dither=true, and software_dither=true. The added 16-level wording makes the implemented software mode explicit.",
+        "Split spread image is visibly disabled with a muted label and switch. Hardware quality mode is absent, consistent with hardware_dither_qualified=false. No supported hardware mode is falsely represented.",
+        "Neither the matching reference nor the candidate contains an image preview, refresh-frequency choices, or a night-mode control on this page. Their absence is not reported as a mismatch for this case.",
+        "The contrast labels and switches are fully readable and do not overlap. The shared header descriptor has the same trailing ellipsis noted in the other candidates; no shadow, stipple, or list pager is visible."
+      ],
+      "intentional_differences": [
+        "Software dithering is labeled as a 16-level mode; the candidate does not expose a hardware quality setting because the recorded profile is not hardware-dither qualified.",
+        "Unsupported spread splitting is clearly disabled instead of copying the reference's enabled switch.",
+        "The unsupported pen navigation entry is omitted under the declared capability bound, and captured header values differ from illustrative reference values."
+      ]
+    },
+    {
+      "case_id": "sc-settings--language",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/sc-settings--language.png",
+      "candidate_sha256": "38982e1a22f85731cd05f5deec73862aaba3b86858195e0931c604ca5befdf07",
+      "reference_png": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/screens/states/sc-settings--language.png",
+      "reference_sha256": "339170fe21e1d878117c7792879674337740aa973b90d205b3fec438c77da8e1",
+      "viewed_candidate": true,
+      "viewed_reference": true,
+      "outcome": "pass_with_observations",
+      "observations": [
+        "Both originals were individually inspected with tools.view_image. Candidate PNG bytes match the screenshot evidence SHA-256 in the case sidecar; reference PNG bytes match its reference SHA-256.",
+        "The four reference languages are all present: Simplified Chinese, Traditional Chinese, English, and Japanese. Simplified Chinese is bold and has the sole trailing checkmark near logical x=884, matching the reference's current-choice treatment.",
+        "The approximately 60-logical-pixel language rows, left content edge near x=356, right-aligned checkmark, thin separators, serif section heading, 320-pixel navigation column, and 80-pixel dock follow the reference geometry.",
+        "The three non-current labels are visibly lighter than the reference's black labels and read as unavailable choices. All remain identifiable without clipping. Static evidence cannot establish whether these rows respond to input or whether localization is implemented.",
+        "The current navigation row remains black with a white icon and label. No list pager, text overlap, shadow, stipple, or content clipped by the dock is visible. The shared device subtitle ends in the same ellipsis observed in the other candidates."
+      ],
+      "intentional_differences": [
+        "The three non-current language choices use a disabled-looking gray treatment. This review records the visual difference without asserting unavailable-language behavior from a screenshot alone.",
+        "The unsupported pen navigation entry is omitted under the declared capability bound, and captured header values differ from illustrative reference values."
+      ]
+    }
+  ],
+  "suggestions": [
+    {
+      "id": "P3R1-REF27-1",
+      "case_id": "sc-settings--categories",
+      "priority": "P2",
+      "description": "The first three category rows omit the Rename affordance instead of explicitly representing the unavailable action as disabled.",
+      "evidence": "At approximately logical y=230-410, the candidate shows category names and counts only, with each count at the far-right content edge. The matching reference places a Rename button at the right of each of these three rows and its count immediately before the button. The candidate sidecar records all category detail rows as enabled=false, but no disabled rename button or equivalent unavailable action is visible. Uncategorized correctly has no Rename affordance.",
+      "recommendation": "Preserve a trailing Rename affordance for each of the first three category rows and render it explicitly disabled while renaming is unimplemented. Keep the count before that disabled affordance, retain the existing row geometry, and keep Uncategorized immutable. Do not simulate a successful rename.",
+      "status": "open",
+      "introduced_round": 1
+    }
+  ],
+  "limitations": [
+    "This independent review covers only the four case pairs in reference-27.input.json. It does not declare the entire round clean.",
+    "Only existing JSON and original PNG files were read, and Get-FileHash was used for PNG identity. No application, build, tests, validation suite, runtime probe, Git operation, or product modification was performed.",
+    "Candidate captures are 930x1240 at logical scale 1. Reference originals are 1860x2480 at physical scale 2; tools.view_image displayed the references resized to 1368x1824. Geometry was compared at equivalent logical dimensions without modifying the original evidence bytes.",
+    "Coordinate descriptions are approximate visual estimates. This review did not use programmatic pixel measurement or derive contrast ratios.",
+    "Screenshots and supplied sidecars establish visible state and declared capabilities, but do not prove click outcomes, language switching, rename behavior, download completion, processed-image output, or physical e-ink behavior.",
+    "The full download destination is present in the supplied JSON but truncated in the PNG. No path-reveal interaction or separate long-path stress case was examined.",
+    "The aggregate reference tree SHA-256 was supplied by the task and was not recomputed in this four-case review; every reviewed reference PNG was independently hashed and matched its sidecar."
+  ]
+}

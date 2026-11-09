@@ -1,0 +1,51 @@
+{
+  "schema_version": 1,
+  "kind": "C6-tag-fixture-capacity-scope-adjudication",
+  "record_date": "2026-11-07",
+  "authority": "Root explicitly adjudicated the fixture baseline through final_validation_delivery after reviewing the preserved 700c attempt. This changes only the qualification fixture expectation and its provenance; it grants no product edit or automatic visual acceptance.",
+  "original_attempt": {
+    "scope": "Immutable C6 pre-touch source 700c only",
+    "source_sha256": "700c2344c54f518b57f05b41be1ed72941bb4e1f691bcc900a41944a4399c69c",
+    "binary_sha256": "baafaf4b29a7a6629e8ef95da9dae38da323adccaa89288a92afe3bc4318e0ee",
+    "run_id": "3d31486b716e",
+    "round": 4,
+    "actual_captures": 36,
+    "passed": 35,
+    "failed": 1,
+    "driver_exit_code": 1,
+    "manifest_sha256": "3472ffa5d6b36b95d5c9ccff93549fbe544458dc4a5bd94710bbbcbb3ab9ad46",
+    "inventory_sha256": "256a189509693e518015a8d9670d079303e71ea1ea2847277a78803c5cbe5ea1",
+    "failed_case_id": "pw5--content-stress--filter-tags-first",
+    "original_result_changed": false,
+    "originals_retained": "artifacts/phase3/candidate6/ui-tag-qualification-pre-touch-01"
+  },
+  "baseline_provenance": {
+    "C4": "The old actual dc0 Paperwhite content fixture used four columns, eight tags per page and five pages. That record belongs to C4.",
+    "C5_PW_runtime": "Unknown: the C5 bounded qualification did not execute the 34-tag Paperwhite fixture. Do not describe C5 as having measured either three or four columns.",
+    "C6_pre_touch_runtime": "The actual 700c native observations show three columns, six tags per page and six pages on both Paperwhite and Scribe.",
+    "static_source_comparison": "Verified C5 892 and C6 pre-touch 700c have identical TagFlow marker-budget, available-width, columns, page-size and visible-count expressions. ui/tag-flow.slint is the only changed UI/asset file; src/app.rs and src/downloads.rs are the other changed product files. This is source evidence, not an invented C5 runtime measurement.",
+    "source_comparison_sha256": "31738c677d994f4c69965016a9cec33c7fdfe570550699a26e441ac45a49dca0"
+  },
+  "adjudicated_fixture": {
+    "provider": "Existing actual loopback Komga JSON: Actual tag 00 through 31 plus Adventure and Mystery; public fixture credentials only",
+    "tag_count": 34,
+    "pw5": {"columns": 3, "rows_per_page": 2, "page_size": 6, "page_count": 6, "horizontal_padding": 16},
+    "scribe": {"columns": 3, "rows_per_page": 2, "page_size": 6, "page_count": 6, "horizontal_padding": 18},
+    "fresh_qualification_expected_captures": 36,
+    "driver_original_nominal_estimate": "The unchanged driver's nominal 34 was the earlier static estimate. Its actual-derived case set and capture count are authoritative, and its success gate requires every derived case without omissions or extras."
+  },
+  "only_executable_change": {
+    "path": "scripts/handoff_tag_pixels.py",
+    "old_sha256": "a8a0c9d198546b577fbc1e9ae797faccc18e45a6f6e2760105382dce4e3b0530",
+    "new_sha256": "f97014cfca910b30a75cea484e57dcd9e4566ca1401785b096ab5851add979a1",
+    "change": "Replace the incorrectly transferred C4 PW column expectation with Root's C6 fixture expectation, and label that provenance explicitly."
+  },
+  "unchanged_contracts": [
+    "No production source, UI, asset or vendor file is edited by this adjudication.",
+    "Formal main 8811746a09e761bfff55879a018d71f98d1d957d5ba79e8f008bdcaf90d5f55e, qualification driver 7cd32588578edff343a33dc2a70b99cb6f838f6063de175c4e269935c53eb0b6 and formal full plan b3adabbf4f2d33789f381dc2ac55474d89fcd210d58ce9e5083c0d818d547eec remain unchanged.",
+    "Keep the complete ordered 34-ID sweep, real final page, native CC/pointer replay, centered neutral glyph and width thresholds, selected fill/marker, excluded frame/strike, actual HTTP payload evidence and long-suffix original review requirements.",
+    "Retain the original failed 35/1/exit1 attempt and every original execution input. Do not relabel it as passing or reuse its images for another source.",
+    "Do not start a C5 or 700c baseline App. Wait for the owner's final source/binary identity and explicit GO, then execute one fresh 36-capture qualification on that final source."
+  ],
+  "acceptance": "A passing affected-tag qualification remains partial and supplies zero full-round or clean-round credit. Complete independent original-PNG review and the two fresh complete full rounds remain separate requirements."
+}

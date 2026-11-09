@@ -1,0 +1,136 @@
+{
+  "batch_id": "supplemental-43",
+  "reviewer": "independent-visual-reviewer-supplemental-43",
+  "run_id": "a1baf3fe3dc2",
+  "reviewed_case_ids": [
+    "scribe-landscape--resume-restored",
+    "scribe-landscape--reversed-tap-input",
+    "scribe-landscape--seek-menu-baseline",
+    "scribe-landscape--seek-preview",
+    "scribe-landscape--seek-release",
+    "scribe-landscape--tap-boundary-center",
+    "scribe-landscape--tap-boundary-side",
+    "scribe-landscape--toc-last-page"
+  ],
+  "reviewed_cases": [
+    {
+      "case_id": "scribe-landscape--resume-restored",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/scribe-landscape--resume-restored.png",
+      "candidate_sha256": "91ceb9e8a9b560e178d234248902dc249c94f21c6c7da60c0057ce780d16ea37",
+      "viewed_candidate": true,
+      "outcome": "pass",
+      "observations": [
+        "Directly viewed the original 1240 by 930 landscape PNG. The restored scene contains only the two artwork allocations, with continuous panel geometry and no decorative center gutter.",
+        "No bookmark ribbon, footer text, status bar, notification, or menu residue is visible. The narrow top and bottom white areas remain part of the artwork presentation rather than an application inset.",
+        "The supplied state identifies reader route, menu closed, page 20 of 40, and displayed page 20. The screenshot hash matches both the input expectation and case screenshot evidence; run, binary, and source identities match the assigned round."
+      ],
+      "intentional_differences": []
+    },
+    {
+      "case_id": "scribe-landscape--reversed-tap-input",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/scribe-landscape--reversed-tap-input.png",
+      "candidate_sha256": "91ceb9e8a9b560e178d234248902dc249c94f21c6c7da60c0057ce780d16ea37",
+      "viewed_candidate": true,
+      "outcome": "pass",
+      "observations": [
+        "Directly viewed the original PNG for this case even though its bytes match other closed-reader captures. Both page allocations remain legible, with artwork patterns reaching the horizontal display edges and no added seam decoration.",
+        "The final scene is artwork only: no menu, status, ribbon, footer, notification, or tap-zone visualization remains visible.",
+        "Case metadata identifies the reversed-tap result as page 10 of 40 with committed and displayed page 10. The PNG hash matches the input and screenshot evidence, and all assigned provenance identifiers match. The static scene alone cannot establish input inversion."
+      ],
+      "intentional_differences": []
+    },
+    {
+      "case_id": "scribe-landscape--seek-menu-baseline",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/scribe-landscape--seek-menu-baseline.png",
+      "candidate_sha256": "51d17444f10f121e64d13d2b833439bdf7869b3692c52a729395a907a2cb3708",
+      "viewed_candidate": true,
+      "outcome": "pass",
+      "observations": [
+        "Directly viewed the menu-open landscape baseline. The integrated header has a readable book caption and chapter 34 title, back action, orientation lock, bookmark and contents actions, and time/battery readout without collisions.",
+        "The progress area shows 12-13 / 40, 28 remaining pages, a right-to-left track with a distinct outlined square thumb, and opposing chapter actions. Its content aligns to the prescribed landscape inset.",
+        "The five bottom tools are evenly spaced, with separate icons and readable labels. White surfaces and thin rules have no shadow or stippled backdrop. Metadata confirms menu open and committed/displayed page 12; the PNG hash and assigned provenance all match."
+      ],
+      "intentional_differences": []
+    },
+    {
+      "case_id": "scribe-landscape--seek-preview",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/scribe-landscape--seek-preview.png",
+      "candidate_sha256": "edc7ea53a9796388ebd9810c2c1f8e423b0b7105bf238a5001aff8919189e9fb",
+      "viewed_candidate": true,
+      "outcome": "pass",
+      "observations": [
+        "Directly viewed the drag-preview PNG. The progress readout changes to 32-33 / 40, the remaining count becomes 8, and the seek thumb moves left along the right-to-left track while the artwork and other menu controls retain their baseline geometry.",
+        "The supplied state retains committed and displayed page 12 during this preview. That is consistent with prototype/spec-interaction.dc.html line 81 and DESIGN_HANDOFF.md: dragging previews the page number and release starts decoding. The preview readout is not treated as an incorrect committed-page claim.",
+        "The preview values, track, chapter actions, header, and five tool labels remain clear and unoccluded. The screenshot hash matches both evidence sources, and the assigned run, binary, and source identities match."
+      ],
+      "intentional_differences": []
+    },
+    {
+      "case_id": "scribe-landscape--seek-release",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/scribe-landscape--seek-release.png",
+      "candidate_sha256": "91ceb9e8a9b560e178d234248902dc249c94f21c6c7da60c0057ce780d16ea37",
+      "viewed_candidate": true,
+      "outcome": "pass",
+      "observations": [
+        "Directly viewed the original release-result PNG. The seek controls and both menu bands are absent, exposing the complete landscape artwork scene with balanced page allocations.",
+        "No persistent page counter, bookmark ribbon, status bar, notification, or decorative gutter is visible after release.",
+        "Case metadata identifies committed and displayed page 32 of 40 after release. The screenshot matches its expected and evidence SHA256 values and the assigned provenance. The repeated artwork in this fixture does not visually distinguish page 32 from other closed-reader pages."
+      ],
+      "intentional_differences": []
+    },
+    {
+      "case_id": "scribe-landscape--tap-boundary-center",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/scribe-landscape--tap-boundary-center.png",
+      "candidate_sha256": "51d17444f10f121e64d13d2b833439bdf7869b3692c52a729395a907a2cb3708",
+      "viewed_candidate": true,
+      "outcome": "pass",
+      "observations": [
+        "Directly viewed this case PNG. The center-boundary result presents the complete menu-open scene, with chapter 34 in the header and the 12-13 / 40 range remaining visible.",
+        "The orientation lock, header actions, seek thumb, neighboring chapter controls, and five bottom tools have clear separation; there is no clipping or unexpected overlay.",
+        "The supplied state keeps reader, committed, and displayed page at 12 with menu open, consistent with the center zone opening the menu. Hashes and assigned provenance match. The still image cannot locate or measure the input boundary itself."
+      ],
+      "intentional_differences": []
+    },
+    {
+      "case_id": "scribe-landscape--tap-boundary-side",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/scribe-landscape--tap-boundary-side.png",
+      "candidate_sha256": "91ceb9e8a9b560e178d234248902dc249c94f21c6c7da60c0057ce780d16ea37",
+      "viewed_candidate": true,
+      "outcome": "pass",
+      "observations": [
+        "Directly viewed the side-boundary result. The menu remains closed, leaving the two artwork allocations and original white image margins without any application chrome.",
+        "No tap-zone guides, residual progress track, ribbon, footer, status text, notification, or decorative center seam appears.",
+        "Case metadata records reader, committed, and displayed page 14 of 40, consistent with a spread advance from page 12. The input/evidence/current PNG hashes and the assigned provenance all match; the static artwork cannot independently prove the 30/40/30 threshold."
+      ],
+      "intentional_differences": []
+    },
+    {
+      "case_id": "scribe-landscape--toc-last-page",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/scribe-landscape--toc-last-page.png",
+      "candidate_sha256": "7f9307710a17804472d69a0d7abf0dd2e1b6b146a5055ccd22e7f76e2cab331b",
+      "viewed_candidate": true,
+      "outcome": "pass",
+      "observations": [
+        "Directly viewed the final contents page. The active contents tab is underlined, the bookmark tab remains readable, and the remaining chapter 2 and chapter 1 records occupy one row across two columns with dotted leaders and read-state labels.",
+        "The white contents sheet fits the short final-page content instead of leaving three rows of empty capacity. It uses thin rules and no shadow or stippled backdrop; the artwork above remains visible.",
+        "The folio reads 15 / 15 at the center, with the previous-page action at the left edge and the next-page action absent at the right. The underlying 12-13 / 40 progress band and five tools retain their baseline positions.",
+        "Metadata identifies reader-toc choices, panel page 15 of 15, and exactly the two visible chapter records. The screenshot hash matches the input and case evidence, with the assigned run, binary, and source identities unchanged."
+      ],
+      "intentional_differences": []
+    }
+  ],
+  "suggestions": [],
+  "coverage_gaps": [
+    "This supplemental batch provides eight candidate PNGs and no independent reference PNGs. Visual judgments use the explicit scope, handoff, prototype text, and case identity metadata; no other images were loaded.",
+    "The batch covers only Scribe landscape resume, reversed tap result, seek baseline/preview/release, center/side boundary results, and contents last page. It does not establish a complete round or clean-round result.",
+    "The final contents page has only two records. It supports the two-column final-page layout and content-height behavior, but does not independently show the full three-row contents capacity or stability across every folio transition.",
+    "Static captures show final visible states rather than event timing, the actual 30/40/30 hit boundaries, reversal routing, menu-open input suppression, or the absence of an invisible footer-cycle hit zone."
+  ],
+  "limitations": [
+    "Each of the eight original candidate PNGs was directly opened with view_image. Current SHA256 values were obtained with Get-FileHash and matched both expected_png_sha256 and case evidence_hashes.screenshot.sha256.",
+    "All eight case sidecars identify round 1, run a1baf3fe3dc2, binary 94d7f3bbcab475ad8833a2f3c486138f7b49bead231851c2d8eab2f0c3d2ac51, and source aef9db4e111165016a10a2a95e111f3155860b8510c7f6207ec9c79fbec5082c. Their supplied mechanical checks were read as supporting evidence, not substituted for visual review or rerun locally.",
+    "The text sources used were docs/review/phase3-reference-scope.json, docs/DESIGN_HANDOFF.md, and the exported HANDOFF.md, prototype/sc-reader.dc.html, and prototype/spec-interaction.dc.html. The closed-reader artwork-only scope override takes precedence over obsolete ribbon/footer behavior.",
+    "The same demo artwork appears in several page states. Numeric committed-page claims therefore rely on the supplied sidecars rather than independent recognition of unique page content.",
+    "No application, build, test suite, smoke test, runtime probe, Git operation, or product modification was performed. This review cannot certify physical wake/resume behavior, decoding latency, e-ink hardware behavior, or a 512 MiB memory limit."
+  ]
+}

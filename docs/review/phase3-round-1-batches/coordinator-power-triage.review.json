@@ -1,0 +1,52 @@
+{
+  "kind": "coordinator-targeted-triage-only",
+  "batch_id": "coordinator-targeted-power",
+  "reviewer": "/root/phase3_round1_review",
+  "run_id": "a1baf3fe3dc2",
+  "targeted_review": {
+    "case_id": "sc-settings--power",
+    "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/sc-settings--power.png",
+    "candidate_sha256": "aab544e43e1027631a6ff4072a3a6d9eb52f86d9caeda70b2b1b8e0a18734e4f",
+    "reference_png": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/screens/states/sc-settings--power.png",
+    "reference_sha256": "784e15a6156fbb749e6e8b0871748b92fff977feb0164a5b97ee59d8a1df4abb",
+    "viewed_candidate": true,
+    "viewed_reference": true,
+    "comparison": "Native logical 1x and original physical 2x compared at the same logical proportions. The reference display layer resized its preview, so logical coordinates are approximate.",
+    "observations": [
+      "The unavailable label is beside the screensaver section heading and visibly applies to its three disabled cards. The separate charging-update and reading-time Wi-Fi rows above it are disabled without an explanation in those rows.",
+      "An additional thick black segment extends across the dock separator from approximately x57 to x874 at y1162-1167. The reference uses a thin full-width top rule and a short selected Settings indicator approximately x800-874. The existing selected icon and caption remain visible."
+    ],
+    "pixel_identity_algorithm": "sha256-of-unmodified-png-bytes"
+  },
+  "suggestions": [
+    {
+      "id": "P3R1-COORD-1",
+      "case_id": "sc-settings--power",
+      "priority": "P3",
+      "description": "Keep the dock selection indicator within the selected tab and remove the extra long dark segment.",
+      "evidence": "The original candidate has a thick black segment spanning approximately logical x57-874 above the dock, crossing several inactive tabs. The normalized original reference only has the short Settings indicator around x800-874 in addition to the thin full-width rule.",
+      "recommendation": "Inspect the dock indicator and any unintentionally exposed horizontal scrollbar, then constrain the selected marker to its intended tab. Do not remove the required thin top rule.",
+      "status": "open",
+      "introduced_round": 1
+    }
+  ],
+  "scope_qualifications": [
+    {
+      "group_id": "P3R1-G26",
+      "status": "open-clarity-only",
+      "priority": "P3",
+      "observed": "The charging-update and reading-time Wi-Fi rows have no visible unavailable explanation; the screensaver unavailable label is lower down beside the screensaver heading.",
+      "recommended_action": "Add a concise accurate unavailable explanation that clearly applies to each unsupported upper policy or to their shared group. No unintegrated firmware or background policy implementation is required."
+    },
+    {
+      "accepted_id": "P3R1-A02",
+      "status": "accepted",
+      "observed": "The disabled screensaver cards have a visible section-level unavailable label."
+    }
+  ],
+  "limitations": [
+    "This targeted follow-up does not add another required full-round case or replace the original independent reviewer.",
+    "The exact component responsible for the long dock segment is not established by these pixels.",
+    "No application, build, test, smoke test or runtime probe was executed locally. Static PNGs do not qualify physical firmware behavior."
+  ]
+}

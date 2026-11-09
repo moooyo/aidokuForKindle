@@ -1,0 +1,233 @@
+{
+  "batch_id": "supplemental-34",
+  "reviewer": "/root/phase3_round1_review/supplemental_34",
+  "run_id": "a1baf3fe3dc2",
+  "round": 1,
+  "binary_sha256": "94d7f3bbcab475ad8833a2f3c486138f7b49bead231851c2d8eab2f0c3d2ac51",
+  "source_sha256": "aef9db4e111165016a10a2a95e111f3155860b8510c7f6207ec9c79fbec5082c",
+  "review_mode": "Independent static visual review of the eight assigned candidate PNGs; no independent reference PNG was supplied or viewed.",
+  "identity_audit": {
+    "method": "Read-only Get-FileHash SHA256 of each current candidate PNG, compared with input expected_png_sha256 and its case_metadata evidence_hashes.screenshot.sha256.",
+    "all_eight_png_hashes_match_both_recorded_hashes": true,
+    "all_eight_case_sidecars_match_run_binary_and_source_identity": true,
+    "all_eight_case_sidecars_have_empty_intentional_differences": true,
+    "supplied_checks": "All eight case sidecars contain no failed checks. These existing records were inspected for capture identity and claimed state, not rerun or substituted for visual review."
+  },
+  "reference_texts": [
+    "D:/Code/aidokuForKindle/docs/review/phase3-reference-scope.json",
+    "D:/Code/aidokuForKindle/docs/DESIGN_HANDOFF.md",
+    "D:/Code/aidokuForKindle/docs/review/phase3-prototype-reference-support.json",
+    "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/HANDOFF.md, relevant foundation, folio, reader and source-management sections",
+    "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/prototype/sc-sources.dc.html, installed/blocked rows, language results, folio and source-list declarations"
+  ],
+  "reviewed_case_ids": [
+    "scribe--source-language-ja",
+    "scribe--source-language-zh-Hans",
+    "scribe--source-language-zh-Hant",
+    "scribe--source-list-operation--added",
+    "scribe--source-list-operation--removed",
+    "scribe--sources-first-boundary",
+    "scribe--sources-last-page",
+    "scribe-landscape--ltr-page-input"
+  ],
+  "reviewed_cases": [
+    {
+      "case_id": "scribe--source-language-ja",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/scribe--source-language-ja.png",
+      "candidate_sha256": "e34be9949c404ae43aff580da0bc2774469f3c16e27df848ce4e0463584aa3ff",
+      "viewed_candidate": true,
+      "outcome": "issue_found",
+      "observations": [
+        "The 930x1240 portrait source manager visibly has the fixed installed-source column, separate available/update tabs, white outlined controls and the active Browse dock item. The identity sidecar records profile scribe, desktop backend, route sources, source_filter 1 and source_language ja.",
+        "The Japanese language chip is visibly selected with black fill and white text. The right column contains one MangaDex row with multilingual/version secondary text and an Update action; the available count is one and the folio is 1/1 with neither directional action visible. This language selection and outcome were observed in the PNG, not inferred solely from source_language.",
+        "The installed column retains four built-in and three extension sources. The blocked source B has a dashed warning tile, gray text and an Uninstall action, but its secondary text is ellipsized after the browser-verification wording and Kindle. The explicit unavailable clause is not visible; see P3R1-SUP34-1.",
+        "No shadow, dimmed backdrop, screen-tone mask, content overlap or right-column pagination spill into the installed column is visible."
+      ],
+      "intentional_differences": [
+        "Current source records, language-result count, time and battery data may differ from prototype fixtures; those data differences are accepted.",
+        "No independent reference image exists for this supplemental language state."
+      ]
+    },
+    {
+      "case_id": "scribe--source-language-zh-Hans",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/scribe--source-language-zh-Hans.png",
+      "candidate_sha256": "9a64b3b20c695447ef6e010d363d5b79db52eda6dd58dcb5847e72b065bb265f",
+      "viewed_candidate": true,
+      "outcome": "issue_found",
+      "observations": [
+        "The Simplified Chinese chip is visibly black with white text, while the other four language chips remain white and outlined. The sidecar identity records the 930x1240 portrait sources route with source_filter 1 and source_language zh-Hans.",
+        "The available tab and header show 124 results, while the distinct update tab shows two. Exactly ten right-column rows are visible: MangaDex, source A, and demonstration sources 001 through 008. Update actions remain separate from Install actions, and all ten rows fit above the folio without collisions.",
+        "The folio reads 1/13 with Next visible and the Previous allocation empty; its center remains aligned within the right column. The installed-source groups remain unchanged on the left.",
+        "The blocked source B secondary line loses its explicit unavailable clause to ellipsis. Its warning tile and Uninstall action remain visible; this is the same issue as P3R1-SUP34-1.",
+        "The page uses white surfaces, outlined secondary controls, thin separators and no shadow or dimmed overlay."
+      ],
+      "intentional_differences": [
+        "The 124 available records and source titles are the captured data set; prototype sample names and counts are not required replacements.",
+        "No independent reference image exists for this supplemental language state."
+      ]
+    },
+    {
+      "case_id": "scribe--source-language-zh-Hant",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/scribe--source-language-zh-Hant.png",
+      "candidate_sha256": "f4720ce3f3baaac1a8a33344a45e2ee88fb117a374f3f741d5e61604460a2859",
+      "viewed_candidate": true,
+      "outcome": "issue_found",
+      "observations": [
+        "The Traditional Chinese chip is visibly selected. The header and available tab both show zero available records, distinct from the update count of two; the sidecar records source_language zh-Hant and an empty available_sources collection.",
+        "The right column visibly presents an empty-result icon, a prominent no-results heading and a black Add Source action. No stale source rows remain in the result area. The folio is 1/1 with neither directional action shown.",
+        "The seven installed sources retain their separate left column and built-in/extension group counts. The blocked source B still truncates the unavailable clause in its secondary line; see P3R1-SUP34-1.",
+        "The empty result and its action remain within the right column, with no row overflow, gray surface, shadow or screen-tone mask."
+      ],
+      "intentional_differences": [
+        "An actual zero-result language filter is accepted rather than fabricating the prototype's demonstration sources.",
+        "No independent reference image exists for this supplemental language state."
+      ]
+    },
+    {
+      "case_id": "scribe--source-list-operation--added",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/scribe--source-list-operation--added.png",
+      "candidate_sha256": "514343e61381cba984426494edf08e2e8f094e80ec9f0512053749bf1a1549ac",
+      "viewed_candidate": true,
+      "outcome": "no_new_issue_observed",
+      "observations": [
+        "The sources route is visibly covered by a centered white Source Lists float near x=115, y=250 with approximately 700 design-pixel width, a black outline and no shadow or dimmed background. The title and black Done action remain clear of the content.",
+        "One outlined repository card visibly contains Actual local fixture repository, the complete http://127.0.0.1:40049/index.json address and a separate Remove action. The sidecar modal is choices with repository-list context and the matching enabled repository-remove identifier; its supplied check records an actual saved HTTP repository row.",
+        "The dashed Add Source List action fits beneath the card with generous separation. The float ends near y=546 and follows its content rather than filling the screen. The installed-source column and 1/1 folio remain visible behind it without a scrim.",
+        "The captured background has one installed, configured Local Komga fixture and zero available/update records. These are coherent fixture data, rather than a claim that the prototype's larger source set was imported."
+      ],
+      "intentional_differences": [
+        "The actual local fixture repository name and loopback HTTP address replace the prototype's placeholder list name/address and fabricated count.",
+        "The captured installed-source count and background records are allowed data differences."
+      ]
+    },
+    {
+      "case_id": "scribe--source-list-operation--removed",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/scribe--source-list-operation--removed.png",
+      "candidate_sha256": "04216f4edd2b7e3c371ec2bbb2df2dd7724fad218bbaadfb9491edbaf56d9bd1",
+      "viewed_candidate": true,
+      "outcome": "no_new_issue_observed",
+      "observations": [
+        "The Source Lists float retains the same top placement, width, title, Done action, white fill and black outline as the added-state capture. Its bottom has moved upward to approximately y=510, consistent with shorter content rather than a fixed empty sheet height.",
+        "The repository card, its URL and its Remove action are absent. A concise unconfigured status occupies the empty area, and the dashed Add Source List action remains available. The visible removed result agrees with the sidecar's empty modal_items and modal_item_ids; the supplied persisted-row removal check records an empty result.",
+        "The underlying one-installed-source state remains present and the folio remains 1/1. No stale repository text, residual card outline, mask, shadow or text/control collision is visible."
+      ],
+      "intentional_differences": [
+        "The concise empty/unconfigured status reports the actual empty repository collection; the prototype's removed-list example does not require fabricated rows.",
+        "The underlying Local Komga fixture and captured counts are accepted data differences."
+      ]
+    },
+    {
+      "case_id": "scribe--sources-first-boundary",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/scribe--sources-first-boundary.png",
+      "candidate_sha256": "fef0ed0b1f8f3d91e3c93a63092f0b4ce0ad082c20673a0b92d274aeaa19d78e",
+      "viewed_candidate": true,
+      "outcome": "issue_found",
+      "observations": [
+        "The All language chip is visibly selected on the available tab. Ten right-column rows are present: the two installed sources with update actions and demonstration sources 001 through 008 with Install actions; the tab/header count is 124.",
+        "The right-column folio reads 1/13, shows Next with text and a chevron, and hides Previous while preserving its left allocation. The sidecar records page 1 of 13, matching the visible boundary state; the PNG does not itself establish that an attempted backward input was clamped.",
+        "The fixed left column still contains four built-in sources and three extensions. Its groups, add affordance and dock remain aligned independently of right-side pagination.",
+        "The blocked source B secondary line ends in ellipsis before its unavailable clause, as in the language cases; see P3R1-SUP34-1. No additional overlap, row-limit violation or shadow is visible."
+      ],
+      "intentional_differences": [
+        "Thirteen pages follow the captured 124 records at ten right-column rows per page; prototype sample totals do not prescribe a different page count.",
+        "No independent reference image exists for this supplemental boundary state."
+      ]
+    },
+    {
+      "case_id": "scribe--sources-last-page",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/scribe--sources-last-page.png",
+      "candidate_sha256": "241e7224409829f8926d6d308db44630019dffd261d6fbbb08fba30e55d850bb",
+      "viewed_candidate": true,
+      "outcome": "issue_found",
+      "observations": [
+        "The available tab retains 124 records with All selected. The final right-column page contains exactly four source rows, numbered 119 through 122, each with a separate Install action. This is consistent with the final four records after twelve ten-record pages, including the first-page updateable sources.",
+        "The folio visibly reads 13/13, shows Previous with text and a chevron, and hides Next while retaining the right allocation. The sidecar records page 13 of 13 and the same four available source identifiers.",
+        "The installed-source column still displays the same four built-in and three extension sources as the first-page capture. It does not page with the right column, and the dock stays fixed at the bottom.",
+        "The blocked source B secondary text again hides its explicit unavailable status after ellipsis; see P3R1-SUP34-1. The sparse final page has no extra fabricated rows or clipped row content."
+      ],
+      "intentional_differences": [
+        "The partial final page and 13/13 folio reflect the captured source collection rather than prototype sample counts.",
+        "No independent reference image exists for this supplemental final-page state."
+      ]
+    },
+    {
+      "case_id": "scribe-landscape--ltr-page-input",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/scribe-landscape--ltr-page-input.png",
+      "candidate_sha256": "c45bb8b3874337f6de3431d2a100773719ed0c63138dc8ce7bcd41ec96628557",
+      "viewed_candidate": true,
+      "outcome": "no_new_issue_observed",
+      "observations": [
+        "The 1240x930 landscape capture visibly contains two adjacent comic-page allocations with panel artwork, line patterns and speech shapes. There is no open reader menu, top status bar, bottom tool rail, folio, page-number corner, bookmark ribbon, notification or application dock.",
+        "Artwork fills the two horizontal half-width allocations. The visible top and bottom white bands are symmetric aspect-fit space, approximately 29 design pixels each; there is no decorative center divider or extra application gutter. The sidecar's recorded processed-input geometry independently describes the same fit destinations, but no additional artwork or oracle PNG was opened.",
+        "The sidecar identity records route reader, landscape true, menu false, reading_direction ltr, spread true and displayed/committed page 14 of 40. These identify the claimed post-input capture; a static artwork image cannot independently establish LTR tap mapping or a page-turn sequence.",
+        "The supplied pure-reader oracle reports zero changed pixels and no ignored region. This is retained capture evidence only; the visual conclusion here is limited to the absence of visible reader chrome and the observed artwork layout."
+      ],
+      "intentional_differences": [
+        "The user's artwork-only closed-reader rule intentionally overrides the reference's persistent bookmark ribbon, footer and footer-cycle decoration.",
+        "Actual page artwork, aspect ratio and aspect-fit white space may differ from the reference illustration and are accepted; the white bands are not reported as viewport inset."
+      ]
+    }
+  ],
+  "suggestions": [
+    {
+      "id": "P3R1-SUP34-1",
+      "case_id": "scribe--source-language-zh-Hans",
+      "affected_case_ids": [
+        "scribe--source-language-ja",
+        "scribe--source-language-zh-Hans",
+        "scribe--source-language-zh-Hant",
+        "scribe--sources-first-boundary",
+        "scribe--sources-last-page"
+      ],
+      "priority": "P3",
+      "related_parent_observation": "REF31-2; the parent reviewer identified the same underlying status-readability issue. No other review images were opened by this reviewer.",
+      "description": "The blocked source row truncates the explicit unavailable status, so its visible reason stops after the browser-verification wording and Kindle.",
+      "evidence": [
+        "In all five 930x1240 source-manager captures with source B, the subtitle around x=100..287, y=746..762 is ellipsized before the unavailable clause. The gray source name, dashed warning tile and Uninstall action remain visible. This is a status-readability issue, not evidence that an unavailable operation is enabled or that a backend operation is blocked.",
+        "The case sidecars contain the full browser-verification/unavailable subtitle and available=false for source B. The issue is the visible projection of that truthful state, not the underlying state value.",
+        "HANDOFF.md section 5.4 requires a browser-verification-dependent source to show a concise verification/unavailable status and an Uninstall action. prototype/sc-sources.dc.html line 71 uses a concise status that retains the unavailable keyword; docs/DESIGN_HANDOFF.md requires blocked state to be explicit."
+      ],
+      "recommendation": "Shorten the source-manager blocked subtitle or reserve a visible unavailable status segment before optional detail. Keep the browser-verification reason and unavailable state readable within the existing 400-pixel installed column, while retaining the warning tile and Uninstall action. Recheck the five affected states on the same candidate.",
+      "status": "open",
+      "introduced_round": 1
+    }
+  ],
+  "coverage_gaps": [
+    {
+      "case_ids": [
+        "scribe--source-language-ja",
+        "scribe--source-language-zh-Hans",
+        "scribe--source-language-zh-Hant"
+      ],
+      "description": "Selected language chips and their single-result, dense-result and empty-result outcomes are visually covered. The PNGs do not independently establish the tap sequence, resetting to page one after changing language, or whether source membership is filtered correctly beyond the visible captured records. English language selection is outside this assigned batch."
+    },
+    {
+      "case_ids": [
+        "scribe--source-list-operation--added",
+        "scribe--source-list-operation--removed"
+      ],
+      "description": "The saved repository row and its removed/empty visible outcome are covered, and the supplied checks describe actual persisted records. Independent HTTP import, storage persistence after restart, Remove dispatch, Done and outside dismissal were not executed by this reviewer."
+    },
+    {
+      "case_ids": [
+        "scribe--sources-first-boundary",
+        "scribe--sources-last-page"
+      ],
+      "description": "First/last folio labels, unavailable directional-action visibility, stable allocations and ten/four-row limits are covered. The batch does not show the open center jump grid or establish selection, outside dismissal, swipe behavior or repeated boundary-input clamping."
+    },
+    {
+      "case_ids": [
+        "scribe-landscape--ltr-page-input"
+      ],
+      "description": "Visible artwork-only landscape output is covered. LTR input mapping, normal lower-right page turning, absence of an invisible footer-cycle hit zone, input generation fences, retained-scene wake, refresh timing and physical device behavior cannot be established from this single static PNG."
+    }
+  ],
+  "limitations": [
+    "Exactly the eight assigned candidate PNGs were opened with tools.view_image. No other candidate, reference, processed-input, expected-oracle or difference image was loaded.",
+    "This supplemental batch has no independent reference PNG. Textual scope, relevant HANDOFF/prototype declarations and the supplied case metadata support the review; no exact pixel-match-to-reference claim is made.",
+    "Only existing JSON/text/PNG files and read-only SHA256 identity checks were used. No application, prototype runtime, build, test suite, smoke test or runtime probe was launched locally or remotely; no git operation or product modification was performed.",
+    "The existing mechanical_passed fields and sidecar checks were treated as supplied evidence rather than new verification results. Actual persistence, event dispatch and interaction behavior require the root review's independent remote evidence.",
+    "The captures identify the desktop backend and Scribe design profile at unit native scale. They do not qualify physical panel output, sensor behavior, hardware waveforms, sleep/wake behavior, touch-target response or a 512 MiB memory limit.",
+    "This is an eight-case supplemental result with one actionable finding, not a declaration that the complete round or applicable matrix is clean."
+  ]
+}

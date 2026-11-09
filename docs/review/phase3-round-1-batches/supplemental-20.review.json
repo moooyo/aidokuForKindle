@@ -1,0 +1,200 @@
+{
+  "batch_id": "supplemental-20",
+  "reviewer": "/root/phase3_round1_review/supplemental_20",
+  "run_id": "a1baf3fe3dc2",
+  "binary_sha256": "94d7f3bbcab475ad8833a2f3c486138f7b49bead231851c2d8eab2f0c3d2ac51",
+  "source_sha256": "aef9db4e111165016a10a2a95e111f3155860b8510c7f6207ec9c79fbec5082c",
+  "review_method": "Fresh candidate-only visual review. Each of the eight assigned original PNGs was individually opened with tools.view_image. Existing case JSON and static handoff/prototype text were read; current PNG hashes were obtained with Get-FileHash. No other image was opened.",
+  "source_materials": [
+    "docs/review/phase3-reference-scope.json: precedence, sharedContract, capabilityBounds, and the pw-reader/sc-library matrix entries",
+    "docs/DESIGN_HANDOFF.md: folio pager, library overlays, and reader sections",
+    "HANDOFF.md: sections 4.8, 5.1, 5.3, and section 11 empty-state requirement",
+    "prototype/pw-reader.dc.html: menu and ToC declarations",
+    "prototype/pager.dc.html: page-picker panel and folio declarations",
+    "prototype/sc-library.dc.html: download queue declaration",
+    "ui-ux-pro-max/SKILL.md: state-feedback and visual-consistency guidance, subordinate to the project handoff"
+  ],
+  "identity_checks": {
+    "all_case_names_match_input": true,
+    "all_run_ids_match": true,
+    "all_binary_hashes_match": true,
+    "all_source_hashes_match": true,
+    "all_current_png_hashes_match_input_and_case_evidence": true
+  },
+  "reviewed_case_ids": [
+    "pw5-portrait--toc-bookmarks",
+    "pw5-portrait--toc-last-page",
+    "pw5-portrait--toc-page-jump",
+    "pw5-portrait--vertical-bottom-right",
+    "pw5-portrait--webtoon-import",
+    "pw5-portrait--webtoon-step",
+    "pw5-portrait--zones-closed-pure",
+    "sc-library--download-queue--cancel-all"
+  ],
+  "reviewed_cases": [
+    {
+      "case_id": "pw5-portrait--toc-bookmarks",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/pw5-portrait--toc-bookmarks.png",
+      "candidate_sha256": "eb1ff4f43f845b05b0ec6252e1bd5768432f3615e62401a75406a6019e406c2c",
+      "viewed_candidate": true,
+      "outcome": "issues_found",
+      "observations": [
+        "The Bookmarks tab is visibly selected with a bold label and underline. Its list area is entirely blank: no empty-state status or action is shown, although the sidecar records bookmark_count=0. This is finding P3R1-SUP20-1.",
+        "The menu header identifies chapter 34 and shows an unfilled bookmark icon, consistent with reader_bookmarked=false. The reader progress is 12/40, with the remaining-page caption, seek track, neighboring chapter controls, and five bottom tools readable.",
+        "The compact white panel has no shadow, dimmed backdrop, or screen-tone UI mask. Patterned dots and crosshatching belong to the artwork visible behind it.",
+        "No saved-bookmark row or chapter row is present, so a saved row's target and a current-chapter dot cannot be visually assessed in this case. Their absence is not recorded as a separate defect."
+      ],
+      "intentional_differences": []
+    },
+    {
+      "case_id": "pw5-portrait--toc-last-page",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/pw5-portrait--toc-last-page.png",
+      "candidate_sha256": "ac560f885ff51f7da3d1aa2d3d1df169926a6f482ef16a128b7916f05abf7a03",
+      "viewed_candidate": true,
+      "outcome": "no_actionable_finding",
+      "observations": [
+        "The Chapters tab is selected. The final ToC page contains one chapter-1 row with gray read-state text and a dotted leader, matching the sidecar's single final-page modal item.",
+        "The centered folio reads 18/18. Previous-page text and chevron remain at the left; the unavailable next action leaves its allocation empty. The panel contracts to the one visible row rather than reserving five empty rows.",
+        "The filled header bookmark and main reader progress 12/40 agree with reader_bookmarked=true and the current reader state. The visible row and folio are not clipped.",
+        "Current chapter 34 is not among the visible final-page rows; its current dot and row progress cannot be assessed here. The absence of that dot on chapter 1 is appropriate."
+      ],
+      "intentional_differences": []
+    },
+    {
+      "case_id": "pw5-portrait--toc-page-jump",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/pw5-portrait--toc-page-jump.png",
+      "candidate_sha256": "52f31ee0b7428dd98cb2050c05b720f51066e7e642f14c864bd558c0e7741a93",
+      "viewed_candidate": true,
+      "outcome": "issues_found",
+      "observations": [
+        "The open panel picker shows all 18 pages in a balanced six-column, three-row grid. Page 1 and the 1/18 folio are inverse; Next remains at the right and the first-page Previous allocation is empty.",
+        "A full-width black rule appears around y=471, within the grid near the second row's top edge and visible through button gaps. The picker title and first row sit above that rule, so it is not the top boundary of the complete picker. This is finding P3R1-SUP20-2.",
+        "The white picker covers the underlying chapter rows. No current-chapter row or dot is visible to assess. The Bookmarks tab remains unselected, while the Chapters tab and header ToC action retain their selected indicators.",
+        "The main reader controls remain readable below the picker. No dimmed backdrop or offset shadow is visible."
+      ],
+      "intentional_differences": []
+    },
+    {
+      "case_id": "pw5-portrait--vertical-bottom-right",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/pw5-portrait--vertical-bottom-right.png",
+      "candidate_sha256": "416a731c9469ccac4520e4badf2b0c6cf74e0bf68c64f3a28a81d8475251c0fb",
+      "viewed_candidate": true,
+      "outcome": "no_actionable_finding",
+      "observations": [
+        "The viewport contains only comic artwork: a skyline panel at the top, patterned speech panels in the middle, and a radial panel at the lower left. There is no menu header, status bar, bookmark ribbon, footer, notification, or visible tap-zone decoration.",
+        "The artwork reaches the display edges in this vertical crop. Its panel boundaries and the image portion at the top are consistent with a viewport into actual artwork, without a separate UI gutter or an erroneous blank region.",
+        "The sidecar identifies vertical reading at page 12 with offset=90, image_height=1738, and viewport_height=1648. Its bottom-right action check supports the captured identity; a single final PNG does not itself prove the gesture or absence of a hidden footer-cycle target."
+      ],
+      "intentional_differences": []
+    },
+    {
+      "case_id": "pw5-portrait--webtoon-import",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/pw5-portrait--webtoon-import.png",
+      "candidate_sha256": "f6fc7cf9c716fbb2f57303a1d50e499fcff25b1c7b267bde28b4445bf269a90d",
+      "viewed_candidate": true,
+      "outcome": "no_actionable_finding",
+      "observations": [
+        "The portrait library shows one imported Chapter 1 book, using the tall fixture's actual cover in both the outlined continuation card and the single library tile.",
+        "The header and category counts show one book, one updated book, one reading book, and zero planned/completed books, consistent with the sidecar's projected counts. The unread badge 1 and download icon sit beside the tile title, outside the artwork.",
+        "The continuation card shows chapter 1 and a 1/1 counter; the library folio is also 1/1. This is compatible with the real single tall image and is not judged against sample reference page counts.",
+        "A small centered white outlined Saved toast sits above the bottom navigation. The remaining grid area is empty because only one book exists. No clipping, offset cover shadow, dimmed backdrop, or screen-tone UI mask is visible."
+      ],
+      "intentional_differences": []
+    },
+    {
+      "case_id": "pw5-portrait--webtoon-step",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/pw5-portrait--webtoon-step.png",
+      "candidate_sha256": "9ad9eac9f7b65e24259642ec04101e1f83fa06bf44700b4781a7a144db599463",
+      "viewed_candidate": true,
+      "outcome": "no_actionable_finding",
+      "observations": [
+        "The closed reader shows the tall image's black and gray panels with embedded VERTICAL PANEL 3 and VERTICAL PANEL 4 labels. Partial adjacent content at the top and bottom is consistent with a viewport within the long image.",
+        "The image's white gutters, panel spacing, and embedded labels are artwork. No menu, status bar, bookmark ribbon, footer label, notification, or tap-zone overlay is visible; the white areas are not treated as an application viewport inset.",
+        "The sidecar records a single-image chapter at page 1/1, vertical offset=1401, viewport_height=1648, and image_height=7543. The 85-percent step check records the same expected offset, but temporal movement is not independently established by this static PNG."
+      ],
+      "intentional_differences": []
+    },
+    {
+      "case_id": "pw5-portrait--zones-closed-pure",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/pw5-portrait--zones-closed-pure.png",
+      "candidate_sha256": "99e72fc0524cab6742a606d8fd257bc1fd762c534457451aacba487d8ee9c394",
+      "viewed_candidate": true,
+      "outcome": "no_actionable_finding",
+      "observations": [
+        "The entire frame is the comic image, including a skyline panel, dotted and crosshatched panels, and a lower radial panel. No labels or rectangles visualize the tap zones even though show_tap_zones=true in the sidecar, consistent with the artwork-only closed-reader override.",
+        "The bookmark state is true, yet no persistent bookmark ribbon is drawn. There is also no header, status bar, footer, notification, or menu residual.",
+        "Narrow white margins around the fitted artwork and its panel gutters are accepted as actual artwork/aspect-ratio content. They do not form an application inset or an erroneous empty viewport. Hidden input targets cannot be assessed from these pixels."
+      ],
+      "intentional_differences": []
+    },
+    {
+      "case_id": "sc-library--download-queue--cancel-all",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/sc-library--download-queue--cancel-all.png",
+      "candidate_sha256": "17f6da643d86ab59659ddce8f1c711762ff58394c4ad9f80dfdc768d91770f58",
+      "viewed_candidate": true,
+      "outcome": "issues_found",
+      "observations": [
+        "The download queue is centered over the Scribe settings screen at approximately x=145, y=300, with the expected 640-pixel width. Its white background has no dimmed scrim, stipple, or shadow.",
+        "The three visible fixture chapter rows each show 6/6 pages and a full black progress line, agreeing with the sidecar's completed jobs 1-3. Long titles ellipsize while the counters remain readable.",
+        "The global Pause control is visibly disabled and Close is a black primary control. The sidecar records only terminal jobs after cancellation, so the disabled global operation does not imply a runnable pause action.",
+        "The folio shows 1/2 with Next at the right and an empty Previous allocation. However, the floating outline's left and right edges terminate around y=729 while its white pager area continues to about y=797 without side or bottom borders. This is finding P3R1-SUP20-3.",
+        "The cancelled fifth job belongs to the unseen second page. This PNG cannot confirm that row's cancellation text or appearance; the existing cancel-all state check is supporting evidence only."
+      ],
+      "intentional_differences": []
+    }
+  ],
+  "suggestions": [
+    {
+      "id": "P3R1-SUP20-1",
+      "case_id": "pw5-portrait--toc-bookmarks",
+      "priority": "P2",
+      "description": "The empty Bookmarks tab provides no empty-state feedback.",
+      "evidence": [
+        "The selected Bookmarks tab is followed by a blank white list area, with no status text or contextual action.",
+        "The case state records bookmark_count=0, reader_toc_tab=bookmarks, and reader_bookmarked=false.",
+        "HANDOFF.md:392 requires missing empty states to be completed with a status and action. The prototype's sample rows do not waive this empty-state requirement."
+      ],
+      "recommendation": "Render a concise no-bookmarks status and an action to bookmark the current page in the empty list area. Keep the panel sized to its actual content and base the action on the real bookmark state.",
+      "status": "open",
+      "introduced_round": 1
+    },
+    {
+      "id": "P3R1-SUP20-2",
+      "case_id": "pw5-portrait--toc-page-jump",
+      "priority": "P2",
+      "description": "The jump panel's black boundary falls inside its page grid.",
+      "evidence": [
+        "A full-width black rule at approximately y=471 is exposed between the second-row buttons, while the title and first grid row are above it.",
+        "The actual panel contains a title and three rows for pages 1-18, so the rule is not above the complete panel content.",
+        "prototype/pager.dc.html:22 places the 2-pixel top border on the white section containing both the title and the complete grid; docs/DESIGN_HANDOFF.md:152-156 specifies a white panel directly above the pager."
+      ],
+      "recommendation": "Size and position the complete picker from its title, padding, and all three grid rows. Keep its top rule above the title and its white interior opaque so an underlying separator cannot cross the grid.",
+      "status": "open",
+      "introduced_round": 1
+    },
+    {
+      "id": "P3R1-SUP20-3",
+      "case_id": "sc-library--download-queue--cancel-all",
+      "priority": "P2",
+      "description": "The Scribe queue's floating border does not enclose its pager.",
+      "evidence": [
+        "The outline at approximately x=145 and x=784 stops near y=729. The white 1/2 pager and Next control continue below it to about y=797, with no side or bottom outline.",
+        "The lower white extension covers part of the settings content but is visually detached from the bounded queue panel.",
+        "prototype/sc-library.dc.html:160 declares a 2-pixel border around the entire content-sized queue section. docs/DESIGN_HANDOFF.md:272-280 specifies the bounded 640-pixel queue and content-following sheet height."
+      ],
+      "recommendation": "Include the pager and its bottom padding within the floating queue's measured height, and extend the same outline around the complete panel instead of leaving the pager outside its border.",
+      "status": "open",
+      "introduced_round": 1
+    }
+  ],
+  "limitations": [
+    "This batch has no independent reference PNG. Visual findings use only the eight assigned candidate PNGs, the supplied case sidecars, and static scope/handoff/prototype text. No other image was opened.",
+    "Current Get-FileHash results match both the input's expected PNG hashes and the case screenshot evidence hashes. All eight sidecars identify run a1baf3fe3dc2 and the stated frozen binary/source hashes.",
+    "The case sidecars declare no case-specific intentional differences. Scope-wide rules still permit real titles, counts, covers, capacities, artwork, and artwork white margins, and require an artwork-only closed reader.",
+    "Current-chapter dots, row progress, and saved-bookmark rows are assessed only when those rows are visible. The final ToC page excludes the current chapter, the picker covers chapter rows, and the bookmark list is empty.",
+    "Static PNGs cannot prove outside dismissal, hidden hit targets, footer-cycle target absence, vertical gesture routing, temporal 85-percent stepping, queue cancellation on unseen rows, or physical sleep/wake behavior.",
+    "Existing exact-artwork checks report zero changed pixels for the three closed-reader cases. They support provenance and were not substituted for the individual visual inspections.",
+    "No application, build, test, validation suite, smoke test, runtime probe, Git operation, or product modification was performed locally or remotely for this review.",
+    "These findings cover only this eight-case supplemental batch and do not establish that the full round or matrix is clean."
+  ]
+}

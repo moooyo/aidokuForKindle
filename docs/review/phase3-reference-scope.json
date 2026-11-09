@@ -1,0 +1,1803 @@
+{
+  "schemaVersion": 1,
+  "kind": "reference-scope-baseline",
+  "recordDate": "2026-11-06",
+  "reviewer": "/root/handoff_visual_review",
+  "projectRoot": "D:\\Code\\aidokuForKindle",
+  "status": "reference-inspection-complete; frozen-candidate-review-not-started",
+  "reference": {
+    "root": "C:\\Users\\moooyo\\Downloads\\aidoku-kindle-handoff\\aidoku-kindle-handoff",
+    "designVersion": "1793901158-6c09",
+    "designDate": "2026-11-06",
+    "authoritativeText": "HANDOFF.md",
+    "exactGeometry": "prototype/*.dc.html",
+    "screenshotIndex": "screens/INDEX.md",
+    "localEnglishSummary": "docs/DESIGN_HANDOFF.md",
+    "inputSha256": {
+      "HANDOFF.md": "39F54E1B43FECFB1678A9BF70B27DEE3525435E18293E9DE3772E24F3107E91A",
+      "tokens/tokens.json": "4FF105C39848DC267F8AF66B2BDA9CB842DA6E947F2D9F545E80C70331A9249F",
+      "screens/INDEX.md": "5555199E48A919190CC8BB5ABEC171B975E344ECB13211AF65A5CB9EC359A7A0",
+      "prototype/canvas.json": "1B8EBB56F86916CE131604E7FE2543D7187E182F8489736AFD1FE66BAC91D390"
+    },
+    "fullTextRead": [
+      "README.md",
+      "HANDOFF.md",
+      "tokens/tokens.json",
+      "prototype/README.md",
+      "prototype/canvas.json",
+      "screens/INDEX.md"
+    ],
+    "prototypeExcerptReads": [
+      {
+        "file": "prototype/Main.dc.html",
+        "lines": "141-245",
+        "purpose": "PW sort/filter/queue geometry and visible-page records"
+      },
+      {
+        "file": "prototype/pw-manga.dc.html",
+        "lines": "19-110",
+        "purpose": "PW first-page information and compact subsequent pages"
+      },
+      {
+        "file": "prototype/sc-manga.dc.html",
+        "lines": "38-80",
+        "purpose": "384-pixel information column and independent directory"
+      },
+      {
+        "file": "prototype/sc-library.dc.html",
+        "lines": "182-199",
+        "purpose": "SC sort float and screenshot/specification distinction"
+      },
+      {
+        "file": "prototype/pw-reader.dc.html",
+        "lines": "111-162",
+        "purpose": "Menu header and five-row ToC"
+      },
+      {
+        "file": "prototype/sc-reader-portrait.dc.html",
+        "lines": "95-243",
+        "purpose": "Two-column ToC and menu-panel layout"
+      },
+      {
+        "file": "prototype/sc-reader.dc.html",
+        "lines": "19-433 targeted matches",
+        "purpose": "Landscape page allocations, ToC, footer override and menu chrome"
+      },
+      {
+        "file": "prototype/sc-settings.dc.html",
+        "lines": "40-103",
+        "purpose": "Fixed navigation column and form components"
+      }
+    ],
+    "inventoryReadBy": "/root/handoff_visual_review/reference_inventory",
+    "inventoryMethod": "Read-only INDEX.md/canvas.json/directory comparison; no image inspection was delegated to the inventory helper."
+  },
+  "counts": {
+    "productDefaults": 17,
+    "productStates": 84,
+    "productReferenceImages": 101,
+    "paperwhiteStates": 32,
+    "scribeStates": 52,
+    "readerStates": 23,
+    "nonReaderStates": 61,
+    "componentImages": 4,
+    "specificationImages": 2,
+    "rejectedAlternativeImages": 1,
+    "rootScreenImages": 24,
+    "overviews": 2,
+    "allReferencePng": 110,
+    "userOverriddenFooterStateImages": 2,
+    "directlyApplicableProductReferenceImagesBeforeCapabilityBounds": 99
+  },
+  "precedence": [
+    {
+      "id": "closed-reader-artwork-only",
+      "decision": "The user's reaffirmed closed reader contains artwork only. No bookmark ribbon, footer labels, status bar, notification, decorative gutter, or invisible lower-right footer-cycle target may be restored.",
+      "overrides": [
+        "HANDOFF.md section 5.3 persistent ribbon and footer-cycle behavior",
+        "tokens/tokens.json component.bookmarkRibbon",
+        "tokens/tokens.json reader.tapZones.footerToggle",
+        "screens/states/pw-reader--fullscreen-footer.png",
+        "screens/states/sc-reader-portrait--fullscreen-footer.png"
+      ],
+      "menuRule": "Open menus and all other pages follow the new export. Bookmarks remain menu actions. A visible footer setting must not falsely promise a closed-reader decoration."
+    },
+    {
+      "id": "new-handoff",
+      "decision": "The November export supersedes historical PDF/C5 visual rounds. None of those rounds contributes to the new clean-round streak."
+    },
+    {
+      "id": "exact-declared-geometry",
+      "decision": "Use the matching screenshot and exact prototype declaration when prose is simplified. SC manga has a 384-design-pixel information column, not equal 465-pixel halves."
+    },
+    {
+      "id": "prototype-is-reference",
+      "decision": "Never open the prototype as a runnable app or transplant its HTML. Missing support.js is documented. Exclude simulation authorization, preview navigation, fake values, artificial delay and incomplete business logic."
+    },
+    {
+      "id": "real-state",
+      "decision": "Reference names, counts, dates, capacities, covers, authorization and connection examples are sample data. Production displays actual records and honest unavailable or error states."
+    }
+  ],
+  "profiles": [
+    {
+      "id": "pw5",
+      "layout": "pw",
+      "design": [
+        618,
+        824
+      ],
+      "physical": [
+        1236,
+        1648
+      ],
+      "comparison": "Exact reference resolution",
+      "orientation": "Portrait outside reader; manual reader rotation"
+    },
+    {
+      "id": "pw6",
+      "layout": "pw",
+      "design": [
+        632,
+        840
+      ],
+      "physical": [
+        1264,
+        1680
+      ],
+      "comparison": "Stretched PW profile; no independent screenshot",
+      "orientation": "Portrait outside reader; manual reader rotation"
+    },
+    {
+      "id": "scribe12",
+      "layout": "sc",
+      "design": [
+        930,
+        1240
+      ],
+      "physical": [
+        1860,
+        2480
+      ],
+      "landscapeDesign": [
+        1240,
+        930
+      ],
+      "landscapePhysical": [
+        2480,
+        1860
+      ],
+      "comparison": "Exact portrait and landscape-reader references",
+      "orientation": "Portrait outside reader; reader sensor-follow only when a sensor is actually present"
+    },
+    {
+      "id": "scribe3",
+      "layout": "sc",
+      "design": [
+        990,
+        1320
+      ],
+      "physical": [
+        1980,
+        2640
+      ],
+      "comparison": "Stretched SC profile; no independent screenshot",
+      "orientation": "Portrait outside reader; capability-dependent reader rotation"
+    }
+  ],
+  "sharedContract": {
+    "visual": [
+      "Eight semantic UI gray values: 000000, 555555, 666666, 999999, BBBBBB, DDDDDD, EEEEEE, FFFFFF.",
+      "Serif display/book titles, sans interface text, Literata numerals/Latin; preserve hierarchy and intended heavy faces.",
+      "White outlined cards, controls and popups; no shadow, dimmed backdrop, gray card fill, pills or transitions.",
+      "Paginated lists and balanced folio jump grids; preserve edge navigation allocation on first/last page.",
+      "Use 1/1.5/2 design-pixel hair/control/popup rules and 4-pixel control radius; no subpixel-thin rules."
+    ],
+    "geometry": {
+      "paperwhite": {
+        "margin": 22,
+        "minTouch": 48,
+        "status": 28,
+        "dock": 72,
+        "pager": 52,
+        "library": [
+          4,
+          2
+        ],
+        "catalogRows": 5,
+        "detailFirstRows": 6,
+        "detailLaterRows": 12
+      },
+      "scribe": {
+        "margin": 36,
+        "minTouch": 56,
+        "status": 36,
+        "dock": 80,
+        "pager": 68,
+        "library": [
+          6,
+          3
+        ],
+        "catalog": [
+          5,
+          3
+        ],
+        "settingsNav": 320,
+        "sourceManagerInstalled": 400,
+        "detailInfo": 384,
+        "detailRows": 16
+      }
+    },
+    "behavior": [
+      "Whole-control inverse press feedback; selected black with white content; meaningful icon controls have names.",
+      "Transparent outside capture closes overlays; menu-open reader input does not turn a page.",
+      "Keyboard replaces dock while editing; result mode restores dock.",
+      "Capabilities and operation states are truthful; unavailable hardware controls are hidden as required by the handoff."
+    ]
+  },
+  "capabilityBounds": [
+    {
+      "id": "hardware",
+      "rule": "Read actual frontlight, warmth, sensor, hardware dither and pen support. Hide absent hardware controls and dependent rows/tools; never display enabled or successful hardware state without support.",
+      "evidenceRequired": "Runtime capability declaration and capture environment identity",
+      "physicalQualification": false
+    },
+    {
+      "id": "authentication",
+      "rule": "No fabricated logged-in/linked account, pending device code, QR, countdown or completion. Where no real authorization integration exists, use a concise honest unavailable state.",
+      "evidenceRequired": "Actual account/integration state; avoid exposing credentials"
+    },
+    {
+      "id": "source-endpoint",
+      "rule": "A QR/local URL waiting screen must correspond to an actual supported endpoint. Setup/test/connect and source installation/update states must be real or honestly unavailable.",
+      "evidenceRequired": "Declared supported integration and operation state"
+    },
+    {
+      "id": "migration",
+      "rule": "Candidate selection and retention switches must not imply completed migration if the migration operation is unavailable.",
+      "evidenceRequired": "Candidate source and operation result"
+    },
+    {
+      "id": "driver",
+      "rule": "Remote emulator rendering does not qualify e-ink waveforms, natural light, pen, rotation sensor or physical sleep/wake. Record actual GL16 fallbacks separately.",
+      "evidenceRequired": "Driver/environment declaration"
+    },
+    {
+      "id": "data",
+      "rule": "Different real counts, titles, covers, dates and capacities are intentional only at the data level; they do not waive geometry, clipping, navigation or false state."
+    }
+  ],
+  "pageStateMatrix": [
+    {
+      "board": "Main",
+      "profile": "pw",
+      "route": "library",
+      "orientation": "portrait",
+      "physicalSize": [
+        1236,
+        1648
+      ],
+      "prototype": "prototype/Main.dc.html",
+      "default": {
+        "id": "Main--default",
+        "reference": "screens/Main.png",
+        "role": "default",
+        "reviewStatus": "awaiting-frozen-remote-evidence"
+      },
+      "assertions": [
+        "Four columns by two rows; title-adjacent unread/download state.",
+        "White continuation card; selection hides continuation on PW.",
+        "Folio above 72-pixel dock."
+      ],
+      "states": [
+        {
+          "id": "Main--download-queue",
+          "reference": "screens/states/Main--download-queue.png",
+          "expected": "Real queue rows with cover/title/progress/state and pause/resume-all plus close.",
+          "applicability": "applicable-subject-to-evidence-based-capability-bounds",
+          "reviewStatus": "awaiting-frozen-remote-evidence"
+        },
+        {
+          "id": "Main--jump-pages",
+          "reference": "screens/states/Main--jump-pages.png",
+          "expected": "Balanced page grid above the folio, current page inverse and outside dismissal.",
+          "applicability": "applicable-subject-to-evidence-based-capability-bounds",
+          "reviewStatus": "awaiting-frozen-remote-evidence"
+        },
+        {
+          "id": "Main--more",
+          "reference": "screens/states/Main--more.png",
+          "expected": "Anchored menu with context-specific actions and truthful availability.",
+          "applicability": "applicable-subject-to-evidence-based-capability-bounds",
+          "reviewStatus": "awaiting-frozen-remote-evidence"
+        },
+        {
+          "id": "Main--select",
+          "reference": "screens/states/Main--select.png",
+          "expected": "Selection heading/checks and a four-action bulk bar replacing the dock.",
+          "applicability": "applicable-subject-to-evidence-based-capability-bounds",
+          "reviewStatus": "awaiting-frozen-remote-evidence"
+        },
+        {
+          "id": "Main--sort",
+          "reference": "screens/states/Main--sort.png",
+          "expected": "Sorting choices, direction and three-state filters; selected inverse controls.",
+          "applicability": "applicable-subject-to-evidence-based-capability-bounds",
+          "reviewStatus": "awaiting-frozen-remote-evidence"
+        }
+      ]
+    },
+    {
+      "board": "pw-manga",
+      "profile": "pw",
+      "route": "manga-detail",
+      "orientation": "portrait",
+      "physicalSize": [
+        1236,
+        1648
+      ],
+      "prototype": "prototype/pw-manga.dc.html",
+      "default": {
+        "id": "pw-manga--default",
+        "reference": "screens/pw-manga.png",
+        "role": "default",
+        "reviewStatus": "awaiting-frozen-remote-evidence"
+      },
+      "assertions": [
+        "First page has information/actions and six rows; subsequent pages have twelve.",
+        "No dock; compact subsequent-page book header.",
+        "Information cover 132 x 186; chapter row height 52."
+      ],
+      "states": [
+        {
+          "id": "pw-manga--batch-download",
+          "reference": "screens/states/pw-manga--batch-download.png",
+          "expected": "Next five, all unread, custom range and remove-read-download actions plus real free space.",
+          "applicability": "applicable-subject-to-evidence-based-capability-bounds",
+          "reviewStatus": "awaiting-frozen-remote-evidence"
+        },
+        {
+          "id": "pw-manga--chapters-p2",
+          "reference": "screens/states/pw-manga--chapters-p2.png",
+          "expected": "Compact book header, information collapsed, twelve chapter rows and folio.",
+          "applicability": "applicable-subject-to-evidence-based-capability-bounds",
+          "reviewStatus": "awaiting-frozen-remote-evidence"
+        },
+        {
+          "id": "pw-manga--description",
+          "reference": "screens/states/pw-manga--description.png",
+          "expected": "Full description, tag controls and source/update/size metadata in a bottom sheet.",
+          "applicability": "applicable-subject-to-evidence-based-capability-bounds",
+          "reviewStatus": "awaiting-frozen-remote-evidence"
+        },
+        {
+          "id": "pw-manga--more",
+          "reference": "screens/states/pw-manga--more.png",
+          "expected": "Anchored menu with context-specific actions and truthful availability.",
+          "applicability": "applicable-subject-to-evidence-based-capability-bounds",
+          "reviewStatus": "awaiting-frozen-remote-evidence"
+        },
+        {
+          "id": "pw-manga--tracking",
+          "reference": "screens/states/pw-manga--tracking.png",
+          "expected": "Tracking service cards with real linked/unlinked/unavailable state and settings navigation.",
+          "applicability": "applicable-subject-to-evidence-based-capability-bounds",
+          "reviewStatus": "awaiting-frozen-remote-evidence",
+          "capabilityBound": "authentication"
+        }
+      ]
+    },
+    {
+      "board": "pw-reader",
+      "profile": "pw",
+      "route": "reader",
+      "orientation": "portrait",
+      "physicalSize": [
+        1236,
+        1648
+      ],
+      "prototype": "prototype/pw-reader.dc.html",
+      "default": {
+        "id": "pw-reader--default",
+        "reference": "screens/pw-reader.png",
+        "role": "menu-open",
+        "reviewStatus": "awaiting-frozen-remote-evidence"
+      },
+      "assertions": [
+        "Default reference is menu open; closed reader follows artwork-only override.",
+        "Menu header uses 26-pixel status plus 58-pixel content row; tools are 68 high.",
+        "ToC five rows at 46 pixels."
+      ],
+      "states": [
+        {
+          "id": "pw-reader--fullscreen-footer",
+          "reference": "screens/states/pw-reader--fullscreen-footer.png",
+          "expected": "Reference inspected; requested footer/ribbon behavior is intentionally overridden.",
+          "applicability": "user-overridden-reference-only",
+          "reviewStatus": "awaiting-frozen-remote-evidence"
+        },
+        {
+          "id": "pw-reader--fullscreen",
+          "reference": "screens/states/pw-reader--fullscreen.png",
+          "expected": "Artwork-only reader under the user override; no app decoration or footer-cycle region.",
+          "applicability": "applicable-subject-to-evidence-based-capability-bounds",
+          "reviewStatus": "awaiting-frozen-remote-evidence",
+          "intentionalDifference": "Persistent reference bookmark ribbon is absent under the user override."
+        },
+        {
+          "id": "pw-reader--image",
+          "reference": "screens/states/pw-reader--image.png",
+          "expected": "Actual image preview, five contrast positions, refresh choices, dither capability/state and night option.",
+          "applicability": "applicable-subject-to-evidence-based-capability-bounds",
+          "reviewStatus": "awaiting-frozen-remote-evidence"
+        },
+        {
+          "id": "pw-reader--light",
+          "reference": "screens/states/pw-reader--light.png",
+          "expected": "Conditional frontlight/warmth sliders 0..24 and supported Scribe auto brightness.",
+          "applicability": "applicable-subject-to-evidence-based-capability-bounds",
+          "reviewStatus": "awaiting-frozen-remote-evidence",
+          "capabilityBound": "hardware"
+        },
+        {
+          "id": "pw-reader--mode",
+          "reference": "screens/states/pw-reader--mode.png",
+          "expected": "Four direction cards and crop/split controls; PW additionally has single/spread/auto layout.",
+          "applicability": "applicable-subject-to-evidence-based-capability-bounds",
+          "reviewStatus": "awaiting-frozen-remote-evidence"
+        },
+        {
+          "id": "pw-reader--more",
+          "reference": "screens/states/pw-reader--more.png",
+          "expected": "Anchored menu with context-specific actions and truthful availability.",
+          "applicability": "applicable-subject-to-evidence-based-capability-bounds",
+          "reviewStatus": "awaiting-frozen-remote-evidence",
+          "intentionalDifference": "Footer preferences cannot restore closed-reader labels or the invisible cycle target."
+        },
+        {
+          "id": "pw-reader--rotate",
+          "reference": "screens/states/pw-reader--rotate.png",
+          "expected": "PW portrait, landscape and reverse-landscape manual choices.",
+          "applicability": "applicable-subject-to-evidence-based-capability-bounds",
+          "reviewStatus": "awaiting-frozen-remote-evidence",
+          "capabilityBound": "hardware"
+        },
+        {
+          "id": "pw-reader--toc",
+          "reference": "screens/states/pw-reader--toc.png",
+          "expected": "Chapter/bookmark tabs, current chapter dot/progress, read/download state, profile-specific paginated rows.",
+          "applicability": "applicable-subject-to-evidence-based-capability-bounds",
+          "reviewStatus": "awaiting-frozen-remote-evidence"
+        }
+      ]
+    },
+    {
+      "board": "pw-browse",
+      "profile": "pw",
+      "route": "source-management",
+      "orientation": "portrait",
+      "physicalSize": [
+        1236,
+        1648
+      ],
+      "prototype": "prototype/pw-browse.dc.html",
+      "default": {
+        "id": "pw-browse--default",
+        "reference": "screens/pw-browse.png",
+        "role": "default",
+        "reviewStatus": "awaiting-frozen-remote-evidence"
+      },
+      "assertions": [
+        "Top-level installed/available/update source management with PW dock.",
+        "Built-in and extension groups; unavailable verification state is explicit.",
+        "In-place tabs and full-width bottom add/list sheets."
+      ],
+      "states": [
+        {
+          "id": "pw-browse--add-source",
+          "reference": "screens/states/pw-browse--add-source.png",
+          "expected": "Add-source panel with truthful endpoint/QR/wait state or direct URL entry.",
+          "applicability": "applicable-subject-to-evidence-based-capability-bounds",
+          "reviewStatus": "awaiting-frozen-remote-evidence",
+          "capabilityBound": "source-endpoint"
+        },
+        {
+          "id": "pw-browse--available",
+          "reference": "screens/states/pw-browse--available.png",
+          "expected": "Available-source list with language filtering and real install actions.",
+          "applicability": "applicable-subject-to-evidence-based-capability-bounds",
+          "reviewStatus": "awaiting-frozen-remote-evidence"
+        },
+        {
+          "id": "pw-browse--source-lists",
+          "reference": "screens/states/pw-browse--source-lists.png",
+          "expected": "Actual source-list records with remove/add and profile-specific management action.",
+          "applicability": "applicable-subject-to-evidence-based-capability-bounds",
+          "reviewStatus": "awaiting-frozen-remote-evidence"
+        },
+        {
+          "id": "pw-browse--updates",
+          "reference": "screens/states/pw-browse--updates.png",
+          "expected": "Actual updatable source versions, per-row update and bulk update; preserve installed column on SC.",
+          "applicability": "applicable-subject-to-evidence-based-capability-bounds",
+          "reviewStatus": "awaiting-frozen-remote-evidence"
+        }
+      ]
+    },
+    {
+      "board": "pw-source",
+      "profile": "pw",
+      "route": "source-catalog",
+      "orientation": "portrait",
+      "physicalSize": [
+        1236,
+        1648
+      ],
+      "prototype": "prototype/pw-source.dc.html",
+      "default": {
+        "id": "pw-source--default",
+        "reference": "screens/pw-source.png",
+        "role": "default",
+        "reviewStatus": "awaiting-frozen-remote-evidence"
+      },
+      "assertions": [
+        "Secondary source catalog with back label; no dock.",
+        "Five rows per page with 64 x 88 covers and 108-pixel rows.",
+        "Search/filter/source settings are separate actions."
+      ],
+      "states": [
+        {
+          "id": "pw-source--filter",
+          "reference": "screens/states/pw-source--filter.png",
+          "expected": "Order, publication status, tri-state tags, reset and apply-results action.",
+          "applicability": "applicable-subject-to-evidence-based-capability-bounds",
+          "reviewStatus": "awaiting-frozen-remote-evidence"
+        },
+        {
+          "id": "pw-source--source-settings",
+          "reference": "screens/states/pw-source--source-settings.png",
+          "expected": "Source-declared settings rendered with common form controls.",
+          "applicability": "applicable-subject-to-evidence-based-capability-bounds",
+          "reviewStatus": "awaiting-frozen-remote-evidence"
+        }
+      ]
+    },
+    {
+      "board": "pw-search",
+      "profile": "pw",
+      "route": "search",
+      "orientation": "portrait",
+      "physicalSize": [
+        1236,
+        1648
+      ],
+      "prototype": "prototype/pw-search.dc.html",
+      "default": {
+        "id": "pw-search--default",
+        "reference": "screens/pw-search.png",
+        "role": "default",
+        "reviewStatus": "awaiting-frozen-remote-evidence"
+      },
+      "assertions": [
+        "White outlined input/scopes and bottom keyboard during editing.",
+        "PW pending source count; up to three covers per result source.",
+        "Composition/candidates, shift, backspace, numbers, language, space and search."
+      ],
+      "states": [
+        {
+          "id": "pw-search--numbers",
+          "reference": "screens/states/pw-search--numbers.png",
+          "expected": "Numeric/symbol keyboard with language/letters/backspace/space/search and stable geometry.",
+          "applicability": "applicable-subject-to-evidence-based-capability-bounds",
+          "reviewStatus": "awaiting-frozen-remote-evidence"
+        },
+        {
+          "id": "pw-search--results",
+          "reference": "screens/states/pw-search--results.png",
+          "expected": "Source-grouped results, count/view-all, independent empty/timeout/retry state and restored dock.",
+          "applicability": "applicable-subject-to-evidence-based-capability-bounds",
+          "reviewStatus": "awaiting-frozen-remote-evidence"
+        }
+      ]
+    },
+    {
+      "board": "pw-history",
+      "profile": "pw",
+      "route": "history",
+      "orientation": "portrait",
+      "physicalSize": [
+        1236,
+        1648
+      ],
+      "prototype": "prototype/pw-history.dc.html",
+      "default": {
+        "id": "pw-history--default",
+        "reference": "screens/pw-history.png",
+        "role": "default",
+        "reviewStatus": "awaiting-frozen-remote-evidence"
+      },
+      "assertions": [
+        "Grouped dates and 76-pixel reading records with 46 x 64 covers.",
+        "Progress/time, per-entry remove and actual pagination.",
+        "Updates change heading and expose bulk download."
+      ],
+      "states": [
+        {
+          "id": "pw-history--clear-confirm",
+          "reference": "screens/states/pw-history--clear-confirm.png",
+          "expected": "White outlined confirmation with equal cancel/clear actions and transparent outside capture.",
+          "applicability": "applicable-subject-to-evidence-based-capability-bounds",
+          "reviewStatus": "awaiting-frozen-remote-evidence"
+        },
+        {
+          "id": "pw-history--incognito",
+          "reference": "screens/states/pw-history--incognito.png",
+          "expected": "Pressed incognito control and inverted application status bar; actual history policy.",
+          "applicability": "applicable-subject-to-evidence-based-capability-bounds",
+          "reviewStatus": "awaiting-frozen-remote-evidence"
+        },
+        {
+          "id": "pw-history--updates",
+          "reference": "screens/states/pw-history--updates.png",
+          "expected": "Grouped real chapter updates, queued/download state, heading change, bulk download and folio.",
+          "applicability": "applicable-subject-to-evidence-based-capability-bounds",
+          "reviewStatus": "awaiting-frozen-remote-evidence"
+        }
+      ]
+    },
+    {
+      "board": "pw-settings",
+      "profile": "pw",
+      "route": "settings",
+      "orientation": "portrait",
+      "physicalSize": [
+        1236,
+        1648
+      ],
+      "prototype": "prototype/pw-settings.dc.html",
+      "default": {
+        "id": "pw-settings--default",
+        "reference": "screens/pw-settings.png",
+        "role": "default",
+        "reviewStatus": "awaiting-frozen-remote-evidence"
+      },
+      "assertions": [
+        "Two grouped list pages; first page has device card and seven rows.",
+        "Secondary pages have back label and 30/38 serif heading; dock remains.",
+        "No list pager on secondary pages."
+      ],
+      "states": [
+        {
+          "id": "pw-settings--display",
+          "reference": "screens/states/pw-settings--display.png",
+          "expected": "Refresh interval, quality radio cards, profile-appropriate controls and sixteen grayscale cells.",
+          "applicability": "applicable-subject-to-evidence-based-capability-bounds",
+          "reviewStatus": "awaiting-frozen-remote-evidence"
+        },
+        {
+          "id": "pw-settings--page2",
+          "reference": "screens/states/pw-settings--page2.png",
+          "expected": "PW second grouped settings page without device card, nine rows and final-page folio.",
+          "applicability": "applicable-subject-to-evidence-based-capability-bounds",
+          "reviewStatus": "awaiting-frozen-remote-evidence"
+        },
+        {
+          "id": "pw-settings--power",
+          "reference": "screens/states/pw-settings--power.png",
+          "expected": "Wake/update/Wi-Fi policies, three screensaver choices and actual exit action.",
+          "applicability": "applicable-subject-to-evidence-based-capability-bounds",
+          "reviewStatus": "awaiting-frozen-remote-evidence"
+        }
+      ]
+    },
+    {
+      "board": "sc-library",
+      "profile": "sc",
+      "route": "library",
+      "orientation": "portrait",
+      "physicalSize": [
+        1860,
+        2480
+      ],
+      "prototype": "prototype/sc-library.dc.html",
+      "default": {
+        "id": "sc-library--default",
+        "reference": "screens/sc-library.png",
+        "role": "default",
+        "reviewStatus": "awaiting-frozen-remote-evidence"
+      },
+      "assertions": [
+        "Six columns by three rows; title-adjacent unread/download state.",
+        "Continuation and daily update cards side by side; selection retains both.",
+        "More/sort floats, centered queue, folio above 80-pixel dock."
+      ],
+      "states": [
+        {
+          "id": "sc-library--download-queue",
+          "reference": "screens/states/sc-library--download-queue.png",
+          "expected": "Real queue rows with cover/title/progress/state and pause/resume-all plus close.",
+          "applicability": "applicable-subject-to-evidence-based-capability-bounds",
+          "reviewStatus": "awaiting-frozen-remote-evidence"
+        },
+        {
+          "id": "sc-library--jump-pages",
+          "reference": "screens/states/sc-library--jump-pages.png",
+          "expected": "Balanced page grid above the folio, current page inverse and outside dismissal.",
+          "applicability": "applicable-subject-to-evidence-based-capability-bounds",
+          "reviewStatus": "awaiting-frozen-remote-evidence"
+        },
+        {
+          "id": "sc-library--more",
+          "reference": "screens/states/sc-library--more.png",
+          "expected": "Anchored menu with context-specific actions and truthful availability.",
+          "applicability": "applicable-subject-to-evidence-based-capability-bounds",
+          "reviewStatus": "awaiting-frozen-remote-evidence"
+        },
+        {
+          "id": "sc-library--select",
+          "reference": "screens/states/sc-library--select.png",
+          "expected": "Selection heading/checks and a four-action bulk bar replacing the dock.",
+          "applicability": "applicable-subject-to-evidence-based-capability-bounds",
+          "reviewStatus": "awaiting-frozen-remote-evidence"
+        },
+        {
+          "id": "sc-library--sort",
+          "reference": "screens/states/sc-library--sort.png",
+          "expected": "Sorting choices, direction and three-state filters; selected inverse controls.",
+          "applicability": "applicable-subject-to-evidence-based-capability-bounds",
+          "reviewStatus": "awaiting-frozen-remote-evidence"
+        }
+      ]
+    },
+    {
+      "board": "sc-manga",
+      "profile": "sc",
+      "route": "manga-detail",
+      "orientation": "portrait",
+      "physicalSize": [
+        1860,
+        2480
+      ],
+      "prototype": "prototype/sc-manga.dc.html",
+      "default": {
+        "id": "sc-manga--default",
+        "reference": "screens/sc-manga.png",
+        "role": "default",
+        "reviewStatus": "awaiting-frozen-remote-evidence"
+      },
+      "assertions": [
+        "384-pixel information column with 306 x 420 cover; directory in remaining width.",
+        "Sixteen chapter rows at 60 pixels; no dock.",
+        "Separate tracking/migration floats and actual operation states."
+      ],
+      "states": [
+        {
+          "id": "sc-manga--migrate",
+          "reference": "screens/states/sc-manga--migrate.png",
+          "expected": "Candidate radio rows, separate retention/removal toggles, cancel and real start state.",
+          "applicability": "applicable-subject-to-evidence-based-capability-bounds",
+          "reviewStatus": "awaiting-frozen-remote-evidence",
+          "capabilityBound": "migration"
+        },
+        {
+          "id": "sc-manga--more",
+          "reference": "screens/states/sc-manga--more.png",
+          "expected": "Anchored menu with context-specific actions and truthful availability.",
+          "applicability": "applicable-subject-to-evidence-based-capability-bounds",
+          "reviewStatus": "awaiting-frozen-remote-evidence"
+        },
+        {
+          "id": "sc-manga--tracking",
+          "reference": "screens/states/sc-manga--tracking.png",
+          "expected": "Tracking service cards with real linked/unlinked/unavailable state and settings navigation.",
+          "applicability": "applicable-subject-to-evidence-based-capability-bounds",
+          "reviewStatus": "awaiting-frozen-remote-evidence",
+          "capabilityBound": "authentication"
+        }
+      ]
+    },
+    {
+      "board": "sc-browse",
+      "profile": "sc",
+      "route": "source-catalog",
+      "orientation": "portrait",
+      "physicalSize": [
+        1860,
+        2480
+      ],
+      "prototype": "prototype/sc-browse.dc.html",
+      "default": {
+        "id": "sc-browse--default",
+        "reference": "screens/sc-browse.png",
+        "role": "default",
+        "reviewStatus": "awaiting-frozen-remote-evidence"
+      },
+      "assertions": [
+        "Top-level current-source catalog keeps dock; title triggers source picker.",
+        "Five by three grid with 150 x 202 covers.",
+        "Search/filter row and source-declared settings float."
+      ],
+      "states": [
+        {
+          "id": "sc-browse--blocked-source",
+          "reference": "screens/states/sc-browse--blocked-source.png",
+          "expected": "Verification-unavailable content with source switch, migration and uninstall.",
+          "applicability": "applicable-subject-to-evidence-based-capability-bounds",
+          "reviewStatus": "awaiting-frozen-remote-evidence"
+        },
+        {
+          "id": "sc-browse--filter",
+          "reference": "screens/states/sc-browse--filter.png",
+          "expected": "Order, publication status, tri-state tags, reset and apply-results action.",
+          "applicability": "applicable-subject-to-evidence-based-capability-bounds",
+          "reviewStatus": "awaiting-frozen-remote-evidence"
+        },
+        {
+          "id": "sc-browse--server-setup",
+          "reference": "screens/states/sc-browse--server-setup.png",
+          "expected": "Labeled server/credential fields, phone entry and truthful test/connect state.",
+          "applicability": "applicable-subject-to-evidence-based-capability-bounds",
+          "reviewStatus": "awaiting-frozen-remote-evidence",
+          "capabilityBound": "source-endpoint"
+        },
+        {
+          "id": "sc-browse--source-picker",
+          "reference": "screens/states/sc-browse--source-picker.png",
+          "expected": "Grouped built-in/extension rows, current checkmark and management footer actions.",
+          "applicability": "applicable-subject-to-evidence-based-capability-bounds",
+          "reviewStatus": "awaiting-frozen-remote-evidence"
+        },
+        {
+          "id": "sc-browse--source-settings",
+          "reference": "screens/states/sc-browse--source-settings.png",
+          "expected": "Source-declared settings rendered with common form controls.",
+          "applicability": "applicable-subject-to-evidence-based-capability-bounds",
+          "reviewStatus": "awaiting-frozen-remote-evidence"
+        }
+      ]
+    },
+    {
+      "board": "sc-reader-portrait",
+      "profile": "sc",
+      "route": "reader",
+      "orientation": "portrait",
+      "physicalSize": [
+        1860,
+        2480
+      ],
+      "prototype": "prototype/sc-reader-portrait.dc.html",
+      "default": {
+        "id": "sc-reader-portrait--default",
+        "reference": "screens/sc-reader-portrait.png",
+        "role": "menu-open",
+        "reviewStatus": "awaiting-frozen-remote-evidence"
+      },
+      "assertions": [
+        "Default is menu open; closed reader follows artwork-only override.",
+        "78-pixel integrated header; 76-pixel tools; menu inset 48.",
+        "ToC six rows as two columns of three at 50 pixels, with 48 gap."
+      ],
+      "states": [
+        {
+          "id": "sc-reader-portrait--fullscreen-footer",
+          "reference": "screens/states/sc-reader-portrait--fullscreen-footer.png",
+          "expected": "Reference inspected; requested footer/ribbon behavior is intentionally overridden.",
+          "applicability": "user-overridden-reference-only",
+          "reviewStatus": "awaiting-frozen-remote-evidence"
+        },
+        {
+          "id": "sc-reader-portrait--fullscreen",
+          "reference": "screens/states/sc-reader-portrait--fullscreen.png",
+          "expected": "Artwork-only reader under the user override; no app decoration or footer-cycle region.",
+          "applicability": "applicable-subject-to-evidence-based-capability-bounds",
+          "reviewStatus": "awaiting-frozen-remote-evidence",
+          "intentionalDifference": "Persistent reference bookmark ribbon is absent under the user override."
+        },
+        {
+          "id": "sc-reader-portrait--image",
+          "reference": "screens/states/sc-reader-portrait--image.png",
+          "expected": "Actual image preview, five contrast positions, refresh choices, dither capability/state and night option.",
+          "applicability": "applicable-subject-to-evidence-based-capability-bounds",
+          "reviewStatus": "awaiting-frozen-remote-evidence"
+        },
+        {
+          "id": "sc-reader-portrait--light",
+          "reference": "screens/states/sc-reader-portrait--light.png",
+          "expected": "Conditional frontlight/warmth sliders 0..24 and supported Scribe auto brightness.",
+          "applicability": "applicable-subject-to-evidence-based-capability-bounds",
+          "reviewStatus": "awaiting-frozen-remote-evidence",
+          "capabilityBound": "hardware"
+        },
+        {
+          "id": "sc-reader-portrait--mode",
+          "reference": "screens/states/sc-reader-portrait--mode.png",
+          "expected": "Four direction cards and crop/split controls; PW additionally has single/spread/auto layout.",
+          "applicability": "applicable-subject-to-evidence-based-capability-bounds",
+          "reviewStatus": "awaiting-frozen-remote-evidence"
+        },
+        {
+          "id": "sc-reader-portrait--more",
+          "reference": "screens/states/sc-reader-portrait--more.png",
+          "expected": "Anchored menu with context-specific actions and truthful availability.",
+          "applicability": "applicable-subject-to-evidence-based-capability-bounds",
+          "reviewStatus": "awaiting-frozen-remote-evidence",
+          "intentionalDifference": "Footer preferences cannot restore closed-reader labels or the invisible cycle target."
+        },
+        {
+          "id": "sc-reader-portrait--orientation",
+          "reference": "screens/states/sc-reader-portrait--orientation.png",
+          "expected": "SC portrait/spread choices and sensor-follow only if supported; exclude prototype preview link.",
+          "applicability": "applicable-subject-to-evidence-based-capability-bounds",
+          "reviewStatus": "awaiting-frozen-remote-evidence",
+          "capabilityBound": "hardware"
+        },
+        {
+          "id": "sc-reader-portrait--toc",
+          "reference": "screens/states/sc-reader-portrait--toc.png",
+          "expected": "Chapter/bookmark tabs, current chapter dot/progress, read/download state, profile-specific paginated rows.",
+          "applicability": "applicable-subject-to-evidence-based-capability-bounds",
+          "reviewStatus": "awaiting-frozen-remote-evidence"
+        }
+      ]
+    },
+    {
+      "board": "sc-reader",
+      "profile": "sc",
+      "route": "reader",
+      "orientation": "landscape",
+      "physicalSize": [
+        2480,
+        1860
+      ],
+      "prototype": "prototype/sc-reader.dc.html",
+      "default": {
+        "id": "sc-reader--default",
+        "reference": "screens/sc-reader.png",
+        "role": "menu-open",
+        "reviewStatus": "awaiting-frozen-remote-evidence"
+      },
+      "assertions": [
+        "Landscape reference is menu open, two 50-percent page allocations.",
+        "78-pixel integrated header with orientation lock; range progress; 76-pixel tools.",
+        "Menu content inset 120; ToC two columns of three 50-pixel rows."
+      ],
+      "states": [
+        {
+          "id": "sc-reader--fullscreen",
+          "reference": "screens/states/sc-reader--fullscreen.png",
+          "expected": "Artwork-only reader under the user override; no app decoration or footer-cycle region.",
+          "applicability": "applicable-subject-to-evidence-based-capability-bounds",
+          "reviewStatus": "awaiting-frozen-remote-evidence",
+          "intentionalDifference": "Persistent reference bookmark ribbon is absent under the user override."
+        },
+        {
+          "id": "sc-reader--image",
+          "reference": "screens/states/sc-reader--image.png",
+          "expected": "Actual image preview, five contrast positions, refresh choices, dither capability/state and night option.",
+          "applicability": "applicable-subject-to-evidence-based-capability-bounds",
+          "reviewStatus": "awaiting-frozen-remote-evidence"
+        },
+        {
+          "id": "sc-reader--layout",
+          "reference": "screens/states/sc-reader--layout.png",
+          "expected": "Single/spread/auto, separate-cover toggle and whole/split spread treatment.",
+          "applicability": "applicable-subject-to-evidence-based-capability-bounds",
+          "reviewStatus": "awaiting-frozen-remote-evidence"
+        },
+        {
+          "id": "sc-reader--light",
+          "reference": "screens/states/sc-reader--light.png",
+          "expected": "Conditional frontlight/warmth sliders 0..24 and supported Scribe auto brightness.",
+          "applicability": "applicable-subject-to-evidence-based-capability-bounds",
+          "reviewStatus": "awaiting-frozen-remote-evidence",
+          "capabilityBound": "hardware"
+        },
+        {
+          "id": "sc-reader--mode",
+          "reference": "screens/states/sc-reader--mode.png",
+          "expected": "Four direction cards and crop/split controls; PW additionally has single/spread/auto layout.",
+          "applicability": "applicable-subject-to-evidence-based-capability-bounds",
+          "reviewStatus": "awaiting-frozen-remote-evidence"
+        },
+        {
+          "id": "sc-reader--more",
+          "reference": "screens/states/sc-reader--more.png",
+          "expected": "Anchored menu with context-specific actions and truthful availability.",
+          "applicability": "applicable-subject-to-evidence-based-capability-bounds",
+          "reviewStatus": "awaiting-frozen-remote-evidence",
+          "intentionalDifference": "Footer preferences cannot restore closed-reader labels or the invisible cycle target."
+        },
+        {
+          "id": "sc-reader--toc",
+          "reference": "screens/states/sc-reader--toc.png",
+          "expected": "Chapter/bookmark tabs, current chapter dot/progress, read/download state, profile-specific paginated rows.",
+          "applicability": "applicable-subject-to-evidence-based-capability-bounds",
+          "reviewStatus": "awaiting-frozen-remote-evidence"
+        }
+      ]
+    },
+    {
+      "board": "sc-sources",
+      "profile": "sc",
+      "route": "source-management",
+      "orientation": "portrait",
+      "physicalSize": [
+        1860,
+        2480
+      ],
+      "prototype": "prototype/sc-sources.dc.html",
+      "default": {
+        "id": "sc-sources--default",
+        "reference": "screens/sc-sources.png",
+        "role": "default",
+        "reviewStatus": "awaiting-frozen-remote-evidence"
+      },
+      "assertions": [
+        "Separate manager keeps dock and back label.",
+        "400-pixel installed column; right column alone has ten-row pagination.",
+        "Add/list floats use 700-pixel declared width at top 250."
+      ],
+      "states": [
+        {
+          "id": "sc-sources--add-source",
+          "reference": "screens/states/sc-sources--add-source.png",
+          "expected": "Add-source panel with truthful endpoint/QR/wait state or direct URL entry.",
+          "applicability": "applicable-subject-to-evidence-based-capability-bounds",
+          "reviewStatus": "awaiting-frozen-remote-evidence",
+          "capabilityBound": "source-endpoint"
+        },
+        {
+          "id": "sc-sources--source-lists",
+          "reference": "screens/states/sc-sources--source-lists.png",
+          "expected": "Actual source-list records with remove/add and profile-specific management action.",
+          "applicability": "applicable-subject-to-evidence-based-capability-bounds",
+          "reviewStatus": "awaiting-frozen-remote-evidence"
+        },
+        {
+          "id": "sc-sources--updates",
+          "reference": "screens/states/sc-sources--updates.png",
+          "expected": "Actual updatable source versions, per-row update and bulk update; preserve installed column on SC.",
+          "applicability": "applicable-subject-to-evidence-based-capability-bounds",
+          "reviewStatus": "awaiting-frozen-remote-evidence"
+        }
+      ]
+    },
+    {
+      "board": "sc-search",
+      "profile": "sc",
+      "route": "search",
+      "orientation": "portrait",
+      "physicalSize": [
+        1860,
+        2480
+      ],
+      "prototype": "prototype/sc-search.dc.html",
+      "default": {
+        "id": "sc-search--default",
+        "reference": "screens/sc-search.png",
+        "role": "default",
+        "reviewStatus": "awaiting-frozen-remote-evidence"
+      },
+      "assertions": [
+        "Immediate local library match while editing; no network search until submission.",
+        "Up to six covers per source after search, with source-grouped independent state.",
+        "Keyboard replaces dock; results restore dock."
+      ],
+      "states": [
+        {
+          "id": "sc-search--results",
+          "reference": "screens/states/sc-search--results.png",
+          "expected": "Source-grouped results, count/view-all, independent empty/timeout/retry state and restored dock.",
+          "applicability": "applicable-subject-to-evidence-based-capability-bounds",
+          "reviewStatus": "awaiting-frozen-remote-evidence"
+        }
+      ]
+    },
+    {
+      "board": "sc-history",
+      "profile": "sc",
+      "route": "history",
+      "orientation": "portrait",
+      "physicalSize": [
+        1860,
+        2480
+      ],
+      "prototype": "prototype/sc-history.dc.html",
+      "default": {
+        "id": "sc-history--default",
+        "reference": "screens/sc-history.png",
+        "role": "default",
+        "reviewStatus": "awaiting-frozen-remote-evidence"
+      },
+      "assertions": [
+        "Two equal record columns with 32 gap, 124-pixel rows and 72 x 98 covers.",
+        "Date groups span both columns and preserve chronological ordering.",
+        "Real progress/time, per-entry remove and pagination."
+      ],
+      "states": [
+        {
+          "id": "sc-history--clear-confirm",
+          "reference": "screens/states/sc-history--clear-confirm.png",
+          "expected": "White outlined confirmation with equal cancel/clear actions and transparent outside capture.",
+          "applicability": "applicable-subject-to-evidence-based-capability-bounds",
+          "reviewStatus": "awaiting-frozen-remote-evidence"
+        },
+        {
+          "id": "sc-history--incognito",
+          "reference": "screens/states/sc-history--incognito.png",
+          "expected": "Pressed incognito control and inverted application status bar; actual history policy.",
+          "applicability": "applicable-subject-to-evidence-based-capability-bounds",
+          "reviewStatus": "awaiting-frozen-remote-evidence"
+        },
+        {
+          "id": "sc-history--updates",
+          "reference": "screens/states/sc-history--updates.png",
+          "expected": "Grouped real chapter updates, queued/download state, heading change, bulk download and folio.",
+          "applicability": "applicable-subject-to-evidence-based-capability-bounds",
+          "reviewStatus": "awaiting-frozen-remote-evidence"
+        }
+      ]
+    },
+    {
+      "board": "sc-settings",
+      "profile": "sc",
+      "route": "settings",
+      "orientation": "portrait",
+      "physicalSize": [
+        1860,
+        2480
+      ],
+      "prototype": "prototype/sc-settings.dc.html",
+      "default": {
+        "id": "sc-settings--default",
+        "reference": "screens/sc-settings.png",
+        "role": "display-refresh",
+        "reviewStatus": "awaiting-frozen-remote-evidence"
+      },
+      "assertions": [
+        "Fixed 320-pixel navigation column; right content padding 26 36 20.",
+        "Default is display/refresh; no list pager; 80-pixel dock.",
+        "46-pixel visual navigation rows, black current row, consistent form tokens."
+      ],
+      "states": [
+        {
+          "id": "sc-settings--about",
+          "reference": "screens/states/sc-settings--about.png",
+          "expected": "Version/device/license/homepage data rows; actual values.",
+          "applicability": "applicable-subject-to-evidence-based-capability-bounds",
+          "reviewStatus": "awaiting-frozen-remote-evidence"
+        },
+        {
+          "id": "sc-settings--auto-update",
+          "reference": "screens/states/sc-settings--auto-update.png",
+          "expected": "Off/daily/weekly selection and actual Wi-Fi/charging/completion conditions.",
+          "applicability": "applicable-subject-to-evidence-based-capability-bounds",
+          "reviewStatus": "awaiting-frozen-remote-evidence"
+        },
+        {
+          "id": "sc-settings--backup",
+          "reference": "screens/states/sc-settings--backup.png",
+          "expected": "Backup/restore actions and actual dated backup rows or honest unavailable state.",
+          "applicability": "applicable-subject-to-evidence-based-capability-bounds",
+          "reviewStatus": "awaiting-frozen-remote-evidence"
+        },
+        {
+          "id": "sc-settings--categories",
+          "reference": "screens/states/sc-settings--categories.png",
+          "expected": "Category counts, inline rename, immutable Uncategorized and add category.",
+          "applicability": "applicable-subject-to-evidence-based-capability-bounds",
+          "reviewStatus": "awaiting-frozen-remote-evidence"
+        },
+        {
+          "id": "sc-settings--download",
+          "reference": "screens/states/sc-settings--download.png",
+          "expected": "Prefetch count, resizing/grayscale switches and actual destination.",
+          "applicability": "applicable-subject-to-evidence-based-capability-bounds",
+          "reviewStatus": "awaiting-frozen-remote-evidence"
+        },
+        {
+          "id": "sc-settings--image",
+          "reference": "screens/states/sc-settings--image.png",
+          "expected": "Actual image preview, five contrast positions, refresh choices, dither capability/state and night option.",
+          "applicability": "applicable-subject-to-evidence-based-capability-bounds",
+          "reviewStatus": "awaiting-frozen-remote-evidence"
+        },
+        {
+          "id": "sc-settings--language",
+          "reference": "screens/states/sc-settings--language.png",
+          "expected": "Four interface language choices with trailing current checkmark.",
+          "applicability": "applicable-subject-to-evidence-based-capability-bounds",
+          "reviewStatus": "awaiting-frozen-remote-evidence"
+        },
+        {
+          "id": "sc-settings--light",
+          "reference": "screens/states/sc-settings--light.png",
+          "expected": "Conditional frontlight/warmth sliders 0..24 and supported Scribe auto brightness.",
+          "applicability": "applicable-subject-to-evidence-based-capability-bounds",
+          "reviewStatus": "awaiting-frozen-remote-evidence",
+          "capabilityBound": "hardware"
+        },
+        {
+          "id": "sc-settings--logs",
+          "reference": "screens/states/sc-settings--logs.png",
+          "expected": "Logging state with export/clear actions and actual operation status.",
+          "applicability": "applicable-subject-to-evidence-based-capability-bounds",
+          "reviewStatus": "awaiting-frozen-remote-evidence"
+        },
+        {
+          "id": "sc-settings--pen",
+          "reference": "screens/states/sc-settings--pen.png",
+          "expected": "Pen/palm controls only when the runtime supports them.",
+          "applicability": "applicable-subject-to-evidence-based-capability-bounds",
+          "reviewStatus": "awaiting-frozen-remote-evidence",
+          "capabilityBound": "hardware"
+        },
+        {
+          "id": "sc-settings--power",
+          "reference": "screens/states/sc-settings--power.png",
+          "expected": "Wake/update/Wi-Fi policies, three screensaver choices and actual exit action.",
+          "applicability": "applicable-subject-to-evidence-based-capability-bounds",
+          "reviewStatus": "awaiting-frozen-remote-evidence"
+        },
+        {
+          "id": "sc-settings--reading",
+          "reference": "screens/states/sc-settings--reading.png",
+          "expected": "Four default directions and per-title direction memory.",
+          "applicability": "applicable-subject-to-evidence-based-capability-bounds",
+          "reviewStatus": "awaiting-frozen-remote-evidence"
+        },
+        {
+          "id": "sc-settings--source-lists",
+          "reference": "screens/states/sc-settings--source-lists.png",
+          "expected": "Actual source-list records with remove/add and profile-specific management action.",
+          "applicability": "applicable-subject-to-evidence-based-capability-bounds",
+          "reviewStatus": "awaiting-frozen-remote-evidence"
+        },
+        {
+          "id": "sc-settings--spread",
+          "reference": "screens/states/sc-settings--spread.png",
+          "expected": "Landscape spread policy, whole/split spread and separate-cover preference.",
+          "applicability": "applicable-subject-to-evidence-based-capability-bounds",
+          "reviewStatus": "awaiting-frozen-remote-evidence"
+        },
+        {
+          "id": "sc-settings--storage",
+          "reference": "screens/states/sc-settings--storage.png",
+          "expected": "Actual downloaded/cache/cover/free breakdown, largest records and targeted cleanup.",
+          "applicability": "applicable-subject-to-evidence-based-capability-bounds",
+          "reviewStatus": "awaiting-frozen-remote-evidence"
+        },
+        {
+          "id": "sc-settings--tap-zones",
+          "reference": "screens/states/sc-settings--tap-zones.png",
+          "expected": "Three diagram radio cards plus inversion and zone display preferences.",
+          "applicability": "applicable-subject-to-evidence-based-capability-bounds",
+          "reviewStatus": "awaiting-frozen-remote-evidence"
+        },
+        {
+          "id": "sc-settings--tracking-login",
+          "reference": "screens/states/sc-settings--tracking-login.png",
+          "expected": "Actual authorization pending/account cards and sync/offline controls; no simulation.",
+          "applicability": "applicable-subject-to-evidence-based-capability-bounds",
+          "reviewStatus": "awaiting-frozen-remote-evidence",
+          "capabilityBound": "authentication"
+        }
+      ]
+    }
+  ],
+  "supportReferences": [
+    {
+      "file": "screens/cover.png",
+      "role": "component",
+      "physicalSize": [
+        272,
+        368
+      ],
+      "reviewUse": "Placeholder treatment only; production cover artwork is real data."
+    },
+    {
+      "file": "screens/nav-pw.png",
+      "role": "component",
+      "physicalSize": [
+        1236,
+        144
+      ],
+      "reviewUse": "Embedded PW dock geometry and active/idle state."
+    },
+    {
+      "file": "screens/dock-sc.png",
+      "role": "component",
+      "physicalSize": [
+        1860,
+        160
+      ],
+      "reviewUse": "Embedded SC dock geometry and active/idle state."
+    },
+    {
+      "file": "screens/pager.png",
+      "role": "component",
+      "physicalSize": [
+        1236,
+        104
+      ],
+      "reviewUse": "Embedded folio pager."
+    },
+    {
+      "file": "screens/spec-foundation.png",
+      "role": "specification",
+      "physicalSize": [
+        2800,
+        5200
+      ],
+      "reviewUse": "Global visual contract, not an application route."
+    },
+    {
+      "file": "screens/spec-interaction.png",
+      "role": "specification",
+      "physicalSize": [
+        2800,
+        4360
+      ],
+      "reviewUse": "Interaction/refresh contract, excluding the explicit closed-reader override."
+    },
+    {
+      "file": "screens/pager-options.png",
+      "role": "rejected-alternatives-reference",
+      "physicalSize": [
+        3352,
+        1920
+      ],
+      "reviewUse": "Only option B is adopted; A/C are not implementation targets."
+    },
+    {
+      "file": "overview-paperwhite.png",
+      "role": "overview",
+      "reviewUse": "Route/topology overview only, not a substitute for individual image viewing."
+    },
+    {
+      "file": "overview-scribe.png",
+      "role": "overview",
+      "reviewUse": "Route/topology overview only, not a substitute for individual image viewing."
+    }
+  ],
+  "referenceImageInspection": {
+    "method": "Each original PNG was opened with tools.view_image in named groups and manually viewed. No contact-sheet-only or automated pass-count claim is used.",
+    "viewedBy": "/root/handoff_visual_review",
+    "viewedPngCount": 110,
+    "groups": [
+      {
+        "id": "overviews",
+        "files": [
+          "overview-paperwhite.png",
+          "overview-scribe.png"
+        ],
+        "notes": "Topology overview only; full individual references inspected separately."
+      },
+      {
+        "id": "product-defaults",
+        "files": [
+          "screens/Main.png",
+          "screens/pw-manga.png",
+          "screens/pw-browse.png",
+          "screens/pw-source.png",
+          "screens/pw-search.png",
+          "screens/pw-history.png",
+          "screens/pw-settings.png",
+          "screens/pw-reader.png",
+          "screens/sc-reader-portrait.png",
+          "screens/sc-reader.png",
+          "screens/sc-library.png",
+          "screens/sc-manga.png",
+          "screens/sc-browse.png",
+          "screens/sc-sources.png",
+          "screens/sc-search.png",
+          "screens/sc-history.png",
+          "screens/sc-settings.png"
+        ],
+        "notes": "Manually viewed all 17 default product images. Reader defaults show menus; PW source has no dock, while SC manager keeps the dock. SC manga has a visibly narrower left information column."
+      },
+      {
+        "id": "pw-library-states",
+        "files": [
+          "screens/states/Main--more.png",
+          "screens/states/Main--sort.png",
+          "screens/states/Main--download-queue.png",
+          "screens/states/Main--select.png",
+          "screens/states/Main--jump-pages.png"
+        ],
+        "notes": "PW library More is a top-right float; sort and queue replace the lower screen with white full-width sheets; selection hides continuation and replaces dock; jump is a single row of six centered folio choices."
+      },
+      {
+        "id": "sc-library-states",
+        "files": [
+          "screens/states/sc-library--more.png",
+          "screens/states/sc-library--sort.png",
+          "screens/states/sc-library--download-queue.png",
+          "screens/states/sc-library--select.png",
+          "screens/states/sc-library--jump-pages.png"
+        ],
+        "notes": "SC More and sort are top-right floats; queue is centered; selection retains both continuation/update cards and replaces dock; jump is full-width above folio. The SC sort reference only shows eight choices and Done, whereas HANDOFF requires direction and filters too."
+      },
+      {
+        "id": "pw-detail-states",
+        "files": [
+          "screens/states/pw-manga--more.png",
+          "screens/states/pw-manga--description.png",
+          "screens/states/pw-manga--batch-download.png",
+          "screens/states/pw-manga--tracking.png",
+          "screens/states/pw-manga--chapters-p2.png"
+        ],
+        "notes": "PW detail page two collapses information to a compact book title and twelve chapter rows, preserving an eight-page total for 86 records. Description, batch download, and tracking are bottom sheets. Linked account/progress in the export is illustrative; unavailable integration must be explicit."
+      },
+      {
+        "id": "sc-detail-states",
+        "files": [
+          "screens/states/sc-manga--more.png",
+          "screens/states/sc-manga--tracking.png",
+          "screens/states/sc-manga--migrate.png"
+        ],
+        "notes": "SC detail uses anchored More and centered tracking/migration floats, white backgrounds without dimming. Migration separates a radio candidate list from three retention/removal toggles and equal Cancel/Start actions."
+      },
+      {
+        "id": "pw-management-states",
+        "files": [
+          "screens/states/pw-browse--available.png",
+          "screens/states/pw-browse--updates.png",
+          "screens/states/pw-browse--add-source.png",
+          "screens/states/pw-browse--source-lists.png"
+        ],
+        "notes": "PW source management uses in-place tabs, language filters, outlined per-row install/update, and a wide bulk update action. Add source and source list controls are bottom sheets. QR/local IP waiting examples must never imply a running endpoint without actual service support."
+      },
+      {
+        "id": "catalog-filter-settings",
+        "files": [
+          "screens/states/pw-source--filter.png",
+          "screens/states/pw-source--source-settings.png",
+          "screens/states/sc-browse--filter.png",
+          "screens/states/sc-browse--source-settings.png"
+        ],
+        "notes": "Filters have four order choices, multiple publication states, twelve tag chips with tri-state semantics, Reset, and a wide results action. PW panels attach to the bottom; SC panels float near header triggers. Source settings use declared language/quality controls."
+      },
+      {
+        "id": "sc-source-selection-states",
+        "files": [
+          "screens/states/sc-browse--source-picker.png",
+          "screens/states/sc-browse--server-setup.png",
+          "screens/states/sc-browse--blocked-source.png"
+        ],
+        "notes": "SC source picker is a bounded grouped float with current checkmark and management footer actions. Unconfigured server and verification-blocked sources replace the catalog content while preserving top-level dock. Setup has labeled fields and two equal actions; blocked state has migration and uninstall."
+      },
+      {
+        "id": "sc-management-states",
+        "files": [
+          "screens/states/sc-sources--updates.png",
+          "screens/states/sc-sources--add-source.png",
+          "screens/states/sc-sources--source-lists.png"
+        ],
+        "notes": "SC source updates affect only the right column; installed sources remain stable on the left. Add/list panels float at the same upper-center location; all background content remains undimmed."
+      },
+      {
+        "id": "search-states",
+        "files": [
+          "screens/states/pw-search--numbers.png",
+          "screens/states/pw-search--results.png",
+          "screens/states/sc-search--results.png"
+        ],
+        "notes": "Numeric PW keyboard retains candidate strip but changes letter keys to numbers/symbols. Search results restore the dock, group records by source with separate no-results and timeout/retry rows, and show up to three PW or six SC covers per source."
+      },
+      {
+        "id": "history-states",
+        "files": [
+          "screens/states/pw-history--updates.png",
+          "screens/states/pw-history--incognito.png",
+          "screens/states/pw-history--clear-confirm.png",
+          "screens/states/sc-history--updates.png",
+          "screens/states/sc-history--incognito.png",
+          "screens/states/sc-history--clear-confirm.png"
+        ],
+        "notes": "Updates switch the main heading and expose bulk download while preserving per-row queued/download states. Incognito uses a full-width inverted status bar and pressed header action. Clear dialogs are outlined white with two equal actions and no dimming."
+      },
+      {
+        "id": "settings-pw-and-hardware",
+        "files": [
+          "screens/states/pw-settings--page2.png",
+          "screens/states/pw-settings--display.png",
+          "screens/states/pw-settings--power.png",
+          "screens/states/sc-settings--light.png",
+          "screens/states/sc-settings--pen.png"
+        ],
+        "notes": "PW settings page two omits the device card and has nine grouped rows; secondary pages keep the dock but omit list pager. Display has five refresh choices, three quality cards, three switches, and sixteen grayscale cells. Power has three screensaver thumbnails. SC light/pen are capability-dependent."
+      },
+      {
+        "id": "sc-settings-system-reading",
+        "files": [
+          "screens/states/sc-settings--power.png",
+          "screens/states/sc-settings--storage.png",
+          "screens/states/sc-settings--reading.png",
+          "screens/states/sc-settings--tap-zones.png",
+          "screens/states/sc-settings--image.png"
+        ],
+        "notes": "All SC settings retain the same 320-design-pixel navigation column and active black row. Storage is a stacked usage bar with separate legend and targeted management actions. Reading is four equal directions. Tap-zone radio cards include diagrams and two switches. Image treatment has five contrast choices plus crop/dither/split."
+      },
+      {
+        "id": "sc-settings-library-source",
+        "files": [
+          "screens/states/sc-settings--spread.png",
+          "screens/states/sc-settings--categories.png",
+          "screens/states/sc-settings--auto-update.png",
+          "screens/states/sc-settings--source-lists.png",
+          "screens/states/sc-settings--download.png"
+        ],
+        "notes": "Spread has three orientation layouts, two spread treatments, and separate-cover switch. Categories have inline Rename with an immutable Uncategorized row and dashed Add. Automatic updates use a three-way frequency plus three conditions. Source lists include manage/add/remove. Downloads show four prefetch choices and actual destination."
+      },
+      {
+        "id": "sc-settings-tracking-general",
+        "files": [
+          "screens/states/sc-settings--tracking-login.png",
+          "screens/states/sc-settings--backup.png",
+          "screens/states/sc-settings--language.png",
+          "screens/states/sc-settings--logs.png",
+          "screens/states/sc-settings--about.png"
+        ],
+        "notes": "Tracking authorizes inside the account card, showing QR/code/pending and cancel rather than a modal. The export's authorization simulation button is explicitly excluded. Backup has two actions and a dated list; language uses a trailing checkmark; logs have one switch and two actions; About is concise data rows."
+      },
+      {
+        "id": "pw-reader-fullscreen-toc-mode",
+        "files": [
+          "screens/states/pw-reader--fullscreen.png",
+          "screens/states/pw-reader--fullscreen-footer.png",
+          "screens/states/pw-reader--toc.png",
+          "screens/states/pw-reader--mode.png"
+        ],
+        "notes": "Closed PW reference has a bookmark ribbon, and footer variant adds white-backed chapter/progress labels; both decorations and the invisible footer-cycle hit region are overridden by the user's pure-artwork decision. ToC is a five-row sheet above menu chrome. Mode has four direction cards, three layouts, and crop/split toggles."
+      },
+      {
+        "id": "pw-reader-picture-light-direction-more",
+        "files": [
+          "screens/states/pw-reader--image.png",
+          "screens/states/pw-reader--light.png",
+          "screens/states/pw-reader--rotate.png",
+          "screens/states/pw-reader--more.png"
+        ],
+        "notes": "PW reader picture uses a preview with contrast stepper, five refresh intervals, dither and night controls. Light has two 0..24 sliders; manual direction has portrait/landscape/reverse-landscape cards. More includes footer setting in export but the closed-reader result remains pure artwork under the user override."
+      },
+      {
+        "id": "sc-portrait-fullscreen-toc-mode",
+        "files": [
+          "screens/states/sc-reader-portrait--fullscreen.png",
+          "screens/states/sc-reader-portrait--fullscreen-footer.png",
+          "screens/states/sc-reader-portrait--toc.png",
+          "screens/states/sc-reader-portrait--mode.png"
+        ],
+        "notes": "SC portrait closed artwork uses edge-to-edge canvas and the export's ribbon; its footer variant is a centered page label in a white lower art margin. These decorations are overridden. Portrait ToC is two-column and mode has four cards with crop/split toggles side by side, without PW layout row."
+      },
+      {
+        "id": "sc-portrait-picture-light-orientation-more",
+        "files": [
+          "screens/states/sc-reader-portrait--image.png",
+          "screens/states/sc-reader-portrait--light.png",
+          "screens/states/sc-reader-portrait--orientation.png",
+          "screens/states/sc-reader-portrait--more.png"
+        ],
+        "notes": "SC picture is horizontal preview/contrast/refresh with dither status and night toggle to the right. Light presents brightness and warmth side by side with auto below. Orientation has portrait/spread/follow cards; prototype-only preview link is excluded. More is two columns with manual refresh."
+      },
+      {
+        "id": "sc-landscape-fullscreen-toc-mode-layout",
+        "files": [
+          "screens/states/sc-reader--fullscreen.png",
+          "screens/states/sc-reader--toc.png",
+          "screens/states/sc-reader--mode.png",
+          "screens/states/sc-reader--layout.png"
+        ],
+        "notes": "Landscape uses two equal page allocations with no decorative seam, and ribbon is overridden. Header adds orientation lock; page progress is a range. Tools replace direction with layout. ToC/mode/layout panels use generous 120-design-pixel side insets."
+      },
+      {
+        "id": "sc-landscape-picture-light-more",
+        "files": [
+          "screens/states/sc-reader--image.png",
+          "screens/states/sc-reader--light.png",
+          "screens/states/sc-reader--more.png"
+        ],
+        "notes": "Landscape picture/light/more preserve wide side insets, compact stacked menu controls, explicit current tab, and undimmed artwork. Frontlight/warmth/auto brightness are only truthful where capabilities exist."
+      },
+      {
+        "id": "components-and-pager-options",
+        "files": [
+          "screens/cover.png",
+          "screens/nav-pw.png",
+          "screens/dock-sc.png",
+          "screens/pager.png",
+          "screens/pager-options.png"
+        ],
+        "notes": "Viewed all four component references and the options board. Adopted option B is the folio pager with text navigation and central current/total, no enclosing rule. Options A/C remain rejected alternatives, not routes. Cover art is an illustrative halftone placeholder."
+      },
+      {
+        "id": "specification-boards",
+        "files": [
+          "screens/spec-foundation.png",
+          "screens/spec-interaction.png"
+        ],
+        "notes": "Viewed both full specification boards. The book-page hierarchy, eight-color UI palette, no scroll/animation/shadows/dimming, folio pagination, target dimensions, refresh scheduling and gestures align with HANDOFF. Reader ribbon/footer/cycle instructions are overridden only for the closed reader."
+      }
+    ],
+    "representsImplementationVerification": false,
+    "localAppOrPrototypeExecuted": false
+  },
+  "notExportedAsIndependentPng": [
+    {
+      "state": "pw-settings--tracking",
+      "basis": "HANDOFF plus pw-settings prototype; no independent PNG exists."
+    },
+    {
+      "state": "sc-search--numbers",
+      "basis": "Keyboard contract plus PW numeric reference; no independent SC PNG exists."
+    },
+    {
+      "state": "sc-reader--fullscreen-footer",
+      "basis": "No independent landscape footer PNG exists; closed-footer behavior is user-overridden in any case."
+    },
+    {
+      "state": "PW settings sections other than display and power",
+      "basis": "HANDOFF content and PW secondary-page contract; no exact screenshot for each section."
+    },
+    {
+      "state": "Empty/offline/long-content and operational variants",
+      "basis": "HANDOFF and behavior rules; no claim of an independently exported per-state pixel reference."
+    }
+  ],
+  "additionalRequiredCases": [
+    {
+      "id": "folio-boundaries",
+      "scope": [
+        "library",
+        "catalog",
+        "detail",
+        "history",
+        "source-manager-right",
+        "settings-lists"
+      ],
+      "check": "First/last/one-page state, stable edge allocation, center jump selection and outside dismissal; data counts and page membership agree."
+    },
+    {
+      "id": "detail-boundaries",
+      "scope": [
+        "pw-manga",
+        "sc-manga"
+      ],
+      "check": "PW information collapses after page one; six then twelve or SC sixteen records; reverse order, current/read/queued/downloaded states and long chapter titles."
+    },
+    {
+      "id": "library-actions",
+      "scope": [
+        "Main",
+        "sc-library"
+      ],
+      "check": "All tabs, eight sorts, direction/filter tri-state cycle, selection/all-page/move/remove/read/download, queue pause/resume-all, update toast, outside dismissal."
+    },
+    {
+      "id": "reader-input",
+      "scope": [
+        "pw-reader",
+        "sc-reader-portrait",
+        "sc-reader"
+      ],
+      "check": "33/34/33 ordinary and 30/40/30 effective spreads; RTL/LTR inversion, top/center/bottom vertical behavior, discrete webtoon 85-percent steps; open menus never turn pages."
+    },
+    {
+      "id": "reader-pure-scene",
+      "scope": [
+        "pw-reader",
+        "sc-reader-portrait",
+        "sc-reader"
+      ],
+      "check": "After menu close and after resume, no ribbon/footer/status/notification/gutter or invisible lower-right footer-cycle target."
+    },
+    {
+      "id": "reader-boundaries",
+      "scope": [
+        "pw-reader",
+        "sc-reader-portrait",
+        "sc-reader"
+      ],
+      "check": "First/last/odd final spread and next chapter; persisted progress/bookmarks; seek preview before release; chapter/bookmark tabs and ToC paging; cache setting invalidation."
+    },
+    {
+      "id": "orientation-return",
+      "scope": [
+        "reader",
+        "all-non-reader-routes"
+      ],
+      "check": "Reader manual/sensor policy is truthful; returning from landscape reader restores non-reader portrait."
+    },
+    {
+      "id": "keyboard-modes",
+      "scope": [
+        "pw-search",
+        "sc-search"
+      ],
+      "check": "Pinyin composition/candidate paging, English, shift, symbols, backspace, space, clear, cancel and source scopes; no clipping or key-label collisions."
+    },
+    {
+      "id": "search-concurrency",
+      "scope": [
+        "pw-search",
+        "sc-search"
+      ],
+      "check": "Independent success/empty/timeout/retry/retrying sources and early completion; real results only; up to three or six records, view-all and actual pagination."
+    },
+    {
+      "id": "source-capability",
+      "scope": [
+        "pw-browse",
+        "pw-source",
+        "sc-browse",
+        "sc-sources"
+      ],
+      "check": "Installed/available/update tabs, language filters, picker, blocked/unconfigured/connected states, source settings declarations, real source-list add/remove and honest endpoint availability."
+    },
+    {
+      "id": "history-operation",
+      "scope": [
+        "pw-history",
+        "sc-history"
+      ],
+      "check": "Grouped chronology, real timestamps/progress, entry deletion/clear confirmation, empty result, global incognito status/persistence and updates queue states."
+    },
+    {
+      "id": "all-settings-sections",
+      "scope": [
+        "pw-settings",
+        "sc-settings"
+      ],
+      "check": "Review all 18 sections where applicable, not only screenshot-exported PW pages; every enabled control has a concrete operation or truthful unavailable state."
+    },
+    {
+      "id": "truthful-hardware",
+      "scope": [
+        "settings",
+        "reader"
+      ],
+      "check": "Frontlight/warmth/sensor/dither/pen missing-capability variants hide dependent controls; no fabricated connected, authorized, logged-in or completed state."
+    },
+    {
+      "id": "content-stress",
+      "scope": [
+        "all-products"
+      ],
+      "check": "Empty, long title/description, dense categories/sources, offline and timeout states remain paginated and readable without overlap."
+    },
+    {
+      "id": "performance-and-resume",
+      "scope": [
+        "library",
+        "queue",
+        "reader"
+      ],
+      "check": "Root's remote behavioral evidence must cover visible-only cover work, cached pixels, distinct download usage, coalesced queue pressure and retained artwork sleep/wake. Static PNGs cannot establish timing or absence of UI-thread work."
+    }
+  ],
+  "implementationReview": {
+    "cleanRoundStreak": 0,
+    "completedRounds": [],
+    "status": "Waiting for Root to supply a frozen new candidate and fresh remote native Slint screenshots.",
+    "localVerificationAuthorized": false,
+    "permittedEnvironment": "Root-managed ssh test-env or designated Aidoku guest only; this reviewer does not launch a separate app/VM.",
+    "provenanceRequired": [
+      "Source snapshot/hash identifying all production changes",
+      "Candidate binary SHA256",
+      "Design version and matching reference",
+      "Native Slint capture method and environment identity",
+      "Capture dimensions, device profile and actual capability declaration",
+      "Fresh capture run identity per round; fixtures and relevant operation evidence"
+    ],
+    "roundRecordRequired": [
+      "Exact inspected implementation PNG list with reference mapping",
+      "New actionable suggestions with source/reference/evidence/owner/retest",
+      "Unresolved previous suggestions and intentional differences",
+      "Frozen source and binary hashes",
+      "Complete-matrix flag, capability exclusions with evidence, clean streak result"
+    ],
+    "exitRule": "Two consecutive complete fresh manual walks of the entire applicable matrix on a frozen candidate with zero new actionable suggestions and no unresolved actionable findings. Any production change resets the streak. Static reviews, automated pass counts, overview-only views and prior PDF/C5 rounds do not count.",
+    "claimLimit": "Reference inspection is complete. No new native candidate has been executed or inspected in this baseline, and no UI fidelity or behavior acceptance is asserted."
+  }
+}

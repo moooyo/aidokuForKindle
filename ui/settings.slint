@@ -1,0 +1,177 @@
+import { State, Commands } from "state.slint";
+import { Theme } from "theme.slint";
+import { Strings } from "strings.slint";
+import { BodyText, Caption, GroupLabel, Icon, PageBar, TitleText } from "widgets.slint";
+import { DeviceGlyph, SettingsListRow } from "settings-controls.slint";
+import { SettingsBody } from "settings-sections.slint";
+
+component SettingsBackButton inherits Rectangle {
+    callback clicked();
+    width: 120px; height: 48px;
+    property <bool> inverted: hit.pressed;
+    background: root.inverted ? Theme.ink : Theme.paper;
+    border-radius: Theme.control-radius;
+    accessible-role: button;
+    accessible-label: Strings.settings;
+    Icon { x: 4px; y: 12px; width: 24px; height: 24px; kind: "chevron-left"; inverted: root.inverted; }
+    BodyText { x: 30px; y: 0px; width: parent.width - 42px; height: parent.height; text: Strings.settings; font-size: 16px; font-weight: 500; color: root.inverted ? Theme.paper : Theme.ink; }
+    hit := TouchArea {
+        pointer-event(event) => { if event.kind == PointerEventKind.down { Commands.refresh("fast"); } else if event.kind == PointerEventKind.up { Commands.refresh("ui"); } }
+        clicked => { root.clicked(); }
+    }
+}
+
+export component SettingsPage inherits Rectangle {
+    background: Theme.paper;
+    property <bool> root-list: !State.large-screen && State.settings-section == "";
+    property <string> section: State.large-screen && State.settings-section == "" ? "screen-refresh" : State.settings-section;
+    property <length> header-height: State.large-screen ? 109.5px : root.root-list ? 77.5px : 96px;
+    property <string> section-title:
+        root.section == "screen-refresh" ? Strings.screen-refresh :
+        root.section == "frontlight-warmth" ? Strings.frontlight-warmth :
+        root.section == "pen" ? Strings.pen :
+        root.section == "wifi-sleep-exit" ? Strings.wifi-sleep-exit :
+        root.section == "storage" ? Strings.storage :
+        root.section == "default-direction" ? (State.large-screen ? Strings.settings-reading-direction : Strings.default-direction) :
+        root.section == "tap-regions" ? Strings.tap-regions :
+        root.section == "image-processing" ? Strings.image-processing :
+        root.section == "spread" ? Strings.spread-and-landscape :
+        root.section == "categories" ? Strings.category :
+        root.section == "auto-update" ? Strings.automatic-updates :
+        root.section == "source-lists" ? Strings.source-list :
+        root.section == "downloads" ? Strings.download :
+        root.section == "tracking" ? Strings.tracking :
+        root.section == "backup" ? Strings.backup-restore :
+        root.section == "language" ? Strings.interface-language :
+        root.section == "logs" ? Strings.logs-diagnostics : Strings.about;
+
+    if root.root-list || State.large-screen: Rectangle {
+        x: 0px; y: 0px; width: parent.width; height: root.header-height;
+        Caption {
+            x: State.large-screen ? 36px : 22px;
+            y: State.large-screen ? 8px : 4px;
+            width: parent.width - self.x * 2;
+            height: State.large-screen ? 22.5px : 19.5px;
+            text: Strings.version + " " + State.version;
+            font-size: State.large-screen ? 15px : 13px;
+            letter-spacing: State.large-screen ? 3px : 2px;
+        }
+        TitleText {
+            x: State.large-screen ? 36px : 22px;
+            y: State.large-screen ? 34.5px : 25.5px;
+            width: State.large-screen ? 250px : parent.width - 44px;
+            height: Theme.title-line;
+            text: Strings.settings;
+            font-size: Theme.title;
+            letter-spacing: Theme.title-tracking;
+        }
+        if State.large-screen: Rectangle {
+            x: max(320px, parent.width - 474px);
+            y: 34.5px;
+            width: parent.width - self.x - 36px;
+            height: 71px;
+            DeviceGlyph { x: 0px; y: 0px; }
+            Text { x: 54px; y: 0px; width: max(0px, parent.width - 183px); height: 28.5px; text: State.device-name; font-family: Theme.numbers; font-size: 19px; font-weight: 700; color: Theme.ink; vertical-alignment: center; overflow: elide; }
+            Text { x: 54px; y: 28.5px; width: max(0px, parent.width - 183px); height: 42px; text: State.device-description; font-family: Theme.sans; font-size: 14px; color: Theme.secondary; vertical-alignment: top; wrap: word-wrap; overflow: clip; }
+            Rectangle { x: parent.width - 114px; y: 2px; width: 1px; height: 66px; background: Theme.line; }
+            Caption { x: parent.width - 100px; y: 0px; width: 100px; height: 24px; text: Strings.free + " " + State.free-space; font-size: 14px; font-family: Theme.numbers; horizontal-alignment: right; }
+            Caption { x: parent.width - 100px; y: 26px; width: 100px; height: 24px; text: State.wifi ? Strings.wifi-connected : Strings.wifi-disconnected; font-size: 14px; horizontal-alignment: right; }
+        }
+        if State.large-screen: Rectangle { x: 0px; y: parent.height - 1px; width: parent.width; height: 1px; background: Theme.line; }
+    }
+
+    if root.root-list: Rectangle {
+        property <length> card-height: State.page == 1 ? 85px : 0px;
+        x: 0px; y: root.header-height;
+        width: parent.width; height: max(0px, parent.height - self.y - Theme.pager-height);
+        clip: true;
+        if State.page == 1: Rectangle {
+            x: 16px; y: 0px; width: parent.width - 32px; height: parent.card-height;
+            border-width: Theme.control-border; border-color: Theme.ink; border-radius: Theme.control-radius; background: Theme.paper;
+            DeviceGlyph { x: 18px; y: 14px; }
+            Text { x: 74px; y: 15px; width: max(0px, parent.width - 74px - 148px); height: 27px; text: State.device-name; font-family: Theme.numbers; font-size: 18px; font-weight: 700; color: Theme.ink; vertical-alignment: center; overflow: elide; }
+            Caption { x: 74px; y: 44px; width: max(0px, parent.width - 74px - 130px); height: 22px; text: State.device-description; font-size: 13px; }
+            Caption { x: parent.width - 136px; y: 18px; width: 118px; height: 22px; text: Strings.free + " " + State.free-space; font-family: Theme.numbers; font-size: 13px; horizontal-alignment: right; }
+            Caption { x: parent.width - 136px; y: 42px; width: 118px; height: 22px; text: State.wifi ? Strings.wifi-connected : Strings.wifi-disconnected; font-size: 13px; horizontal-alignment: right; }
+        }
+        Rectangle {
+            x: 0px;
+            y: State.page == 1 ? parent.card-height + 6px : 0px;
+            width: parent.width; height: parent.height - self.y;
+            VerticalLayout {
+                x: 0px; y: 0px; width: parent.width; height: parent.height;
+                spacing: 0px;
+                alignment: start;
+                for item[index] in State.settings: Rectangle {
+                    property <bool> starts-group: index == 0 || item.group != State.settings[index - 1].group;
+                    property <length> row-extent: 52px + (self.starts-group ? 38px : 0px);
+                    min-height: self.row-extent;
+                    preferred-height: self.row-extent;
+                    max-height: self.row-extent;
+                    if self.starts-group: GroupLabel {
+                        x: 22px; y: 12px; width: parent.width - 44px; height: 22px;
+                        text: item.group == "device" ? Strings.device : item.group == "reading" ? Strings.reading-group : item.group == "library" ? Strings.library : item.group == "sources" || item.group == "sources-data" ? Strings.sources-and-data : item.group == "library-sources" ? Strings.library-and-sources : Strings.general;
+                        font-size: 12px;
+                    }
+                    SettingsListRow { x: 0px; y: parent.starts-group ? 38px : 0px; width: parent.width; item: item; }
+                }
+            }
+        }
+    }
+
+    if State.large-screen: Rectangle {
+        x: 0px; y: root.header-height;
+        width: 320px; height: parent.height - self.y;
+        clip: true;
+        Rectangle { x: parent.width - 1px; y: 0px; width: 1px; height: parent.height; background: Theme.line; }
+        Rectangle {
+            x: 0px; y: 6px; width: parent.width; height: parent.height - 18px;
+            VerticalLayout {
+                x: 0px; y: 0px; width: parent.width; height: parent.height;
+                spacing: 0px;
+                alignment: start;
+                for item[index] in State.settings: Rectangle {
+                    property <bool> starts-group: index == 0 || item.group != State.settings[index - 1].group;
+                    property <length> row-extent: 46px + (self.starts-group ? 42px : 0px);
+                    min-height: self.row-extent;
+                    preferred-height: self.row-extent;
+                    max-height: self.row-extent;
+                    if self.starts-group: GroupLabel {
+                        x: 36px; y: 16px; width: parent.width - 60px; height: 20px;
+                        text: item.group == "device" ? Strings.device : item.group == "reading" ? Strings.reading-group : item.group == "library" || item.group == "library-sources" || item.group == "sources" || item.group == "sources-data" ? Strings.library-and-sources : Strings.general;
+                        font-size: 13px;
+                    }
+                    SettingsListRow { x: 20px; y: parent.starts-group ? 42px : 0px; width: parent.width - 34px; sidebar: true; selected: item.id == root.section; item: item; }
+                }
+            }
+        }
+    }
+
+    if !root.root-list: Rectangle {
+        x: State.large-screen ? 320px : 0px;
+        y: State.large-screen ? root.header-height : 0px;
+        width: parent.width - self.x; height: parent.height - self.y;
+        if !State.large-screen: SettingsBackButton { x: 8px; y: 0px; width: 120px; height: 48px; clicked => { Commands.action("settings", "back", ""); } }
+        TitleText {
+            x: State.large-screen ? 36px : 22px;
+            y: State.large-screen ? 26px : 48px;
+            width: parent.width - self.x * 2; height: State.large-screen ? 40px : 38px;
+            text: root.section-title; font-size: 30px; letter-spacing: 3px;
+        }
+        SettingsBody {
+            x: State.large-screen ? 36px : 22px;
+            y: State.large-screen ? 84px : 102px;
+            width: parent.width - self.x * 2; height: max(0px, parent.height - self.y - (State.large-screen ? 20px : 14px));
+            section: root.section;
+        }
+    }
+
+    if root.root-list: PageBar {
+        x: 0px;
+        y: parent.height - self.height;
+        width: parent.width;
+        page: State.page;
+        count: State.page-count;
+        turn(direction) => { Commands.action("page", "turn", direction); }
+    }
+}

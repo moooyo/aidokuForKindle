@@ -1,0 +1,111 @@
+{
+  "batch_id": "reference-15",
+  "reviewer": "/root/phase3_round1_review/reference_15",
+  "run_id": "a1baf3fe3dc2",
+  "status": "reviewed-with-findings",
+  "reviewed_case_ids": [
+    "sc-browse--source-picker",
+    "sc-browse--source-settings"
+  ],
+  "identity": {
+    "round": 1,
+    "binary_sha256": "94d7f3bbcab475ad8833a2f3c486138f7b49bead231851c2d8eab2f0c3d2ac51",
+    "source_sha256": "aef9db4e111165016a10a2a95e111f3155860b8510c7f6207ec9c79fbec5082c",
+    "assigned_reference_bundle_sha256": "e7b49b456255432d74cfe41346f9d44c1a9c55bf67c5d55483e4ae3029547d18",
+    "case_identity_matches_assignment": true,
+    "png_hash_basis": "Get-FileHash SHA256 over the unmodified original PNG file bytes, compared with each case metadata evidence hash and reference hash.",
+    "comparison_scale": "Candidate 930 x 1240 native pixels at logical 1x; reference 1860 x 2480 physical pixels at 2x. Geometry was compared at the same logical scale."
+  },
+  "reviewed_cases": [
+    {
+      "case_id": "sc-browse--source-picker",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/sc-browse--source-picker.png",
+      "candidate_sha256": "e38ab301dcf499679048878b9ffc2b8c44ebdc6e241ae6bd11799aebb81436c3",
+      "reference_png": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/screens/states/sc-browse--source-picker.png",
+      "reference_sha256": "ba31c572c5584efe71aedff182ed94b5fd5916b875080bd7aa61ee24d2ea578d",
+      "case_metadata": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/cases/sc-browse--source-picker.json",
+      "candidate_sha256_matches_case_evidence": true,
+      "reference_sha256_matches_case_metadata": true,
+      "viewed_candidate": true,
+      "viewed_reference": true,
+      "view_method": "tools.view_image on each original PNG",
+      "outcome": "issues_found",
+      "observations": [
+        "The case metadata identifies round 1, run a1baf3fe3dc2, the assigned binary and source hashes, Scribe portrait, catalog route, and source-picker modal context.",
+        "The candidate retains the white black-outlined floating popover, separate built-in and extension groups, the current MangaDex checkmark, and all three management footer actions. All seven source rows and the footer are visible within the viewport.",
+        "At the same logical scale, the popover has the expected left alignment and approximately 620-pixel width. Primary source labels are legible, with black icons and muted secondary text preserving the grayscale hierarchy.",
+        "The Komga, Kavita, and Suwayomi right-hand subtitles all lose the trailing connectivity state to an ellipsis. Their visible common server-category prefix does not distinguish the connected server from unconfigured servers. See P3R1-REF15-1.",
+        "The unavailable extension remains visibly muted and is not marked current. The image does not show a fabricated authorization success.",
+        "The surrounding catalog retains the five-column, three-row cover layout, approximately 150 x 202 logical cover cells, page controls, and bottom dock. No reachability obstruction is visible for the popover rows or footer."
+      ],
+      "intentional_differences": [
+        "Source names, subtitle wording, update wording, counts, catalog ordering, titles, and cover artwork may follow the captured demo data rather than the design fixture. These content differences are accepted where geometry and meaningful state remain clear.",
+        "The unavailable extension is a truthful capability boundary. This review does not require successful authorization or use of that source.",
+        "Popover height is assessed against its actual content. No defect is raised solely because a content-driven boundary differs from the reference."
+      ]
+    },
+    {
+      "case_id": "sc-browse--source-settings",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/sc-browse--source-settings.png",
+      "candidate_sha256": "40a1635f306c54f50026d4b82293a1c53b1fed8ea413b024c2b6dbf40ba2a2c1",
+      "reference_png": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/screens/states/sc-browse--source-settings.png",
+      "reference_sha256": "dd7241e8d72ddc9c3947b53b724512ab3a7311ae5135394689f92cb4cce88ee1",
+      "case_metadata": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/cases/sc-browse--source-settings.json",
+      "candidate_sha256_matches_case_evidence": true,
+      "reference_sha256_matches_case_metadata": true,
+      "viewed_candidate": true,
+      "viewed_reference": true,
+      "view_method": "tools.view_image on each original PNG",
+      "outcome": "issues_found",
+      "observations": [
+        "The case metadata identifies round 1, run a1baf3fe3dc2, the assigned binary and source hashes, Scribe portrait, catalog route, and source-settings modal context.",
+        "The reference places the settings title, Done action, and source preferences within a white black-outlined floating container. The candidate shows only the title, Done action, and a small unconfigured message, with no enclosing white outlined popover. See P3R1-REF15-2.",
+        "The candidate settings title is visible around logical x390, y152, and the Done action around x792, y138. The catalog search remains directly beneath this exposed header, and the unconfigured message sits against the search row's lower edge. These are visual coordinate estimates, not pixel measurements.",
+        "The captured source_id is mangadex and source_preference_groups is empty. The review accepts the absence of the reference fixture's language and image-quality controls for this captured source state; it does not accept loss of the popover boundary or collision with the catalog controls.",
+        "The background catalog retains the five-column, three-row cover geometry, paging, and dock, with legible primary labels and grayscale content. The Done action is visible, but static evidence does not establish its interaction behavior."
+      ],
+      "intentional_differences": [
+        "No source-declared preference groups are present in the case metadata. A truthful empty state is appropriate, and source preferences must not be fabricated to reproduce the reference fixture.",
+        "A settings popover may shrink to its actual content, consistent with content-driven sheet sizing. The finding concerns the absent white outlined container and overlapping exposed content, not a difference in overall top position or height.",
+        "Catalog ordering, titles, counts, cover artwork, and source update wording may differ with the captured demo data."
+      ]
+    }
+  ],
+  "suggestions": [
+    {
+      "id": "P3R1-REF15-1",
+      "case_id": "sc-browse--source-picker",
+      "priority": "P2",
+      "description": "The source picker truncates the meaningful connectivity state of built-in servers.",
+      "evidence": [
+        "In the candidate PNG, Komga, Kavita, and Suwayomi each display the same generic server-category prefix followed by an ellipsis in the right-hand column.",
+        "The case metadata records Komga as connected and Kavita and Suwayomi as unconfigured, but those distinguishing trailing states are absent from the visible candidate rows.",
+        "At the same logical scale, the reference shows concise connected or disconnected states clearly in the corresponding right-hand column."
+      ],
+      "recommendation": "Preserve the complete actual connectivity or configuration state in a dedicated compact status area. Separate it from the generic source-category prefix, or truncate the category before the state, while keeping row geometry and source selection reachable at the 930-pixel logical viewport.",
+      "status": "open",
+      "introduced_round": 1
+    },
+    {
+      "id": "P3R1-REF15-2",
+      "case_id": "sc-browse--source-settings",
+      "priority": "P2",
+      "description": "The empty source-settings state loses its white outlined popover and exposes its contents against the catalog controls.",
+      "evidence": [
+        "The reference has a clear white black-outlined settings container around its header, action, and form body.",
+        "The candidate has no visible popover border or body surface: its title and Done action float over the catalog search area, and the small unconfigured message meets the search row's lower edge.",
+        "The metadata records an empty source_preference_groups array. That supports an empty settings body but does not justify removing the floating container or its internal spacing."
+      ],
+      "recommendation": "Render the white outlined floating container for source-settings even when the active source declares no preferences. Place a truthful empty-state message below the header with adequate padding and keep the Done action within that container. Size the container to actual content without inventing preferences or requiring a fixed top position.",
+      "status": "open",
+      "introduced_round": 1
+    }
+  ],
+  "limitations": [
+    "This independent review covers only the two assigned cases and four PNG files; it makes no claim that the complete round is clean or fully reviewed.",
+    "Inspection used existing JSON and original PNG files plus Get-FileHash. No application, build, tests, validation suite, runtime probe, Git operation, or product modification was performed.",
+    "Visual geometry assessments are based on the displayed originals normalized to logical scale. The image viewer automatically resized the 2x reference display; no PNG bytes were altered or derived comparison images generated.",
+    "Static screenshots establish visible state and layout, not live hit targets, navigation, persistence, authorization, hardware rendering, or network behavior.",
+    "The assigned reference bundle hash was supplied by the review task and was not independently recomputed. Both individual local reference PNG byte hashes were independently computed and match their case metadata."
+  ]
+}

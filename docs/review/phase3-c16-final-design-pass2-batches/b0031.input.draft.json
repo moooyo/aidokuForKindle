@@ -1,0 +1,796 @@
+{
+  "schema_version": 1,
+  "kind": "Actual C16 final-design-pass2 bounded fresh input draft",
+  "scope": "FINAL_DESIGN_REFERENCE_PASS2",
+  "coordinator": "/root/c15_visual_coordinator",
+  "batch_id": "b0031",
+  "pass": 2,
+  "run_id": "c205f1b52500",
+  "draft_only": true,
+  "formal_input": false,
+  "assigned_owner": null,
+  "actual_worker_parent": null,
+  "proxy_lane": null,
+  "slot_id": null,
+  "task_name": null,
+  "status": "queued",
+  "assignment_status": "Sole coordinator registration and actual dispatch are pending; proposal fields do not create primary ownership.",
+  "proposed_registration": {
+    "proxy_lane": "Root",
+    "slot_id": "Root-C16-R2-03",
+    "required_parent": "/root/c15_visual_coordinator",
+    "task_name": "c16fd2_root_b0031",
+    "proposed_owner": "/root/c15_visual_coordinator/c16fd2_root_b0031",
+    "fork_turns": "none",
+    "registrar": "/root/c15_visual_coordinator",
+    "actual_registered": false,
+    "slot_registration_rule": "Register only after the actual prior worker naturally releases this slot; sole coordinator registration is required."
+  },
+  "primary_ownership_audit": {
+    "ledger_path": "D:/Code/aidokuForKindle/docs/review/phase3-c16-final-design-pass2-ledger.json",
+    "ledger_sha256_owner_declared": null,
+    "ledger_actual_run_id": "c205f1b52500",
+    "ledger_pass": 2,
+    "selected_module_id": "sc-history",
+    "selected_actual_run_id": "c205f1b52500",
+    "exact_identity_key_rule": "2|actual_run_id|actual_module_id|actual_case_id",
+    "matching_primary_owner_count": 0,
+    "scope": "Exact selected case IDs checked by static reading of the new pass2 ledger immediately before this draft; no ledger mutation."
+  },
+  "freeze": {
+    "source_file_count": 229,
+    "source_sha256": "1fe46f49f4b60ad455b9e870e376a571adf203aebdf50b7d8616e376801c5626",
+    "desktop_sha256": "8aa3e37550e48fc195adf3c1511158b2dc8dd65099a7e250b32b198ca6bfd6b9",
+    "desktop_bytes": 265909992,
+    "core_manifest_sha256": "cf91ea316b335fbcbb09528c51205a49a01bd1452cc3695edc15b297e477ecb0",
+    "shared_preparation_sha256": null,
+    "input_binding_sha256": "d363238f693e495659570cb2592355a9b977a19a4ee668a1b7ca39adbf3c92f3"
+  },
+  "module": {
+    "id": "sc-history",
+    "snapshot_path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate16/final-design-pass-2-modules/sc-history/snapshot.json",
+    "snapshot_sha256": "a813b4a0d19f3f0e5eb508d3512b683a49c456df33e1f84fe15104ecaeb6b9e8",
+    "snapshot_sha256_owner_record_path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate16/final-design-pass-2-original-return-01/owner-release-01.json",
+    "snapshot_sha256_owner_record_json_pointer": "/design_collection/modules/13/snapshot/sha256",
+    "inventory_field": "members",
+    "originals_modified": false,
+    "actual_manual_ids": [
+      "sc-history--clear-confirm",
+      "sc-history--default",
+      "sc-history--incognito",
+      "sc-history--updates"
+    ],
+    "actual_prerequisite_ids": [],
+    "independent_directory_binding": "D:/Code/aidokuForKindle/artifacts/phase3/candidate16/final-design-pass-2-modules/sc-history",
+    "path_binding_rule": "Join only actual snapshot.members.path to this independent pass2 module directory. Do not use historical outputs or observations."
+  },
+  "owner_release_binding": {
+    "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate16/final-design-pass-2-original-return-01/owner-release-01.json",
+    "sha256_owner_declared": "2eba9c5c1daca36b188992a8a418b379b23d595634e95f2c7ed7cef98816b74a",
+    "main_run_id_owner_declared": "c205f1b52500",
+    "supplement_run_id_owner_declared": "7d2c39ca1514",
+    "selected_module_record_json_pointer": "/design_collection/modules/13",
+    "resources_released_owner_declared": {
+      "capture": true,
+      "desktop_app": true,
+      "http_fixture": true,
+      "pil_observer": true,
+      "ordinary_transfer": true
+    },
+    "viewer_count_owner_declared": 0,
+    "manual_acceptance_recorded_by_producer": false,
+    "accepted_owner_declared": false,
+    "hash_source": "Actual pass2 owner-release SHA supplied by the sole coordinator. Selected snapshot SHA is copied only from its actual module declaration; no local hashing."
+  },
+  "source_after_owner_binding": {
+    "owner_record_path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate16/final-design-pass-2-original-return-01/owner-release-01.json",
+    "owner_record_sha256": "2eba9c5c1daca36b188992a8a418b379b23d595634e95f2c7ed7cef98816b74a",
+    "source_snapshot_after_sha256": "1fe46f49f4b60ad455b9e870e376a571adf203aebdf50b7d8616e376801c5626",
+    "source_canonical_after_sha256": "1fe46f49f4b60ad455b9e870e376a571adf203aebdf50b7d8616e376801c5626",
+    "source_file_count": 229,
+    "desktop_after": {
+      "path": "/root/aidoku-phase3/candidate16-root-01/desktop/aidoku",
+      "bytes": 265909992,
+      "sha256": "8aa3e37550e48fc195adf3c1511158b2dc8dd65099a7e250b32b198ca6bfd6b9"
+    },
+    "source_and_inputs_unchanged_owner_declared": true,
+    "scope": "Actual producer after-identity declarations only. Source and binary identity do not supply glyph, purity or operation acceptance."
+  },
+  "stable_module_index_binding": null,
+  "global_final_manifest": {
+    "owner_record_path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate16/final-design-pass-2-original-return-01/owner-release-01.json",
+    "owner_record_sha256": "2eba9c5c1daca36b188992a8a418b379b23d595634e95f2c7ed7cef98816b74a",
+    "main_raw_manifest_owner_declared": {
+      "path": "/root/aidoku-phase3/evidence/candidate16/final-design-pass-2/manifest.json",
+      "bytes": 4668347,
+      "sha256": "7592fa5751682cec2cd7b1b672cdedc545c20fe85df1a37a47c7ef480bcdfd09"
+    },
+    "supplement_raw_manifest_owner_declared": {
+      "path": "/root/aidoku-phase3/evidence/candidate16/f11-pass2-supported-pagination-01/manifest.json",
+      "bytes": 132603,
+      "sha256": "74345f9701feb3d7c640dffee4cd20c0c4160ee032750a461ff40060cbcc47a5"
+    },
+    "scope": "New actual main and supplement final manifest declarations from owner-release only; no historical input or manual acceptance credit."
+  },
+  "global_final_inventory": {
+    "owner_record_path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate16/final-design-pass-2-original-return-01/owner-release-01.json",
+    "owner_record_sha256": "2eba9c5c1daca36b188992a8a418b379b23d595634e95f2c7ed7cef98816b74a",
+    "ordinary_original_inventory_owner_declared": {
+      "path": "/root/aidoku-phase3/evidence/candidate16/final-design-pass-2-original-return-01/mirror-inventory.json",
+      "bytes": 459015,
+      "sha256": "fea3ce16eb57ca3f0c23e3efe1784b614d60c182ef5e8769d7fc6e86489c38aa"
+    },
+    "ordinary_original_return_owner_declared": {
+      "path": "/root/aidoku-phase3/evidence/candidate16/final-design-pass-2-original-return-01/local-return-verification.json",
+      "bytes": 811,
+      "sha256": "cb295e7711e0099bd1ed526746aa71fc7d6cae296bb4565e83f9fde4cdf47ccd"
+    }
+  },
+  "global_final_reconciliation": {
+    "owner_record_path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate16/final-design-pass-2-original-return-01/owner-release-01.json",
+    "owner_record_sha256": "2eba9c5c1daca36b188992a8a418b379b23d595634e95f2c7ed7cef98816b74a",
+    "native_count_owner_declared": 149,
+    "manual_required_count_owner_declared": 138,
+    "prerequisite_count_owner_declared": 11,
+    "reference_count_owner_declared": 101,
+    "module_count_owner_declared": 21,
+    "module_return_matched_members_owner_declared": 1089,
+    "glyph_status_owner_declared": "Unassessed by producer; only the coordinator actual fresh ledger supplies manual acceptance.",
+    "producer_manual_acceptance": false,
+    "producer_accepted": false,
+    "clean_credit": 0
+  },
+  "global_status": "New owner-release supplies actual sealed module, final collection and after-identity declarations. Shared preparation and stable index SHA remain null. Manual and global closure acceptance are pending.",
+  "case_ids": [
+    "sc-history--clear-confirm",
+    "sc-history--default",
+    "sc-history--incognito",
+    "sc-history--updates"
+  ],
+  "case_id_partition_specification": {
+    "path": "D:/Code/aidokuForKindle/docs/review/phase3-c16-final-design-pass1-batches/b0031.input.json",
+    "field": "case_ids",
+    "scope": "Only case_ids is the authorized historical grouping specification. All actual run, paths, hashes, roles, references, support and acceptance fields come from newly sealed pass2 members."
+  },
+  "case_identity_key_rule": "2|actual_run_id|actual_module_id|actual_case_id",
+  "manual_case_count": 4,
+  "cases": [
+    {
+      "case_id": "sc-history--clear-confirm",
+      "case_key": "2|c205f1b52500|sc-history|sc-history--clear-confirm",
+      "module_id": "sc-history",
+      "run_id": "c205f1b52500",
+      "round": 2,
+      "source_sha256_owner_declared": "1fe46f49f4b60ad455b9e870e376a571adf203aebdf50b7d8616e376801c5626",
+      "binary_sha256_owner_declared": "8aa3e37550e48fc195adf3c1511158b2dc8dd65099a7e250b32b198ca6bfd6b9",
+      "manual_review_required": true,
+      "prerequisite": false,
+      "native_capture_size": [
+        930,
+        1240
+      ],
+      "actual_route": "history",
+      "reader_panel_owner_declared": "",
+      "capability_declaration": {
+        "backend": "desktop",
+        "frontlight_control_exposed": true,
+        "hardware_dither_qualified": false,
+        "orientation_profile_declared": true,
+        "pairing_endpoint_running": false,
+        "pen_input_implemented": false,
+        "physical_hardware_qualified": false,
+        "profile": "scribe",
+        "scope": "selected design profile and implemented application controls",
+        "server_configuration_implemented": true,
+        "software_dither": true,
+        "tracking_authorization_implemented": false,
+        "warmth_control_exposed": true
+      },
+      "artifacts": {
+        "case_json": {
+          "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate16/final-design-pass-2-modules/sc-history/files/output/cases/sc-history--clear-confirm.json",
+          "sha256": "e8b63bbfe6d55044196bf2316071286f350125c58cfbb9857cd0a6725793c4c6",
+          "bytes": 27071,
+          "module_relative_path": "files/output/cases/sc-history--clear-confirm.json",
+          "original_path": "/root/aidoku-phase3/evidence/candidate16/final-design-pass-2/cases/sc-history--clear-confirm.json",
+          "owner_inventory_json_pointer": "/members/1"
+        },
+        "screenshot": {
+          "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate16/final-design-pass-2-modules/sc-history/files/output/sc-history--clear-confirm.png",
+          "sha256": "43975e01d9aa7a553093a45a914c02139a99755ab5ff631f893110874b180278",
+          "bytes": 167408,
+          "module_relative_path": "files/output/sc-history--clear-confirm.png",
+          "original_path": "/root/aidoku-phase3/evidence/candidate16/final-design-pass-2/sc-history--clear-confirm.png",
+          "owner_inventory_json_pointer": "/members/5"
+        },
+        "state": {
+          "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate16/final-design-pass-2-modules/sc-history/files/output/sc-history--clear-confirm.state.json",
+          "sha256": "77120f8dfe1b848cc94c89876e4f23934f8c60d16adbd47c0be929a9d723a175",
+          "bytes": 15446,
+          "module_relative_path": "files/output/sc-history--clear-confirm.state.json",
+          "original_path": "/root/aidoku-phase3/evidence/candidate16/final-design-pass-2/sc-history--clear-confirm.state.json",
+          "owner_inventory_json_pointer": "/members/6"
+        },
+        "metadata": {
+          "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate16/final-design-pass-2-modules/sc-history/files/output/sc-history--clear-confirm.metadata.json",
+          "sha256": "fb9083ade6c462241d5b0166505279ca0b4311a402c79e8a796d573141fb3a85",
+          "bytes": 680,
+          "module_relative_path": "files/output/sc-history--clear-confirm.metadata.json",
+          "original_path": "/root/aidoku-phase3/evidence/candidate16/final-design-pass-2/sc-history--clear-confirm.metadata.json",
+          "owner_inventory_json_pointer": "/members/7"
+        },
+        "actions": {
+          "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate16/final-design-pass-2-modules/sc-history/files/output/actions/sc-history--clear-confirm.json",
+          "sha256": "89149b9d93750240a9af5a0fdc765aade7bcbab1b1fc53346676b29fb70ca5ec",
+          "bytes": 95,
+          "module_relative_path": "files/output/actions/sc-history--clear-confirm.json",
+          "original_path": "/root/aidoku-phase3/evidence/candidate16/final-design-pass-2/actions/sc-history--clear-confirm.json",
+          "owner_inventory_json_pointer": "/members/8"
+        },
+        "log": {
+          "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate16/final-design-pass-2-modules/sc-history/files/output/sc-history--clear-confirm.log",
+          "sha256": "7e68a4176710a866675a6b95bcf7bed2d96c58a8fd7996a4d48f3679514483a9",
+          "bytes": 72,
+          "module_relative_path": "files/output/sc-history--clear-confirm.log",
+          "original_path": "/root/aidoku-phase3/evidence/candidate16/final-design-pass-2/sc-history--clear-confirm.log",
+          "owner_inventory_json_pointer": "/members/9"
+        }
+      },
+      "reference": {
+        "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate16/final-design-pass-2-modules/sc-history/files/references/aa4da538e1370a5fa5a9761ed81c70951e525cb63718d517866d475b7635157c-sc-history--clear-confirm.png",
+        "sha256": "aa4da538e1370a5fa5a9761ed81c70951e525cb63718d517866d475b7635157c",
+        "bytes": 105427,
+        "module_relative_path": "files/references/aa4da538e1370a5fa5a9761ed81c70951e525cb63718d517866d475b7635157c-sc-history--clear-confirm.png",
+        "original_path": "/root/aidoku-phase3/evidence/candidate16/final-design-preparation-01/references/screens/states/sc-history--clear-confirm.png",
+        "owner_inventory_json_pointer": "/members/10",
+        "kind": "exact-published-design-reference",
+        "binding_type": "exact",
+        "reference_role_owner_declared": null,
+        "applicability": "applicable-subject-to-evidence-based-capability-bounds",
+        "case_declared_sha256": "aa4da538e1370a5fa5a9761ed81c70951e525cb63718d517866d475b7635157c",
+        "case_reference_id_owner_declared": "sc-history--clear-confirm",
+        "applicability_rule": "Retain the actual case applicability and capability declaration, including null or unavailable controls. Do not add unobserved operation or hardware acceptance."
+      },
+      "reference_expected": "White outlined confirmation with equal cancel/clear actions and transparent outside capture.",
+      "intentional_differences": [],
+      "visible_ui_requirements": null,
+      "native_visible_regions": null,
+      "extra_required_originals": [],
+      "own_source_composition_reading_required": false,
+      "artwork_content_contract": null,
+      "pure_reader_oracle": null,
+      "pure_oracle": null,
+      "own_closed_source_chain_required": null,
+      "same_case_closed_prerequisite": null,
+      "same_case_dependencies": null,
+      "acceptance_scope_limit": "Bounded captured native UI within actual reference applicability and capability declarations. An open panel supports UI observations only.",
+      "closed_or_post_close_effect_acceptance": null,
+      "owner_json_pointers": {
+        "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate16/final-design-pass-2-modules/sc-history/files/output/cases/sc-history--clear-confirm.json",
+        "sha256": "e8b63bbfe6d55044196bf2316071286f350125c58cfbb9857cd0a6725793c4c6",
+        "state": "/state",
+        "metadata": "/metadata",
+        "actions": "/actions",
+        "checks": "/checks",
+        "command": "/command",
+        "capability_declaration": "/state/capability_declaration",
+        "reference_applicability": "/reference_applicability",
+        "pure_reader_oracle": "/pure_reader_oracle",
+        "pure_oracle": "/pure_oracle",
+        "own_closed_source_chain_required": "/own_closed_source_chain_required",
+        "same_case_closed_prerequisite": "/same_case_closed_prerequisite",
+        "same_case_dependencies": "/same_case_dependencies",
+        "closed_or_post_close_effect_acceptance": "/closed_or_post_close_effect_acceptance"
+      }
+    },
+    {
+      "case_id": "sc-history--default",
+      "case_key": "2|c205f1b52500|sc-history|sc-history--default",
+      "module_id": "sc-history",
+      "run_id": "c205f1b52500",
+      "round": 2,
+      "source_sha256_owner_declared": "1fe46f49f4b60ad455b9e870e376a571adf203aebdf50b7d8616e376801c5626",
+      "binary_sha256_owner_declared": "8aa3e37550e48fc195adf3c1511158b2dc8dd65099a7e250b32b198ca6bfd6b9",
+      "manual_review_required": true,
+      "prerequisite": false,
+      "native_capture_size": [
+        930,
+        1240
+      ],
+      "actual_route": "history",
+      "reader_panel_owner_declared": "",
+      "capability_declaration": {
+        "backend": "desktop",
+        "frontlight_control_exposed": true,
+        "hardware_dither_qualified": false,
+        "orientation_profile_declared": true,
+        "pairing_endpoint_running": false,
+        "pen_input_implemented": false,
+        "physical_hardware_qualified": false,
+        "profile": "scribe",
+        "scope": "selected design profile and implemented application controls",
+        "server_configuration_implemented": true,
+        "software_dither": true,
+        "tracking_authorization_implemented": false,
+        "warmth_control_exposed": true
+      },
+      "artifacts": {
+        "case_json": {
+          "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate16/final-design-pass-2-modules/sc-history/files/output/cases/sc-history--default.json",
+          "sha256": "d18a55841c9ae1fcc133ee018b39cb0d25eabf6bdb50e8f9b967d393aca9804f",
+          "bytes": 26213,
+          "module_relative_path": "files/output/cases/sc-history--default.json",
+          "original_path": "/root/aidoku-phase3/evidence/candidate16/final-design-pass-2/cases/sc-history--default.json",
+          "owner_inventory_json_pointer": "/members/2"
+        },
+        "screenshot": {
+          "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate16/final-design-pass-2-modules/sc-history/files/output/sc-history--default.png",
+          "sha256": "952df7516c791598b0578977d2339a3caa6977a7a6be8045f1c1d9f9f2818213",
+          "bytes": 172673,
+          "module_relative_path": "files/output/sc-history--default.png",
+          "original_path": "/root/aidoku-phase3/evidence/candidate16/final-design-pass-2/sc-history--default.png",
+          "owner_inventory_json_pointer": "/members/11"
+        },
+        "state": {
+          "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate16/final-design-pass-2-modules/sc-history/files/output/sc-history--default.state.json",
+          "sha256": "082ec99a30abdf457cee430b52d6474d08e6a106e6c0e8d7c140cc25f60751ca",
+          "bytes": 15101,
+          "module_relative_path": "files/output/sc-history--default.state.json",
+          "original_path": "/root/aidoku-phase3/evidence/candidate16/final-design-pass-2/sc-history--default.state.json",
+          "owner_inventory_json_pointer": "/members/12"
+        },
+        "metadata": {
+          "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate16/final-design-pass-2-modules/sc-history/files/output/sc-history--default.metadata.json",
+          "sha256": "6cc6ccfa5fddfef0a37f46f07235072586d6c510be17477a95d82476d2220f47",
+          "bytes": 680,
+          "module_relative_path": "files/output/sc-history--default.metadata.json",
+          "original_path": "/root/aidoku-phase3/evidence/candidate16/final-design-pass-2/sc-history--default.metadata.json",
+          "owner_inventory_json_pointer": "/members/13"
+        },
+        "actions": {
+          "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate16/final-design-pass-2-modules/sc-history/files/output/actions/sc-history--default.json",
+          "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+          "bytes": 3,
+          "module_relative_path": "files/output/actions/sc-history--default.json",
+          "original_path": "/root/aidoku-phase3/evidence/candidate16/final-design-pass-2/actions/sc-history--default.json",
+          "owner_inventory_json_pointer": "/members/14"
+        },
+        "log": {
+          "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate16/final-design-pass-2-modules/sc-history/files/output/sc-history--default.log",
+          "sha256": "7e68a4176710a866675a6b95bcf7bed2d96c58a8fd7996a4d48f3679514483a9",
+          "bytes": 72,
+          "module_relative_path": "files/output/sc-history--default.log",
+          "original_path": "/root/aidoku-phase3/evidence/candidate16/final-design-pass-2/sc-history--default.log",
+          "owner_inventory_json_pointer": "/members/15"
+        }
+      },
+      "reference": {
+        "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate16/final-design-pass-2-modules/sc-history/files/references/562741444dac41a890fb1abd6a26e200e2aecab996cbf42a4a39d454522ac494-sc-history.png",
+        "sha256": "562741444dac41a890fb1abd6a26e200e2aecab996cbf42a4a39d454522ac494",
+        "bytes": 106335,
+        "module_relative_path": "files/references/562741444dac41a890fb1abd6a26e200e2aecab996cbf42a4a39d454522ac494-sc-history.png",
+        "original_path": "/root/aidoku-phase3/evidence/candidate16/final-design-preparation-01/references/screens/sc-history.png",
+        "owner_inventory_json_pointer": "/members/16",
+        "kind": "exact-published-design-reference",
+        "binding_type": "exact",
+        "reference_role_owner_declared": null,
+        "applicability": "applicable",
+        "case_declared_sha256": "562741444dac41a890fb1abd6a26e200e2aecab996cbf42a4a39d454522ac494",
+        "case_reference_id_owner_declared": "sc-history--default",
+        "applicability_rule": "Retain the actual case applicability and capability declaration, including null or unavailable controls. Do not add unobserved operation or hardware acceptance."
+      },
+      "reference_expected": null,
+      "intentional_differences": [],
+      "visible_ui_requirements": null,
+      "native_visible_regions": null,
+      "extra_required_originals": [],
+      "own_source_composition_reading_required": false,
+      "artwork_content_contract": null,
+      "pure_reader_oracle": null,
+      "pure_oracle": null,
+      "own_closed_source_chain_required": null,
+      "same_case_closed_prerequisite": null,
+      "same_case_dependencies": null,
+      "acceptance_scope_limit": "Bounded captured native UI within actual reference applicability and capability declarations. An open panel supports UI observations only.",
+      "closed_or_post_close_effect_acceptance": null,
+      "owner_json_pointers": {
+        "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate16/final-design-pass-2-modules/sc-history/files/output/cases/sc-history--default.json",
+        "sha256": "d18a55841c9ae1fcc133ee018b39cb0d25eabf6bdb50e8f9b967d393aca9804f",
+        "state": "/state",
+        "metadata": "/metadata",
+        "actions": "/actions",
+        "checks": "/checks",
+        "command": "/command",
+        "capability_declaration": "/state/capability_declaration",
+        "reference_applicability": "/reference_applicability",
+        "pure_reader_oracle": "/pure_reader_oracle",
+        "pure_oracle": "/pure_oracle",
+        "own_closed_source_chain_required": "/own_closed_source_chain_required",
+        "same_case_closed_prerequisite": "/same_case_closed_prerequisite",
+        "same_case_dependencies": "/same_case_dependencies",
+        "closed_or_post_close_effect_acceptance": "/closed_or_post_close_effect_acceptance"
+      }
+    },
+    {
+      "case_id": "sc-history--incognito",
+      "case_key": "2|c205f1b52500|sc-history|sc-history--incognito",
+      "module_id": "sc-history",
+      "run_id": "c205f1b52500",
+      "round": 2,
+      "source_sha256_owner_declared": "1fe46f49f4b60ad455b9e870e376a571adf203aebdf50b7d8616e376801c5626",
+      "binary_sha256_owner_declared": "8aa3e37550e48fc195adf3c1511158b2dc8dd65099a7e250b32b198ca6bfd6b9",
+      "manual_review_required": true,
+      "prerequisite": false,
+      "native_capture_size": [
+        930,
+        1240
+      ],
+      "actual_route": "history",
+      "reader_panel_owner_declared": "",
+      "capability_declaration": {
+        "backend": "desktop",
+        "frontlight_control_exposed": true,
+        "hardware_dither_qualified": false,
+        "orientation_profile_declared": true,
+        "pairing_endpoint_running": false,
+        "pen_input_implemented": false,
+        "physical_hardware_qualified": false,
+        "profile": "scribe",
+        "scope": "selected design profile and implemented application controls",
+        "server_configuration_implemented": true,
+        "software_dither": true,
+        "tracking_authorization_implemented": false,
+        "warmth_control_exposed": true
+      },
+      "artifacts": {
+        "case_json": {
+          "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate16/final-design-pass-2-modules/sc-history/files/output/cases/sc-history--incognito.json",
+          "sha256": "ee67277ed30b07dc3474ba722a7449ac8e9a42b020f7f17adfd339fa4a90f2c8",
+          "bytes": 26511,
+          "module_relative_path": "files/output/cases/sc-history--incognito.json",
+          "original_path": "/root/aidoku-phase3/evidence/candidate16/final-design-pass-2/cases/sc-history--incognito.json",
+          "owner_inventory_json_pointer": "/members/3"
+        },
+        "screenshot": {
+          "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate16/final-design-pass-2-modules/sc-history/files/output/sc-history--incognito.png",
+          "sha256": "314975d2e35c24758102e0ed40ce11b13b4d215e2b4dd4ef86ab2fd9df0a0f8d",
+          "bytes": 177050,
+          "module_relative_path": "files/output/sc-history--incognito.png",
+          "original_path": "/root/aidoku-phase3/evidence/candidate16/final-design-pass-2/sc-history--incognito.png",
+          "owner_inventory_json_pointer": "/members/17"
+        },
+        "state": {
+          "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate16/final-design-pass-2-modules/sc-history/files/output/sc-history--incognito.state.json",
+          "sha256": "a98c1e05dc6eccd73ebe546c3d670f6d4206ec0b91d54ae0648d09d1854fb3b6",
+          "bytes": 15101,
+          "module_relative_path": "files/output/sc-history--incognito.state.json",
+          "original_path": "/root/aidoku-phase3/evidence/candidate16/final-design-pass-2/sc-history--incognito.state.json",
+          "owner_inventory_json_pointer": "/members/18"
+        },
+        "metadata": {
+          "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate16/final-design-pass-2-modules/sc-history/files/output/sc-history--incognito.metadata.json",
+          "sha256": "14e66d254c254253d6598dadf1a8e87d1a309aa21c0c27f10c24ff1fa2c3af6e",
+          "bytes": 680,
+          "module_relative_path": "files/output/sc-history--incognito.metadata.json",
+          "original_path": "/root/aidoku-phase3/evidence/candidate16/final-design-pass-2/sc-history--incognito.metadata.json",
+          "owner_inventory_json_pointer": "/members/19"
+        },
+        "actions": {
+          "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate16/final-design-pass-2-modules/sc-history/files/output/actions/sc-history--incognito.json",
+          "sha256": "e4d149f7ab5d6e186462bd819731eeec86fdc1166c50480989bb980ac46a1bec",
+          "bytes": 99,
+          "module_relative_path": "files/output/actions/sc-history--incognito.json",
+          "original_path": "/root/aidoku-phase3/evidence/candidate16/final-design-pass-2/actions/sc-history--incognito.json",
+          "owner_inventory_json_pointer": "/members/20"
+        },
+        "log": {
+          "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate16/final-design-pass-2-modules/sc-history/files/output/sc-history--incognito.log",
+          "sha256": "7e68a4176710a866675a6b95bcf7bed2d96c58a8fd7996a4d48f3679514483a9",
+          "bytes": 72,
+          "module_relative_path": "files/output/sc-history--incognito.log",
+          "original_path": "/root/aidoku-phase3/evidence/candidate16/final-design-pass-2/sc-history--incognito.log",
+          "owner_inventory_json_pointer": "/members/21"
+        }
+      },
+      "reference": {
+        "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate16/final-design-pass-2-modules/sc-history/files/references/204bd725431fba2485dc74848e7b19da924466a715bb798c414185a2d96850b7-sc-history--incognito.png",
+        "sha256": "204bd725431fba2485dc74848e7b19da924466a715bb798c414185a2d96850b7",
+        "bytes": 109023,
+        "module_relative_path": "files/references/204bd725431fba2485dc74848e7b19da924466a715bb798c414185a2d96850b7-sc-history--incognito.png",
+        "original_path": "/root/aidoku-phase3/evidence/candidate16/final-design-preparation-01/references/screens/states/sc-history--incognito.png",
+        "owner_inventory_json_pointer": "/members/22",
+        "kind": "exact-published-design-reference",
+        "binding_type": "exact",
+        "reference_role_owner_declared": null,
+        "applicability": "applicable-subject-to-evidence-based-capability-bounds",
+        "case_declared_sha256": "204bd725431fba2485dc74848e7b19da924466a715bb798c414185a2d96850b7",
+        "case_reference_id_owner_declared": "sc-history--incognito",
+        "applicability_rule": "Retain the actual case applicability and capability declaration, including null or unavailable controls. Do not add unobserved operation or hardware acceptance."
+      },
+      "reference_expected": "Pressed incognito control and inverted application status bar; actual history policy.",
+      "intentional_differences": [],
+      "visible_ui_requirements": null,
+      "native_visible_regions": null,
+      "extra_required_originals": [],
+      "own_source_composition_reading_required": false,
+      "artwork_content_contract": null,
+      "pure_reader_oracle": null,
+      "pure_oracle": null,
+      "own_closed_source_chain_required": null,
+      "same_case_closed_prerequisite": null,
+      "same_case_dependencies": null,
+      "acceptance_scope_limit": "Bounded captured native UI within actual reference applicability and capability declarations. An open panel supports UI observations only.",
+      "closed_or_post_close_effect_acceptance": null,
+      "owner_json_pointers": {
+        "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate16/final-design-pass-2-modules/sc-history/files/output/cases/sc-history--incognito.json",
+        "sha256": "ee67277ed30b07dc3474ba722a7449ac8e9a42b020f7f17adfd339fa4a90f2c8",
+        "state": "/state",
+        "metadata": "/metadata",
+        "actions": "/actions",
+        "checks": "/checks",
+        "command": "/command",
+        "capability_declaration": "/state/capability_declaration",
+        "reference_applicability": "/reference_applicability",
+        "pure_reader_oracle": "/pure_reader_oracle",
+        "pure_oracle": "/pure_oracle",
+        "own_closed_source_chain_required": "/own_closed_source_chain_required",
+        "same_case_closed_prerequisite": "/same_case_closed_prerequisite",
+        "same_case_dependencies": "/same_case_dependencies",
+        "closed_or_post_close_effect_acceptance": "/closed_or_post_close_effect_acceptance"
+      }
+    },
+    {
+      "case_id": "sc-history--updates",
+      "case_key": "2|c205f1b52500|sc-history|sc-history--updates",
+      "module_id": "sc-history",
+      "run_id": "c205f1b52500",
+      "round": 2,
+      "source_sha256_owner_declared": "1fe46f49f4b60ad455b9e870e376a571adf203aebdf50b7d8616e376801c5626",
+      "binary_sha256_owner_declared": "8aa3e37550e48fc195adf3c1511158b2dc8dd65099a7e250b32b198ca6bfd6b9",
+      "manual_review_required": true,
+      "prerequisite": false,
+      "native_capture_size": [
+        930,
+        1240
+      ],
+      "actual_route": "history",
+      "reader_panel_owner_declared": "",
+      "capability_declaration": {
+        "backend": "desktop",
+        "frontlight_control_exposed": true,
+        "hardware_dither_qualified": false,
+        "orientation_profile_declared": true,
+        "pairing_endpoint_running": false,
+        "pen_input_implemented": false,
+        "physical_hardware_qualified": false,
+        "profile": "scribe",
+        "scope": "selected design profile and implemented application controls",
+        "server_configuration_implemented": true,
+        "software_dither": true,
+        "tracking_authorization_implemented": false,
+        "warmth_control_exposed": true
+      },
+      "artifacts": {
+        "case_json": {
+          "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate16/final-design-pass-2-modules/sc-history/files/output/cases/sc-history--updates.json",
+          "sha256": "c369c060fd133a82aa2d4851f7e5795315f819813e1c46f6b26e69877bf3c1c1",
+          "bytes": 26505,
+          "module_relative_path": "files/output/cases/sc-history--updates.json",
+          "original_path": "/root/aidoku-phase3/evidence/candidate16/final-design-pass-2/cases/sc-history--updates.json",
+          "owner_inventory_json_pointer": "/members/4"
+        },
+        "screenshot": {
+          "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate16/final-design-pass-2-modules/sc-history/files/output/sc-history--updates.png",
+          "sha256": "5df06ce47f713238ebae96fdf1c194f69a7815edddedb60b59f8a224c7674403",
+          "bytes": 154957,
+          "module_relative_path": "files/output/sc-history--updates.png",
+          "original_path": "/root/aidoku-phase3/evidence/candidate16/final-design-pass-2/sc-history--updates.png",
+          "owner_inventory_json_pointer": "/members/23"
+        },
+        "state": {
+          "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate16/final-design-pass-2-modules/sc-history/files/output/sc-history--updates.state.json",
+          "sha256": "6620881075e5238403e43da3498cc9bbcc5c97038c79aff4dbc899299965a26e",
+          "bytes": 15062,
+          "module_relative_path": "files/output/sc-history--updates.state.json",
+          "original_path": "/root/aidoku-phase3/evidence/candidate16/final-design-pass-2/sc-history--updates.state.json",
+          "owner_inventory_json_pointer": "/members/24"
+        },
+        "metadata": {
+          "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate16/final-design-pass-2-modules/sc-history/files/output/sc-history--updates.metadata.json",
+          "sha256": "613a7b8f6a668e24e36fe34c4b8bf592be53988106878e9f378b9955f8367f3d",
+          "bytes": 680,
+          "module_relative_path": "files/output/sc-history--updates.metadata.json",
+          "original_path": "/root/aidoku-phase3/evidence/candidate16/final-design-pass-2/sc-history--updates.metadata.json",
+          "owner_inventory_json_pointer": "/members/25"
+        },
+        "actions": {
+          "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate16/final-design-pass-2-modules/sc-history/files/output/actions/sc-history--updates.json",
+          "sha256": "9f48610a00f2a2e200313c4633ad9754b6f9fc05d4109afcff1f7944313648e9",
+          "bytes": 97,
+          "module_relative_path": "files/output/actions/sc-history--updates.json",
+          "original_path": "/root/aidoku-phase3/evidence/candidate16/final-design-pass-2/actions/sc-history--updates.json",
+          "owner_inventory_json_pointer": "/members/26"
+        },
+        "log": {
+          "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate16/final-design-pass-2-modules/sc-history/files/output/sc-history--updates.log",
+          "sha256": "7e68a4176710a866675a6b95bcf7bed2d96c58a8fd7996a4d48f3679514483a9",
+          "bytes": 72,
+          "module_relative_path": "files/output/sc-history--updates.log",
+          "original_path": "/root/aidoku-phase3/evidence/candidate16/final-design-pass-2/sc-history--updates.log",
+          "owner_inventory_json_pointer": "/members/27"
+        }
+      },
+      "reference": {
+        "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate16/final-design-pass-2-modules/sc-history/files/references/7bace0d570987347affaadd52cfda31a1e82cff96a19a856f0e98a0cdff32653-sc-history--updates.png",
+        "sha256": "7bace0d570987347affaadd52cfda31a1e82cff96a19a856f0e98a0cdff32653",
+        "bytes": 88115,
+        "module_relative_path": "files/references/7bace0d570987347affaadd52cfda31a1e82cff96a19a856f0e98a0cdff32653-sc-history--updates.png",
+        "original_path": "/root/aidoku-phase3/evidence/candidate16/final-design-preparation-01/references/screens/states/sc-history--updates.png",
+        "owner_inventory_json_pointer": "/members/28",
+        "kind": "exact-published-design-reference",
+        "binding_type": "exact",
+        "reference_role_owner_declared": null,
+        "applicability": "applicable-subject-to-evidence-based-capability-bounds",
+        "case_declared_sha256": "7bace0d570987347affaadd52cfda31a1e82cff96a19a856f0e98a0cdff32653",
+        "case_reference_id_owner_declared": "sc-history--updates",
+        "applicability_rule": "Retain the actual case applicability and capability declaration, including null or unavailable controls. Do not add unobserved operation or hardware acceptance."
+      },
+      "reference_expected": "Grouped real chapter updates, queued/download state, heading change, bulk download and folio.",
+      "intentional_differences": [],
+      "visible_ui_requirements": null,
+      "native_visible_regions": null,
+      "extra_required_originals": [],
+      "own_source_composition_reading_required": false,
+      "artwork_content_contract": null,
+      "pure_reader_oracle": null,
+      "pure_oracle": null,
+      "own_closed_source_chain_required": null,
+      "same_case_closed_prerequisite": null,
+      "same_case_dependencies": null,
+      "acceptance_scope_limit": "Bounded captured native UI within actual reference applicability and capability declarations. An open panel supports UI observations only.",
+      "closed_or_post_close_effect_acceptance": null,
+      "owner_json_pointers": {
+        "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate16/final-design-pass-2-modules/sc-history/files/output/cases/sc-history--updates.json",
+        "sha256": "c369c060fd133a82aa2d4851f7e5795315f819813e1c46f6b26e69877bf3c1c1",
+        "state": "/state",
+        "metadata": "/metadata",
+        "actions": "/actions",
+        "checks": "/checks",
+        "command": "/command",
+        "capability_declaration": "/state/capability_declaration",
+        "reference_applicability": "/reference_applicability",
+        "pure_reader_oracle": "/pure_reader_oracle",
+        "pure_oracle": "/pure_oracle",
+        "own_closed_source_chain_required": "/own_closed_source_chain_required",
+        "same_case_closed_prerequisite": "/same_case_closed_prerequisite",
+        "same_case_dependencies": "/same_case_dependencies",
+        "closed_or_post_close_effect_acceptance": "/closed_or_post_close_effect_acceptance"
+      }
+    }
+  ],
+  "image_open_plan": [
+    {
+      "case_id": "sc-history--clear-confirm",
+      "role": "actual-current-native-original",
+      "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate16/final-design-pass-2-modules/sc-history/files/output/sc-history--clear-confirm.png",
+      "sha256": "43975e01d9aa7a553093a45a914c02139a99755ab5ff631f893110874b180278",
+      "mandatory": true,
+      "covered_case_ids": [
+        "sc-history--clear-confirm"
+      ]
+    },
+    {
+      "case_id": "sc-history--clear-confirm",
+      "role": "exact-published-design-reference",
+      "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate16/final-design-pass-2-modules/sc-history/files/references/aa4da538e1370a5fa5a9761ed81c70951e525cb63718d517866d475b7635157c-sc-history--clear-confirm.png",
+      "sha256": "aa4da538e1370a5fa5a9761ed81c70951e525cb63718d517866d475b7635157c",
+      "mandatory": true,
+      "covered_case_ids": [
+        "sc-history--clear-confirm"
+      ]
+    },
+    {
+      "case_id": "sc-history--default",
+      "role": "actual-current-native-original",
+      "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate16/final-design-pass-2-modules/sc-history/files/output/sc-history--default.png",
+      "sha256": "952df7516c791598b0578977d2339a3caa6977a7a6be8045f1c1d9f9f2818213",
+      "mandatory": true,
+      "covered_case_ids": [
+        "sc-history--default"
+      ]
+    },
+    {
+      "case_id": "sc-history--default",
+      "role": "exact-published-design-reference",
+      "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate16/final-design-pass-2-modules/sc-history/files/references/562741444dac41a890fb1abd6a26e200e2aecab996cbf42a4a39d454522ac494-sc-history.png",
+      "sha256": "562741444dac41a890fb1abd6a26e200e2aecab996cbf42a4a39d454522ac494",
+      "mandatory": true,
+      "covered_case_ids": [
+        "sc-history--default"
+      ]
+    },
+    {
+      "case_id": "sc-history--incognito",
+      "role": "actual-current-native-original",
+      "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate16/final-design-pass-2-modules/sc-history/files/output/sc-history--incognito.png",
+      "sha256": "314975d2e35c24758102e0ed40ce11b13b4d215e2b4dd4ef86ab2fd9df0a0f8d",
+      "mandatory": true,
+      "covered_case_ids": [
+        "sc-history--incognito"
+      ]
+    },
+    {
+      "case_id": "sc-history--incognito",
+      "role": "exact-published-design-reference",
+      "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate16/final-design-pass-2-modules/sc-history/files/references/204bd725431fba2485dc74848e7b19da924466a715bb798c414185a2d96850b7-sc-history--incognito.png",
+      "sha256": "204bd725431fba2485dc74848e7b19da924466a715bb798c414185a2d96850b7",
+      "mandatory": true,
+      "covered_case_ids": [
+        "sc-history--incognito"
+      ]
+    },
+    {
+      "case_id": "sc-history--updates",
+      "role": "actual-current-native-original",
+      "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate16/final-design-pass-2-modules/sc-history/files/output/sc-history--updates.png",
+      "sha256": "5df06ce47f713238ebae96fdf1c194f69a7815edddedb60b59f8a224c7674403",
+      "mandatory": true,
+      "covered_case_ids": [
+        "sc-history--updates"
+      ]
+    },
+    {
+      "case_id": "sc-history--updates",
+      "role": "exact-published-design-reference",
+      "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate16/final-design-pass-2-modules/sc-history/files/references/7bace0d570987347affaadd52cfda31a1e82cff96a19a856f0e98a0cdff32653-sc-history--updates.png",
+      "sha256": "7bace0d570987347affaadd52cfda31a1e82cff96a19a856f0e98a0cdff32653",
+      "mandatory": true,
+      "covered_case_ids": [
+        "sc-history--updates"
+      ]
+    }
+  ],
+  "source_composition_comparison_pairs": [],
+  "reference_pair_count": 4,
+  "source_oracle_pair_count": 0,
+  "comparison_pair_count": 4,
+  "planned_minimum_image_opens": 8,
+  "own_processed_original_open_count": 0,
+  "own_expected_original_open_count": 0,
+  "diagnostic_difference_image_opens": 0,
+  "image_open_count_policy": "Open every mandatory actual unique path independently. A legitimately shared exact path has one actual opening with covered-case bindings; equal SHA across different paths gives no reuse credit.",
+  "maximum_manual_cases": 4,
+  "maximum_reference_pairs": 4,
+  "maximum_comparison_pairs": 4,
+  "maximum_image_opens": 8,
+  "fork_turns": "none",
+  "model_selection": "Intentional inheritance because current tool metadata does not distinguish model capabilities.",
+  "worker_contract": "D:/Code/aidokuForKindle/docs/review/phase3-full-fresh-worker-contract.md",
+  "skill_path": "C:/Users/moooyo/.codex/skills/ui-ux-pro-max/SKILL.md",
+  "requirements": [
+    "Actually open every mandatory current, reference and own processed/expected unique path in image_open_plan. Retain explicit covered-case bindings for lawful same-path sharing; matching SHA alone supplies no opening credit.",
+    "Count own source-oracle composition pairs together with design-reference pairs within four total pairs and eight required opens. Own expected is a source composition, never a design reference. Do not open diagnostic difference images.",
+    "Read required actual glyph hierarchy, clipping, icons, visible feedback, pure reader content and supported normal use from the new originals. Required issues block closure; extra non-required optimizations remain deferred.",
+    "Preserve actual raw reference applicability and capability declarations, including null, empty and unavailable controls. A captured desktop control does not prove hardware operation.",
+    "An open panel supports captured UI only. Preserve raw closed/source acceptance fields and do not infer closing operations, post-close effects or unobserved functional proof.",
+    "Old pass1 images or observations, Source parameters and automatic PASS cannot replace new glyph, purity or closing-operation observations.",
+    "Required unread text or uncertain extent needs a precise own-source ROI request and reading_pending. Do not generate or process the ROI in this worker.",
+    "Typeface and numeric weights such as 500 or 700 remain unmeasured limitations unless actual new evidence exists. Static parameters do not replace visible glyph and extent observations.",
+    "The assigned worker may read static local text and use tools.view_image for the required originals only. No SSH, hashing, tests, builds, validation, probes, App/capture, Python/PIL, cropping, resizing, image processing, extra images, child agents, Source edits, old report edits or registry edits.",
+    "Write a new compact English report at report_path and use Chinese team messages. Record actual actor, parent, proxy and slot; path-role-SHA openings; reference/source/total pair counts; bounded findings; new_required, reading_pending, identity and deferred.",
+    "A reference-only case under an actual user override is required reading as related context. Preserve the override and do not restore its overridden app footer, cycle target or ribbon.",
+    "Each case with an actual source oracle requires its own complete retained processed and expected original chain. Mechanical oracle metrics do not substitute for new manual purity observations.",
+    "No hidden, hardware, unobserved operation, lease, performance, full-stress, package or global clean credit."
+  ],
+  "required_member_pending": [],
+  "report_path": "D:/Code/aidokuForKindle/docs/review/phase3-c16-final-design-pass2-batches/b0031.review.json",
+  "credit": {
+    "full_stress": 0,
+    "clean": 0,
+    "package": 0,
+    "pass1": 0,
+    "pass2": 0
+  },
+  "static_draft_helper_image_opens": 0,
+  "declared_hash_basis": "Actual independent pass2 snapshot.members plus the actual owner-release module SHA and after-identity declarations. The owner-release SHA is supplied by the sole coordinator; no local or Source hashing."
+}

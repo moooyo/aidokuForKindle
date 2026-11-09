@@ -1,0 +1,183 @@
+{
+  "batch_id": "supplemental-22",
+  "reviewer": "/root/phase3_round1_review/supplemental_22",
+  "run_id": "a1baf3fe3dc2",
+  "round": 1,
+  "binary_sha256": "94d7f3bbcab475ad8833a2f3c486138f7b49bead231851c2d8eab2f0c3d2ac51",
+  "source_sha256": "aef9db4e111165016a10a2a95e111f3155860b8510c7f6207ec9c79fbec5082c",
+  "scope": "Independent visual review of only the eight candidate PNGs listed in supplemental-22.input.json. Every candidate was individually opened with tools.view_image. No independent reference PNGs were supplied or opened. This is a batch review, not a clean verdict for the entire round.",
+  "text_contracts_consulted": [
+    "D:/Code/aidokuForKindle/docs/review/phase3-reference-scope.json",
+    "D:/Code/aidokuForKindle/docs/review/phase3-prototype-reference-support.json",
+    "D:/Code/aidokuForKindle/docs/DESIGN_HANDOFF.md",
+    "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/HANDOFF.md:129",
+    "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/prototype/sc-browse.dc.html:120",
+    "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/prototype/sc-browse.dc.html:296"
+  ],
+  "identity_evidence": {
+    "method": "Read-only Get-FileHash SHA256 on each current candidate PNG, compared with both the input expected_png_sha256 and the case sidecar evidence_hashes.screenshot.sha256. Read the sidecar state, checks, intentional_differences, run, binary, source and capture fields.",
+    "all_eight_current_png_hashes_match_input_and_case_evidence": true,
+    "all_eight_sidecars_match_requested_run_binary_source_and_round": true,
+    "all_eight_are_scribe_portrait_930_by_1240_native_captures": true,
+    "all_recorded_mechanical_checks_passed": true,
+    "mechanical_check_interpretation": "Recorded checks corroborate capture identity and declared state; they are not substituted for the individual visual review or treated as fresh functional verification."
+  },
+  "reviewed_case_ids": [
+    "scribe--anchored-menu-outside-dismiss",
+    "scribe--catalog-filter-apply",
+    "scribe--catalog-filter-reset",
+    "scribe--catalog-first-boundary",
+    "scribe--catalog-last-page",
+    "scribe--catalog-tag-1",
+    "scribe--catalog-tag-2",
+    "scribe--catalog-tag-3"
+  ],
+  "reviewed_cases": [
+    {
+      "case_id": "scribe--anchored-menu-outside-dismiss",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/scribe--anchored-menu-outside-dismiss.png",
+      "candidate_sha256": "a272a0763ace9d782671578c0598fa3f4bc96e8a242957ff480ef7f517cad464",
+      "viewed_candidate": true,
+      "outcome": "no_actionable_visual_issue",
+      "observations": [
+        "The captured library has no remaining anchored menu, outline, dimming or shadow. Header actions and the underlying content are fully visible, matching the sidecar route library, menu null and empty modal.",
+        "The two outlined continuation/update cards fit their content. The continuation card shows readable chapter information and 12/40 progress; the update card retains its three legible rows.",
+        "All 18 library covers occupy the Scribe six-column, three-row grid. Unread badges and download indicators are beside the titles below the cover artwork; stipple is confined to the intentional demo cover designs.",
+        "The first-page folio reads 1/3, the previous action is absent and the next action remains visible above the library-selected dock. Sidecar checks record the same 1/3 range. The endpoint image supports a closed result, not independent proof of the outside-tap event."
+      ],
+      "intentional_differences": []
+    },
+    {
+      "case_id": "scribe--catalog-filter-apply",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/scribe--catalog-filter-apply.png",
+      "candidate_sha256": "0c55ccc8e3dc83e2693c2254f620d7439ba6100828b0c533905771b48d40d689",
+      "viewed_candidate": true,
+      "outcome": "no_actionable_visual_issue",
+      "observations": [
+        "The filter panel is closed and the filter trigger is black with a white funnel, providing a visible active-filter state. The MangaDex source title, Popular tab and browse-selected dock remain readable.",
+        "The catalog shows five columns and three rows, with cover frames, title rows and publication/chapter metadata separated clearly. The displayed records all show the ongoing publication state.",
+        "The sidecar records Latest ordering plus Ongoing status, two active filters, 97 results and 15 visible records. The displayed 1/7 folio is consistent with that result count and capacity, with previous absent and next available.",
+        "Several unavailable covers use centered title plates, and one long title is ellipsized below its cover while remaining readable in the title plate. These data-dependent covers and title lengths do not obscure controls or the pager. PNG evidence alone does not establish SQL query correctness."
+      ],
+      "intentional_differences": []
+    },
+    {
+      "case_id": "scribe--catalog-filter-reset",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/scribe--catalog-filter-reset.png",
+      "candidate_sha256": "4a909d819c448132f8d8f7dbd089705f8128ea65c67a78997cfb3a49da38e4aa",
+      "viewed_candidate": true,
+      "outcome": "no_actionable_visual_issue",
+      "observations": [
+        "The filter float is bounded near its header trigger at the specified Scribe top/right location. It has a white surface, a dark outline, no shadow and an undimmed background. Its bottom follows the action row without excessive unused panel space.",
+        "Relevance is selected in black; Latest is available. Follows and Rating are visibly muted, matching their disabled declarations. All four publication choices and all nine source-provided tags are neutral.",
+        "Reset and the full-width results action are visible and unclipped. The action shows 128 loaded records and the background folio reads 1/9, matching zero active filters and 128 results in the sidecar.",
+        "The source provides nine real tag choices rather than the prototype's twelve fixture choices. All nine fit in two rows, and the footer/dock stay reachable outside the floating panel. The recorded reset-specific check confirms the zero-active-filter endpoint."
+      ],
+      "intentional_differences": []
+    },
+    {
+      "case_id": "scribe--catalog-first-boundary",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/scribe--catalog-first-boundary.png",
+      "candidate_sha256": "9b0baedfdac5540acd8c3709f2a61624c52a1b347067de67b5436f92dfcd6e2b",
+      "viewed_candidate": true,
+      "outcome": "no_actionable_visual_issue",
+      "observations": [
+        "The catalog displays 15 records in its five-column, three-row layout with intact title and metadata rows. Library-membership bookmarks sit beside titles rather than covering the artwork.",
+        "The folio reads 1/9. No previous label or chevron appears in the reserved left edge, while Next remains visible at the right. The centered folio and browse-selected dock retain their positions.",
+        "The filter trigger is white and outlined, matching the unfiltered sidecar state. The case records page 1, page_count 9, 128 results and 15 visible catalog records, and its explicit first-page check passes."
+      ],
+      "intentional_differences": []
+    },
+    {
+      "case_id": "scribe--catalog-last-page",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/scribe--catalog-last-page.png",
+      "candidate_sha256": "8a877a7a77d3eff1e2fd33a0bb8142bdee9b4fae19978ed47454c9d4c1501d54",
+      "viewed_candidate": true,
+      "outcome": "no_actionable_visual_issue",
+      "observations": [
+        "Eight remaining records fill the first row and three cells of the second row in the same five-column catalog geometry. Empty remaining slots stay blank; no duplicate or stretched filler row appears.",
+        "The folio reads 9/9 with Previous visible and the next label/chevron absent. The footer remains above the dock despite the short final page, with no clipping of the last record row.",
+        "The sidecar records page 9 of 9 and eight visible records from 128 results, consistent with fifteen-record page capacity. Its final-folio boundary check records the same endpoint. Title-plate covers are accepted data-dependent placeholders."
+      ],
+      "intentional_differences": []
+    },
+    {
+      "case_id": "scribe--catalog-tag-1",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/scribe--catalog-tag-1.png",
+      "candidate_sha256": "fabd76b367a0aef93d0000b544dc394b35140b605856393ef207b443d21bed8f",
+      "viewed_candidate": true,
+      "outcome": "visual_fidelity_issue",
+      "observations": [
+        "The Adventure tag is visibly included through a black chip with white text, while the other eight chips remain neutral. Its prefix is a plus sign rather than the required checkmark; see P3R1-SUP22-1.",
+        "The panel remains white and outlined at the expected header-adjacent location, with all controls and the full-width results action visible. The background is undimmed and no panel shadow is present.",
+        "The results action shows 61 loaded records and the background folio reads 1/5. The sidecar corroborates Adventure state 1, one active filter, 61 results and the exact three-state-cycle checkpoint. Relevance remains selected, and unsupported Follows/Rating remain muted."
+      ],
+      "intentional_differences": []
+    },
+    {
+      "case_id": "scribe--catalog-tag-2",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/scribe--catalog-tag-2.png",
+      "candidate_sha256": "0efbc4e5408360e861a39eef3ca56f1e76e4c1d967d4d5f449653e37f8da1ab9",
+      "viewed_candidate": true,
+      "outcome": "visual_fidelity_issue",
+      "observations": [
+        "The Adventure tag is visibly excluded through a dashed outline and struck gray label, distinct from both the black include chip and neutral white chips. Its prefix is a minus sign rather than the required cross; see P3R1-SUP22-2.",
+        "The results action shows 67 loaded records with a 1/5 folio behind the panel. The sidecar corroborates Adventure state -1, one active filter and 67 results. The 61 include and 67 exclude counts total the 128 neutral results, which supports the displayed state distinction without proving the underlying SQL implementation.",
+        "Reset, ordering, publication choices, the remaining tags and the action row are fully visible inside the bounded content-sized float. There is no dimmed backdrop or shadow, and the dock stays visible."
+      ],
+      "intentional_differences": []
+    },
+    {
+      "case_id": "scribe--catalog-tag-3",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/scribe--catalog-tag-3.png",
+      "candidate_sha256": "4a909d819c448132f8d8f7dbd089705f8128ea65c67a78997cfb3a49da38e4aa",
+      "viewed_candidate": true,
+      "outcome": "no_actionable_visual_issue",
+      "observations": [
+        "After the third tag checkpoint, Adventure returns to the same neutral white, plain-label chip as the other eight tags. There is no remaining plus/minus prefix, strike or black include fill.",
+        "The results action returns to 128 loaded records and the folio returns to 1/9. The sidecar records Adventure state 0, zero active filters, 128 results and the exact cycle checkpoint, consistent with the visibly cleared state.",
+        "The panel is content-sized, fully within the portrait viewport and visually identical to the reset endpoint. This candidate and the reset candidate have identical verified PNG hashes but were each individually opened for this review. Their different action histories cannot be inferred solely from those identical endpoint pixels."
+      ],
+      "intentional_differences": []
+    }
+  ],
+  "suggestions": [
+    {
+      "id": "P3R1-SUP22-1",
+      "case_id": "scribe--catalog-tag-1",
+      "priority": "P3",
+      "description": "The catalog include tag uses a plus prefix instead of the required checkmark.",
+      "evidence": [
+        "In the individually viewed candidate, the first tag chip at approximately x310-397, y597-643 is black with a white plus prefix before Adventure. Its PNG hash is fabd76b367a0aef93d0000b544dc394b35140b605856393ef207b443d21bed8f.",
+        "The sidecar declares Adventure state 1 and 61 filtered results. HANDOFF.md line 129 specifies a checkmark for include, and prototype/sc-browse.dc.html line 296 assigns the same checkmark. The black selected state is clear, so this is a glyph-fidelity issue rather than observed functional obstruction."
+      ],
+      "recommendation": "Use the required checkmark prefix for included catalog tags while preserving the black selected surface and real filter state/count behavior.",
+      "status": "open",
+      "introduced_round": 1
+    },
+    {
+      "id": "P3R1-SUP22-2",
+      "case_id": "scribe--catalog-tag-2",
+      "priority": "P3",
+      "description": "The catalog exclude tag uses a minus prefix instead of the required cross.",
+      "evidence": [
+        "In the individually viewed candidate, the first tag chip at approximately x310-397, y597-643 has a dashed outline and a struck gray label with a minus prefix, with no cross glyph. Its PNG hash is 0efbc4e5408360e861a39eef3ca56f1e76e4c1d967d4d5f449653e37f8da1ab9.",
+        "The sidecar declares Adventure state -1 and 67 filtered results. HANDOFF.md line 129 specifies a cross for exclude, and prototype/sc-browse.dc.html line 296 assigns that cross. The dashed/struck state remains distinguishable, so this is a glyph-fidelity issue rather than observed functional obstruction."
+      ],
+      "recommendation": "Use the required cross prefix for excluded catalog tags while retaining clear separation from include and neutral states and preserving the real filter results.",
+      "status": "open",
+      "introduced_round": 1
+    }
+  ],
+  "coverage_gaps": [
+    "No independent reference PNG was supplied for these supplemental cases; exact pixel comparison was unavailable. The visual findings use the supplied candidates and the textual handoff/prototype contract.",
+    "The batch supplies captured endpoints for dismissal, filter application/reset and tag cycling. It does not independently demonstrate pointer event dispatch, hit-target dimensions, persistence, SQL predicates or the complete interaction sequence.",
+    "This batch has no zero-result catalog, opened row/page-picker, reader, hardware-absence, image-quality or authorization panel case. No coverage verdict is made for those states here."
+  ],
+  "limitations": [
+    "Only the eight input-listed candidate PNGs were loaded. No other image was inspected and no application, test, build, smoke test or runtime probe was executed during this review.",
+    "Actual record titles, publication/chapter counts, progress, timestamps and source-provided choice counts were accepted as data-dependent differences. Demo cover patterns were treated separately from actual unread counts and membership indicators.",
+    "All metadata intentional_differences arrays are empty. Recorded mechanical passes corroborate provenance and declared state but do not override the two visually observed marker discrepancies.",
+    "Desktop PNGs do not establish physical wake behavior, a 512 MiB memory budget, physical e-ink rendering, hardware capability qualification or pen input. No such inference is made."
+  ]
+}

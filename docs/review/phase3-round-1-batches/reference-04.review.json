@@ -1,0 +1,63 @@
+{
+  "batch_id": "reference-04",
+  "reviewer": "fresh-independent-reference-04",
+  "run_id": "a1baf3fe3dc2",
+  "reviewed_case_ids": [
+    "pw-browse--updates"
+  ],
+  "reviewed_cases": [
+    {
+      "case_id": "pw-browse--updates",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/pw-browse--updates.png",
+      "candidate_sha256": "c1e8f815af5d31d4d7dfd98fc1f55aa094efe780329383fa9648336e028f4e30",
+      "reference_png": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/screens/states/pw-browse--updates.png",
+      "reference_sha256": "2cdb556928678e331ce7b582fbdf65c14ae81ad506e2e76364631329c313da16",
+      "viewed_candidate": true,
+      "viewed_reference": true,
+      "outcome": "issues_found",
+      "provenance": {
+        "case_metadata": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/cases/pw-browse--updates.json",
+        "run_id_matches": true,
+        "binary_sha256": "94d7f3bbcab475ad8833a2f3c486138f7b49bead231851c2d8eab2f0c3d2ac51",
+        "binary_sha256_matches_expected": true,
+        "source_sha256": "aef9db4e111165016a10a2a95e111f3155860b8510c7f6207ec9c79fbec5082c",
+        "source_sha256_matches_expected": true,
+        "candidate_raw_png_sha256_matches_case_evidence": true,
+        "reference_raw_png_sha256_matches_case_metadata": true,
+        "identity_method": "PowerShell Get-FileHash SHA256 over the original PNG bytes; no transformed image was used as pixel identity.",
+        "comparison_scale": "Candidate 618x824 logical 1x; reference 1236x1648 physical 2x compared at 618x824 logical size."
+      },
+      "observations": [
+        "The status bar, browse title, list and add controls, three source tabs, update rows, bulk update button, and five-item PW dock are all visible without clipping.",
+        "At equal logical scale, the content margin is about 22 px, row icons are about 44 px square, per-row update buttons are about 84x40 px, and the bulk update button is about 574x52 px. Their positions and spacing visually track the reference to approximately 1 logical pixel.",
+        "The update tab has a clear black underline and bold label. Browse is the active dock destination. Source names, action labels, and dock labels retain comparable hierarchy and remain legible at the native logical size.",
+        "The interface uses white surfaces, black primary controls, neutral gray secondary text, and thin gray dividers. No decorative shadow, stipple, or tinted surface is visible.",
+        "Both per-row update actions and the bulk update action are fully inside the viewport and unobstructed. Static screenshots establish visibility only; they do not prove hit targets or action execution.",
+        "The header and tab both report 2 updates, matching state.source_update_count and the two update=true installed sources. Metadata records installed MangaDex v12 with available v13, and installed demo-a v8 with available v9.",
+        "The candidate replaces the reference version-transition subtitles with language plus installed version. As a result, neither row exposes the available target version even though the capture metadata contains it; see P3R1-REF04-1."
+      ],
+      "intentional_differences": [
+        "The candidate is an unmodified native logical 1x PNG while the reference is a physical 2x PNG; this capture-scale difference is not a layout defect.",
+        "Source names, languages, current versions, and update counts may reflect real application data. This allowance does not cover omitting an available target version that is already present in the same capture state."
+      ]
+    }
+  ],
+  "suggestions": [
+    {
+      "id": "P3R1-REF04-1",
+      "case_id": "pw-browse--updates",
+      "priority": "P2",
+      "description": "Show the installed-to-available version transition for each updatable source.",
+      "evidence": "The reference subtitles show v12 -> v13 and v8 -> v9. The candidate instead shows language plus v12 and language plus v8. The case metadata confirms installed_sources contains v12/v8, available_sources contains v13/v9, both rows have update=true, and source_update_count is 2. Thus the missing target versions are not caused by an unavailable update or a permissible real-data difference.",
+      "recommendation": "In the updates tab, derive each row subtitle from the installed and available source versions and display the current-to-target transition. Preserve the existing row geometry and use only actual version data; do not fabricate updates when no newer version exists.",
+      "status": "open",
+      "introduced_round": 1
+    }
+  ],
+  "limitations": [
+    "This review covers only the single candidate/reference pair in reference-04; it does not establish a clean result for the full review round.",
+    "Only the existing PNGs and case JSON were inspected. No application, build, test, smoke check, or runtime probe was executed on the local machine or elsewhere by this reviewer.",
+    "Static screenshots cannot verify tab switching, source update execution, touch behavior, network truth, or sheet reachability. Installed and available source groups, unavailable-verification rows, and bottom sheets are outside this captured updates-tab state.",
+    "Binary and source identities were matched against the values in the case metadata; the binary and source archive were not rehashed by this reviewer. The reference image hash was checked individually, not the aggregate reference-set hash."
+  ]
+}

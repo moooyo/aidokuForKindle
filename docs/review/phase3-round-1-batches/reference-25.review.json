@@ -1,0 +1,105 @@
+{
+  "batch_id": "reference-25",
+  "reviewer": "/root/phase3_round1_review/reference_25",
+  "run_id": "a1baf3fe3dc2",
+  "review_kind": "fresh independent static reference-pair review",
+  "round": 1,
+  "reviewed_case_ids": [
+    "sc-search--default",
+    "sc-search--results"
+  ],
+  "identity": {
+    "candidate": "candidate3",
+    "binary_sha256": "94d7f3bbcab475ad8833a2f3c486138f7b49bead231851c2d8eab2f0c3d2ac51",
+    "source_sha256": "aef9db4e111165016a10a2a95e111f3155860b8510c7f6207ec9c79fbec5082c",
+    "supplied_reference_bundle_sha256": "e7b49b456255432d74cfe41346f9d44c1a9c55bf67c5d55483e4ae3029547d18",
+    "metadata_identity_matches_expected": true,
+    "hash_scope": "SHA-256 was computed with Get-FileHash over the original, unmodified PNG file bytes. Both candidate hashes match case evidence_hashes.screenshot.sha256, and both reference hashes match case reference_sha256. The reference bundle hash was supplied by the coordinator and was not recomputed within this two-case review.",
+    "comparison_scale": "Candidate 930x1240 logical 1x; reference 1860x2480 physical 2x. Geometry was compared at the same logical scale. Reference previews were resized by the image viewer only."
+  },
+  "reviewed_cases": [
+    {
+      "case_id": "sc-search--default",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/sc-search--default.png",
+      "candidate_sha256": "6201e44322a3f6a22f39c1ccf0fb499d79ccb65ab4f5c400af317bf415981f0d",
+      "reference_png": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/screens/sc-search.png",
+      "reference_sha256": "7f66ae6f58fee41e471fab3f308afc9170bc1465b5c66cc0b590fac30a2a72c4",
+      "viewed_candidate": true,
+      "viewed_reference": true,
+      "case_metadata": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/cases/sc-search--default.json",
+      "candidate_hash_matches_case_evidence": true,
+      "reference_hash_matches_case_metadata": true,
+      "outcome": "pass_with_static_review_limitations",
+      "observations": [
+        "The search field, cancel action, scope chips and divider align with the reference at logical scale: the search field is approximately x36/y52, 798x60, and the scope divider is near y194.",
+        "The saved state identifies route search, modal keyboard, target search and pinyin mode. Two local library matches are visible immediately beneath the shelf heading; their covers, titles and secondary progress/source text fit without clipping.",
+        "The keyboard begins near logical y870 and occupies the bottom of the viewport in place of the dock. All four key rows, language/number switches, space key, backspace and the search submission key remain visible.",
+        "Input text and local-match titles retain the reference's serif hierarchy, while scope controls and secondary labels are legible. The grayscale interface has clear dark outlines and readable secondary gray text; no clipped glyphs or offscreen visible controls were found.",
+        "No actionable visual discrepancy was identified in this editing-state pair. Saved search group data alone does not establish whether network work occurred during editing."
+      ],
+      "intentional_differences": [
+        "The candidate has committed the full query while the reference shows a partial query with an active gang composition and candidate strip. The candidate state explicitly records empty keyboard_composition and keyboard_candidates, so a plain pinyin strip is appropriate.",
+        "The candidate has two genuine local matches instead of one, including different ordering and progress detail. The additional card occupies the second local-match column without changing the reference geometry.",
+        "The candidate's source count/order and system clock reflect the captured fixture and session rather than the handoff's sample data.",
+        "Native cover artwork can differ from the reference sample artwork."
+      ]
+    },
+    {
+      "case_id": "sc-search--results",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/sc-search--results.png",
+      "candidate_sha256": "c3ab934f4b733e6f435909f45ba0c3efe033148d8f70c340e48d42c7123a70b5",
+      "reference_png": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/screens/states/sc-search--results.png",
+      "reference_sha256": "4e8beddc0af4eae836a26c3606c7cbd80c1308b5a255b771bd4e0672f05b61b1",
+      "viewed_candidate": true,
+      "viewed_reference": true,
+      "case_metadata": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/cases/sc-search--results.json",
+      "candidate_hash_matches_case_evidence": true,
+      "reference_hash_matches_case_metadata": true,
+      "outcome": "issues_found",
+      "observations": [
+        "The top search controls and status line preserve the reference layout. The first source heading is near logical y262 and its covers begin near y293; approximately 125x165 cover cells retain the reference six-column geometry even though this fixture supplies only three books.",
+        "MangaDex and Komga each display their own count and right-aligned view-all action. The saved independent group states contain three MangaDex books, one Komga book, an empty local group and a separate failed source group. Each visible group remains within the six-cover limit.",
+        "The local empty state and failed source row with its retry action remain separately visible and do not obscure successful groups. The generic operation-incomplete message is consistent with the saved error state and need not reproduce the reference's timeout wording.",
+        "The keyboard is dismissed and the dock is restored near logical y1160, with search selected. Source actions, retry and all five dock items remain visible without overlap or clipping.",
+        "Cover-caption Chinese titles use bold serif glyphs, whereas the corresponding reference result captions use the interface sans-serif face. This changes caption texture and perceived weight even though title cell geometry is otherwise aligned.",
+        "The retry control is approximately 88x44 logical pixels, compared with about 74x44 in the reference. Its right edge aligns near x894, but its left edge extends approximately 14 logical pixels farther left.",
+        "The remaining source headings, count labels, secondary metadata and grayscale contrast are readable, with no additional visible clipping."
+      ],
+      "intentional_differences": [
+        "The candidate reports four searched sources and three MangaDex results rather than the sample's five sources and eighteen results; the actual fixture counts do not require fabricated extra covers.",
+        "Source chip order, exact book text, available cover artwork and saved source status are data-driven differences.",
+        "The failed group records error=true and timeout=false, so its operation-incomplete label is accepted instead of the reference timeout label.",
+        "The system clock and native 1x rasterization differ from the 2x reference capture."
+      ]
+    }
+  ],
+  "suggestions": [
+    {
+      "id": "P3R1-REF25-1",
+      "case_id": "sc-search--results",
+      "priority": "P2",
+      "description": "Use the reference interface sans-serif typography for result-card captions.",
+      "evidence": "All visible Chinese titles below MangaDex and Komga covers have pronounced serif stroke contrast and terminals in the candidate. Their reference counterparts use sans-serif UI glyphs. The editing-state local-match heading intentionally uses serif typography, so this discrepancy is specific to the result-card caption style.",
+      "recommendation": "Apply the reference UI sans-serif family and matching approximately 16px caption weight to the result cards, while preserving the editing-state local-match title styling and the current caption geometry.",
+      "status": "open",
+      "introduced_round": 1
+    },
+    {
+      "id": "P3R1-REF25-2",
+      "case_id": "sc-search--results",
+      "priority": "P3",
+      "description": "Match the compact retry-button width in the failed source row.",
+      "evidence": "At normalized logical scale, the candidate retry button spans approximately x806-894 (88px) and y887-931 (44px). The reference spans approximately x820-894 (74px) at the same height. Both use the same short retry label; the difference is control geometry rather than fixture content.",
+      "recommendation": "Use the reference approximately 74px width or equivalent horizontal padding for this retry control, retaining the 44px height and aligned right edge.",
+      "status": "open",
+      "introduced_round": 1
+    }
+  ],
+  "limitations": [
+    "This review covers only the two assigned reference pairs and four original PNGs; it does not certify the full round.",
+    "Only pre-existing PNG/JSON evidence was read and file hashes computed. No application, build, test, smoke test, runtime probe, Git operation or product modification was performed locally.",
+    "A static screenshot and saved state cannot establish live network submission timing, keyboard composition behavior, hit-target behavior, navigation, retry execution or asynchronous request independence.",
+    "Logical pixel measurements are visual estimates from the original screenshots as displayed by the image viewer, not a programmatic pixel-diff or local validation run.",
+    "Physical e-ink rendering, hardware refresh and grayscale behavior were not exercised."
+  ]
+}

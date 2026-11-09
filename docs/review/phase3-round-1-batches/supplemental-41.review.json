@@ -1,0 +1,166 @@
+{
+  "batch_id": "supplemental-41",
+  "reviewer": "/root/phase3_round1_review/supplemental_41; independent manual visual review",
+  "run_id": "a1baf3fe3dc2",
+  "candidate_identity": {
+    "candidate": "C3",
+    "round": 1,
+    "binary_sha256": "94d7f3bbcab475ad8833a2f3c486138f7b49bead231851c2d8eab2f0c3d2ac51",
+    "source_sha256": "aef9db4e111165016a10a2a95e111f3155860b8510c7f6207ec9c79fbec5082c",
+    "identity_result": "All eight case sidecars identify the assigned run, binary, and source. Each current candidate PNG SHA-256 matches both the input manifest and the case screenshot evidence hash."
+  },
+  "review_basis": [
+    "docs/review/phase3-reference-scope.json: precedence, profiles, shared contract, and capability bounds",
+    "docs/DESIGN_HANDOFF.md: artwork-only reader override, native stretched profiles, common styling, source management, settings, and reader geometry",
+    "docs/review/phase3-prototype-reference-support.json: retained user contract, reference overrides, and acceptance conditions for pw-settings, pw-browse, and sc-reader",
+    "The assigned input manifest and the eight existing case metadata JSON files",
+    "Direct tools.view_image inspection of each of the eight assigned candidate PNG files, including separate inspection of the three identically hashed bookmark captures"
+  ],
+  "reviewed_case_ids": [
+    "pw6--stretch-settings",
+    "pw6--stretch-sources",
+    "scribe-landscape--bookmark-baseline",
+    "scribe-landscape--bookmark-cold-persistence",
+    "scribe-landscape--bookmark-toggle-pure",
+    "scribe-landscape--first-page",
+    "scribe-landscape--image-setting-invalidation",
+    "scribe-landscape--last-page"
+  ],
+  "reviewed_cases": [
+    {
+      "case_id": "pw6--stretch-settings",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/pw6--stretch-settings.png",
+      "candidate_sha256": "d8fb965027bc7ae62155b5bf480e4fd9b94c6bd17e79d3427559e0fe50c7b72d",
+      "viewed_candidate": true,
+      "outcome": "no_actionable_visual_finding",
+      "observations": [
+        "The native 632x840 portrait screenshot shows the settings route with no modal. Its title, version caption, and white outlined Paperwhite 6 device card are fully visible.",
+        "Page one contains the expected seven setting rows, grouped under device and reading labels. Screen refresh, frontlight and warmth, power, storage, reading direction, tap regions, and image processing all retain readable labels and right-aligned summaries without overlap or truncation.",
+        "The device card describes a 7-inch Paperwhite 6, warmth, and absence of an orientation sensor. The sidecar declares frontlight and warmth controls exposed and orientation unavailable; this is profile evidence rather than physical hardware qualification.",
+        "The folio reads 1/2, preserves the empty previous-action allocation, and places the next action at the right. The five-action dock has a distinct selected Settings icon and label.",
+        "The device card and rows retain a white background, outlined hierarchy, and hairline separators. No shadow, screen-tone mask, unwanted gray card fill, or clipped dock is visible."
+      ],
+      "intentional_differences": [
+        "A distinct native viewport is captured at this profile's actual size; it is not resized to impersonate an exact handoff canvas."
+      ]
+    },
+    {
+      "case_id": "pw6--stretch-sources",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/pw6--stretch-sources.png",
+      "candidate_sha256": "1ee8c1ab06843d609e355bf3569c4988987ae4292271762ebaaedcaa2b447eb5",
+      "viewed_candidate": true,
+      "outcome": "no_actionable_visual_finding",
+      "observations": [
+        "The native 632x840 portrait screenshot shows the top-level source manager, with Installed selected, Available and Updates tabs, and Browse selected in the dock. There is no catalog-style pager.",
+        "All seven installed rows and the dashed add-source action fit above the dock. Built-in sources use black tiles, extensions use white outlined tiles, and section labels clearly separate the two groups.",
+        "Local files, connected Komga, and unconfigured Kavita and Suwayomi have distinct readable subtitles. Their visible statuses agree with the installed-source records in the sidecar.",
+        "The blocked extension has a dashed warning tile, muted source name, explicit browser-verification unavailability text, and a separate Uninstall button. It does not show a normal catalog-entry chevron or claim a successful browser verification.",
+        "The counts 7 installed, 124 available, and 2 updates agree with the captured records. These data values are not treated as exact-reference layout requirements. No overlapping rows, cut-off labels, shadows, or UI stipple are visible."
+      ],
+      "intentional_differences": [
+        "A distinct native viewport is captured at this profile's actual size; it is not resized to impersonate an exact handoff canvas."
+      ]
+    },
+    {
+      "case_id": "scribe-landscape--bookmark-baseline",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/scribe-landscape--bookmark-baseline.png",
+      "candidate_sha256": "91ceb9e8a9b560e178d234248902dc249c94f21c6c7da60c0057ce780d16ea37",
+      "viewed_candidate": true,
+      "outcome": "no_actionable_visual_finding",
+      "observations": [
+        "The 1240x930 landscape capture contains two artwork pages. The left page has a large radial panel above a vertical-line panel; the right page has the skyline and crosshatched figure panels.",
+        "The sidecar identifies reader page 12/40, RTL spread mode, a closed menu, no modal, settled artwork, and a bookmarked current page with bookmark_count=1.",
+        "Despite the bookmarked state, direct inspection shows no bookmark ribbon, corner badge, status bar, page label, footer, notification, or visible reader control. This follows the explicit artwork-only user override.",
+        "Both pages occupy their equal-width allocations without a decorative center seam. The white bands above and below the artwork agree with the recorded aspect-preserving destination geometry y=29..901; they are not reported as an inset UI viewport.",
+        "The sidecar reports zero changed pixels against processed-artwork sampling, which corroborates the manual inspection but is not used as a substitute for it."
+      ],
+      "intentional_differences": []
+    },
+    {
+      "case_id": "scribe-landscape--bookmark-cold-persistence",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/scribe-landscape--bookmark-cold-persistence.png",
+      "candidate_sha256": "91ceb9e8a9b560e178d234248902dc249c94f21c6c7da60c0057ce780d16ea37",
+      "viewed_candidate": true,
+      "outcome": "no_actionable_visual_finding",
+      "observations": [
+        "This candidate was opened and inspected separately. Its landscape spread shows the same radial-panel left page and skyline right page as the baseline, with the same clean white top and bottom bands.",
+        "The captured state remains on reader page 12/40 with menu=false, no modal, reader_image_ready=true, and no pending reader work. The expected cold-persistence assertion records reader_bookmarked=false and bookmark_count=0.",
+        "The screenshot contains no ribbon, corner badge, footer, status bar, notification, stale menu edge, or other visible residue after the reported bookmark change and cold re-entry.",
+        "The identical PNG hash is consistent with the requirement that a bookmark-state change must not alter the closed-reader artwork. The static capture cannot independently establish the persistence operation or its timing."
+      ],
+      "intentional_differences": []
+    },
+    {
+      "case_id": "scribe-landscape--bookmark-toggle-pure",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/scribe-landscape--bookmark-toggle-pure.png",
+      "candidate_sha256": "91ceb9e8a9b560e178d234248902dc249c94f21c6c7da60c0057ce780d16ea37",
+      "viewed_candidate": true,
+      "outcome": "no_actionable_visual_finding",
+      "observations": [
+        "This candidate was opened and inspected separately. The complete two-page spread remains visible with no change in placement or page pairing relative to the bookmarked baseline.",
+        "The sidecar records page 12/40, reader_bookmarked=false, bookmark_count=0, menu=false, no modal, and settled artwork. Its bookmark-purity check also reports that no closed-reader ribbon or corner is painted.",
+        "Direct inspection finds no bookmark decoration, footer text, status bar, notification, menu chrome, or artificial center gutter. The art patterns are part of the manga image, not a UI screen-tone overlay.",
+        "The unchanged PNG is appropriate for the pure-artwork scene after a bookmark toggle. The screenshot does not establish that the normal bottom-right page-turn region has no hidden footer-cycle handler."
+      ],
+      "intentional_differences": []
+    },
+    {
+      "case_id": "scribe-landscape--first-page",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/scribe-landscape--first-page.png",
+      "candidate_sha256": "c45bb8b3874337f6de3431d2a100773719ed0c63138dc8ce7bcd41ec96628557",
+      "viewed_candidate": true,
+      "outcome": "no_actionable_visual_finding",
+      "observations": [
+        "The first-page capture visibly differs from page 12: the skyline and figure page is on the left and the radial-panel page is on the right, with both page allocations fully represented.",
+        "The sidecar confirms reader_page=1, reader_total=40, RTL spread mode, menu=false, and a committed session on the same chapter. No loading or repair state is pending.",
+        "The closed scene shows artwork only, without boundary navigation buttons, page-number text, ribbon, footer, status bar, or notification.",
+        "The paired pages keep their aspect ratio, equal-width allocations, and expected white bands. No decorative divider or clipping introduced by reader chrome is visible. A still image cannot establish previous-page boundary behavior."
+      ],
+      "intentional_differences": []
+    },
+    {
+      "case_id": "scribe-landscape--image-setting-invalidation",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/scribe-landscape--image-setting-invalidation.png",
+      "candidate_sha256": "70d5fa39b13997b42baee743efcf587986bec0cd831ff499a3b81f79dcc65856",
+      "viewed_candidate": true,
+      "outcome": "no_actionable_visual_finding",
+      "observations": [
+        "The changed-image-setting capture shows the page-12 radial and skyline spread at the same placement and aspect ratio as the baseline. Panel borders, speech balloons, and page edges remain intact.",
+        "The sidecar records effective contrast=10 instead of the baseline 0, reader_generation=3, a different processed-image identity, settled artwork, menu=false, and no modal. This supplies capture-state context for the distinct candidate PNG hash.",
+        "No image-settings panel, stale preview, progress indicator, status bar, footer, ribbon, or notification remains over the artwork.",
+        "The changed rendering remains legible and aligned, without an extra seam or UI clipping. A static image and sidecar can corroborate the resulting image identity but cannot independently prove cache invalidation execution or concurrency behavior."
+      ],
+      "intentional_differences": []
+    },
+    {
+      "case_id": "scribe-landscape--last-page",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/scribe-landscape--last-page.png",
+      "candidate_sha256": "a4ccc209b5b8c88c7b81f48c68282bdb6c54716613244bb20338fa6a106a3d2f",
+      "viewed_candidate": true,
+      "outcome": "no_actionable_visual_finding",
+      "observations": [
+        "The terminal capture displays one portrait artwork page centered in the landscape canvas, rather than stretching it or retaining an empty second-page card.",
+        "The sidecar records page 40/40 and a committed single first_path with second_path=null. Its full-viewport allocation is 1240x930 and its aspect-preserving destination is x=289..951, y=0..930, matching the visible wide white side margins.",
+        "The artwork reaches the top and bottom edges, and its skyline, dot panel, crosshatched figure, and lower radial panel remain readable. The side margins do not carry a border, decorative gutter, or overlay.",
+        "No page label, chapter-end banner, footer, status bar, ribbon, notification, or stale half-spread is visible. The static capture does not establish the action taken when advancing beyond the chapter end."
+      ],
+      "intentional_differences": []
+    }
+  ],
+  "suggestions": [],
+  "coverage_gaps": [
+    "PW6 has no independent exact reference PNG. Its two cases were reviewed at native 632x840 against the declared stretched-profile structure and text requirements; they were not resized or treated as PW5 pixel matches.",
+    "This batch contains only closed-reader captures. Default-open menu appearance and the bookmark menu action are outside these eight images.",
+    "PNG inspection cannot prove the absence of an invisible footer-cycle hit zone, normal bottom-right page turning, menu input fencing, or first/last-page navigation behavior.",
+    "Bookmark cold persistence, bookmark toggle execution, and image-cache invalidation are supported by the existing sidecar state and checks, but were not independently exercised in this visual review.",
+    "Physical sleep/wake restoration, e-ink waveforms, actual frontlight or sensor behavior, and 512 MiB device behavior cannot be qualified by these desktop captures.",
+    "Only the eight assigned supplemental cases are covered. This report does not declare the whole round clean."
+  ],
+  "limitations": [
+    "Only the eight assigned candidate PNG files were loaded as images. No independent reference, oracle, difference, or processed-artwork image was loaded.",
+    "The existing zero-pixel reader-oracle results were treated as corroborative metadata, while each candidate received direct visual inspection.",
+    "Source titles, counts, time, storage values, artwork, and progress were assessed as captured data rather than required literal reference content.",
+    "Absent hardware controls and unimplemented software operations require truthful treatment; a screenshot cannot establish that an enabled integration completes successfully.",
+    "This review used existing files and Get-FileHash only. No application, build, test suite, smoke test, or runtime probe was executed, and no product file was modified."
+  ]
+}

@@ -1,0 +1,167 @@
+{
+  "batch_id": "supplemental-01",
+  "reviewer": "/root/phase3_round1_review/supplemental_01",
+  "run_id": "a1baf3fe3dc2",
+  "round": 1,
+  "binary_sha256": "94d7f3bbcab475ad8833a2f3c486138f7b49bead231851c2d8eab2f0c3d2ac51",
+  "source_sha256": "aef9db4e111165016a10a2a95e111f3155860b8510c7f6207ec9c79fbec5082c",
+  "review_method": "Fresh independent visual inspection of all eight listed candidate PNGs through functions tools.view_image, with read-only case sidecar inspection and Get-FileHash SHA256 checks. No application, prototype, build, test, or runtime probe was executed.",
+  "reference_basis": [
+    "docs/review/phase3-reference-scope.json: shared visual and behavior contracts, real-state precedence, Main queue requirements, and limitations for operational variants without independent PNGs.",
+    "docs/DESIGN_HANDOFF.md: queue geometry at line 272 and content-dependent sheet height at lines 279-280.",
+    "Authoritative HANDOFF.md: sections 3.3, 3.4, and 5.1, including white outlined overlays, undimmed background, pagination, truthful queue rows, pause/resume, and close.",
+    "prototype/Main.dc.html: queue declaration at lines 173-189, including bottom attachment, padding, cover sizing, row spacing, title/state layout, progress, and header actions. The prototype was read as text only."
+  ],
+  "reviewed_case_ids": [
+    "Main--download-queue--cancel-all",
+    "Main--download-queue--completed-job-menu",
+    "Main--download-queue--completed-real-job",
+    "Main--download-queue--completed-remove-apply",
+    "Main--download-queue--completed-remove-cancel",
+    "Main--download-queue--completed-remove-confirm",
+    "Main--download-queue--page-two",
+    "Main--download-queue--pause-all"
+  ],
+  "reviewed_cases": [
+    {
+      "case_id": "Main--download-queue--cancel-all",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/Main--download-queue--cancel-all.png",
+      "candidate_sha256": "9fe5c256d1295abfce38a276d478acd3866964237736866f80ad27123fa312c2",
+      "candidate_hash_matches_input_and_case_evidence": true,
+      "case_identity_matches_frozen_candidate": true,
+      "viewed_candidate": true,
+      "outcome": "no_actionable_visual_finding",
+      "observations": [
+        "The bottom-attached queue displays chapters 1, 2, and 3, each with a cover, an ellipsized title, a full progress rule, and a readable 6 / 6 page count. The title and right-side count do not overlap.",
+        "Pause all is visibly disabled, Close remains prominent, and the centered 1 / 2 folio preserves an empty previous-page allocation and a visible next-page control.",
+        "The sheet has a white background and black top rule without shadow, stippled backdrop, or dimming. The settings content behind it retains its normal contrast.",
+        "The case sidecar records four completed jobs and chapter 5 cancelled at 2 / 6. The supplied cancel-all check reports the real job update. The cancelled row is on the unshown second page, so this frame alone does not visually prove its status."
+      ],
+      "intentional_differences": []
+    },
+    {
+      "case_id": "Main--download-queue--completed-job-menu",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/Main--download-queue--completed-job-menu.png",
+      "candidate_sha256": "833668e3ce69ff4a68c6e6cd06a696f710692ea7138820e6f27392dcbc33c8c0",
+      "candidate_hash_matches_input_and_case_evidence": true,
+      "case_identity_matches_frozen_candidate": true,
+      "viewed_candidate": true,
+      "outcome": "no_actionable_visual_finding",
+      "observations": [
+        "A content-height bottom sheet presents the Download management heading, a black Done action, and three separate rows for Continue reading, Remove offline chapter, and Cancel.",
+        "Each row label is fully readable with clear separators and no footer collision. The white sheet and black top rule preserve the undimmed settings page behind it.",
+        "The metadata identifies the menu as the completed chapter 1 job and enables only reading, removal, and close actions. The visible choices agree with that completed-job context; no active download progress is claimed."
+      ],
+      "intentional_differences": []
+    },
+    {
+      "case_id": "Main--download-queue--completed-real-job",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/Main--download-queue--completed-real-job.png",
+      "candidate_sha256": "370e2309db150025f0581e01fa621fa9a13afeb8f9e64fe699e6b781f2e0b554",
+      "candidate_hash_matches_input_and_case_evidence": true,
+      "case_identity_matches_frozen_candidate": true,
+      "viewed_candidate": true,
+      "outcome": "no_actionable_visual_finding",
+      "observations": [
+        "The completed queue is open above the manga detail route rather than the settings route. The visible detail heading, artwork cover, continuation action, and directory heading remain undimmed above the sheet.",
+        "Chapters 1 through 3 each display a full progress rule and 6 / 6 pages. Long fixture chapter titles truncate before the separate count area and remain on one line.",
+        "The disabled Pause all action, enabled Close action, and 1 / 2 folio fit within the white sheet without clipping or shadow.",
+        "The supplied sidecar records the visible jobs as completed, with counts matching the rendered 6 / 6 labels. Actual completion is supported by that existing evidence, not by a newly executed operation in this review."
+      ],
+      "intentional_differences": []
+    },
+    {
+      "case_id": "Main--download-queue--completed-remove-apply",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/Main--download-queue--completed-remove-apply.png",
+      "candidate_sha256": "6ada7fd368eb042194b03b97c4382169a6b2315869ec3cd387555258237067ba",
+      "candidate_hash_matches_input_and_case_evidence": true,
+      "case_identity_matches_frozen_candidate": true,
+      "viewed_candidate": true,
+      "outcome": "no_actionable_visual_finding",
+      "observations": [
+        "The reopened queue starts with chapters 2, 3, and 4; chapter 1 is absent from the visible membership. All three remaining visible rows show full progress and 6 / 6 pages.",
+        "The background storage summary displays 51 KB, while the before-removal and cancellation frames display 69 KB. This is consistent with the supplied removal evidence without asserting independent byte-level verification.",
+        "The 1 / 2 folio and next-page control remain aligned after the queue count changes from five to four. No blank duplicate row, title collision, or progress clipping is visible.",
+        "The sidecar records four remaining jobs, reports removal of the actual completed job, and records the chapter 1 downloaded flag as false. The screenshot provides the corresponding visible row update."
+      ],
+      "intentional_differences": []
+    },
+    {
+      "case_id": "Main--download-queue--completed-remove-cancel",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/Main--download-queue--completed-remove-cancel.png",
+      "candidate_sha256": "26508ea1beb16b4dfc6100ade8df0888c21b71eff07d891de377459ec7e1565b",
+      "candidate_hash_matches_input_and_case_evidence": true,
+      "case_identity_matches_frozen_candidate": true,
+      "viewed_candidate": true,
+      "outcome": "no_actionable_visual_finding",
+      "observations": [
+        "The confirmation has closed to the settings page, with no residual dialog outline, dimming, or stale overlay. The settings rows, 1 / 2 folio, and selected Settings dock item are readable.",
+        "The storage summary remains 69 KB, matching the retained-download state rather than the 51 KB removal-applied frame.",
+        "The supplied state has no active modal and still contains five jobs, including completed chapter 1 at 6 / 6. Its cancellation check reports preservation of the actual completed download.",
+        "The queue itself is not visible after cancellation, so file preservation and the retained row are metadata-supported observations rather than directly visible content in this frame."
+      ],
+      "intentional_differences": []
+    },
+    {
+      "case_id": "Main--download-queue--completed-remove-confirm",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/Main--download-queue--completed-remove-confirm.png",
+      "candidate_sha256": "49180384055c95ae5090e0acb57f5141b2f99cb943276e070dca88a178a2fd75",
+      "candidate_hash_matches_input_and_case_evidence": true,
+      "case_identity_matches_frozen_candidate": true,
+      "viewed_candidate": true,
+      "outcome": "no_actionable_visual_finding",
+      "observations": [
+        "A compact white outlined confirmation is fully contained within the viewport and leaves the settings background undimmed. Its border is clear without a shadow or stippled backdrop.",
+        "The prompt to remove this chapter download and retain shared or imported content fits on one line without cropping.",
+        "Cancel and Remove are equal-width adjacent actions with readable centered labels; the destructive action has the intended black fill and white text.",
+        "The supplied modal context identifies completed chapter 1, and its two action identifiers are job-remove-confirm and close. The visible confirmation agrees with that action state."
+      ],
+      "intentional_differences": []
+    },
+    {
+      "case_id": "Main--download-queue--page-two",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/Main--download-queue--page-two.png",
+      "candidate_sha256": "23d71ac0e45f622b6fe4132fdb847a6e0ff98732467371cca31f85986f7de6ef",
+      "candidate_hash_matches_input_and_case_evidence": true,
+      "case_identity_matches_frozen_candidate": true,
+      "viewed_candidate": true,
+      "outcome": "no_actionable_visual_finding",
+      "observations": [
+        "The second queue page contains two distinct rows for chapters 4 and 5, each with its own cover, truncated title, empty progress rule, and Waiting to download status. These labels agree with the zero-completed queued state in the sidecar.",
+        "The centered 2 / 2 folio exposes Previous page on the left and leaves the next-page edge allocation empty. No first-page row is repeated.",
+        "With two rows, the bottom sheet starts lower than the three-row queue frames. This follows the documented content-dependent sheet height and is not treated as a fixed-height mismatch.",
+        "Pause all and Close remain fully readable. The sheet, progress rules, separators, and undimmed settings backdrop show no overlap, clipping, shadow, or stipple.",
+        "The supplied queue-pagination check identifies chapters 4 and 5 as the distinct real second-page membership, matching the visible row numbers."
+      ],
+      "intentional_differences": []
+    },
+    {
+      "case_id": "Main--download-queue--pause-all",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/Main--download-queue--pause-all.png",
+      "candidate_sha256": "3e4e26b0f051c2227448a2363ca6e660bb3026a96e2f8db382a9af873e3c0df3",
+      "candidate_hash_matches_input_and_case_evidence": true,
+      "case_identity_matches_frozen_candidate": true,
+      "viewed_candidate": true,
+      "outcome": "no_actionable_visual_finding",
+      "observations": [
+        "The queue header changes its bulk control to enabled Resume all, providing visible feedback for the paused queue. Close remains a separate black action.",
+        "The first three jobs remain completed at 6 / 6 with full progress rules; pausing does not falsely relabel already completed work. Their one-line titles and separate counters remain readable.",
+        "The white bottom sheet and 1 / 2 folio retain the same alignment as the other three-row queue frames, without shadow, dimming, stipple, or clipped controls.",
+        "The supplied state records downloads_paused=true and chapters 4 and 5 paused at 2 / 6 and 0 / 6. Those paused rows are on the unshown second page; the frame visually establishes the Resume all feedback but not each paused row label."
+      ],
+      "intentional_differences": []
+    }
+  ],
+  "suggestions": [],
+  "limitations": [
+    "Only the eight candidate PNGs listed by supplemental-01.input.json were opened. No other candidate or reference image was loaded. These operational states have no independently inspected per-state pixel reference, so this is a contract-based visual review and makes no pixel-match claim.",
+    "All eight current PNG hashes match both expected_png_sha256 and the corresponding case evidence screenshot hash. All sidecars identify round 1, run a1baf3fe3dc2, and the stated frozen binary and source hashes. Existing mechanical checks were read as supplied evidence and were not rerun or substituted for visual inspection.",
+    "The native captures are 618 by 824 logical pixels. The case metadata records a two-times physical reference scale for the 1236 by 1648 PW5 profile; this review does not assert independent physical-resolution pixel equivalence.",
+    "Static frames cannot establish pointer reachability, touch target behavior, whole-control press inversion, outside dismissal, elapsed timing, download interruption, or actual file deletion. Existing sidecar operation checks provide supporting state evidence, not a new independent runtime replay.",
+    "The cancel-all and pause-all captures show page 1 containing completed jobs. Their cancelled or paused jobs are on the unshown page 2. The supplied page-two PNG captures an earlier queued state, so this batch does not visually establish the final cancelled and paused row presentations.",
+    "The queue sidecars list a cancel-all action, including an enabled action in the page-two state, while these dedicated queue frames visibly expose only Pause all or Resume all and Close. HANDOFF section 5.1 explicitly requires those visible controls; this review makes no acceptance claim for the additional cancel-all action's visible entry point.",
+    "No empty queue, failed-job, or retry presentation is present in this batch. Real fixture titles, queue counts, progress, storage values, and capture time are allowed data differences, while geometry, clipping, pagination, and truthful state remain applicable.",
+    "This batch contains no closed-reader frame, missing-hardware variant, quality-unavailable state, or authorization state. It cannot qualify pure-artwork reader behavior, physical e-ink refresh, hardware sleep/wake, memory use at 512 MiB, or other physical hardware behavior.",
+    "Zero new suggestions in this eight-case supplemental batch does not establish a complete clean round, complete matrix coverage, or the required consecutive-clean-round streak."
+  ]
+}

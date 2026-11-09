@@ -1,0 +1,126 @@
+{
+  "batch_id": "reference-26",
+  "reviewer": "/root/phase3_round1_review/reference_26",
+  "run_id": "a1baf3fe3dc2",
+  "round": 1,
+  "review_type": "Fresh independent visual review of four assigned reference pairs",
+  "outcome": "No open suggestions in this reviewed batch",
+  "reviewed_case_ids": [
+    "sc-settings--default",
+    "sc-settings--about",
+    "sc-settings--auto-update",
+    "sc-settings--backup"
+  ],
+  "identity_verification": {
+    "binary_sha256": "94d7f3bbcab475ad8833a2f3c486138f7b49bead231851c2d8eab2f0c3d2ac51",
+    "source_sha256": "aef9db4e111165016a10a2a95e111f3155860b8510c7f6207ec9c79fbec5082c",
+    "reference_set_sha256": "e7b49b456255432d74cfe41346f9d44c1a9c55bf67c5d55483e4ae3029547d18",
+    "case_metadata_identity_match": true,
+    "candidate_png_hashes_match_case_evidence": true,
+    "reference_png_hashes_match_case_metadata": true,
+    "hash_method": "PowerShell Get-FileHash -Algorithm SHA256 on the unmodified original PNG bytes",
+    "reference_set_verification": "The reference-set identity was supplied by the coordinator. This review independently matched all four assigned reference PNG hashes to their case metadata.",
+    "capture_method_recorded_by_metadata": "native Slint application --capture; unmodified original PNG",
+    "comparison_scale": "Candidate images are 930 by 1240 at logical 1x. Reference images are 1860 by 2480 at physical 2x for the same 930 by 1240 logical viewport. Visual comparisons account for this scale difference."
+  },
+  "reviewed_cases": [
+    {
+      "case_id": "sc-settings--default",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/sc-settings--default.png",
+      "candidate_sha256": "e35dca2ac34da2d37d880f7341eac759cf54e830ab975fc275bdcbabf3137338",
+      "reference_png": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/screens/sc-settings.png",
+      "reference_sha256": "d662725b6151b4cd4ac8d869e9548f98edfa9ee32a1b6e5906356507bdcd32fb",
+      "viewed_candidate": true,
+      "viewed_reference": true,
+      "outcome": "pass",
+      "observations": [
+        "The initial panel is Display and Refresh. The corresponding navigation row has a solid black selection surface with white icon and label.",
+        "The 320-logical-pixel navigation column, 46-pixel visual navigation rows, right-panel inset, and 80-pixel dock are visually consistent with the assigned contract. All displayed navigation destinations remain above the dock, with no list pager or clipped final row.",
+        "The five refresh-interval controls are complete and legible, with six pages visibly selected. The three quality rows have consistent spacing and fully visible labels.",
+        "The grayscale test displays sixteen distinguishable adjoining cells. Its white final cell has a visible right border joined to the top and bottom outline; the strip is closed.",
+        "Heading, form, secondary-text, and divider hierarchy is coherent at the shared logical scale. The surface is white without shadow or stipple, and no panel content overlaps the dock."
+      ],
+      "intentional_differences": [
+        "The unsupported pen-input destination is absent, consistent with the case metadata declaring pen_input_implemented=false.",
+        "Quality-mode controls are greyed out and explicitly marked temporarily unavailable. The unqualified hardware-dither control is absent, consistent with hardware_dither_qualified=false. These states avoid presenting unsupported controls as working.",
+        "A separate clear-after-menu-close control is visible. The actual version and device information replace reference placeholders; the longer secondary device description uses an ellipsis within its allocated header area."
+      ]
+    },
+    {
+      "case_id": "sc-settings--about",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/sc-settings--about.png",
+      "candidate_sha256": "3f12f6303d8f4bd7b037f7459210de883dafc4a5062bd3110bdb8ac45f33a924",
+      "reference_png": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/screens/states/sc-settings--about.png",
+      "reference_sha256": "82a6b4924adc8187c18630fe9e79119098737d55d56c09efa69f5942616371eb",
+      "viewed_candidate": true,
+      "viewed_reference": true,
+      "outcome": "pass",
+      "observations": [
+        "The About navigation row is selected in black and remains fully visible above the dock. The content starts at the same panel inset as the other assigned settings cases.",
+        "All four expected rows are present: version, device, open-source license, and project homepage. Labels align left, values align right, and thin dividers provide consistent row separation.",
+        "The actual values 0.1.0, Kindle Scribe 1, and GPL-3.0-or-later are fully visible. The homepage is represented by a dash rather than a fabricated address.",
+        "The page title, labels, Latin values, sidebar icons, and dock labels are legible, with no clipped row, unwanted pager, collision, shadow, or stipple."
+      ],
+      "intentional_differences": [
+        "Actual version and device values replace reference placeholders, and the license row displays the actual license identifier instead of the reference View button.",
+        "The homepage has no configured value and displays a dash. The unsupported pen-input navigation destination is omitted according to the capability declaration."
+      ]
+    },
+    {
+      "case_id": "sc-settings--auto-update",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/sc-settings--auto-update.png",
+      "candidate_sha256": "4cdf580b4e30ad353d58e2212659d5b1f426276f414720a81878faf9d344e98e",
+      "reference_png": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/screens/states/sc-settings--auto-update.png",
+      "reference_sha256": "3e2cfa76a6ae4f84ef5ebb7d93543decab149d5838d1047982238b0e7f5c0c68",
+      "viewed_candidate": true,
+      "viewed_reference": true,
+      "outcome": "pass",
+      "observations": [
+        "The Automatic Library Update title and selected navigation row match the requested section. The navigation and dock retain the same geometry as the other settings cases.",
+        "The Off, Daily, and Weekly frequency options form a complete aligned row. Wi-Fi-only, charging-only, and skip-completed conditions are all visible with aligned switches and dividers.",
+        "The frequency and condition controls share a consistent disabled grey treatment. The visible temporarily-unavailable status agrees with settings_status in the supplied state evidence.",
+        "No frequency is falsely shown as an active working selection, and no update-success message is displayed. The disabled labels remain readable, with no truncation or overlap in the content area."
+      ],
+      "intentional_differences": [
+        "The reference illustrates a configured daily scheduler and active condition values. The candidate instead exposes an explicit unavailable state with disabled controls, as permitted by the evidence-based capability bound.",
+        "The unsupported pen-input navigation destination is omitted according to the capability declaration."
+      ]
+    },
+    {
+      "case_id": "sc-settings--backup",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/sc-settings--backup.png",
+      "candidate_sha256": "b4bc531d87530f06dc737b8f4a908815f0cb2deb42668d31c7ed3e2daf6e42c8",
+      "reference_png": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/screens/states/sc-settings--backup.png",
+      "reference_sha256": "52d5464f5820a38d38e1c9cf0f01b74be1c74321e3fb2db1664bc6baca9725d8",
+      "viewed_candidate": true,
+      "viewed_reference": true,
+      "outcome": "pass",
+      "observations": [
+        "The Backup and Restore title and selected navigation row identify the correct section. The shared fixed sidebar, panel inset, and dock remain visually consistent.",
+        "Backup Now and Restore from Backup are both visible with complete outlines and grey disabled labels. The recent-backups section states temporarily unavailable.",
+        "There are no fabricated dated backup rows, sizes, or completion messages. This matches the explicit unavailable state recorded by the supplied case metadata.",
+        "The title, actions, section label, and status fit comfortably within the content panel without clipping, collision, shadow, or stipple. Every navigation row remains visually reachable above the dock."
+      ],
+      "intentional_differences": [
+        "The reference shows enabled actions and example dated backup records. The candidate presents disabled actions and an honest unavailable state because backup integration is unavailable; the reference dates and file sizes are therefore not copied.",
+        "The unsupported pen-input navigation destination is omitted according to the capability declaration."
+      ]
+    }
+  ],
+  "suggestions": [],
+  "prior_finding_rechecks": [
+    {
+      "finding_id": "P3R002",
+      "case_id": "sc-settings--default",
+      "status": "resolved_in_reviewed_evidence",
+      "observation": "Fresh inspection of the original candidate PNG shows a visible outline on the right edge of the sixteenth, white grayscale cell, connected to the top and bottom borders. The previously reported open right edge is not present in this capture."
+    }
+  ],
+  "limitations": [
+    "This review covers only the four assigned cases and eight original PNGs; it makes no claim that the full round is clean.",
+    "Review actions were limited to reading the assigned JSON evidence, computing PNG hashes, viewing existing PNGs with tools.view_image, and writing this review document. No application, build, test, smoke test, runtime probe, Git operation, or product modification was performed locally.",
+    "Reachability here means visible layout access within the supplied static captures. Interaction behavior, disabled-control enforcement, hardware refresh, scheduling, backup execution, and real-device behavior were not exercised.",
+    "The supplied case metadata establishes capture identity and declared capability bounds. It does not independently prove runtime implementation correctness, and this review does not treat its recorded automated passed flags as fresh verification.",
+    "Reference previews were displayed by the image tool at a reduced presentation size. Comparison accounted for the stated physical 2x reference scale; no PNG bytes were edited or transformed."
+  ]
+}

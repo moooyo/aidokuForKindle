@@ -1,0 +1,145 @@
+{
+  "batch_id": "reference-29",
+  "reviewer": "/root/phase3_round1_review/reference_29",
+  "run_id": "a1baf3fe3dc2",
+  "round": 1,
+  "outcome": "needs_changes",
+  "identity": {
+    "binary_sha256": "94d7f3bbcab475ad8833a2f3c486138f7b49bead231851c2d8eab2f0c3d2ac51",
+    "source_sha256": "aef9db4e111165016a10a2a95e111f3155860b8510c7f6207ec9c79fbec5082c",
+    "supplied_reference_bundle_sha256": "e7b49b456255432d74cfe41346f9d44c1a9c55bf67c5d55483e4ae3029547d18",
+    "case_metadata_identity_match": true,
+    "candidate_png_hashes_match_case_evidence": true,
+    "reference_png_hashes_match_case_evidence": true,
+    "hash_method": "PowerShell Get-FileHash -Algorithm SHA256 on the unmodified source PNG bytes",
+    "comparison_scale": "Candidate 930 x 1240 at logical 1x; reference 1860 x 2480 at physical 2x; visual geometry compared in the same logical coordinate space."
+  },
+  "reviewed_case_ids": [
+    "sc-settings--reading",
+    "sc-settings--source-lists",
+    "sc-settings--spread",
+    "sc-settings--storage"
+  ],
+  "reviewed_cases": [
+    {
+      "case_id": "sc-settings--reading",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/sc-settings--reading.png",
+      "candidate_sha256": "fb6ad07b62088ef8e74435d88a05936a7f75703f4de3cc40507da055e1972c9a",
+      "reference_png": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/screens/states/sc-settings--reading.png",
+      "reference_sha256": "195eebc84f1f00bbe0f2bfd3a4a9dc5d03197cd1adadff735b76b76a1d81652d",
+      "viewed_candidate": true,
+      "viewed_reference": true,
+      "outcome": "needs_changes",
+      "observations": [
+        "The four default direction options are fully visible in one row. The right-to-left option uses the black selected treatment, and the per-title direction memory switch is visibly on, consistent with reading_direction=rtl and remember_book_direction=true in the case metadata.",
+        "The navigation boundary is at approximately 320 logical pixels, the selected row is approximately 46 pixels high, and the bottom dock occupies the final 80 pixels. Main content retains the reference's wide white surface, aligned heading, approximately 36-pixel horizontal content inset, thin gray separators, and serif heading/sans-serif form hierarchy.",
+        "All four direction buttons and the memory switch are within the visible content area, without clipping or overlap. There is no list pager, shadow, or stippled page surface.",
+        "The shared device header capability line ends with an ellipsis and leaves the orientation capability unreadable. This is the shared issue recorded in P3R1-REF29-3."
+      ],
+      "intentional_differences": [
+        "The unavailable pen-input navigation entry is absent. The case metadata explicitly declares pen_input_implemented=false, so this is an accepted capability-bound omission rather than a navigation geometry defect.",
+        "The candidate additionally exposes a double-tap zoom switch in the off state; preferences.double_tap_zoom=false is present in the metadata. This additional implemented preference does not obscure the required direction or memory controls.",
+        "Time, application version, device model wording, and truthful capability wording may differ from the reference's illustrative values."
+      ]
+    },
+    {
+      "case_id": "sc-settings--source-lists",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/sc-settings--source-lists.png",
+      "candidate_sha256": "36d2801d5b9ca1bbf92951e47f33ebd29158f69323b831a4d342805f22df432f",
+      "reference_png": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/screens/states/sc-settings--source-lists.png",
+      "reference_sha256": "59db057382521f043b9e5f488978d9feee579624aee5a3223579266e40bc592d",
+      "viewed_candidate": true,
+      "viewed_reference": true,
+      "outcome": "needs_changes",
+      "observations": [
+        "The source-lists heading, Add source list action, and Open source manager action are fully visible and do not collide with navigation or the dock. The selected source-lists row retains the black current-section treatment.",
+        "The reference shows a saved-record row with a remove action; the candidate shows an empty-record marker. The metadata explicitly documents that saved repository records are real and empty data is not replaced with fictional subscriptions. A remove control cannot be assessed from this empty state.",
+        "The approximately 320-pixel navigation boundary, 46-pixel current row, content alignment, and 80-pixel dock remain consistent with the shared settings shell. Add and management actions are slightly narrower than the reference; Add uses a solid rather than dashed outline, but both labels remain clear and fully contained.",
+        "The white content surface has no shadow or stipple, and body/heading fonts and separators preserve the reference hierarchy. The shared header ellipsis issue is recorded in P3R1-REF29-3."
+      ],
+      "intentional_differences": [
+        "An empty saved source-list collection is accepted instead of the reference's illustrative repository name and URL. No fictional record or remove action is required for this empty collection.",
+        "The pen navigation omission is justified by pen_input_implemented=false. Actual version, time, model wording, and truthful capability wording may differ."
+      ]
+    },
+    {
+      "case_id": "sc-settings--spread",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/sc-settings--spread.png",
+      "candidate_sha256": "8532074a3b548c531f96f365ac123405a1913d9114e8e1e8c9369b8f138239e4",
+      "reference_png": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/screens/states/sc-settings--spread.png",
+      "reference_sha256": "9b78dda1bafc088c3a1ea86de04456e1fb6910e0c35cd6edfc1390105a8ddc76",
+      "viewed_candidate": true,
+      "viewed_reference": true,
+      "outcome": "needs_changes",
+      "observations": [
+        "Automatic spread, Always spread, and Keep single page are fully visible in a three-button row; Automatic spread is selected. This agrees with page_layout_mode=automatic and the spread preference in the metadata.",
+        "Whole-page versus split-spread controls and the separate-cover switch occupy the expected lower form region, but all are visibly gray and disabled. A visible Unavailable label accompanies the spread-image section, and neither lower preference has an enabled selected treatment. This is P3R1-REF29-1.",
+        "The form's horizontal extent, thin separators, selected navigation row, and dock remain within the reference settings geometry. No control is clipped, and no panel shadow or stippled background appears.",
+        "The shared header capability line is truncated as in the other three cases; see P3R1-REF29-3."
+      ],
+      "intentional_differences": [
+        "The unavailable pen-input navigation entry is correctly hidden under the declared pen capability bound. This bound does not justify disabling software spread-image and separate-cover preferences.",
+        "Actual time, version, device model wording, and truthful capability wording may differ from the illustrative reference values."
+      ]
+    },
+    {
+      "case_id": "sc-settings--storage",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/sc-settings--storage.png",
+      "candidate_sha256": "cdb00885ad865ff1c298cd1ec2ea3bce5881beb54368aad38d3ac93dee8b2ae5",
+      "reference_png": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/screens/states/sc-settings--storage.png",
+      "reference_sha256": "f252b959d18ed347f4b661ac28c1ffbd2be6aad8a5364ef4943b56ad3698c779",
+      "viewed_candidate": true,
+      "viewed_reference": true,
+      "outcome": "needs_changes",
+      "observations": [
+        "The candidate presents only three summary rows: downloaded chapters with an unknown marker and a Configure action, cache usage of 0 B, and remaining space of 9.4 GB. These visible values agree with the corresponding settings_details metadata.",
+        "The reference's stacked usage bar, separate download/image-cache/cover/free legend, and largest-usage section are absent. The candidate has no cover-usage category or largest-record empty state. This structural omission is P3R1-REF29-2; it is distinct from allowing real storage values to differ.",
+        "Clear temporary cache and Delete downloaded read chapters actions are both visible below the summaries, with complete labels and no overlap. The static capture cannot establish their side effects or whether the Configure action supplies targeted per-record management.",
+        "The content remains inside the approximately 320-pixel navigation boundary and above the 80-pixel dock, with white surfaces and thin gray separators. The shared header ellipsis issue remains visible; see P3R1-REF29-3."
+      ],
+      "intentional_differences": [
+        "Real 0 B cache usage, unknown downloaded byte total, and 9.4 GB free space are accepted instead of the reference's illustrative nonzero values. No largest-title records should be fabricated when none are backed by actual stored files.",
+        "The pen-input navigation omission follows pen_input_implemented=false. Actual version, time, model wording, and truthful capability wording may differ."
+      ]
+    }
+  ],
+  "suggestions": [
+    {
+      "id": "P3R1-REF29-1",
+      "case_id": "sc-settings--spread",
+      "priority": "P2",
+      "description": "The required whole/split-spread and separate-cover preferences are unavailable.",
+      "evidence": "In the candidate's lower form, both Whole page and Split into two pages are gray and unselected, the separate-cover switch is gray and off, and the spread-image section explicitly says Unavailable. The reference provides enabled controls with a selected whole-page state and an enabled separate-cover switch. The case has no intentional difference declaring these software preferences out of scope, and the declared pen/hardware/auth capability bounds do not apply to them.",
+      "recommendation": "Implement persistent whole-versus-split spread handling and the separate-cover preference, then expose enabled controls with the same clear selected-state treatment as the reference. Keep the current honest unavailable presentation until those behaviors exist.",
+      "status": "open",
+      "introduced_round": 1
+    },
+    {
+      "id": "P3R1-REF29-2",
+      "case_id": "sc-settings--storage",
+      "priority": "P2",
+      "description": "The storage page omits the usage breakdown and largest-usage section required by the reference.",
+      "evidence": "The candidate contains three text rows and two cleanup buttons. It has no stacked usage bar, no distinct cover-usage value, and no largest-usage heading, records, or explicit empty state. The reference allocates a usage bar and four-category download/cache/cover/free legend above a largest-record list with per-record management actions. Actual empty or unknown data explains differing numbers and record count, but not the missing categories and section structure.",
+      "recommendation": "Restore the breakdown and largest-usage structure using actual download, cache, cover, and free-space values. Represent zero or unknown totals honestly, show a clear empty state when no largest records exist, and expose targeted management only for real records. Preserve the existing cleanup actions.",
+      "status": "open",
+      "introduced_round": 1
+    },
+    {
+      "id": "P3R1-REF29-3",
+      "case_id": "sc-settings--reading",
+      "priority": "P3",
+      "description": "The shared device header truncates its capability summary before the orientation capability is readable.",
+      "evidence": "All four candidate PNGs show the capability line below Kindle Scribe 1 ending in an ellipsis after the warmth capability and the beginning of the next capability. At the same logical scale, the reference contains its full capability summary before the vertical status divider. The actual capability wording may differ, but the incomplete visible label is a shared header geometry/readability issue.",
+      "recommendation": "Use concise truthful capability labels or rebalance the device header's available text width so that the supported capability summary fits completely while preserving the right status column and the existing logical geometry.",
+      "status": "open",
+      "introduced_round": 1
+    }
+  ],
+  "limitations": [
+    "This independent review covers only the four case IDs in reference-29.input.json and the eight supplied PNGs. It does not declare the complete review round clean.",
+    "All eight images were individually opened with tools.view_image. Source PNG bytes were not changed; candidate and reference SHA256 values were checked against each case's evidence metadata using Get-FileHash.",
+    "No application, build, test suite, runtime probe, Git operation, or product modification was performed. Static images and existing JSON metadata cannot prove action execution, persistence, runtime reachability, cleanup side effects, or hardware behavior.",
+    "The source-list capture contains no saved records, so populated-record geometry and the remove action could not be reviewed. The storage capture does not establish real largest stored-file records, so no illustrative reference titles or totals are required.",
+    "The supplied reference bundle identity is recorded as provided by the parent task. Each individual reference PNG hash was independently checked against its case metadata."
+  ]
+}

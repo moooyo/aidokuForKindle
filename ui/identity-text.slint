@@ -1,0 +1,12 @@
+export component IdentityTextFit inherits Text {
+    in property <string> full-text;
+    in property <string> compact-text;
+    in property <length> available-width;
+    out property <string> display-text: root.preferred-width > root.available-width && root.compact-text != "" ? root.compact-text : root.full-text;
+
+    // Keep native full-title measurement independent of the chosen display text.
+    text: root.full-text;
+    wrap: no-wrap;
+    opacity: 0;
+    accessible-role: none;
+}

@@ -1,0 +1,76 @@
+{
+  "schema_version": 1,
+  "kind": "candidate13-recoverable-old-Aidoku-compiler-leaf-proposal",
+  "owner": "/root/final_validation_delivery",
+  "status": "Root authorization pending; no compiler leaf has been deleted",
+  "current_source_sha256": "40b4b08f2b3529162772763414581cce37c4eb8de85d6b89f6bc4217bae14bfc",
+  "current_all_targets_exit_code": 101,
+  "current_failed_test_count": 85,
+  "archive_cleanup_receipt": "/root/aidoku-phase3/evidence/candidate13/diagnostics/archive-unlink-01/receipt.json",
+  "archive_cleanup_receipt_sha256": "7523b754442a14cfe6dc90b2f6a3de55bcf4071308e4499c3cd1284f553d8077",
+  "actual_available_bytes_after_archive_cleanup": 1245323264,
+  "protected_failed_test_executable": {
+    "remote": "/root/aidoku-build/target/debug/deps/aidoku_kindle-dc74463d0bb17e86",
+    "local": "D:/Code/aidokuForKindle/artifacts/phase3/candidate13/build/first-failure/aidoku_kindle-dc74463d0bb17e86",
+    "bytes": 118180376,
+    "sha256": "b9b8591ecc3e8482df2d043b6d9e1a130cb16b19a8dfeb81f54d1b54e5a63f99",
+    "action": "Retain both copies and all original failure/source/log records."
+  },
+  "proposed_inode_groups": [
+    {
+      "kind": "Old Candidate12 normal library compiler output",
+      "remote_exact_leaves": [
+        "/root/aidoku-build/target/debug/libaidoku_kindle.rlib",
+        "/root/aidoku-build/target/debug/deps/libaidoku_kindle-2d74b38a6fe75d24.rlib"
+      ],
+      "device": 2049,
+      "inode": 566167,
+      "link_count": 2,
+      "all_links_found_inside_debug": true,
+      "logical_bytes": 439378720,
+      "allocated_bytes_once": 439390208,
+      "sha256": "6764721777f44d7ce03f906ec98e7d1d727a80bf1fdfa942e7168ba5109b1b2f",
+      "local_exact_recovery": "D:/Code/aidokuForKindle/artifacts/phase3/candidate12/compiler-history/libaidoku_kindle-2d74b38a6fe75d24.rlib",
+      "local_bytes_and_sha256_match": true,
+      "recovery_source": "/root/aidoku-phase3/candidate12/source-snapshot; source c3c0e5776e620d469adb98576549efb7589e4b4c3f82828ecc96346cc43741cc; Cargo.lock retained"
+    },
+    {
+      "kind": "Old Candidate12 normal library metadata compiler output",
+      "remote_exact_leaves": [
+        "/root/aidoku-build/target/debug/deps/libaidoku_kindle-2d74b38a6fe75d24.rmeta"
+      ],
+      "device": 2049,
+      "inode": 566054,
+      "link_count": 1,
+      "logical_bytes": 47631817,
+      "allocated_bytes_once": 47636480,
+      "sha256": "80e665348650cadbe8f378fc29c277780c7af88bbed6d28f80661894d61955ba",
+      "local_exact_recovery": "D:/Code/aidokuForKindle/artifacts/phase3/candidate12/compiler-history/libaidoku_kindle-2d74b38a6fe75d24.rmeta",
+      "local_bytes_and_sha256_match": true
+    },
+    {
+      "kind": "Duplicate old Candidate12 desktop Cargo executable",
+      "remote_exact_leaves": [
+        "/root/aidoku-build/target/debug/aidoku",
+        "/root/aidoku-build/target/debug/deps/aidoku-daa1bd70b209dc16"
+      ],
+      "device": 2049,
+      "inode": 566154,
+      "link_count": 2,
+      "all_links_found_inside_debug": true,
+      "logical_bytes": 257511328,
+      "allocated_bytes_once": 254656512,
+      "sha256": "3c7de4c4ef442f424ed9e7814e1b74bf76a718565f8f465f9f566a7e75d71543",
+      "local_exact_recovery": "D:/Code/aidokuForKindle/artifacts/phase3/candidate12/compiler-history/aidoku-c12-desktop",
+      "local_bytes_and_sha256_match": true,
+      "additional_retained_frozen_copy": "/root/aidoku-phase3/candidate12/desktop/aidoku"
+    }
+  ],
+  "total_named_leaves": 5,
+  "distinct_inode_count": 3,
+  "allocated_bytes_proposed_once": 741683200,
+  "prospective_available_bytes_before_other_work": 1987006464,
+  "headroom_boundary": "This proposal alone is insufficient for two complete UI rounds, fresh native and formal raw evidence, new frozen binaries and build headroom. The retained C11 full1 footprint is about 1.03 GB per round before new native/performance evidence. Do not infer rerun/full authorization from the prospective free-space count.",
+  "protected_shared_target_boundary": "debug/deps also contains weread executables and shared dependency outputs. Never delete target, debug, deps, a parent directory, a glob or any other file. The current Candidate13 library/compiler output and failed test executable are excluded.",
+  "required_before_unlink": "Root must approve the exact five leaves. Recheck resolved absolute paths, regular files, all hard-link identities/counts, bytes and hashes immediately before mutation; save an independent before/after df/statvfs receipt. No recursive deletion is proposed."
+}

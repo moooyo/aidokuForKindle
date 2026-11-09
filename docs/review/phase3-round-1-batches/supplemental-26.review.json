@@ -1,0 +1,165 @@
+{
+  "batch_id": "supplemental-26",
+  "reviewer": "independent-static-review/supplemental-26",
+  "run_id": "a1baf3fe3dc2",
+  "binary_sha256": "94d7f3bbcab475ad8833a2f3c486138f7b49bead231851c2d8eab2f0c3d2ac51",
+  "source_sha256": "aef9db4e111165016a10a2a95e111f3155860b8510c7f6207ec9c79fbec5082c",
+  "reviewed_case_ids": [
+    "scribe--filter-unread-2",
+    "scribe--filter-unread-3",
+    "scribe--folio-outside-dismiss",
+    "scribe--history-clear-apply",
+    "scribe--history-clear-cancel",
+    "scribe--history-delete-entry",
+    "scribe--history-first-boundary",
+    "scribe--history-last-page"
+  ],
+  "reviewed_cases": [
+    {
+      "case_id": "scribe--filter-unread-2",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/scribe--filter-unread-2.png",
+      "candidate_sha256": "4ebe44baa264646adb1c821309b43b3843f4a02a2da584aa46095f93bc1ef018",
+      "viewed_candidate": true,
+      "outcome": "pass",
+      "observations": [
+        "Viewed the original 930 x 1240 candidate. Its current SHA-256 matches both the batch expected hash and the case screenshot evidence hash; the case run, binary, and source identities match the assigned round.",
+        "The library-filter choices float is anchored at the upper right with a white surface, a black outline, and no shadow or dimmed backdrop. Eight sort choices, a direction row, four filters, and Done remain visible within the content-sized panel.",
+        "Recently read and newest-to-oldest have inverse selection treatment. The unread filter has a visible exclusion mark and dashed outline, distinct from the neutral filters; this agrees with library_filters [0, -1, 0, 0].",
+        "The reduced shelf is visible around the panel and the folio reads 1/1 with both edge actions absent. The center remains at the same horizontal position as the multi-page library cases.",
+        "The fixture unread badges visible beside some titles were not used to infer actual database unread eligibility. Their demonstration values are independent of the actual unread predicate described by the task."
+      ],
+      "intentional_differences": []
+    },
+    {
+      "case_id": "scribe--filter-unread-3",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/scribe--filter-unread-3.png",
+      "candidate_sha256": "3f16a3268c3c2edaddbdb21bbf6fc3b87a9b5868fcd13e726e3996fae629ee5e",
+      "viewed_candidate": true,
+      "outcome": "pass",
+      "observations": [
+        "Viewed the original 930 x 1240 candidate. Its current SHA-256 matches the batch and case screenshot evidence; the recorded run, binary, and source identities match the assigned round.",
+        "The unread filter has returned to the same neutral outlined treatment as the other filters, without the exclusion mark. This agrees with library_filters [0, 0, 0, 0].",
+        "The surrounding shelf has returned to the full six-column, three-row first page; the supplied state contains 18 visible books and the folio now reads 1/3.",
+        "The sort and direction selections remain legible and inverse. The white outlined float follows its expanded content and keeps its Done action above the bottom edge without clipping.",
+        "The first-page Previous action is hidden while Next remains at the right and the page total stays centered. No gray capture mask, popup shadow, or surface stipple is visible; patterned pixels belong to fixture cover artwork."
+      ],
+      "intentional_differences": []
+    },
+    {
+      "case_id": "scribe--folio-outside-dismiss",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/scribe--folio-outside-dismiss.png",
+      "candidate_sha256": "a272a0763ace9d782671578c0598fa3f4bc96e8a242957ff480ef7f517cad464",
+      "viewed_candidate": true,
+      "outcome": "pass",
+      "observations": [
+        "Viewed the original candidate and matched its SHA-256 to both expected and case evidence hashes. The supplied case records library route, modal empty, and page_jump_open false for the assigned run and build.",
+        "The page-picker panel and outside-capture surface are absent from the final image. The library header, both summary cards, categories, complete six-by-three shelf, folio, and navigation are unobstructed.",
+        "The continuation and daily-update cards use white outlined surfaces. The 12/40 continuation label is paired with an approximately 30-percent progress fill.",
+        "Unread and downloaded indicators sit beside titles below artwork. The visible captions and three shelf rows do not collide with the folio.",
+        "The folio retains a centered 1/3, a right-aligned Next action, and empty left allocation for the unavailable Previous action. The still establishes the dismissed endpoint, not independent proof of pointer hit testing."
+      ],
+      "intentional_differences": []
+    },
+    {
+      "case_id": "scribe--history-clear-apply",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/scribe--history-clear-apply.png",
+      "candidate_sha256": "3531d1ec57770c272234ce11d84854ce96c9ae277d2a92350eccbd296f69fafb",
+      "viewed_candidate": true,
+      "outcome": "needs_change",
+      "observations": [
+        "Viewed the original candidate and matched its SHA-256 with both batch and case screenshot hashes. The supplied case checks report history_count 0, modal empty, and folio 1/1 on the assigned run and build.",
+        "The confirmation is closed and the reading-history content is empty. The recent-reading summary is zero, the clear icon is muted, and neither folio edge action remains visible.",
+        "A centered clock icon and a heavy empty-history heading provide a clear status on the white content surface.",
+        "The empty content area has no local action to open the library, browse, or otherwise start reading. HANDOFF.md section 11 item 4 explicitly requires empty states to contain status plus an action. The global dock still provides library and browse routes, so this finding concerns handoff fidelity and a more direct next step within the empty component. See P3R1-SUP26-1.",
+        "The source-only history prototype supplies an empty illustration and heading but no action. This incomplete source state does not remove the handoff's explicit UX requirement."
+      ],
+      "intentional_differences": []
+    },
+    {
+      "case_id": "scribe--history-clear-cancel",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/scribe--history-clear-cancel.png",
+      "candidate_sha256": "ffc68bacf530d3760ebd067d5a5f9e011e3bf117da5589a176c85a4a4b30bb14",
+      "viewed_candidate": true,
+      "outcome": "pass",
+      "observations": [
+        "Viewed the original candidate and matched its SHA-256 against the batch and case evidence. The supplied checks identify history route, modal empty, history_count 20, and page 1 of 5.",
+        "The confirmation is absent and six visible records remain across four descending date groups. Today and Yesterday each occupy paired columns; November 1 and October 31 each have one record without moving later dates into the same group.",
+        "Both record columns have aligned cover, title, chapter, progress/time, and remove-action positions. Their equal widths and 32-pixel inter-column gap agree with the Scribe history declaration.",
+        "The 12/40, 5/22, and 8/22 records show proportionate fills of about 30, 23, and 36 percent. Completed records use completion/time text rather than a partial-progress bar.",
+        "The first-page folio reads 1/5 with only Next visible. The navigation and page center remain stable, and the clear icon remains enabled for the retained records."
+      ],
+      "intentional_differences": []
+    },
+    {
+      "case_id": "scribe--history-delete-entry",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/scribe--history-delete-entry.png",
+      "candidate_sha256": "1331b72dea9f8333b80b805936118a4a505ae3cff246f5141e3927abe527caa4",
+      "viewed_candidate": true,
+      "outcome": "pass",
+      "observations": [
+        "Viewed the original candidate and matched its SHA-256 to expected and case screenshot evidence. The supplied deletion check records a durable history count of 19, one below the 20-entry baseline.",
+        "The former first Today record is absent; the remaining Today record has moved into the left column. The recent-seven-days summary changes from eight to seven while the other visible date groups remain present.",
+        "Yesterday retains two aligned records, including the 5/22 partial-progress entry at the right. The November 1 and October 31 groups remain in descending chronological order.",
+        "Covers, chapter lines, completed or progress/time lines, and per-entry remove icons retain their spacing. No orphaned heading, stale cover, overlapping text, or misplaced remove icon is visible.",
+        "The folio remains 1/5 with hidden Previous and right-aligned Next, consistent with the supplied page count after deletion."
+      ],
+      "intentional_differences": []
+    },
+    {
+      "case_id": "scribe--history-first-boundary",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/scribe--history-first-boundary.png",
+      "candidate_sha256": "ffc68bacf530d3760ebd067d5a5f9e011e3bf117da5589a176c85a4a4b30bb14",
+      "viewed_candidate": true,
+      "outcome": "pass",
+      "observations": [
+        "Individually viewed this candidate despite its matching the clear-cancel image hash. Its current SHA-256 matches its own batch and case evidence, and the supplied checks record page 1 within a five-page history.",
+        "The unavailable Previous action is hidden while its left allocation remains empty; 1/5 stays centered and Next stays at the right edge above the dock.",
+        "The first-page content is unchanged: Today precedes Yesterday, followed by November 1 and October 31, with the newer record at the left of each two-record date group.",
+        "The paired columns, 72 x 98 inner covers, chapter text, progress/time lines, and remove controls are legible and aligned. No boundary-induced content shift is visible.",
+        "The still and supplied boundary check establish the captured first-page state; they do not independently establish behavior for repeated touches on an unavailable action."
+      ],
+      "intentional_differences": []
+    },
+    {
+      "case_id": "scribe--history-last-page",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/scribe--history-last-page.png",
+      "candidate_sha256": "6f981df4c2cc70580dec73436c31d8c3b5e4394c650a8a54d88117933cb5f00d",
+      "viewed_candidate": true,
+      "outcome": "pass",
+      "observations": [
+        "Viewed the original candidate and matched its current SHA-256 to both expected and case screenshot hashes. The supplied state records 20 total history entries and page 5 of 5 for the assigned run and build.",
+        "The final page shows October 18 above October 17, preserving descending date order. Each date contains one completed entry in the left column; the unused right column is a legitimate partial-page allocation.",
+        "Both entries retain readable title, chapter, completion/time, cover, and remove-action alignment. The title plate for the lower entry remains legible.",
+        "Completed entries have completion/time text without misleading partial-progress fills.",
+        "The folio reads 5/5 in the same centered position as page 1. Previous remains visible on the left, Next is hidden with its right allocation preserved, and the navigation stays fixed at the bottom."
+      ],
+      "intentional_differences": []
+    }
+  ],
+  "suggestions": [
+    {
+      "id": "P3R1-SUP26-1",
+      "case_id": "scribe--history-clear-apply",
+      "priority": "P3",
+      "description": "The empty history state provides a status but no action for returning to reading or discovering content.",
+      "evidence": "The viewed candidate has only a clock icon and an empty-history heading in its central content area, with no action beneath them. The global dock still offers library and browse routes. Case metadata records history_count 0, modal empty, and page 1/1. The authoritative handoff at C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/HANDOFF.md, section 11 item 4 (line 392), explicitly requires incomplete empty states to be completed with status plus an action. The source-only sc-history.dc.html empty branch at lines 96-101 omits that action and therefore cannot be treated as a completed UX specification.",
+      "recommendation": "Add one concise, enabled action within the empty-history component, such as an Open library or Browse action connected to the corresponding real route. Keep the existing centered status and the declared monochrome control treatment, then capture the cleared endpoint again.",
+      "status": "open",
+      "introduced_round": 1
+    }
+  ],
+  "coverage_gaps": [
+    "This supplemental batch contains eight Scribe candidates and no independent reference PNG. Visual conclusions use the reference scope, handoff, prototype source, supplied case metadata, and the eight original candidates; no other images were loaded.",
+    "The snapshots show final endpoints after filtering, dismissal, cancel, clear, deletion, and boundary navigation. Pointer hit regions, event sequencing, and persistence were not independently exercised by this static reviewer.",
+    "History pages 2 through 4 were not provided in this batch. The viewed first and final pages preserve their local descending chronology, but complete cross-page chronology is outside this batch.",
+    "The actual unread predicate was not rederived from a database. Fixture cover unread badges were kept separate from actual unread counts and were not treated as evidence of a filtering failure.",
+    "No closed-reader, missing-hardware, authentication, quality-control, or physical-device state is pictured in this batch."
+  ],
+  "limitations": [
+    "All eight candidate hashes matched the batch expected hashes and case evidence hashes, and all eight case files matched run a1baf3fe3dc2, binary 94d7f3bbcab475ad8833a2f3c486138f7b49bead231851c2d8eab2f0c3d2ac51, and source aef9db4e111165016a10a2a95e111f3155860b8510c7f6207ec9c79fbec5082c.",
+    "The reviewed images are native 930 x 1240 desktop captures for the Scribe design profile. This review does not assert physical 1860 x 2480 device qualification or independent pixel identity to an export.",
+    "Only static reads, file hashing, image viewing, and this review artifact were performed locally. No application, prototype runtime, build, test, smoke check, or runtime probe was run.",
+    "Static PNGs cannot establish sleep/wake restoration, e-ink refresh behavior, hardware capability correctness, timing, memory behavior on a 512 MiB device, or durable operations beyond the supplied evidence.",
+    "This artifact reviews only supplemental-26 and does not declare the complete phase or review round clean."
+  ]
+}

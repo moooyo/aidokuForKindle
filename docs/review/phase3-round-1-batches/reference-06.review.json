@@ -1,0 +1,172 @@
+{
+  "batch_id": "reference-06",
+  "reviewer": "/root/phase3_round1_review/reference_06",
+  "run_id": "a1baf3fe3dc2",
+  "round": 1,
+  "status": "completed_with_findings",
+  "review_method": "Fresh independent visual inspection of all eight assigned original PNGs using view_image, with reference geometry interpreted at one-half physical scale. A subsequent text-only review checked the design handoff and PW detail prototype constraints without loading additional images.",
+  "identity": {
+    "candidate_pixel_identity": "SHA-256 of original unmodified PNG bytes",
+    "binary_sha256": "94d7f3bbcab475ad8833a2f3c486138f7b49bead231851c2d8eab2f0c3d2ac51",
+    "source_sha256": "aef9db4e111165016a10a2a95e111f3155860b8510c7f6207ec9c79fbec5082c",
+    "supplied_reference_set_sha256": "e7b49b456255432d74cfe41346f9d44c1a9c55bf67c5d55483e4ae3029547d18",
+    "case_metadata_run_binary_source_match": true,
+    "all_candidate_hashes_match_case_evidence": true,
+    "all_reference_hashes_match_case_evidence": true,
+    "candidate_logical_size": [618, 824],
+    "reference_physical_size": [1236, 1648],
+    "reference_physical_scale": 2,
+    "reference_set_hash_note": "The reference-set hash is supplied review provenance. Individual reference PNG hashes were independently recomputed and matched their case metadata; the aggregate reference-set hash was not recomputed."
+  },
+  "reviewed_case_ids": [
+    "pw-manga--default",
+    "pw-manga--batch-download",
+    "pw-manga--chapters-p2",
+    "pw-manga--description"
+  ],
+  "reviewed_cases": [
+    {
+      "case_id": "pw-manga--default",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/pw-manga--default.png",
+      "candidate_sha256": "c82dab94dd83aff1aa8a20bffe4a0058bf48a276b6475bfdf356f66c31300fe1",
+      "reference_png": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/screens/pw-manga.png",
+      "reference_sha256": "18b052844a8b90a2a558d2225301b2e273a6cb6bb2f457d7cc017294e89bd274",
+      "viewed_candidate": true,
+      "viewed_reference": true,
+      "outcome": "pass",
+      "observations": [
+        "The cover, book-information column, summary link, reading action, bookmark, and tracking action occupy the same logical positions and proportions as the reference. The information cover retains the approximately 132 by 186 logical-pixel interior footprint.",
+        "The initial page shows exactly six complete chapter rows with approximately 52 logical-pixel spacing, with the directory heading and download action above them and a centered 1/8 folio below. No dock is present.",
+        "Title hierarchy, secondary gray text, dotted leaders, outlined download buttons, and the black reading action visually match at equal logical scale. No text clipping, overlap, shadow, or stippled panel surface is visible.",
+        "The summary-link chevron sits immediately after its label with approximately a 10 logical-pixel gap, consistent with the reference and the prior spacing correction."
+      ],
+      "intentional_differences": [
+        "Original 1x native rasterization and the 2x physical reference have different sampling detail; comparisons use equal logical scale."
+      ]
+    },
+    {
+      "case_id": "pw-manga--batch-download",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/pw-manga--batch-download.png",
+      "candidate_sha256": "667cd5fa298c29465a9162f7d0317aa5add28fadcaba703597c5f432c1c7d652",
+      "reference_png": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/screens/states/pw-manga--batch-download.png",
+      "reference_sha256": "bf955d46adf4588b06ae33aca771b5df9d9921fb6fec44bb8ca78b261905ac75",
+      "viewed_candidate": true,
+      "viewed_reference": true,
+      "outcome": "pass",
+      "observations": [
+        "All four required action meanings are visible: next five chapters, unread chapters, custom range, and removal of read downloads. The sidecar lists all four corresponding action IDs as enabled. The cancel action and free-space line are fully visible.",
+        "The underlying book information and directory header retain their reference geometry. The white batch panel has a hard black top boundary, thin gray row dividers, and no shadow or stippled backdrop.",
+        "The candidate panel top is about 8 logical pixels below the reference, but this is not independently a defect: the handoff specifies content-driven sheet heights. The inspected cancel control begins about 20 logical pixels below each sheet top, consistent with the 2-pixel top border plus 18-pixel top padding, and both controls are about 44 pixels high.",
+        "The left action inset is approximately 26 logical pixels in both images, consistent with 22-pixel outer padding plus 4-pixel action padding. The observed approximately 64-pixel option rhythm is consistent with the prototype 56-pixel actions and 8-pixel gap. No label or action is clipped, and no separate internal-padding, row-size, or control-size violation is established."
+      ],
+      "intentional_differences": [
+        "The candidate uses shorter next-five and unread-action wording while retaining the required action meanings.",
+        "The candidate sidecar supplies empty size-estimate values and null cached_download_bytes, so reference download-size estimates were not treated as required literal data."
+      ]
+    },
+    {
+      "case_id": "pw-manga--chapters-p2",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/pw-manga--chapters-p2.png",
+      "candidate_sha256": "a14e62155f05d1a051b21cda4acfd643410acbaaded98a452667122a051aa251",
+      "reference_png": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/screens/states/pw-manga--chapters-p2.png",
+      "reference_sha256": "53dd5de9ebc57a7794457f92857e25b8cbe1235df110ae24f71f84e86da42586",
+      "viewed_candidate": true,
+      "viewed_reference": true,
+      "outcome": "pass",
+      "observations": [
+        "The large information section is collapsed and the book title is centered in the compact navigation header above the directory section.",
+        "Exactly twelve full rows, chapter numbers 80 through 69, are visible at approximately 52 logical-pixel intervals. Chapter names, gray dates, dotted leaders, and the right-aligned outlined download controls follow the reference layout.",
+        "The directory download action, previous-page action, centered 2/8 folio, and next-page action remain visible with matching edge margins. There is no dock and the last row clears the folio.",
+        "Typography hierarchy, gray contrast, and white outlined controls visually match. No clipping, overlap, shadow, or stippled surface is visible."
+      ],
+      "intentional_differences": [
+        "Original 1x native rasterization and the 2x physical reference have different sampling detail; comparisons use equal logical scale."
+      ]
+    },
+    {
+      "case_id": "pw-manga--description",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/pw-manga--description.png",
+      "candidate_sha256": "36be53d5b696ce3cc76fbe680589ef28a29db43c8d623baa0e2a1f4a41cede91",
+      "reference_png": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/screens/states/pw-manga--description.png",
+      "reference_sha256": "470b7e99526c882e74a1b3cdedde9dd83378e97bb22c62981da1a642b1f73bd8",
+      "viewed_candidate": true,
+      "viewed_reference": true,
+      "outcome": "needs_correction",
+      "observations": [
+        "The white description panel shows a title, black close action, description text, four outlined tag controls, and source/update/local-storage metadata. All controls and metadata are visible without clipping, and the panel has no shadow or stippled surface.",
+        "The panel top boundary is approximately candidate y=455 versus reference y=463 in logical coordinates. This content-driven height difference is not independently a defect. Both close controls begin about 20 logical pixels below their respective sheet tops, consistent with the 2-pixel top border plus 18-pixel padding, and both are about 44 pixels high.",
+        "The candidate body begins flush at approximately x=26, while the reference first line begins around x=62 with a two-em first-line indent. The candidate body uses approximately 26 logical-pixel line spacing versus about 32 in the reference, producing visibly tighter paragraph rhythm.",
+        "The candidate sidecar contains a shorter two-sentence body than the reference. This permitted content-length difference is not a finding and does not invalidate the explicit 32-pixel line-height and two-em indent requirements.",
+        "The underlying summary-link chevron still has the corrected close spacing after its label."
+      ],
+      "intentional_differences": [
+        "The update date and unavailable local byte total differ from the reference and were treated as dynamic metadata.",
+        "The source metadata omits the reference language suffix; this content difference was not treated as a geometry exemption.",
+        "The candidate book record has a shorter description than the reference. Real description content and resulting content-driven sheet height may differ."
+      ],
+      "finding_ids": ["P3R1-REF06-3"]
+    }
+  ],
+  "suggestions": [
+    {
+      "id": "P3R1-REF06-3",
+      "case_id": "pw-manga--description",
+      "priority": "P3",
+      "description": "The description paragraph omits the reference first-line indent and has tighter line spacing.",
+      "evidence": "DESIGN_HANDOFF.md:319-321 explicitly requires a serif 18/32 description body. The original PW prototype at pw-manga.dc.html:118 explicitly declares font-size: 18px; line-height: 32px; text-indent: 2em. In the already inspected images, the candidate paragraph starts at the content edge near logical x=26, while the reference first line starts around logical x=62. Consecutive candidate lines are approximately 26 logical pixels apart, compared with 32 in the reference. This is a typography-polish discrepancy without observed clipping or functional loss, independent of the shorter candidate text.",
+      "recommendation": "Apply the reference two-em first-line indent and approximately 32 logical-pixel line height to the description body while preserving its left and right content margins.",
+      "constraint_sources": [
+        {
+          "file": "D:/Code/aidokuForKindle/docs/DESIGN_HANDOFF.md",
+          "line": 320,
+          "constraint": "Full-width content-driven sheet; padding 18 26 28; serif 18/32 body."
+        },
+        {
+          "file": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/prototype/pw-manga.dc.html",
+          "line": 118,
+          "constraint": "font-size: 18px; line-height: 32px; text-indent: 2em"
+        }
+      ],
+      "status": "open",
+      "introduced_round": 1
+    }
+  ],
+  "withdrawn_findings": [
+    {
+      "id": "P3R1-REF06-1",
+      "case_id": "pw-manga--batch-download",
+      "status": "withdrawn",
+      "reason": "A sheet top-edge difference alone does not violate the handoff: DESIGN_HANDOFF.md:279-280 says sheet heights follow content. The explicit batch padding and control/row dimensions did not establish a separate violation in the inspected evidence."
+    },
+    {
+      "id": "P3R1-REF06-2",
+      "case_id": "pw-manga--description",
+      "status": "withdrawn",
+      "reason": "A sheet top-edge difference alone does not violate the content-driven-height rule at DESIGN_HANDOFF.md:279-280. The close-control height and top inset remain consistent with the explicit prototype constraints. Only the independently specified paragraph formatting is retained as a finding."
+    }
+  ],
+  "revision_notes": [
+    "A text-only follow-up read DESIGN_HANDOFF.md:279-280 and 319-324 plus pw-manga.dc.html:113-143. No image was loaded again.",
+    "Removed the two anchor-only suggestions, accepted real description-length differences, and classified the remaining paragraph-formatting suggestion as P3 because there is no observed functional, clipping, or major-layout harm."
+  ],
+  "prior_finding_rechecks": [
+    {
+      "finding_id": "P3D-007",
+      "case_ids": [
+        "pw-manga--default",
+        "pw-manga--batch-download",
+        "pw-manga--description"
+      ],
+      "outcome": "fixed_in_reviewed_evidence",
+      "observations": "Direct inspection of the assigned PNGs confirms that the summary-link chevron follows the label at approximately a 10 logical-pixel gap rather than appearing at the far end of the information column. This matches the reference spacing."
+    }
+  ],
+  "limitations": [
+    "Only the four assigned cases and their eight original PNGs were visually inspected. This review does not establish that the full round is clean.",
+    "No application, build, test, smoke check, runtime probe, Git operation, or product-code modification was performed locally or remotely.",
+    "Reachability observations are limited to visible controls and the supplied state sidecars. No control was interactively exercised.",
+    "Pixel geometry values in findings are visual estimates; no locally executed image-analysis or validation suite was used.",
+    "Real description length may differ from the reference, and sheet height follows content. No separate content-loss or fixed-sheet-height finding is asserted.",
+    "Binary and source identities were matched against the supplied case metadata and expected hashes; the executable and source tree were not independently rebuilt or hashed during this review."
+  ]
+}

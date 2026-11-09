@@ -1,0 +1,661 @@
+{
+  "schema_version": 1,
+  "round": 1,
+  "status": "changes_required",
+  "review_kind": "manual_static_screenshot_comparison",
+  "review_complete": false,
+  "new_suggestion_count": 23,
+  "consecutive_clean_rounds": 0,
+  "coverage_note": "All twelve baseline screenshots were inspected. Scribe's detailed layout review is blocked by the incorrect captured window size; it must be repeated after the canvas fix. A complete clean round is not claimed.",
+  "coordinate_system": {
+    "units": "logical design pixels",
+    "paperwhite_baseline_size": [
+      618,
+      824
+    ],
+    "reference_png_scale": 2,
+    "scribe_baseline_size": [
+      618,
+      824
+    ],
+    "scribe_expected_portrait": [
+      930,
+      1240
+    ],
+    "scribe_expected_landscape": [
+      1240,
+      930
+    ]
+  },
+  "screens": [
+    {
+      "id": "pw5-library",
+      "actual": "artifacts/ui-round-1/pw5-library.png",
+      "reference": "tmp/design/reference-01.png",
+      "reviewed": true,
+      "detailed_review_blocked": false
+    },
+    {
+      "id": "pw5-detail",
+      "actual": "artifacts/ui-round-1/pw5-detail.png",
+      "reference": "tmp/design/reference-02.png",
+      "reviewed": true,
+      "detailed_review_blocked": false
+    },
+    {
+      "id": "pw5-reader",
+      "actual": "artifacts/ui-round-1/pw5-reader.png",
+      "reference": "tmp/design/reference-03.png",
+      "reviewed": true,
+      "detailed_review_blocked": false
+    },
+    {
+      "id": "pw5-sources",
+      "actual": "artifacts/ui-round-1/pw5-sources.png",
+      "reference": "tmp/design/reference-04.png",
+      "reviewed": true,
+      "detailed_review_blocked": false
+    },
+    {
+      "id": "pw5-catalog",
+      "actual": "artifacts/ui-round-1/pw5-catalog.png",
+      "reference": "tmp/design/reference-05.png",
+      "reviewed": true,
+      "detailed_review_blocked": false
+    },
+    {
+      "id": "pw5-search",
+      "actual": "artifacts/ui-round-1/pw5-search.png",
+      "reference": "tmp/design/reference-06.png",
+      "reviewed": true,
+      "detailed_review_blocked": false
+    },
+    {
+      "id": "pw5-history",
+      "actual": "artifacts/ui-round-1/pw5-history.png",
+      "reference": "tmp/design/reference-07.png",
+      "reviewed": true,
+      "detailed_review_blocked": false
+    },
+    {
+      "id": "pw5-settings",
+      "actual": "artifacts/ui-round-1/pw5-settings.png",
+      "reference": "tmp/design/reference-08.png",
+      "reviewed": true,
+      "detailed_review_blocked": false
+    },
+    {
+      "id": "scribe-library",
+      "actual": "artifacts/ui-round-1/scribe-library.png",
+      "reference": "tmp/design/reference-09.png",
+      "reviewed": true,
+      "detailed_review_blocked": true
+    },
+    {
+      "id": "scribe-detail",
+      "actual": "artifacts/ui-round-1/scribe-detail.png",
+      "reference": "tmp/design/reference-10.png",
+      "reviewed": true,
+      "detailed_review_blocked": true
+    },
+    {
+      "id": "scribe-sources",
+      "actual": "artifacts/ui-round-1/scribe-sources.png",
+      "reference": "tmp/design/reference-11.png",
+      "reviewed": true,
+      "detailed_review_blocked": true
+    },
+    {
+      "id": "scribe-landscape-reader",
+      "actual": "artifacts/ui-round-1/scribe-landscape-reader.png",
+      "reference": "tmp/design/reference-12.png",
+      "reviewed": true,
+      "detailed_review_blocked": true
+    }
+  ],
+  "accepted_design_data_differences": [
+    {
+      "screen": "pw5-detail",
+      "description": "The fixture contains all 86 chapters. At six chapters per page, the correct page count is 15. The mock's count of eight contradicts its chapter total; retain the real 1/15 pager."
+    },
+    {
+      "screen": "pw5-detail",
+      "description": "The current partial chapter is excluded from the unopened-chapter label, giving the reference count of 52. Database unread counts and cover-update badges remain separate concepts."
+    },
+    {
+      "screen": "pw5-search",
+      "description": "The mock's five-source label is not authority to fabricate a source response. Both scope and completion counts must use the actual searchable set."
+    }
+  ],
+  "findings": [
+    {
+      "id": "R1-D001",
+      "priority": "P1",
+      "screens": [
+        "scribe-library",
+        "scribe-detail",
+        "scribe-sources",
+        "scribe-landscape-reader"
+      ],
+      "bounds_design_px": null,
+      "title": "Scribe capture uses the Paperwhite window size",
+      "observed": "All four Scribe snapshots and metadata report 618x824 while their requested logical canvases are 930x1240 or 1240x930. Grid covers collapse, sidebar content clips, and landscape pages are letterboxed.",
+      "recommendation": "Bind the native window and snapshot size to the selected device canvas and orientation, then recapture all Scribe screens before assessing their detailed geometry.",
+      "owner": "root",
+      "status": "implemented_awaiting_recapture",
+      "evidence": [
+        "artifacts/ui-round-1/scribe-library.png",
+        "artifacts/ui-round-1/scribe-detail.png",
+        "artifacts/ui-round-1/scribe-sources.png",
+        "artifacts/ui-round-1/scribe-landscape-reader.png"
+      ]
+    },
+    {
+      "id": "R1-D002",
+      "priority": "P1",
+      "screens": [
+        "pw5-library",
+        "pw5-detail",
+        "pw5-settings"
+      ],
+      "bounds_design_px": [
+        0,
+        30,
+        618,
+        104
+      ],
+      "title": "Shared page headers are vertically centered instead of anchored",
+      "observed": "The library and settings title/metadata blocks are absent; the detail back control appears over the chapter heading near y=416.",
+      "recommendation": "Explicitly anchor PageHeader at x=0,y=0 within page content. Preserve its defined height and ensure its children remain within that frame.",
+      "owner": "root",
+      "status": "implemented_awaiting_recapture",
+      "evidence": [
+        "artifacts/ui-round-1/pw5-library.png",
+        "artifacts/ui-round-1/pw5-detail.png",
+        "artifacts/ui-round-1/pw5-settings.png"
+      ]
+    },
+    {
+      "id": "R1-D003",
+      "priority": "P1",
+      "screens": [
+        "pw5-sources",
+        "pw5-catalog",
+        "pw5-history"
+      ],
+      "bounds_design_px": [
+        470,
+        32,
+        618,
+        104
+      ],
+      "title": "Absolute icon buttons have parent-wide default geometry",
+      "observed": "The sources Add button extends past the right edge, catalog search/filter/settings actions disappear, and history actions are partially missing. The common IconButton defines preferred-width without an explicit width.",
+      "recommendation": "Set IconButton.width to its preferred-width so absolute instances receive the intended touch width. Recheck all right-aligned action groups rather than adding page-specific offsets.",
+      "owner": "root",
+      "status": "implemented_awaiting_recapture",
+      "evidence": [
+        "artifacts/ui-round-1/pw5-sources.png",
+        "artifacts/ui-round-1/pw5-catalog.png",
+        "artifacts/ui-round-1/pw5-history.png"
+      ]
+    },
+    {
+      "id": "R1-D004",
+      "priority": "P1",
+      "screens": [
+        "pw5-detail"
+      ],
+      "bounds_design_px": [
+        22,
+        312,
+        596,
+        368
+      ],
+      "title": "Continue button overlaps the favorite control",
+      "observed": "The primary button begins at x=88 instead of x=22 and extends through the favorite button. Its white arrow tile is covered by the favorite control.",
+      "recommendation": "Anchor ContinueButton to x=0,y=0 in its action group. Retain the gap to the favorite control and the intended trailing inset of the arrow tile.",
+      "owner": "ui_primary",
+      "status": "implemented_awaiting_recapture",
+      "evidence": [
+        "artifacts/ui-round-1/pw5-detail.png"
+      ]
+    },
+    {
+      "id": "R1-D005",
+      "priority": "P2",
+      "screens": [
+        "pw5-library",
+        "pw5-history"
+      ],
+      "bounds_design_px": [
+        83,
+        202,
+        467,
+        573
+      ],
+      "title": "Progress fills start in the middle of their tracks",
+      "observed": "The 12/40 fill in the continuation card and the history progress fills are centered within their tracks.",
+      "recommendation": "Anchor each fill Rectangle at x=0,y=0 and derive its width from the stored page/total fraction.",
+      "owner": "ui_primary_and_ui_aux",
+      "status": "implemented_awaiting_recapture",
+      "evidence": [
+        "artifacts/ui-round-1/pw5-library.png",
+        "artifacts/ui-round-1/pw5-history.png"
+      ]
+    },
+    {
+      "id": "R1-D006",
+      "priority": "P2",
+      "screens": [
+        "pw5-reader"
+      ],
+      "bounds_design_px": [
+        60,
+        51,
+        486,
+        86
+      ],
+      "title": "Reader chapter number appears twice",
+      "observed": "The reader heading renders the chapter number prefix and a second already-prefixed chapter label.",
+      "recommendation": "Expose or use the bare chapter title for the heading, adding the localized chapter prefix and number only once.",
+      "owner": "ui_primary",
+      "status": "implemented_awaiting_recapture",
+      "evidence": [
+        "artifacts/ui-round-1/pw5-reader.png"
+      ]
+    },
+    {
+      "id": "R1-D007",
+      "priority": "P2",
+      "screens": [
+        "pw5-reader"
+      ],
+      "bounds_design_px": [
+        0,
+        0,
+        618,
+        30
+      ],
+      "title": "Reader status bar is not at the top edge",
+      "observed": "The open-menu reader omits the time, connectivity, and battery row visible in reference page 3.",
+      "recommendation": "Anchor the embedded StatusBar to y=0 within the reader header.",
+      "owner": "root",
+      "status": "implemented_awaiting_recapture",
+      "evidence": [
+        "artifacts/ui-round-1/pw5-reader.png"
+      ]
+    },
+    {
+      "id": "R1-D008",
+      "priority": "P2",
+      "screens": [
+        "pw5-library",
+        "pw5-sources",
+        "pw5-search",
+        "pw5-history",
+        "pw5-settings"
+      ],
+      "bounds_design_px": [
+        0,
+        752,
+        618,
+        753
+      ],
+      "title": "Bottom navigation lacks its full-width top rule",
+      "observed": "Only the selected item's short heavy rule is visible, without the continuous black separator shown in the reference.",
+      "recommendation": "Anchor the navigation separator at y=0 and keep it visible above or clear of item backgrounds.",
+      "owner": "root",
+      "status": "implemented_awaiting_recapture",
+      "evidence": [
+        "artifacts/ui-round-1/pw5-library.png",
+        "artifacts/ui-round-1/pw5-sources.png",
+        "artifacts/ui-round-1/pw5-search.png",
+        "artifacts/ui-round-1/pw5-history.png",
+        "artifacts/ui-round-1/pw5-settings.png"
+      ]
+    },
+    {
+      "id": "R1-D009",
+      "priority": "P2",
+      "screens": [
+        "pw5-reader",
+        "scribe-landscape-reader"
+      ],
+      "bounds_design_px": [
+        16,
+        89,
+        602,
+        636
+      ],
+      "title": "Demo comic panel geometry is compressed behind the menu",
+      "observed": "The city panel ends at y=194 and the dotted panel starts at y=207; reference page 3 places those boundaries at about y=284 and y=294, with the radial panel starting at y=548.",
+      "recommendation": "Restore the observed art-only PDF clips at their original positions and extend the hidden image regions. Preserve image bounds under border cropping. The same image should project the city baseline to about y=330 in the Scribe spread.",
+      "owner": "design_research",
+      "status": "implemented_awaiting_recapture",
+      "evidence": [
+        "artifacts/ui-round-1/pw5-reader.png",
+        "artifacts/ui-round-1/scribe-landscape-reader.png"
+      ]
+    },
+    {
+      "id": "R1-D010",
+      "priority": "P2",
+      "screens": [
+        "pw5-reader",
+        "scribe-landscape-reader"
+      ],
+      "bounds_design_px": [
+        123,
+        756,
+        247,
+        824
+      ],
+      "title": "Reader picture tool uses a landscape-photo symbol",
+      "observed": "The reference picture-adjustment tool is a circular half-plane with horizontal rules, whereas the baseline uses mountains.",
+      "recommendation": "Use the circular adjustment drawing for picture.svg. Keep the landscape drawing separately for the settings image-processing row.",
+      "owner": "design_research",
+      "status": "implemented_awaiting_recapture",
+      "evidence": [
+        "artifacts/ui-round-1/pw5-reader.png",
+        "artifacts/ui-round-1/scribe-landscape-reader.png"
+      ]
+    },
+    {
+      "id": "R1-D011",
+      "priority": "P2",
+      "screens": [
+        "pw5-catalog",
+        "pw5-history",
+        "scribe-sources"
+      ],
+      "bounds_design_px": null,
+      "title": "Context covers display unrelated printed titles or patterns",
+      "observed": "Examples include Glasshouse showing the Paper Crane title, Midnight Radio showing Silver Mountains, and Steam and Oak showing Lighthouse Keeper. History also reuses library cover editions whose patterns differ from its reference.",
+      "recommendation": "Extract clean catalog and history covers for their respective reference contexts, remove embedded UI badges, embed all assets, and project context-specific paths without overriding a user's custom cover. Cache decoded covers by the actual path as well as book identity.",
+      "owner": "design_research_and_root",
+      "status": "in_progress",
+      "evidence": [
+        "artifacts/ui-round-1/pw5-catalog.png",
+        "artifacts/ui-round-1/pw5-history.png",
+        "artifacts/ui-round-1/scribe-sources.png"
+      ]
+    },
+    {
+      "id": "R1-D012",
+      "priority": "P2",
+      "screens": [
+        "pw5-history"
+      ],
+      "bounds_design_px": [
+        458,
+        48,
+        608,
+        96
+      ],
+      "title": "History privacy action does not match its meaning",
+      "observed": "The action shows a lock and an elided label instead of the crossed-eye and full Incognito text; the separate clear-history action is not visible.",
+      "recommendation": "Restore the crossed-eye plus text treatment and retain a separate visible trash action within its touch target.",
+      "owner": "ui_aux",
+      "status": "identified",
+      "evidence": [
+        "artifacts/ui-round-1/pw5-history.png"
+      ]
+    },
+    {
+      "id": "R1-D013",
+      "priority": "P3",
+      "screens": [
+        "pw5-history"
+      ],
+      "bounds_design_px": [
+        22,
+        177,
+        170,
+        625
+      ],
+      "title": "History date headings merge different text roles",
+      "observed": "Today, Yesterday, and Sunday run directly into black bold dates as one string.",
+      "recommendation": "Render the group label separately from the date. Use Literata and #555 for dates with about eight design pixels of spacing.",
+      "owner": "ui_aux",
+      "status": "identified",
+      "evidence": [
+        "artifacts/ui-round-1/pw5-history.png"
+      ]
+    },
+    {
+      "id": "R1-D014",
+      "priority": "P2",
+      "screens": [
+        "pw5-search"
+      ],
+      "bounds_design_px": [
+        16,
+        96,
+        440,
+        175
+      ],
+      "title": "Search scope and completed-source counts contradict each other",
+      "observed": "The scope chip says five sources while the summary says four were searched.",
+      "recommendation": "Derive both counts from the same real installed and enabled search-source set. Do not invent a fifth response to match a mock count.",
+      "owner": "ui_aux_and_root",
+      "status": "identified",
+      "evidence": [
+        "artifacts/ui-round-1/pw5-search.png"
+      ]
+    },
+    {
+      "id": "R1-D015",
+      "priority": "P2",
+      "screens": [
+        "pw5-search"
+      ],
+      "bounds_design_px": [
+        22,
+        376,
+        251,
+        614
+      ],
+      "title": "Search card metadata loses completion and volume information",
+      "observed": "Nocturne is presented as 42 chapters rather than Completed; the Komga edition is presented as five chapters rather than volumes 1-5.",
+      "recommendation": "Prefer the completion status when present and preserve the Komga volume label already supplied by the fixture metadata.",
+      "owner": "ui_aux",
+      "status": "identified",
+      "evidence": [
+        "artifacts/ui-round-1/pw5-search.png"
+      ]
+    },
+    {
+      "id": "R1-D016",
+      "priority": "P2",
+      "screens": [
+        "pw5-settings"
+      ],
+      "bounds_design_px": [
+        22,
+        246,
+        48,
+        568
+      ],
+      "title": "Settings rows use unrelated icon meanings",
+      "observed": "Sleep uses a sun, storage uses a gear, tap regions use a filter, and screen refresh uses a list icon.",
+      "recommendation": "Use a moon, storage stack, tap crosshair, and page/refresh symbol respectively. Keep the mountain image symbol for image processing.",
+      "owner": "ui_aux",
+      "status": "identified",
+      "evidence": [
+        "artifacts/ui-round-1/pw5-settings.png"
+      ]
+    },
+    {
+      "id": "R1-D017",
+      "priority": "P2",
+      "screens": [
+        "pw5-history",
+        "scribe-library"
+      ],
+      "bounds_design_px": null,
+      "title": "Book-update and chapter-update counters share one value",
+      "observed": "The history Chapter Updates tab and Scribe Today's Chapters panel show seven, reusing the updated-book count. The design distinguishes seven updated books from six chapter updates.",
+      "recommendation": "Maintain a separate chapter-update/event counter from the updated-book counter and derive both from their corresponding data sets.",
+      "owner": "root",
+      "status": "identified",
+      "evidence": [
+        "artifacts/ui-round-1/pw5-history.png",
+        "artifacts/ui-round-1/scribe-library.png"
+      ]
+    },
+    {
+      "id": "R1-D018",
+      "priority": "P2",
+      "screens": [
+        "pw5-history"
+      ],
+      "bounds_design_px": [
+        22,
+        32,
+        250,
+        57
+      ],
+      "title": "Seven-day reading summary counts the visible page",
+      "observed": "The summary displays five chapters because HistoryPage reads State.history.length, which is the current five-item page.",
+      "recommendation": "Compute the summary from the complete persisted history filtered to the intended seven-day interval and completion rules. If the demo should show twelve, provide truthful supporting progress records rather than hardcoding the count.",
+      "owner": "root_and_ui_aux",
+      "status": "identified",
+      "evidence": [
+        "artifacts/ui-round-1/pw5-history.png"
+      ]
+    },
+    {
+      "id": "R1-D019",
+      "priority": "P2",
+      "screens": [
+        "pw5-library"
+      ],
+      "bounds_design_px": [
+        16,
+        104,
+        602,
+        226
+      ],
+      "title": "Continuation thumbnail and action dimensions differ from the design",
+      "observed": "The thumbnail is 64x98 rather than approximately 64x88 and sits too high; the arrow target and its gap to the page count are too small.",
+      "recommendation": "Use the reference thumbnail height and inset, a 52-unit Paperwhite or 64-unit Scribe arrow target, and preserve the reference page-count spacing.",
+      "owner": "ui_primary",
+      "status": "implemented_awaiting_recapture",
+      "evidence": [
+        "artifacts/ui-round-1/pw5-library.png"
+      ]
+    },
+    {
+      "id": "R1-D020",
+      "priority": "P2",
+      "screens": [
+        "pw5-detail"
+      ],
+      "bounds_design_px": [
+        174,
+        266,
+        326,
+        310
+      ],
+      "title": "Summary link reverses its icon order and sits too low",
+      "observed": "The baseline renders a leading chevron before the label instead of a trailing chevron after it.",
+      "recommendation": "Put the chevron after the label and restore the reference vertical position near the end of the synopsis block.",
+      "owner": "ui_primary",
+      "status": "implemented_awaiting_recapture",
+      "evidence": [
+        "artifacts/ui-round-1/pw5-detail.png"
+      ]
+    },
+    {
+      "id": "R1-D021",
+      "priority": "P2",
+      "screens": [
+        "pw5-detail"
+      ],
+      "bounds_design_px": [
+        474,
+        312,
+        596,
+        431
+      ],
+      "title": "Detail action symbols are incomplete",
+      "observed": "The active favorite is outlined rather than solid and the sort action lacks the reference up/down ordering symbol.",
+      "recommendation": "Use a solid selected bookmark and a distinct order symbol, maintaining independent touch areas for sort and download.",
+      "owner": "ui_primary",
+      "status": "implemented_awaiting_recapture",
+      "evidence": [
+        "artifacts/ui-round-1/pw5-detail.png"
+      ]
+    },
+    {
+      "id": "R1-D022",
+      "priority": "P2",
+      "screens": [
+        "pw5-library"
+      ],
+      "bounds_design_px": [
+        316,
+        292,
+        597,
+        676
+      ],
+      "title": "Wider Paperwhite cover slots crop printed title positions",
+      "observed": "The star title sits too close to the upper crop, the silver title band is too high, and the lighthouse badge covers part of the second character. Static enlarged evidence is in tmp/design/cover-labels-round-1.png.",
+      "recommendation": "Provide Paperwhite-specific cover variants for indices 2,6,7 with safe title positions and the correct wider aspect ratio. Retain the Scribe and detail editions.",
+      "owner": "design_research",
+      "status": "implemented_awaiting_projection",
+      "evidence": [
+        "artifacts/ui-round-1/pw5-library.png"
+      ]
+    },
+    {
+      "id": "R1-D023",
+      "priority": "P3",
+      "screens": [
+        "pw5-reader"
+      ],
+      "bounds_design_px": [
+        371,
+        756,
+        494,
+        824
+      ],
+      "title": "Orientation tool uses a migration/exchange symbol",
+      "observed": "The reference shows a rotation arrow, while the baseline uses opposing straight arrows also used for migration.",
+      "recommendation": "Use a separate rotation drawing for the reader orientation tool and retain the exchange drawing for migration.",
+      "owner": "ui_aux_or_reader",
+      "status": "identified",
+      "evidence": [
+        "artifacts/ui-round-1/pw5-reader.png"
+      ]
+    }
+  ],
+  "additional_agent_adjustments_pending_recapture": [
+    {
+      "owner": "ui_primary",
+      "description": "The Scribe detail right-column offset now includes the sidebar's margin origin; confirm it on a genuine 930x1240 canvas."
+    },
+    {
+      "owner": "ui_primary",
+      "description": "Library caption sizes were adjusted to keep long Scribe titles readable; confirm the final font scale against the reference after canvas correction."
+    }
+  ],
+  "verification_note": "This review only read static screenshots, metadata, source text, and reference images. No local application, build, test suite, or runtime probe was executed. Implemented fixes are not considered resolved until new remote captures are visually checked.",
+  "static_resource_findings": [
+    {
+      "id": "R1-C001",
+      "priority": "P2",
+      "kind": "static_resource_review",
+      "owner": "ui_primary",
+      "status": "implemented_not_runtime_verified",
+      "observed": "The cover cache had no upper bound, and synchronizing history decoded covers for records outside the current page.",
+      "recommendation": "Bound the decoded-cover cache and decode only the currently visible history page, while allowing active Slint models to retain their displayed images.",
+      "reported_change": "The shared cover cache is limited to 64 entries and history cover loading is restricted to the current page.",
+      "evidence": [
+        "src/app/view.rs"
+      ],
+      "verification_note": "This is a source-review finding reported by ui_primary, not an assertion about the static screenshot or a completed runtime memory regression."
+    }
+  ]
+}

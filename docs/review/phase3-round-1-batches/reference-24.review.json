@@ -1,0 +1,74 @@
+{
+  "batch_id": "reference-24",
+  "reviewer": "/root/phase3_round1_review/reference_24",
+  "round": 1,
+  "run_id": "a1baf3fe3dc2",
+  "binary_sha256": "94d7f3bbcab475ad8833a2f3c486138f7b49bead231851c2d8eab2f0c3d2ac51",
+  "source_sha256": "aef9db4e111165016a10a2a95e111f3155860b8510c7f6207ec9c79fbec5082c",
+  "provided_reference_set_sha256": "e7b49b456255432d74cfe41346f9d44c1a9c55bf67c5d55483e4ae3029547d18",
+  "reviewed_case_ids": [
+    "sc-reader-portrait--toc"
+  ],
+  "reviewed_cases": [
+    {
+      "case_id": "sc-reader-portrait--toc",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/sc-reader-portrait--toc.png",
+      "candidate_sha256": "c0185588b0757d994cdd10598e8da0245cb35a2f485f93cf478a12c94bd5c728",
+      "reference_png": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/screens/states/sc-reader-portrait--toc.png",
+      "reference_sha256": "c9230282a65c48552b853b77c4b20a6287be7d8931b91ab5c21b26e8364cf4e3",
+      "case_metadata": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/cases/sc-reader-portrait--toc.json",
+      "viewed_candidate": true,
+      "viewed_reference": true,
+      "outcome": "pass_with_advisory",
+      "identity_checks": {
+        "metadata_run_id_matches": true,
+        "metadata_binary_sha256_matches": true,
+        "metadata_source_sha256_matches": true,
+        "candidate_png_hash_matches_case_evidence": true,
+        "reference_png_hash_matches_case_metadata": true,
+        "hash_method": "PowerShell Get-FileHash -Algorithm SHA256 on unmodified PNG bytes",
+        "candidate_logical_size": [930, 1240],
+        "candidate_scale_factor": 1,
+        "reference_physical_size": [1860, 2480],
+        "reference_physical_scale": 2
+      },
+      "observations": [
+        "Both PNGs were individually opened with tools.view_image. Geometry was compared at the same logical scale, accounting for the reference image's 2x physical resolution.",
+        "The candidate is the Scribe portrait reader with the menu and chapter ToC open. The header shows the same current chapter 34, an active bookmark, a selected ToC action, and integrated time/battery. Its 78-logical-pixel header and 76-logical-pixel bottom tools agree with the reference structure.",
+        "The ToC presents chapter/bookmark tabs, a selected chapter underline, two columns of three legible 50-logical-pixel chapter rows, dotted leaders, and the expected 48-logical-pixel column gap and content inset. The actual reference PNG and this batch's input assertion both show three rows per column.",
+        "The candidate displays folio 1/15 with chapters 86, 85, 84 in the left column and 83, 82, 81 in the right column. Metadata independently records panel_page=1, panel_page_count=15, and current_chapter ending in chapter-034. The current chapter is consequently outside this visible ToC folio.",
+        "The reference's visible rows include chapter 34 with a dot, bold title, and 12/40 progress, plus downloaded/read labels on neighboring rows. The candidate's visible chapters 86-81 are outside the metadata's downloaded range 27-35, so blank downloaded/read states on those rows are not by themselves a defect. This frame cannot establish the candidate's current-row dot, bold treatment, inline progress, or read-state styling.",
+        "The shared reader footer visibly retains 28 pages remaining, next-chapter downloaded status, 12/40 progress, the RTL slider, and chapter 35/33 navigation. Text, inactive grays, separators, and toolbar icons remain legible without visible clipping or overlapping targets.",
+        "The candidate includes an additional 68-logical-pixel folio row above the reader progress section. The resulting upward expansion of the ToC sheet is consistent with content-dependent sheet height, while the bottom progress and tools remain aligned; no sheet-height defect was inferred.",
+        "HANDOFF.md line 217 specifies the current chapter's dot, bold text, and inline progress, but does not explicitly require selecting its folio when opening ToC. The portrait prototype generates rows from current chapter +3 through current chapter -2 at lines 336-343, while openToc at line 382 only toggles the panel. An automatic current-folio requirement therefore remains an inference when applied to a real paginated chapter list."
+      ],
+      "intentional_differences": [
+        "Actual chapter inventory and labels differ from the reference sample. A genuine 86-chapter list, a 15-page folio, and unread/undownloaded latest rows are accepted data-dependent differences.",
+        "An actual folio control adds content to the sheet. Its height and the corresponding sheet-top position are accepted rather than compared to the reference's shorter sample sheet.",
+        "Artwork composition, border content, and cropping differ between the images. These artwork differences alone do not establish an incorrect reader viewport inset."
+      ]
+    }
+  ],
+  "suggestions": [
+    {
+      "id": "P3R1-REF24-1",
+      "case_id": "sc-reader-portrait--toc",
+      "priority": "P3",
+      "description": "Consider preserving current-chapter context when opening a paginated ToC.",
+      "evidence": "The candidate is reading chapter 34 at 12/40, but its visible ToC folio 1/15 contains only chapters 86-81. The reference and portrait prototype keep chapter 34 visible with its current dot and progress. HANDOFF.md does not explicitly mandate automatic folio selection; this is an optional UX inference, not a confirmed visual or functional defect.",
+      "recommendation": "If product intent favors the prototype's immediate reading context, initialize the ToC to the folio containing the active chapter or provide an explicit current-chapter jump while retaining access to all chapters. Otherwise retain the real pagination and verify current-row styling in a separate authorized capture.",
+      "basis": "inference_from_prototype_context",
+      "classification": "optional_ux_advisory",
+      "status": "open",
+      "introduced_round": 1
+    }
+  ],
+  "confirmed_issue_count": 0,
+  "optional_advisory_count": 1,
+  "limitations": [
+    "This review covers only reference-24 and its single PNG pair. It does not claim that the full round is clean.",
+    "No application, build, tests, validation suite, runtime probe, Git operation, or product modification was performed. The work consisted of static artifact reads, PNG hashing, visual inspection, targeted handoff/prototype source reads authorized by the parent reviewer, and writing this review document.",
+    "Static screenshots establish visible layout and apparent reachability only. They do not prove click handling, tab switching, pagination behavior, or the styling of rows on unseen folios.",
+    "The reference viewer resized its display preview to 1368x1824; the original 1860x2480 reference PNG bytes were hashed without alteration. The provided reference-set hash was recorded as task identity and was not independently recomputed from a complete bundle."
+  ]
+}

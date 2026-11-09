@@ -1,0 +1,396 @@
+{
+  "schema_version": 1,
+  "kind": "phase3-candidate8-independent-ui-component-equivalence-audit",
+  "audit_version": "phase3-c8-component-equivalence-v1",
+  "reviewer_task": "/root/final_validation_delivery/c8_component_equivalence_audit",
+  "recorded_at": "2026-11-06T21:29:55.790Z",
+  "evidence_observed_at": "2026-11-06T21:26:03.831646+00:00",
+  "audit_frozen": true,
+  "approved_for_ui_component_reuse": true,
+  "approval_scope": "Conditional permission to use two independently accepted, immutable Candidate7 UI rounds as the UI component of a new Candidate8 composition. This is an equivalence decision, not UI-round acceptance or whole-candidate acceptance.",
+  "overall_accepted": false,
+  "overall_status": "pending",
+  "high_confidence_blocking_findings": [],
+  "reuse_preconditions": {
+    "verified": true,
+    "source_record_count_per_candidate": 227,
+    "source_path_sets_and_included_scope_equal": true,
+    "unchanged_production_records": 226,
+    "added_production_paths": [],
+    "removed_production_paths": [],
+    "sole_modified_production_path": "vendor/slint-backend-kindle/src/platform.rs",
+    "ui_assets_main_shared_and_build_inputs_equal": true,
+    "candidate7_snapshot_matches_candidate7_manifest": true,
+    "candidate8_snapshot_matches_candidate8_manifest": true,
+    "candidate8_master_matches_candidate8_manifest": true,
+    "default_desktop_features": [
+      "default",
+      "desktop"
+    ],
+    "exact_kindle_backend_in_default_normal_dependency_tree": false,
+    "exact_kindle_backend_in_default_metadata_resolved_closure": false,
+    "exact_kindle_backend_in_actual_default_compiler_artifacts": false,
+    "actual_default_compiler_artifact_count": 636,
+    "selected_artifact_found_exactly_in_saved_compiler_stream": true,
+    "selected_artifact_profile": {
+      "debug_assertions": true,
+      "debuginfo": 0,
+      "opt_level": "0",
+      "overflow_checks": true,
+      "test": false
+    },
+    "frozen_desktop_bytes_equal": true,
+    "independently_compared_desktop_bytes": 255231288,
+    "frozen_desktop_sha256": "7762b8c8db6567ad5fda672c3cf8a55471088d21802415d14b4fb6325f51f630"
+  },
+  "code_scope_read": {
+    "paths": [
+      "Cargo.toml",
+      "src/platform.rs",
+      "build.rs"
+    ],
+    "findings": [
+      "Cargo.toml enables desktop by default. The optional Linux slint-backend-kindle dependency is enabled by the kindle feature.",
+      "Shared platform code gates Kindle backend references on both the kindle feature and Linux.",
+      "build.rs reads assets/i18n/zh-CN.json and compiles ui/app.slint; it does not read the modified vendor backend file.",
+      "The independently verified source snapshots show no changes in any UI, asset, main, shared, or build input record."
+    ],
+    "scope": "Read-only local code and evidence-document inspection, corroborated by the saved default graph and compiler-artifact records. No local test, build, application, or runtime probe was run."
+  },
+  "candidate_source_binding": {
+    "source_algorithm": "sha256-of-canonical-sorted-relative-file-records-v1",
+    "candidate7_source_sha256": "aabda8e5d5a80f6c99c489203c7c650b3108081f67a3dd3fed9fc7a489a74e49",
+    "candidate8_source_sha256": "30eb9c13693e3dc5bec3cbb550bb961af7a21731f0ed6992f2a1c3ae4ce4da60",
+    "candidate7_desktop_path": "/root/aidoku-phase3/candidate7/desktop/aidoku",
+    "candidate8_desktop_path": "/root/aidoku-phase3/candidate8/desktop/aidoku",
+    "source_records_are_globally_equal": false,
+    "ui_and_default_desktop_component_equivalent": true
+  },
+  "legacy_c7_strict_global_source_acceptance": {
+    "accepted": false,
+    "scope": "Candidate7 whole-source evidence cannot qualify Candidate8 because their global production-source SHA-256 values differ. The original strict global-source result remains false; this report creates a separate, versioned UI-component permission.",
+    "original_capture_manifests_modified": false,
+    "foreign_candidate8_native_performance_lease_or_package_evidence_added_to_candidate7_manifests": false,
+    "original_candidate7_ui_round1_review_accepted_at_read": false,
+    "original_candidate7_ui_round1_binding": {
+      "path": "D:\\Code\\aidokuForKindle\\artifacts\\phase3\\candidate7\\ui-round-1\\manifest.json",
+      "bytes": 20628108,
+      "sha256": "d19407c9f401f9b58e072371734387d96086fc06538f93baceb8864e5ebf41e8",
+      "source_sha256": "aabda8e5d5a80f6c99c489203c7c650b3108081f67a3dd3fed9fc7a489a74e49",
+      "source_sha256_after": "aabda8e5d5a80f6c99c489203c7c650b3108081f67a3dd3fed9fc7a489a74e49",
+      "binary_sha256": "7762b8c8db6567ad5fda672c3cf8a55471088d21802415d14b4fb6325f51f630",
+      "source_unchanged": true,
+      "binary_unchanged": true,
+      "full_capture_suite_completed": true,
+      "mechanical_success": true,
+      "required_review_case_count": 542,
+      "case_count": 583,
+      "review": {
+        "recorded": false,
+        "coverage_complete": false,
+        "clean_round": false,
+        "clean_round_streak": 0,
+        "accepted": false,
+        "suggestions": [],
+        "reason": "Independent complete manual review has not yet been recorded."
+      }
+    }
+  },
+  "pending_gates": [
+    {
+      "gate": "Candidate7 UI round 1 independent complete manual acceptance",
+      "status": "pending-in-this-audit",
+      "requirement": "Record complete independent manual review of all 542 required review cases, with acceptance justified from the immutable original evidence. The existing 583-case mechanical capture success does not establish a clean UI round."
+    },
+    {
+      "gate": "Candidate7 UI round 2 capture and independent complete manual acceptance",
+      "status": "pending-in-this-audit",
+      "requirement": "Complete a separate full round with fresh run data on the same immutable Candidate7 production source snapshot and desktop binary. Bind both rounds to the same qualified capture plan, reference scope, and harness inputs, then independently accept the complete required review coverage."
+    },
+    {
+      "gate": "Fresh Candidate8 native validation",
+      "status": "pending-in-this-audit",
+      "requirement": "Qualify native renderer, rotation, snapshots, lifecycle, and required device/backend cases against the Candidate8 source SHA-256 and current native artifacts. Candidate7 native evidence is not reused by this approval."
+    },
+    {
+      "gate": "Fresh Candidate8 formal performance qualification",
+      "status": "pending-in-this-audit",
+      "requirement": "Complete and accept the designated formal performance evidence against Candidate8 source and binary bindings."
+    },
+    {
+      "gate": "Fresh Candidate8 lease qualification",
+      "status": "pending-in-this-audit",
+      "requirement": "Complete and accept required lease and resource evidence against Candidate8 source and artifact bindings."
+    },
+    {
+      "gate": "Fresh Candidate8 development package qualification",
+      "status": "pending-in-this-audit",
+      "requirement": "Create and independently qualify the current Candidate8 package and its complete source/artifact evidence binding."
+    },
+    {
+      "gate": "New versioned Candidate8 composite acceptance",
+      "status": "pending-in-this-audit",
+      "requirement": "Compose the accepted same-Candidate7 immutable UI rounds with fresh accepted Candidate8 native, performance, lease, and package evidence. Preserve all original candidate manifests and record every component's exact scope, paths, hashes, and independently accepted gates."
+    }
+  ],
+  "interpretation_limits": [
+    "Permission for UI-component reuse does not certify a clean UI round, completion of Candidate8 native fixes, native performance, lease behavior, physical Kindle hardware, or package qualification.",
+    "The 701 metadata packages, 701 resolve nodes, and 701 root-reachable records are the default Cargo resolved closure including dev and target-specific dependencies. They are not a count of host-active compiled packages.",
+    "The selected actual desktop artifact has opt_level=0, debuginfo=0, debug_assertions=true, overflow_checks=true, and profile.test=false. Debug assertions must not be described as enabled debug information.",
+    "The saved core-gate manifest and its log bindings are provenance for this audit; this audit did not rerun or independently accept those tests.",
+    "Any later change to relevant source inputs, the frozen desktop bytes, capture inputs, or required component scope invalidates this specific equivalence permission and requires a new versioned audit."
+  ],
+  "independent_observation": {
+    "default_build_evidence": {
+      "backend_exact_package_ids": [],
+      "backend_reachable_ids": [],
+      "build_finished_messages": [
+        {
+          "reason": "build-finished",
+          "success": true
+        }
+      ],
+      "compiler_artifact_backend_exact_ids": [],
+      "compiler_artifact_count": 636,
+      "compiler_messages": {
+        "bytes": 521832,
+        "path": "/root/aidoku-phase3/evidence/candidate8/build/desktop-artifacts-01.jsonl",
+        "sha256": "5dd256fb0f9033979c95776bf517babfb4978ae3541ecd8558dc26c470240d5f"
+      },
+      "default_metadata": {
+        "bytes": 3489270,
+        "path": "/root/aidoku-phase3/evidence/candidate8/build/default-metadata.json",
+        "sha256": "68b1d1a7152703d4297bdc9e50bf9d8a39335818864ae5a7d1cd4a3320181ae4"
+      },
+      "metadata_count_scope": "Cargo default metadata resolved closure, including dev and target-specific dependencies; not a count of host-active compiled packages.",
+      "metadata_package_count": 701,
+      "metadata_resolve_node_count": 701,
+      "metadata_root_reachable_count": 701,
+      "normal_tree": {
+        "bytes": 74145,
+        "path": "/root/aidoku-phase3/evidence/candidate8/build/default-active-tree.txt",
+        "sha256": "a453f17a41d51f4cda3b75b0d74b49fd5b822dc13294d3a6b44e09136fe895aa"
+      },
+      "normal_tree_backend_exact_lines": [],
+      "root_executable_artifact_count": 1,
+      "root_features": [
+        "default",
+        "desktop"
+      ],
+      "root_package_id": "path+file:///root/aidoku-phase3/source#aidoku-kindle@0.1.0",
+      "root_package_name": "aidoku-kindle",
+      "selected_artifact": {
+        "executable": "/root/aidoku-build/target/debug/aidoku",
+        "features": [
+          "default",
+          "desktop"
+        ],
+        "filenames": [
+          "/root/aidoku-build/target/debug/aidoku"
+        ],
+        "fresh": false,
+        "manifest_path": "/root/aidoku-phase3/source/Cargo.toml",
+        "package_id": "path+file:///root/aidoku-phase3/source#aidoku-kindle@0.1.0",
+        "profile": {
+          "debug_assertions": true,
+          "debuginfo": 0,
+          "opt_level": "0",
+          "overflow_checks": true,
+          "test": false
+        },
+        "reason": "compiler-artifact",
+        "target": {
+          "crate_types": [
+            "bin"
+          ],
+          "doc": true,
+          "doctest": false,
+          "edition": "2024",
+          "kind": [
+            "bin"
+          ],
+          "name": "aidoku",
+          "src_path": "/root/aidoku-phase3/source/src/main.rs",
+          "test": true
+        }
+      },
+      "selected_artifact_binding": {
+        "bytes": 757,
+        "path": "/root/aidoku-phase3/evidence/candidate8/build/desktop-selected-artifact.json",
+        "sha256": "927624419e3819b8aee84b0486927bc3bc3c77ed1c934c48824cdd90d3144e98"
+      },
+      "selected_artifact_found_exactly_in_compiler_stream": true
+    },
+    "desktop": {
+      "bytes_compared": 255231288,
+      "candidate7": {
+        "bytes": 255231288,
+        "path": "/root/aidoku-phase3/candidate7/desktop/aidoku",
+        "sha256": "7762b8c8db6567ad5fda672c3cf8a55471088d21802415d14b4fb6325f51f630",
+        "stat_bytes": 255231288
+      },
+      "candidate8": {
+        "bytes": 255231288,
+        "path": "/root/aidoku-phase3/candidate8/desktop/aidoku",
+        "sha256": "7762b8c8db6567ad5fda672c3cf8a55471088d21802415d14b4fb6325f51f630",
+        "stat_bytes": 255231288
+      },
+      "equal": true,
+      "method": "Independent single-pass streaming comparison and two individual SHA-256 calculations in 1 MiB chunks."
+    },
+    "environment": "ssh test-env",
+    "evidence_bindings": [
+      {
+        "bytes": 6390,
+        "path": "/root/aidoku-phase3/evidence/candidate8/build/desktop-gate-manifest.json",
+        "sha256": "34a7b1ae48e4f590d950fbe7dc55f39ca88cae9c16b7a569e42b02b1efe46745"
+      },
+      {
+        "bytes": 37151,
+        "path": "/root/aidoku-phase3/evidence/candidate8/build/source-before-gate-01.json",
+        "sha256": "2e243c7659c9bb2fa76425e93c9f7977939705858ca526be423be72c0eee9423"
+      },
+      {
+        "bytes": 37151,
+        "path": "/root/aidoku-phase3/evidence/candidate8/build/source-after-gate-01.json",
+        "sha256": "2e243c7659c9bb2fa76425e93c9f7977939705858ca526be423be72c0eee9423"
+      },
+      {
+        "bytes": 756,
+        "path": "/root/aidoku-phase3/evidence/candidate8/build/production-diff.json",
+        "sha256": "fb95195bda60df95aa8bf6d1a99349bee232ee58f7c2f41c385a7ed93dce9ebe"
+      },
+      {
+        "bytes": 156480,
+        "path": "/root/aidoku-phase3/evidence/candidate8/build/default-resolved-reachable-packages.json",
+        "sha256": "3aac4f2fb500e7092b828deaa1c10a97d129fd57d5c63a0cc17d119023f17e68"
+      }
+    ],
+    "executed_scope": "Read and hash existing frozen evidence, source snapshots, current source, and desktop binaries only. No Cargo, application, test, build, or performance process was launched.",
+    "kind": "independent-read-only-candidate8-ui-component-equivalence-observation-v1",
+    "recorded_at": "2026-11-06T21:26:03.831646+00:00",
+    "source": {
+      "added": [],
+      "candidate7_snapshot": {
+        "claimed_count": 227,
+        "discovered_path_count": 227,
+        "extra_discovered_paths": [],
+        "manifest": {
+          "bytes": 37151,
+          "path": "/root/aidoku-phase3/evidence/candidate7/build/source-after-gate-01.json",
+          "sha256": "81c2a8ed9060662a7952e3a453e3e49bf0cd0006ded3dabc9cb6b1cb4cbda79e"
+        },
+        "manifest_source_sha256": "aabda8e5d5a80f6c99c489203c7c650b3108081f67a3dd3fed9fc7a489a74e49",
+        "matches": true,
+        "mismatches": [],
+        "missing_discovered_paths": [],
+        "recomputed_record_sha256": "aabda8e5d5a80f6c99c489203c7c650b3108081f67a3dd3fed9fc7a489a74e49",
+        "recomputed_tree_sha256": "aabda8e5d5a80f6c99c489203c7c650b3108081f67a3dd3fed9fc7a489a74e49",
+        "record_count": 227,
+        "record_paths_sorted_unique": true,
+        "root": "/root/aidoku-phase3/candidate7/source-snapshot",
+        "unique_path_count": 227
+      },
+      "candidate8_master": {
+        "claimed_count": 227,
+        "discovered_path_count": 227,
+        "extra_discovered_paths": [],
+        "manifest": {
+          "bytes": 37151,
+          "path": "/root/aidoku-phase3/evidence/candidate8/build/source-after-gate-01.json",
+          "sha256": "2e243c7659c9bb2fa76425e93c9f7977939705858ca526be423be72c0eee9423"
+        },
+        "manifest_source_sha256": "30eb9c13693e3dc5bec3cbb550bb961af7a21731f0ed6992f2a1c3ae4ce4da60",
+        "matches": true,
+        "mismatches": [],
+        "missing_discovered_paths": [],
+        "recomputed_record_sha256": "30eb9c13693e3dc5bec3cbb550bb961af7a21731f0ed6992f2a1c3ae4ce4da60",
+        "recomputed_tree_sha256": "30eb9c13693e3dc5bec3cbb550bb961af7a21731f0ed6992f2a1c3ae4ce4da60",
+        "record_count": 227,
+        "record_paths_sorted_unique": true,
+        "root": "/root/aidoku-phase3/source",
+        "unique_path_count": 227
+      },
+      "candidate8_snapshot": {
+        "claimed_count": 227,
+        "discovered_path_count": 227,
+        "extra_discovered_paths": [],
+        "manifest": {
+          "bytes": 37151,
+          "path": "/root/aidoku-phase3/evidence/candidate8/build/source-after-gate-01.json",
+          "sha256": "2e243c7659c9bb2fa76425e93c9f7977939705858ca526be423be72c0eee9423"
+        },
+        "manifest_source_sha256": "30eb9c13693e3dc5bec3cbb550bb961af7a21731f0ed6992f2a1c3ae4ce4da60",
+        "matches": true,
+        "mismatches": [],
+        "missing_discovered_paths": [],
+        "recomputed_record_sha256": "30eb9c13693e3dc5bec3cbb550bb961af7a21731f0ed6992f2a1c3ae4ce4da60",
+        "recomputed_tree_sha256": "30eb9c13693e3dc5bec3cbb550bb961af7a21731f0ed6992f2a1c3ae4ce4da60",
+        "record_count": 227,
+        "record_paths_sorted_unique": true,
+        "root": "/root/aidoku-phase3/candidate8/source-snapshot",
+        "unique_path_count": 227
+      },
+      "included_scope_equal": true,
+      "modified": [
+        {
+          "after": {
+            "bytes": 31067,
+            "path": "vendor/slint-backend-kindle/src/platform.rs",
+            "sha256": "bd3208a0e0a2c1c1c41eb1dae4b64b78df8b5cef9e95f9cc5c994c1dcd734a3b"
+          },
+          "before": {
+            "bytes": 29044,
+            "path": "vendor/slint-backend-kindle/src/platform.rs",
+            "sha256": "0d603bab4ab9b40b88ebbbd8fc7a09a111a2a10affe18bad9e0be4bf03e66f09"
+          },
+          "path": "vendor/slint-backend-kindle/src/platform.rs"
+        }
+      ],
+      "removed": [],
+      "unchanged_records": 226
+    }
+  },
+  "verification_commands": [
+    {
+      "environment": "Windows PowerShell launching ssh test-env",
+      "command": "$componentAuditInput = @'\nimport datetime\nimport hashlib\nimport json\nimport pathlib\nimport re\n\nBASE = pathlib.Path(\"/root/aidoku-phase3\")\nB7 = BASE / \"evidence/candidate7/build\"\nB8 = BASE / \"evidence/candidate8/build\"\n\ndef load_json(path):\n    return json.loads(path.read_bytes().decode(\"utf-8-sig\"))\n\ndef sha_file(path):\n    h = hashlib.sha256()\n    with path.open(\"rb\") as stream:\n        for chunk in iter(lambda: stream.read(1024 * 1024), b\"\"):\n            h.update(chunk)\n    return h.hexdigest()\n\ndef file_binding(path):\n    return {\"path\": str(path), \"bytes\": path.stat().st_size, \"sha256\": sha_file(path)}\n\ndef canonical_sha(records):\n    content = json.dumps(records, ensure_ascii=True, sort_keys=True, separators=(\",\", \":\"), allow_nan=False).encode(\"utf-8\")\n    return hashlib.sha256(content).hexdigest()\n\ndef check_manifest(path, root):\n    manifest = load_json(path)\n    expected = {r[\"path\"]: r for r in manifest[\"files\"]}\n    seen_paths = set()\n    for name in manifest[\"included_files\"]:\n        p = root / name\n        if p.is_file():\n            seen_paths.add(name)\n    for name in manifest[\"included_directories\"]:\n        directory = root / name\n        if directory.is_dir():\n            for p in directory.rglob(\"*\"):\n                if p.is_file():\n                    seen_paths.add(p.relative_to(root).as_posix())\n    computed = []\n    mismatches = []\n    for relative in sorted(expected):\n        p = root / relative\n        if not p.is_file():\n            mismatches.append({\"path\": relative, \"problem\": \"missing\"})\n            continue\n        item = {\"path\": relative, \"bytes\": p.stat().st_size, \"sha256\": sha_file(p)}\n        computed.append(item)\n        if item != expected[relative]:\n            mismatches.append({\"path\": relative, \"expected\": expected[relative], \"actual\": item})\n    return {\n        \"manifest\": file_binding(path), \"root\": str(root),\n        \"claimed_count\": manifest[\"file_count\"], \"record_count\": len(manifest[\"files\"]),\n        \"unique_path_count\": len(expected),\n        \"record_paths_sorted_unique\": list(expected) == sorted(set(expected)),\n        \"manifest_source_sha256\": manifest[\"sha256\"],\n        \"recomputed_record_sha256\": canonical_sha(manifest[\"files\"]),\n        \"recomputed_tree_sha256\": canonical_sha(computed),\n        \"discovered_path_count\": len(seen_paths),\n        \"missing_discovered_paths\": sorted(set(expected) - seen_paths),\n        \"extra_discovered_paths\": sorted(seen_paths - set(expected)),\n        \"mismatches\": mismatches,\n        \"matches\": len(computed) == manifest[\"file_count\"] and not mismatches and seen_paths == set(expected) and canonical_sha(computed) == manifest[\"sha256\"]\n    }\n\nm7path = B7 / \"source-after-gate-01.json\"\nm8path = B8 / \"source-after-gate-01.json\"\nm7 = load_json(m7path)\nm8 = load_json(m8path)\nr7 = {r[\"path\"]: r for r in m7[\"files\"]}\nr8 = {r[\"path\"]: r for r in m8[\"files\"]}\nmodified = [{\"path\": p, \"before\": r7[p], \"after\": r8[p]} for p in sorted(set(r7) & set(r8)) if r7[p] != r8[p]]\nsource = {\n    \"candidate7_snapshot\": check_manifest(m7path, BASE / \"candidate7/source-snapshot\"),\n    \"candidate8_snapshot\": check_manifest(m8path, BASE / \"candidate8/source-snapshot\"),\n    \"candidate8_master\": check_manifest(m8path, BASE / \"source\"),\n    \"modified\": modified, \"added\": sorted(set(r8) - set(r7)), \"removed\": sorted(set(r7) - set(r8)),\n    \"unchanged_records\": sum(r7[p] == r8[p] for p in set(r7) & set(r8)),\n    \"included_scope_equal\": m7[\"included_files\"] == m8[\"included_files\"] and m7[\"included_directories\"] == m8[\"included_directories\"],\n}\n\nbinary7 = BASE / \"candidate7/desktop/aidoku\"\nbinary8 = BASE / \"candidate8/desktop/aidoku\"\nh7 = hashlib.sha256()\nh8 = hashlib.sha256()\nequal = True\ncount7 = 0\ncount8 = 0\nwith binary7.open(\"rb\") as a, binary8.open(\"rb\") as b:\n    while True:\n        x = a.read(1024 * 1024)\n        y = b.read(1024 * 1024)\n        if not x and not y:\n            break\n        h7.update(x)\n        h8.update(y)\n        count7 += len(x)\n        count8 += len(y)\n        equal = equal and x == y\nbinary = {\n    \"candidate7\": {\"path\": str(binary7), \"bytes\": count7, \"stat_bytes\": binary7.stat().st_size, \"sha256\": h7.hexdigest()},\n    \"candidate8\": {\"path\": str(binary8), \"bytes\": count8, \"stat_bytes\": binary8.stat().st_size, \"sha256\": h8.hexdigest()},\n    \"equal\": equal and count7 == count8, \"bytes_compared\": min(count7, count8),\n    \"method\": \"Independent single-pass streaming comparison and two individual SHA-256 calculations in 1 MiB chunks.\"\n}\n\ntreepath = B8 / \"default-active-tree.txt\"\ntree = treepath.read_text()\ntree_backend_lines = [line for line in tree.splitlines() if re.search(r\"(?<![A-Za-z0-9_-])slint-backend-kindle(?=[\\s@]|$)\", line)]\nmetapath = B8 / \"default-metadata.json\"\nmeta = load_json(metapath)\npackages = {p[\"id\"]: p for p in meta[\"packages\"]}\nnodes = {n[\"id\"]: n for n in meta[\"resolve\"][\"nodes\"]}\nroot = meta[\"resolve\"][\"root\"]\nreachable = set()\ntodo = [root]\nwhile todo:\n    pid = todo.pop()\n    if pid in reachable:\n        continue\n    reachable.add(pid)\n    todo.extend(nodes.get(pid, {}).get(\"dependencies\", []))\nbackend_ids = {pid for pid, p in packages.items() if p[\"name\"] == \"slint-backend-kindle\"}\njsonlpath = B8 / \"desktop-artifacts-01.jsonl\"\nmessages = [json.loads(line) for line in jsonlpath.read_text().splitlines() if line.strip()]\nartifacts = [m for m in messages if m.get(\"reason\") == \"compiler-artifact\"]\nartifact_backend = [m[\"package_id\"] for m in artifacts if m[\"package_id\"] in backend_ids or re.search(r\"(?:#|[/ ])slint-backend-kindle(?:@| |$)\", m[\"package_id\"])]\nselectedpath = B8 / \"desktop-selected-artifact.json\"\nselected = load_json(selectedpath)\nselected_matches = [m for m in artifacts if m == selected]\nroot_artifacts = [m for m in artifacts if m[\"package_id\"] == root and m.get(\"target\", {}).get(\"name\") == \"aidoku\" and m.get(\"executable\")]\ngraph = {\n    \"normal_tree\": file_binding(treepath), \"normal_tree_backend_exact_lines\": tree_backend_lines,\n    \"default_metadata\": file_binding(metapath),\n    \"root_package_id\": root, \"root_package_name\": packages[root][\"name\"],\n    \"root_features\": sorted(nodes[root][\"features\"]),\n    \"metadata_package_count\": len(packages), \"metadata_resolve_node_count\": len(nodes),\n    \"metadata_root_reachable_count\": len(reachable),\n    \"metadata_count_scope\": \"Cargo default metadata resolved closure, including dev and target-specific dependencies; not a count of host-active compiled packages.\",\n    \"backend_exact_package_ids\": sorted(backend_ids),\n    \"backend_reachable_ids\": sorted(backend_ids & reachable),\n    \"compiler_messages\": file_binding(jsonlpath),\n    \"compiler_artifact_count\": len(artifacts),\n    \"compiler_artifact_backend_exact_ids\": artifact_backend,\n    \"selected_artifact_binding\": file_binding(selectedpath),\n    \"selected_artifact_found_exactly_in_compiler_stream\": len(selected_matches) == 1,\n    \"root_executable_artifact_count\": len(root_artifacts),\n    \"selected_artifact\": selected,\n    \"build_finished_messages\": [m for m in messages if m.get(\"reason\") == \"build-finished\"],\n}\nevidence_names = [\"desktop-gate-manifest.json\", \"source-before-gate-01.json\", \"source-after-gate-01.json\", \"production-diff.json\", \"default-resolved-reachable-packages.json\"]\nreport = {\n    \"kind\": \"independent-read-only-candidate8-ui-component-equivalence-observation-v1\",\n    \"recorded_at\": datetime.datetime.now(datetime.timezone.utc).isoformat(),\n    \"environment\": \"ssh test-env\",\n    \"source\": source, \"desktop\": binary, \"default_build_evidence\": graph,\n    \"evidence_bindings\": [file_binding(B8 / name) for name in evidence_names],\n    \"executed_scope\": \"Read and hash existing frozen evidence, source snapshots, current source, and desktop binaries only. No Cargo, application, test, build, or performance process was launched.\"\n}\nprint(json.dumps(report, indent=2, ensure_ascii=True, sort_keys=True))\n'@\n$componentAuditInput | ssh -T -o BatchMode=yes -o ConnectTimeout=15 test-env 'python3 -'",
+      "exit_code": 0,
+      "launched_processes": [
+        "ssh",
+        "python3 reading existing files only"
+      ],
+      "remote_process_finished": true,
+      "remote_work_after_observation": "None. The SSH command completed before formal performance began, and the auditor ceased remote access immediately.",
+      "mutation_scope": "None."
+    },
+    {
+      "environment": "Local Windows PowerShell",
+      "command": "Get-Content -LiteralPath 'D:\\Code\\aidokuForKindle\\Cargo.toml' -Raw",
+      "purpose": "Read the unchanged default and optional feature declaration."
+    },
+    {
+      "environment": "Local Windows PowerShell",
+      "command": "Get-Content -LiteralPath 'D:\\Code\\aidokuForKindle\\src\\platform.rs' -TotalCount 125\nGet-Content -LiteralPath 'D:\\Code\\aidokuForKindle\\build.rs' -TotalCount 135",
+      "purpose": "Read the shared platform gating and complete build-script input scope."
+    },
+    {
+      "environment": "Local Windows PowerShell",
+      "command": "$legacyUiPath = 'D:\\Code\\aidokuForKindle\\artifacts\\phase3\\candidate7\\ui-round-1\\manifest.json'\n$legacyUiManifest = Get-Content -LiteralPath $legacyUiPath -Raw | ConvertFrom-Json\n[ordered]@{\n  path = $legacyUiPath\n  bytes = (Get-Item -LiteralPath $legacyUiPath).Length\n  sha256 = (Get-FileHash -LiteralPath $legacyUiPath -Algorithm SHA256).Hash.ToLowerInvariant()\n  source_sha256 = $legacyUiManifest.source_sha256\n  source_sha256_after = $legacyUiManifest.source_sha256_after\n  binary_sha256 = $legacyUiManifest.binary_sha256\n  source_unchanged = $legacyUiManifest.source_unchanged\n  binary_unchanged = $legacyUiManifest.binary_unchanged\n  full_capture_suite_completed = $legacyUiManifest.full_capture_suite_completed\n  mechanical_success = $legacyUiManifest.mechanical_success\n  required_review_case_count = @($legacyUiManifest.required_review_case_ids).Count\n  case_count = @($legacyUiManifest.cases).Count\n  review = $legacyUiManifest.review\n} | ConvertTo-Json -Depth 8",
+      "purpose": "Read and hash the unchanged original Candidate7 UI round 1 evidence document; no candidate acceptance field was edited."
+    }
+  ],
+  "corroborating_subreview": {
+    "reviewer_task": "/root/final_validation_delivery/c8_component_equivalence_audit/local_evidence_reader",
+    "model_routing": "Intentional parent-model inheritance: advertised spawn metadata supplied model names without sufficient capability descriptions to choose a different model reliably.",
+    "scope": "Independent bounded local read-only evidence and code inspection; no remote access, file edits, tests, builds, or application execution.",
+    "findings": "No high-confidence component-reuse blocker. The local source records, feature gating, default dependency evidence, and compiler-artifact records agree with the independent remote observation.",
+    "relied_on_for_binary_or_snapshot_validation": false
+  },
+  "file_mutation_scope": {
+    "only_written_path": "docs/review/phase3-c8-component-equivalence.json",
+    "production_code_modified": false,
+    "legacy_candidate7_manifests_modified": false,
+    "commit_push_pr_or_issue_write_performed": false
+  }
+}

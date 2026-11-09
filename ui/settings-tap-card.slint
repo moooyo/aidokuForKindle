@@ -1,0 +1,78 @@
+import { State, Commands } from "state.slint";
+import { Theme } from "theme.slint";
+import { BodyText } from "widgets.slint";
+
+export component TapLayoutCard inherits Rectangle {
+    in property <string> text;
+    in property <string> layout;
+    in property <bool> selected;
+    callback clicked();
+    property <bool> inverted: root.selected != hit.pressed;
+    property <color> foreground: root.inverted ? Theme.paper : Theme.ink;
+    x: 0px;
+    y: 0px;
+    height: State.large-screen ? 63px : 52px;
+    border-width: Theme.control-border;
+    border-color: root.selected ? Theme.ink : Theme.dotted;
+    border-radius: Theme.control-radius;
+    background: root.inverted ? Theme.ink : Theme.paper;
+    accessible-role: radio-button;
+    accessible-label: root.text;
+    accessible-checkable: true;
+    accessible-checked: root.selected;
+    Rectangle {
+        x: State.large-screen ? 18px : 16px;
+        y: (parent.height - self.height) / 2;
+        width: State.large-screen ? 24px : 22px;
+        height: self.width;
+        border-width: 2px;
+        border-color: root.foreground;
+        border-radius: 3px;
+        background: transparent;
+        if root.selected: Rectangle {
+            x: (parent.width - 10px) / 2;
+            y: (parent.height - 10px) / 2;
+            width: 10px;
+            height: 10px;
+            background: root.foreground;
+        }
+    }
+    BodyText {
+        x: State.large-screen ? 58px : 52px;
+        y: 0px;
+        width: max(0px, parent.width - self.x - 72px);
+        height: parent.height;
+        text: root.text;
+        font-size: State.large-screen ? 17px : 16px;
+        font-weight: State.large-screen ? 700 : 400;
+        color: root.foreground;
+    }
+    Path {
+        x: parent.width - 48px;
+        y: (parent.height - 40px) / 2;
+        width: 30px;
+        height: 40px;
+        viewbox-width: 30;
+        viewbox-height: 40;
+        fill: transparent;
+        stroke: root.foreground;
+        stroke-width: 1.6px;
+        stroke-line-cap: round;
+        stroke-line-join: round;
+        // Merge adjacent turn regions and mirror the horizontal Reader mapping for RTL.
+        commands: root.layout == "thirds" ? "M1.5 1.5h27v37h-27zM10.5 1.5v37M19.5 1.5v37" :
+            root.layout == "l-shaped" ? (State.reading-direction == "rtl" ? "M1.5 1.5h27v37h-27zM10.5 27h18M19.5 1.5V27M10.5 1.5v37" : "M1.5 1.5h27v37h-27zM1.5 27h18M10.5 1.5V27M19.5 1.5v37") :
+            "M1.5 1.5h27v37h-27zM9 20h12M12 17l-3 3 3 3M18 17l3 3-3 3";
+    }
+    hit := TouchArea {
+        x: 0px;
+        y: 0px;
+        width: parent.width;
+        height: parent.height;
+        pointer-event(event) => {
+            if event.kind == PointerEventKind.down { Commands.refresh("fast"); }
+            else if event.kind == PointerEventKind.up { Commands.refresh("ui"); }
+        }
+        clicked => { root.clicked(); }
+    }
+}

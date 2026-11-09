@@ -1,0 +1,220 @@
+{
+  "schema_version": 1,
+  "round": 3,
+  "status": "changes_required",
+  "review_kind": "manual_static_screenshot_comparison",
+  "review_complete": true,
+  "scope_note": "All twelve baseline reference screens were reviewed. Newly requested selection and cache-management states belong to the next expanded review and are not represented as checked here.",
+  "new_suggestion_count": 1,
+  "known_unresolved_visual_count": 2,
+  "qualifies_as_clean_round": false,
+  "consecutive_clean_rounds": 0,
+  "screens": [
+    {
+      "id": "pw5-library",
+      "actual": "artifacts/ui-round-3/pw5-library.png",
+      "reference": "tmp/design/reference-01.png",
+      "reviewed": true
+    },
+    {
+      "id": "pw5-detail",
+      "actual": "artifacts/ui-round-3/pw5-detail.png",
+      "reference": "tmp/design/reference-02.png",
+      "reviewed": true
+    },
+    {
+      "id": "pw5-reader",
+      "actual": "artifacts/ui-round-3/pw5-reader.png",
+      "reference": "tmp/design/reference-03.png",
+      "reviewed": true
+    },
+    {
+      "id": "pw5-sources",
+      "actual": "artifacts/ui-round-3/pw5-sources.png",
+      "reference": "tmp/design/reference-04.png",
+      "reviewed": true
+    },
+    {
+      "id": "pw5-catalog",
+      "actual": "artifacts/ui-round-3/pw5-catalog.png",
+      "reference": "tmp/design/reference-05.png",
+      "reviewed": true
+    },
+    {
+      "id": "pw5-search",
+      "actual": "artifacts/ui-round-3/pw5-search.png",
+      "reference": "tmp/design/reference-06.png",
+      "reviewed": true
+    },
+    {
+      "id": "pw5-history",
+      "actual": "artifacts/ui-round-3/pw5-history.png",
+      "reference": "tmp/design/reference-07.png",
+      "reviewed": true
+    },
+    {
+      "id": "pw5-settings",
+      "actual": "artifacts/ui-round-3/pw5-settings.png",
+      "reference": "tmp/design/reference-08.png",
+      "reviewed": true
+    },
+    {
+      "id": "scribe-library",
+      "actual": "artifacts/ui-round-3/scribe-library.png",
+      "reference": "tmp/design/reference-09.png",
+      "reviewed": true
+    },
+    {
+      "id": "scribe-detail",
+      "actual": "artifacts/ui-round-3/scribe-detail.png",
+      "reference": "tmp/design/reference-10.png",
+      "reviewed": true
+    },
+    {
+      "id": "scribe-sources",
+      "actual": "artifacts/ui-round-3/scribe-sources.png",
+      "reference": "tmp/design/reference-11.png",
+      "reviewed": true
+    },
+    {
+      "id": "scribe-landscape-reader",
+      "actual": "artifacts/ui-round-3/scribe-landscape-reader.png",
+      "reference": "tmp/design/reference-12.png",
+      "reviewed": true
+    }
+  ],
+  "new_findings": [
+    {
+      "id": "R3-D001",
+      "priority": "P2",
+      "reported_by": "root",
+      "screens": [
+        "pw5-library",
+        "scribe-library",
+        "pw5-catalog",
+        "scribe-sources"
+      ],
+      "bounds_design_px": {
+        "paperwhite_rule_y": 278,
+        "scribe_library_rule_y": 392
+      },
+      "title": "Tab backgrounds break the full-width divider into short segments",
+      "observed": "The white background of each unpressed Tab covers the parent divider, leaving disconnected gray line fragments.",
+      "recommendation": "Keep unpressed Tab backgrounds transparent and retain whole-control inversion only while pressed, allowing the continuous parent rule and selected underline to remain visible.",
+      "status": "implemented_awaiting_round_4_recapture",
+      "evidence": [
+        "artifacts/ui-round-3/pw5-library.png",
+        "artifacts/ui-round-3/scribe-library.png"
+      ]
+    }
+  ],
+  "resolved_from_round_2": [
+    "R2-D001",
+    "R2-D002",
+    "R2-D003",
+    "R2-D004",
+    "R2-D005"
+  ],
+  "resolved_known_findings": [
+    {
+      "id": "R1-D011",
+      "evidence": [
+        "artifacts/ui-round-3/pw5-catalog.png",
+        "artifacts/ui-round-3/pw5-history.png",
+        "artifacts/ui-round-3/scribe-sources.png"
+      ],
+      "result": "Context cover art and printed titles match their respective reference editions without duplicated embedded badges."
+    },
+    {
+      "id": "R1-D017",
+      "evidence": [
+        "artifacts/ui-round-3/scribe-library.png",
+        "artifacts/ui-round-3/pw5-history.png"
+      ],
+      "result": "The chapter-update count is six and is distinct from the seven-book library summary."
+    },
+    {
+      "id": "R1-D018",
+      "evidence": [
+        "artifacts/ui-round-3/pw5-history.png",
+        "src/app/view.rs"
+      ],
+      "result": "The summary shows eight unique visited chapters while five rows are visible. Static source inspection confirms the full persisted history is filtered to the seven-day interval before deduplication; no independent runtime formula test was executed by this reviewer."
+    },
+    {
+      "id": "R1-D022",
+      "evidence": [
+        "artifacts/ui-round-3/pw5-library.png",
+        "artifacts/ui-round-3/pw5-search.png"
+      ],
+      "result": "Paperwhite printed-title variants and the wider search art preserve complete inner titles and appropriate unread-badge clearance."
+    }
+  ],
+  "known_visual_findings": [
+    {
+      "id": "R1-D012",
+      "status": "still_visible_in_round_3",
+      "observed": "The history Incognito action still uses a lock rather than a crossed-eye symbol; its full label and separate trash control are present."
+    },
+    {
+      "id": "R1-D016",
+      "status": "partially_resolved_in_round_3",
+      "observed": "Sleep and storage symbols are corrected, while refresh and tap-region rows still use list and split-layout symbols instead of page and crosshair symbols."
+    }
+  ],
+  "functional_and_platform_blockers": [
+    {
+      "id": "R3-F001",
+      "kind": "remote_interaction_regression",
+      "status": "fix_reported_in_progress",
+      "description": "The frozen remote E2E report has 56 passed cases and one failed reader-long-press case. Its state sidecar keeps modal empty, so this round cannot establish the requested page-action behavior.",
+      "evidence": [
+        "artifacts/ui-round-3/report.json",
+        "artifacts/ui-round-3/reader-long-press.state.json"
+      ]
+    },
+    {
+      "id": "R3-P001",
+      "kind": "native_persistence",
+      "status": "reported_by_root_in_progress",
+      "description": "Root reported a native SQLite startup/persistence issue being investigated separately. The reviewer did not independently execute the native application."
+    }
+  ],
+  "source_grid_badge_check": {
+    "screen": "scribe-sources",
+    "status": "no_new_important_issue",
+    "description": "The in-library tags use the reference lower-left overlay position. The reference itself overlaps part of the title printed on the cover; the external title caption stays complete. This is not recorded as a new missing-title defect.",
+    "evidence": [
+      "artifacts/ui-round-3/scribe-sources.png",
+      "tmp/design/reference-11.png"
+    ]
+  },
+  "explicit_platform_differences": [
+    {
+      "status": "planned_label_correction_awaiting_round_4",
+      "description": "The orientation control should say Locked Direction when only manual rotation is implemented. Keeping that truthful label instead of the mock's Auto Rotate is an intentional capability difference, not a request to simulate an unsupported sensor path."
+    }
+  ],
+  "accepted_source_variations": [
+    "The 86-chapter book keeps its true fifteen-page Paperwhite directory.",
+    "Dynamic chapter totals, seven-day counts, and installed/searchable-source counts follow actual persisted fixture state.",
+    "Device-specific speech-balloon variations in the mock art do not justify substituting different comic content for the same page."
+  ],
+  "expanded_scope_pending_round_4": [
+    "Detail chapter long-press selection and batch actions",
+    "Download management with real queue state",
+    "Cache controls and storage accounting",
+    "Complete baseline regression after the shared Tab fix",
+    "Reader long-press and native-package repair evidence"
+  ],
+  "reported_performance_context": {
+    "reported_by": "root",
+    "fixture_pages": 72,
+    "serial_seconds": 18.222,
+    "two_background_workers_seconds": 6.4,
+    "reported_checks_passed": 11,
+    "limitation": "This is a fixed host fixture measurement, not a claim about general throughput or Kindle hardware speed."
+  },
+  "verification_note": "This reviewer only read static screenshots, metadata, source text, and existing reports. No local application, build, test suite, or runtime probe was executed. Clean-round counting remains zero until unresolved findings and required functional fixes are resolved and a complete fresh review has no new advice.",
+  "classification_correction": "The initial report classified the SQLite issue too broadly as a packaging dependency. The later sqlite-native/analysis.md establishes that the reported scope is intermittent native persistence; no corruption cause is asserted here."
+}

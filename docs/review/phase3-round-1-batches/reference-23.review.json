@@ -1,0 +1,140 @@
+{
+  "batch_id": "reference-23",
+  "reviewer": "/root/phase3_round1_review/reference_23",
+  "run_id": "a1baf3fe3dc2",
+  "round": 1,
+  "scope": "Independent visual review of the four supplied reference pairs only.",
+  "binary_sha256": "94d7f3bbcab475ad8833a2f3c486138f7b49bead231851c2d8eab2f0c3d2ac51",
+  "source_sha256": "aef9db4e111165016a10a2a95e111f3155860b8510c7f6207ec9c79fbec5082c",
+  "expected_reference_manifest_sha256": "e7b49b456255432d74cfe41346f9d44c1a9c55bf67c5d55483e4ae3029547d18",
+  "identity_verification": {
+    "case_sidecars_read": true,
+    "case_names_match": true,
+    "round_run_binary_source_match_expected": true,
+    "candidate_hashes_match_case_evidence": true,
+    "reference_hashes_match_case_metadata": true,
+    "png_hash_method": "PowerShell Get-FileHash -Algorithm SHA256 on the original, unmodified PNG bytes.",
+    "reference_manifest_note": "The supplied aggregate reference identity was recorded, not independently recomputed. Each of the four reference PNG hashes was independently computed and matched its case sidecar."
+  },
+  "comparison_method": "All eight original PNGs were individually opened with tools.view_image. Candidate screenshots use a 930 x 1240 logical viewport at 1x; references use 1860 x 2480 at 2x. Geometry and typography were compared at the same logical proportions. Artwork differences alone were not treated as viewport defects.",
+  "reviewed_case_ids": [
+    "sc-reader-portrait--light",
+    "sc-reader-portrait--mode",
+    "sc-reader-portrait--more",
+    "sc-reader-portrait--orientation"
+  ],
+  "reviewed_cases": [
+    {
+      "case_id": "sc-reader-portrait--light",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/sc-reader-portrait--light.png",
+      "candidate_sha256": "0330d03d4c8f26a04c8b833046adb0d42826ce55aba0c3f6f8f44fdb6358e56c",
+      "reference_png": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/screens/states/sc-reader-portrait--light.png",
+      "reference_sha256": "87ea1f9d83f7551b97d7c1dbe0e838e1a9fb35725e82a4f6388e3668808e893b",
+      "viewed_candidate": true,
+      "viewed_reference": true,
+      "outcome": "pass_with_capability_limits",
+      "observations": [
+        "The integrated header, bottom tool row, 48-logical-pixel sheet inset, and persistent open-menu page controls have the expected hierarchy and remain fully visible.",
+        "Frontlight and warmth are displayed as two side-by-side slider groups with visible numeric values, distinct endpoint icons, black active tracks, pale inactive tracks, and outlined square thumbs. No label, slider, or toolbar clipping is visible.",
+        "The sheet title has a bold serif treatment and the smaller body labels remain legible against a white background. Active brightness styling is distinct from the gray inactive tools.",
+        "The candidate displays frontlight 12 and warmth 8 while the reference displays 14 and 6. These captured preference values do not demonstrate a control defect.",
+        "The candidate omits the reference automatic-brightness row. The sidecar qualifies declared frontlight and warmth controls but does not establish an implemented automatic-brightness sensor; no unsupported sensor control is required by this review."
+      ],
+      "intentional_differences": [
+        "Desktop evidence qualifies the declared lighting controls only; physical lighting effects and automatic-brightness sensing are not established.",
+        "A shorter sheet resulting from omission of an unsupported automatic-brightness row is accepted; its top position alone is not a geometry failure.",
+        "The artwork content differs and is not sufficient evidence of a viewport inset defect."
+      ]
+    },
+    {
+      "case_id": "sc-reader-portrait--mode",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/sc-reader-portrait--mode.png",
+      "candidate_sha256": "d8c715f62d8b8c4e3cf39cd59273c7ba2d8199bc3407acd05ba813dbc62d9add",
+      "reference_png": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/screens/states/sc-reader-portrait--mode.png",
+      "reference_sha256": "6d2b8a8ad2d80a07aadeac4c8bfe96f1943a7e73ee42afb050caf8754c9f3c2a",
+      "viewed_candidate": true,
+      "viewed_reference": true,
+      "outcome": "issues_found",
+      "observations": [
+        "All four direction cards are present in one row: right-to-left, left-to-right, vertical page turning, and continuous vertical scrolling. The selected right-to-left card is black with reversed white content, while the other cards retain clear outlines and dark labels.",
+        "The crop-borders toggle is visible in the lower left of the sheet, but the corresponding lower-right split-wide-page control shown in the reference is absent. That half of the row is empty, although crop and split are both explicitly required for this state.",
+        "The four cards, their icons, and the crop label are readable without overlap. The header, page slider, chapter navigation, and active reading-mode toolbar item remain visible.",
+        "The reference includes a small per-book default direction hint at the upper right; the candidate does not display that hint. This was not elevated separately from the required-control omission."
+      ],
+      "intentional_differences": [
+        "The Scribe sheet is not required to add the Paperwhite-only single/spread/automatic layout row.",
+        "Artwork differences were excluded from the control and geometry assessment."
+      ]
+    },
+    {
+      "case_id": "sc-reader-portrait--more",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/sc-reader-portrait--more.png",
+      "candidate_sha256": "d4725455357b636168b1b0d3e8a21afb4f3a19933b5ab9782a84c5cabae70abc",
+      "reference_png": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/screens/states/sc-reader-portrait--more.png",
+      "reference_sha256": "585df4650da5966908c1b6309a863f988d6983cf338ac786d0d7e4f12a79f60d",
+      "viewed_candidate": true,
+      "viewed_reference": true,
+      "outcome": "pass_with_intentional_differences",
+      "observations": [
+        "The More sheet shows a tap-zone visibility toggle on the left and the immediate full-screen-refresh action on the right, with both labels and their controls fully inside the 48-logical-pixel sheet inset.",
+        "The More toolbar item has clear selected styling. The sheet heading, body labels, thin separators, page controls, and chapter navigation remain readable with no visible clipping or overlap.",
+        "The candidate removes the reference footer-preference button group and compacts the remaining actions into one row. The reduced content accounts for the changed sheet height; no sheet-height defect was inferred.",
+        "The visible page count and chapter controls belong to the open reader menu. These screenshots do not depict the closed reader."
+      ],
+      "intentional_differences": [
+        "Removal of legacy footer preferences complies with the artwork-only closed-reader override; such preferences must not restore labels, a bookmark ribbon, notifications, or an invisible footer-cycle target.",
+        "The remaining actions may use a more compact arrangement after removal of the footer-preference group."
+      ]
+    },
+    {
+      "case_id": "sc-reader-portrait--orientation",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/sc-reader-portrait--orientation.png",
+      "candidate_sha256": "6422194c6f6ee25f539461a0cfcb217ed57ba90ee0b6a5c932f867646a2430ad",
+      "reference_png": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/screens/states/sc-reader-portrait--orientation.png",
+      "reference_sha256": "ebbe1249f7d355eebc5eaca682880f398fa0d9cb1ced5b42c93a2c66d487736e",
+      "viewed_candidate": true,
+      "viewed_reference": true,
+      "outcome": "issues_found",
+      "observations": [
+        "Manual portrait and landscape cards are present. Portrait is selected with a black fill and white content, and landscape remains a clearly outlined alternative. The panel was not excluded for lack of sensor evidence.",
+        "The Scribe landscape card uses a generic landscape label and a single-page rectangle icon. The reference explicitly presents landscape spread with a center-divided two-page icon, so the candidate loses that mode's visual meaning.",
+        "The sidecar records preferences.spread=true. This review therefore does not claim that selecting landscape fails to produce a spread; the finding is limited to the card's wording and icon.",
+        "The two cards are evenly arranged, their labels and icons are unobscured, and the active orientation tool remains visually distinct. No visible clipping or low-contrast text issue was found."
+      ],
+      "intentional_differences": [
+        "Sensor-follow is conditional on actual sensor support, which is not established by this desktop capture or the profile declaration alone.",
+        "The prototype landscape preview link is intentionally excluded.",
+        "A shorter sheet after removing sensor-follow and the prototype preview link is accepted."
+      ]
+    }
+  ],
+  "suggestions": [
+    {
+      "id": "P3R1-REF23-1",
+      "case_id": "sc-reader-portrait--mode",
+      "priority": "P2",
+      "description": "The Scribe reading-mode sheet omits the required split-wide-page toggle.",
+      "evidence": "The candidate shows four direction cards and a crop-borders toggle at the lower left, with the entire lower-right control area empty. At the same logical scale, the reference places the split-cross-page-image label and toggle in that lower-right area. The supplied expected state explicitly requires crop and split controls, and this software control has no stated hardware exclusion.",
+      "recommendation": "Restore the split-wide-page control beside crop borders in the Scribe reading-mode sheet, with its current state visibly represented and an accessible interaction target.",
+      "status": "open",
+      "introduced_round": 1
+    },
+    {
+      "id": "P3R1-REF23-2",
+      "case_id": "sc-reader-portrait--orientation",
+      "priority": "P3",
+      "description": "The Scribe landscape card does not communicate that it represents landscape spread.",
+      "evidence": "The candidate's second card uses a generic landscape label and a single-page rectangular icon. The reference and expected state identify the Scribe alternative as landscape spread, illustrated by a rectangle divided into two pages. Candidate metadata already records preferences.spread=true, so this is a visual-affordance finding rather than a claim about runtime behavior.",
+      "recommendation": "Use the landscape-spread label and a two-page icon for the Scribe landscape action so the card accurately communicates the applicable reading layout.",
+      "status": "open",
+      "introduced_round": 1
+    }
+  ],
+  "limitations": [
+    "This review covers only the four supplied cases and eight screenshots in reference-23; it does not establish that the full round is clean.",
+    "Only existing JSON and PNG evidence was read, original PNG bytes were hashed, and the requested review JSON was written. No application, build, test, validation suite, runtime probe, Git operation, or product modification was performed.",
+    "Static screenshots establish visual visibility and layout only. Slider ranges, hit targets, navigation behavior, control effects, sensor behavior, and physical e-ink or lighting behavior were not exercised.",
+    "Closed-reader artwork-only behavior, table-of-contents row geometry, and other reader panels are not visible in these four screenshots and were not independently verified.",
+    "The profile declares orientation and lighting controls, while physical hardware remains unqualified. Actual automatic-brightness and orientation sensors were not established by the available evidence."
+  ]
+}

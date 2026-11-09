@@ -1,0 +1,107 @@
+{
+  "batch_id": "reference-13",
+  "reviewer": "/root/phase3_round1_review/reference_13",
+  "round": 1,
+  "run_id": "a1baf3fe3dc2",
+  "binary_sha256": "94d7f3bbcab475ad8833a2f3c486138f7b49bead231851c2d8eab2f0c3d2ac51",
+  "source_sha256": "aef9db4e111165016a10a2a95e111f3155860b8510c7f6207ec9c79fbec5082c",
+  "reference_bundle_sha256": "e7b49b456255432d74cfe41346f9d44c1a9c55bf67c5d55483e4ae3029547d18",
+  "scope": "Independent visual review of only the three reference pairs in reference-13.input.json.",
+  "identity_checks": {
+    "case_metadata_identity": "All three case sidecars match the requested case ID, round 1, run ID, binary SHA256, and source SHA256.",
+    "candidate_png_identity": "Get-FileHash SHA256 of each unmodified candidate PNG matches its case evidence_hashes.screenshot.sha256.",
+    "reference_png_identity": "Get-FileHash SHA256 of each unmodified reference PNG matches its case reference_sha256.",
+    "comparison_scale": "Candidate native captures are 618 x 824 logical pixels at 1x; references are 1236 x 1648 physical pixels at 2x. Geometry was compared at the same logical scale."
+  },
+  "reviewed_case_ids": [
+    "pw-source--default",
+    "pw-source--filter",
+    "pw-source--source-settings"
+  ],
+  "reviewed_cases": [
+    {
+      "case_id": "pw-source--default",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/pw-source--default.png",
+      "candidate_sha256": "9982eafb3a4c363c2d57dcc72e042e16912421235462dcbc0ea9282a7bcb6a2f",
+      "reference_png": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/screens/pw-source.png",
+      "reference_sha256": "47ea9827f59640d1c13cce5693c0e4d9ba9db5d44c50cefc3549107c5053daf6",
+      "viewed_candidate": true,
+      "viewed_reference": true,
+      "outcome": "pass",
+      "observations": [
+        "The secondary catalog has a labeled back action and distinct search, filter, and source-settings icons. There is no dock.",
+        "All five catalog rows are visible. Covers are approximately 64 x 88 logical pixels, rows follow approximately 108-pixel spacing, and the cover/text columns and separators align closely with the reference at half physical scale.",
+        "The source heading and book titles retain a bold serif hierarchy; authors, genres, and status lines remain gray and readable without clipping or collisions with the library badges.",
+        "The page folio and next-page action remain fully visible below the fifth row. The white background, thin separators, and outlined surfaces have no added shadows or stippled backdrop."
+      ],
+      "intentional_differences": [
+        "The source subtitle contains its actual language/version summary without the reference's appended total-count phrase. The real catalog count is still represented by the page range, and this shorter data summary does not disturb the header geometry.",
+        "Native 1x rasterization differs from the physical 2x reference at individual glyph and cover-pattern pixels; no geometric defect is inferred from that sampling difference."
+      ]
+    },
+    {
+      "case_id": "pw-source--filter",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/pw-source--filter.png",
+      "candidate_sha256": "73a74e5f168b326146a6b2ed3de80e4c7b67f98ecf26bd82b5902b3b9b000bc7",
+      "reference_png": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/screens/states/pw-source--filter.png",
+      "reference_sha256": "1339b77a8346218b73343211b67163fbba6efe5b875fff5b2b37239dfcfd2c23",
+      "viewed_candidate": true,
+      "viewed_reference": true,
+      "outcome": "pass",
+      "observations": [
+        "The filter sheet is a white surface with a black top border, a title and Reset action, sorting, publication-status controls, neutral tag chips, and a full-width results action.",
+        "Four sorting choices occupy the same four-column logical layout as the reference. The selected sort is black with white text, enabled alternatives have dark outlines, and disabled choices are visibly gray.",
+        "The four publication-status choices fit on one row, and all nine real tag choices fit across two rows without clipping. The results action is fully inside the 618 x 824 viewport with readable text.",
+        "The sheet top is near logical y=366, compared with about y=370 in the reference. Content-dependent sheet height is allowed; the small top-edge difference does not cause crowding or lost controls.",
+        "The visible tags are neutral, consistent with catalog_tag_options state=0 in the sidecar. This still image alone does not demonstrate the include/exclude transitions.",
+        "No shadow, stippled scrim, clipped text, or button overlap is visible. The underlying catalog remains readable above the sheet."
+      ],
+      "intentional_differences": [
+        "The candidate uses its source-derived tag set and publication-status wording instead of copying the reference's sample choices.",
+        "Follow and Rating sorting are disabled in both the visible controls and the case state. Their gray styling is accepted as actual capability feedback.",
+        "The results action describes the 128 loaded books rather than the reference's approximate result count. The active filter icon also receives a black selection background. These differences do not obstruct the controls."
+      ]
+    },
+    {
+      "case_id": "pw-source--source-settings",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/pw-source--source-settings.png",
+      "candidate_sha256": "9982eafb3a4c363c2d57dcc72e042e16912421235462dcbc0ea9282a7bcb6a2f",
+      "reference_png": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/screens/states/pw-source--source-settings.png",
+      "reference_sha256": "42bad520a2095b2d0acaefba27f4a1b7e172639189dcb1edd438f3a237d02f19",
+      "viewed_candidate": true,
+      "viewed_reference": true,
+      "outcome": "needs_change",
+      "observations": [
+        "The reference presents a source-settings sheet with a heading and Done action. The candidate presents the unchanged full catalog, with no settings surface, empty-state message, or visible close action.",
+        "The candidate PNG is byte-identical to pw-source--default. Its case state nevertheless records modal=choices and modal_context=source-settings, so the recorded settings state has no visible representation.",
+        "The real source_preference_groups array is empty. This supports omitting the reference's particular language and image-quality controls, but the settings action still needs visible feedback for that empty declaration.",
+        "The underlying catalog remains geometrically sound and unclipped. The finding concerns the complete absence of a settings surface, not a content-dependent sheet height or top-edge position."
+      ],
+      "intentional_differences": [
+        "No preferences are declared for the selected real source in this capture; the reference's specific language and quality options must not be fabricated merely to reproduce the sample content."
+      ],
+      "suggestion_ids": [
+        "P3R1-REF13-1"
+      ]
+    }
+  ],
+  "suggestions": [
+    {
+      "id": "P3R1-REF13-1",
+      "case_id": "pw-source--source-settings",
+      "priority": "P2",
+      "description": "Opening source settings for a source with no declared preferences produces no visible settings state or empty-state feedback.",
+      "evidence": "The settings candidate is visibly identical to the default catalog and has the same unmodified-PNG SHA256, 9982eafb3a4c363c2d57dcc72e042e16912421235462dcbc0ea9282a7bcb6a2f. The settings case sidecar records modal=choices, modal_context=source-settings, and source_preference_groups=[]. Unlike the reference's visible sheet, the candidate has no heading, explanation, or Done/Close control.",
+      "recommendation": "Render a white outlined source-settings sheet with the actual source title, a clear message that this source exposes no preferences, and a reachable Done/Close action when the declaration is empty. Continue to render only genuine source-declared common form controls when preferences exist.",
+      "status": "open",
+      "introduced_round": 1
+    }
+  ],
+  "limitations": [
+    "Only the three listed pairs and their existing JSON sidecars were reviewed. No conclusion is made about the rest of the round.",
+    "All six original PNGs were individually opened with tools.view_image. Hashes describe their unmodified on-disk bytes; no image was resized, recaptured, or edited for this review.",
+    "This was a static evidence review. No local application, build, tests, validation suite, runtime probe, Git operation, or product modification was performed.",
+    "Control reachability is assessed from visible placement and recorded state only. Tag include/exclude transitions, persistence, dismissal behavior, and network-backed source preference discovery were not exercised.",
+    "The reference bundle identifier is supplied review context. Individual reference PNG hashes were independently compared with each case sidecar; the complete reference bundle was not rehashed."
+  ]
+}

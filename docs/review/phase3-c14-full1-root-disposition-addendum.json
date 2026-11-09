@@ -1,0 +1,63 @@
+{
+  "schema_version": 1,
+  "kind": "independent-root-visual-and-source-disposition-addendum",
+  "owner": "/root/final_validation_delivery/c4_full_review_coordinator",
+  "adjudicator": "/root",
+  "round": 1,
+  "run_id": "1e2765959467",
+  "source_sha256": "4737c2c1b8dcdf3c5c97400e2036502c6efdf932ff25322b8ddd51fc62d7c99f",
+  "binary_sha256": "01ec3051c62598d100f2203694ed7840d4706052bdbea260f5176b7d255b5a37",
+  "case_id": "pw-manga--more",
+  "case_json_sha256": "6e9d50af2a7a9bf3c39bc5351fcb086fa6776d0342b499e2334fde5586c053ef",
+  "module_inventory": "D:/Code/aidokuForKindle/artifacts/phase3/candidate14/ui-round-1-module-snapshots/002-pw-detail/inventory.json",
+  "module_inventory_sha256": "7ea5e3ab883d75987017dd1db2849947a47efc38db34c30bd046659e595d935d",
+  "original_report": "D:/Code/aidokuForKindle/docs/review/phase3-c14-full1-batches/c14r1-m002-b003.review.json",
+  "finding": {
+    "id": "C14R1-MORE-FONT-01",
+    "disposition": "root-accepted-new-actionable",
+    "required_product_fix": true,
+    "observed_behavior": "The current detail More menu's first three operation rows render visibly heavier than the regular-weight exact reference. Text is complete and menu geometry, spacing and frame largely agree.",
+    "actual_root_viewings": [
+      {
+        "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate14/ui-round-1/pw-manga--more.png",
+        "sha256": "fcc814350b710a1741ef2c09682d655fb70e600632db0be869281cc12a89ea39",
+        "actual_open": true
+      },
+      {
+        "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate14/ui-round-1-module-snapshots/002-pw-detail/files/source-dependencies/f5582eb96276981c5b537524a384ef26563e530ec56701318ed88a7bb069afe8-pw-manga--more.png",
+        "sha256": "f5582eb96276981c5b537524a384ef26563e530ec56701318ed88a7bb069afe8",
+        "actual_open": true
+      }
+    ],
+    "prototype": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/prototype/pw-manga.dc.html",
+    "prototype_anchor": "Line 106: menuitem uses 17px without a bold style; Root confirms the reference regular-weight 400 outcome.",
+    "source_anchor": "ui/panels.slint:68 MoreMenu direct BodyText explicitly uses 500 in the frozen C14 source.",
+    "precision_correction": "Root's earlier visual inference of 700 is withdrawn as a source-property claim. Keep the original worker and Root visible-heaviness observations and their original wording. The supported source-to-reference repair is detail-menu 500 to 400.",
+    "required_outcome": "PW and SC detail More labels use the reference regular-weight treatment. Content differences and truthful unavailable states do not waive typography.",
+    "narrow_next_source_fix": "font-weight: root.detail ? 400 : 500;",
+    "fix_scope": "Root's sole writer froze this one-line C15 candidate repair for detail More. Library 500 and other button/title weights remain unchanged. Official C15 identity and new actual images are not established by this C14 addendum.",
+    "related_observation_limit": "Reader More and Library More raw observations linked to the same worker ID are not automatically accepted by this detail-only adjudication. Preserve those related records for separate Root scope or font-property decisions."
+  },
+  "credit": {
+    "root_extra_original_opens": 2,
+    "new_unique_primary_manual_credit": 0,
+    "coordinator_image_opens": 0,
+    "full_round_credit": 0,
+    "clean_round_credit": 0,
+    "clean_streak": 0
+  },
+  "gate": {
+    "current_c14_round_one_clean": false,
+    "record_clean_allowed": false,
+    "round_two_authorized": false,
+    "status": "C14 R1 is diagnostic and nonclean because of the accepted new typography finding. Continue authorized fresh review until FVD's complete-module boundary hold; no C14 image or result becomes C15 credit."
+  },
+  "preservation": {
+    "original_worker_report_changed": false,
+    "original_capture_or_case_changed": false,
+    "production_or_harness_changed_by_coordinator": false,
+    "new_hash_probe_or_crop_performed": false,
+    "root_visual_slot_released": true,
+    "basis": "Root explicitly reported the two actual image opens and subsequent frozen-source/prototype reading. File SHA values are existing owner declarations."
+  }
+}

@@ -1,0 +1,90 @@
+{
+  "schema_version": 1,
+  "kind": "FINAL-C6-long-outline-readable-crop-request",
+  "round": 5,
+  "run_id": "a2f53f0c33db",
+  "source_sha256": "adafa23e6e1e4906990c3162025dd26d85e20e2f2bb4bed2f21c980bc4d565f5",
+  "binary_sha256": "baafaf4b29a7a6629e8ef95da9dae38da323adccaa89288a92afe3bc4318e0ee",
+  "manifest_sha256": "aa389850a0c5c2f41c266307964ffc95faa9b4b1a3247ab568ed5833c8b2547e",
+  "inventory_sha256": "029ca8231c5c230f4240dcd5be69e71cf1b41302c56c52e736e06d0dcc3a2cc6",
+  "execution_gate": "Sole UI/copy owner only, after explicit native-quiet release and Root/FVD resource clearance. Coordinator/reviewers issue no remote command or image processing.",
+  "originals_rule": "Retain original PNGs, failed/pre-touch attempts and all existing reports unchanged. Verify original source hash and dimensions remotely before/after. Output to a new derivative directory with provenance.",
+  "requests": [
+    {
+      "request_id": "pw5--c6-tag-long-neutral",
+      "source_path": "/root/aidoku-phase3/evidence/candidate6/ui-tag-qualification-final-01/pw5--c6-tag-long-neutral.png",
+      "source_sha256": "af67525758a2da77ffdaf6475a9fdaff01258eea13c2144ac2022eb297b350d7",
+      "source_dimensions": [
+        618,
+        824
+      ],
+      "crop_xywh": [
+        20,
+        580,
+        120,
+        48
+      ],
+      "purpose": "Read both long neutral horizontal rules at the label start and left frame.",
+      "retain_unscaled_crop": true,
+      "display_scale": 4,
+      "interpolation": "nearest-neighbor"
+    },
+    {
+      "request_id": "scribe--c6-tag-long-neutral",
+      "source_path": "/root/aidoku-phase3/evidence/candidate6/ui-tag-qualification-final-01/scribe--c6-tag-long-neutral.png",
+      "source_sha256": "a16beb7d6fc5ed229d76547177ada858408766a5cb279b412e597280c377ac1c",
+      "source_dimensions": [
+        930,
+        1240
+      ],
+      "crop_xywh": [
+        308,
+        594,
+        128,
+        52
+      ],
+      "purpose": "Read both long neutral horizontal rules at the label start and left frame.",
+      "retain_unscaled_crop": true,
+      "display_scale": 4,
+      "interpolation": "nearest-neighbor"
+    },
+    {
+      "request_id": "pw5--c6-tag-long-excluded",
+      "source_path": "/root/aidoku-phase3/evidence/candidate6/ui-tag-qualification-final-01/pw5--c6-tag-long-excluded.png",
+      "source_sha256": "8dfa95b4da595d2207da01a7e35a594750367fce59e4e3d523f24367e4fed02e",
+      "source_dimensions": [
+        618,
+        824
+      ],
+      "crop_xywh": [
+        20,
+        580,
+        120,
+        48
+      ],
+      "purpose": "Distinguish a long masked white segment from the intended excluded dashed rhythm.",
+      "retain_unscaled_crop": true,
+      "display_scale": 4,
+      "interpolation": "nearest-neighbor"
+    }
+  ],
+  "trace_fields": [
+    "source_path",
+    "source_sha256_before",
+    "source_sha256_after",
+    "source_dimensions",
+    "crop_xywh",
+    "unscaled_path",
+    "unscaled_sha256",
+    "unscaled_dimensions",
+    "display_path",
+    "display_sha256",
+    "display_dimensions",
+    "scale",
+    "interpolation",
+    "generation_command",
+    "owner"
+  ],
+  "fresh_review": "A new fork_turns=none worker opens only the three actual display crops plus any specifically needed original-scale crops, with no more than six images. It must not infer the root cause from code and must separate neutral solid closure from excluded dashes.",
+  "status": "queued; not executed by coordinator"
+}

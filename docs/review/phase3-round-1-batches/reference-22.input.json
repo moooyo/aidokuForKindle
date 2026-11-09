@@ -1,0 +1,68 @@
+{
+  "batch_id": "reference-22",
+  "kind": "reference-pairs",
+  "status": "awaiting-local-evidence",
+  "reviewer": null,
+  "cases": [
+    {
+      "case_id": "sc-reader-portrait--default",
+      "candidate": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/sc-reader-portrait--default.png",
+      "case_metadata": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/cases/sc-reader-portrait--default.json",
+      "reference": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/screens/sc-reader-portrait.png",
+      "expected_state": "menu-open",
+      "assertions": [
+        "Default is menu open; closed reader follows artwork-only override.",
+        "78-pixel integrated header; 76-pixel tools; menu inset 48.",
+        "ToC six rows as two columns of three at 50 pixels, with 48 gap."
+      ],
+      "applicability": "applicable",
+      "capability_bound": null,
+      "intentional_difference": null
+    },
+    {
+      "case_id": "sc-reader-portrait--fullscreen-footer",
+      "candidate": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/sc-reader-portrait--fullscreen-footer.png",
+      "case_metadata": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/cases/sc-reader-portrait--fullscreen-footer.json",
+      "reference": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/screens/states/sc-reader-portrait--fullscreen-footer.png",
+      "expected_state": "Reference inspected; requested footer/ribbon behavior is intentionally overridden.",
+      "assertions": [
+        "Default is menu open; closed reader follows artwork-only override.",
+        "78-pixel integrated header; 76-pixel tools; menu inset 48.",
+        "ToC six rows as two columns of three at 50 pixels, with 48 gap."
+      ],
+      "applicability": "user-overridden-reference-only",
+      "capability_bound": null,
+      "intentional_difference": "Reference-only alias: the user overrides the footer and bookmark ribbon. Capture the native artwork-only scene; this never means a footer has been implemented."
+    },
+    {
+      "case_id": "sc-reader-portrait--fullscreen",
+      "candidate": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/sc-reader-portrait--fullscreen.png",
+      "case_metadata": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/cases/sc-reader-portrait--fullscreen.json",
+      "reference": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/screens/states/sc-reader-portrait--fullscreen.png",
+      "expected_state": "Artwork-only reader under the user override; no app decoration or footer-cycle region.",
+      "assertions": [
+        "Default is menu open; closed reader follows artwork-only override.",
+        "78-pixel integrated header; 76-pixel tools; menu inset 48.",
+        "ToC six rows as two columns of three at 50 pixels, with 48 gap."
+      ],
+      "applicability": "applicable-subject-to-evidence-based-capability-bounds",
+      "capability_bound": null,
+      "intentional_difference": "Persistent reference bookmark ribbon is absent under the user override."
+    },
+    {
+      "case_id": "sc-reader-portrait--image",
+      "candidate": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/sc-reader-portrait--image.png",
+      "case_metadata": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/cases/sc-reader-portrait--image.json",
+      "reference": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/screens/states/sc-reader-portrait--image.png",
+      "expected_state": "Actual image preview, five contrast positions, refresh choices, dither capability/state and night option.",
+      "assertions": [
+        "Default is menu open; closed reader follows artwork-only override.",
+        "78-pixel integrated header; 76-pixel tools; menu inset 48.",
+        "ToC six rows as two columns of three at 50 pixels, with 48 gap."
+      ],
+      "applicability": "applicable-subject-to-evidence-based-capability-bounds",
+      "capability_bound": null,
+      "intentional_difference": null
+    }
+  ]
+}

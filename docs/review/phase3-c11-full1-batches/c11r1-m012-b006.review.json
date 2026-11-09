@@ -1,0 +1,276 @@
+{
+  "schema_version": 1,
+  "batch_id": "c11r1-m012-b006",
+  "reviewer": "c11r1_tail_m012_b006",
+  "record_date": "2026-11-07",
+  "round": 1,
+  "run_id": "55c498296d35",
+  "module_id": "012-c4-c5-reader-controls",
+  "input": {
+    "path": "D:/Code/aidokuForKindle/docs/review/phase3-c11-full1-batches/c11r1-m012-b006.input.json",
+    "sha256": "pending owner declaration; no local hash was run",
+    "hash_basis": "All evidence hashes are owner declarations; no local rehash was performed."
+  },
+  "module_snapshot": {
+    "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate11/ui-round-1/snapshots/ui-round-1-snapshot-012-c4-c5-reader-controls/inventory.json",
+    "sha256": "2709353f3d330bb2ff599c5f0e3cb62e718d0b33a8516ba45a0d737edae9ebad"
+  },
+  "freeze_tuple": {
+    "run_id": "55c498296d35",
+    "source_sha256": "33a2d049307c398da8bfbf196d1bf8e086412c117c194b592f4a93b5bfaedb3f",
+    "binary_sha256": "1e60db345cbd6fbe580258a4a309bf42361781061dc2033f78a8a5eb4446ad72"
+  },
+  "reviewed_case_ids": [
+    "scribe--c5-orientation-landscape-automatic",
+    "scribe--c5-orientation-landscape-single",
+    "scribe--c5-orientation-landscape-vertical"
+  ],
+  "actual_original_image_opens": 4,
+  "actual_candidate_image_opens": 3,
+  "actual_reference_image_opens": 1,
+  "reference_pairs": 3,
+  "source_artwork_image_opens": 0,
+  "oracle_image_opens": 0,
+  "references": [
+    {
+      "reference_id": "sc-reader-portrait--orientation",
+      "path": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/screens/states/sc-reader-portrait--orientation.png",
+      "sha256": "ebbe1249f7d355eebc5eaca682880f398fa0d9cb1ced5b42c93a2c66d487736e",
+      "original_dimensions": [
+        1860,
+        2480
+      ],
+      "actual_image_opened": true,
+      "actual_open_count": 1,
+      "tool": "tools.view_image",
+      "tool_display_dimensions": [
+        1368,
+        1824
+      ],
+      "comparison_kind": "related-logical-orientation-contract-only",
+      "exact_state_reference": false,
+      "comparison_for_case_ids": [
+        "scribe--c5-orientation-landscape-automatic",
+        "scribe--c5-orientation-landscape-single",
+        "scribe--c5-orientation-landscape-vertical"
+      ],
+      "observation": "The original portrait reference visibly uses a titled three-card orientation panel, black selected portrait card, outlined alternatives, a progress block and bottom navigation. Its third card follows the device and it includes a landscape preview link. The declared desktop manual-orientation scope explains the current reverse-landscape choice.",
+      "limitation": "The tool displayed the 1860 x 2480 reference at 1368 x 1824. No local image processing, resizing or pixel comparison was performed."
+    }
+  ],
+  "cases": [
+    {
+      "case_id": "scribe--c5-orientation-landscape-automatic",
+      "original_png_path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate11/ui-round-1/snapshots/ui-round-1-snapshot-012-c4-c5-reader-controls/files/output/scribe--c5-orientation-landscape-automatic.png",
+      "png_sha256": "8a343324b91d63ed66f26e35fb215737b23d6c346835527e22b9f8a30db6cd3b",
+      "case_json_sha256": "0cbba7c00f703805b6c5c4fd7be0d48fd287057191717fbd33a8a9e25fa00731",
+      "state_sha256": "4016814d1f1227b89612eeb7d4133b55f702b9e78d65588c1b465f8bc5dd7178",
+      "metadata_sha256": "d7aaa8d6a34559515ecb449dbeaa6de99ab7e59323e14bd33ae03d0ccdcb0a09",
+      "actions_sha256": "7fbdf10ef8f8395eb7df612ed0a088fddb302d87e22296ba029e3f4e0b8deab1",
+      "log_sha256": "1b7cf8ed4ce4958b8e7f6e907802f7378c8d9d65c978e103ca66ffd8026e83b8",
+      "reference_sha256": "ebbe1249f7d355eebc5eaca682880f398fa0d9cb1ced5b42c93a2c66d487736e",
+      "exact_reference_sha256": null,
+      "reference_comparison_status": "related-logical-contract-only-no-exact-state-reference",
+      "actual_image_opened": true,
+      "actual_image_open_count": 1,
+      "actual_image_view_tool": "tools.view_image",
+      "native_dimensions": [
+        1240,
+        930
+      ],
+      "actual_render_source_images_opened": 0,
+      "static_text_reads": [
+        "assigned case JSON",
+        "assigned state JSON",
+        "assigned action JSON"
+      ],
+      "capture_context": {
+        "route": "reader",
+        "modal": "choices",
+        "modal_context": "reader-orientation",
+        "menu": true,
+        "reader_panel": "orientation",
+        "display_landscape": true,
+        "display_rotation_degrees": 90,
+        "page_layout_mode": "automatic",
+        "reading_direction": "rtl",
+        "effective_spread": true,
+        "reader_visible_pages": [
+          12,
+          13
+        ]
+      },
+      "observation": "Two source-art pages are visible side by side above the open panel. The selected landscape and reverse-landscape choices say two-page and include split-page diagrams. The folio reads 12-13 / 40, agreeing with the retained visible_pages [12, 13].",
+      "layout_observation": "The three aligned cards retain clear labels, outlined unselected bounds and a black selected landscape card. The heading, header controls, menu progress area and lower navigation are legible and do not collide. These are open-menu captures.",
+      "reference_application": "The portrait reference supplies the orientation-card hierarchy and selection contrast. Its portrait geometry, sensor-follow sample and preview row are not exact landscape-state requirements; manual direction and reverse-landscape controls are accepted by the supplied contract.",
+      "static_action_support": {
+        "action_count": 8,
+        "scope": "The existing recipe sets remember-book-direction=false, the stated layout mode, cover-alone=false, the stated reading direction and orientation=landscape, then seeks page 12, opens the Reader menu and opens orientation. The final state and case identity are consistent with that recorded scope.",
+        "not_executed_in_this_case": "No activation of the portrait or reverse-landscape card, physical rotation, pointer event or closed-menu interaction appears in the recipe."
+      },
+      "source_artwork_attribution_basis": "Untouched displayed_reader first_path/second_path declarations and the case JSON processed-resource records provide static render-source identity only. No source or oracle image was assigned or opened, and the application data directory was not read. Visible artwork frames and whitespace are not treated as application gutter defects.",
+      "intentional_capability_check": "No intentional difference is declared. The top manual-direction control and three manual choices are within the supplied software-only contract; no sensor-follow or physical-hardware claim is made.",
+      "static_verdict": "No new actionable issue observed in the assigned open-menu geometry, dynamic page labels, selection diagrams or folio. This is a bounded related-contract observation, not exact-state acceptance.",
+      "limitations": [
+        "No independent exact-state landscape reference was supplied.",
+        "Open-menu captures do not qualify closed Reader full-frame artwork, hidden footer/page/corner/toggle hit regions or menu-close behavior."
+      ]
+    },
+    {
+      "case_id": "scribe--c5-orientation-landscape-single",
+      "original_png_path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate11/ui-round-1/snapshots/ui-round-1-snapshot-012-c4-c5-reader-controls/files/output/scribe--c5-orientation-landscape-single.png",
+      "png_sha256": "90d80255bde68f9f57042341a601f995b683a7ae67f37891390976da7130b635",
+      "case_json_sha256": "b23825157d6706709910ba1a16f95500ff014f0742f6292dc83296f6bc4a4035",
+      "state_sha256": "e8b8cc3024adc264e216a2230281f15a17ea515d7ad44e1f9b8cecff18bb928a",
+      "metadata_sha256": "f3a014f4f15af22357dd54bdd9c1a7f4da83df1b4ec5f443a2739475a28de8ae",
+      "actions_sha256": "39933d81b89becc32a4881f551a4874596576d0a6c7f0289d45c05175b40d5d9",
+      "log_sha256": "1b7cf8ed4ce4958b8e7f6e907802f7378c8d9d65c978e103ca66ffd8026e83b8",
+      "reference_sha256": "ebbe1249f7d355eebc5eaca682880f398fa0d9cb1ced5b42c93a2c66d487736e",
+      "exact_reference_sha256": null,
+      "reference_comparison_status": "related-logical-contract-only-no-exact-state-reference",
+      "actual_image_opened": true,
+      "actual_image_open_count": 1,
+      "actual_image_view_tool": "tools.view_image",
+      "native_dimensions": [
+        1240,
+        930
+      ],
+      "actual_render_source_images_opened": 0,
+      "static_text_reads": [
+        "assigned case JSON",
+        "assigned state JSON",
+        "assigned action JSON"
+      ],
+      "capture_context": {
+        "route": "reader",
+        "modal": "choices",
+        "modal_context": "reader-orientation",
+        "menu": true,
+        "reader_panel": "orientation",
+        "display_landscape": true,
+        "display_rotation_degrees": 90,
+        "page_layout_mode": "single",
+        "reading_direction": "rtl",
+        "effective_spread": false,
+        "reader_visible_pages": [
+          12
+        ]
+      },
+      "observation": "One centered source-art page is visible above the open panel. The selected landscape and reverse-landscape choices say single-page and use undivided page diagrams. The folio reads 12 / 40, agreeing with retained visible_pages [12] and spread=false. No double-page claim appears.",
+      "layout_observation": "The three aligned cards retain clear labels, outlined unselected bounds and a black selected landscape card. The heading, header controls, menu progress area and lower navigation are legible and do not collide. These are open-menu captures.",
+      "reference_application": "The portrait reference supplies the orientation-card hierarchy and selection contrast. Its portrait geometry, sensor-follow sample and preview row are not exact landscape-state requirements; manual direction and reverse-landscape controls are accepted by the supplied contract.",
+      "static_action_support": {
+        "action_count": 8,
+        "scope": "The existing recipe sets remember-book-direction=false, the stated layout mode, cover-alone=false, the stated reading direction and orientation=landscape, then seeks page 12, opens the Reader menu and opens orientation. The final state and case identity are consistent with that recorded scope.",
+        "not_executed_in_this_case": "No activation of the portrait or reverse-landscape card, physical rotation, pointer event or closed-menu interaction appears in the recipe."
+      },
+      "source_artwork_attribution_basis": "Untouched displayed_reader first_path/second_path declarations and the case JSON processed-resource records provide static render-source identity only. No source or oracle image was assigned or opened, and the application data directory was not read. Visible artwork frames and whitespace are not treated as application gutter defects.",
+      "intentional_capability_check": "No intentional difference is declared. The top manual-direction control and three manual choices are within the supplied software-only contract; no sensor-follow or physical-hardware claim is made.",
+      "static_verdict": "No new actionable issue observed in the assigned open-menu geometry, dynamic page labels, selection diagrams or folio. This is a bounded related-contract observation, not exact-state acceptance.",
+      "limitations": [
+        "No independent exact-state landscape reference was supplied.",
+        "Open-menu captures do not qualify closed Reader full-frame artwork, hidden footer/page/corner/toggle hit regions or menu-close behavior."
+      ]
+    },
+    {
+      "case_id": "scribe--c5-orientation-landscape-vertical",
+      "original_png_path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate11/ui-round-1/snapshots/ui-round-1-snapshot-012-c4-c5-reader-controls/files/output/scribe--c5-orientation-landscape-vertical.png",
+      "png_sha256": "6a67321235f7b960529b0e4da0395e63fea905aa16da5e71fadde2113bccd494",
+      "case_json_sha256": "3e84abd52e711046db18071c34d3148f5dd89348f5b8e178632fdda71ccb39e0",
+      "state_sha256": "ec1cff618fc6bc840fe589e162ee12670082df8d8409226f44eb63b334105f31",
+      "metadata_sha256": "958c246dce8cfd598edc5a713a1cdf42374598bb0145251d3121eb4abf3ef975",
+      "actions_sha256": "79c9cb8724690051d934974a3aaec00839a00abdb3b5a4dee9b4895442f54f77",
+      "log_sha256": "1b7cf8ed4ce4958b8e7f6e907802f7378c8d9d65c978e103ca66ffd8026e83b8",
+      "reference_sha256": "ebbe1249f7d355eebc5eaca682880f398fa0d9cb1ced5b42c93a2c66d487736e",
+      "exact_reference_sha256": null,
+      "reference_comparison_status": "related-logical-contract-only-no-exact-state-reference",
+      "actual_image_opened": true,
+      "actual_image_open_count": 1,
+      "actual_image_view_tool": "tools.view_image",
+      "native_dimensions": [
+        1240,
+        930
+      ],
+      "actual_render_source_images_opened": 0,
+      "static_text_reads": [
+        "assigned case JSON",
+        "assigned state JSON",
+        "assigned action JSON"
+      ],
+      "capture_context": {
+        "route": "reader",
+        "modal": "choices",
+        "modal_context": "reader-orientation",
+        "menu": true,
+        "reader_panel": "orientation",
+        "display_landscape": true,
+        "display_rotation_degrees": 90,
+        "page_layout_mode": "double",
+        "reading_direction": "vertical",
+        "effective_spread": false,
+        "reader_visible_pages": [
+          12
+        ]
+      },
+      "observation": "An enlarged upper portion of one source-art page is visible above the open panel. Landscape and reverse-landscape choices say single-page and use undivided page diagrams. The folio reads 12 / 40. Although the stored layout mode is double, the recorded vertical direction has effective spread=false; the visible wording agrees with that effective result.",
+      "layout_observation": "The three aligned cards retain clear labels, outlined unselected bounds and a black selected landscape card. The heading, header controls, menu progress area and lower navigation are legible and do not collide. These are open-menu captures.",
+      "reference_application": "The portrait reference supplies the orientation-card hierarchy and selection contrast. Its portrait geometry, sensor-follow sample and preview row are not exact landscape-state requirements; manual direction and reverse-landscape controls are accepted by the supplied contract.",
+      "static_action_support": {
+        "action_count": 8,
+        "scope": "The existing recipe sets remember-book-direction=false, the stated layout mode, cover-alone=false, the stated reading direction and orientation=landscape, then seeks page 12, opens the Reader menu and opens orientation. The final state and case identity are consistent with that recorded scope.",
+        "not_executed_in_this_case": "No activation of the portrait or reverse-landscape card, physical rotation, pointer event or closed-menu interaction appears in the recipe."
+      },
+      "source_artwork_attribution_basis": "Untouched displayed_reader first_path/second_path declarations and the case JSON processed-resource records provide static render-source identity only. No source or oracle image was assigned or opened, and the application data directory was not read. Visible artwork frames and whitespace are not treated as application gutter defects.",
+      "intentional_capability_check": "No intentional difference is declared. The top manual-direction control and three manual choices are within the supplied software-only contract; no sensor-follow or physical-hardware claim is made.",
+      "static_verdict": "No new actionable issue observed in the assigned open-menu geometry, dynamic page labels, selection diagrams or folio. This is a bounded related-contract observation, not exact-state acceptance.",
+      "limitations": [
+        "No independent exact-state landscape reference was supplied.",
+        "Open-menu captures do not qualify closed Reader full-frame artwork, hidden footer/page/corner/toggle hit regions or menu-close behavior."
+      ]
+    }
+  ],
+  "new_actionable": [],
+  "suggestions": [],
+  "pending": [
+    {
+      "id": "exact-landscape-orientation-reference",
+      "status": "preexisting-input-scope-limit",
+      "case_ids": [
+        "scribe--c5-orientation-landscape-automatic",
+        "scribe--c5-orientation-landscape-single",
+        "scribe--c5-orientation-landscape-vertical"
+      ],
+      "detail": "Each assigned supplemental state has only the related portrait orientation reference. Exact-state visual comparison remains unassessed; it is not marked passed."
+    }
+  ],
+  "new_pending": [],
+  "new_pending_count": 0,
+  "unreadable_detail_count": 0,
+  "historical_findings": [],
+  "regression_closures": [],
+  "limitations": [
+    "All four assigned originals were directly opened. No additional candidate, processed, oracle, old-round or source-art image was opened.",
+    "Case and state identity agree with the owner-declared run/source/binary and original artifact hashes; no new hash, metric, validator, test, build, probe, application or SSH execution was performed.",
+    "Only recorded final open-menu behavior is supported. Card activation, closed Reader chrome and invisible hit regions were not exercised.",
+    "This review qualifies the declared desktop software profile only. It does not establish physical hardware, native physical lifecycle, e-ink behavior, performance or a live-reader lease.",
+    "The owner source and reference manifests were read as static identity lists; current production source files were not used as frozen capture evidence.",
+    "No prior report or prior image was used to claim a historical repair closure."
+  ],
+  "static_identity_manifests_read": [
+    {
+      "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate11/ui-round-1/snapshots/ui-round-1-snapshot-012-c4-c5-reader-controls/files/output/source-files.json",
+      "sha256": "e332086df1f552ae7d7c7d434491f6886a167095a86789d6e0ec93ca47975e9e"
+    },
+    {
+      "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate11/ui-round-1/snapshots/ui-round-1-snapshot-012-c4-c5-reader-controls/files/output/reference-files.json",
+      "sha256": "caad04a243ecbaac22c790d7918f50c8678985b9e58a9f963694fe7d69e2775a"
+    }
+  ],
+  "final_capture_scope": {
+    "manifest_path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate11/ui-round-1/manifest.json",
+    "manifest_sha256": "ff5fad60889a430ef0ae78e0f5c52a08e6a8d57a5785f306b303e56857a1079d",
+    "scope": "Only these three assigned cases were visually reviewed. Final required-ID and immutable-evidence reconciliation remains the coordinator's separate full-run task.",
+    "full_round_acceptance": false,
+    "clean_round_credit": 0
+  }
+}

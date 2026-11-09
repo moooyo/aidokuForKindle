@@ -1,0 +1,167 @@
+{
+  "batch_id": "supplemental-17",
+  "reviewer": "/root/phase3_round1_review/supplemental_17",
+  "run_id": "a1baf3fe3dc2",
+  "round": 1,
+  "binary_sha256": "94d7f3bbcab475ad8833a2f3c486138f7b49bead231851c2d8eab2f0c3d2ac51",
+  "source_sha256": "aef9db4e111165016a10a2a95e111f3155860b8510c7f6207ec9c79fbec5082c",
+  "review_scope": "Fresh independent visual inspection of the eight assigned candidate PNGs, with their existing case metadata and the accepted closed-reader contract. No independent reference image was supplied or loaded.",
+  "reference_basis": [
+    "docs/review/phase3-reference-scope.json: closed-reader-artwork-only precedence and pw-reader scope",
+    "docs/review/phase3-prototype-reference-support.json: retained_user_contract, reference_overrides, and prototype/pw-reader.dc.html board map",
+    "docs/DESIGN_HANDOFF.md: Reader and required review loop",
+    "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/HANDOFF.md: section 5.3, subject to the accepted user override",
+    "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/prototype/pw-reader.dc.html: static artwork, menu, bookmark, and footer declarations only"
+  ],
+  "artifact_identity_checks": {
+    "method": "Read existing JSON metadata and calculate SHA256 with Get-FileHash; do not execute the application or rerun capture checks.",
+    "all_candidate_hashes_match_input_expected": true,
+    "all_candidate_hashes_match_case_screenshot_evidence": true,
+    "all_case_run_binary_source_identities_match": true,
+    "recorded_capture_method": "native Slint application --capture; unmodified original PNG",
+    "recorded_profile": "pw5",
+    "recorded_native_size": [618, 824],
+    "recorded_backend": "desktop",
+    "physical_hardware_qualified": false
+  },
+  "reviewed_case_ids": [
+    "pw5-portrait--bookmark-cold-persistence",
+    "pw5-portrait--bookmark-toggle-pure",
+    "pw5-portrait--first-page",
+    "pw5-portrait--image-setting-invalidation",
+    "pw5-portrait--last-page",
+    "pw5-portrait--legacy-footer-1-pure",
+    "pw5-portrait--legacy-footer-2-pure",
+    "pw5-portrait--legacy-footer-3-pure"
+  ],
+  "reviewed_cases": [
+    {
+      "case_id": "pw5-portrait--bookmark-cold-persistence",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/pw5-portrait--bookmark-cold-persistence.png",
+      "candidate_sha256": "99e72fc0524cab6742a606d8fd257bc1fd762c534457451aacba487d8ee9c394",
+      "viewed_candidate": true,
+      "outcome": "no_actionable_visual_issue",
+      "observations": [
+        "The existing sidecar records a settled closed reader at page 12 of 40, reader_bookmarked=false and bookmark_count=0; the displayed session agrees with that page.",
+        "Actual viewing shows the striped skyline panel above dotted and radial panels on the left and a tall crosshatched panel on the right. Artwork is present throughout the reading scene, with no error or loading placeholder.",
+        "No status bar, bookmark ribbon, footer text, notification, menu rail, or separate bottom-corner badge is visible. The white page areas and comic-panel gutters are not evidence of an application viewport inset.",
+        "This is the visible cold-persistence endpoint. The screenshot does not independently establish the preceding bookmark operation or a real process restart."
+      ],
+      "intentional_differences": []
+    },
+    {
+      "case_id": "pw5-portrait--bookmark-toggle-pure",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/pw5-portrait--bookmark-toggle-pure.png",
+      "candidate_sha256": "99e72fc0524cab6742a606d8fd257bc1fd762c534457451aacba487d8ee9c394",
+      "viewed_candidate": true,
+      "outcome": "no_actionable_visual_issue",
+      "observations": [
+        "The existing sidecar records page 12 of 40 with menu=false, no modal, reader_bookmarked=false and bookmark_count=0; the recorded bookmark purity check passes.",
+        "The skyline silhouette, outlined speech balloons, dotted left panel, radial lower panel, and right crosshatched panel remain visible in the actual PNG. Their outlines do not appear covered by an application overlay.",
+        "The upper-right corner has no bookmark ribbon, and the bottom edge has no footer label or transient bookmark notice. No independent blank strip or UI frame is apparent.",
+        "This endpoint is visually artwork-only. It does not show the open-menu bookmark action or prove the complete toggle sequence."
+      ],
+      "intentional_differences": []
+    },
+    {
+      "case_id": "pw5-portrait--first-page",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/pw5-portrait--first-page.png",
+      "candidate_sha256": "6b4703a4d4b2bdccf43e91f43cfba716e3cfca4ddb2cc0abd1b6a7f041c02852",
+      "viewed_candidate": true,
+      "outcome": "no_actionable_visual_issue",
+      "observations": [
+        "The existing sidecar identifies reader page 1 of 40 and the displayed session agrees; menu and modal are closed, and image work is settled.",
+        "Actual viewing shows a tall radial panel on the left, two stippled panels on the upper right, and a wide vertically striped panel below. The artwork differs from the page-12 composition and contains no error or missing-image placeholder.",
+        "The top and bottom artwork meet the capture edges without visible application chrome. No page counter, boundary button, bookmark corner, status bar, or footer has been added to the closed reader.",
+        "The artwork has unequal white side areas and edge-touching panel lines. With no independent source artwork supplied, these alone do not establish an incorrect viewport inset or unintended crop."
+      ],
+      "intentional_differences": []
+    },
+    {
+      "case_id": "pw5-portrait--image-setting-invalidation",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/pw5-portrait--image-setting-invalidation.png",
+      "candidate_sha256": "009865b917dbcabbd6e97530b3f91b19d1913ce85c0ce394939bf87f3dbd6f9c",
+      "viewed_candidate": true,
+      "outcome": "no_actionable_visual_issue",
+      "observations": [
+        "The existing sidecar records the settled page-12 reader with contrast=10, crop_borders=true and software dither=true. Its recorded invalidation check reports a different processed-image cache path after the image setting changed.",
+        "Actual viewing retains the striped skyline, dotted and radial left panels, and crosshatched right panel in the same visible arrangement as the other page-12 cases. There is no blank frame, decode placeholder, displaced panel, or visible application overlay.",
+        "The current PNG hash differs from the contrast-0 page-12 PNG. The predominantly black-and-white illustration shows no obvious large tonal change by eye; no stronger visual contrast claim is made.",
+        "The processed-path change is metadata evidence. This static inspection does not independently exercise invalidation or prove that every processing operation used the intended cache key."
+      ],
+      "intentional_differences": []
+    },
+    {
+      "case_id": "pw5-portrait--last-page",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/pw5-portrait--last-page.png",
+      "candidate_sha256": "99e72fc0524cab6742a606d8fd257bc1fd762c534457451aacba487d8ee9c394",
+      "viewed_candidate": true,
+      "outcome": "no_actionable_visual_issue",
+      "observations": [
+        "The existing sidecar records reader page 40 of 40, with the displayed session on page 40, menu=false, no modal and settled image work.",
+        "Actual viewing shows the skyline, dotted, radial and tall crosshatched artwork composition. It is not replaced by an end-of-chapter blank page, boundary notice, or loading error.",
+        "No footer/page count, status bar, bookmark ribbon, navigation rail, notification, or extra seam is visible. The comic-panel borders and speech balloons remain distinguishable from application controls.",
+        "Its PNG is identical to several page-12 cases. Without independent page source images, that repetition does not establish a wrong-page defect; page identity and chapter-boundary behavior are not visually proved by this PNG."
+      ],
+      "intentional_differences": []
+    },
+    {
+      "case_id": "pw5-portrait--legacy-footer-1-pure",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/pw5-portrait--legacy-footer-1-pure.png",
+      "candidate_sha256": "99e72fc0524cab6742a606d8fd257bc1fd762c534457451aacba487d8ee9c394",
+      "viewed_candidate": true,
+      "outcome": "no_actionable_visual_issue",
+      "observations": [
+        "The existing sidecar records reader_effective.footer_mode=1 and a passing persisted footer_mode=1 check, with page 12 of 40 and reader_bookmarked=true.",
+        "Actual viewing shows the skyline at the top and the radial/crosshatched artwork continuing to the lower edge. The former footer area contains only the artwork and its white page areas.",
+        "No legacy page-count label, chapter caption, top-right bookmark ribbon, status bar, or notification is visible despite the stored footer mode and bookmarked state.",
+        "The dots and crosshatching are inside comic panels, not an application backdrop. The absence of a visible footer does not prove that the lower-right hit region has normal page-turn behavior."
+      ],
+      "intentional_differences": [
+        "A stored legacy footer preference never restores closed-reader labels or a footer-cycle hit region."
+      ]
+    },
+    {
+      "case_id": "pw5-portrait--legacy-footer-2-pure",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/pw5-portrait--legacy-footer-2-pure.png",
+      "candidate_sha256": "99e72fc0524cab6742a606d8fd257bc1fd762c534457451aacba487d8ee9c394",
+      "viewed_candidate": true,
+      "outcome": "no_actionable_visual_issue",
+      "observations": [
+        "The existing sidecar records reader_effective.footer_mode=2 and a passing persisted footer_mode=2 check; the closed reader is settled on bookmarked page 12 of 40.",
+        "Actual viewing shows the lower-left radial rays and the black rounded form in the right crosshatched panel reaching the capture's lower artwork edge. No remaining-pages label or separate white information plate covers them.",
+        "The striped upper panel and speech balloons remain unobstructed. No bookmark ribbon, menu rail, status bar, or notification appears elsewhere in the viewport.",
+        "The captured visual result is artwork-only. Invisible footer-cycle dispatch and actual page-turn input are outside what this still image can demonstrate."
+      ],
+      "intentional_differences": [
+        "A stored legacy footer preference never restores closed-reader labels or a footer-cycle hit region."
+      ]
+    },
+    {
+      "case_id": "pw5-portrait--legacy-footer-3-pure",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/pw5-portrait--legacy-footer-3-pure.png",
+      "candidate_sha256": "99e72fc0524cab6742a606d8fd257bc1fd762c534457451aacba487d8ee9c394",
+      "viewed_candidate": true,
+      "outcome": "no_actionable_visual_issue",
+      "observations": [
+        "The existing sidecar records reader_effective.footer_mode=3 and a passing persisted footer_mode=3 check, with menu=false and reader_bookmarked=true at page 12 of 40.",
+        "Actual viewing shows the same clearly rendered skyline, dotted, radial and crosshatched panel composition. There is no clock label, chapter footer, bottom badge, or blank replacement region.",
+        "The upper-right corner contains artwork rather than a persistent bookmark ribbon; the top and bottom have no status or tool bars. No application shadow or overlay mask is visible.",
+        "The legacy preference has no visible decoration in this endpoint. The PNG alone cannot certify removal of an invisible footer-cycle target or physical wake restoration."
+      ],
+      "intentional_differences": [
+        "A stored legacy footer preference never restores closed-reader labels or a footer-cycle hit region."
+      ]
+    }
+  ],
+  "suggestions": [],
+  "limitations": [
+    "Only the eight candidate PNGs named in supplemental-17.input.json were loaded as images, each through view_image. No independent reference or source-artwork image was supplied or inspected.",
+    "The existing case checks report an exact processed-artwork oracle with zero changed pixels and zero ignored pixels. That recorded diagnostic supports provenance but does not replace the per-image human visual inspection above.",
+    "A PNG cannot prove absence of an invisible footer-cycle hit zone, normal lower-right page turning, menu-only bookmark dispatch, actual cold persistence, or first/last-page transition behavior.",
+    "The desktop capability declaration does not qualify physical Kindle sleep/wake, hardware dither, e-ink refresh waveforms, sensor behavior, or physical light controls. No hardware success is inferred from these captures.",
+    "All assigned cases have closed menus. The default reference's open-menu layout, white outlined UI panels, image-quality controls, and truthful unavailable authorization states are not directly visible in this batch.",
+    "Existing artwork, scale, white margins, and repeated demo-page content may differ from prototype sample art. Without independent source images, no source-accurate crop or wrong-page conclusion is made from those differences alone.",
+    "No application, build, test suite, smoke test, runtime probe, or prototype was executed. This batch result is not a declaration that the complete review round is clean."
+  ]
+}

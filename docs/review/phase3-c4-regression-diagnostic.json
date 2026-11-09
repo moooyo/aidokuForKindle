@@ -1,0 +1,1376 @@
+{
+  "schemaVersion": 1,
+  "kind": "phase3-c4-targeted-regression-diagnostic",
+  "recordDate": "2026-11-06",
+  "reviewer": "/root/phase3_defaults_review",
+  "status": "targeted-twenty-case-review-complete; no-new-high-confidence-defect; not-a-clean-round",
+  "candidate": "phase3-candidate4",
+  "run_id": "582bb83fb7a1",
+  "captureRound": 2,
+  "binary_sha256": "7c2f685ecafc7207446f0e75877b74d14cbc6e41a43f5accee8ae992256e3183",
+  "source_sha256": "dc0cd6227768a5125ecf702982ce639789bc8bca390de82bab83329927ea6353",
+  "source_sha256_after": "dc0cd6227768a5125ecf702982ce639789bc8bca390de82bab83329927ea6353",
+  "source_unchanged": true,
+  "binary_unchanged": true,
+  "reference_sha256": "e7b49b456255432d74cfe41346f9d44c1a9c55bf67c5d55483e4ae3029547d18",
+  "reference_scope_sha256": "c910bed9f02ed17b2ca0a54aca1beeeeb6caabc5a17a91afe764ddd3e7b0d33c",
+  "capture_plan_sha256": "b6ca491b2af5e3f053c9b6a74d3dd23ac9b90ee93a88b5fed0d5d4f009645f49",
+  "harness_sha256": "49063ed94bd621ff901aa06a4d2977603776ae462ba777756d0280ba0f7eaabb",
+  "evidence": {
+    "root": "D:/Code/aidokuForKindle/artifacts/phase3/candidate4/ui-regression-diagnostic",
+    "manifest": "artifacts/phase3/candidate4/ui-regression-diagnostic/manifest.json",
+    "executionLog": "artifacts/phase3/candidate4/ui-regression-diagnostic/execution.log",
+    "host": "test-env",
+    "captureMethod": "native Slint software-renderer application --capture with real --actions",
+    "captureGeneratedAt": "2026-11-06T09:34:33.235256+00:00",
+    "originalScreenshotsModified": false,
+    "localCopyReady": "The parent confirmed copy completion before any image was viewed.",
+    "caseShaDefinition": "screenshotSha256 identifies the current C4 case image; stateSha256 additionally binds state-related conclusions. All hashes are transcribed from this run manifest. No C3 image is used as C4 evidence.",
+    "reviewerExecution": "Only static file reads, original-image views and this report authoring were performed. No application, test, build, runtime probe, CLI, SSH or Git operation was executed."
+  },
+  "reference": {
+    "root": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff",
+    "designVersion": "1793901158-6c09",
+    "scope": "docs/review/phase3-reference-scope.json",
+    "handoffSummary": "docs/DESIGN_HANDOFF.md",
+    "priorFindingMap": "docs/review/phase3-round-1-findings-map.json",
+    "implementationDisposition": "docs/review/phase3-c4-ui-local.json"
+  },
+  "scope": {
+    "targetReferenceCases": 20,
+    "manuallyReviewedReferenceCases": 20,
+    "inspectedPairs": 20,
+    "uniqueImagesViewed": 40,
+    "maximumImageViewsPerReviewer": 8,
+    "coordinatorImagesViewed": 0,
+    "extraQueueArtifactsInCapture": 10,
+    "extraQueueArtifactsManuallyReviewed": 0,
+    "extraQueuePrerequisites": 1,
+    "extraQueueSupplementalCases": 9,
+    "capturedManualRequiredCases": 29,
+    "capturedManualRequiredCasesNotReviewed": 9,
+    "referenceInventory": 101,
+    "referenceCasesNotCapturedOrReviewedHere": 81,
+    "requiredSupplementalGroups": 21,
+    "completedSupplementalGroupsReportedByManifest": 0,
+    "fullCaptureSuiteCompleted": false,
+    "referenceCoverageComplete": false,
+    "completeManualReview": false,
+    "runtimeBehaviorReviewed": false,
+    "canonicalC3FindingGroups": 47,
+    "canonicalGroupsRepresentedByReviewedCaseChecks": 22,
+    "globalCanonicalGroupClosuresAsserted": 0,
+    "cleanRound": false,
+    "cleanRoundStreak": 0,
+    "comparison": "References are exported at 2x and native captures are logical 1x. Reviewers compared matching logical proportions; quoted coordinates and dimensions are approximate."
+  },
+  "mechanics": {
+    "selectedReferenceCasesPassed": 20,
+    "extraQueueArtifactsPassed": 10,
+    "totalPassed": 30,
+    "totalFailed": 0,
+    "elapsedSeconds": 130.09,
+    "manifestMechanicalSuccess": false,
+    "explanation": "All thirty selected capture cases passed their mechanical checks. The manifest retains mechanical_success=false because the complete reference/supplemental suite is absent. Mechanical passes do not create manual review credit."
+  },
+  "assignments": [
+    {
+      "reviewer": "/root/phase3_defaults_review/c4_jump_queue",
+      "caseIds": [
+        "Main--jump-pages",
+        "sc-library--jump-pages",
+        "sc-library--download-queue",
+        "Main--more"
+      ],
+      "pairs": 4,
+      "imageViews": 8
+    },
+    {
+      "reviewer": "/root/phase3_defaults_review/c4_tags_sources",
+      "caseIds": [
+        "Main--sort",
+        "pw-manga--description",
+        "pw-source--source-settings",
+        "sc-browse--source-picker"
+      ],
+      "pairs": 4,
+      "imageViews": 8
+    },
+    {
+      "reviewer": "/root/phase3_defaults_review/c4_reader_cards",
+      "caseIds": [
+        "pw-reader--mode",
+        "pw-reader--rotate",
+        "pw-reader--toc",
+        "sc-reader--layout"
+      ],
+      "pairs": 4,
+      "imageViews": 8
+    },
+    {
+      "reviewer": "/root/phase3_defaults_review/c4_settings",
+      "caseIds": [
+        "sc-settings--categories",
+        "sc-settings--logs",
+        "sc-settings--power",
+        "sc-settings--storage"
+      ],
+      "pairs": 4,
+      "imageViews": 8
+    },
+    {
+      "reviewer": "/root/phase3_defaults_review/c4_sources_search",
+      "caseIds": [
+        "pw-manga--more",
+        "pw-browse--updates",
+        "pw-history--incognito",
+        "sc-search--results"
+      ],
+      "pairs": 4,
+      "imageViews": 8
+    }
+  ],
+  "summary": {
+    "newHighConfidenceProductFindings": 0,
+    "priorDefectsRemainingInReviewedPresentationChecks": 0,
+    "targetedVisualChecks": "The C3 issues represented in these captured cases have current-frame visual closure evidence. This does not close an entire canonical group, behavior or unreviewed variant.",
+    "tagFlow": "All four current short tags appear exactly once, remain readable and have independent outlines. Long-label, suffix, larger-set and multipage stress is not covered.",
+    "sourceEmptyState": "The Paperwhite empty-preferences sheet has source identity, a truthful empty declaration and a contained Done action.",
+    "queueAndJump": "The inspected queue frame encloses its pager; the inspected library jump frames have opaque complete surfaces with the top rule above their grids.",
+    "settings": "Current category/log/power feedback and button/header/dock geometry are restored. Storage is a ready, known-scale case with real recorded values; unknown-state behavior remains unreviewed.",
+    "reader": "Required splitting/layout/orientation structure is visible. The older harness only opens these panels and does not establish newly implemented business behavior.",
+    "conclusion": "Continue with the complete matching-source reference and supplemental review. This targeted diagnostic leaves the clean-round streak at zero."
+  },
+  "reviewed_case_ids": [
+    "Main--jump-pages",
+    "Main--more",
+    "Main--sort",
+    "pw-manga--description",
+    "pw-manga--more",
+    "pw-reader--mode",
+    "pw-reader--rotate",
+    "pw-reader--toc",
+    "pw-browse--updates",
+    "pw-source--source-settings",
+    "pw-history--incognito",
+    "sc-library--download-queue",
+    "sc-library--jump-pages",
+    "sc-browse--source-picker",
+    "sc-reader--layout",
+    "sc-search--results",
+    "sc-settings--categories",
+    "sc-settings--logs",
+    "sc-settings--power",
+    "sc-settings--storage"
+  ],
+  "cases": [
+    {
+      "caseId": "Main--jump-pages",
+      "referenceId": "Main--jump-pages",
+      "screenshot": "artifacts/phase3/candidate4/ui-regression-diagnostic/Main--jump-pages.png",
+      "reference": "screens/states/Main--jump-pages.png",
+      "screenshotSha256": "e00a278cfdecbe31c3a1940c2ff441904aa8b5d8a4334bc4f733388bed11893a",
+      "stateSha256": "01edd78c68d9945fb4c53c504296cb0bfaec3f5bee57e2cebd07a3339e9c883c",
+      "referenceSha256": "1b381b140df164e5e0f9491d2cb28dfe182792bceeb4e75803ac8408be54ffff",
+      "otherManifestEvidenceHashes": {
+        "metadata": "c56ea348e54cd999cb44348af9bf74663c7a92d5d24aea30f407be1c95baae19",
+        "actions": "8b12b6da2c5404799401a43f4916022d0687f94db8200bcd9516ab7ad8c19aa7",
+        "log": "dc121ceea011a63c29b404d6c6b75bbe2db32b326923b8fa99759f457bfd709f"
+      },
+      "logicalSize": [
+        618,
+        824
+      ],
+      "mechanicalPassed": true,
+      "priorGroupChecks": [
+        {
+          "groupId": "P3R1-G01",
+          "disposition": "closed-in-reviewed-case",
+          "closureScope": "Visible presentation in this recorded case only."
+        }
+      ],
+      "observedEvidence": [
+        "The top rule is above the jump heading and no rule crosses the six page buttons.",
+        "The opaque white surface encloses the heading, complete displayed grid, folio, navigation and lower padding."
+      ],
+      "notExercised": [
+        "Expanded multirow grids and reader ToC jump surfaces were not exercised."
+      ],
+      "outcome": "No new high-confidence product defect established in this case."
+    },
+    {
+      "caseId": "Main--more",
+      "referenceId": "Main--more",
+      "screenshot": "artifacts/phase3/candidate4/ui-regression-diagnostic/Main--more.png",
+      "reference": "screens/states/Main--more.png",
+      "screenshotSha256": "5d2e4adbac546da3d19159ed70bb2a150b6ce5feff1d10833243c8e3bbec57d5",
+      "stateSha256": "0c3266eea76b1913a3afe21e8144cab0824c17b37214580dbd13f2d824896f6f",
+      "referenceSha256": "cc740c4be85a90bba48238897d459e0819245937ae0e878f6a8d28cb9107a2d0",
+      "otherManifestEvidenceHashes": {
+        "metadata": "02abec0ef30e07d54ab4b00aaaafcd1b6e5b1b3a7eaf2a0020360a9c1f4ddac8",
+        "actions": "f6b6922a2a51d4d57dce2ccbcdea844e66849db4a16a2a6cb351a78a7b7d378f",
+        "log": "dc121ceea011a63c29b404d6c6b75bbe2db32b326923b8fa99759f457bfd709f"
+      },
+      "logicalSize": [
+        618,
+        824
+      ],
+      "mechanicalPassed": true,
+      "priorGroupChecks": [
+        {
+          "groupId": "P3R1-G02",
+          "disposition": "closed-in-reviewed-case",
+          "closureScope": "Visible presentation in this recorded case only."
+        }
+      ],
+      "observedEvidence": [
+        "Multiselect uses a check inside a complete square outline.",
+        "All four rows, their glyphs and labels remain within the popup; a category folder outline is also visible."
+      ],
+      "notExercised": [
+        "The Scribe More menu was not reviewed."
+      ],
+      "outcome": "No new high-confidence product defect established in this case."
+    },
+    {
+      "caseId": "Main--sort",
+      "referenceId": "Main--sort",
+      "screenshot": "artifacts/phase3/candidate4/ui-regression-diagnostic/Main--sort.png",
+      "reference": "screens/states/Main--sort.png",
+      "screenshotSha256": "ed1514673cf0b6b397d7a3084088a8daf7c0aa09899a0a716429fe04ac61f476",
+      "stateSha256": "085403734f9394605e21cfffb4cd6a5a061d8bbb3860f64785f9f93f300c7259",
+      "referenceSha256": "69d5019d7305fb8049f67824eb675d7d8227eeebaf025dd7f10a327cfb6eebfe",
+      "otherManifestEvidenceHashes": {
+        "metadata": "4e7dafce2367f6c056f48b32edbb6edb19bc9c3bb2cd198452b2afc283c70cf2",
+        "actions": "ee5fd16d2c2d255ba4c9b4f1846b4c2aebbffa59d66ba7093cabac83753a47a9",
+        "log": "dc121ceea011a63c29b404d6c6b75bbe2db32b326923b8fa99759f457bfd709f"
+      },
+      "logicalSize": [
+        618,
+        824
+      ],
+      "mechanicalPassed": true,
+      "priorGroupChecks": [
+        {
+          "groupId": "P3R1-G03",
+          "disposition": "closed-in-reviewed-case",
+          "closureScope": "Visible presentation in this recorded case only."
+        }
+      ],
+      "observedEvidence": [
+        "The four filter chips have approximately 16 px labels and 86x44 px bounds; every label has a separate readable outline.",
+        "The selected recent-read sort, descending direction and neutral filters agree with the captured state."
+      ],
+      "notExercised": [
+        "Other filter combinations were not exercised."
+      ],
+      "outcome": "No new high-confidence product defect established in this case."
+    },
+    {
+      "caseId": "pw-manga--description",
+      "referenceId": "pw-manga--description",
+      "screenshot": "artifacts/phase3/candidate4/ui-regression-diagnostic/pw-manga--description.png",
+      "reference": "screens/states/pw-manga--description.png",
+      "screenshotSha256": "539dd4af8500b60c6992ae216da6c7a08727e12a6934d514173554f6f7f4461f",
+      "stateSha256": "12f3f44b9218637152b35b3e114ec18796b3e1ffa7bbcb395eeebef7ecc9fbae",
+      "referenceSha256": "470b7e99526c882e74a1b3cdedde9dd83378e97bb22c62981da1a642b1f73bd8",
+      "otherManifestEvidenceHashes": {
+        "metadata": "8cf9d9b6fe6fad30de338bd81263b274122a5f6ff76b36ff274b525a65d269de",
+        "actions": "145fd647aed7d2cd7a6eb2a9292b9810dcc752e6203459a62640653be04c5e5e",
+        "log": "dc121ceea011a63c29b404d6c6b75bbe2db32b326923b8fa99759f457bfd709f"
+      },
+      "logicalSize": [
+        618,
+        824
+      ],
+      "mechanicalPassed": true,
+      "priorGroupChecks": [
+        {
+          "groupId": "P3R1-G06",
+          "disposition": "closed-in-reviewed-case",
+          "closureScope": "Visible presentation in this recorded case only."
+        }
+      ],
+      "observedEvidence": [
+        "The first body line is indented approximately 36 logical px, with approximately 32 px line spacing.",
+        "The sheet contains the complete current body, all four short actual tag labels exactly once in separate outlines, and three metadata rows.",
+        "The current panel is 1/1; no pager is needed."
+      ],
+      "notExercised": [
+        "Oversized labels, larger tag collections, distinguishing long suffixes and multipage summary containment were not exercised."
+      ],
+      "outcome": "No new high-confidence product defect established in this case."
+    },
+    {
+      "caseId": "pw-manga--more",
+      "referenceId": "pw-manga--more",
+      "screenshot": "artifacts/phase3/candidate4/ui-regression-diagnostic/pw-manga--more.png",
+      "reference": "screens/states/pw-manga--more.png",
+      "screenshotSha256": "fcc814350b710a1741ef2c09682d655fb70e600632db0be869281cc12a89ea39",
+      "stateSha256": "c8237d401dd81561150cbd125171e574c7b52d8d69a07e6aedd08271f839bcb3",
+      "referenceSha256": "f5582eb96276981c5b537524a384ef26563e530ec56701318ed88a7bb069afe8",
+      "otherManifestEvidenceHashes": {
+        "metadata": "6bd547fc94fe3e8a5e1d2b06cca56ece2a6d7a3a41de824026c01f886f8a15f6",
+        "actions": "92ade1acb88de9bc7648c1087b31c401396e5ce080ac3599c74deb9f7c07e5b6",
+        "log": "dc121ceea011a63c29b404d6c6b75bbe2db32b326923b8fa99759f457bfd709f"
+      },
+      "logicalSize": [
+        618,
+        824
+      ],
+      "mechanicalPassed": true,
+      "priorGroupChecks": [],
+      "observedEvidence": [
+        "The four-row menu preserves the reference plain-text treatment, position, row spacing and continuous outline.",
+        "The unavailable screensaver action is visibly muted and has a short explanation; enabled action declarations agree with recorded state."
+      ],
+      "notExercised": [
+        "Action execution was not exercised."
+      ],
+      "outcome": "No new high-confidence product defect established in this case."
+    },
+    {
+      "caseId": "pw-reader--mode",
+      "referenceId": "pw-reader--mode",
+      "screenshot": "artifacts/phase3/candidate4/ui-regression-diagnostic/pw-reader--mode.png",
+      "reference": "screens/states/pw-reader--mode.png",
+      "screenshotSha256": "ecce585c3eaf005bbf9f8ad6f3ca2fd2efd378878dd3e317dddfdabf1ac0f76c",
+      "stateSha256": "c73fa3dfefcb021e4b339f08e45ce5bb0c7334f2fb6bf70b80284844ad59ed3d",
+      "referenceSha256": "3367daee5dde3df38cc6cc09f01ea27030799377488591c68535eeb3bcac4673",
+      "otherManifestEvidenceHashes": {
+        "metadata": "e5591389dbbe5749a0e71ddd86e5de9c705921b701a32e45871a2dfacbff02cf",
+        "actions": "f598a44f9e2f58253936fc297076a7c892644be2cb9518dfdc1f083e27bdaab9",
+        "log": "dc121ceea011a63c29b404d6c6b75bbe2db32b326923b8fa99759f457bfd709f"
+      },
+      "logicalSize": [
+        618,
+        824
+      ],
+      "mechanicalPassed": true,
+      "priorGroupChecks": [
+        {
+          "groupId": "P3R1-G08",
+          "disposition": "closed-in-reviewed-case",
+          "closureScope": "Visible presentation in this recorded case only."
+        },
+        {
+          "groupId": "P3R1-G10",
+          "disposition": "closed-in-reviewed-case",
+          "closureScope": "Visible presentation in this recorded case only."
+        }
+      ],
+      "observedEvidence": [
+        "Four direction cards and the separate Single/Double/Automatic row are visible.",
+        "The independent wide-page splitting slot is restored with a disabled switch and concise unavailable explanation.",
+        "A subdued right-aligned book-default RTL hint is visible and agrees with the available RTL state."
+      ],
+      "notExercised": [
+        "The state has no independent stored-book-default direction field. This unchanged-direction capture does not establish that the hint follows a separately stored default after direction changes.",
+        "Scribe mode cases and splitting behavior were not exercised."
+      ],
+      "outcome": "No new high-confidence product defect established in this case."
+    },
+    {
+      "caseId": "pw-reader--rotate",
+      "referenceId": "pw-reader--rotate",
+      "screenshot": "artifacts/phase3/candidate4/ui-regression-diagnostic/pw-reader--rotate.png",
+      "reference": "screens/states/pw-reader--rotate.png",
+      "screenshotSha256": "7ea2089de62a06db72aac7c27e5cf37d011ccf8a29eafce76e8e97eddcd05eb1",
+      "stateSha256": "2d437e0ca499eb6858c1b083d711e59206a04e2ad8aa80254c917a3749d58e70",
+      "referenceSha256": "e53b7cced39e13d9a4c597c847a54a55d643675530cc71e6b37855fa047e3b16",
+      "otherManifestEvidenceHashes": {
+        "metadata": "397082851650c4828f710963e8bf689e97d80ff9ae285560e9ea6417bd2db599",
+        "actions": "d4276b9b2dd1d8d44a4a19105553bf0ba797d4db352401d915befc3dbc333400",
+        "log": "dc121ceea011a63c29b404d6c6b75bbe2db32b326923b8fa99759f457bfd709f"
+      },
+      "logicalSize": [
+        618,
+        824
+      ],
+      "mechanicalPassed": true,
+      "priorGroupChecks": [
+        {
+          "groupId": "P3R1-G09",
+          "disposition": "closed-in-reviewed-case",
+          "closureScope": "Visible presentation in this recorded case only."
+        }
+      ],
+      "observedEvidence": [
+        "Portrait, Landscape and Reverse landscape appear as three equal-width cards.",
+        "Portrait is selected and all three modal actions are enabled in the captured state."
+      ],
+      "notExercised": [
+        "The recorded actions open the panel without selecting Reverse landscape. Actual 270-degree output and persistence were not exercised."
+      ],
+      "outcome": "No new high-confidence product defect established in this case."
+    },
+    {
+      "caseId": "pw-reader--toc",
+      "referenceId": "pw-reader--toc",
+      "screenshot": "artifacts/phase3/candidate4/ui-regression-diagnostic/pw-reader--toc.png",
+      "reference": "screens/states/pw-reader--toc.png",
+      "screenshotSha256": "43ebf20e01989abf984c98320edd18c7afef814d6ceb43fd9dc25c7920fa0116",
+      "stateSha256": "cfbc5d6cbc6b7ce38346a0048ff7664bbb8443c8c693ee6909e624a29cbb9f1e",
+      "referenceSha256": "f66825556e844eff175f196cbd33179b0cd8d0e401129667d575f198f3d2e543",
+      "otherManifestEvidenceHashes": {
+        "metadata": "bddd3c3c12e41a092f2e3bd91bbb65ab59c3c9e1e123589e275d92b60df8ff8a",
+        "actions": "575f412a28cdd4321e5b4a34a3faf0aef1f90d3c7c0c567d150a2326c46e9ae9",
+        "log": "dc121ceea011a63c29b404d6c6b75bbe2db32b326923b8fa99759f457bfd709f"
+      },
+      "logicalSize": [
+        618,
+        824
+      ],
+      "mechanicalPassed": true,
+      "priorGroupChecks": [],
+      "observedEvidence": [
+        "The selected Chapters tab shows five real chapter rows; the current row has its dot, bold title and 12/40 progress.",
+        "The visible 11/18 folio agrees with the captured panel state. Five 46 px rows and the lower boundary near y636 remain unclipped.",
+        "Adding the approximately 52 px real folio moves the top edge to approximately y293 versus reference y344. This geometry variation is retained separately for the full review."
+      ],
+      "notExercised": [
+        "The Bookmarks tab is not selected and bookmark_count is 1; empty-bookmark feedback and its current-page action are not exercised.",
+        "Reader page-jump grids and ToC navigation behavior were not exercised."
+      ],
+      "outcome": "No new high-confidence product defect established in this case."
+    },
+    {
+      "caseId": "pw-browse--updates",
+      "referenceId": "pw-browse--updates",
+      "screenshot": "artifacts/phase3/candidate4/ui-regression-diagnostic/pw-browse--updates.png",
+      "reference": "screens/states/pw-browse--updates.png",
+      "screenshotSha256": "08333a9e10b8611fcb842b1f20771ff0d4d1dd1f89f5bfe6d0551b4ac396c617",
+      "stateSha256": "33bf90d2e159c678f93d4b588ea1af8da23f125e2c0655c07dab614e3cfaf427",
+      "referenceSha256": "2cdb556928678e331ce7b582fbdf65c14ae81ad506e2e76364631329c313da16",
+      "otherManifestEvidenceHashes": {
+        "metadata": "4c361490b162a4775485258ef72b64cdfc81ff95dea67d9e797b77d508918e0c",
+        "actions": "213ed0824125daca36165436e279c8bbc515c04f03d44284e83d596db24f737a",
+        "log": "dc121ceea011a63c29b404d6c6b75bbe2db32b326923b8fa99759f457bfd709f"
+      },
+      "logicalSize": [
+        618,
+        824
+      ],
+      "mechanicalPassed": true,
+      "priorGroupChecks": [
+        {
+          "groupId": "P3R1-G04",
+          "disposition": "closed-in-reviewed-case",
+          "closureScope": "Visible presentation in this recorded case only."
+        }
+      ],
+      "observedEvidence": [
+        "Visible subtitles show the complete rightward transitions v12 -> v13 and v8 -> v9, supported by matching installed and available source records.",
+        "Row boundaries and individual/all-update controls retain the reference geometry."
+      ],
+      "notExercised": [
+        "Scribe updates and actual update execution were not exercised."
+      ],
+      "outcome": "No new high-confidence product defect established in this case."
+    },
+    {
+      "caseId": "pw-source--source-settings",
+      "referenceId": "pw-source--source-settings",
+      "screenshot": "artifacts/phase3/candidate4/ui-regression-diagnostic/pw-source--source-settings.png",
+      "reference": "screens/states/pw-source--source-settings.png",
+      "screenshotSha256": "d9da0da8fde17562ae71605a885f4e2fec7eafc46cfe82ea0f2880dbffe3416e",
+      "stateSha256": "4ae7281fd4b793911926910c8de5d871b0d16da84b5da9643cdc39be6789d2c7",
+      "referenceSha256": "42bad520a2095b2d0acaefba27f4a1b7e172639189dcb1edd438f3a237d02f19",
+      "otherManifestEvidenceHashes": {
+        "metadata": "e77cba2e6cfbc88f2f4b8a76f744425808b9e1048283cfa8e24d33573f5aaf4c",
+        "actions": "3ed1bb93e4540acb8b4c0cef23c145d95c5534cf88314f79963c58613b84f6ed",
+        "log": "dc121ceea011a63c29b404d6c6b75bbe2db32b326923b8fa99759f457bfd709f"
+      },
+      "logicalSize": [
+        618,
+        824
+      ],
+      "mechanicalPassed": true,
+      "priorGroupChecks": [
+        {
+          "groupId": "P3R1-G12",
+          "disposition": "closed-in-reviewed-case",
+          "closureScope": "Visible presentation in this recorded case only."
+        }
+      ],
+      "observedEvidence": [
+        "A white contained bottom sheet has the MangaDex settings identity, a visible Done action, a black top boundary and a truthful no-configurable-options message.",
+        "The empty declaration agrees with source_preference_groups=[]; no preferences are fabricated."
+      ],
+      "notExercised": [
+        "Scribe source settings, nonempty declarations and closing behavior were not exercised."
+      ],
+      "outcome": "No new high-confidence product defect established in this case."
+    },
+    {
+      "caseId": "pw-history--incognito",
+      "referenceId": "pw-history--incognito",
+      "screenshot": "artifacts/phase3/candidate4/ui-regression-diagnostic/pw-history--incognito.png",
+      "reference": "screens/states/pw-history--incognito.png",
+      "screenshotSha256": "ec5c1b8b3c25698f446ba7ddbb77729fdcbd933e051fb2f4345840c27a86c7b4",
+      "stateSha256": "76f7886e42e02a5bf22ca6bd227635b4d88635dd388863c9e2bb23db7320d52a",
+      "referenceSha256": "0c31c58650b054b6316b24eadae1575386a4ea1d407e83c859ca769e8b4bb999",
+      "otherManifestEvidenceHashes": {
+        "metadata": "0c3f467dc58ef93b8c489488664bc37a91aa7dcf039842899dfe259566fcbbf3",
+        "actions": "e4d149f7ab5d6e186462bd819731eeec86fdc1166c50480989bb980ac46a1bec",
+        "log": "dc121ceea011a63c29b404d6c6b75bbe2db32b326923b8fa99759f457bfd709f"
+      },
+      "logicalSize": [
+        618,
+        824
+      ],
+      "mechanicalPassed": true,
+      "priorGroupChecks": [
+        {
+          "groupId": "P3R1-G05",
+          "disposition": "closed-in-reviewed-case",
+          "closureScope": "Visible presentation in this recorded case only."
+        }
+      ],
+      "observedEvidence": [
+        "The active black status strip contains the centered incognito/no-history notice.",
+        "Clock, Wi-Fi, battery percentage and icon remain visible; the active preference agrees with the capture."
+      ],
+      "notExercised": [
+        "Persistence, other routes/profiles, enable transitions and actual history-write policy were not exercised."
+      ],
+      "outcome": "No new high-confidence product defect established in this case."
+    },
+    {
+      "caseId": "sc-library--download-queue",
+      "referenceId": "sc-library--download-queue",
+      "screenshot": "artifacts/phase3/candidate4/ui-regression-diagnostic/sc-library--download-queue.png",
+      "reference": "screens/states/sc-library--download-queue.png",
+      "screenshotSha256": "358fdd9ebe10d893f9c2603c5dc077248ece6435370194e75321a739e658a237",
+      "stateSha256": "bee783b1949da8f867056224960b08f5aa6ac5521311d31191499a9497025fbb",
+      "referenceSha256": "6b7706f66911f0fb4bb7eb743d0e57c0b6c1091614f245f00e2cff9c0aaab766",
+      "otherManifestEvidenceHashes": {
+        "metadata": "9f7aab0523789b2ac8e6a7d668ae6fdf4f4c026ccd219eec57d04ee17be85a85",
+        "actions": "26646e26902e77e50c67256d2499731f27f03fb26a638df67d29b95e96cbfb80",
+        "log": "7e68a4176710a866675a6b95bcf7bed2d96c58a8fd7996a4d48f3679514483a9",
+        "provider:sc-library--download-queue": "af9a1feab0a697f12485500c6e30e046e6e818f4d91feafa9ab48155666fdafc"
+      },
+      "logicalSize": [
+        930,
+        1240
+      ],
+      "mechanicalPassed": true,
+      "priorGroupChecks": [
+        {
+          "groupId": "P3R1-G16",
+          "disposition": "closed-in-reviewed-case",
+          "closureScope": "Visible presentation in this recorded case only."
+        }
+      ],
+      "observedEvidence": [
+        "A continuous four-sided outline encloses all three rows, progress bars, the 1/2 folio, next action and bottom spacing.",
+        "Long fixture titles have visible ellipses while right-aligned statuses remain readable within the panel."
+      ],
+      "notExercised": [
+        "No additional queue artifact was viewed. Final-page containment and operation variants remain unreviewed."
+      ],
+      "outcome": "No new high-confidence product defect established in this case."
+    },
+    {
+      "caseId": "sc-library--jump-pages",
+      "referenceId": "sc-library--jump-pages",
+      "screenshot": "artifacts/phase3/candidate4/ui-regression-diagnostic/sc-library--jump-pages.png",
+      "reference": "screens/states/sc-library--jump-pages.png",
+      "screenshotSha256": "c3cc85d50f78ff0ee3e47ac90883b90afe6a7c106a6a1f92ac3dfae6afc2e6f0",
+      "stateSha256": "7d5af46f4518af32cf736323be267c3c68d1b75cd9ae73d7ad0daa6c577fe48a",
+      "referenceSha256": "96c3587b0513a0becb8901f8315b04aa74a094dc46874ad309f31a337e77e65d",
+      "otherManifestEvidenceHashes": {
+        "metadata": "fd8032dcf33c07f535e6b1891f121f25d417091dabfb7e5c9d12238721f66187",
+        "actions": "8b12b6da2c5404799401a43f4916022d0687f94db8200bcd9516ab7ad8c19aa7",
+        "log": "7e68a4176710a866675a6b95bcf7bed2d96c58a8fd7996a4d48f3679514483a9"
+      },
+      "logicalSize": [
+        930,
+        1240
+      ],
+      "mechanicalPassed": true,
+      "priorGroupChecks": [
+        {
+          "groupId": "P3R1-G01",
+          "disposition": "closed-in-reviewed-case",
+          "closureScope": "Visible presentation in this recorded case only."
+        }
+      ],
+      "observedEvidence": [
+        "The top rule spans the surface above the heading without crossing the three page buttons.",
+        "The opaque surface contains the title, complete displayed grid, 1/3 folio, next action and lower padding."
+      ],
+      "notExercised": [
+        "Expanded multirow grids and reader ToC jump surfaces were not exercised."
+      ],
+      "outcome": "No new high-confidence product defect established in this case."
+    },
+    {
+      "caseId": "sc-browse--source-picker",
+      "referenceId": "sc-browse--source-picker",
+      "screenshot": "artifacts/phase3/candidate4/ui-regression-diagnostic/sc-browse--source-picker.png",
+      "reference": "screens/states/sc-browse--source-picker.png",
+      "screenshotSha256": "5437cfbc2ecbcc4e00b44201b6211038d5d90b536fc9aa0ba6ac68cb341ede53",
+      "stateSha256": "e77a146b4b146aba5141694315af4c1cc8dc7004c45238884494d00acd38c5fe",
+      "referenceSha256": "ba31c572c5584efe71aedff182ed94b5fd5916b875080bd7aa61ee24d2ea578d",
+      "otherManifestEvidenceHashes": {
+        "metadata": "2d53a6b0937c62de4d34ab7ac14cd0271eb7187bd8edba40130ab0fc1e30d596",
+        "actions": "52e40d070bca37a1ec401037010ebeb0f39781c40e607dbeba1548039f60255c",
+        "log": "7e68a4176710a866675a6b95bcf7bed2d96c58a8fd7996a4d48f3679514483a9"
+      },
+      "logicalSize": [
+        930,
+        1240
+      ],
+      "mechanicalPassed": true,
+      "priorGroupChecks": [
+        {
+          "groupId": "P3R1-G15",
+          "disposition": "closed-in-reviewed-case",
+          "closureScope": "Visible presentation in this recorded case only."
+        }
+      ],
+      "observedEvidence": [
+        "The actual connected and unconfigured statuses remain complete and distinguishable, matching compact_status.",
+        "All seven current source names, group headings, selected-source mark, extension indicators and three footer actions are readable and contained."
+      ],
+      "notExercised": [
+        "Long source names and larger source lists were not exercised."
+      ],
+      "outcome": "No new high-confidence product defect established in this case."
+    },
+    {
+      "caseId": "sc-reader--layout",
+      "referenceId": "sc-reader--layout",
+      "screenshot": "artifacts/phase3/candidate4/ui-regression-diagnostic/sc-reader--layout.png",
+      "reference": "screens/states/sc-reader--layout.png",
+      "screenshotSha256": "d452beda817daf4fc15a7e613c465e65973aa818b27b0d104988665f69a59042",
+      "stateSha256": "4b48207b0d25867d24eda1a304cfe3622fd5b5de0152994138b0a8cf51b78458",
+      "referenceSha256": "b1b897b31bf421080f4669a36a2d903271d31dbf98245a5d3cf3ab244ac9d055",
+      "otherManifestEvidenceHashes": {
+        "metadata": "c3c8d8342673b6aff73627cbb48ebe2c554fbb4b0f83ffbdc59a9035299c0597",
+        "actions": "9b2d6d4093b48cb276592c4e7dfd19bd228108785f08e4107f4af6879a1573bc",
+        "log": "1b7cf8ed4ce4958b8e7f6e907802f7378c8d9d65c978e103ca66ffd8026e83b8"
+      },
+      "logicalSize": [
+        1240,
+        930
+      ],
+      "mechanicalPassed": true,
+      "priorGroupChecks": [
+        {
+          "groupId": "P3R1-G20",
+          "disposition": "closed-in-reviewed-case",
+          "closureScope": "Visible presentation in this recorded case only."
+        }
+      ],
+      "observedEvidence": [
+        "Single, Double and Automatic remain three reference-sized cards; Automatic is selected consistently with state.",
+        "The right column contains the separate-cover switch and distinct whole/split-spread structure.",
+        "The separate-cover switch is off, matching both recorded values; Whole-page is selected and splitting is disabled with an accurate visible reason."
+      ],
+      "notExercised": [
+        "The recorded actions only open Layout. Cover-alone transitions, persistence and split behavior were not exercised."
+      ],
+      "outcome": "No new high-confidence product defect established in this case."
+    },
+    {
+      "caseId": "sc-search--results",
+      "referenceId": "sc-search--results",
+      "screenshot": "artifacts/phase3/candidate4/ui-regression-diagnostic/sc-search--results.png",
+      "reference": "screens/states/sc-search--results.png",
+      "screenshotSha256": "b899e0beedcb4048c9bd682ef15b9fcd5b5d60d145a80d02e6ec0f4a6e93938e",
+      "stateSha256": "9598083ca914d53a6289a4353f2c1f1ef54984aa4edb422517e4456df2796e75",
+      "referenceSha256": "4e8beddc0af4eae836a26c3606c7cbd80c1308b5a255b771bd4e0672f05b61b1",
+      "otherManifestEvidenceHashes": {
+        "metadata": "0287161f6ca6c425148208603b374222e983c08e8607094c8c5d63140064b58e",
+        "actions": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+        "log": "7e68a4176710a866675a6b95bcf7bed2d96c58a8fd7996a4d48f3679514483a9"
+      },
+      "logicalSize": [
+        930,
+        1240
+      ],
+      "mechanicalPassed": true,
+      "priorGroupChecks": [
+        {
+          "groupId": "P3R1-G22",
+          "disposition": "closed-in-reviewed-case",
+          "closureScope": "Visible presentation in this recorded case only."
+        },
+        {
+          "groupId": "P3R1-G23",
+          "disposition": "closed-in-reviewed-case",
+          "closureScope": "Visible presentation in this recorded case only."
+        }
+      ],
+      "observedEvidence": [
+        "Result-card captions use interface sans-serif glyphs at approximately 16 logical px.",
+        "Retry is approximately 74x44 logical px, with reference-consistent padding and right alignment.",
+        "Cover bounds, section spacing, independent empty/error rows and the restored dock remain consistent."
+      ],
+      "notExercised": [
+        "Independent retry actions and other search-result states were not exercised."
+      ],
+      "outcome": "No new high-confidence product defect established in this case."
+    },
+    {
+      "caseId": "sc-settings--categories",
+      "referenceId": "sc-settings--categories",
+      "screenshot": "artifacts/phase3/candidate4/ui-regression-diagnostic/sc-settings--categories.png",
+      "reference": "screens/states/sc-settings--categories.png",
+      "screenshotSha256": "6908133c2e314a068fa288caa5d3cb02e279b016797868fd497ec1b50f710029",
+      "stateSha256": "3da4553a7d38ff2c3ece9b0940b247e38c04043f2cf78473b79d05b83c97072b",
+      "referenceSha256": "6c2f648e6df840e533da066ae20a9fcc049464b595122972baa0b98eebdebed0",
+      "otherManifestEvidenceHashes": {
+        "metadata": "f60966c37a3c28a9c5070fb6c68d6f38d27d8069308c2644c5650c565c7d2083",
+        "actions": "7050faf7d22ffa1c45ad123e9194378c240d1f27f801f881e1220ae931341661",
+        "log": "7e68a4176710a866675a6b95bcf7bed2d96c58a8fd7996a4d48f3679514483a9"
+      },
+      "logicalSize": [
+        930,
+        1240
+      ],
+      "mechanicalPassed": true,
+      "priorGroupChecks": [
+        {
+          "groupId": "P3R1-G24",
+          "disposition": "closed-in-reviewed-case",
+          "closureScope": "Visible presentation in this recorded case only."
+        }
+      ],
+      "observedEvidence": [
+        "Disabled Rename and New category affordances have a visible explanation covering creation and renaming.",
+        "Counts precede trailing actions. Uncategorized has a count and no Rename action.",
+        "Visible counts 12, 9, 25 and 0 agree with the captured details and total library count of 46."
+      ],
+      "notExercised": [
+        "Category operations and other profiles were not exercised."
+      ],
+      "outcome": "No new high-confidence product defect established in this case."
+    },
+    {
+      "caseId": "sc-settings--logs",
+      "referenceId": "sc-settings--logs",
+      "screenshot": "artifacts/phase3/candidate4/ui-regression-diagnostic/sc-settings--logs.png",
+      "reference": "screens/states/sc-settings--logs.png",
+      "screenshotSha256": "165a48cd128eb0e9b458d43275102eb56d9a64086e3a00651bc6252502a040f2",
+      "stateSha256": "8adfb255faa7d23edc5c99e761c10bf5f79d25cc007fbff119a290de6d913cbc",
+      "referenceSha256": "3782d39f072cf9ddb3a6161c68ced59eb7d462e06e802481af7561a903674591",
+      "otherManifestEvidenceHashes": {
+        "metadata": "1061185707139af44e0023f9e33bc0276b39170bf2307f2ecab94c326b60f9d5",
+        "actions": "36d1827dcf24282514eb4683db5e7c6b67651d5048a9de80a77726c11026ac30",
+        "log": "7e68a4176710a866675a6b95bcf7bed2d96c58a8fd7996a4d48f3679514483a9"
+      },
+      "logicalSize": [
+        930,
+        1240
+      ],
+      "mechanicalPassed": true,
+      "priorGroupChecks": [
+        {
+          "groupId": "P3R1-G25",
+          "disposition": "closed-in-reviewed-case",
+          "closureScope": "Visible presentation in this recorded case only."
+        },
+        {
+          "groupId": "P3R1-G27",
+          "disposition": "closed-in-reviewed-case",
+          "closureScope": "Visible presentation in this recorded case only."
+        }
+      ],
+      "observedEvidence": [
+        "Logging, Export logs and Clear logs are disabled with a visible explanation that log management is not integrated.",
+        "Both action buttons are approximately 118 logical px wide."
+      ],
+      "notExercised": [
+        "No logging integration or action behavior was exercised."
+      ],
+      "outcome": "No new high-confidence product defect established in this case."
+    },
+    {
+      "caseId": "sc-settings--power",
+      "referenceId": "sc-settings--power",
+      "screenshot": "artifacts/phase3/candidate4/ui-regression-diagnostic/sc-settings--power.png",
+      "reference": "screens/states/sc-settings--power.png",
+      "screenshotSha256": "6727caa76a7397f94e79036d2eb9b2789e228a1d46245e56576683180ea17c9b",
+      "stateSha256": "1a2fc5fbfd372563c83157fda2bf6939aa4c891f45a1bf97ca622f6c1441ec22",
+      "referenceSha256": "784e15a6156fbb749e6e8b0871748b92fff977feb0164a5b97ee59d8a1df4abb",
+      "otherManifestEvidenceHashes": {
+        "metadata": "3341ae3887651d54d8bda5341b6d1f73f14de32b1c0dbe169e3b22669077c586",
+        "actions": "72c34f5679131b510f0c47dd56a3d055965fa43925dbe2bff65c8a72bc690296",
+        "log": "7e68a4176710a866675a6b95bcf7bed2d96c58a8fd7996a4d48f3679514483a9"
+      },
+      "logicalSize": [
+        930,
+        1240
+      ],
+      "mechanicalPassed": true,
+      "priorGroupChecks": [
+        {
+          "groupId": "P3R1-G26",
+          "disposition": "closed-in-reviewed-case",
+          "closureScope": "Visible presentation in this recorded case only."
+        },
+        {
+          "groupId": "P3R1-G47",
+          "disposition": "closed-in-reviewed-case",
+          "closureScope": "Visible presentation in this recorded case only."
+        }
+      ],
+      "observedEvidence": [
+        "Charging-update and reading-Wi-Fi rows each have their own accurate unavailable explanation.",
+        "Screensaver choices remain disabled with a section-scoped limitation.",
+        "The dock has a thin full-width top rule and a short Settings marker near x800..874, with no thick segment across inactive tabs."
+      ],
+      "notExercised": [
+        "Firmware and background-policy behavior were not exercised."
+      ],
+      "outcome": "No new high-confidence product defect established in this case."
+    },
+    {
+      "caseId": "sc-settings--storage",
+      "referenceId": "sc-settings--storage",
+      "screenshot": "artifacts/phase3/candidate4/ui-regression-diagnostic/sc-settings--storage.png",
+      "reference": "screens/states/sc-settings--storage.png",
+      "screenshotSha256": "920de35f1bb49f4c4719eadf797e9ba93176cb9e66b946b72bbb6d89af4c1802",
+      "stateSha256": "9d29ba917c8a416386db1e2d28c290073a7d7547da3441f7eb001c6f8926f3f1",
+      "referenceSha256": "f252b959d18ed347f4b661ac28c1ffbd2be6aad8a5364ef4943b56ad3698c779",
+      "otherManifestEvidenceHashes": {
+        "metadata": "ab9d496260941da0e0b940892dfe028c5810223e5cf4f23a12e6db182a304f9c",
+        "actions": "63b0ca10c0dbc76289816decaed69e0af11134ef6bb54344c6d34874e3c571a7",
+        "log": "7e68a4176710a866675a6b95bcf7bed2d96c58a8fd7996a4d48f3679514483a9"
+      },
+      "logicalSize": [
+        930,
+        1240
+      ],
+      "mechanicalPassed": true,
+      "priorGroupChecks": [
+        {
+          "groupId": "P3R1-G28",
+          "disposition": "closed-in-reviewed-case",
+          "closureScope": "Visible presentation in this recorded case only."
+        },
+        {
+          "groupId": "P3R1-G29",
+          "disposition": "closed-in-reviewed-case",
+          "closureScope": "Visible presentation in this recorded case only."
+        }
+      ],
+      "observedEvidence": [
+        "Download, image-cache, cover and free totals are separately visible as 225.6 KB, 0 B, 0 B and 2.7 GB, agreeing with the recorded ready state.",
+        "All four components are known and storage_scale_known=true. The small usage fraction and explanatory scale caption agree with recorded image data plus available space.",
+        "Largest usage shows one actual recorded book, its 225.6 KB total, a Manage action and a total of one book.",
+        "The capability summary remains readable through the orientation-sensor declaration."
+      ],
+      "notExercised": [
+        "Unknown, loading, empty and partial storage branches were not captured; underlying derivation and Manage behavior were not verified.",
+        "Other G29 header cases and profiles were not reviewed."
+      ],
+      "outcome": "No new high-confidence product defect established in this case."
+    }
+  ],
+  "groupDispositions": [
+    {
+      "groupId": "P3R1-G01",
+      "priority": "P2",
+      "description": "Page-jump surfaces draw their top separator inside the page grid.",
+      "disposition": "closed-in-reviewed-case-only",
+      "globalGroupClosure": false,
+      "reviewedEvidence": [
+        {
+          "caseId": "Main--jump-pages",
+          "screenshotSha256": "e00a278cfdecbe31c3a1940c2ff441904aa8b5d8a4334bc4f733388bed11893a",
+          "stateSha256": "01edd78c68d9945fb4c53c504296cb0bfaec3f5bee57e2cebd07a3339e9c883c"
+        },
+        {
+          "caseId": "sc-library--jump-pages",
+          "screenshotSha256": "c3cc85d50f78ff0ee3e47ac90883b90afe6a7c106a6a1f92ac3dfae6afc2e6f0",
+          "stateSha256": "7d5af46f4518af32cf736323be267c3c68d1b75cd9ae73d7ad0daa6c577fe48a"
+        }
+      ],
+      "stillRequired": "Review the complete applicable reference and supplemental group on the frozen full candidate; unexercised cases and behavior retain their original scope."
+    },
+    {
+      "groupId": "P3R1-G02",
+      "priority": "P3",
+      "description": "Library More menus use incomplete or incorrect action icons.",
+      "disposition": "closed-in-reviewed-case-only",
+      "globalGroupClosure": false,
+      "reviewedEvidence": [
+        {
+          "caseId": "Main--more",
+          "screenshotSha256": "5d2e4adbac546da3d19159ed70bb2a150b6ce5feff1d10833243c8e3bbec57d5",
+          "stateSha256": "0c3266eea76b1913a3afe21e8144cab0824c17b37214580dbd13f2d824896f6f"
+        }
+      ],
+      "stillRequired": "Review the complete applicable reference and supplemental group on the frozen full candidate; unexercised cases and behavior retain their original scope."
+    },
+    {
+      "groupId": "P3R1-G03",
+      "priority": "P3",
+      "description": "Paperwhite library filter-chip labels and widths are smaller than the reference.",
+      "disposition": "closed-in-reviewed-case-only",
+      "globalGroupClosure": false,
+      "reviewedEvidence": [
+        {
+          "caseId": "Main--sort",
+          "screenshotSha256": "ed1514673cf0b6b397d7a3084088a8daf7c0aa09899a0a716429fe04ac61f476",
+          "stateSha256": "085403734f9394605e21cfffb4cd6a5a061d8bbb3860f64785f9f93f300c7259"
+        }
+      ],
+      "stillRequired": "Review the complete applicable reference and supplemental group on the frozen full candidate; unexercised cases and behavior retain their original scope."
+    },
+    {
+      "groupId": "P3R1-G04",
+      "priority": "P2",
+      "description": "Source update rows omit the installed-to-available version transition.",
+      "disposition": "closed-in-reviewed-case-only",
+      "globalGroupClosure": false,
+      "reviewedEvidence": [
+        {
+          "caseId": "pw-browse--updates",
+          "screenshotSha256": "08333a9e10b8611fcb842b1f20771ff0d4d1dd1f89f5bfe6d0551b4ac396c617",
+          "stateSha256": "33bf90d2e159c678f93d4b588ea1af8da23f125e2c0655c07dab614e3cfaf427"
+        }
+      ],
+      "stillRequired": "Review the complete applicable reference and supplemental group on the frozen full candidate; unexercised cases and behavior retain their original scope."
+    },
+    {
+      "groupId": "P3R1-G05",
+      "priority": "P2",
+      "description": "Active incognito status strips omit the centered no-history policy notice.",
+      "disposition": "closed-in-reviewed-case-only",
+      "globalGroupClosure": false,
+      "reviewedEvidence": [
+        {
+          "caseId": "pw-history--incognito",
+          "screenshotSha256": "ec5c1b8b3c25698f446ba7ddbb77729fdcbd933e051fb2f4345840c27a86c7b4",
+          "stateSha256": "76f7886e42e02a5bf22ca6bd227635b4d88635dd388863c9e2bb23db7320d52a"
+        }
+      ],
+      "stillRequired": "Review the complete applicable reference and supplemental group on the frozen full candidate; unexercised cases and behavior retain their original scope."
+    },
+    {
+      "groupId": "P3R1-G06",
+      "priority": "P3",
+      "description": "The Paperwhite description body lacks the specified first-line indent and line spacing.",
+      "disposition": "closed-in-reviewed-case-only",
+      "globalGroupClosure": false,
+      "reviewedEvidence": [
+        {
+          "caseId": "pw-manga--description",
+          "screenshotSha256": "539dd4af8500b60c6992ae216da6c7a08727e12a6934d514173554f6f7f4461f",
+          "stateSha256": "12f3f44b9218637152b35b3e114ec18796b3e1ffa7bbcb395eeebef7ecc9fbae"
+        }
+      ],
+      "stillRequired": "Review the complete applicable reference and supplemental group on the frozen full candidate; unexercised cases and behavior retain their original scope."
+    },
+    {
+      "groupId": "P3R1-G08",
+      "priority": "P2",
+      "description": "All three reading-mode panels omit the reference slot for the independent wide-page splitting control.",
+      "disposition": "closed-in-reviewed-case-only",
+      "globalGroupClosure": false,
+      "reviewedEvidence": [
+        {
+          "caseId": "pw-reader--mode",
+          "screenshotSha256": "ecce585c3eaf005bbf9f8ad6f3ca2fd2efd378878dd3e317dddfdabf1ac0f76c",
+          "stateSha256": "c73fa3dfefcb021e4b339f08e45ce5bb0c7334f2fb6bf70b80284844ad59ed3d"
+        }
+      ],
+      "stillRequired": "Review the complete applicable reference and supplemental group on the frozen full candidate; unexercised cases and behavior retain their original scope."
+    },
+    {
+      "groupId": "P3R1-G09",
+      "priority": "P2",
+      "description": "Paperwhite manual orientation omits reverse landscape.",
+      "disposition": "closed-in-reviewed-case-only",
+      "globalGroupClosure": false,
+      "reviewedEvidence": [
+        {
+          "caseId": "pw-reader--rotate",
+          "screenshotSha256": "7ea2089de62a06db72aac7c27e5cf37d011ccf8a29eafce76e8e97eddcd05eb1",
+          "stateSha256": "2d437e0ca499eb6858c1b083d711e59206a04e2ad8aa80254c917a3749d58e70"
+        }
+      ],
+      "stillRequired": "Review the complete applicable reference and supplemental group on the frozen full candidate; unexercised cases and behavior retain their original scope."
+    },
+    {
+      "groupId": "P3R1-G10",
+      "priority": "P3",
+      "description": "Reading-mode title rows omit the current book's stored default-direction hint.",
+      "disposition": "closed-in-reviewed-case-only",
+      "globalGroupClosure": false,
+      "reviewedEvidence": [
+        {
+          "caseId": "pw-reader--mode",
+          "screenshotSha256": "ecce585c3eaf005bbf9f8ad6f3ca2fd2efd378878dd3e317dddfdabf1ac0f76c",
+          "stateSha256": "c73fa3dfefcb021e4b339f08e45ce5bb0c7334f2fb6bf70b80284844ad59ed3d"
+        }
+      ],
+      "stillRequired": "Review the complete applicable reference and supplemental group on the frozen full candidate; unexercised cases and behavior retain their original scope."
+    },
+    {
+      "groupId": "P3R1-G12",
+      "priority": "P2",
+      "description": "Empty source preferences fail to produce a contained, recognizable source-settings state.",
+      "disposition": "closed-in-reviewed-case-only",
+      "globalGroupClosure": false,
+      "reviewedEvidence": [
+        {
+          "caseId": "pw-source--source-settings",
+          "screenshotSha256": "d9da0da8fde17562ae71605a885f4e2fec7eafc46cfe82ea0f2880dbffe3416e",
+          "stateSha256": "4ae7281fd4b793911926910c8de5d871b0d16da84b5da9643cdc39be6789d2c7"
+        }
+      ],
+      "stillRequired": "Review the complete applicable reference and supplemental group on the frozen full candidate; unexercised cases and behavior retain their original scope."
+    },
+    {
+      "groupId": "P3R1-G15",
+      "priority": "P2",
+      "description": "The source picker truncates the distinguishing server connection state.",
+      "disposition": "closed-in-reviewed-case-only",
+      "globalGroupClosure": false,
+      "reviewedEvidence": [
+        {
+          "caseId": "sc-browse--source-picker",
+          "screenshotSha256": "5437cfbc2ecbcc4e00b44201b6211038d5d90b536fc9aa0ba6ac68cb341ede53",
+          "stateSha256": "e77a146b4b146aba5141694315af4c1cc8dc7004c45238884494d00acd38c5fe"
+        }
+      ],
+      "stillRequired": "Review the complete applicable reference and supplemental group on the frozen full candidate; unexercised cases and behavior retain their original scope."
+    },
+    {
+      "groupId": "P3R1-G16",
+      "priority": "P2",
+      "description": "The Scribe queue panel border does not enclose its pagination.",
+      "disposition": "closed-in-reviewed-case-only",
+      "globalGroupClosure": false,
+      "reviewedEvidence": [
+        {
+          "caseId": "sc-library--download-queue",
+          "screenshotSha256": "358fdd9ebe10d893f9c2603c5dc077248ece6435370194e75321a739e658a237",
+          "stateSha256": "bee783b1949da8f867056224960b08f5aa6ac5521311d31191499a9497025fbb"
+        }
+      ],
+      "stillRequired": "Review the complete applicable reference and supplemental group on the frozen full candidate; unexercised cases and behavior retain their original scope."
+    },
+    {
+      "groupId": "P3R1-G20",
+      "priority": "P2",
+      "description": "The landscape Layout sheet omits separate-cover and whole/split-spread control structure.",
+      "disposition": "closed-in-reviewed-case-only",
+      "globalGroupClosure": false,
+      "reviewedEvidence": [
+        {
+          "caseId": "sc-reader--layout",
+          "screenshotSha256": "d452beda817daf4fc15a7e613c465e65973aa818b27b0d104988665f69a59042",
+          "stateSha256": "4b48207b0d25867d24eda1a304cfe3622fd5b5de0152994138b0a8cf51b78458"
+        }
+      ],
+      "stillRequired": "Review the complete applicable reference and supplemental group on the frozen full candidate; unexercised cases and behavior retain their original scope."
+    },
+    {
+      "groupId": "P3R1-G22",
+      "priority": "P3",
+      "description": "Search result-card captions use serif rather than interface sans-serif typography.",
+      "disposition": "closed-in-reviewed-case-only",
+      "globalGroupClosure": false,
+      "reviewedEvidence": [
+        {
+          "caseId": "sc-search--results",
+          "screenshotSha256": "b899e0beedcb4048c9bd682ef15b9fcd5b5d60d145a80d02e6ec0f4a6e93938e",
+          "stateSha256": "9598083ca914d53a6289a4353f2c1f1ef54984aa4edb422517e4456df2796e75"
+        }
+      ],
+      "stillRequired": "Review the complete applicable reference and supplemental group on the frozen full candidate; unexercised cases and behavior retain their original scope."
+    },
+    {
+      "groupId": "P3R1-G23",
+      "priority": "P3",
+      "description": "The failed-source Retry control is wider than the reference.",
+      "disposition": "closed-in-reviewed-case-only",
+      "globalGroupClosure": false,
+      "reviewedEvidence": [
+        {
+          "caseId": "sc-search--results",
+          "screenshotSha256": "b899e0beedcb4048c9bd682ef15b9fcd5b5d60d145a80d02e6ec0f4a6e93938e",
+          "stateSha256": "9598083ca914d53a6289a4353f2c1f1ef54984aa4edb422517e4456df2796e75"
+        }
+      ],
+      "stillRequired": "Review the complete applicable reference and supplemental group on the frozen full candidate; unexercised cases and behavior retain their original scope."
+    },
+    {
+      "groupId": "P3R1-G24",
+      "priority": "P2",
+      "description": "Unavailable category creation and renaming lack explicit action and capability presentation.",
+      "disposition": "closed-in-reviewed-case-only",
+      "globalGroupClosure": false,
+      "reviewedEvidence": [
+        {
+          "caseId": "sc-settings--categories",
+          "screenshotSha256": "6908133c2e314a068fa288caa5d3cb02e279b016797868fd497ec1b50f710029",
+          "stateSha256": "3da4553a7d38ff2c3ece9b0940b247e38c04043f2cf78473b79d05b83c97072b"
+        }
+      ],
+      "stillRequired": "Review the complete applicable reference and supplemental group on the frozen full candidate; unexercised cases and behavior retain their original scope."
+    },
+    {
+      "groupId": "P3R1-G25",
+      "priority": "P2",
+      "description": "Disabled logging settings omit the recorded visible unavailable feedback.",
+      "disposition": "closed-in-reviewed-case-only",
+      "globalGroupClosure": false,
+      "reviewedEvidence": [
+        {
+          "caseId": "sc-settings--logs",
+          "screenshotSha256": "165a48cd128eb0e9b458d43275102eb56d9a64086e3a00651bc6252502a040f2",
+          "stateSha256": "8adfb255faa7d23edc5c99e761c10bf5f79d25cc007fbff119a290de6d913cbc"
+        }
+      ],
+      "stillRequired": "Review the complete applicable reference and supplemental group on the frozen full candidate; unexercised cases and behavior retain their original scope."
+    },
+    {
+      "groupId": "P3R1-G26",
+      "priority": "P3",
+      "description": "Disabled charging-update and reading-time Wi-Fi rows lack a visible unavailable explanation.",
+      "disposition": "closed-in-reviewed-case-only",
+      "globalGroupClosure": false,
+      "reviewedEvidence": [
+        {
+          "caseId": "sc-settings--power",
+          "screenshotSha256": "6727caa76a7397f94e79036d2eb9b2789e228a1d46245e56576683180ea17c9b",
+          "stateSha256": "1a2fc5fbfd372563c83157fda2bf6939aa4c891f45a1bf97ca622f6c1441ec22"
+        }
+      ],
+      "stillRequired": "Review the complete applicable reference and supplemental group on the frozen full candidate; unexercised cases and behavior retain their original scope."
+    },
+    {
+      "groupId": "P3R1-G27",
+      "priority": "P3",
+      "description": "Scribe logging action buttons are narrower than the reference.",
+      "disposition": "closed-in-reviewed-case-only",
+      "globalGroupClosure": false,
+      "reviewedEvidence": [
+        {
+          "caseId": "sc-settings--logs",
+          "screenshotSha256": "165a48cd128eb0e9b458d43275102eb56d9a64086e3a00651bc6252502a040f2",
+          "stateSha256": "8adfb255faa7d23edc5c99e761c10bf5f79d25cc007fbff119a290de6d913cbc"
+        }
+      ],
+      "stillRequired": "Review the complete applicable reference and supplemental group on the frozen full candidate; unexercised cases and behavior retain their original scope."
+    },
+    {
+      "groupId": "P3R1-G28",
+      "priority": "P2",
+      "description": "Storage settings omit the four-part usage presentation and largest-storage management section.",
+      "disposition": "closed-in-reviewed-case-only",
+      "globalGroupClosure": false,
+      "reviewedEvidence": [
+        {
+          "caseId": "sc-settings--storage",
+          "screenshotSha256": "920de35f1bb49f4c4719eadf797e9ba93176cb9e66b946b72bbb6d89af4c1802",
+          "stateSha256": "9d29ba917c8a416386db1e2d28c290073a7d7547da3441f7eb001c6f8926f3f1"
+        }
+      ],
+      "stillRequired": "Review the complete applicable reference and supplemental group on the frozen full candidate; unexercised cases and behavior retain their original scope."
+    },
+    {
+      "groupId": "P3R1-G29",
+      "priority": "P3",
+      "description": "The shared Scribe device header truncates its capability summary before orientation is readable.",
+      "disposition": "closed-in-reviewed-case-only",
+      "globalGroupClosure": false,
+      "reviewedEvidence": [
+        {
+          "caseId": "sc-settings--storage",
+          "screenshotSha256": "920de35f1bb49f4c4719eadf797e9ba93176cb9e66b946b72bbb6d89af4c1802",
+          "stateSha256": "9d29ba917c8a416386db1e2d28c290073a7d7547da3441f7eb001c6f8926f3f1"
+        }
+      ],
+      "stillRequired": "Review the complete applicable reference and supplemental group on the frozen full candidate; unexercised cases and behavior retain their original scope."
+    },
+    {
+      "groupId": "P3R1-G47",
+      "priority": "P3",
+      "description": "The dock has an extra thick dark segment spanning several inactive tabs.",
+      "disposition": "closed-in-reviewed-case-only",
+      "globalGroupClosure": false,
+      "reviewedEvidence": [
+        {
+          "caseId": "sc-settings--power",
+          "screenshotSha256": "6727caa76a7397f94e79036d2eb9b2789e228a1d46245e56576683180ea17c9b",
+          "stateSha256": "1a2fc5fbfd372563c83157fda2bf6939aa4c891f45a1bf97ca622f6c1441ec22"
+        }
+      ],
+      "stillRequired": "Review the complete applicable reference and supplemental group on the frozen full candidate; unexercised cases and behavior retain their original scope."
+    }
+  ],
+  "stateCorroboration": {
+    "storage": {
+      "caseId": "sc-settings--storage",
+      "status": "ready",
+      "scaleKnown": true,
+      "downloadedBytes": 225600,
+      "imageCacheBytes": 0,
+      "coverBytes": 0,
+      "freeBytes": 2748035072,
+      "recordedBookCount": 1,
+      "unknownLoadingEmptyPartial": "not-exercised"
+    },
+    "categories": {
+      "caseId": "sc-settings--categories",
+      "counts": [
+        12,
+        9,
+        25,
+        0
+      ],
+      "libraryCount": 46,
+      "creationAndRenameEnabled": false
+    },
+    "tagFlow": {
+      "caseId": "pw-manga--description",
+      "actualTagCount": 4,
+      "visibleUniqueTagCount": 4,
+      "panelPage": 1,
+      "panelPageCount": 1
+    },
+    "readerToc": {
+      "caseId": "pw-reader--toc",
+      "panelPage": 11,
+      "panelPageCount": 18,
+      "visibleRows": 5,
+      "bookmarkCount": 1,
+      "selectedTab": "chapters"
+    },
+    "orientation": {
+      "caseId": "pw-reader--rotate",
+      "enabledCards": 3,
+      "currentRotationDegrees": 0,
+      "reverseLandscapeSelected": false,
+      "reverseLandscapeActionExercised": false
+    },
+    "layout": {
+      "caseId": "sc-reader--layout",
+      "pageLayoutMode": "automatic",
+      "coverAlone": false,
+      "visibleCoverAlone": false,
+      "rotationDegrees": 90,
+      "visiblePages": [
+        12,
+        13
+      ],
+      "coverAloneActionExercised": false
+    }
+  },
+  "nonblockingObservations": [
+    {
+      "id": "C4-OBS-TOC-FOLIO",
+      "caseId": "pw-reader--toc",
+      "screenshotSha256": "43ebf20e01989abf984c98320edd18c7afef814d6ceb43fd9dc25c7920fa0116",
+      "stateSha256": "cfbc5d6cbc6b7ce38346a0048ff7664bbb8443c8c693ee6909e624a29cbb9f1e",
+      "observation": "The real 11/18 folio adds approximately 52 px to the sheet. Its top edge is approximately y293 versus reference y344; the lower edge remains approximately y636 and all five 46 px rows remain unclipped.",
+      "disposition": "No high-confidence defect is inferred because the handoff also requires real pagination. Retain the explicit geometry variation for disposition during the complete ToC/page-jump review; no artwork or title exemption is used."
+    }
+  ],
+  "notExercised": [
+    {
+      "groupId": "P3R1-G39",
+      "caseId": "pw-reader--toc",
+      "scope": "Empty Bookmarks and the current-page action. Only Chapters with one saved bookmark was captured."
+    },
+    {
+      "scope": "All ten additional queue artifacts, including the fixture prerequisite and nine operation/page/removal variants."
+    },
+    {
+      "scope": "Long and oversized TagFlow labels, distinguishing suffixes, large tag collections, detail previews, first/final page reachability and multipage summary containment."
+    },
+    {
+      "scope": "Storage unknown, loading, empty and partial branches; underlying storage derivation and management actions."
+    },
+    {
+      "scope": "Independent stored-book-default direction provenance after changing active direction."
+    },
+    {
+      "scope": "New cover-alone behavior, new tap maps and actual 270-degree rotation/output/persistence. Their implementation is parent-reported; this old-harness subset does not exercise them."
+    },
+    {
+      "scope": "Closed-reader artwork-only behavior, physical e-ink/firmware capability behavior and matching-source native/performance requirements."
+    },
+    {
+      "scope": "Every unreviewed reference/supplemental case and every remaining scope of the 47 canonical C3 groups."
+    }
+  ],
+  "intentionalDifferences": [
+    "Real titles, names, records, counts, dates, capacities, covers and progress may differ from illustrative reference values. Geometry, clipping, containment and truthful state still apply.",
+    "Unintegrated operations may remain disabled when an accurate, concise unavailable reason is visible. No fabricated enabled or successful state is required.",
+    "The artwork-only closed-reader override remains authoritative; this subset does not revalidate the closed reader."
+  ],
+  "additionalQueueArtifactsNotReviewed": [
+    {
+      "caseId": "sc-library--download-queue--fixture-seed",
+      "prerequisite": true,
+      "manualReviewRequired": false,
+      "manuallyReviewed": false
+    },
+    {
+      "caseId": "sc-library--download-queue--page-two",
+      "prerequisite": false,
+      "manualReviewRequired": true,
+      "manuallyReviewed": false
+    },
+    {
+      "caseId": "sc-library--download-queue--pause-all",
+      "prerequisite": false,
+      "manualReviewRequired": true,
+      "manuallyReviewed": false
+    },
+    {
+      "caseId": "sc-library--download-queue--resume-all",
+      "prerequisite": false,
+      "manualReviewRequired": true,
+      "manuallyReviewed": false
+    },
+    {
+      "caseId": "sc-library--download-queue--cancel-all",
+      "prerequisite": false,
+      "manualReviewRequired": true,
+      "manuallyReviewed": false
+    },
+    {
+      "caseId": "sc-library--download-queue--completed-real-job",
+      "prerequisite": false,
+      "manualReviewRequired": true,
+      "manuallyReviewed": false
+    },
+    {
+      "caseId": "sc-library--download-queue--completed-job-menu",
+      "prerequisite": false,
+      "manualReviewRequired": true,
+      "manuallyReviewed": false
+    },
+    {
+      "caseId": "sc-library--download-queue--completed-remove-confirm",
+      "prerequisite": false,
+      "manualReviewRequired": true,
+      "manuallyReviewed": false
+    },
+    {
+      "caseId": "sc-library--download-queue--completed-remove-cancel",
+      "prerequisite": false,
+      "manualReviewRequired": true,
+      "manuallyReviewed": false
+    },
+    {
+      "caseId": "sc-library--download-queue--completed-remove-apply",
+      "prerequisite": false,
+      "manualReviewRequired": true,
+      "manuallyReviewed": false
+    }
+  ],
+  "newFindings": [],
+  "nextRequiredReview": "Capture and independently review the complete applicable 101-reference inventory, all required supplemental groups and matching-source external native/performance evidence on the frozen candidate. Revisit all 47 canonical groups and the explicit limits above. Two consecutive complete clean rounds are still required; this diagnostic grants no clean-round credit."
+}

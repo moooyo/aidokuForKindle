@@ -1,0 +1,3099 @@
+{
+  "schema_version": 1,
+  "kind": "phase3-handoff-native-capture-plan",
+  "status": "c13-native-selected-scribe-source-identity-capture-contract",
+  "reference_scope": "docs/review/phase3-reference-scope.json",
+  "reference_scope_sha256": "c910bed9f02ed17b2ca0a54aca1beeeeb6caabc5a17a91afe764ddd3e7b0d33c",
+  "reference_default_count": 17,
+  "reference_state_count": 84,
+  "reference_cases": [
+    {
+      "id": "Main--default",
+      "board": "Main",
+      "profile": "pw5",
+      "screen": "library",
+      "landscape": false,
+      "reference": "screens/Main.png",
+      "recipe": "library-default",
+      "applicability": "applicable",
+      "capability_bound": null,
+      "intentional_difference": null,
+      "native_capture_required": true,
+      "assertions": [
+        "Four columns by two rows; title-adjacent unread/download state.",
+        "White continuation card; selection hides continuation on PW.",
+        "Folio above 72-pixel dock."
+      ],
+      "expected_physical_size": [
+        1236,
+        1648
+      ],
+      "expected_state": "default",
+      "review_basis": "Original supplied PNG plus HANDOFF and profile geometry; actual fixture data may differ."
+    },
+    {
+      "id": "Main--download-queue",
+      "board": "Main",
+      "profile": "pw5",
+      "screen": "library",
+      "landscape": false,
+      "reference": "screens/states/Main--download-queue.png",
+      "recipe": "real-loopback-download-queue",
+      "applicability": "applicable-subject-to-evidence-based-capability-bounds",
+      "capability_bound": null,
+      "intentional_difference": null,
+      "native_capture_required": true,
+      "assertions": [
+        "Four columns by two rows; title-adjacent unread/download state.",
+        "White continuation card; selection hides continuation on PW.",
+        "Folio above 72-pixel dock."
+      ],
+      "expected_physical_size": [
+        1236,
+        1648
+      ],
+      "expected_state": "Real queue rows with cover/title/progress/state and pause/resume-all plus close.",
+      "review_basis": "Original supplied PNG plus HANDOFF and profile geometry; actual fixture data may differ."
+    },
+    {
+      "id": "Main--jump-pages",
+      "board": "Main",
+      "profile": "pw5",
+      "screen": "library",
+      "landscape": false,
+      "reference": "screens/states/Main--jump-pages.png",
+      "recipe": "library-jump-pages",
+      "applicability": "applicable-subject-to-evidence-based-capability-bounds",
+      "capability_bound": null,
+      "intentional_difference": null,
+      "native_capture_required": true,
+      "assertions": [
+        "Four columns by two rows; title-adjacent unread/download state.",
+        "White continuation card; selection hides continuation on PW.",
+        "Folio above 72-pixel dock."
+      ],
+      "expected_physical_size": [
+        1236,
+        1648
+      ],
+      "expected_state": "Balanced page grid above the folio, current page inverse and outside dismissal.",
+      "review_basis": "Original supplied PNG plus HANDOFF and profile geometry; actual fixture data may differ."
+    },
+    {
+      "id": "Main--more",
+      "board": "Main",
+      "profile": "pw5",
+      "screen": "library",
+      "landscape": false,
+      "reference": "screens/states/Main--more.png",
+      "recipe": "library-more",
+      "applicability": "applicable-subject-to-evidence-based-capability-bounds",
+      "capability_bound": null,
+      "intentional_difference": null,
+      "native_capture_required": true,
+      "assertions": [
+        "Four columns by two rows; title-adjacent unread/download state.",
+        "White continuation card; selection hides continuation on PW.",
+        "Folio above 72-pixel dock."
+      ],
+      "expected_physical_size": [
+        1236,
+        1648
+      ],
+      "expected_state": "Anchored menu with context-specific actions and truthful availability.",
+      "review_basis": "Original supplied PNG plus HANDOFF and profile geometry; actual fixture data may differ."
+    },
+    {
+      "id": "Main--select",
+      "board": "Main",
+      "profile": "pw5",
+      "screen": "library",
+      "landscape": false,
+      "reference": "screens/states/Main--select.png",
+      "recipe": "library-select",
+      "applicability": "applicable-subject-to-evidence-based-capability-bounds",
+      "capability_bound": null,
+      "intentional_difference": null,
+      "native_capture_required": true,
+      "assertions": [
+        "Four columns by two rows; title-adjacent unread/download state.",
+        "White continuation card; selection hides continuation on PW.",
+        "Folio above 72-pixel dock."
+      ],
+      "expected_physical_size": [
+        1236,
+        1648
+      ],
+      "expected_state": "Selection heading/checks and a four-action bulk bar replacing the dock.",
+      "review_basis": "Original supplied PNG plus HANDOFF and profile geometry; actual fixture data may differ."
+    },
+    {
+      "id": "Main--sort",
+      "board": "Main",
+      "profile": "pw5",
+      "screen": "library",
+      "landscape": false,
+      "reference": "screens/states/Main--sort.png",
+      "recipe": "library-sort",
+      "applicability": "applicable-subject-to-evidence-based-capability-bounds",
+      "capability_bound": null,
+      "intentional_difference": null,
+      "native_capture_required": true,
+      "assertions": [
+        "Four columns by two rows; title-adjacent unread/download state.",
+        "White continuation card; selection hides continuation on PW.",
+        "Folio above 72-pixel dock."
+      ],
+      "expected_physical_size": [
+        1236,
+        1648
+      ],
+      "expected_state": "Sorting choices, direction and three-state filters; selected inverse controls.",
+      "review_basis": "Original supplied PNG plus HANDOFF and profile geometry; actual fixture data may differ."
+    },
+    {
+      "id": "pw-manga--default",
+      "board": "pw-manga",
+      "profile": "pw5",
+      "screen": "detail",
+      "landscape": false,
+      "reference": "screens/pw-manga.png",
+      "recipe": "detail-default",
+      "applicability": "applicable",
+      "capability_bound": null,
+      "intentional_difference": null,
+      "native_capture_required": true,
+      "assertions": [
+        "First page has information/actions and six rows; subsequent pages have twelve.",
+        "No dock; compact subsequent-page book header.",
+        "Information cover 132 x 186; chapter row height 52."
+      ],
+      "expected_physical_size": [
+        1236,
+        1648
+      ],
+      "expected_state": "default",
+      "review_basis": "Original supplied PNG plus HANDOFF and profile geometry; actual fixture data may differ."
+    },
+    {
+      "id": "pw-manga--batch-download",
+      "board": "pw-manga",
+      "profile": "pw5",
+      "screen": "detail",
+      "landscape": false,
+      "reference": "screens/states/pw-manga--batch-download.png",
+      "recipe": "detail-batch-download",
+      "applicability": "applicable-subject-to-evidence-based-capability-bounds",
+      "capability_bound": null,
+      "intentional_difference": null,
+      "native_capture_required": true,
+      "assertions": [
+        "First page has information/actions and six rows; subsequent pages have twelve.",
+        "No dock; compact subsequent-page book header.",
+        "Information cover 132 x 186; chapter row height 52."
+      ],
+      "expected_physical_size": [
+        1236,
+        1648
+      ],
+      "expected_state": "Next five, all unread, custom range and remove-read-download actions plus real free space.",
+      "review_basis": "Original supplied PNG plus HANDOFF and profile geometry; actual fixture data may differ."
+    },
+    {
+      "id": "pw-manga--chapters-p2",
+      "board": "pw-manga",
+      "profile": "pw5",
+      "screen": "detail",
+      "landscape": false,
+      "reference": "screens/states/pw-manga--chapters-p2.png",
+      "recipe": "detail-chapters-p2",
+      "applicability": "applicable-subject-to-evidence-based-capability-bounds",
+      "capability_bound": null,
+      "intentional_difference": null,
+      "native_capture_required": true,
+      "assertions": [
+        "First page has information/actions and six rows; subsequent pages have twelve.",
+        "No dock; compact subsequent-page book header.",
+        "Information cover 132 x 186; chapter row height 52."
+      ],
+      "expected_physical_size": [
+        1236,
+        1648
+      ],
+      "expected_state": "Compact book header, information collapsed, twelve chapter rows and folio.",
+      "review_basis": "Original supplied PNG plus HANDOFF and profile geometry; actual fixture data may differ."
+    },
+    {
+      "id": "pw-manga--description",
+      "board": "pw-manga",
+      "profile": "pw5",
+      "screen": "detail",
+      "landscape": false,
+      "reference": "screens/states/pw-manga--description.png",
+      "recipe": "detail-description",
+      "applicability": "applicable-subject-to-evidence-based-capability-bounds",
+      "capability_bound": null,
+      "intentional_difference": null,
+      "native_capture_required": true,
+      "assertions": [
+        "First page has information/actions and six rows; subsequent pages have twelve.",
+        "No dock; compact subsequent-page book header.",
+        "Information cover 132 x 186; chapter row height 52."
+      ],
+      "expected_physical_size": [
+        1236,
+        1648
+      ],
+      "expected_state": "Full description, tag controls and source/update/size metadata in a bottom sheet.",
+      "review_basis": "Original supplied PNG plus HANDOFF and profile geometry; actual fixture data may differ."
+    },
+    {
+      "id": "pw-manga--more",
+      "board": "pw-manga",
+      "profile": "pw5",
+      "screen": "detail",
+      "landscape": false,
+      "reference": "screens/states/pw-manga--more.png",
+      "recipe": "detail-more",
+      "applicability": "applicable-subject-to-evidence-based-capability-bounds",
+      "capability_bound": null,
+      "intentional_difference": null,
+      "native_capture_required": true,
+      "assertions": [
+        "First page has information/actions and six rows; subsequent pages have twelve.",
+        "No dock; compact subsequent-page book header.",
+        "Information cover 132 x 186; chapter row height 52."
+      ],
+      "expected_physical_size": [
+        1236,
+        1648
+      ],
+      "expected_state": "Anchored menu with context-specific actions and truthful availability.",
+      "review_basis": "Original supplied PNG plus HANDOFF and profile geometry; actual fixture data may differ."
+    },
+    {
+      "id": "pw-manga--tracking",
+      "board": "pw-manga",
+      "profile": "pw5",
+      "screen": "detail",
+      "landscape": false,
+      "reference": "screens/states/pw-manga--tracking.png",
+      "recipe": "detail-tracking",
+      "applicability": "applicable-subject-to-evidence-based-capability-bounds",
+      "capability_bound": "authentication",
+      "intentional_difference": null,
+      "native_capture_required": true,
+      "assertions": [
+        "First page has information/actions and six rows; subsequent pages have twelve.",
+        "No dock; compact subsequent-page book header.",
+        "Information cover 132 x 186; chapter row height 52."
+      ],
+      "expected_physical_size": [
+        1236,
+        1648
+      ],
+      "expected_state": "Tracking service cards with real linked/unlinked/unavailable state and settings navigation.",
+      "review_basis": "Original supplied PNG plus HANDOFF and profile geometry; actual fixture data may differ."
+    },
+    {
+      "id": "pw-reader--default",
+      "board": "pw-reader",
+      "profile": "pw5",
+      "screen": "reader",
+      "landscape": false,
+      "reference": "screens/pw-reader.png",
+      "recipe": "reader-menu",
+      "applicability": "applicable",
+      "capability_bound": null,
+      "intentional_difference": null,
+      "native_capture_required": true,
+      "assertions": [
+        "Default reference is menu open; closed reader follows artwork-only override.",
+        "Menu header uses 26-pixel status plus 58-pixel content row; tools are 68 high.",
+        "ToC five rows at 46 pixels."
+      ],
+      "expected_physical_size": [
+        1236,
+        1648
+      ],
+      "expected_state": "menu-open",
+      "review_basis": "Original supplied PNG plus HANDOFF and profile geometry; actual fixture data may differ."
+    },
+    {
+      "id": "pw-reader--fullscreen-footer",
+      "board": "pw-reader",
+      "profile": "pw5",
+      "screen": "reader",
+      "landscape": false,
+      "reference": "screens/states/pw-reader--fullscreen-footer.png",
+      "recipe": "reader-artwork-only",
+      "applicability": "user-overridden-reference-only",
+      "capability_bound": null,
+      "intentional_difference": "Reference-only alias: the user overrides the footer and bookmark ribbon. Capture the native artwork-only scene; this never means a footer has been implemented.",
+      "native_capture_required": true,
+      "assertions": [
+        "Default reference is menu open; closed reader follows artwork-only override.",
+        "Menu header uses 26-pixel status plus 58-pixel content row; tools are 68 high.",
+        "ToC five rows at 46 pixels."
+      ],
+      "expected_physical_size": [
+        1236,
+        1648
+      ],
+      "expected_state": "Reference inspected; requested footer/ribbon behavior is intentionally overridden.",
+      "review_basis": "Original supplied PNG plus HANDOFF and profile geometry; actual fixture data may differ.",
+      "reference_role": "reference-only alias of artwork-only closed reader"
+    },
+    {
+      "id": "pw-reader--fullscreen",
+      "board": "pw-reader",
+      "profile": "pw5",
+      "screen": "reader",
+      "landscape": false,
+      "reference": "screens/states/pw-reader--fullscreen.png",
+      "recipe": "reader-artwork-only",
+      "applicability": "applicable-subject-to-evidence-based-capability-bounds",
+      "capability_bound": null,
+      "intentional_difference": "Persistent reference bookmark ribbon is absent under the user override.",
+      "native_capture_required": true,
+      "assertions": [
+        "Default reference is menu open; closed reader follows artwork-only override.",
+        "Menu header uses 26-pixel status plus 58-pixel content row; tools are 68 high.",
+        "ToC five rows at 46 pixels."
+      ],
+      "expected_physical_size": [
+        1236,
+        1648
+      ],
+      "expected_state": "Artwork-only reader under the user override; no app decoration or footer-cycle region.",
+      "review_basis": "Original supplied PNG plus HANDOFF and profile geometry; actual fixture data may differ."
+    },
+    {
+      "id": "pw-reader--image",
+      "board": "pw-reader",
+      "profile": "pw5",
+      "screen": "reader",
+      "landscape": false,
+      "reference": "screens/states/pw-reader--image.png",
+      "recipe": "reader-image",
+      "applicability": "applicable-subject-to-evidence-based-capability-bounds",
+      "capability_bound": null,
+      "intentional_difference": null,
+      "native_capture_required": true,
+      "assertions": [
+        "Default reference is menu open; closed reader follows artwork-only override.",
+        "Menu header uses 26-pixel status plus 58-pixel content row; tools are 68 high.",
+        "ToC five rows at 46 pixels."
+      ],
+      "expected_physical_size": [
+        1236,
+        1648
+      ],
+      "expected_state": "Actual image preview, five contrast positions, refresh choices, dither capability/state and night option.",
+      "review_basis": "Original supplied PNG plus HANDOFF and profile geometry; actual fixture data may differ."
+    },
+    {
+      "id": "pw-reader--light",
+      "board": "pw-reader",
+      "profile": "pw5",
+      "screen": "reader",
+      "landscape": false,
+      "reference": "screens/states/pw-reader--light.png",
+      "recipe": "reader-light",
+      "applicability": "applicable-subject-to-evidence-based-capability-bounds",
+      "capability_bound": "hardware",
+      "intentional_difference": null,
+      "native_capture_required": true,
+      "assertions": [
+        "Default reference is menu open; closed reader follows artwork-only override.",
+        "Menu header uses 26-pixel status plus 58-pixel content row; tools are 68 high.",
+        "ToC five rows at 46 pixels."
+      ],
+      "expected_physical_size": [
+        1236,
+        1648
+      ],
+      "expected_state": "Conditional frontlight/warmth sliders 0..24 and supported Scribe auto brightness.",
+      "review_basis": "Original supplied PNG plus HANDOFF and profile geometry; actual fixture data may differ."
+    },
+    {
+      "id": "pw-reader--mode",
+      "board": "pw-reader",
+      "profile": "pw5",
+      "screen": "reader",
+      "landscape": false,
+      "reference": "screens/states/pw-reader--mode.png",
+      "recipe": "reader-mode",
+      "applicability": "applicable-subject-to-evidence-based-capability-bounds",
+      "capability_bound": null,
+      "intentional_difference": null,
+      "native_capture_required": true,
+      "assertions": [
+        "Default reference is menu open; closed reader follows artwork-only override.",
+        "Menu header uses 26-pixel status plus 58-pixel content row; tools are 68 high.",
+        "ToC five rows at 46 pixels."
+      ],
+      "expected_physical_size": [
+        1236,
+        1648
+      ],
+      "expected_state": "Four direction cards and crop/split controls; PW additionally has single/spread/auto layout.",
+      "review_basis": "Original supplied PNG plus HANDOFF and profile geometry; actual fixture data may differ."
+    },
+    {
+      "id": "pw-reader--more",
+      "board": "pw-reader",
+      "profile": "pw5",
+      "screen": "reader",
+      "landscape": false,
+      "reference": "screens/states/pw-reader--more.png",
+      "recipe": "reader-more",
+      "applicability": "applicable-subject-to-evidence-based-capability-bounds",
+      "capability_bound": null,
+      "intentional_difference": "Any legacy footer preference in More cannot restore closed-reader labels, ribbon, notification or an invisible footer-cycle hit region.",
+      "native_capture_required": true,
+      "assertions": [
+        "Default reference is menu open; closed reader follows artwork-only override.",
+        "Menu header uses 26-pixel status plus 58-pixel content row; tools are 68 high.",
+        "ToC five rows at 46 pixels."
+      ],
+      "expected_physical_size": [
+        1236,
+        1648
+      ],
+      "expected_state": "Anchored menu with context-specific actions and truthful availability.",
+      "review_basis": "Original supplied PNG plus HANDOFF and profile geometry; actual fixture data may differ."
+    },
+    {
+      "id": "pw-reader--rotate",
+      "board": "pw-reader",
+      "profile": "pw5",
+      "screen": "reader",
+      "landscape": false,
+      "reference": "screens/states/pw-reader--rotate.png",
+      "recipe": "reader-rotate",
+      "applicability": "applicable-subject-to-evidence-based-capability-bounds",
+      "capability_bound": "Manual portrait/landscape is applicable; only sensor-follow depends on actual sensor support. No whole-panel exclusion.",
+      "intentional_difference": null,
+      "native_capture_required": true,
+      "assertions": [
+        "Default reference is menu open; closed reader follows artwork-only override.",
+        "Menu header uses 26-pixel status plus 58-pixel content row; tools are 68 high.",
+        "ToC five rows at 46 pixels."
+      ],
+      "expected_physical_size": [
+        1236,
+        1648
+      ],
+      "expected_state": "PW portrait, landscape and reverse-landscape manual choices.",
+      "review_basis": "Original supplied PNG plus HANDOFF and profile geometry; actual fixture data may differ."
+    },
+    {
+      "id": "pw-reader--toc",
+      "board": "pw-reader",
+      "profile": "pw5",
+      "screen": "reader",
+      "landscape": false,
+      "reference": "screens/states/pw-reader--toc.png",
+      "recipe": "reader-toc",
+      "applicability": "applicable-subject-to-evidence-based-capability-bounds",
+      "capability_bound": null,
+      "intentional_difference": null,
+      "native_capture_required": true,
+      "assertions": [
+        "Default reference is menu open; closed reader follows artwork-only override.",
+        "Menu header uses 26-pixel status plus 58-pixel content row; tools are 68 high.",
+        "ToC five rows at 46 pixels."
+      ],
+      "expected_physical_size": [
+        1236,
+        1648
+      ],
+      "expected_state": "Chapter/bookmark tabs, current chapter dot/progress, read/download state, profile-specific paginated rows.",
+      "review_basis": "Original supplied PNG plus HANDOFF and profile geometry; actual fixture data may differ."
+    },
+    {
+      "id": "pw-browse--default",
+      "board": "pw-browse",
+      "profile": "pw5",
+      "screen": "sources",
+      "landscape": false,
+      "reference": "screens/pw-browse.png",
+      "recipe": "sources-default",
+      "applicability": "applicable",
+      "capability_bound": null,
+      "intentional_difference": null,
+      "native_capture_required": true,
+      "assertions": [
+        "Top-level installed/available/update source management with PW dock.",
+        "Built-in and extension groups; unavailable verification state is explicit.",
+        "In-place tabs and full-width bottom add/list sheets."
+      ],
+      "expected_physical_size": [
+        1236,
+        1648
+      ],
+      "expected_state": "default",
+      "review_basis": "Original supplied PNG plus HANDOFF and profile geometry; actual fixture data may differ."
+    },
+    {
+      "id": "pw-browse--add-source",
+      "board": "pw-browse",
+      "profile": "pw5",
+      "screen": "sources",
+      "landscape": false,
+      "reference": "screens/states/pw-browse--add-source.png",
+      "recipe": "sources-add-source",
+      "applicability": "applicable-subject-to-evidence-based-capability-bounds",
+      "capability_bound": "source-endpoint",
+      "intentional_difference": null,
+      "native_capture_required": true,
+      "assertions": [
+        "Top-level installed/available/update source management with PW dock.",
+        "Built-in and extension groups; unavailable verification state is explicit.",
+        "In-place tabs and full-width bottom add/list sheets."
+      ],
+      "expected_physical_size": [
+        1236,
+        1648
+      ],
+      "expected_state": "Add-source panel with truthful endpoint/QR/wait state or direct URL entry.",
+      "review_basis": "Original supplied PNG plus HANDOFF and profile geometry; actual fixture data may differ."
+    },
+    {
+      "id": "pw-browse--available",
+      "board": "pw-browse",
+      "profile": "pw5",
+      "screen": "sources",
+      "landscape": false,
+      "reference": "screens/states/pw-browse--available.png",
+      "recipe": "sources-available",
+      "applicability": "applicable-subject-to-evidence-based-capability-bounds",
+      "capability_bound": null,
+      "intentional_difference": null,
+      "native_capture_required": true,
+      "assertions": [
+        "Top-level installed/available/update source management with PW dock.",
+        "Built-in and extension groups; unavailable verification state is explicit.",
+        "In-place tabs and full-width bottom add/list sheets."
+      ],
+      "expected_physical_size": [
+        1236,
+        1648
+      ],
+      "expected_state": "Available-source list with language filtering and real install actions.",
+      "review_basis": "Original supplied PNG plus HANDOFF and profile geometry; actual fixture data may differ."
+    },
+    {
+      "id": "pw-browse--source-lists",
+      "board": "pw-browse",
+      "profile": "pw5",
+      "screen": "sources",
+      "landscape": false,
+      "reference": "screens/states/pw-browse--source-lists.png",
+      "recipe": "sources-source-lists",
+      "applicability": "applicable-subject-to-evidence-based-capability-bounds",
+      "capability_bound": null,
+      "intentional_difference": null,
+      "native_capture_required": true,
+      "assertions": [
+        "Top-level installed/available/update source management with PW dock.",
+        "Built-in and extension groups; unavailable verification state is explicit.",
+        "In-place tabs and full-width bottom add/list sheets."
+      ],
+      "expected_physical_size": [
+        1236,
+        1648
+      ],
+      "expected_state": "Actual source-list records with remove/add and profile-specific management action.",
+      "review_basis": "Original supplied PNG plus HANDOFF and profile geometry; actual fixture data may differ."
+    },
+    {
+      "id": "pw-browse--updates",
+      "board": "pw-browse",
+      "profile": "pw5",
+      "screen": "sources",
+      "landscape": false,
+      "reference": "screens/states/pw-browse--updates.png",
+      "recipe": "sources-updates",
+      "applicability": "applicable-subject-to-evidence-based-capability-bounds",
+      "capability_bound": null,
+      "intentional_difference": null,
+      "native_capture_required": true,
+      "assertions": [
+        "Top-level installed/available/update source management with PW dock.",
+        "Built-in and extension groups; unavailable verification state is explicit.",
+        "In-place tabs and full-width bottom add/list sheets."
+      ],
+      "expected_physical_size": [
+        1236,
+        1648
+      ],
+      "expected_state": "Actual updatable source versions, per-row update and bulk update; preserve installed column on SC.",
+      "review_basis": "Original supplied PNG plus HANDOFF and profile geometry; actual fixture data may differ."
+    },
+    {
+      "id": "pw-source--default",
+      "board": "pw-source",
+      "profile": "pw5",
+      "screen": "catalog",
+      "landscape": false,
+      "reference": "screens/pw-source.png",
+      "recipe": "catalog-default",
+      "applicability": "applicable",
+      "capability_bound": null,
+      "intentional_difference": null,
+      "native_capture_required": true,
+      "assertions": [
+        "Secondary source catalog with back label; no dock.",
+        "Five rows per page with 64 x 88 covers and 108-pixel rows.",
+        "Search/filter/source settings are separate actions."
+      ],
+      "expected_physical_size": [
+        1236,
+        1648
+      ],
+      "expected_state": "default",
+      "review_basis": "Original supplied PNG plus HANDOFF and profile geometry; actual fixture data may differ."
+    },
+    {
+      "id": "pw-source--filter",
+      "board": "pw-source",
+      "profile": "pw5",
+      "screen": "catalog",
+      "landscape": false,
+      "reference": "screens/states/pw-source--filter.png",
+      "recipe": "catalog-filter",
+      "applicability": "applicable-subject-to-evidence-based-capability-bounds",
+      "capability_bound": null,
+      "intentional_difference": null,
+      "native_capture_required": true,
+      "assertions": [
+        "Secondary source catalog with back label; no dock.",
+        "Five rows per page with 64 x 88 covers and 108-pixel rows.",
+        "Search/filter/source settings are separate actions."
+      ],
+      "expected_physical_size": [
+        1236,
+        1648
+      ],
+      "expected_state": "Order, publication status, tri-state tags, reset and apply-results action.",
+      "review_basis": "Original supplied PNG plus HANDOFF and profile geometry; actual fixture data may differ."
+    },
+    {
+      "id": "pw-source--source-settings",
+      "board": "pw-source",
+      "profile": "pw5",
+      "screen": "catalog",
+      "landscape": false,
+      "reference": "screens/states/pw-source--source-settings.png",
+      "recipe": "catalog-source-settings",
+      "applicability": "applicable-subject-to-evidence-based-capability-bounds",
+      "capability_bound": null,
+      "intentional_difference": null,
+      "native_capture_required": true,
+      "assertions": [
+        "Secondary source catalog with back label; no dock.",
+        "Five rows per page with 64 x 88 covers and 108-pixel rows.",
+        "Search/filter/source settings are separate actions."
+      ],
+      "expected_physical_size": [
+        1236,
+        1648
+      ],
+      "expected_state": "Source-declared settings rendered with common form controls.",
+      "review_basis": "Original supplied PNG plus HANDOFF and profile geometry; actual fixture data may differ."
+    },
+    {
+      "id": "pw-search--default",
+      "board": "pw-search",
+      "profile": "pw5",
+      "screen": "search",
+      "landscape": false,
+      "reference": "screens/pw-search.png",
+      "recipe": "search-default",
+      "applicability": "applicable",
+      "capability_bound": null,
+      "intentional_difference": null,
+      "native_capture_required": true,
+      "assertions": [
+        "White outlined input/scopes and bottom keyboard during editing.",
+        "PW pending source count; up to three covers per result source.",
+        "Composition/candidates, shift, backspace, numbers, language, space and search."
+      ],
+      "expected_physical_size": [
+        1236,
+        1648
+      ],
+      "expected_state": "default",
+      "review_basis": "Original supplied PNG plus HANDOFF and profile geometry; actual fixture data may differ."
+    },
+    {
+      "id": "pw-search--numbers",
+      "board": "pw-search",
+      "profile": "pw5",
+      "screen": "search",
+      "landscape": false,
+      "reference": "screens/states/pw-search--numbers.png",
+      "recipe": "search-numbers",
+      "applicability": "applicable-subject-to-evidence-based-capability-bounds",
+      "capability_bound": null,
+      "intentional_difference": null,
+      "native_capture_required": true,
+      "assertions": [
+        "White outlined input/scopes and bottom keyboard during editing.",
+        "PW pending source count; up to three covers per result source.",
+        "Composition/candidates, shift, backspace, numbers, language, space and search."
+      ],
+      "expected_physical_size": [
+        1236,
+        1648
+      ],
+      "expected_state": "Numeric/symbol keyboard with language/letters/backspace/space/search and stable geometry.",
+      "review_basis": "Original supplied PNG plus HANDOFF and profile geometry; actual fixture data may differ."
+    },
+    {
+      "id": "pw-search--results",
+      "board": "pw-search",
+      "profile": "pw5",
+      "screen": "search",
+      "landscape": false,
+      "reference": "screens/states/pw-search--results.png",
+      "recipe": "search-results",
+      "applicability": "applicable-subject-to-evidence-based-capability-bounds",
+      "capability_bound": null,
+      "intentional_difference": null,
+      "native_capture_required": true,
+      "assertions": [
+        "White outlined input/scopes and bottom keyboard during editing.",
+        "PW pending source count; up to three covers per result source.",
+        "Composition/candidates, shift, backspace, numbers, language, space and search."
+      ],
+      "expected_physical_size": [
+        1236,
+        1648
+      ],
+      "expected_state": "Source-grouped results, count/view-all, independent empty/timeout/retry state and restored dock.",
+      "review_basis": "Original supplied PNG plus HANDOFF and profile geometry; actual fixture data may differ."
+    },
+    {
+      "id": "pw-history--default",
+      "board": "pw-history",
+      "profile": "pw5",
+      "screen": "history",
+      "landscape": false,
+      "reference": "screens/pw-history.png",
+      "recipe": "history-default",
+      "applicability": "applicable",
+      "capability_bound": null,
+      "intentional_difference": null,
+      "native_capture_required": true,
+      "assertions": [
+        "Grouped dates and 76-pixel reading records with 46 x 64 covers.",
+        "Progress/time, per-entry remove and actual pagination.",
+        "Updates change heading and expose bulk download."
+      ],
+      "expected_physical_size": [
+        1236,
+        1648
+      ],
+      "expected_state": "default",
+      "review_basis": "Original supplied PNG plus HANDOFF and profile geometry; actual fixture data may differ."
+    },
+    {
+      "id": "pw-history--clear-confirm",
+      "board": "pw-history",
+      "profile": "pw5",
+      "screen": "history",
+      "landscape": false,
+      "reference": "screens/states/pw-history--clear-confirm.png",
+      "recipe": "history-clear-confirm",
+      "applicability": "applicable-subject-to-evidence-based-capability-bounds",
+      "capability_bound": null,
+      "intentional_difference": null,
+      "native_capture_required": true,
+      "assertions": [
+        "Grouped dates and 76-pixel reading records with 46 x 64 covers.",
+        "Progress/time, per-entry remove and actual pagination.",
+        "Updates change heading and expose bulk download."
+      ],
+      "expected_physical_size": [
+        1236,
+        1648
+      ],
+      "expected_state": "White outlined confirmation with equal cancel/clear actions and transparent outside capture.",
+      "review_basis": "Original supplied PNG plus HANDOFF and profile geometry; actual fixture data may differ."
+    },
+    {
+      "id": "pw-history--incognito",
+      "board": "pw-history",
+      "profile": "pw5",
+      "screen": "history",
+      "landscape": false,
+      "reference": "screens/states/pw-history--incognito.png",
+      "recipe": "history-incognito",
+      "applicability": "applicable-subject-to-evidence-based-capability-bounds",
+      "capability_bound": null,
+      "intentional_difference": null,
+      "native_capture_required": true,
+      "assertions": [
+        "Grouped dates and 76-pixel reading records with 46 x 64 covers.",
+        "Progress/time, per-entry remove and actual pagination.",
+        "Updates change heading and expose bulk download."
+      ],
+      "expected_physical_size": [
+        1236,
+        1648
+      ],
+      "expected_state": "Pressed incognito control and inverted application status bar; actual history policy.",
+      "review_basis": "Original supplied PNG plus HANDOFF and profile geometry; actual fixture data may differ."
+    },
+    {
+      "id": "pw-history--updates",
+      "board": "pw-history",
+      "profile": "pw5",
+      "screen": "history",
+      "landscape": false,
+      "reference": "screens/states/pw-history--updates.png",
+      "recipe": "history-updates",
+      "applicability": "applicable-subject-to-evidence-based-capability-bounds",
+      "capability_bound": null,
+      "intentional_difference": null,
+      "native_capture_required": true,
+      "assertions": [
+        "Grouped dates and 76-pixel reading records with 46 x 64 covers.",
+        "Progress/time, per-entry remove and actual pagination.",
+        "Updates change heading and expose bulk download."
+      ],
+      "expected_physical_size": [
+        1236,
+        1648
+      ],
+      "expected_state": "Grouped real chapter updates, queued/download state, heading change, bulk download and folio.",
+      "review_basis": "Original supplied PNG plus HANDOFF and profile geometry; actual fixture data may differ."
+    },
+    {
+      "id": "pw-settings--default",
+      "board": "pw-settings",
+      "profile": "pw5",
+      "screen": "settings",
+      "landscape": false,
+      "reference": "screens/pw-settings.png",
+      "recipe": "settings-default",
+      "applicability": "applicable",
+      "capability_bound": null,
+      "intentional_difference": null,
+      "native_capture_required": true,
+      "assertions": [
+        "Two grouped list pages; first page has device card and seven rows.",
+        "Secondary pages have back label and 30/38 serif heading; dock remains.",
+        "No list pager on secondary pages."
+      ],
+      "expected_physical_size": [
+        1236,
+        1648
+      ],
+      "expected_state": "default",
+      "review_basis": "Original supplied PNG plus HANDOFF and profile geometry; actual fixture data may differ."
+    },
+    {
+      "id": "pw-settings--display",
+      "board": "pw-settings",
+      "profile": "pw5",
+      "screen": "settings",
+      "landscape": false,
+      "reference": "screens/states/pw-settings--display.png",
+      "recipe": "settings-display",
+      "applicability": "applicable-subject-to-evidence-based-capability-bounds",
+      "capability_bound": null,
+      "intentional_difference": null,
+      "native_capture_required": true,
+      "assertions": [
+        "Two grouped list pages; first page has device card and seven rows.",
+        "Secondary pages have back label and 30/38 serif heading; dock remains.",
+        "No list pager on secondary pages."
+      ],
+      "expected_physical_size": [
+        1236,
+        1648
+      ],
+      "expected_state": "Refresh interval, quality radio cards, profile-appropriate controls and sixteen grayscale cells.",
+      "review_basis": "Original supplied PNG plus HANDOFF and profile geometry; actual fixture data may differ."
+    },
+    {
+      "id": "pw-settings--page2",
+      "board": "pw-settings",
+      "profile": "pw5",
+      "screen": "settings",
+      "landscape": false,
+      "reference": "screens/states/pw-settings--page2.png",
+      "recipe": "settings-page2",
+      "applicability": "applicable-subject-to-evidence-based-capability-bounds",
+      "capability_bound": null,
+      "intentional_difference": null,
+      "native_capture_required": true,
+      "assertions": [
+        "Two grouped list pages; first page has device card and seven rows.",
+        "Secondary pages have back label and 30/38 serif heading; dock remains.",
+        "No list pager on secondary pages."
+      ],
+      "expected_physical_size": [
+        1236,
+        1648
+      ],
+      "expected_state": "PW second grouped settings page without device card, nine rows and final-page folio.",
+      "review_basis": "Original supplied PNG plus HANDOFF and profile geometry; actual fixture data may differ."
+    },
+    {
+      "id": "pw-settings--power",
+      "board": "pw-settings",
+      "profile": "pw5",
+      "screen": "settings",
+      "landscape": false,
+      "reference": "screens/states/pw-settings--power.png",
+      "recipe": "settings-power",
+      "applicability": "applicable-subject-to-evidence-based-capability-bounds",
+      "capability_bound": null,
+      "intentional_difference": null,
+      "native_capture_required": true,
+      "assertions": [
+        "Two grouped list pages; first page has device card and seven rows.",
+        "Secondary pages have back label and 30/38 serif heading; dock remains.",
+        "No list pager on secondary pages."
+      ],
+      "expected_physical_size": [
+        1236,
+        1648
+      ],
+      "expected_state": "Wake/update/Wi-Fi policies, three screensaver choices and actual exit action.",
+      "review_basis": "Original supplied PNG plus HANDOFF and profile geometry; actual fixture data may differ."
+    },
+    {
+      "id": "sc-library--default",
+      "board": "sc-library",
+      "profile": "scribe",
+      "screen": "library",
+      "landscape": false,
+      "reference": "screens/sc-library.png",
+      "recipe": "library-default",
+      "applicability": "applicable",
+      "capability_bound": null,
+      "intentional_difference": null,
+      "native_capture_required": true,
+      "assertions": [
+        "Six columns by three rows; title-adjacent unread/download state.",
+        "Continuation and daily update cards side by side; selection retains both.",
+        "More/sort floats, centered queue, folio above 80-pixel dock."
+      ],
+      "expected_physical_size": [
+        1860,
+        2480
+      ],
+      "expected_state": "default",
+      "review_basis": "Original supplied PNG plus HANDOFF and profile geometry; actual fixture data may differ."
+    },
+    {
+      "id": "sc-library--download-queue",
+      "board": "sc-library",
+      "profile": "scribe",
+      "screen": "library",
+      "landscape": false,
+      "reference": "screens/states/sc-library--download-queue.png",
+      "recipe": "real-loopback-download-queue",
+      "applicability": "applicable-subject-to-evidence-based-capability-bounds",
+      "capability_bound": null,
+      "intentional_difference": null,
+      "native_capture_required": true,
+      "assertions": [
+        "Six columns by three rows; title-adjacent unread/download state.",
+        "Continuation and daily update cards side by side; selection retains both.",
+        "More/sort floats, centered queue, folio above 80-pixel dock."
+      ],
+      "expected_physical_size": [
+        1860,
+        2480
+      ],
+      "expected_state": "Real queue rows with cover/title/progress/state and pause/resume-all plus close.",
+      "review_basis": "Original supplied PNG plus HANDOFF and profile geometry; actual fixture data may differ."
+    },
+    {
+      "id": "sc-library--jump-pages",
+      "board": "sc-library",
+      "profile": "scribe",
+      "screen": "library",
+      "landscape": false,
+      "reference": "screens/states/sc-library--jump-pages.png",
+      "recipe": "library-jump-pages",
+      "applicability": "applicable-subject-to-evidence-based-capability-bounds",
+      "capability_bound": null,
+      "intentional_difference": null,
+      "native_capture_required": true,
+      "assertions": [
+        "Six columns by three rows; title-adjacent unread/download state.",
+        "Continuation and daily update cards side by side; selection retains both.",
+        "More/sort floats, centered queue, folio above 80-pixel dock."
+      ],
+      "expected_physical_size": [
+        1860,
+        2480
+      ],
+      "expected_state": "Balanced page grid above the folio, current page inverse and outside dismissal.",
+      "review_basis": "Original supplied PNG plus HANDOFF and profile geometry; actual fixture data may differ."
+    },
+    {
+      "id": "sc-library--more",
+      "board": "sc-library",
+      "profile": "scribe",
+      "screen": "library",
+      "landscape": false,
+      "reference": "screens/states/sc-library--more.png",
+      "recipe": "library-more",
+      "applicability": "applicable-subject-to-evidence-based-capability-bounds",
+      "capability_bound": null,
+      "intentional_difference": null,
+      "native_capture_required": true,
+      "assertions": [
+        "Six columns by three rows; title-adjacent unread/download state.",
+        "Continuation and daily update cards side by side; selection retains both.",
+        "More/sort floats, centered queue, folio above 80-pixel dock."
+      ],
+      "expected_physical_size": [
+        1860,
+        2480
+      ],
+      "expected_state": "Anchored menu with context-specific actions and truthful availability.",
+      "review_basis": "Original supplied PNG plus HANDOFF and profile geometry; actual fixture data may differ."
+    },
+    {
+      "id": "sc-library--select",
+      "board": "sc-library",
+      "profile": "scribe",
+      "screen": "library",
+      "landscape": false,
+      "reference": "screens/states/sc-library--select.png",
+      "recipe": "library-select",
+      "applicability": "applicable-subject-to-evidence-based-capability-bounds",
+      "capability_bound": null,
+      "intentional_difference": null,
+      "native_capture_required": true,
+      "assertions": [
+        "Six columns by three rows; title-adjacent unread/download state.",
+        "Continuation and daily update cards side by side; selection retains both.",
+        "More/sort floats, centered queue, folio above 80-pixel dock."
+      ],
+      "expected_physical_size": [
+        1860,
+        2480
+      ],
+      "expected_state": "Selection heading/checks and a four-action bulk bar replacing the dock.",
+      "review_basis": "Original supplied PNG plus HANDOFF and profile geometry; actual fixture data may differ."
+    },
+    {
+      "id": "sc-library--sort",
+      "board": "sc-library",
+      "profile": "scribe",
+      "screen": "library",
+      "landscape": false,
+      "reference": "screens/states/sc-library--sort.png",
+      "recipe": "library-sort",
+      "applicability": "applicable-subject-to-evidence-based-capability-bounds",
+      "capability_bound": null,
+      "intentional_difference": null,
+      "native_capture_required": true,
+      "assertions": [
+        "Six columns by three rows; title-adjacent unread/download state.",
+        "Continuation and daily update cards side by side; selection retains both.",
+        "More/sort floats, centered queue, folio above 80-pixel dock."
+      ],
+      "expected_physical_size": [
+        1860,
+        2480
+      ],
+      "expected_state": "Sorting choices, direction and three-state filters; selected inverse controls.",
+      "review_basis": "Original supplied PNG plus HANDOFF and profile geometry; actual fixture data may differ."
+    },
+    {
+      "id": "sc-manga--default",
+      "board": "sc-manga",
+      "profile": "scribe",
+      "screen": "detail",
+      "landscape": false,
+      "reference": "screens/sc-manga.png",
+      "recipe": "detail-default",
+      "applicability": "applicable",
+      "capability_bound": null,
+      "intentional_difference": null,
+      "native_capture_required": true,
+      "assertions": [
+        "384-pixel information column with 306 x 420 cover; directory in remaining width.",
+        "Sixteen chapter rows at 60 pixels; no dock.",
+        "Separate tracking/migration floats and actual operation states."
+      ],
+      "expected_physical_size": [
+        1860,
+        2480
+      ],
+      "expected_state": "default",
+      "review_basis": "Original supplied PNG plus HANDOFF and profile geometry; actual fixture data may differ."
+    },
+    {
+      "id": "sc-manga--migrate",
+      "board": "sc-manga",
+      "profile": "scribe",
+      "screen": "detail",
+      "landscape": false,
+      "reference": "screens/states/sc-manga--migrate.png",
+      "recipe": "detail-migrate",
+      "applicability": "applicable-subject-to-evidence-based-capability-bounds",
+      "capability_bound": "migration",
+      "intentional_difference": null,
+      "native_capture_required": true,
+      "assertions": [
+        "384-pixel information column with 306 x 420 cover; directory in remaining width.",
+        "Sixteen chapter rows at 60 pixels; no dock.",
+        "Separate tracking/migration floats and actual operation states."
+      ],
+      "expected_physical_size": [
+        1860,
+        2480
+      ],
+      "expected_state": "Candidate radio rows, separate retention/removal toggles, cancel and real start state.",
+      "review_basis": "Original supplied PNG plus HANDOFF and profile geometry; actual fixture data may differ."
+    },
+    {
+      "id": "sc-manga--more",
+      "board": "sc-manga",
+      "profile": "scribe",
+      "screen": "detail",
+      "landscape": false,
+      "reference": "screens/states/sc-manga--more.png",
+      "recipe": "detail-more",
+      "applicability": "applicable-subject-to-evidence-based-capability-bounds",
+      "capability_bound": null,
+      "intentional_difference": null,
+      "native_capture_required": true,
+      "assertions": [
+        "384-pixel information column with 306 x 420 cover; directory in remaining width.",
+        "Sixteen chapter rows at 60 pixels; no dock.",
+        "Separate tracking/migration floats and actual operation states."
+      ],
+      "expected_physical_size": [
+        1860,
+        2480
+      ],
+      "expected_state": "Anchored menu with context-specific actions and truthful availability.",
+      "review_basis": "Original supplied PNG plus HANDOFF and profile geometry; actual fixture data may differ."
+    },
+    {
+      "id": "sc-manga--tracking",
+      "board": "sc-manga",
+      "profile": "scribe",
+      "screen": "detail",
+      "landscape": false,
+      "reference": "screens/states/sc-manga--tracking.png",
+      "recipe": "detail-tracking",
+      "applicability": "applicable-subject-to-evidence-based-capability-bounds",
+      "capability_bound": "authentication",
+      "intentional_difference": null,
+      "native_capture_required": true,
+      "assertions": [
+        "384-pixel information column with 306 x 420 cover; directory in remaining width.",
+        "Sixteen chapter rows at 60 pixels; no dock.",
+        "Separate tracking/migration floats and actual operation states."
+      ],
+      "expected_physical_size": [
+        1860,
+        2480
+      ],
+      "expected_state": "Tracking service cards with real linked/unlinked/unavailable state and settings navigation.",
+      "review_basis": "Original supplied PNG plus HANDOFF and profile geometry; actual fixture data may differ."
+    },
+    {
+      "id": "sc-browse--default",
+      "board": "sc-browse",
+      "profile": "scribe",
+      "screen": "catalog",
+      "landscape": false,
+      "reference": "screens/sc-browse.png",
+      "recipe": "catalog-default",
+      "applicability": "applicable",
+      "capability_bound": null,
+      "intentional_difference": null,
+      "native_capture_required": true,
+      "assertions": [
+        "Top-level current-source catalog keeps dock; title triggers source picker.",
+        "Five by three grid with 150 x 202 covers.",
+        "Search/filter row and source-declared settings float."
+      ],
+      "expected_physical_size": [
+        1860,
+        2480
+      ],
+      "expected_state": "default",
+      "review_basis": "Original supplied PNG plus HANDOFF and profile geometry; actual fixture data may differ."
+    },
+    {
+      "id": "sc-browse--blocked-source",
+      "board": "sc-browse",
+      "profile": "scribe",
+      "screen": "catalog",
+      "landscape": false,
+      "reference": "screens/states/sc-browse--blocked-source.png",
+      "recipe": "catalog-blocked-source",
+      "applicability": "applicable-subject-to-evidence-based-capability-bounds",
+      "capability_bound": null,
+      "intentional_difference": null,
+      "native_capture_required": true,
+      "assertions": [
+        "Top-level current-source catalog keeps dock; title triggers source picker.",
+        "Five by three grid with 150 x 202 covers.",
+        "Search/filter row and source-declared settings float."
+      ],
+      "expected_physical_size": [
+        1860,
+        2480
+      ],
+      "expected_state": "Verification-unavailable content with source switch, migration and uninstall.",
+      "review_basis": "Original supplied PNG plus HANDOFF and profile geometry; actual fixture data may differ."
+    },
+    {
+      "id": "sc-browse--filter",
+      "board": "sc-browse",
+      "profile": "scribe",
+      "screen": "catalog",
+      "landscape": false,
+      "reference": "screens/states/sc-browse--filter.png",
+      "recipe": "catalog-filter",
+      "applicability": "applicable-subject-to-evidence-based-capability-bounds",
+      "capability_bound": null,
+      "intentional_difference": null,
+      "native_capture_required": true,
+      "assertions": [
+        "Top-level current-source catalog keeps dock; title triggers source picker.",
+        "Five by three grid with 150 x 202 covers.",
+        "Search/filter row and source-declared settings float."
+      ],
+      "expected_physical_size": [
+        1860,
+        2480
+      ],
+      "expected_state": "Order, publication status, tri-state tags, reset and apply-results action.",
+      "review_basis": "Original supplied PNG plus HANDOFF and profile geometry; actual fixture data may differ."
+    },
+    {
+      "id": "sc-browse--server-setup",
+      "board": "sc-browse",
+      "profile": "scribe",
+      "screen": "catalog",
+      "landscape": false,
+      "reference": "screens/states/sc-browse--server-setup.png",
+      "recipe": "catalog-server-setup",
+      "applicability": "applicable-subject-to-evidence-based-capability-bounds",
+      "capability_bound": "source-endpoint",
+      "intentional_difference": null,
+      "native_capture_required": true,
+      "assertions": [
+        "Top-level current-source catalog keeps dock; title triggers source picker.",
+        "Five by three grid with 150 x 202 covers.",
+        "Search/filter row and source-declared settings float."
+      ],
+      "expected_physical_size": [
+        1860,
+        2480
+      ],
+      "expected_state": "Labeled server/credential fields, phone entry and truthful test/connect state.",
+      "review_basis": "Original supplied PNG plus HANDOFF and profile geometry; actual fixture data may differ."
+    },
+    {
+      "id": "sc-browse--source-picker",
+      "board": "sc-browse",
+      "profile": "scribe",
+      "screen": "catalog",
+      "landscape": false,
+      "reference": "screens/states/sc-browse--source-picker.png",
+      "recipe": "catalog-source-picker",
+      "applicability": "applicable-subject-to-evidence-based-capability-bounds",
+      "capability_bound": null,
+      "intentional_difference": null,
+      "native_capture_required": true,
+      "assertions": [
+        "Top-level current-source catalog keeps dock; title triggers source picker.",
+        "Five by three grid with 150 x 202 covers.",
+        "Search/filter row and source-declared settings float."
+      ],
+      "expected_physical_size": [
+        1860,
+        2480
+      ],
+      "expected_state": "Grouped built-in/extension rows, current checkmark and management footer actions.",
+      "review_basis": "Original supplied PNG plus HANDOFF and profile geometry; actual fixture data may differ."
+    },
+    {
+      "id": "sc-browse--source-settings",
+      "board": "sc-browse",
+      "profile": "scribe",
+      "screen": "catalog",
+      "landscape": false,
+      "reference": "screens/states/sc-browse--source-settings.png",
+      "recipe": "catalog-source-settings",
+      "applicability": "applicable-subject-to-evidence-based-capability-bounds",
+      "capability_bound": null,
+      "intentional_difference": null,
+      "native_capture_required": true,
+      "assertions": [
+        "Top-level current-source catalog keeps dock; title triggers source picker.",
+        "Five by three grid with 150 x 202 covers.",
+        "Search/filter row and source-declared settings float."
+      ],
+      "expected_physical_size": [
+        1860,
+        2480
+      ],
+      "expected_state": "Source-declared settings rendered with common form controls.",
+      "review_basis": "Original supplied PNG plus HANDOFF and profile geometry; actual fixture data may differ."
+    },
+    {
+      "id": "sc-reader-portrait--default",
+      "board": "sc-reader-portrait",
+      "profile": "scribe",
+      "screen": "reader",
+      "landscape": false,
+      "reference": "screens/sc-reader-portrait.png",
+      "recipe": "reader-menu",
+      "applicability": "applicable",
+      "capability_bound": null,
+      "intentional_difference": null,
+      "native_capture_required": true,
+      "assertions": [
+        "Default is menu open; closed reader follows artwork-only override.",
+        "78-pixel integrated header; 76-pixel tools; menu inset 48.",
+        "ToC six rows as two columns of three at 50 pixels, with 48 gap."
+      ],
+      "expected_physical_size": [
+        1860,
+        2480
+      ],
+      "expected_state": "menu-open",
+      "review_basis": "Original supplied PNG plus HANDOFF and profile geometry; actual fixture data may differ."
+    },
+    {
+      "id": "sc-reader-portrait--fullscreen-footer",
+      "board": "sc-reader-portrait",
+      "profile": "scribe",
+      "screen": "reader",
+      "landscape": false,
+      "reference": "screens/states/sc-reader-portrait--fullscreen-footer.png",
+      "recipe": "reader-artwork-only",
+      "applicability": "user-overridden-reference-only",
+      "capability_bound": null,
+      "intentional_difference": "Reference-only alias: the user overrides the footer and bookmark ribbon. Capture the native artwork-only scene; this never means a footer has been implemented.",
+      "native_capture_required": true,
+      "assertions": [
+        "Default is menu open; closed reader follows artwork-only override.",
+        "78-pixel integrated header; 76-pixel tools; menu inset 48.",
+        "ToC six rows as two columns of three at 50 pixels, with 48 gap."
+      ],
+      "expected_physical_size": [
+        1860,
+        2480
+      ],
+      "expected_state": "Reference inspected; requested footer/ribbon behavior is intentionally overridden.",
+      "review_basis": "Original supplied PNG plus HANDOFF and profile geometry; actual fixture data may differ.",
+      "reference_role": "reference-only alias of artwork-only closed reader"
+    },
+    {
+      "id": "sc-reader-portrait--fullscreen",
+      "board": "sc-reader-portrait",
+      "profile": "scribe",
+      "screen": "reader",
+      "landscape": false,
+      "reference": "screens/states/sc-reader-portrait--fullscreen.png",
+      "recipe": "reader-artwork-only",
+      "applicability": "applicable-subject-to-evidence-based-capability-bounds",
+      "capability_bound": null,
+      "intentional_difference": "Persistent reference bookmark ribbon is absent under the user override.",
+      "native_capture_required": true,
+      "assertions": [
+        "Default is menu open; closed reader follows artwork-only override.",
+        "78-pixel integrated header; 76-pixel tools; menu inset 48.",
+        "ToC six rows as two columns of three at 50 pixels, with 48 gap."
+      ],
+      "expected_physical_size": [
+        1860,
+        2480
+      ],
+      "expected_state": "Artwork-only reader under the user override; no app decoration or footer-cycle region.",
+      "review_basis": "Original supplied PNG plus HANDOFF and profile geometry; actual fixture data may differ."
+    },
+    {
+      "id": "sc-reader-portrait--image",
+      "board": "sc-reader-portrait",
+      "profile": "scribe",
+      "screen": "reader",
+      "landscape": false,
+      "reference": "screens/states/sc-reader-portrait--image.png",
+      "recipe": "reader-image",
+      "applicability": "applicable-subject-to-evidence-based-capability-bounds",
+      "capability_bound": null,
+      "intentional_difference": null,
+      "native_capture_required": true,
+      "assertions": [
+        "Default is menu open; closed reader follows artwork-only override.",
+        "78-pixel integrated header; 76-pixel tools; menu inset 48.",
+        "ToC six rows as two columns of three at 50 pixels, with 48 gap."
+      ],
+      "expected_physical_size": [
+        1860,
+        2480
+      ],
+      "expected_state": "Actual image preview, five contrast positions, refresh choices, dither capability/state and night option.",
+      "review_basis": "Original supplied PNG plus HANDOFF and profile geometry; actual fixture data may differ."
+    },
+    {
+      "id": "sc-reader-portrait--light",
+      "board": "sc-reader-portrait",
+      "profile": "scribe",
+      "screen": "reader",
+      "landscape": false,
+      "reference": "screens/states/sc-reader-portrait--light.png",
+      "recipe": "reader-light",
+      "applicability": "applicable-subject-to-evidence-based-capability-bounds",
+      "capability_bound": "hardware",
+      "intentional_difference": null,
+      "native_capture_required": true,
+      "assertions": [
+        "Default is menu open; closed reader follows artwork-only override.",
+        "78-pixel integrated header; 76-pixel tools; menu inset 48.",
+        "ToC six rows as two columns of three at 50 pixels, with 48 gap."
+      ],
+      "expected_physical_size": [
+        1860,
+        2480
+      ],
+      "expected_state": "Conditional frontlight/warmth sliders 0..24 and supported Scribe auto brightness.",
+      "review_basis": "Original supplied PNG plus HANDOFF and profile geometry; actual fixture data may differ."
+    },
+    {
+      "id": "sc-reader-portrait--mode",
+      "board": "sc-reader-portrait",
+      "profile": "scribe",
+      "screen": "reader",
+      "landscape": false,
+      "reference": "screens/states/sc-reader-portrait--mode.png",
+      "recipe": "reader-mode",
+      "applicability": "applicable-subject-to-evidence-based-capability-bounds",
+      "capability_bound": null,
+      "intentional_difference": null,
+      "native_capture_required": true,
+      "assertions": [
+        "Default is menu open; closed reader follows artwork-only override.",
+        "78-pixel integrated header; 76-pixel tools; menu inset 48.",
+        "ToC six rows as two columns of three at 50 pixels, with 48 gap."
+      ],
+      "expected_physical_size": [
+        1860,
+        2480
+      ],
+      "expected_state": "Four direction cards and crop/split controls; PW additionally has single/spread/auto layout.",
+      "review_basis": "Original supplied PNG plus HANDOFF and profile geometry; actual fixture data may differ."
+    },
+    {
+      "id": "sc-reader-portrait--more",
+      "board": "sc-reader-portrait",
+      "profile": "scribe",
+      "screen": "reader",
+      "landscape": false,
+      "reference": "screens/states/sc-reader-portrait--more.png",
+      "recipe": "reader-more",
+      "applicability": "applicable-subject-to-evidence-based-capability-bounds",
+      "capability_bound": null,
+      "intentional_difference": "Any legacy footer preference in More cannot restore closed-reader labels, ribbon, notification or an invisible footer-cycle hit region.",
+      "native_capture_required": true,
+      "assertions": [
+        "Default is menu open; closed reader follows artwork-only override.",
+        "78-pixel integrated header; 76-pixel tools; menu inset 48.",
+        "ToC six rows as two columns of three at 50 pixels, with 48 gap."
+      ],
+      "expected_physical_size": [
+        1860,
+        2480
+      ],
+      "expected_state": "Anchored menu with context-specific actions and truthful availability.",
+      "review_basis": "Original supplied PNG plus HANDOFF and profile geometry; actual fixture data may differ."
+    },
+    {
+      "id": "sc-reader-portrait--orientation",
+      "board": "sc-reader-portrait",
+      "profile": "scribe",
+      "screen": "reader",
+      "landscape": false,
+      "reference": "screens/states/sc-reader-portrait--orientation.png",
+      "recipe": "reader-orientation",
+      "applicability": "applicable-subject-to-evidence-based-capability-bounds",
+      "capability_bound": "Manual portrait/landscape is applicable; only sensor-follow depends on actual sensor support. No whole-panel exclusion.",
+      "intentional_difference": null,
+      "native_capture_required": true,
+      "assertions": [
+        "Default is menu open; closed reader follows artwork-only override.",
+        "78-pixel integrated header; 76-pixel tools; menu inset 48.",
+        "ToC six rows as two columns of three at 50 pixels, with 48 gap."
+      ],
+      "expected_physical_size": [
+        1860,
+        2480
+      ],
+      "expected_state": "SC portrait/spread choices and sensor-follow only if supported; exclude prototype preview link.",
+      "review_basis": "Original supplied PNG plus HANDOFF and profile geometry; actual fixture data may differ."
+    },
+    {
+      "id": "sc-reader-portrait--toc",
+      "board": "sc-reader-portrait",
+      "profile": "scribe",
+      "screen": "reader",
+      "landscape": false,
+      "reference": "screens/states/sc-reader-portrait--toc.png",
+      "recipe": "reader-toc",
+      "applicability": "applicable-subject-to-evidence-based-capability-bounds",
+      "capability_bound": null,
+      "intentional_difference": null,
+      "native_capture_required": true,
+      "assertions": [
+        "Default is menu open; closed reader follows artwork-only override.",
+        "78-pixel integrated header; 76-pixel tools; menu inset 48.",
+        "ToC six rows as two columns of three at 50 pixels, with 48 gap."
+      ],
+      "expected_physical_size": [
+        1860,
+        2480
+      ],
+      "expected_state": "Chapter/bookmark tabs, current chapter dot/progress, read/download state, profile-specific paginated rows.",
+      "review_basis": "Original supplied PNG plus HANDOFF and profile geometry; actual fixture data may differ."
+    },
+    {
+      "id": "sc-reader--default",
+      "board": "sc-reader",
+      "profile": "scribe",
+      "screen": "reader",
+      "landscape": true,
+      "reference": "screens/sc-reader.png",
+      "recipe": "reader-menu",
+      "applicability": "applicable",
+      "capability_bound": null,
+      "intentional_difference": null,
+      "native_capture_required": true,
+      "assertions": [
+        "Landscape reference is menu open, two 50-percent page allocations.",
+        "78-pixel integrated header with orientation lock; range progress; 76-pixel tools.",
+        "Menu content inset 120; ToC two columns of three 50-pixel rows."
+      ],
+      "expected_physical_size": [
+        2480,
+        1860
+      ],
+      "expected_state": "menu-open",
+      "review_basis": "Original supplied PNG plus HANDOFF and profile geometry; actual fixture data may differ."
+    },
+    {
+      "id": "sc-reader--fullscreen",
+      "board": "sc-reader",
+      "profile": "scribe",
+      "screen": "reader",
+      "landscape": true,
+      "reference": "screens/states/sc-reader--fullscreen.png",
+      "recipe": "reader-artwork-only",
+      "applicability": "applicable-subject-to-evidence-based-capability-bounds",
+      "capability_bound": null,
+      "intentional_difference": "Persistent reference bookmark ribbon is absent under the user override.",
+      "native_capture_required": true,
+      "assertions": [
+        "Landscape reference is menu open, two 50-percent page allocations.",
+        "78-pixel integrated header with orientation lock; range progress; 76-pixel tools.",
+        "Menu content inset 120; ToC two columns of three 50-pixel rows."
+      ],
+      "expected_physical_size": [
+        2480,
+        1860
+      ],
+      "expected_state": "Artwork-only reader under the user override; no app decoration or footer-cycle region.",
+      "review_basis": "Original supplied PNG plus HANDOFF and profile geometry; actual fixture data may differ."
+    },
+    {
+      "id": "sc-reader--image",
+      "board": "sc-reader",
+      "profile": "scribe",
+      "screen": "reader",
+      "landscape": true,
+      "reference": "screens/states/sc-reader--image.png",
+      "recipe": "reader-image",
+      "applicability": "applicable-subject-to-evidence-based-capability-bounds",
+      "capability_bound": null,
+      "intentional_difference": null,
+      "native_capture_required": true,
+      "assertions": [
+        "Landscape reference is menu open, two 50-percent page allocations.",
+        "78-pixel integrated header with orientation lock; range progress; 76-pixel tools.",
+        "Menu content inset 120; ToC two columns of three 50-pixel rows."
+      ],
+      "expected_physical_size": [
+        2480,
+        1860
+      ],
+      "expected_state": "Actual image preview, five contrast positions, refresh choices, dither capability/state and night option.",
+      "review_basis": "Original supplied PNG plus HANDOFF and profile geometry; actual fixture data may differ."
+    },
+    {
+      "id": "sc-reader--layout",
+      "board": "sc-reader",
+      "profile": "scribe",
+      "screen": "reader",
+      "landscape": true,
+      "reference": "screens/states/sc-reader--layout.png",
+      "recipe": "reader-layout",
+      "applicability": "applicable-subject-to-evidence-based-capability-bounds",
+      "capability_bound": null,
+      "intentional_difference": null,
+      "native_capture_required": true,
+      "assertions": [
+        "Landscape reference is menu open, two 50-percent page allocations.",
+        "78-pixel integrated header with orientation lock; range progress; 76-pixel tools.",
+        "Menu content inset 120; ToC two columns of three 50-pixel rows."
+      ],
+      "expected_physical_size": [
+        2480,
+        1860
+      ],
+      "expected_state": "Single/spread/auto, separate-cover toggle and whole/split spread treatment.",
+      "review_basis": "Original supplied PNG plus HANDOFF and profile geometry; actual fixture data may differ."
+    },
+    {
+      "id": "sc-reader--light",
+      "board": "sc-reader",
+      "profile": "scribe",
+      "screen": "reader",
+      "landscape": true,
+      "reference": "screens/states/sc-reader--light.png",
+      "recipe": "reader-light",
+      "applicability": "applicable-subject-to-evidence-based-capability-bounds",
+      "capability_bound": "hardware",
+      "intentional_difference": null,
+      "native_capture_required": true,
+      "assertions": [
+        "Landscape reference is menu open, two 50-percent page allocations.",
+        "78-pixel integrated header with orientation lock; range progress; 76-pixel tools.",
+        "Menu content inset 120; ToC two columns of three 50-pixel rows."
+      ],
+      "expected_physical_size": [
+        2480,
+        1860
+      ],
+      "expected_state": "Conditional frontlight/warmth sliders 0..24 and supported Scribe auto brightness.",
+      "review_basis": "Original supplied PNG plus HANDOFF and profile geometry; actual fixture data may differ."
+    },
+    {
+      "id": "sc-reader--mode",
+      "board": "sc-reader",
+      "profile": "scribe",
+      "screen": "reader",
+      "landscape": true,
+      "reference": "screens/states/sc-reader--mode.png",
+      "recipe": "reader-mode",
+      "applicability": "applicable-subject-to-evidence-based-capability-bounds",
+      "capability_bound": null,
+      "intentional_difference": null,
+      "native_capture_required": true,
+      "assertions": [
+        "Landscape reference is menu open, two 50-percent page allocations.",
+        "78-pixel integrated header with orientation lock; range progress; 76-pixel tools.",
+        "Menu content inset 120; ToC two columns of three 50-pixel rows."
+      ],
+      "expected_physical_size": [
+        2480,
+        1860
+      ],
+      "expected_state": "Four direction cards and crop/split controls; PW additionally has single/spread/auto layout.",
+      "review_basis": "Original supplied PNG plus HANDOFF and profile geometry; actual fixture data may differ."
+    },
+    {
+      "id": "sc-reader--more",
+      "board": "sc-reader",
+      "profile": "scribe",
+      "screen": "reader",
+      "landscape": true,
+      "reference": "screens/states/sc-reader--more.png",
+      "recipe": "reader-more",
+      "applicability": "applicable-subject-to-evidence-based-capability-bounds",
+      "capability_bound": null,
+      "intentional_difference": "Any legacy footer preference in More cannot restore closed-reader labels, ribbon, notification or an invisible footer-cycle hit region.",
+      "native_capture_required": true,
+      "assertions": [
+        "Landscape reference is menu open, two 50-percent page allocations.",
+        "78-pixel integrated header with orientation lock; range progress; 76-pixel tools.",
+        "Menu content inset 120; ToC two columns of three 50-pixel rows."
+      ],
+      "expected_physical_size": [
+        2480,
+        1860
+      ],
+      "expected_state": "Anchored menu with context-specific actions and truthful availability.",
+      "review_basis": "Original supplied PNG plus HANDOFF and profile geometry; actual fixture data may differ."
+    },
+    {
+      "id": "sc-reader--toc",
+      "board": "sc-reader",
+      "profile": "scribe",
+      "screen": "reader",
+      "landscape": true,
+      "reference": "screens/states/sc-reader--toc.png",
+      "recipe": "reader-toc",
+      "applicability": "applicable-subject-to-evidence-based-capability-bounds",
+      "capability_bound": null,
+      "intentional_difference": null,
+      "native_capture_required": true,
+      "assertions": [
+        "Landscape reference is menu open, two 50-percent page allocations.",
+        "78-pixel integrated header with orientation lock; range progress; 76-pixel tools.",
+        "Menu content inset 120; ToC two columns of three 50-pixel rows."
+      ],
+      "expected_physical_size": [
+        2480,
+        1860
+      ],
+      "expected_state": "Chapter/bookmark tabs, current chapter dot/progress, read/download state, profile-specific paginated rows.",
+      "review_basis": "Original supplied PNG plus HANDOFF and profile geometry; actual fixture data may differ."
+    },
+    {
+      "id": "sc-sources--default",
+      "board": "sc-sources",
+      "profile": "scribe",
+      "screen": "sources",
+      "landscape": false,
+      "reference": "screens/sc-sources.png",
+      "recipe": "sources-default",
+      "applicability": "applicable",
+      "capability_bound": null,
+      "intentional_difference": null,
+      "native_capture_required": true,
+      "assertions": [
+        "Separate manager keeps dock and back label.",
+        "400-pixel installed column; right column alone has ten-row pagination.",
+        "Add/list floats use 700-pixel declared width at top 250."
+      ],
+      "expected_physical_size": [
+        1860,
+        2480
+      ],
+      "expected_state": "default",
+      "review_basis": "Original supplied PNG plus HANDOFF and profile geometry; actual fixture data may differ."
+    },
+    {
+      "id": "sc-sources--add-source",
+      "board": "sc-sources",
+      "profile": "scribe",
+      "screen": "sources",
+      "landscape": false,
+      "reference": "screens/states/sc-sources--add-source.png",
+      "recipe": "sources-add-source",
+      "applicability": "applicable-subject-to-evidence-based-capability-bounds",
+      "capability_bound": "source-endpoint",
+      "intentional_difference": null,
+      "native_capture_required": true,
+      "assertions": [
+        "Separate manager keeps dock and back label.",
+        "400-pixel installed column; right column alone has ten-row pagination.",
+        "Add/list floats use 700-pixel declared width at top 250."
+      ],
+      "expected_physical_size": [
+        1860,
+        2480
+      ],
+      "expected_state": "Add-source panel with truthful endpoint/QR/wait state or direct URL entry.",
+      "review_basis": "Original supplied PNG plus HANDOFF and profile geometry; actual fixture data may differ."
+    },
+    {
+      "id": "sc-sources--source-lists",
+      "board": "sc-sources",
+      "profile": "scribe",
+      "screen": "sources",
+      "landscape": false,
+      "reference": "screens/states/sc-sources--source-lists.png",
+      "recipe": "sources-source-lists",
+      "applicability": "applicable-subject-to-evidence-based-capability-bounds",
+      "capability_bound": null,
+      "intentional_difference": null,
+      "native_capture_required": true,
+      "assertions": [
+        "Separate manager keeps dock and back label.",
+        "400-pixel installed column; right column alone has ten-row pagination.",
+        "Add/list floats use 700-pixel declared width at top 250."
+      ],
+      "expected_physical_size": [
+        1860,
+        2480
+      ],
+      "expected_state": "Actual source-list records with remove/add and profile-specific management action.",
+      "review_basis": "Original supplied PNG plus HANDOFF and profile geometry; actual fixture data may differ."
+    },
+    {
+      "id": "sc-sources--updates",
+      "board": "sc-sources",
+      "profile": "scribe",
+      "screen": "sources",
+      "landscape": false,
+      "reference": "screens/states/sc-sources--updates.png",
+      "recipe": "sources-updates",
+      "applicability": "applicable-subject-to-evidence-based-capability-bounds",
+      "capability_bound": null,
+      "intentional_difference": null,
+      "native_capture_required": true,
+      "assertions": [
+        "Separate manager keeps dock and back label.",
+        "400-pixel installed column; right column alone has ten-row pagination.",
+        "Add/list floats use 700-pixel declared width at top 250."
+      ],
+      "expected_physical_size": [
+        1860,
+        2480
+      ],
+      "expected_state": "Actual updatable source versions, per-row update and bulk update; preserve installed column on SC.",
+      "review_basis": "Original supplied PNG plus HANDOFF and profile geometry; actual fixture data may differ."
+    },
+    {
+      "id": "sc-search--default",
+      "board": "sc-search",
+      "profile": "scribe",
+      "screen": "search",
+      "landscape": false,
+      "reference": "screens/sc-search.png",
+      "recipe": "search-default",
+      "applicability": "applicable",
+      "capability_bound": null,
+      "intentional_difference": null,
+      "native_capture_required": true,
+      "assertions": [
+        "Immediate local library match while editing; no network search until submission.",
+        "Up to six covers per source after search, with source-grouped independent state.",
+        "Keyboard replaces dock; results restore dock."
+      ],
+      "expected_physical_size": [
+        1860,
+        2480
+      ],
+      "expected_state": "default",
+      "review_basis": "Original supplied PNG plus HANDOFF and profile geometry; actual fixture data may differ."
+    },
+    {
+      "id": "sc-search--results",
+      "board": "sc-search",
+      "profile": "scribe",
+      "screen": "search",
+      "landscape": false,
+      "reference": "screens/states/sc-search--results.png",
+      "recipe": "search-results",
+      "applicability": "applicable-subject-to-evidence-based-capability-bounds",
+      "capability_bound": null,
+      "intentional_difference": null,
+      "native_capture_required": true,
+      "assertions": [
+        "Immediate local library match while editing; no network search until submission.",
+        "Up to six covers per source after search, with source-grouped independent state.",
+        "Keyboard replaces dock; results restore dock."
+      ],
+      "expected_physical_size": [
+        1860,
+        2480
+      ],
+      "expected_state": "Source-grouped results, count/view-all, independent empty/timeout/retry state and restored dock.",
+      "review_basis": "Original supplied PNG plus HANDOFF and profile geometry; actual fixture data may differ."
+    },
+    {
+      "id": "sc-history--default",
+      "board": "sc-history",
+      "profile": "scribe",
+      "screen": "history",
+      "landscape": false,
+      "reference": "screens/sc-history.png",
+      "recipe": "history-default",
+      "applicability": "applicable",
+      "capability_bound": null,
+      "intentional_difference": null,
+      "native_capture_required": true,
+      "assertions": [
+        "Two equal record columns with 32 gap, 124-pixel rows and 72 x 98 covers.",
+        "Date groups span both columns and preserve chronological ordering.",
+        "Real progress/time, per-entry remove and pagination."
+      ],
+      "expected_physical_size": [
+        1860,
+        2480
+      ],
+      "expected_state": "default",
+      "review_basis": "Original supplied PNG plus HANDOFF and profile geometry; actual fixture data may differ."
+    },
+    {
+      "id": "sc-history--clear-confirm",
+      "board": "sc-history",
+      "profile": "scribe",
+      "screen": "history",
+      "landscape": false,
+      "reference": "screens/states/sc-history--clear-confirm.png",
+      "recipe": "history-clear-confirm",
+      "applicability": "applicable-subject-to-evidence-based-capability-bounds",
+      "capability_bound": null,
+      "intentional_difference": null,
+      "native_capture_required": true,
+      "assertions": [
+        "Two equal record columns with 32 gap, 124-pixel rows and 72 x 98 covers.",
+        "Date groups span both columns and preserve chronological ordering.",
+        "Real progress/time, per-entry remove and pagination."
+      ],
+      "expected_physical_size": [
+        1860,
+        2480
+      ],
+      "expected_state": "White outlined confirmation with equal cancel/clear actions and transparent outside capture.",
+      "review_basis": "Original supplied PNG plus HANDOFF and profile geometry; actual fixture data may differ."
+    },
+    {
+      "id": "sc-history--incognito",
+      "board": "sc-history",
+      "profile": "scribe",
+      "screen": "history",
+      "landscape": false,
+      "reference": "screens/states/sc-history--incognito.png",
+      "recipe": "history-incognito",
+      "applicability": "applicable-subject-to-evidence-based-capability-bounds",
+      "capability_bound": null,
+      "intentional_difference": null,
+      "native_capture_required": true,
+      "assertions": [
+        "Two equal record columns with 32 gap, 124-pixel rows and 72 x 98 covers.",
+        "Date groups span both columns and preserve chronological ordering.",
+        "Real progress/time, per-entry remove and pagination."
+      ],
+      "expected_physical_size": [
+        1860,
+        2480
+      ],
+      "expected_state": "Pressed incognito control and inverted application status bar; actual history policy.",
+      "review_basis": "Original supplied PNG plus HANDOFF and profile geometry; actual fixture data may differ."
+    },
+    {
+      "id": "sc-history--updates",
+      "board": "sc-history",
+      "profile": "scribe",
+      "screen": "history",
+      "landscape": false,
+      "reference": "screens/states/sc-history--updates.png",
+      "recipe": "history-updates",
+      "applicability": "applicable-subject-to-evidence-based-capability-bounds",
+      "capability_bound": null,
+      "intentional_difference": null,
+      "native_capture_required": true,
+      "assertions": [
+        "Two equal record columns with 32 gap, 124-pixel rows and 72 x 98 covers.",
+        "Date groups span both columns and preserve chronological ordering.",
+        "Real progress/time, per-entry remove and pagination."
+      ],
+      "expected_physical_size": [
+        1860,
+        2480
+      ],
+      "expected_state": "Grouped real chapter updates, queued/download state, heading change, bulk download and folio.",
+      "review_basis": "Original supplied PNG plus HANDOFF and profile geometry; actual fixture data may differ."
+    },
+    {
+      "id": "sc-settings--default",
+      "board": "sc-settings",
+      "profile": "scribe",
+      "screen": "settings",
+      "landscape": false,
+      "reference": "screens/sc-settings.png",
+      "recipe": "settings-screen-refresh",
+      "applicability": "applicable",
+      "capability_bound": null,
+      "intentional_difference": null,
+      "native_capture_required": true,
+      "assertions": [
+        "Fixed 320-pixel navigation column; right content padding 26 36 20.",
+        "Default is display/refresh; no list pager; 80-pixel dock.",
+        "46-pixel visual navigation rows, black current row, consistent form tokens."
+      ],
+      "expected_physical_size": [
+        1860,
+        2480
+      ],
+      "expected_state": "display-refresh",
+      "review_basis": "Original supplied PNG plus HANDOFF and profile geometry; actual fixture data may differ."
+    },
+    {
+      "id": "sc-settings--about",
+      "board": "sc-settings",
+      "profile": "scribe",
+      "screen": "settings",
+      "landscape": false,
+      "reference": "screens/states/sc-settings--about.png",
+      "recipe": "settings-about",
+      "applicability": "applicable-subject-to-evidence-based-capability-bounds",
+      "capability_bound": null,
+      "intentional_difference": null,
+      "native_capture_required": true,
+      "assertions": [
+        "Fixed 320-pixel navigation column; right content padding 26 36 20.",
+        "Default is display/refresh; no list pager; 80-pixel dock.",
+        "46-pixel visual navigation rows, black current row, consistent form tokens."
+      ],
+      "expected_physical_size": [
+        1860,
+        2480
+      ],
+      "expected_state": "Version/device/license/homepage data rows; actual values.",
+      "review_basis": "Original supplied PNG plus HANDOFF and profile geometry; actual fixture data may differ."
+    },
+    {
+      "id": "sc-settings--auto-update",
+      "board": "sc-settings",
+      "profile": "scribe",
+      "screen": "settings",
+      "landscape": false,
+      "reference": "screens/states/sc-settings--auto-update.png",
+      "recipe": "settings-auto-update",
+      "applicability": "applicable-subject-to-evidence-based-capability-bounds",
+      "capability_bound": null,
+      "intentional_difference": null,
+      "native_capture_required": true,
+      "assertions": [
+        "Fixed 320-pixel navigation column; right content padding 26 36 20.",
+        "Default is display/refresh; no list pager; 80-pixel dock.",
+        "46-pixel visual navigation rows, black current row, consistent form tokens."
+      ],
+      "expected_physical_size": [
+        1860,
+        2480
+      ],
+      "expected_state": "Off/daily/weekly selection and actual Wi-Fi/charging/completion conditions.",
+      "review_basis": "Original supplied PNG plus HANDOFF and profile geometry; actual fixture data may differ."
+    },
+    {
+      "id": "sc-settings--backup",
+      "board": "sc-settings",
+      "profile": "scribe",
+      "screen": "settings",
+      "landscape": false,
+      "reference": "screens/states/sc-settings--backup.png",
+      "recipe": "settings-backup",
+      "applicability": "applicable-subject-to-evidence-based-capability-bounds",
+      "capability_bound": null,
+      "intentional_difference": null,
+      "native_capture_required": true,
+      "assertions": [
+        "Fixed 320-pixel navigation column; right content padding 26 36 20.",
+        "Default is display/refresh; no list pager; 80-pixel dock.",
+        "46-pixel visual navigation rows, black current row, consistent form tokens."
+      ],
+      "expected_physical_size": [
+        1860,
+        2480
+      ],
+      "expected_state": "Backup/restore actions and actual dated backup rows or honest unavailable state.",
+      "review_basis": "Original supplied PNG plus HANDOFF and profile geometry; actual fixture data may differ."
+    },
+    {
+      "id": "sc-settings--categories",
+      "board": "sc-settings",
+      "profile": "scribe",
+      "screen": "settings",
+      "landscape": false,
+      "reference": "screens/states/sc-settings--categories.png",
+      "recipe": "settings-categories",
+      "applicability": "applicable-subject-to-evidence-based-capability-bounds",
+      "capability_bound": null,
+      "intentional_difference": null,
+      "native_capture_required": true,
+      "assertions": [
+        "Fixed 320-pixel navigation column; right content padding 26 36 20.",
+        "Default is display/refresh; no list pager; 80-pixel dock.",
+        "46-pixel visual navigation rows, black current row, consistent form tokens."
+      ],
+      "expected_physical_size": [
+        1860,
+        2480
+      ],
+      "expected_state": "Category counts, inline rename, immutable Uncategorized and add category.",
+      "review_basis": "Original supplied PNG plus HANDOFF and profile geometry; actual fixture data may differ."
+    },
+    {
+      "id": "sc-settings--download",
+      "board": "sc-settings",
+      "profile": "scribe",
+      "screen": "settings",
+      "landscape": false,
+      "reference": "screens/states/sc-settings--download.png",
+      "recipe": "settings-download",
+      "applicability": "applicable-subject-to-evidence-based-capability-bounds",
+      "capability_bound": null,
+      "intentional_difference": null,
+      "native_capture_required": true,
+      "assertions": [
+        "Fixed 320-pixel navigation column; right content padding 26 36 20.",
+        "Default is display/refresh; no list pager; 80-pixel dock.",
+        "46-pixel visual navigation rows, black current row, consistent form tokens."
+      ],
+      "expected_physical_size": [
+        1860,
+        2480
+      ],
+      "expected_state": "Prefetch count, resizing/grayscale switches and actual destination.",
+      "review_basis": "Original supplied PNG plus HANDOFF and profile geometry; actual fixture data may differ."
+    },
+    {
+      "id": "sc-settings--image",
+      "board": "sc-settings",
+      "profile": "scribe",
+      "screen": "settings",
+      "landscape": false,
+      "reference": "screens/states/sc-settings--image.png",
+      "recipe": "settings-image",
+      "applicability": "applicable-subject-to-evidence-based-capability-bounds",
+      "capability_bound": null,
+      "intentional_difference": null,
+      "native_capture_required": true,
+      "assertions": [
+        "Fixed 320-pixel navigation column; right content padding 26 36 20.",
+        "Default is display/refresh; no list pager; 80-pixel dock.",
+        "46-pixel visual navigation rows, black current row, consistent form tokens."
+      ],
+      "expected_physical_size": [
+        1860,
+        2480
+      ],
+      "expected_state": "Actual image preview, five contrast positions, refresh choices, dither capability/state and night option.",
+      "review_basis": "Original supplied PNG plus HANDOFF and profile geometry; actual fixture data may differ."
+    },
+    {
+      "id": "sc-settings--language",
+      "board": "sc-settings",
+      "profile": "scribe",
+      "screen": "settings",
+      "landscape": false,
+      "reference": "screens/states/sc-settings--language.png",
+      "recipe": "settings-language",
+      "applicability": "applicable-subject-to-evidence-based-capability-bounds",
+      "capability_bound": null,
+      "intentional_difference": null,
+      "native_capture_required": true,
+      "assertions": [
+        "Fixed 320-pixel navigation column; right content padding 26 36 20.",
+        "Default is display/refresh; no list pager; 80-pixel dock.",
+        "46-pixel visual navigation rows, black current row, consistent form tokens."
+      ],
+      "expected_physical_size": [
+        1860,
+        2480
+      ],
+      "expected_state": "Four interface language choices with trailing current checkmark.",
+      "review_basis": "Original supplied PNG plus HANDOFF and profile geometry; actual fixture data may differ."
+    },
+    {
+      "id": "sc-settings--light",
+      "board": "sc-settings",
+      "profile": "scribe",
+      "screen": "settings",
+      "landscape": false,
+      "reference": "screens/states/sc-settings--light.png",
+      "recipe": "settings-light",
+      "applicability": "applicable-subject-to-evidence-based-capability-bounds",
+      "capability_bound": "hardware",
+      "intentional_difference": null,
+      "native_capture_required": true,
+      "assertions": [
+        "Fixed 320-pixel navigation column; right content padding 26 36 20.",
+        "Default is display/refresh; no list pager; 80-pixel dock.",
+        "46-pixel visual navigation rows, black current row, consistent form tokens."
+      ],
+      "expected_physical_size": [
+        1860,
+        2480
+      ],
+      "expected_state": "Conditional frontlight/warmth sliders 0..24 and supported Scribe auto brightness.",
+      "review_basis": "Original supplied PNG plus HANDOFF and profile geometry; actual fixture data may differ."
+    },
+    {
+      "id": "sc-settings--logs",
+      "board": "sc-settings",
+      "profile": "scribe",
+      "screen": "settings",
+      "landscape": false,
+      "reference": "screens/states/sc-settings--logs.png",
+      "recipe": "settings-logs",
+      "applicability": "applicable-subject-to-evidence-based-capability-bounds",
+      "capability_bound": null,
+      "intentional_difference": null,
+      "native_capture_required": true,
+      "assertions": [
+        "Fixed 320-pixel navigation column; right content padding 26 36 20.",
+        "Default is display/refresh; no list pager; 80-pixel dock.",
+        "46-pixel visual navigation rows, black current row, consistent form tokens."
+      ],
+      "expected_physical_size": [
+        1860,
+        2480
+      ],
+      "expected_state": "Logging state with export/clear actions and actual operation status.",
+      "review_basis": "Original supplied PNG plus HANDOFF and profile geometry; actual fixture data may differ."
+    },
+    {
+      "id": "sc-settings--pen",
+      "board": "sc-settings",
+      "profile": "scribe",
+      "screen": "settings",
+      "landscape": false,
+      "reference": "screens/states/sc-settings--pen.png",
+      "recipe": "settings-actual-navigation-pen-absence",
+      "applicability": "applicable-subject-to-evidence-based-capability-bounds",
+      "capability_bound": "hardware",
+      "intentional_difference": "Pen input is not implemented. Capture actual navigation proving absent pen controls; do not programmatically force a hidden section or fabricate pen settings.",
+      "native_capture_required": true,
+      "assertions": [
+        "Fixed 320-pixel navigation column; right content padding 26 36 20.",
+        "Default is display/refresh; no list pager; 80-pixel dock.",
+        "46-pixel visual navigation rows, black current row, consistent form tokens."
+      ],
+      "expected_physical_size": [
+        1860,
+        2480
+      ],
+      "expected_state": "Pen/palm controls only when the runtime supports them.",
+      "review_basis": "Original supplied PNG plus HANDOFF and profile geometry; actual fixture data may differ."
+    },
+    {
+      "id": "sc-settings--power",
+      "board": "sc-settings",
+      "profile": "scribe",
+      "screen": "settings",
+      "landscape": false,
+      "reference": "screens/states/sc-settings--power.png",
+      "recipe": "settings-power",
+      "applicability": "applicable-subject-to-evidence-based-capability-bounds",
+      "capability_bound": null,
+      "intentional_difference": null,
+      "native_capture_required": true,
+      "assertions": [
+        "Fixed 320-pixel navigation column; right content padding 26 36 20.",
+        "Default is display/refresh; no list pager; 80-pixel dock.",
+        "46-pixel visual navigation rows, black current row, consistent form tokens."
+      ],
+      "expected_physical_size": [
+        1860,
+        2480
+      ],
+      "expected_state": "Wake/update/Wi-Fi policies, three screensaver choices and actual exit action.",
+      "review_basis": "Original supplied PNG plus HANDOFF and profile geometry; actual fixture data may differ."
+    },
+    {
+      "id": "sc-settings--reading",
+      "board": "sc-settings",
+      "profile": "scribe",
+      "screen": "settings",
+      "landscape": false,
+      "reference": "screens/states/sc-settings--reading.png",
+      "recipe": "settings-reading",
+      "applicability": "applicable-subject-to-evidence-based-capability-bounds",
+      "capability_bound": null,
+      "intentional_difference": null,
+      "native_capture_required": true,
+      "assertions": [
+        "Fixed 320-pixel navigation column; right content padding 26 36 20.",
+        "Default is display/refresh; no list pager; 80-pixel dock.",
+        "46-pixel visual navigation rows, black current row, consistent form tokens."
+      ],
+      "expected_physical_size": [
+        1860,
+        2480
+      ],
+      "expected_state": "Four default directions and per-title direction memory.",
+      "review_basis": "Original supplied PNG plus HANDOFF and profile geometry; actual fixture data may differ."
+    },
+    {
+      "id": "sc-settings--source-lists",
+      "board": "sc-settings",
+      "profile": "scribe",
+      "screen": "settings",
+      "landscape": false,
+      "reference": "screens/states/sc-settings--source-lists.png",
+      "recipe": "settings-source-lists",
+      "applicability": "applicable-subject-to-evidence-based-capability-bounds",
+      "capability_bound": null,
+      "intentional_difference": null,
+      "native_capture_required": true,
+      "assertions": [
+        "Fixed 320-pixel navigation column; right content padding 26 36 20.",
+        "Default is display/refresh; no list pager; 80-pixel dock.",
+        "46-pixel visual navigation rows, black current row, consistent form tokens."
+      ],
+      "expected_physical_size": [
+        1860,
+        2480
+      ],
+      "expected_state": "Actual source-list records with remove/add and profile-specific management action.",
+      "review_basis": "Original supplied PNG plus HANDOFF and profile geometry; actual fixture data may differ."
+    },
+    {
+      "id": "sc-settings--spread",
+      "board": "sc-settings",
+      "profile": "scribe",
+      "screen": "settings",
+      "landscape": false,
+      "reference": "screens/states/sc-settings--spread.png",
+      "recipe": "settings-spread",
+      "applicability": "applicable-subject-to-evidence-based-capability-bounds",
+      "capability_bound": null,
+      "intentional_difference": null,
+      "native_capture_required": true,
+      "assertions": [
+        "Fixed 320-pixel navigation column; right content padding 26 36 20.",
+        "Default is display/refresh; no list pager; 80-pixel dock.",
+        "46-pixel visual navigation rows, black current row, consistent form tokens."
+      ],
+      "expected_physical_size": [
+        1860,
+        2480
+      ],
+      "expected_state": "Landscape spread policy, whole/split spread and separate-cover preference.",
+      "review_basis": "Original supplied PNG plus HANDOFF and profile geometry; actual fixture data may differ."
+    },
+    {
+      "id": "sc-settings--storage",
+      "board": "sc-settings",
+      "profile": "scribe",
+      "screen": "settings",
+      "landscape": false,
+      "reference": "screens/states/sc-settings--storage.png",
+      "recipe": "settings-storage",
+      "applicability": "applicable-subject-to-evidence-based-capability-bounds",
+      "capability_bound": null,
+      "intentional_difference": null,
+      "native_capture_required": true,
+      "assertions": [
+        "Fixed 320-pixel navigation column; right content padding 26 36 20.",
+        "Default is display/refresh; no list pager; 80-pixel dock.",
+        "46-pixel visual navigation rows, black current row, consistent form tokens."
+      ],
+      "expected_physical_size": [
+        1860,
+        2480
+      ],
+      "expected_state": "Actual downloaded/cache/cover/free breakdown, largest records and targeted cleanup.",
+      "review_basis": "Original supplied PNG plus HANDOFF and profile geometry; actual fixture data may differ."
+    },
+    {
+      "id": "sc-settings--tap-zones",
+      "board": "sc-settings",
+      "profile": "scribe",
+      "screen": "settings",
+      "landscape": false,
+      "reference": "screens/states/sc-settings--tap-zones.png",
+      "recipe": "settings-tap-zones",
+      "applicability": "applicable-subject-to-evidence-based-capability-bounds",
+      "capability_bound": null,
+      "intentional_difference": null,
+      "native_capture_required": true,
+      "assertions": [
+        "Fixed 320-pixel navigation column; right content padding 26 36 20.",
+        "Default is display/refresh; no list pager; 80-pixel dock.",
+        "46-pixel visual navigation rows, black current row, consistent form tokens."
+      ],
+      "expected_physical_size": [
+        1860,
+        2480
+      ],
+      "expected_state": "Three diagram radio cards plus inversion and zone display preferences.",
+      "review_basis": "Original supplied PNG plus HANDOFF and profile geometry; actual fixture data may differ."
+    },
+    {
+      "id": "sc-settings--tracking-login",
+      "board": "sc-settings",
+      "profile": "scribe",
+      "screen": "settings",
+      "landscape": false,
+      "reference": "screens/states/sc-settings--tracking-login.png",
+      "recipe": "settings-tracking-login",
+      "applicability": "applicable-subject-to-evidence-based-capability-bounds",
+      "capability_bound": "authentication",
+      "intentional_difference": null,
+      "native_capture_required": true,
+      "assertions": [
+        "Fixed 320-pixel navigation column; right content padding 26 36 20.",
+        "Default is display/refresh; no list pager; 80-pixel dock.",
+        "46-pixel visual navigation rows, black current row, consistent form tokens."
+      ],
+      "expected_physical_size": [
+        1860,
+        2480
+      ],
+      "expected_state": "Actual authorization pending/account cards and sync/offline controls; no simulation.",
+      "review_basis": "Original supplied PNG plus HANDOFF and profile geometry; actual fixture data may differ."
+    }
+  ],
+  "worker": {
+    "transport": "ssh test-env",
+    "os": "Linux",
+    "source_root": "/root/aidoku-phase3/source",
+    "build_target": "/root/aidoku-build/target",
+    "capture": "real native Slint software-renderer window snapshot via --capture and --actions",
+    "local_execution": "forbidden",
+    "run_authorization": "Root must freeze a candidate and issue GO before any build, app or verification run"
+  },
+  "entrypoint": "scripts/verify-handoff-ui.py",
+  "required_arguments": [
+    "--round",
+    "--output",
+    "--binary",
+    "--reference-root"
+  ],
+  "provenance": {
+    "binary": "SHA256 before and after each native case; expected hash supported",
+    "source": "Canonical sorted relative file records {path,bytes,sha256}; hash canonical compact ASCII JSON with sorted object keys. Includes existing Cargo.toml, Cargo.lock, build.rs, rust-toolchain.toml, .cargo/config.toml plus all files recursively in src, ui, assets, vendor, examples. Excludes docs/review, scripts and capture output.",
+    "references": "Original supplied PNG SHA256 and original geometry",
+    "freshness": "Unique run id and brand-new data root in every round; no screenshot or state sidecar reuse",
+    "evidence": [
+      "original application PNG",
+      "application state sidecar",
+      "application capture metadata sidecar",
+      "action JSON",
+      "stdout log",
+      "fixture operation evidence",
+      "per-case mechanical checks"
+    ],
+    "capture_settlement": "Every native invocation passes --capture-settle-covers. At the deadline the application permits up to 15 seconds for cover worker/queue and throttled UI projection to settle. Both cover_work_pending and capture_projection_pending must be false; real failure/backoff placeholders remain explicit. Active download jobs are not a condition to wait until completion.",
+    "reader_commit_tail": "Every Reader capture that requires settled artwork, including open control surfaces after a geometry change, uses a bounded final idle tail of at least 5000ms. Explicit loading/inflight evidence retains its original intent. busy=false, frame identity and whole-viewport zero-pixel assertions are never relaxed; waiting in a development build is not a performance improvement.",
+    "reader_content_validation": "Committed closed-reader source pages may be entirely white or light gray. Their actual source identity plus strict whole-viewport zero-pixel composition replace the inapplicable generic dark-ink quota; all such normal closed frames automatically receive the oracle. Non-reader and open-reader UI content checks remain in force."
+  },
+  "truthful_boundaries": [
+    "Closed readers are artwork only in all profiles, including overridden fullscreen-footer references. Exact processed-image comparison must include every pixel.",
+    "Desktop capability declarations are recorded; frontlight, warmth, sensor, pen and waveform effects are not fabricated. Missing hardware panels record the reachable real fallback or unavailable entry.",
+    "External tracking authorization is not simulated. Capture actual disabled or external-configuration entry and retain an intentional difference.",
+    "Source QR or endpoint states must be backed by an actual application endpoint; no static QR or completion injection.",
+    "Queue rows are created through actual download actions against a loopback Komga fixture with real image bytes, worker lifecycle and database/cache evidence. No inserted fake job progress.",
+    "Demo fixture content is identified as demo data; no artificial logged-in, connected or completed state is seeded.",
+    "Original native screenshots are retained unchanged; no HTML redraw, screenshot repainting, compositing or visual correction is allowed."
+  ],
+  "supplemental_groups": [
+    {
+      "id": "all-settings-sections",
+      "profiles": [
+        "pw5",
+        "scribe"
+      ],
+      "coverage": "Open all 18 declared sections, including capability absence; capture list boundaries and section details.",
+      "scope_case_ids": [
+        "all-settings-sections",
+        "truthful-hardware"
+      ],
+      "artifact_id_pattern": "<profile>--all-settings-sections-* plus per-operation cases in manifest.json"
+    },
+    {
+      "id": "library-sort-and-tristate",
+      "profiles": [
+        "pw5",
+        "scribe"
+      ],
+      "coverage": "All eight sort identifiers, both directions, downloaded/unread/tracked/completed include-exclude-clear cycles and persisted state.",
+      "scope_case_ids": [
+        "library-actions"
+      ],
+      "artifact_id_pattern": "<profile>--library-sort-and-tristate-* plus per-operation cases in manifest.json"
+    },
+    {
+      "id": "catalog-filter-and-source-tabs",
+      "profiles": [
+        "pw5",
+        "scribe"
+      ],
+      "coverage": "Real loaded tags cycle neutral/include/exclude; enabled sorts and statuses; reset/apply; installed/available/update/language/source picker and declared preferences.",
+      "scope_case_ids": [
+        "source-capability"
+      ],
+      "artifact_id_pattern": "<profile>--catalog-filter-and-source-tabs-* plus per-operation cases in manifest.json"
+    },
+    {
+      "id": "keyboard-and-search",
+      "profiles": [
+        "pw5",
+        "scribe"
+      ],
+      "coverage": "Pinyin composition/candidate page/commit, English/shift/numbers/space/backspace/clear/cancel, scopes/local matches; actual loopback success/empty/HTTP failure/real client timeout/retry/retrying, independent early results, view-all and actual pagination.",
+      "scope_case_ids": [
+        "keyboard-modes",
+        "search-concurrency"
+      ],
+      "artifact_id_pattern": "<profile>--keyboard-and-search-* plus per-operation cases in manifest.json"
+    },
+    {
+      "id": "list-and-detail-boundaries",
+      "profiles": [
+        "pw5",
+        "scribe"
+      ],
+      "coverage": "Library, catalog, chapters, history, source manager and settings first/last/one-page boundaries; actual row membership, counts, stable edge allocation and folio jump/outside dismissal; detail collapsed page two; actual selection/all-page/category/read/download/remove operations.",
+      "scope_case_ids": [
+        "folio-boundaries",
+        "detail-boundaries",
+        "library-actions"
+      ],
+      "artifact_id_pattern": "<profile>--list-and-detail-boundaries-* plus per-operation cases in manifest.json"
+    },
+    {
+      "id": "reader-input-and-pure-scene",
+      "profiles": [
+        "pw5",
+        "scribe-portrait",
+        "scribe-landscape"
+      ],
+      "coverage": "33/34/33 ordinary and effective-spread 30/40/30 threshold taps; RTL/LTR/reversal; top/center/bottom vertical input; actual tall CBZ 85-percent steps; first/last and real odd final spread; next chapter; seek preview before release and actual commit; ToC/bookmark tabs and pagination; persisted progress/bookmarks; image-processing cache invalidation; orientation return; full-viewport artwork oracle across footer modes and resume.",
+      "scope_case_ids": [
+        "reader-input",
+        "reader-pure-scene",
+        "reader-boundaries",
+        "orientation-return"
+      ],
+      "artifact_id_pattern": "<profile>--reader-input-and-pure-scene-* plus per-operation cases in manifest.json"
+    },
+    {
+      "id": "real-download-lifecycle",
+      "profiles": [
+        "pw5",
+        "scribe"
+      ],
+      "coverage": "Actual loopback jobs queue, progress, pause/resume/cancel and completed removal; database jobs and image files inspected without falsifying state.",
+      "scope_case_ids": [
+        "library-actions",
+        "detail-boundaries",
+        "history-operation"
+      ],
+      "artifact_id_pattern": "<profile>--real-download-lifecycle-* plus per-operation cases in manifest.json"
+    },
+    {
+      "id": "truthful-source-and-migration",
+      "profiles": [
+        "pw5",
+        "scribe"
+      ],
+      "coverage": "Unconfigured/blocked/server configuration, real loopback connection probe, secret masking, migration candidates/options/cancel and actual result when reachable.",
+      "scope_case_ids": [
+        "source-capability",
+        "truthful-hardware"
+      ],
+      "artifact_id_pattern": "<profile>--truthful-source-and-migration-* plus per-operation cases in manifest.json"
+    },
+    {
+      "id": "content-stress",
+      "profiles": [
+        "pw5",
+        "scribe"
+      ],
+      "coverage": "Actual long book/source/chapter titles, long description, 32 dense tags, 25 configured real loopback source records and pagination; empty/offline/failure states; custom category creation/rename remains explicitly unavailable where not implemented.",
+      "scope_case_ids": [
+        "content-stress"
+      ],
+      "artifact_id_pattern": "<profile>--content-stress-* plus per-operation cases in manifest.json"
+    },
+    {
+      "id": "history-operation",
+      "profiles": [
+        "pw5",
+        "scribe"
+      ],
+      "scope_case_ids": [
+        "history-operation"
+      ],
+      "artifact_id_pattern": "<profile>--history-* and <profile>--incognito-*",
+      "coverage": "Real chronology/date/time/progress rows; actual per-entry deletion, clear apply and cancel, updates and download states; global incognito policy leaves durable rows unchanged and survives restart."
+    },
+    {
+      "id": "profile-stretch",
+      "profiles": [
+        "pw6",
+        "scribe3"
+      ],
+      "scope_case_ids": [
+        "content-stress"
+      ],
+      "artifact_id_pattern": "<profile>--stretch-*",
+      "coverage": "Capture all eight top-level routes at each distinct native viewport. Original screenshot dimensions must remain unchanged."
+    },
+    {
+      "id": "truthful-hardware",
+      "profiles": [
+        "pw5",
+        "scribe",
+        "scribe3-nofrontlight"
+      ],
+      "scope_case_ids": [
+        "truthful-hardware"
+      ],
+      "artifact_id_pattern": "capability--*",
+      "coverage": "Record actual profile controls and runtime backend. No-frontlight hides dependent entries/tools; pen and external auth remain absent/unavailable; manual orientation remains applicable independently of sensor-follow."
+    },
+    {
+      "id": "performance-and-resume",
+      "profiles": [
+        "Root-managed native/performance artifacts"
+      ],
+      "scope_case_ids": [
+        "performance-and-resume"
+      ],
+      "owner": "Root with phase3_native_validation and phase3_jobs/performance owners",
+      "artifact_id_pattern": "External evidence manifest references exact Root artifact path and SHA256",
+      "coverage": [
+        "visible-cover-work",
+        "processed-cache-reuse",
+        "distinct-download-usage",
+        "coalesced-queue-pressure",
+        "retained-artwork-sleep-wake"
+      ],
+      "execution": "Linked external evidence; this capture harness does not duplicate native VM ownership or benchmark execution."
+    }
+  ],
+  "review": {
+    "required": "Independent manual comparison of every applicable matrix capture and every generated supplemental capture",
+    "clean_round_streak": 0,
+    "completed_rounds": [],
+    "criterion": "Two consecutive fresh complete rounds on identical production source, binary and reference hashes, zero new actionable suggestions and zero unresolved actionable findings. Any production change resets the streak.",
+    "no_automatic_acceptance": "Automated assertions and screenshot counts cannot establish visual acceptance.",
+    "matrix_only_ineligible": "A 101-image matrix-only run never completes required supplemental groups and cannot count as a clean round.",
+    "external_evidence_contract": "review-template.external_evidence requires scope_case_id, owner, artifact absolute path, artifact sha256, matching production source_sha256, passed boolean and coverage array. Root native/performance evidence must cover all five declared performance-and-resume items before a clean complete round is counted.",
+    "retry_provenance": "A failed original capture remains immutable and retains its failure result. Fresh diagnostic retries use a separate output/run id, preserve strict assertions and never retroactively convert an incomplete or failed full round into a clean round. --reader-vertical-case selects a bounded standalone retry and is always partial."
+  },
+  "profile_mapping": [
+    {
+      "profile": "pw5",
+      "role": "exact handoff Paperwhite canvas",
+      "native_capture_size": [
+        618,
+        824
+      ],
+      "expected_physical_size": [
+        1236,
+        1648
+      ],
+      "reference_scale": 2
+    },
+    {
+      "profile": "scribe",
+      "orientation": "portrait",
+      "role": "exact handoff Scribe portrait canvas",
+      "native_capture_size": [
+        930,
+        1240
+      ],
+      "expected_physical_size": [
+        1860,
+        2480
+      ],
+      "reference_scale": 2
+    },
+    {
+      "profile": "scribe",
+      "orientation": "landscape",
+      "role": "exact handoff Scribe landscape reader canvas",
+      "native_capture_size": [
+        1240,
+        930
+      ],
+      "expected_physical_size": [
+        2480,
+        1860
+      ],
+      "reference_scale": 2
+    },
+    {
+      "profile": "pw6",
+      "role": "distinct native stretch capture; never resized to impersonate an exact reference",
+      "native_capture_size": [
+        632,
+        840
+      ],
+      "expected_physical_size": [
+        1264,
+        1680
+      ]
+    },
+    {
+      "profile": "scribe3",
+      "role": "distinct native stretch capture; never resized to impersonate an exact reference",
+      "native_capture_size": [
+        990,
+        1320
+      ],
+      "expected_physical_size": [
+        1980,
+        2640
+      ]
+    },
+    {
+      "profile": "scribe3-nofrontlight",
+      "role": "actual missing frontlight and warmth profile",
+      "native_capture_size": [
+        990,
+        1320
+      ],
+      "expected_physical_size": [
+        1980,
+        2640
+      ]
+    }
+  ],
+  "reference_only_support": [
+    {
+      "file": "screens/cover.png",
+      "role": "component",
+      "inspection": "reference-only or embedded component inspection; never a fabricated application route"
+    },
+    {
+      "file": "screens/nav-pw.png",
+      "role": "component",
+      "inspection": "reference-only or embedded component inspection; never a fabricated application route"
+    },
+    {
+      "file": "screens/dock-sc.png",
+      "role": "component",
+      "inspection": "reference-only or embedded component inspection; never a fabricated application route"
+    },
+    {
+      "file": "screens/pager.png",
+      "role": "component",
+      "inspection": "reference-only or embedded component inspection; never a fabricated application route"
+    },
+    {
+      "file": "screens/spec-foundation.png",
+      "role": "specification",
+      "inspection": "reference-only or embedded component inspection; never a fabricated application route"
+    },
+    {
+      "file": "screens/spec-interaction.png",
+      "role": "specification",
+      "inspection": "reference-only or embedded component inspection; never a fabricated application route"
+    },
+    {
+      "file": "screens/pager-options.png",
+      "role": "rejected-alternatives-reference",
+      "inspection": "reference-only or embedded component inspection; never a fabricated application route"
+    },
+    {
+      "file": "overview-paperwhite.png",
+      "role": "overview",
+      "inspection": "reference-only or embedded component inspection; never a fabricated application route"
+    },
+    {
+      "file": "overview-scribe.png",
+      "role": "overview",
+      "inspection": "reference-only or embedded component inspection; never a fabricated application route"
+    }
+  ],
+  "non_exported_state_basis": [
+    {
+      "state": "pw-settings--tracking",
+      "basis": "HANDOFF plus pw-settings prototype; no independent PNG exists."
+    },
+    {
+      "state": "sc-search--numbers",
+      "basis": "Keyboard contract plus PW numeric reference; no independent SC PNG exists."
+    },
+    {
+      "state": "sc-reader--fullscreen-footer",
+      "basis": "No independent landscape footer PNG exists; closed-footer behavior is user-overridden in any case."
+    },
+    {
+      "state": "PW settings sections other than display and power",
+      "basis": "HANDOFF content and PW secondary-page contract; no exact screenshot for each section."
+    },
+    {
+      "state": "Empty/offline/long-content and operational variants",
+      "basis": "HANDOFF and behavior rules; no claim of an independently exported per-state pixel reference."
+    }
+  ],
+  "partial_diagnostic_default_ids": [
+    "Main--default",
+    "pw-manga--default",
+    "pw-reader--default",
+    "pw-browse--default",
+    "pw-source--default",
+    "pw-search--default",
+    "pw-history--default",
+    "pw-settings--default",
+    "sc-library--default",
+    "sc-manga--default",
+    "sc-browse--default",
+    "sc-reader-portrait--default",
+    "sc-reader--default",
+    "sc-sources--default",
+    "sc-search--default",
+    "sc-history--default",
+    "sc-settings--default"
+  ],
+  "c4_revision": {
+    "baseline": "C3 reference scope and all 21 required supplemental groups are preserved.",
+    "product_candidate": {
+      "source_sha256": "dc0cd6227768a5125ecf702982ce639789bc8bca390de82bab83329927ea6353",
+      "binary_sha256": "7c2f685ecafc7207446f0e75877b74d14cbc6e41a43f5accee8ae992256e3183",
+      "file_count": 225
+    },
+    "preparation_only": true,
+    "no_local_verification": true,
+    "baseline_case_count": 478,
+    "estimated_full_case_count": "550-552; native content-aware tag columns determine the exact count, with a conservative ceiling of 556.",
+    "expected_data_bytes": "Approximately 1.4 GiB fresh data plus about 0.2 GiB original evidence; reserve at least 2.0 GiB free before a complete run.",
+    "required_rounds": "Two consecutive fresh complete rounds on unchanged source, binary, harness, helpers, plan and references; complete manual review and Root external evidence remain mandatory.",
+    "helper": "scripts/handoff_c4_business.py",
+    "capture_gaps": [
+      {
+        "id": "P3R1-C01",
+        "coverage": "Existing five PW language cases now explicitly select Available; native chips and actual result/empty rows must be reviewed. Scribe original coverage is retained."
+      },
+      {
+        "id": "P3R1-C02",
+        "coverage": "Existing pause/resume/cancel captures locate the actual affected job row on its real rowid-based queue page; paused/cancelled IDs must be present in the visible model and raw native screenshot."
+      },
+      {
+        "id": "P3R1-C10",
+        "coverage": "Two focused dense-installed-last captures use sources/installed-page and prove actual final Installed membership; Available folios cannot substitute."
+      },
+      {
+        "id": "P3R1-C11",
+        "coverage": "Keep C3 original failed run a1baf3fe3dc2 and separate retry e57768d5b3ea immutable. New committed-reader captures retain a bounded 5000ms tail, strict busy/inflight/identity and full-viewport zero-pixel assertions; no performance improvement is inferred."
+      }
+    ],
+    "focused_contracts": [
+      {
+        "id": "reader-capabilities",
+        "groups": [
+          "reader-input-and-pure-scene"
+        ],
+        "scope": "Real L-shaped and swipe-only pointers in PW/Scribe; independent reversal and legacy reversed compatibility; visible reverse-270 controls, canonical desktop pure raster, restore/wake/return; separate-cover [1] -> [2,3] -> [4,5] -> previous/seek, original checkpoint preservation and restore. Distinct real CBZ page pixels identify the expected source pages, including prefetched frames. Existing actual single final full-width allocations remain valid; no half-slot is forced."
+      },
+      {
+        "id": "book-cleanup-and-storage",
+        "groups": [
+          "all-settings-sections:scribe"
+        ],
+        "scope": "One real Suwayomi loopback fixture downloads six actual books through identical provider page URLs, creating genuine shared pins; real reader cache/cover artifacts and a real local CBZ supplement it. Native More/confirm/cancel/active cleanup/noop/local-protection and Storage loading/ready/top-five/management/after-cleanup are captured. Actor completion is accepted only from finalized BookRemovalFinished RAM evidence. Independent canonical file sizes/pins/other-book flags/local hashes verify protection without pretending every raw cache file is deleted."
+      },
+      {
+        "id": "blocked-origin-selection",
+        "groups": [
+          "truthful-source-and-migration"
+        ],
+        "scope": "Independent real origin and target providers; 17 books are actually browsed/favorited, origin reading is real, cache clearing is an actual action, and only the source configuration is disabled. Empty/last/cancel selectors and a chosen final origin enter the existing real target migration. Origin request deltas must remain exactly empty, including cold cover handling."
+      },
+      {
+        "id": "all-source-scopes",
+        "groups": [
+          "real-http-search",
+          "content-stress"
+        ],
+        "scope": "Native pixel-observed More chips open real bounded four-source and 25-source pickers. Last-source choice and typing cancel retain actual text/composition/mode and do not submit new HTTP. View all must show actual cards, persist real HTTP verification, and respond to a real cover tap; separately cached unverified records remain visible without fabricated connection."
+      },
+      {
+        "id": "visible-closure-evidence",
+        "groups": [
+          "catalog-filter-and-source-tabs",
+          "content-stress",
+          "all-settings-sections"
+        ],
+        "scope": "Empty source settings have real native outlines and explanatory controls; update transitions use actual source rows; demo refresh states are truthful; Storage in demo mode independently measures files. TagFlow columns are observed from native chip outlines, all real page members are clicked and checked continuously to the actual final page. Original PNGs are never repainted or normalized."
+      }
+    ],
+    "external_guards": [
+      "performance-and-resume: visible-cover-work, processed-cache-reuse, distinct-download-usage, coalesced-queue-pressure, retained-artwork-sleep-wake",
+      "independent-live-reader-lease: supported single-App process contract; a genuine held CacheLease object shared through the in-process REGISTRY with independent CacheManager/download-worker instances. Root exact C4 PASS/log/artifact/source hash evidence is required. No fabricated SQL owner, second GUI process, or cross-process product guarantee is required or claimed.",
+      "native-reverse-rotation-mapping: Root-owned native framebuffer/evdev rotation evidence; desktop snapshots retain canonical logical pixels"
+    ],
+    "diagnostic_subsets": [
+      {
+        "argument": "--subset c4-reader",
+        "scope": "New Reader capabilities only, including distinct-cover fixture; approximately 27 captures."
+      },
+      {
+        "argument": "--subset c4-book-storage",
+        "scope": "Combined real book cleanup and Storage fixture; 11 final captures and 4 prerequisites."
+      },
+      {
+        "argument": "--subset c4-migration",
+        "scope": "PW/Scribe blocked-origin bounded selectors and actual target migration; approximately 16 captures."
+      },
+      {
+        "argument": "--subset c4-search",
+        "scope": "Real search/view-all/verification/four-source overflow plus existing independent outcomes on both profiles."
+      },
+      {
+        "argument": "--subset c4-content",
+        "scope": "Dense Installed boundaries, 25-source typing overflow, content-aware real tag pagination and content stress on both profiles."
+      },
+      {
+        "argument": "--subset c4-queue-language",
+        "scope": "PW Available language chips and actual affected queue rows on both profiles."
+      },
+      {
+        "argument": "--reader-vertical-case scribe-portrait --settled-reader-tail-ms 5000",
+        "scope": "Single fresh C11 settled-reader qualification; always partial."
+      },
+      {
+        "argument": "--subset c4-reader-retry",
+        "scope": "Freshly qualify only the two preserved reader-control/bright-artwork harness failures, with one real CBZ prerequisite. Never overwrite or reclassify the original failed qualification."
+      }
+    ],
+    "diagnostic_status": "Every subset is partial and deliberately retains exit/status gates preventing complete or clean-round claims.",
+    "preserved_c4_r1_attempt": {
+      "run_id": "0c9ecf3777c9",
+      "manifest_sha256": "d2a6a5fae352a79bd6ee82076524bf3a25afb62f8bfa822abbfa42d0fbe49ba0",
+      "executed_main_sha256": "5e6f546b7abec0a377e53feafe3afe1e6c6d3259da2699b75f1c4fe44529d5e5",
+      "records": 526,
+      "passed": 516,
+      "failed": 10,
+      "complete_capture_suite": false,
+      "clean_round": false,
+      "originals_unchanged": true,
+      "reason": "Six original frames failed two harness recipe/observation checks and four groups aborted. Retain every original result and the natural-driver native-isolation pause/resume record; separate fresh qualification never rewrites this attempt."
+    },
+    "narrow_recipe_corrections": [
+      "Changing a server endpoint intentionally clears the current catalog. The cached-unverified scenario now performs an ordinary offline sources/open after saving, and still requires real cached cards, false verification and exactly zero new HTTP.",
+      "Source More hit rectangles are observed as full connected native control outlines, including their antialiased edge pixels, instead of a brittle single scan line. The required complete control count and actual pointer-driven picker/result/input assertions are unchanged; no hidden semantic fallback is permitted.",
+      "The same complete-outline observation is used for content-aware tag chips. A one-pixel row can legitimately fall inside a thin native border and is not a valid absence test. Actual native chip rectangles establish first-row columns; every subsequent real page member is still clicked and checked for continuous unique identities through the actual final page."
+    ]
+  },
+  "c5_revision": {
+    "baseline": "Retain all 101 reference states, the 21 required supplemental groups and every original C4 failure. C5 adds nineteen fixed native control and route captures to each complete fresh round.",
+    "product_candidate": {
+      "source_root": "/root/aidoku-phase3/source",
+      "source_sha256": "892f0ac73a807e4fd61a235d9ad4fe00c4f03c1e4e6881f28b2dd8bee2b7ddf1",
+      "binary": "/root/aidoku-phase3/candidate5/desktop/aidoku",
+      "binary_sha256": "9bd66a1f89473218e67558f763a4a7d4da7c642f9960ae5430ceb74ac365129b",
+      "file_count": 227
+    },
+    "preparation_only": true,
+    "no_local_verification": true,
+    "output_root": "/root/aidoku-phase3/evidence/candidate5",
+    "fresh_data_contract": "Every run creates output/data/<new-run-id>. No previous app data, native PNG or successful result is reused for another full round.",
+    "estimated_full_capture_count": "Approximately 581. The exact native TagFlow column count determines a fixed per-candidate total; every actual tag page receives an original observation and a separate real pointer replay. No required branch is shortened to meet this estimate.",
+    "required_rounds": "Two complete fresh rounds on identical product, tools, helpers, plan, references and required review IDs. Full independent manual review and Root-owned external evidence remain mandatory.",
+    "helpers": [
+      "scripts/handoff_c4_business.py",
+      "scripts/handoff_c5_ui.py",
+      "scripts/handoff_c5_reader.py"
+    ],
+    "required_fixed_control_case_ids": [
+      "pw5--c5-about-license-entry",
+      "pw5--c5-license-first",
+      "pw5--c5-license-last",
+      "scribe--c5-about-license-entry",
+      "scribe--c5-license-first",
+      "scribe--c5-license-last",
+      "scribe--c5-license-return",
+      "pw5--c5-empty-history-body",
+      "pw5--c5-empty-history-library",
+      "scribe--c5-empty-history-body",
+      "scribe--c5-empty-history-browse",
+      "scribe--c5-orientation-portrait-automatic",
+      "scribe--c5-orientation-landscape-automatic",
+      "scribe--c5-orientation-landscape-single",
+      "scribe--c5-orientation-landscape-vertical",
+      "pw5--c5-cold-reader-no-catalog",
+      "pw5--c5-cold-reader-to-browse",
+      "scribe--c5-cold-management-no-catalog",
+      "scribe--c5-cold-management-to-browse"
+    ],
+    "qualification": {
+      "argument": "--subset c5-ui",
+      "expected_actual_captures": 38,
+      "maximum_actual_captures": 40,
+      "always_partial": true,
+      "expected_exit_code_when_all_selected_cases_pass": 1,
+      "scope": [
+        "Six unchanged reference recipes inspect Paperwhite More, both neutral catalog filter triggers, Scribe captions and the actual fixed-on chapter refresh surface.",
+        "Eleven fixed license and empty-history body-action captures inspect actual visible controls, source-bound license first/final pages and real pointer navigation.",
+        "Eight fixed orientation and cold Demo route captures inspect actual/prospective spread semantics and genuinely lazy catalog population.",
+        "Eight existing Scribe real-migration captures include actual origin browsing/favoriting, empty/final/cancel selectors, all three real title hints, selection and committed migration.",
+        "Five Scribe intrinsic-tag qualification captures include a fresh real provider seed, actual HTTP metadata, observed first/final native chip outlines and real pointer selection of those page identities. Intermediate pages remain required in each complete round."
+      ],
+      "reference_case_ids": [
+        "Main--more",
+        "pw-source--filter",
+        "sc-browse--default",
+        "sc-browse--filter",
+        "pw-settings--display",
+        "sc-settings--default"
+      ],
+      "runtime_budget": "Each isolated native process retains the existing 90-second limit. Settled Reader cases retain a bounded 5000ms final tail and strict identity checks. This is functional qualification, not performance timing.",
+      "resource_gate": "Wait for the final-validation owner to release the authorized desktop window after the independent Native cold Reader sample. Static preparation does not authorize an App start."
+    },
+    "full_scope_mapping": [
+      {
+        "contracts": ["C4-C5-G02", "C4-C5-G18", "P3R1-G43"],
+        "group": "all-settings-sections:<profile>",
+        "artifact_ids": "handoff_c5_ui.CASE_IDS: eleven fixed PW/Scribe native states",
+        "requirements": "Observe the actual outlined About View control and click its measured native surface. Inspect real GPL first/final text boundaries, unchanged raw license SHA and non-book summary rendering; close returns to About. Observe the actual two body CTA surfaces in an empty History and click Library on PW or Browse on Scribe. Dock navigation or semantic action substitution cannot satisfy this capture."
+      },
+      {
+        "contracts": ["C4-C5-G12", "C5-COLD-DEMO-ROUTES"],
+        "group": "reader-input-and-pure-scene",
+        "artifact_ids": "handoff_c5_reader.CASE_IDS: eight fixed orientation and cold-route states",
+        "requirements": "Open the actual orientation panel in portrait automatic, landscape automatic, landscape single and landscape vertical modes. Compare reader_landscape_spread with actual reader_effective/displayed spread and inspect original dynamic label/seam pixels. Cold Reader and Sources management must have catalog_count=0; ordinary PW source opening and Scribe sources/back must produce actual Browse records with catalog_count=128. Closed Reader retains the exact whole-viewport artwork oracle."
+      },
+      {
+        "contracts": ["C4-C5-G19", "P3R1-G45"],
+        "groups": ["truthful-source-and-migration:pw5", "truthful-source-and-migration:scribe"],
+        "artifact_ids": "<profile>--real-migration--{fixture-seed,origin-library,origin-empty,origin-selector-last,origin-selector-cancel,candidates,selected,committed}",
+        "requirements": "Preserve the existing eight captures per profile. An independent real HTTP target supplies exact, near and unrelated titles. The three actual candidate status fields are distinct title-only classifications, every subtitle retains its real chapter count, and Start is disabled until a real candidate is selected. Scribe final selector has a complete native frame including its last folio. No content/chapters match score is invented."
+      },
+      {
+        "contracts": ["C4-C5-G03", "C4-C5-G04", "C4-C5-G05"],
+        "groups": ["content-stress:pw5", "content-stress:scribe"],
+        "artifact_ids": "<profile>--content-stress--filter-tags-first and --filter-tag-page-<actual-page>[-observe]",
+        "requirements": "Every actual page is first captured unchanged; complete intrinsic-width chip outlines determine real pointer hits in a separate replay. Require exact ordered selected IDs for every page, continuous coverage of the entire real metadata tag collection exactly once, and the actual final page. Equal-cell center calculations and hidden semantic fallback are forbidden. Extra observations are prerequisites retained with full provenance."
+      },
+      {
+        "contracts": ["C4-ACCEPT-04", "P06"],
+        "group": "existing reference matrix and all-settings-sections",
+        "artifact_ids": "pw-settings--display and sc-settings--default",
+        "requirements": "Inspect actual black on-track and gray right-hand disabled knob pixels plus readable Fixed on wording. This is the real chapter full-refresh policy, not a new editable preference or hardware qualification."
+      }
+    ],
+    "mechanical_acceptance": "A complete suite additionally requires every fixed C5 control ID, all original reference IDs and all 21 required groups. Mechanical success never substitutes for independent raw-PNG inspection or a clean-round decision.",
+    "preserved_limits": [
+      "No screenshot is redrawn, retouched, resized to impersonate another profile or beautified.",
+      "The committed closed Reader oracle has zero pixel tolerance and no ignored region, with actual processed input/source identity. Legitimate bright artwork remains valid.",
+      "No fixture SQL marks jobs, downloads, connection verification, actor completion or cache leases successful. Actual HTTP, actor acknowledgements, file bytes and RAM projection remain authoritative.",
+      "The driver never owns the Native VM, physical hardware or formal performance timing. Exact external reports remain required."
+    ]
+  },
+  "c13_revision": {
+    "basis": "Keep all101 references, all21 supplemental groups, all19 C5 controls and all15 C10 search captures unchanged. Historical C11/C12 captures and blockers retain their original source, tools and round identities.",
+    "helper": "scripts/handoff_c13_scope.py",
+    "reused_frozen_helper": "scripts/handoff_c12_scope.py",
+    "fixed_added_captures": 3,
+    "selected700_case_ids": ["scribe--c13-dense-shortcut-00", "scribe--c13-dense-shortcut-01", "scribe--c13-dense-shortcut-02"],
+    "normal500_case_ids": ["scribe--content-stress--scope-typing", "scribe--content-stress--scope-cancel", "scribe--content-stress--scope-select-last"],
+    "full_group_mapping": "During content-stress:scribe, reuse the existing real twenty-five-source data, provider and fresh native typing baseline. Add three actual native pointer selection captures for the first three configured shortcuts; do not add or substitute a fixture seed.",
+    "full_gate": "All three fixed selected700 case IDs are required in addition to the complete original capture set in both fresh full rounds. Capture-helper fingerprints bind both the unchanged C12 scope implementation and the small C13 wrapper.",
+    "runtime_tuple": "The invoking complete-round manifest records the actual authorized final source, executable, reference, tool and plan hashes. No historical source tuple is reused as final acceptance.",
+    "actual_counts": "Expected601 actual captures and557 manual frames are static estimates; the final complete native manifest and immutable case inventory are authoritative.",
+    "unchanged_assertions": "Preserve native pointer-only selection, exact actual source IDs, unchanged unsubmitted query/draft/English keyboard, empty composition and exactly twenty-five initial real HTTP search requests. No private preferred-width getter, reduced font, invented identifier, fake metadata or glyph proof from model fields is allowed.",
+    "fresh_manual_requirement": "Every round independently inspects the actual500 normal and700 selected shortcut names and complete numeric00/01/02 identities in original PNGs. A prior small qualification or older full round cannot replace this review."
+  },
+  "c10_revision": {
+    "baseline": "Keep all 101 reference states, the 21 supplemental groups and the nineteen fixed C5 control captures. Preserve every original C7/C9 capture and finding; none receives C10 source or clean credit.",
+    "product_source_sha256": "5dca4c420996df4d4c4556430724350f33af4223dd8edb5e91626290813008df",
+    "product_binary_sha256": "9ff5f18c03d1ce9c53d260f4e9619cba7f18233e0bed98669329863f2aa8239d",
+    "helper": "scripts/handoff_c10_search.py",
+    "focused_entrypoint": "scripts/verify-handoff-c10.py",
+    "fixed_added_captures": 15,
+    "full_group_mapping": "The complete fixed C10 helper executes once at the end of real-http-search:scribe, covering both Paperwhite identity cases and Scribe layout cases in each full round.",
+    "full_gate": "Every C10 helper CASE_ID is required in addition to all original references/groups/C5 controls. The final two full rounds retain an identical required capture/review set and frozen tuple.",
+    "unread_full_assertion": "For each visible library BookItem, parameterized read-only Store queries require shown unread to equal the latest books.document.unread. No fixed demo badge value or fabricated zero fallback is allowed.",
+    "native_metrics": "P remains a private native preferred-height, not an exported diagnostic. Infer integer H2 from the actual same-frame same-font identical-author glyph-origin difference: H2=long_author_y-short_author_y+28. Record native P only as ((H2-1)/2,H2/2], explicitly inferred_from_actual_frame. Do not default or clamp P/H2.",
+    "bounds": "Require H2<=48 and implied P<=24, overflow card height190+H2<=238, two actual title glyph rows, full separate author ink and no overlap with the next genuine provider group. A larger or unmeasurable result fails.",
+    "identity": "Native pointer selection verifies current hidden MangaDex/Komga source names, 00/01 shortcut distinction and unsubmitted draft preservation. Genuine initial HTTP/cover requests remain separately recorded; no additional search POST is submitted by draft or picker actions.",
+    "short_title": "Retain short card218/title174h22/author200h18/bookmark177 allocation. The short actual HTTP title belongs to the previously favored real first book; no title or bookmark state is created through SQL.",
+    "review": "Source/model metrics never substitute for original glyph/suffix/author/marker review. Independent fresh bounded review remains mandatory, and mechanical capture completion never establishes a clean round."
+  }
+}

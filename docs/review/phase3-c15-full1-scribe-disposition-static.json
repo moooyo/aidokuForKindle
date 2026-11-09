@@ -1,0 +1,306 @@
+{
+  "schema_version": 1,
+  "report_id": "phase3-c15-full1-scribe-disposition-static",
+  "status": "Static repair proposal only; no production edits or verification",
+  "owner": "/root/c15_ui_disposition_static",
+  "parent_supplied_adjudications": [
+    {
+      "report_label": "root-adjudication-01.json",
+      "confirmed_required_families": 3
+    },
+    {
+      "report_label": "root-adjudication-02.json",
+      "confirmed_additional_families": 2,
+      "fresh_images_viewed_by_root": 4
+    }
+  ],
+  "parent_scope_update": "Use the real unconfigured TrackingPanel branch uniformly across profiles and services; do not hardcode a service name to match a single reference. Use the real landscape target policy for the Scribe preview divider.",
+  "source_snapshot_supplied_by_parent": {
+    "file_count": 229,
+    "fingerprint": "c48c94852772b28294738a93b8590529c9e1e289441f1f5db361d8e84ee0196b",
+    "recomputed_by_this_task": false
+  },
+  "current_raw_r1": {
+    "run": "run201dd995b7c6",
+    "worker": "DT87f9",
+    "source_frozen": true,
+    "capture_owner": "Parent-designated sole remote owner",
+    "writer_go_received": false,
+    "repair_frames_added": 0
+  },
+  "supplements_unchanged_reports": [
+    "D:/Code/aidokuForKindle/docs/review/phase3-c15-full1-disposition-static.json",
+    "D:/Code/aidokuForKindle/docs/review/phase3-c15-full1-title-localization-static.json"
+  ],
+  "proposals": [
+    {
+      "id": "C15-scribe-orientation",
+      "parent_confirmed_family": "Scribe orientation preview geometry",
+      "source_evidence": [
+        {
+          "path": "D:/Code/aidokuForKindle/ui/panels-reader.slint",
+          "line": 24,
+          "fact": "The general ReaderChoiceCard viewbox-height default is already 40; its viewbox-width is 48 at line 42."
+        },
+        {
+          "path": "D:/Code/aidokuForKindle/ui/panels-reader.slint",
+          "line": 47,
+          "fact": "The shared card's current stroke-width is 1.7 on Scribe and 1.8 on PW."
+        },
+        {
+          "path": "D:/Code/aidokuForKindle/ui/panels-reader.slint",
+          "line": 505,
+          "fact": "The current orientation preview uses rounded PW device outlines for all three choices."
+        },
+        {
+          "path": "D:/Code/aidokuForKindle/ui/panels-reader.slint",
+          "line": 509,
+          "fact": "The orientation instance overrides viewbox-height to 32, including Scribe."
+        },
+        {
+          "path": "D:/Code/aidokuForKindle/ui/panels-reader.slint",
+          "line": 510,
+          "fact": "Actual selection remains based on portrait/landscape/reverse-landscape State."
+        },
+        {
+          "path": "D:/Code/aidokuForKindle/ui/panels-reader.slint",
+          "line": 511,
+          "fact": "The unchanged callback writes the selected manual orientation value."
+        }
+      ],
+      "exact_reference_evidence": [
+        {
+          "path": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/prototype/sc-reader-portrait.dc.html",
+          "line": 146,
+          "fact": "Scribe orientation SVG declares width 52, height 44, viewBox 0 0 48 40, and stroke-width 1.8."
+        },
+        {
+          "path": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/prototype/sc-reader-portrait.dc.html",
+          "line": 376,
+          "fact": "Portrait uses one direct outline with a bottom marker; the outline extends to y=37.",
+          "path_commands": "M17 3h14v34H17zM22 33h4"
+        },
+        {
+          "path": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/prototype/sc-reader-portrait.dc.html",
+          "line": 377,
+          "fact": "Landscape spread uses one direct outer outline plus a center divider, without a rounded device frame.",
+          "path_commands": "M3 9h42v24H3zM24 9v24"
+        },
+        {
+          "path": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/prototype/sc-reader-portrait.dc.html",
+          "line": 378,
+          "fact": "The third prototype item is sensor-following; this must not replace the supported manual reverse-landscape item in the current implementation."
+        }
+      ],
+      "actual_landscape_policy_evidence": [
+        {
+          "path": "D:/Code/aidokuForKindle/src/app/view.rs",
+          "line": 850,
+          "fact": "The code copies real preferences, forces the hypothetical landscape target, applies current effective reading direction and page-layout mode, and publishes reader-landscape-spread at lines 853-860."
+        },
+        {
+          "path": "D:/Code/aidokuForKindle/src/app.rs",
+          "line": 1514,
+          "fact": "effective_preferences suppresses vertical and vertical-pages, returns false for single, true for double, and retains Scribe/landscape/raw-spread requirements for automatic."
+        },
+        {
+          "path": "D:/Code/aidokuForKindle/src/app/reader_pipeline.rs",
+          "line": 64,
+          "fact": "Actual current frame page count is computed separately; an orientation preview should describe the real target policy rather than claim that the current page always contains two images."
+        },
+        {
+          "path": "D:/Code/aidokuForKindle/src/app/orientation.rs",
+          "line": 36,
+          "fact": "The existing manual model maps portrait to 0, landscape to 90, and reverse-landscape to 270 degrees."
+        }
+      ],
+      "minimal_scribe_delta": [
+        "Add a diagram-stroke-width input whose default equals the existing shared-card stroke expression.",
+        "Set a private scribe-glyph predicate only in reader-orientation for the first two Scribe manual choices.",
+        "For Scribe portrait, use the exact single-outline/bottom-marker path.",
+        "For Scribe landscape, use M3 9h42v24H3z and append M24 9v24 only when the existing parent.landscape-spread target policy is true.",
+        "Use the existing diagram-viewbox-height input with 40 for those two Scribe choices; keep 32 for the manual reverse choice and PW.",
+        "Override stroke-width to the reference's 1.8 only for those two Scribe choices; preserve the existing default everywhere else."
+      ],
+      "combined_orientation_patch_not_applied": "--- a/ui/panels-reader.slint\n+++ b/ui/panels-reader.slint\n@@\n     in property <float> diagram-viewbox-height: 40;\n+    in property <length> diagram-stroke-width: State.large-screen ? 1.7px : 1.8px;\n     callback clicked();\n@@\n-        stroke-width: State.large-screen ? 1.7px : 1.8px;\n+        stroke-width: root.diagram-stroke-width;\n@@\n         for orientation[index] in [\"portrait\", \"landscape\", \"reverse-landscape\"]: ReaderChoiceCard {\n+            property <bool> scribe-glyph: State.large-screen && orientation != \"reverse-landscape\";\n             x: index * ((parent.width - root.card-gap * 2) / 3 + root.card-gap);\n@@\n-            diagram: orientation == \"portrait\" ? \"M18 1h12a2 2 0 0 1 2 2v26a2 2 0 0 1-2 2H18a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2zM19 4h10v20H19z\" :\n-                (orientation == \"landscape\" ? \"M6 8h36a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V10a2 2 0 0 1 2-2zM7 11h27v12H7z\" : \"M6 8h36a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V10a2 2 0 0 1 2-2zM14 11h27v12H14zM22 15l-3 3 3 3M19 18h10\")\n-                + (parent.landscape-spread ? (orientation == \"landscape\" ? \"M20.5 11v12\" : \"M27.5 11v12\") : \"\");\n+            diagram: self.scribe-glyph ? (orientation == \"portrait\" ? \"M17 3h14v34H17zM22 33h4\" : \"M3 9h42v24H3z\" + (parent.landscape-spread ? \"M24 9v24\" : \"\")) :\n+                (orientation == \"portrait\" ? \"M18 1h12a2 2 0 0 1 2 2v26a2 2 0 0 1-2 2H18a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2zM19 4h10v20H19z\" :\n+                    (orientation == \"landscape\" ? \"M6 8h36a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V10a2 2 0 0 1 2-2zM7 11h27v12H7z\" : \"M6 8h36a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V10a2 2 0 0 1 2-2zM14 11h27v12H14z\" + (State.large-screen ? \"M22 15l-3 3 3 3M19 18h10\" : \"\"))\n+                    + (parent.landscape-spread ? (orientation == \"landscape\" ? \"M20.5 11v12\" : \"M27.5 11v12\") : \"\"));\n             diagram-width: State.large-screen ? 52px : 48px; diagram-height: State.large-screen ? 44px : 32px;\n-            diagram-viewbox-height: 32;\n+            diagram-viewbox-height: self.scribe-glyph ? 40 : 32;\n+            diagram-stroke-width: self.scribe-glyph ? 1.8px : (State.large-screen ? 1.7px : 1.8px);\n             selected: orientation == \"portrait\" ? !State.landscape : State.landscape && (orientation == \"reverse-landscape\" ? State.reverse-landscape : !State.reverse-landscape);\n             clicked => { Commands.action(\"settings\", \"set\", \"orientation=\" + orientation); }",
+      "patch_integration_note": "This combined hunk also carries the separately accepted PW reverse-arrow removal from the earlier report. It supersedes the earlier PW-arrow-only diagram hunk; do not apply both against the same original expression.",
+      "preservation": [
+        "The new Scribe delta does not change PW geometry or paths beyond the separately accepted PW-arrow repair.",
+        "The third Scribe reverse-landscape path, arrow, spread marker, 32-high viewbox, 1.7 stroke, selection, label, and callback remain as before.",
+        "Scribe non-spread landscape is a single direct outline with no center divider.",
+        "The shared card default viewbox-height remains 40 and default stroke values remain exactly as before.",
+        "Reader mode, page-layout, and settings tap-layout cards receive no visual or interaction default change.",
+        "Card sizes, labels, pressed/selected styling, accessibility state, touch bounds, reading preferences, and manual 0/90/270 callbacks remain unchanged.",
+        "No sensor-following mode or prototype-only navigation link is added."
+      ],
+      "affected_scope": [
+        "Scribe reader-orientation portrait preview",
+        "Scribe reader-orientation landscape preview under spread and non-spread target policies",
+        "Separately accepted PW reverse-arrow diagram repair"
+      ],
+      "later_check_suggestions": [
+        "Fresh Scribe orientation preview with spread target policy true",
+        "Fresh Scribe orientation preview with single/vertical target policy false",
+        "Third Scribe manual reverse choice and all three selection/callback outcomes",
+        "PW rotate and shared reader mode/layout/tap-layout cards after the combined candidate"
+      ]
+    },
+    {
+      "id": "C15-tracking-unconfigured-outline",
+      "parent_confirmed_family": "Unconfigured tracking card outline",
+      "current_state_scope": "All cards in the existing TrackingPanel loop are unconfigured fallback cards. The uniform outline applies to both supported services on PW and Scribe within this branch only.",
+      "source_evidence": [
+        {
+          "path": "D:/Code/aidokuForKindle/ui/panels-detail.slint",
+          "line": 159,
+          "fact": "The current loop renders AniList and MyAnimeList fallback cards; no linked/configured/authenticated state branch exists here."
+        },
+        {
+          "path": "D:/Code/aidokuForKindle/ui/panels-detail.slint",
+          "line": 162,
+          "fact": "Both fallback cards currently use a solid ink outline."
+        },
+        {
+          "path": "D:/Code/aidokuForKindle/ui/panels-detail.slint",
+          "line": 164,
+          "fact": "Every card displays the actual existing not-configured status."
+        },
+        {
+          "path": "D:/Code/aidokuForKindle/ui/panels-detail.slint",
+          "line": 166,
+          "fact": "Every existing configure action retains the tracking-settings callback."
+        },
+        {
+          "path": "D:/Code/aidokuForKindle/src/app/actions.rs",
+          "line": 208,
+          "fact": "The detail tracking entry opens a tracking context with no_tracking, tracking_help, and configure data; it does not create a successful authorization state."
+        },
+        {
+          "path": "D:/Code/aidokuForKindle/src/app/actions.rs",
+          "line": 1894,
+          "fact": "The settings tracking branch returns no configured service rows and the not_configured state."
+        },
+        {
+          "path": "D:/Code/aidokuForKindle/src/app/actions.rs",
+          "line": 2467,
+          "fact": "show_choices preserves the supplied tracking context as a choices modal."
+        },
+        {
+          "path": "D:/Code/aidokuForKindle/ui/panels.slint",
+          "line": 190,
+          "fact": "Both profiles use this TrackingPanel, with a PW sheet and Scribe float."
+        }
+      ],
+      "reference_evidence": [
+        {
+          "path": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/prototype/sc-manga.dc.html",
+          "line": 139,
+          "fact": "The unauthenticated MyAnimeList card uses a 1.5px dashed #555 outline and radius 4."
+        },
+        {
+          "path": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/prototype/pw-manga.dc.html",
+          "line": 165,
+          "fact": "The PW unauthenticated MyAnimeList card uses the same outline category, thickness, color, and radius."
+        },
+        {
+          "path": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/prototype/sc-manga.dc.html",
+          "line": 127,
+          "fact": "The solid AniList reference card is accompanied by an already-linked status at line 128. It is not the current native unconfigured state."
+        },
+        {
+          "path": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/prototype/pw-manga.dc.html",
+          "line": 154,
+          "fact": "The PW solid AniList reference likewise shows an already-linked status."
+        }
+      ],
+      "reusable_component_evidence": [
+        {
+          "path": "D:/Code/aidokuForKindle/ui/panels-common.slint",
+          "line": 125,
+          "fact": "Existing DashedFrame draws a decorative transparent frame with the supplied line color; it needs no shared-component change."
+        },
+        {
+          "path": "D:/Code/aidokuForKindle/ui/panels-common.slint",
+          "line": 131,
+          "fact": "The existing implementation uses 3px dash segments at 6px pitch, with 4px corner clearance; its thickness is Theme.control-border."
+        },
+        {
+          "path": "D:/Code/aidokuForKindle/ui/theme.slint",
+          "line": 5,
+          "fact": "Theme.secondary is #555."
+        },
+        {
+          "path": "D:/Code/aidokuForKindle/ui/theme.slint",
+          "line": 26,
+          "fact": "Theme.control-border is 1.5px; control-radius at line 28 is 4px."
+        }
+      ],
+      "minimal_change": "Import DashedFrame and use it for every card in the current unconfigured-only TrackingPanel loop, disabling the old solid border. Do not add service-name guards, authentication flags, fabricated linked data, or new callbacks.",
+      "patch_draft_not_applied": "--- a/ui/panels-detail.slint\n+++ b/ui/panels-detail.slint\n@@\n-import { PanelAction, PanelHeader, ChoiceRow } from \"panels-common.slint\";\n+import { PanelAction, PanelHeader, ChoiceRow, DashedFrame } from \"panels-common.slint\";\n@@\n     for service[index] in [\"AniList\", \"MyAnimeList\"]: Rectangle {\n         x: root.pad; y: root.first-top + index * (root.card-height + 12px);\n         width: parent.width - root.pad * 2; height: root.card-height;\n-        background: Theme.paper; border-width: Theme.control-border; border-color: Theme.ink; border-radius: Theme.control-radius;\n+        background: Theme.paper; border-width: 0px; border-radius: Theme.control-radius;\n+        DashedFrame {\n+            x: 0px; y: 0px; width: parent.width; height: parent.height;\n+            line-color: Theme.secondary; accessible-role: none;\n+        }\n         BodyText { x: State.large-screen ? 20px : 16px; y: State.large-screen ? 13px : 11px; width: max(0px, parent.width - self.x * 2 - configure.width - 16px); height: 30px; text: service; font-size: State.large-screen ? 22px : 19px; font-weight: 700; }",
+      "parent_authorized_state_consistency": "Uniform treatment of both native unconfigured services follows the current branch semantics and Root's explicit scope update. The reference does not provide an unconfigured AniList image, so no claim of exact reference data-state parity is made for that service.",
+      "preservation": [
+        "The real unconfigured text, service names, configure label, callback identifiers, and data remain unchanged.",
+        "The existing card-height and panel-height expressions at lines 145-149 remain unchanged.",
+        "The frame is decorative, has accessible-role none, and adds no hit area.",
+        "The existing DashedFrame implementation and all other unconfigured account-card components remain unchanged.",
+        "No future linked-state path is created or made to appear authenticated."
+      ],
+      "affected_scope": [
+        "PW detail TrackingPanel unconfigured AniList card",
+        "PW detail TrackingPanel unconfigured MyAnimeList card",
+        "Scribe detail TrackingPanel unconfigured AniList card",
+        "Scribe detail TrackingPanel unconfigured MyAnimeList card"
+      ],
+      "static_rendering_limit": "DashedFrame expresses the required dashed category, 1.5px thickness, and #555 color. Its existing straight dash segments and corner clearance do not implement browser-style dashed rounded arcs; exact corner pixel matching remains a fresh-candidate visual check.",
+      "later_check_suggestions": [
+        "Fresh PW and Scribe tracking fallback outlines for both services",
+        "Unchanged unconfigured/configure text and real configure callback",
+        "Unchanged panel/card content heights and corner treatment"
+      ]
+    }
+  ],
+  "finite_repair_scope": {
+    "family_count_from_parent": 5,
+    "families": [
+      "Reader-only brightness title, retaining the existing settings frontlight key",
+      "PW reverse-landscape preview arrow removal",
+      "PW/SC pairing waiting indicator with profile-specific circle/gap sizes",
+      "Scribe orientation first-two-card glyphs and context-specific viewbox/stroke",
+      "Uniform dashed outlines in the actual PW/SC unconfigured TrackingPanel branch"
+    ],
+    "production_files_if_later_authorized": [
+      "D:/Code/aidokuForKindle/assets/i18n/zh-CN.json",
+      "D:/Code/aidokuForKindle/ui/panels-reader.slint",
+      "D:/Code/aidokuForKindle/src/app/actions.rs",
+      "D:/Code/aidokuForKindle/ui/panels-sources.slint",
+      "D:/Code/aidokuForKindle/ui/panels-detail.slint"
+    ],
+    "shared_helpers_reused_without_edits": [
+      "D:/Code/aidokuForKindle/ui/panels-common.slint"
+    ],
+    "english_localization_extra_diff": 0,
+    "no_production_diff_applied_by_this_task": true
+  },
+  "integration_gate": {
+    "parent_writer_go_required": true,
+    "wait_for_complete_current_raw_r1_capture_and_manual_opinions": true,
+    "every_accepted_source_repair_belongs_to_a_new_candidate": true,
+    "current_raw_r1_must_keep_its_frozen_source_and_original_frames": true
+  },
+  "execution_scope": {
+    "method": "Static source/specification reading and authoring this new report",
+    "production_or_test_files_edited": 0,
+    "existing_reports_edited": 0,
+    "images_inspected": 0,
+    "ssh_or_remote_calls": 0,
+    "test_build_hash_runtime_python_search_calls": 0,
+    "clean_review_rounds_asserted": 0,
+    "only_authored_file": "D:/Code/aidokuForKindle/docs/review/phase3-c15-full1-scribe-disposition-static.json"
+  },
+  "limitations": [
+    "Visual adjudications are reported from Root; this agent opened no images.",
+    "Both patch drafts are unapplied and were not compiled, executed, or tested.",
+    "No source fingerprint, runtime result, capture result, authentication result, or clean visual round is asserted.",
+    "The existing configure callback was preserved as source; this static task did not execute its destination or authorization flow."
+  ]
+}

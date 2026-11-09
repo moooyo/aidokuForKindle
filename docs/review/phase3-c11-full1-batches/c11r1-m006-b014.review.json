@@ -1,0 +1,146 @@
+{
+  "schema_version": 1,
+  "batch_id": "c11r1-m006-b014",
+  "reviewer": "c11r1_m006_b014",
+  "round": 1,
+  "run_id": "55c498296d35",
+  "module_id": "006-sc-settings-library-keyboard",
+  "scope": "Static review of four Scribe numeric/editing/clear/cancel captures against one related Search reference.",
+  "immutable_input_inventory": {
+    "path": "D:/Code/aidokuForKindle/docs/review/phase3-c11-full1-batches/c11r1-m006-b014.input.json",
+    "sha256_status": "Pending owner declaration in supplied input; no local hash was run.",
+    "identity_policy": "Exact paths, secondary identities, intentional differences and complete freeze/helper/tool declarations are retained by input JSON pointers below.",
+    "source_manifest_sha256": "e332086df1f552ae7d7c7d434491f6886a167095a86789d6e0ec93ca47975e9e",
+    "reference_manifest_sha256": "caad04a243ecbaac22c790d7918f50c8678985b9e58a9f963694fe7d69e2775a",
+    "hash_provenance": "All SHA-256 values are owner declarations, read statically from frozen input/case evidence. No rehash or new execution was performed."
+  },
+  "module_snapshot": {
+    "inventory_ref": "/module_snapshot",
+    "sha256": "3ff873aa1eb704d15552f051ac953edafc142ba5df3bb6813099c7ded4ed109a",
+    "archive_sha256": "166da51904b232bbb1b89448a35cfa1f30e77540920e6caa5cd225840dc759fe",
+    "transfer_accounting_sha256": "a03a34230bcaa010d119fb5ef8d247bc8bae9c3264ea13daf0c338a26a2afb5a",
+    "full_manifest_pending": true
+  },
+  "freeze_tuple": {
+    "inventory_ref": "/freeze_tuple",
+    "source_sha256": "33a2d049307c398da8bfbf196d1bf8e086412c117c194b592f4a93b5bfaedb3f",
+    "binary_sha256": "1e60db345cbd6fbe580258a4a309bf42361781061dc2033f78a8a5eb4446ad72",
+    "reference_sha256": "e7b49b456255432d74cfe41346f9d44c1a9c55bf67c5d55483e4ae3029547d18",
+    "remaining_identity_ref": "/freeze_tuple",
+    "static_identity_observation": "All four frozen case records declare round 1, run 55c498296d35, this source/binary pair, Scribe desktop and 930x1240 native capture size. Their embedded PNG/state/action/metadata/log declarations agree with the assigned input; this is a static declaration comparison."
+  },
+  "reviewed_case_ids": [
+    "scribe--keyboard-numbers",
+    "scribe--keyboard-shift-space-backspace",
+    "scribe--keyboard-clear",
+    "scribe--keyboard-cancel"
+  ],
+  "actual_original_image_opens": 5,
+  "image_open_record": {
+    "new_candidates": 4,
+    "original_references": 1,
+    "related_reference_pairs": 4,
+    "method": "tools.view_image on each assigned original path, without contact sheets, crops, image processing or substitution.",
+    "candidate_native_dimensions": [930, 1240],
+    "reference_original_dimensions": [1860, 2480],
+    "reference_physical_scale": 2
+  },
+  "references": [
+    {
+      "reference_id": "sc-search--default",
+      "inventory_ref": "/original_references/0",
+      "sha256": "7f66ae6f58fee41e471fab3f308afc9170bc1465b5c66cc0b590fac30a2a72c4",
+      "actual_image_opened": true,
+      "actual_open_count": 1,
+      "comparison_kind": "Related logical Search editing contract only; no independent exact-state reference exists for any assigned case.",
+      "observation": "Directly viewed the bordered Search field, adjacent Cancel, single-row source scopes, local-match hierarchy, full-width keyboard separator and four key rows. The reference uses Pinyin composition and a book result; those contents do not establish exact numeric, English, cleared or closed-keyboard states.",
+      "display_note": "view_image reported display resizing from 1860x2480 to 1368x1824. The owner-declared original dimensions remain unchanged; no worker resize or crop was generated."
+    }
+  ],
+  "shared_visual_observation": "At native 930x1240, all four captures retain the Search field and adjacent Cancel, aligned single-row scope controls, readable serif query text and clear section rules. The three open-keyboard states use a separator near y870 and a roughly 370px lower band; mode header, three key rows and the final mode/space/Search row are all visible. This is a visual estimate, not a computed metric. The reference's factor-two geometry supports this related layout judgement. Changed source counts/order and missing book matches remain subject to the same geometry and legibility checks.",
+  "cases": [
+    {
+      "case_id": "scribe--keyboard-numbers",
+      "identity_inventory_ref": "/cases/0",
+      "png_sha256": "2745d42dc0aace8373e43d670606cdc5cc9fdb942f67baab62c4b89e7ca0d55b",
+      "case_json_sha256": "c798fb4ca8e2d2c22c93df28ea09590006ee97ee721d012db55e890af80b021d",
+      "state_sha256": "4b4d71131ec24a46b9b7677fec688064a907391f1afc031c454e0945e3ec5eae",
+      "metadata_sha256": "07959f759e8c76f8b6c8091f4b7aeef9c8c5b087a1157e71d8b8c267c2811514",
+      "actions_sha256": "caf64ef32e8ed969c7e3b678019e69fbcf341e270e9aeea367f0eca8bd2618cd",
+      "log_sha256": "7e68a4176710a866675a6b95bcf7bed2d96c58a8fd7996a4d48f3679514483a9",
+      "reference_sha256": null,
+      "comparison_reference_ids": ["sc-search--default"],
+      "actual_image_opened": true,
+      "actual_open_count": 1,
+      "observation": "Query visibly reads 123. The numeric header and #+= control are distinct; 1 through 0 fill the first row, punctuation occupies staggered lower rows, the backspace outline is readable, and abc/language/space/Search controls fit the last row without clipping or overlap. The local no-match text is readable and does not imply remote search completion.",
+      "static_action_state_support": "Existing actions clear Search, open editing, select numbers and type 1, 2, 3. Saved keyboard_mode=numbers, keyboard_text=123, modal=keyboard and query is empty. This supports the visible draft value; the worker did not execute the recipe.",
+      "intentional_capability_check": "No declared intentional difference. The numeric state is compared only to related Search hierarchy, bounds and feedback; no exact numeric-state equivalence is claimed.",
+      "static_verdict": "related-contract-static-observed-no-new-actionable"
+    },
+    {
+      "case_id": "scribe--keyboard-shift-space-backspace",
+      "identity_inventory_ref": "/cases/1",
+      "png_sha256": "b3cdec11954c660aaf38d2803e9aef07a8243996b877e621d201c598a8ce3271",
+      "case_json_sha256": "828d9f7b80dd06ace4ab6336314f56bef7504cde5db422131d14fc9f1f3f6d3b",
+      "state_sha256": "2fac7df832a799198bb0051b44e9ada6e7024f2c330b792067190cd2c82d100c",
+      "metadata_sha256": "21d7c7e12158715452bc45f406b03be0110dba116f7d2fe0165af98db2477447",
+      "actions_sha256": "2ac238745e752c3a33c8f5a5109215b8fcd2702c823ff5290f442509263cb121",
+      "log_sha256": "7e68a4176710a866675a6b95bcf7bed2d96c58a8fd7996a4d48f3679514483a9",
+      "reference_sha256": null,
+      "comparison_reference_ids": ["sc-search--default"],
+      "actual_image_opened": true,
+      "actual_open_count": 1,
+      "observation": "The Search field visibly contains uppercase A and retains its clear affordance. Lowercase QWERTY rows, the outlined upward shift glyph, outlined backspace glyph and 123/EN/space/Search controls are readable, aligned and fully contained. Keyboard height and row spacing remain consistent with the related reference layout.",
+      "static_action_state_support": "Existing actions select English, shift, type a, insert space, type b and backspace. Saved keyboard_text is exactly \"A \" with one trailing space, keyboard_mode=english and modal=keyboard; query is empty. The PNG establishes the visible A, while the captured state supports whitespace retention and deletion of b.",
+      "intentional_capability_check": "No declared intentional difference. The final lowercase keycaps are consistent with the captured English editing outcome; screenshots do not establish intermediate shift animation or physical input.",
+      "static_verdict": "related-contract-static-observed-no-new-actionable"
+    },
+    {
+      "case_id": "scribe--keyboard-clear",
+      "identity_inventory_ref": "/cases/2",
+      "png_sha256": "66f2efce818d743d78be378425e1fac1937237015055f82a8e9add4881ba0769",
+      "case_json_sha256": "bdc3f32e7c8a2a5ee837d82e5e7dfb8f7b8e010e934f143497a1f9abeb9d054e",
+      "state_sha256": "015f9cade0575575853e9d92bc1617cb1d97af388839360458bda7cd4cabb099",
+      "metadata_sha256": "8325159f5bf9b8662221ca367e4f11d8ac8db9f628ee1e24ab16684b28bd60b9",
+      "actions_sha256": "b2f8d283a9192007aa155b923acb2f266ffc5f6cb16a447928ca7512b0a307eb",
+      "log_sha256": "7e68a4176710a866675a6b95bcf7bed2d96c58a8fd7996a4d48f3679514483a9",
+      "reference_sha256": null,
+      "comparison_reference_ids": ["sc-search--default"],
+      "actual_image_opened": true,
+      "actual_open_count": 1,
+      "observation": "The empty Search field shows its input prompt and no clear X. Cancel remains available; the English keyboard stays open at the same height, with every key row and the Search action visible. The local no-match section remains legible without residual typed text or a success message.",
+      "static_action_state_support": "Existing actions enter clearable in English and then invoke Search clear. Saved keyboard_text, composition and query are empty while modal=keyboard and keyboard_target=search. This supports clearing the draft while retaining editing.",
+      "intentional_capability_check": "No declared intentional difference. Clear feedback is supported by the current PNG and saved empty draft; no submitted-query, Store history or remote-provider outcome is inferred.",
+      "static_verdict": "related-contract-static-observed-no-new-actionable"
+    },
+    {
+      "case_id": "scribe--keyboard-cancel",
+      "identity_inventory_ref": "/cases/3",
+      "png_sha256": "983daf67aa9471f187aab4de6d8d1a69216824ae096f858ac6dd8c3a970e3ad9",
+      "case_json_sha256": "65fddc1d0ec365cf7c7b2b64466a24eec8d5147a38c5ca612a41991a9f6496b3",
+      "state_sha256": "18e349849a8df52c51834ecd6a869b5445223d0a22c4b2d6393474d4187a4d5f",
+      "metadata_sha256": "69e380d541e98edc82d93996c4521d8df778c41146135ceaa03d76127102bdca",
+      "actions_sha256": "4167f6d34dcf5f252ffd3ee33337beca3b73c925fc9683bdfb6891c069e4d136",
+      "log_sha256": "7e68a4176710a866675a6b95bcf7bed2d96c58a8fd7996a4d48f3679514483a9",
+      "reference_sha256": null,
+      "comparison_reference_ids": ["sc-search--default"],
+      "actual_image_opened": true,
+      "actual_open_count": 1,
+      "observation": "No keyboard remains. The empty bordered Search field and source scopes retain their positions; a centered book glyph, search guidance and black Search button provide a readable empty-state hierarchy. The five-item footer returns with Search selected and no clipping or overlap.",
+      "static_action_state_support": "Existing actions clear Search, open editing and cancel. Saved route=search, modal and keyboard_target are empty, and keyboard_text/query are empty. The PNG independently establishes keyboard dismissal and the returned Search empty state.",
+      "intentional_capability_check": "No declared intentional difference. This is a related closed-keyboard comparison; the assigned open-keyboard reference does not establish exact empty-state/footer pixels. The recipe cancels an already empty draft, so non-empty rollback is not covered.",
+      "static_verdict": "related-contract-static-observed-no-new-actionable"
+    }
+  ],
+  "new_actionable": [],
+  "pending": [],
+  "historical_findings": [],
+  "regression_closures": [],
+  "limitations": [
+    "All four supplemental states lack independent exact-state references. Their exact-reference SHA remains null; related-contract review is not an exact-state pass.",
+    "Whitespace is supported by saved state rather than visible pixels. The cancel recipe covers empty-draft dismissal only, not non-empty rollback or persistence.",
+    "Existing action/state evidence was read statically; no tests, builds, probes, hashes, SQL, SSH, app execution, image processing or record-review operation was run.",
+    "Static PNGs do not qualify physical hit regions/input, framebuffer/evdev rotation, sleep/wake, e-ink effects, performance, provider submission or Store/history behavior.",
+    "The immutable module inventory binds this partial record. Full-run manifest reconciliation and the input SHA owner declaration remain outside this batch; no full-round or clean claim is made."
+  ]
+}

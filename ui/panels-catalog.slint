@@ -1,0 +1,60 @@
+import { State, Commands } from "state.slint";
+import { Theme } from "theme.slint";
+import { Strings } from "strings.slint";
+import { Caption, TitleText } from "widgets.slint";
+import { PanelAction } from "panels-common.slint";
+import { TagFlow } from "tag-flow.slint";
+
+export component CatalogFilterPanel inherits Rectangle {
+    property <length> pad: State.large-screen ? 28px : 22px;
+    property <length> pad-top: State.large-screen ? 26px : 20px;
+    property <length> label-height: State.large-screen ? 21px : 18px;
+    property <length> choice-height: State.large-screen ? 50px : 44px;
+    property <length> chip-height: State.large-screen ? 46px : 42px;
+    property <length> sort-label-top: root.pad-top + (State.large-screen ? 46px : 44px) + (State.large-screen ? 12px : 11px);
+    property <length> sort-top: root.sort-label-top + root.label-height + (State.large-screen ? 12px : 11px);
+    property <length> status-label-top: root.sort-top + root.choice-height + (State.large-screen ? 18px : 13px);
+    property <length> status-top: root.status-label-top + root.label-height + (State.large-screen ? 12px : 11px);
+    property <length> tags-label-top: root.status-top + root.chip-height + (State.large-screen ? 18px : 13px);
+    property <length> tags-top: root.tags-label-top + root.label-height + (State.large-screen ? 12px : 11px);
+    property <length> tags-height: tags.content-height;
+    property <length> apply-top: (State.catalog-tag-options.length > 0 ? root.tags-top + root.tags-height : root.tags-label-top) + (State.large-screen ? 22px : 17px);
+    height: root.apply-top + (State.large-screen ? 58px : 52px) + (State.large-screen ? 28px : 24px);
+    background: Theme.paper;
+    TouchArea { x: 0px; y: 0px; width: parent.width; height: parent.height; }
+    if !State.large-screen: Rectangle { x: 0px; y: 0px; width: parent.width; height: 2px; background: Theme.ink; }
+    if State.large-screen: Rectangle { x: 0px; y: 0px; width: parent.width; height: parent.height; border-width: 2px; border-color: Theme.ink; border-radius: Theme.control-radius; background: transparent; }
+    TitleText { x: root.pad; y: root.pad-top; width: max(0px, parent.width - root.pad * 2 - reset.width - 16px); height: State.large-screen ? 46px : 44px; text: Strings.filter; font-size: State.large-screen ? 26px : 23px; letter-spacing: 2px; }
+    reset := PanelAction { x: parent.width - root.pad - self.width; y: root.pad-top; width: self.preferred-width; height: State.large-screen ? 46px : 44px; text: Strings.reset; quiet: true; text-size: State.large-screen ? 17px : 15px; horizontal-padding: State.large-screen ? 6px : 14px; clicked => { Commands.action("catalog", "reset-filter", ""); } }
+    Caption { x: root.pad; y: root.sort-label-top; width: parent.width - root.pad * 2; height: root.label-height; text: Strings.sort; font-size: State.large-screen ? 14px : 12px; letter-spacing: State.large-screen ? 3px : 2px; }
+    for item[index] in State.catalog-sort-options: PanelAction {
+        x: root.pad + index * ((root.width - root.pad * 2 - max(0, State.catalog-sort-options.length - 1) * 8px) / max(1, State.catalog-sort-options.length) + 8px);
+        y: root.sort-top; width: (root.width - root.pad * 2 - max(0, State.catalog-sort-options.length - 1) * 8px) / max(1, State.catalog-sort-options.length); height: root.choice-height;
+        text: item.title; selected: item.value == "✓"; enabled: item.enabled; text-size: State.large-screen ? 16px : 15px; horizontal-padding: 0px;
+        clicked => { Commands.action("catalog", "filter-choice", item.id); }
+    }
+    Caption { x: root.pad; y: root.status-label-top; width: parent.width - root.pad * 2; height: root.label-height; text: Strings.serial-status; font-size: State.large-screen ? 14px : 12px; letter-spacing: State.large-screen ? 3px : 2px; }
+    HorizontalLayout {
+        x: root.pad; y: root.status-top; width: parent.width - root.pad * 2; height: root.chip-height; spacing: 8px; alignment: start;
+        for item in State.catalog-status-options: PanelAction {
+            width: self.preferred-width; height: root.chip-height; text: item.title; selected: item.value == "✓"; enabled: item.enabled;
+            text-size: State.large-screen ? 16px : 15px; horizontal-padding: State.large-screen ? 20px : 18px;
+            clicked => { Commands.action("catalog", "filter-choice", item.id); }
+        }
+    }
+    if State.catalog-tag-options.length > 0: Caption { x: root.pad; y: root.tags-label-top; width: parent.width - root.pad * 2; height: root.label-height; text: Strings.tags; font-size: State.large-screen ? 14px : 12px; letter-spacing: State.large-screen ? 3px : 2px; }
+    tags := TagFlow {
+        x: root.pad; y: root.tags-top; width: parent.width - root.pad * 2; height: root.tags-height;
+        filter-options: State.catalog-tag-options; item-height: root.chip-height;
+        text-size: State.large-screen ? 16px : 15px;
+        horizontal-padding: State.large-screen ? 18px : 16px; intrinsic-width: true;
+        chosen(index) => { Commands.action("catalog", "filter-choice", State.catalog-tag-options[index].id); }
+    }
+    PanelAction {
+        x: root.pad; y: root.apply-top; width: parent.width - root.pad * 2; height: State.large-screen ? 58px : 52px;
+        text: Strings.show-loaded-results + State.catalog-filter-result-count + " " + Strings.books-unit;
+        primary: true; text-size: State.large-screen ? 18px : 16px;
+        clicked => { Commands.action("catalog", "apply-filter", ""); }
+    }
+}
+

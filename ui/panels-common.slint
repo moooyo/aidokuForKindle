@@ -1,0 +1,168 @@
+import { State, Commands, SettingItem } from "state.slint";
+import { Theme } from "theme.slint";
+import { Strings } from "strings.slint";
+import { BodyText, Caption, TitleText, Icon } from "widgets.slint";
+
+export component PanelAction inherits Rectangle {
+    in property <string> text;
+    in property <bool> primary: false;
+    in property <bool> selected: false;
+    in property <bool> quiet: false;
+    in property <bool> enabled: true;
+    in property <bool> align-left: false;
+    in property <length> text-size: State.large-screen ? 17px : 16px;
+    in property <length> horizontal-padding: State.large-screen ? 24px : 20px;
+    callback clicked();
+    property <bool> inverted: root.enabled && ((root.primary || root.selected) != hit.pressed);
+    preferred-width: max(Theme.touch, label.preferred-width + root.horizontal-padding * 2);
+    height: State.large-screen ? 50px : 44px;
+    border-radius: Theme.control-radius;
+    border-width: root.quiet || (root.enabled && (root.primary || root.selected)) ? 0px : Theme.control-border;
+    border-color: root.enabled ? Theme.ink : Theme.dotted;
+    background: root.inverted ? Theme.ink : Theme.paper;
+    accessible-role: button;
+    accessible-label: root.text;
+    accessible-enabled: root.enabled;
+    label := BodyText {
+        x: root.align-left ? root.horizontal-padding : 0px;
+        y: 0px;
+        width: parent.width - (root.align-left ? root.horizontal-padding * 2 : 0px);
+        height: parent.height;
+        text: root.text;
+        font-size: root.text-size;
+        font-weight: root.primary || root.selected || !root.align-left ? 700 : 500;
+        color: !root.enabled ? Theme.disabled : root.inverted ? Theme.paper : Theme.ink;
+        horizontal-alignment: root.align-left ? left : center;
+    }
+    hit := TouchArea {
+        enabled: root.enabled;
+        x: 0px;
+        y: (parent.height - max(parent.height, Theme.touch)) / 2;
+        width: parent.width;
+        height: max(parent.height, Theme.touch);
+        pointer-event(event) => {
+            if event.kind == PointerEventKind.down { Commands.refresh("fast"); }
+            else if event.kind == PointerEventKind.up || event.kind == PointerEventKind.cancel { Commands.refresh("ui"); }
+        }
+        clicked => { root.clicked(); }
+    }
+}
+
+export component PanelHeader inherits Rectangle {
+    x: 0px;
+    y: 0px;
+    in property <string> text;
+    in property <string> action-text: Strings.close;
+    in property <bool> primary: true;
+    in property <length> title-size: State.large-screen ? 28px : 23px;
+    in property <length> action-horizontal-padding: State.large-screen ? 24px : 20px;
+    callback closed();
+    height: State.large-screen ? 50px : 44px;
+    TitleText {
+        x: 0px; y: 0px; width: max(0px, parent.width - done.width - 16px); height: parent.height;
+        text: root.text; font-size: root.title-size; letter-spacing: 2px;
+    }
+    done := PanelAction {
+        x: parent.width - self.width; y: 0px; width: self.preferred-width; height: parent.height;
+        text: root.action-text; primary: root.primary; horizontal-padding: root.action-horizontal-padding;
+        clicked => { root.closed(); }
+    }
+}
+
+export component ChoiceRow inherits Rectangle {
+    x: 0px;
+    y: 0px;
+    in property <SettingItem> item;
+    in property <string> icon;
+    in property <bool> line: true;
+    in property <bool> selected: false;
+    in property <length> inset: 4px;
+    in property <length> text-size: State.large-screen ? 18px : 17px;
+    callback chosen();
+    property <bool> inverted: root.item.enabled && (root.selected != hit.pressed);
+    height: State.large-screen ? 62px : 56px;
+    background: root.inverted ? Theme.ink : Theme.paper;
+    accessible-role: button;
+    accessible-label: root.item.title + " " + root.item.value;
+    accessible-enabled: root.item.enabled;
+    if root.icon != "": Icon {
+        x: root.inset; y: (parent.height - self.height) / 2;
+        width: State.large-screen ? 24px : 22px; height: self.width;
+        kind: root.icon; inverted: root.inverted; enabled: root.item.enabled;
+    }
+    BodyText {
+        x: root.inset + (root.icon == "" ? 0px : (State.large-screen ? 40px : 36px));
+        y: 0px;
+        width: max(0px, parent.width - self.x - root.inset - (root.item.value == "" ? 0px : value.width + 12px));
+        height: parent.height; text: root.item.title; font-size: root.text-size;
+        font-weight: root.selected ? 700 : 500;
+        color: !root.item.enabled ? Theme.disabled : root.inverted ? Theme.paper : Theme.ink;
+    }
+    value := Caption {
+        x: parent.width - self.width - root.inset;
+        y: 0px;
+        width: root.item.value == "" ? 0px : min(parent.width * 0.42, self.preferred-width);
+        height: parent.height; text: root.item.value;
+        font-family: Theme.numbers; font-size: State.large-screen ? 15px : 14px;
+        color: !root.item.enabled ? Theme.disabled : root.inverted ? Theme.paper : Theme.secondary;
+        horizontal-alignment: right;
+    }
+    if root.line: Rectangle {
+        x: root.inset; y: parent.height - 1px; width: parent.width - root.inset * 2; height: 1px;
+        background: Theme.line;
+    }
+    hit := TouchArea {
+        enabled: root.item.enabled;
+        x: 0px; y: 0px; width: parent.width; height: parent.height;
+        pointer-event(event) => {
+            if event.kind == PointerEventKind.down { Commands.refresh("fast"); }
+            else if event.kind == PointerEventKind.up || event.kind == PointerEventKind.cancel { Commands.refresh("ui"); }
+        }
+        clicked => { root.chosen(); }
+    }
+}
+
+export component DashedFrame inherits Rectangle {
+    in property <color> line-color: Theme.secondary;
+    in property <bool> rounded-corners: false;
+    x: 0px;
+    y: 0px;
+    background: transparent;
+    clip: true;
+    for index in ceil(max(0px, root.width - 8px) / 6px): Rectangle {
+        x: 4px + index * 6px; y: 0px; width: min(3px, max(0px, root.width - self.x - 4px)); height: Theme.control-border;
+        background: root.line-color;
+    }
+    for index in ceil(max(0px, root.width - 8px) / 6px): Rectangle {
+        x: 4px + index * 6px; y: parent.height - Theme.control-border; width: min(3px, max(0px, root.width - self.x - 4px)); height: Theme.control-border;
+        background: root.line-color;
+    }
+    for index in ceil(max(0px, root.height - 8px) / 6px): Rectangle {
+        x: 0px; y: 4px + index * 6px; width: Theme.control-border; height: min(3px, max(0px, root.height - self.y - 4px));
+        background: root.line-color;
+    }
+    for index in ceil(max(0px, root.height - 8px) / 6px): Rectangle {
+        x: parent.width - Theme.control-border; y: 4px + index * 6px; width: Theme.control-border; height: min(3px, max(0px, root.height - self.y - 4px));
+        background: root.line-color;
+    }
+    if root.rounded-corners && root.width >= 8px && root.height >= 8px: Rectangle {
+        x: 0px; y: 0px; width: root.width; height: root.height;
+        background: transparent;
+        accessible-role: none;
+        // Match the current 4px radius and 1.5px border tokens.
+        for corner in 4: Path {
+            x: corner == 0 || corner == 3 ? 0px : root.width - Theme.control-radius;
+            y: corner < 2 ? 0px : root.height - Theme.control-radius;
+            width: Theme.control-radius; height: Theme.control-radius;
+            viewbox-width: 4; viewbox-height: 4;
+            fill: root.line-color;
+            stroke: transparent; stroke-width: 0px;
+            accessible-role: none;
+            commands: corner == 0 ? "M0 4A4 4 0 0 1 4 0L4 1.5A2.5 2.5 0 0 0 1.5 4z" :
+                corner == 1 ? "M0 0A4 4 0 0 1 4 4L2.5 4A2.5 2.5 0 0 0 0 1.5z" :
+                corner == 2 ? "M4 0A4 4 0 0 1 0 4L0 2.5A2.5 2.5 0 0 0 2.5 0z" :
+                "M4 4A4 4 0 0 1 0 0L1.5 0A2.5 2.5 0 0 0 4 2.5z";
+        }
+    }
+}
+

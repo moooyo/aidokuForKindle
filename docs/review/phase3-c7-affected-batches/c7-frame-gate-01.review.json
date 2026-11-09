@@ -1,0 +1,191 @@
+{
+  "schema_version": 1,
+  "batch_id": "c7-frame-gate-01",
+  "reviewer": "/root/final_validation_delivery/c4_full_review_coordinator/c7_frame_gate_01",
+  "record_date": "2026-11-07",
+  "run_id": "24132e853d24",
+  "round": 6,
+  "capture_manifest_sha256": "f516ca911200e7c2a4118bd0d277de0190183bcdc3fa47850df699d3689772ab",
+  "inventory_sha256": "9e145ce183621ddb45075e377d8a798a8e9fe6fddc8cfce6d7d72579414e5a02",
+  "transfer_accounting_sha256": "794ed21e928d04f2649d66f82134b1ae180e4a9e14427496644cda6478478400",
+  "freeze_tuple": {
+    "source_file_count": 227,
+    "source_sha256": "aabda8e5d5a80f6c99c489203c7c650b3108081f67a3dd3fed9fc7a489a74e49",
+    "binary_sha256": "7762b8c8db6567ad5fda672c3cf8a55471088d21802415d14b4fb6325f51f630",
+    "harness_sha256": "8811746a09e761bfff55879a018d71f98d1d957d5ba79e8f008bdcaf90d5f55e",
+    "capture_plan_sha256": "b3adabbf4f2d33789f381dc2ac55474d89fcd210d58ce9e5083c0d818d547eec",
+    "reference_scope_sha256": "c910bed9f02ed17b2ca0a54aca1beeeeb6caabc5a17a91afe764ddd3e7b0d33c",
+    "reference_sha256": "e7b49b456255432d74cfe41346f9d44c1a9c55bf67c5d55483e4ae3029547d18",
+    "capture_helper_sha256": {
+      "verify-ui.py": "470872e6fd22a78b474c0f862164875ad9c7237bd2f3f164512864580ac1e90d",
+      "verify-fullscreen.py": "4a6c48cef771e66e9b3058edd888dcf2d4bce02e2720b5cc00c7a5b987bc9670",
+      "handoff_c4_business.py": "6197f375b247962e3ce9acdd3779468073f11e0002ac3c7ce876a7b1a0d0d9be",
+      "handoff_c5_ui.py": "fa30ef2bf8ab512e9705f43933ff6acaf32993e5aa1dbc62be330d4c97b481f2",
+      "handoff_c5_reader.py": "5b88a0c1b8e1151a3f96decef1a3a06f98a0d9de99908709bafbfb02cea490d5"
+    },
+    "frame_driver_sha256": "5fa31be3e5c9e5229b0f3029df3e4a3d656987a201e6d23c1e9f5e04cd1846bd",
+    "strong_pixels_sha256": "cc1d878531b4abeced53261538a345b73f7e6781e4c7be909eb9e5302e6f51d0"
+  },
+  "artifact_root": "D:/Code/aidokuForKindle/artifacts/phase3/candidate7/ui-tag-frame-qualification-01/",
+  "identity_basis": "Supplied immutable inventory and transfer identities, without local rehash. All six case files declare this run, round, source and binary; metadata profiles and log sizes agree with their cases.",
+  "image_usage": {"candidate_originals": 6, "reference_originals": 2, "actual_image_opens": 8, "basic_export_comparisons": 2, "supplemental_long_states": 4, "crops": 0},
+  "review_scope": "Fresh C7 affected tag-frame closure, suffix readability, marker semantics and neutral centering. Four long states have related control references, without independent exact exports.",
+  "reviewed_case_ids": ["pw-source--filter", "sc-browse--filter", "pw5--c7-tag-long-neutral", "pw5--c7-tag-long-excluded", "scribe--c7-tag-long-neutral", "scribe--c7-tag-long-excluded"],
+  "cases": [
+    {
+      "case_id": "pw-source--filter",
+      "evidence": {
+        "png": {"path": "pw-source--filter.png", "sha256": "d76b901de996b8351f5711ba6b93c2d4763df806013f4464f90b78081c0bdac2"},
+        "case_json": {"path": "cases/pw-source--filter.json", "sha256": "0ea8ebedd7359b90a7642602ee749a6e0ee47b5021cb1b5250bf1cb8044d12a7"},
+        "state": {"path": "pw-source--filter.state.json", "sha256": "16552271600c3d882a7442e27891285a5854130c095cce9b686fd1cdeb63fe16"},
+        "action": {"path": "actions/pw-source--filter.json", "sha256": "97498c0a800999be91f169be14fc8b046abbbe6d353122c462bc1e06a5f0adfc"},
+        "meta": {"path": "pw-source--filter.metadata.json", "sha256": "cdb72861939c814b2a15a0caf2d9ee1416219be3e285ef2be89f40421ca30080"},
+        "log": {"path": "pw-source--filter.log", "sha256": "dc121ceea011a63c29b404d6c6b75bbe2db32b326923b8fa99759f457bfd709f"}
+      },
+      "actual_view": {"viewed": true, "tool": "tools.view_image", "original": true},
+      "outline": "All nine visible short neutral chips retain closed thin solid outlines on all four sides; text does not interrupt the frames.",
+      "visible_suffix": "Not applicable: short labels.",
+      "marker_and_centering": "No neutral marker or empty marker gutter. Each short label appears horizontally and vertically centered within its intrinsic chip.",
+      "static_check": "Filter-menu action at 650 ms; catalog choices modal, zero active filters and 128 results. Metadata and ready log both identify pw5 618x824.",
+      "intentional_check": "No declared intentional differences. The frozen requirement explicitly asks for a neutral trigger and neutral labels with zero active filters; the candidate satisfies that state contract.",
+      "capability_check": "Desktop pw5; follows/rating are disabled in state and visibly disabled. Physical hardware and hardware dither qualification are false.",
+      "reference_id": "pw-source--filter",
+      "verdict": "pass_affected_frame_gate",
+      "limits": "Basic reference data and captions differ; this verdict covers the affected frame and neutral alignment contract, without claiming complete page equivalence."
+    },
+    {
+      "case_id": "sc-browse--filter",
+      "evidence": {
+        "png": {"path": "sc-browse--filter.png", "sha256": "c59137d7540ad38edaa7d3a019fce0b3fe5b70b29cf69e58b2210da8e7c1ae6c"},
+        "case_json": {"path": "cases/sc-browse--filter.json", "sha256": "b2359e015e622db4790eef49b748dc2f60ebf022985d50a366399334e5aabc17"},
+        "state": {"path": "sc-browse--filter.state.json", "sha256": "b20663377e96d3c819b82290f63293a981e0d24b82a02199cb70d3a8d9e0790f"},
+        "action": {"path": "actions/sc-browse--filter.json", "sha256": "97498c0a800999be91f169be14fc8b046abbbe6d353122c462bc1e06a5f0adfc"},
+        "meta": {"path": "sc-browse--filter.metadata.json", "sha256": "b347c32dbe3228c7156649f422e150187937fbf6caae27b3c1099fb420ec50e6"},
+        "log": {"path": "sc-browse--filter.log", "sha256": "7e68a4176710a866675a6b95bcf7bed2d96c58a8fd7996a4d48f3679514483a9"}
+      },
+      "actual_view": {"viewed": true, "tool": "tools.view_image", "original": true},
+      "outline": "Nine short neutral tag chips have closed solid top, bottom and side strokes. The filter dialog outline is also visibly closed.",
+      "visible_suffix": "Not applicable: short labels.",
+      "marker_and_centering": "Neutral tags have no marker or reserved blank marker slot. Label spacing looks balanced horizontally and vertically.",
+      "static_check": "Filter-menu action at 650 ms; catalog choices modal, zero active filters and 128 results. Metadata and ready log both identify scribe 930x1240.",
+      "intentional_check": "No declared intentional differences. The basic export depicts selected examples, while this frozen C7 case explicitly requires zero active neutral filters; candidate markers and trigger agree with its actual state.",
+      "capability_check": "Desktop scribe; follows/rating are disabled in state and visibly disabled. Orientation profile is declared; physical hardware and hardware dither qualification are false.",
+      "reference_id": "sc-browse--filter",
+      "verdict": "pass_affected_frame_gate",
+      "limits": "The export has different data and selected examples. Only affected control geometry and the explicit neutral-state contract are assessed."
+    },
+    {
+      "case_id": "pw5--c7-tag-long-neutral",
+      "evidence": {
+        "png": {"path": "pw5--c7-tag-long-neutral.png", "sha256": "28ab7b6f8bce6172afe82179a1b1961af23239e450181521415286bb80737a40"},
+        "case_json": {"path": "cases/pw5--c7-tag-long-neutral.json", "sha256": "8df1950e2622b24d915a56e56fd4ae8ec881befd0ac2ce9290442d497884e3bc"},
+        "state": {"path": "pw5--c7-tag-long-neutral.state.json", "sha256": "84397feadca114c31dede66edbb52a279d8cc0c75421a6f45e61e301d181a18b"},
+        "action": {"path": "actions/pw5--c7-tag-long-neutral.json", "sha256": "93cec1c18b6b18fe09cdb3171179c6772da1899e8cc4dcb4714af18e9f08b485"},
+        "meta": {"path": "pw5--c7-tag-long-neutral.metadata.json", "sha256": "07314affd2c837614e7edcd1d2094397793a09b42c50ebb6542e0c724fc3035c"},
+        "log": {"path": "pw5--c7-tag-long-neutral.log", "sha256": "dc121ceea011a63c29b404d6c6b75bbe2db32b326923b8fa99759f457bfd709f"}
+      },
+      "actual_view": {"viewed": true, "tool": "tools.view_image", "original": true},
+      "outline": "The long first chip has uninterrupted solid top and bottom strokes and closed left/right sides and corners. No white masking gap appears beside the leading ellipsis or beneath text.",
+      "visible_suffix": "DISTINCT-SUFFIX-00",
+      "suffix_basis": "Directly read from the original PNG, independently of model text.",
+      "marker_and_centering": "No marker or empty marker slot. The truncated label has visibly balanced left/right padding and is vertically centered; the short second chip is also centered.",
+      "static_check": "Open komga, open filter and reset actions; catalog choices modal, 34 tag options, first tag state 0, zero active filters and 20 results. Metadata and ready log identify pw5 618x824.",
+      "intentional_check": "No declared intentional differences. Leading truncation is bounded and retains the distinguishing tail as required by the frozen long-neutral contract.",
+      "capability_check": "Desktop pw5 with neutral trigger; follows/rating visibly match disabled state. Physical hardware qualification is false.",
+      "related_reference_id": "pw-source--filter",
+      "verdict": "pass_affected_frame_gate",
+      "limits": "Supplemental long state without an independent exact export; judged by its visible frame and actual-state contract."
+    },
+    {
+      "case_id": "pw5--c7-tag-long-excluded",
+      "evidence": {
+        "png": {"path": "pw5--c7-tag-long-excluded.png", "sha256": "0c8b67dffe8257cd656bb29485c53d91297bcd688c1f999f796f6606400ca0fa"},
+        "case_json": {"path": "cases/pw5--c7-tag-long-excluded.json", "sha256": "2f9d4dc3f937d2803f77adb537d445aee2e1d47cd799e62e795dabbfca45dabb"},
+        "state": {"path": "pw5--c7-tag-long-excluded.state.json", "sha256": "a9dae5a67eee1ecf3f5b9bbcd40fce13c6a0dc885cb8adcccb806b7946b117b5"},
+        "action": {"path": "actions/pw5--c7-tag-long-excluded.json", "sha256": "343f1fce10fb8f4e2aab1b8e21145f6874a983c51c54280de11670ca21946a53"},
+        "meta": {"path": "pw5--c7-tag-long-excluded.metadata.json", "sha256": "6cd573180988c6477a02fe5dc75a26f57ffe54ad3702a6f72d6bf1ae828d0d42"},
+        "log": {"path": "pw5--c7-tag-long-excluded.log", "sha256": "dc121ceea011a63c29b404d6c6b75bbe2db32b326923b8fa99759f457bfd709f"}
+      },
+      "actual_view": {"viewed": true, "tool": "tools.view_image", "original": true},
+      "outline": "Regular dash cadence runs across top/bottom and along both sides of the capped long chip. The ellipsis/text area creates no extra white break in the frame.",
+      "visible_suffix": "DISTINCT-SUFFIX-00",
+      "suffix_basis": "Directly readable in the original PNG despite the strike.",
+      "marker_and_centering": "Gray cross remains distinct at the left. A continuous strike crosses the truncated label and suffix without erasing them. Marker plus label appears balanced within the frame; the second neutral chip has no marker gutter.",
+      "static_check": "Two pointer press/release cycles target 309,604 from the fresh neutral frame. Case records six pointer events; first tag state is -1, active count 1 and results 0, matching the cross, active trigger and apply caption. Metadata and ready log identify pw5 618x824.",
+      "intentional_check": "No declared intentional differences. The capped long outline retains its width and regular dash gaps as required; width growth is not part of this contract.",
+      "capability_check": "Desktop pw5 synthetic pointer evidence only; visible excluded semantics match state. Physical hardware qualification is false.",
+      "related_reference_id": "pw-source--filter",
+      "verdict": "pass_affected_frame_gate",
+      "limits": "Supplemental excluded state without an independent exact export. Static pointer records and resulting PNG do not establish physical input behavior."
+    },
+    {
+      "case_id": "scribe--c7-tag-long-neutral",
+      "evidence": {
+        "png": {"path": "scribe--c7-tag-long-neutral.png", "sha256": "af401b0d0f00a0926ba2d2588e786ea099bc05751ea3fa56d41a8ded1ceb251d"},
+        "case_json": {"path": "cases/scribe--c7-tag-long-neutral.json", "sha256": "d2d7f3f89ed8409c41455e1a01991de3f2a2ec6a2b3bf1b198e5ca30196dbce0"},
+        "state": {"path": "scribe--c7-tag-long-neutral.state.json", "sha256": "7fd2d126940f95bd359486a8a29232adfc5b7813cc49ec68dc0a4d0e0f4253b3"},
+        "action": {"path": "actions/scribe--c7-tag-long-neutral.json", "sha256": "93cec1c18b6b18fe09cdb3171179c6772da1899e8cc4dcb4714af18e9f08b485"},
+        "meta": {"path": "scribe--c7-tag-long-neutral.metadata.json", "sha256": "27be740f4b94c66e09250483cb7b4751c7692378ca475c9db275a5d0a48ec182"},
+        "log": {"path": "scribe--c7-tag-long-neutral.log", "sha256": "7e68a4176710a866675a6b95bcf7bed2d96c58a8fd7996a4d48f3679514483a9"}
+      },
+      "actual_view": {"viewed": true, "tool": "tools.view_image", "original": true},
+      "outline": "The long chip has continuous solid top, bottom, left and right strokes with closed corners. The label background does not cut any side or create an opening near the ellipsis.",
+      "visible_suffix": "DISTINCT-SUFFIX-00",
+      "suffix_basis": "Directly read from the original PNG.",
+      "marker_and_centering": "Neutral label has no marker or blank marker reservation. Left/right insets look equal and text is vertically centered; the short second chip also has balanced insets.",
+      "static_check": "Open komga, open filter and reset actions; 34 tag options, first tag state 0, zero active filters and 20 results. Metadata and ready log identify scribe 930x1240.",
+      "intentional_check": "No declared intentional differences. The bounded leading truncation retains the required distinguishing tail.",
+      "capability_check": "Desktop scribe with orientation profile declared, neutral trigger and disabled follows/rating matching state. Physical hardware qualification is false.",
+      "related_reference_id": "sc-browse--filter",
+      "verdict": "pass_affected_frame_gate",
+      "limits": "Supplemental long state without an independent exact export; judged by actual pixels and state, using the reference for related control geometry."
+    },
+    {
+      "case_id": "scribe--c7-tag-long-excluded",
+      "evidence": {
+        "png": {"path": "scribe--c7-tag-long-excluded.png", "sha256": "835a2ab5eef80b1d577222d23187fd0d48df32552c2d00fa7dba545d1080d8b3"},
+        "case_json": {"path": "cases/scribe--c7-tag-long-excluded.json", "sha256": "53001a9a8529e6c32ca1ddd05712c56c500a5c19cbbae403f8afe7fdb41f4221"},
+        "state": {"path": "scribe--c7-tag-long-excluded.state.json", "sha256": "7cc9a1a7c58f92be1e087294f30ec1809cb81d9eed856ed00dec8e8f0d1a551f"},
+        "action": {"path": "actions/scribe--c7-tag-long-excluded.json", "sha256": "23db9a469b70133d0a437169ffdb376bc7e92be5bdf83c872187a8bf90a5dca5"},
+        "meta": {"path": "scribe--c7-tag-long-excluded.metadata.json", "sha256": "2abb7f8124edb754d9934af5fed65aa777c399a49f1bc6cfa34d5f6f8ed0cf25"},
+        "log": {"path": "scribe--c7-tag-long-excluded.log", "sha256": "7e68a4176710a866675a6b95bcf7bed2d96c58a8fd7996a4d48f3679514483a9"}
+      },
+      "actual_view": {"viewed": true, "tool": "tools.view_image", "original": true},
+      "outline": "All four dashed sides retain a regular cadence, including both ends and the area near the leading ellipsis. No text-mask opening interrupts the top, bottom or vertical sides.",
+      "visible_suffix": "DISTINCT-SUFFIX-00",
+      "suffix_basis": "Directly read from the original PNG with its strike visible.",
+      "marker_and_centering": "The gray cross is separately readable; the continuous strike runs through the label and suffix while leaving their forms readable. Marker and text remain balanced vertically. The second neutral chip retains centered text without a marker slot.",
+      "static_check": "Two pointer press/release cycles target 592,620 from the fresh neutral frame. Case records six pointer events; first tag state is -1, active count 1 and results 0, agreeing with the cross, active filter trigger and apply caption. Metadata and ready log identify scribe 930x1240.",
+      "intentional_check": "No declared intentional differences. The capped long frame preserves width and its expected dash gaps; no width growth is required.",
+      "capability_check": "Desktop scribe synthetic pointer evidence only, with orientation profile declared. Physical hardware qualification is false.",
+      "related_reference_id": "sc-browse--filter",
+      "verdict": "pass_affected_frame_gate",
+      "limits": "Supplemental excluded state without an independent exact export. Static action records do not qualify physical input."
+    }
+  ],
+  "references": [
+    {
+      "reference_id": "pw-source--filter",
+      "path": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/screens/states/pw-source--filter.png",
+      "sha256": "1339b77a8346218b73343211b67163fbba6efe5b875fff5b2b37239dfcfd2c23",
+      "actual_view": {"viewed": true, "tool": "tools.view_image", "original": true},
+      "observed": "Original basic bottom filter sheet: closed neutral chip outlines, centered short captions and no neutral marker gutter. Used as the basic export and related PW control geometry; not an exact long-state export."
+    },
+    {
+      "reference_id": "sc-browse--filter",
+      "path": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/screens/states/sc-browse--filter.png",
+      "sha256": "fc4e1eb1a853240fc1f6019ffb447cd1a04b85fd4ddfe1af8d233e113195532e",
+      "actual_view": {"viewed": true, "tool": "tools.view_image", "original": true, "tool_preview_size": [1368, 1824], "original_size": [1860, 2480]},
+      "observed": "Original basic dialog shows closed neutral outlines and a black selected tag with a check. Neutral and selected marker semantics are distinct. Its selected data state differs from the explicit C7 neutral case; related geometry only for long states."
+    }
+  ],
+  "suggestions": [],
+  "new_actionable_findings": [],
+  "gaps": [
+    {"detail": "Four long states have no independent exact exports; they are supplemental related-contract states.", "blocks_affected_frame_gate": false},
+    {"detail": "Native desktop screenshots and synthetic pointer records provide no physical Kindle input or hardware dither qualification.", "blocks_affected_frame_gate": false},
+    {"detail": "Hashes are supplied immutable identities, without local recomputation. No test, build, probe, validation suite, SSH, copy or image processing was performed.", "blocks_affected_frame_gate": false}
+  ],
+  "verdict": "affected_frame_gate_clear",
+  "qualification": "Partial C7 qualification limited to these six affected candidate frames and two original references. No unreviewed surface is covered."
+}

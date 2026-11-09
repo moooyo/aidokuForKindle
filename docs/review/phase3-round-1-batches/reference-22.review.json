@@ -1,0 +1,151 @@
+{
+  "batch_id": "reference-22",
+  "reviewer": "independent-visual-review/reference_22",
+  "run_id": "a1baf3fe3dc2",
+  "round": 1,
+  "scope": "Independent review of the four assigned candidate/reference pairs only.",
+  "identity": {
+    "binary_sha256": "94d7f3bbcab475ad8833a2f3c486138f7b49bead231851c2d8eab2f0c3d2ac51",
+    "source_sha256": "aef9db4e111165016a10a2a95e111f3155860b8510c7f6207ec9c79fbec5082c",
+    "supplied_reference_bundle_sha256": "e7b49b456255432d74cfe41346f9d44c1a9c55bf67c5d55483e4ae3029547d18",
+    "case_metadata_identity_match": true,
+    "candidate_png_hashes_match_case_evidence": true,
+    "reference_png_hashes_match_case_metadata": true,
+    "hash_method": "PowerShell Get-FileHash -Algorithm SHA256 on the unmodified original PNG bytes.",
+    "scale_comparison": "Candidate 930x1240 at logical 1x; reference 1860x2480 at physical 2x. Geometry was compared at the same logical scale.",
+    "reference_bundle_note": "The bundle hash is supplied review context; this four-pair review independently hashed only the eight assigned PNG files."
+  },
+  "reviewed_case_ids": [
+    "sc-reader-portrait--default",
+    "sc-reader-portrait--fullscreen-footer",
+    "sc-reader-portrait--fullscreen",
+    "sc-reader-portrait--image"
+  ],
+  "reviewed_cases": [
+    {
+      "case_id": "sc-reader-portrait--default",
+      "case_metadata": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/cases/sc-reader-portrait--default.json",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/sc-reader-portrait--default.png",
+      "candidate_sha256": "1a24006c0713596d49b40ad927db738c51a612247e2697f47156d6127a0cf421",
+      "reference_png": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/screens/sc-reader-portrait.png",
+      "reference_sha256": "a435bacd0c94da82f96f49904136f271b7500709c42609eb727a4f104dba5f45",
+      "viewed_candidate": true,
+      "viewed_reference": true,
+      "outcome": "no_actionable_finding",
+      "observations": [
+        "The candidate visibly opens with the reader menu, consistent with menu=true in the matching case metadata.",
+        "The integrated header is approximately 78 logical pixels high. The book/chapter text, back arrow, bookmark, bullet-list table-of-contents action and time/battery group remain distinct and unclipped.",
+        "The bottom menu begins at approximately logical y=1031, with 48-pixel side insets for progress and chapter controls and a 76-pixel tool row. Its placement agrees with the normalized reference.",
+        "The remaining-page text, current/total page numbers, progress handle, both chapter navigation labels and all five tool labels are readable. The space between the chapter navigation buttons contains no stray horizontal rules.",
+        "The More tool displays a three-dot ellipsis, and the header table-of-contents action has separate bullets and approximately 20-pixel-wide list geometry.",
+        "Typography preserves a bold chapter heading and quieter supporting text. Controls and separators use neutral grayscale, with no visible tint, overlap or clipped glyphs."
+      ],
+      "intentional_differences": [
+        "Artwork composition and its internal margins differ from the reference. These content differences alone are not evidence of an application viewport inset."
+      ]
+    },
+    {
+      "case_id": "sc-reader-portrait--fullscreen-footer",
+      "case_metadata": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/cases/sc-reader-portrait--fullscreen-footer.json",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/sc-reader-portrait--fullscreen-footer.png",
+      "candidate_sha256": "f019cd0ad046560f83be742a1cfe87e3ea9108a62a28975242909dfaaac8f9f5",
+      "reference_png": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/screens/states/sc-reader-portrait--fullscreen-footer.png",
+      "reference_sha256": "a7d91455ce1c08e2d523f8175d3bef765e85bc07574cbbdd09bb6ae1a8ef10a4",
+      "viewed_candidate": true,
+      "viewed_reference": true,
+      "outcome": "no_actionable_finding_under_user_override",
+      "observations": [
+        "The candidate is a pure artwork scene. No application header, bookmark ribbon, footer page number, tool row or notification is visible.",
+        "The case metadata records menu=false, no modal, no reader panel and show_tap_zones=false. The visible capture agrees with the closed-reader state.",
+        "The reference visibly contains a bookmark ribbon and a centered footer page number. Their absence in the candidate follows the explicit artwork-only override.",
+        "The same candidate PNG bytes are used by the fullscreen case, consistent with both aliases rendering the same overridden closed-reader scene."
+      ],
+      "intentional_differences": [
+        "The reference footer and persistent bookmark ribbon are intentionally absent under the user override.",
+        "Artwork composition, cropping and artwork-internal margins may differ. No viewport-inset finding is inferred from those differences."
+      ]
+    },
+    {
+      "case_id": "sc-reader-portrait--fullscreen",
+      "case_metadata": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/cases/sc-reader-portrait--fullscreen.json",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/sc-reader-portrait--fullscreen.png",
+      "candidate_sha256": "f019cd0ad046560f83be742a1cfe87e3ea9108a62a28975242909dfaaac8f9f5",
+      "reference_png": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/screens/states/sc-reader-portrait--fullscreen.png",
+      "reference_sha256": "3ad7edde21596ce841ee59add8b6dd0a03eccc06725781fe72c28802f9c67f4e",
+      "viewed_candidate": true,
+      "viewed_reference": true,
+      "outcome": "no_actionable_finding_under_user_override",
+      "observations": [
+        "The candidate visibly contains artwork only. It has no application header, footer, bookmark ribbon, notification or tool row.",
+        "The case metadata records menu=false and no active modal or reader panel, consistent with the observed closed-reader scene.",
+        "The reference bookmark ribbon is visible at its upper right, while the candidate omits it as explicitly required.",
+        "The artwork reaches the top and bottom of the native candidate capture. Differences in the pictured panels and artwork-internal white margins do not establish an application viewport defect."
+      ],
+      "intentional_differences": [
+        "The persistent reference bookmark ribbon is intentionally absent under the user override.",
+        "Artwork composition and cropping differ from the reference and were not treated as application-decoration defects."
+      ]
+    },
+    {
+      "case_id": "sc-reader-portrait--image",
+      "case_metadata": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/cases/sc-reader-portrait--image.json",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/sc-reader-portrait--image.png",
+      "candidate_sha256": "9e04b10bad8fee5a69523241d7026829dd547adefa93c095bfe7a248deda52ed",
+      "reference_png": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/screens/states/sc-reader-portrait--image.png",
+      "reference_sha256": "6ded816b6c76abacc6fe7b48f11a1bc5ad01b3d6ee0a288e4275f6378dc79d30",
+      "viewed_candidate": true,
+      "viewed_reference": true,
+      "outcome": "no_actionable_finding",
+      "observations": [
+        "The image settings sheet is visibly open above the progress area, with the Image tool selected and the reader menu retained. Metadata records menu=true and reader_panel=picture.",
+        "The sheet begins at approximately logical y=778 and fits above the unchanged lower menu. Its actual artwork preview, heading, contrast controls, refresh choices, dither row and night switch are all visible without clipping.",
+        "The contrast control shows five positions with the standard state selected, plus distinct minus and plus buttons. Refresh choices are every page, 3, 6, 10 and chapter change, with 6 visibly selected.",
+        "The sixteen-level grayscale dither switch is on and the night switch is off. The dither wording does not claim qualified hardware dithering, consistent with metadata declaring software_dither=true and hardware_dither_qualified=false.",
+        "The sheet preserves the reference's two-column control organization and 48-pixel outer inset at the normalized logical scale. Neutral gray separators and unselected outlines remain legible against white.",
+        "The chapter navigation row is free of stray rules, the More icon is a three-dot ellipsis, and the top table-of-contents action retains distinct bullet-list geometry at approximately 20 logical pixels wide."
+      ],
+      "intentional_differences": [
+        "The preview shows the candidate's actual artwork rather than the reference's differently composed crop.",
+        "The reference hardware-dither status is replaced by the implemented sixteen-level grayscale dither control. The supplied capability declaration supports software dithering and does not qualify hardware dithering."
+      ]
+    }
+  ],
+  "suggestions": [],
+  "prior_finding_rechecks": [
+    {
+      "finding_id": "P3D004",
+      "case_ids": [
+        "sc-reader-portrait--default",
+        "sc-reader-portrait--image"
+      ],
+      "outcome": "fixed_in_observed_cases",
+      "observation": "Both viewed menu states show a compact three-dot ellipsis above the More label, consistent with the reference action."
+    },
+    {
+      "finding_id": "P3D005",
+      "case_ids": [
+        "sc-reader-portrait--default",
+        "sc-reader-portrait--image"
+      ],
+      "outcome": "fixed_in_observed_cases",
+      "observation": "Both viewed menu states leave clean white space between the previous/next chapter buttons. No stray horizontal rules cross that navigation row; the progress track above and toolbar boundary below remain separate."
+    },
+    {
+      "finding_id": "P3R001",
+      "case_ids": [
+        "sc-reader-portrait--default",
+        "sc-reader-portrait--image"
+      ],
+      "outcome": "fixed_in_observed_cases",
+      "observation": "The header table-of-contents action in both viewed states is a bullet-list icon with separate bullets and lines, approximately 20 logical pixels wide, rather than a tiny three-line glyph."
+    }
+  ],
+  "limitations": [
+    "This review covers only the four assigned reference pairs and makes no claim that the complete round is clean.",
+    "All eight assigned original PNGs were individually displayed with tools.view_image. The viewer downsampled the 1860x2480 reference images for display; comparisons used the documented 2x reference scale.",
+    "No application, build, test suite, runtime probe, Git operation or product modification was performed. Work was limited to reading the assigned JSON/PNG evidence, hashing the PNG bytes and writing this review document.",
+    "Static screenshots establish visible state and clipping only. They do not prove pointer reachability, interaction behavior or the absence of an invisible footer-cycle hit region.",
+    "The two-column six-row table-of-contents panel is not open in these assigned captures, so its row dimensions and spacing are not evaluated here.",
+    "Unsupported pen, sensor, qualified hardware-dither and external-authorization behavior cannot be validated from these static reader states."
+  ]
+}

@@ -1,0 +1,168 @@
+import { State, Commands, FilterOption } from "state.slint";
+import { Theme } from "theme.slint";
+import { Strings } from "strings.slint";
+import { PanelAction, DashedFrame } from "panels-common.slint";
+
+component TagFlowChip inherits Rectangle {
+    in property <string> text;
+    in property <int> state;
+    in property <bool> interactive;
+    in property <length> text-size;
+    in property <int> text-weight: 500;
+    in property <length> horizontal-padding;
+    in property <length> marker-width;
+    callback chosen();
+    property <bool> interaction-pressed: false;
+    property <bool> inverted: root.interactive && ((root.state == 1) != root.interaction-pressed);
+    property <color> foreground: root.inverted ? Theme.paper : root.state == -1 ? Theme.secondary : Theme.ink;
+    // Keep the flow's capacity budget separate from each chip's visible marker.
+    property <length> effective-marker-width: root.interactive && root.state != 0 ? root.marker-width : 0px;
+    property <bool> label-overflowed: label.preferred-width > label-box.width;
+    preferred-width: max(Theme.touch, label.preferred-width + root.horizontal-padding * 2 + root.effective-marker-width);
+    background: root.inverted ? Theme.ink : Theme.paper;
+    border-radius: Theme.control-radius;
+    border-width: root.state == -1 ? 0px : root.interactive ? Theme.control-border : 1px;
+    border-color: root.interactive ? (root.state == 0 ? Theme.disabled : Theme.ink) : Theme.secondary;
+    accessible-role: none;
+    changed interactive => { root.interaction-pressed = false; }
+    if root.state == -1: DashedFrame {
+        x: 0px; y: 0px; width: parent.width; height: parent.height;
+        line-color: root.foreground;
+    }
+    if root.interactive: Text {
+        x: root.horizontal-padding; y: 0px; width: root.effective-marker-width; height: parent.height;
+        text: root.state == 1 ? "✓" : root.state == -1 ? "✕" : "";
+        font-family: Theme.sans; font-size: root.text-size; font-weight: root.text-weight;
+        color: root.foreground; vertical-alignment: center;
+    }
+    label-box := Rectangle {
+        x: root.horizontal-padding + root.effective-marker-width; y: 0px;
+        width: max(0px, parent.width - root.horizontal-padding * 2 - root.effective-marker-width);
+        height: parent.height; clip: true;
+        label := Text {
+            // An oversized single label keeps its distinguishing suffix inside its own chip.
+            x: root.label-overflowed ? parent.width - self.preferred-width : 0px;
+            y: 0px; width: root.label-overflowed ? self.preferred-width : parent.width; height: parent.height;
+            text: root.text; font-family: Theme.sans; font-size: root.text-size; font-weight: root.text-weight;
+            color: root.foreground; vertical-alignment: center; horizontal-alignment: center;
+            wrap: no-wrap; overflow: clip;
+        }
+        if root.label-overflowed: Rectangle {
+            // Keep the overflow mask inside the frame so it cannot hide solid or dashed edges.
+            property <length> frame-inset: root.interactive ? ceil(Theme.control-border / 1px) * 1px : 1px;
+            x: 0px; y: self.frame-inset; width: ellipsis.preferred-width + 2px;
+            height: max(0px, parent.height - self.frame-inset * 2);
+            background: root.inverted ? Theme.ink : Theme.paper;
+            ellipsis := Text {
+                width: self.preferred-width; height: parent.height; text: "…";
+                font-family: Theme.sans; font-size: root.text-size; font-weight: root.text-weight;
+                color: root.foreground; vertical-alignment: center;
+            }
+        }
+        if root.state == -1: Rectangle {
+            x: (parent.width - self.width) / 2; y: parent.height / 2;
+            width: min(parent.width, label.preferred-width); height: 1px; background: root.foreground;
+        }
+    }
+    if root.interactive: Rectangle {
+        x: 0px; y: 0px; width: parent.width; height: parent.height;
+        accessible-role: button;
+        accessible-label: (root.state == 1 ? "✓ " : root.state == -1 ? "✕ " : "") + root.text;
+        accessible-checkable: true;
+        accessible-checked: root.state != 0;
+        TouchArea {
+            x: 0px; width: parent.width;
+            y: (parent.height - max(parent.height, Theme.touch)) / 2; height: max(parent.height, Theme.touch);
+            changed pressed => { root.interaction-pressed = self.pressed; }
+            pointer-event(event) => {
+                if event.kind == PointerEventKind.down { Commands.refresh("fast"); }
+                else if event.kind == PointerEventKind.up || event.kind == PointerEventKind.cancel { Commands.refresh("ui"); }
+            }
+            clicked => { root.chosen(); }
+        }
+    }
+}
+
+export component TagFlow inherits Rectangle {
+    in property <[string]> labels;
+    in property <[FilterOption]> filter-options;
+    in property <length> item-height: State.large-screen ? 38px : 34px;
+    in property <length> text-size: State.large-screen ? 17px : 15px;
+    in property <int> text-weight: 500;
+    in property <length> horizontal-padding: 10px;
+    in property <length> gap: 8px;
+    in property <bool> intrinsic-width: false;
+    in property <int> rows-per-page: 2;
+    in-out property <int> page: 0;
+    out property <int> page-count: max(1, ceil(root.item-count * 1.0 / root.page-size));
+    out property <length> content-height: root.item-count == 0 ? 0px : root.visible-rows * root.item-height + max(0, root.visible-rows - 1) * root.gap + (root.page-count > 1 ? 48px + root.gap : 0px);
+    callback chosen(int);
+    property <bool> interactive: root.filter-options.length > 0;
+    property <int> item-count: root.interactive ? root.filter-options.length : root.labels.length;
+    property <length> marker-width: root.interactive ? max(include-marker.preferred-width, exclude-marker.preferred-width) + 4px : 0px;
+    property <length> item-preferred-width: max(Theme.touch, measurements.preferred-width + root.horizontal-padding * 2 + root.marker-width);
+    property <length> available-width: max(1px, root.width);
+    property <int> columns: min(max(1, root.item-count), max(1, floor((root.available-width + root.gap) / (min(root.available-width, root.item-preferred-width) + root.gap))));
+    property <int> page-size: root.columns * max(1, root.rows-per-page);
+    property <int> current-page: max(0, min(root.page, root.page-count - 1));
+    property <int> visible-count: min(root.page-size, max(0, root.item-count - root.current-page * root.page-size));
+    property <int> visible-rows: ceil(root.visible-count * 1.0 / root.columns);
+    height: root.content-height;
+    background: transparent;
+    changed page-count => { root.page = root.current-page; }
+
+    // Keep measurement as a direct native layout with no assigned geometry.
+    // Transparent text still participates in intrinsic layout and measures every off-page label.
+    measurements := VerticalLayout {
+        spacing: 0px; padding: 0px;
+        for index in root.item-count: Text {
+            text: root.interactive ? root.filter-options[index].title : root.labels[index];
+            font-family: Theme.sans; font-size: root.text-size; font-weight: root.text-weight; wrap: no-wrap;
+            opacity: 0; accessible-role: none;
+        }
+    }
+    include-marker := Text {
+        text: "✓"; font-family: Theme.sans; font-size: root.text-size; font-weight: root.text-weight;
+        opacity: 0; accessible-role: none;
+    }
+    exclude-marker := Text {
+        text: "✕"; font-family: Theme.sans; font-size: root.text-size; font-weight: root.text-weight;
+        opacity: 0; accessible-role: none;
+    }
+    for row in root.visible-rows: HorizontalLayout {
+        x: 0px; y: row * (root.item-height + root.gap); width: parent.width; height: root.item-height;
+        spacing: root.gap; padding: 0px; alignment: start;
+        for column in min(root.columns, max(0, root.visible-count - row * root.columns)): TagFlowChip {
+            property <int> row-count: min(root.columns, max(0, root.visible-count - row * root.columns));
+            property <int> item-index: root.current-page * root.page-size + row * root.columns + column;
+            property <length> slot-width: max(0px, (parent.width - (self.row-count - 1) * root.gap) / max(1, self.row-count));
+            // Intrinsic chips keep a real gap; equal cells expand a partial final row into the remaining width.
+            width: root.intrinsic-width ? min(self.preferred-width, self.slot-width) : self.slot-width;
+            height: root.item-height; horizontal-stretch: 0;
+            text: root.interactive ? root.filter-options[self.item-index].title : root.labels[self.item-index];
+            state: root.interactive ? root.filter-options[self.item-index].state : 0;
+            interactive: root.interactive; text-size: root.text-size; text-weight: root.text-weight;
+            horizontal-padding: root.horizontal-padding; marker-width: root.marker-width;
+            chosen => { root.chosen(self.item-index); }
+        }
+    }
+    if root.page-count > 1: Rectangle {
+        x: 0px; y: parent.height - 48px; width: parent.width; height: 48px;
+        PanelAction {
+            x: 0px; y: 0px; width: self.preferred-width; height: 48px;
+            text: Strings.previous; quiet: true; enabled: root.current-page > 0;
+            clicked => { root.page = max(0, root.current-page - 1); Commands.refresh("ui"); }
+        }
+        Text {
+            x: parent.width / 2 - 40px; y: 0px; width: 80px; height: parent.height;
+            text: (root.current-page + 1) + " / " + root.page-count;
+            font-family: Theme.numbers; font-size: Theme.caption; color: Theme.secondary;
+            horizontal-alignment: center; vertical-alignment: center;
+        }
+        PanelAction {
+            x: parent.width - self.width; y: 0px; width: self.preferred-width; height: 48px;
+            text: Strings.next; quiet: true; enabled: root.current-page + 1 < root.page-count;
+            clicked => { root.page = min(root.page-count - 1, root.current-page + 1); Commands.refresh("ui"); }
+        }
+    }
+}

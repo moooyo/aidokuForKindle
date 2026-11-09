@@ -1,0 +1,179 @@
+{
+  "schema_version": 1,
+  "batch_id": "c11r1-m005-b006",
+  "reviewer": "c11r1_m005_b006",
+  "record_date": "2026-11-07",
+  "round": 1,
+  "run_id": "55c498296d35",
+  "module_id": "005-pw-sources-search-content",
+  "immutable_input": {
+    "path": "D:/Code/aidokuForKindle/docs/review/phase3-c11-full1-batches/c11r1-m005-b006.input.json",
+    "sha256_status": "Owner declaration pending; no local hash was run.",
+    "other_case_identity_source": "Exact local/owner paths, bytes and remaining provenance are retained in the immutable input case records and module inventory."
+  },
+  "module_snapshot": {
+    "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate11/ui-round-1/snapshots/ui-round-1-snapshot-005-pw-sources-search-content/inventory.json",
+    "sha256": "9097f57f4d544d5230118fbb2511f6c1ab32e6939bcfef33a3cbae027469937b",
+    "archive_sha256": "78480343b6eccc753be9ca9751c3bf74850dcaf7086d045a11641aef19c4ef89",
+    "transfer_accounting_sha256": "63539a8e3fccbd311ec2c55bca1f12ae60909d44afd06b823a3e8560cce08cdc",
+    "full_manifest_pending": true
+  },
+  "freeze_tuple": {
+    "run_id": "55c498296d35",
+    "source_sha256": "33a2d049307c398da8bfbf196d1bf8e086412c117c194b592f4a93b5bfaedb3f",
+    "binary_sha256": "1e60db345cbd6fbe580258a4a309bf42361781061dc2033f78a8a5eb4446ad72",
+    "reference_sha256": "e7b49b456255432d74cfe41346f9d44c1a9c55bf67c5d55483e4ae3029547d18",
+    "capture_plan_sha256": "b201d4ac36df8023fb12f07e0adae91f4c63201cdd441add6ddd0a0d535ca368",
+    "reference_scope_sha256": "c910bed9f02ed17b2ca0a54aca1beeeeb6caabc5a17a91afe764ddd3e7b0d33c",
+    "main_harness_sha256": "f7e2d3dc3c66479715a7d5d094a7b9165379c3e1f4b1b8ecad092b78b924a892",
+    "gate_manifest_sha256": "5e353b5686ec70f89bb367e8f5ff99ef2e6a2b533e43218acffeed278e5d52d2",
+    "complete_identity_reference": "Immutable input #/freeze_tuple and module inventory #/frozen_identity; helper/execution-input declarations are retained there.",
+    "hash_origin": "All SHA values are owner declarations; no local rehash."
+  },
+  "reviewed_case_ids": [
+    "pw5--http-search-success",
+    "pw5--http-search-empty",
+    "pw5--http-search-failure",
+    "pw5--http-search-retry"
+  ],
+  "actual_original_image_opens": 5,
+  "actual_opened_new_candidate_count": 4,
+  "actual_opened_reference_count": 1,
+  "references": [
+    {
+      "reference_id": "pw-search--results",
+      "path": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/screens/states/pw-search--results.png",
+      "sha256": "a59eb8400889e67fb7dc0d86cc83c22d37999bdeb6ae746d638b2964f3c14a18",
+      "dimensions": [
+        1236,
+        1648
+      ],
+      "actual_image_opened": true,
+      "actual_viewing_record": "Opened this assigned original with tools.view_image during this worker job.",
+      "comparison_kind": "Related logical screen/state contract only; no exact-state reference for any of the four supplemental cases.",
+      "observation": "The original has a search field, source scope chips, a completed-source summary, source-grouped preview cards, empty/failure rows with a right-aligned Retry action and a selected Search footer marker. Its physical dimensions are twice the candidates' logical native dimensions."
+    }
+  ],
+  "cases": [
+    {
+      "case_id": "pw5--http-search-success",
+      "immutable_input_case": "#/cases/0",
+      "png_sha256": "0bce229a6b44b958b64321feff88fd7c5b1aec666958d1ba5deeb08dcd67d681",
+      "case_json_sha256": "149c60669d4195abaa7f9507014c51b94be8cb138b621578a52f547f10f49b33",
+      "state_sha256": "6c20864d3ab33f5ee061bc0251a22f03e2721a76dfc50656875066f45308e13d",
+      "metadata_sha256": "2b8f4436657cc51c9392317dfc7d26593d0d2e521d4cceaa29c97a8dc8a81bb4",
+      "actions_sha256": "9918ce377de383b7a2e9081802e96a5dad352b8c995cbd3835538336a7a13aa5",
+      "log_sha256": "dc121ceea011a63c29b404d6c6b75bbe2db32b326923b8fa99759f457bfd709f",
+      "reference_sha256": null,
+      "comparison_reference_ids": [
+        "pw-search--results"
+      ],
+      "exact_state_reference_status": "Unavailable; not passed or manufactured.",
+      "native_dimensions": [
+        618,
+        824
+      ],
+      "actual_image_opened": true,
+      "actual_viewing_record": "Opened this exact assigned original with tools.view_image.",
+      "observation": "The one-source scope row, completed-source summary and Local komga fixture heading are legible. Three bounded preview cards sit below the 20-item count with a right-aligned View all affordance. The cover frames, single-line ellipsized English titles and metadata retain the related reference's hierarchy and gutters; no text crosses a card boundary. The five-item footer and selected Search marker remain clear.",
+      "static_evidence": "The frozen query action targets fixture at 450 ms. Existing provider evidence contains one successful series-list POST and three authorized thumbnail GETs. State records 20 results, three preview books, no pending/error state and settled visible covers; this supports the displayed completed result without a new runtime check.",
+      "intentional_capability_checks": "The fixture's one source, English titles, cover artwork and 20-item count are content differences. Actual card allocation, legibility and control boundaries were inspected independently.",
+      "static_verdict": "Consistent with the assigned related logical contract; no independent exact-state reference exists.",
+      "provider_request_sha256": "b9475ac8514d46c25b8dbe08b1924ebcfaccfa1069a0f769b90e393d848a8aa1",
+      "provider_evidence_reference": "Module inventory files/output/fixtures/pw5--http-search-success.requests.json; configuration provenance is retained in the adjacent fixture JSON."
+    },
+    {
+      "case_id": "pw5--http-search-empty",
+      "immutable_input_case": "#/cases/1",
+      "png_sha256": "f85a5606129ef2e6f905897878d36007491976b622ae2815098cef0ec4dc04d6",
+      "case_json_sha256": "9e23b045777fb00432712b88c62c5681f49faebe1735999a4377380bda3eaad5",
+      "state_sha256": "955e157f8ccc32806fcbd4c6b0da232d6f95c1586bc5095513d2a9d94006a47b",
+      "metadata_sha256": "0265b88cc956a4e9ef1d283dd03787e9a712c5e4d14797b509432f49ac5ed5bc",
+      "actions_sha256": "9918ce377de383b7a2e9081802e96a5dad352b8c995cbd3835538336a7a13aa5",
+      "log_sha256": "dc121ceea011a63c29b404d6c6b75bbe2db32b326923b8fa99759f457bfd709f",
+      "reference_sha256": null,
+      "comparison_reference_ids": [
+        "pw-search--results"
+      ],
+      "exact_state_reference_status": "Unavailable; not passed or manufactured.",
+      "native_dimensions": [
+        618,
+        824
+      ],
+      "actual_image_opened": true,
+      "actual_viewing_record": "Opened this exact assigned original with tools.view_image.",
+      "observation": "The same search field, source chips and source-heading alignment remain intact. The summary reports zero sources with results and the source row displays the localized empty-state label. No stale result card or Retry button is visible. The empty content area stops cleanly above the unchanged footer.",
+      "static_evidence": "The frozen query action targets fixture at 450 ms. Existing provider evidence contains one authorized series-list POST without a fixture failure. State records zero results, an empty book list, no pending/error state and the empty-state status; the screenshot is consistent with that completed empty response.",
+      "intentional_capability_checks": "Empty content legitimately reduces this source group to one status row; layout and status legibility remain reviewed.",
+      "static_verdict": "Consistent with the assigned related logical contract; no independent exact-state reference exists.",
+      "provider_request_sha256": "c02e9fe83f58863568f685fa6a9c0055e2102e288936c6477b713a099db2e6a7",
+      "provider_evidence_reference": "Module inventory files/output/fixtures/pw5--http-search-empty.requests.json; configuration provenance is retained in the adjacent fixture JSON."
+    },
+    {
+      "case_id": "pw5--http-search-failure",
+      "immutable_input_case": "#/cases/2",
+      "png_sha256": "9d3e57abc3d53147640c9358efa48ffac6f663065499ac97e676d37fea76b06e",
+      "case_json_sha256": "f65d86546ac8eaf12b6a6f2e2fb67b1b26fbdef5a8490bbc8147a585dc3cc098",
+      "state_sha256": "1fb15874e682f38af7008a99e118354b0c7336aa1def90f4b2f7f519086cd87b",
+      "metadata_sha256": "9145fa81921998d8a49ba035eae5ed5067a89057e27ce07e143835418a606229",
+      "actions_sha256": "9918ce377de383b7a2e9081802e96a5dad352b8c995cbd3835538336a7a13aa5",
+      "log_sha256": "dc121ceea011a63c29b404d6c6b75bbe2db32b326923b8fa99759f457bfd709f",
+      "reference_sha256": null,
+      "comparison_reference_ids": [
+        "pw-search--results"
+      ],
+      "exact_state_reference_status": "Unavailable; not passed or manufactured.",
+      "native_dimensions": [
+        618,
+        824
+      ],
+      "actual_image_opened": true,
+      "actual_viewing_record": "Opened this exact assigned original with tools.view_image.",
+      "observation": "The summary reports zero sources with results, while the source row visibly distinguishes failure through the localized incomplete-operation status and a black Retry button at the right edge. The button, source title and status do not overlap. No success card or empty-state label misrepresents the failure; header and footer geometry remain stable.",
+      "static_evidence": "The frozen query action targets fixture at 450 ms. Existing provider evidence contains one authorized series-list POST marked fixture_failure=true. State records error=true, pending=false, zero books and the incomplete-operation status; this supports the truthful retryable failure shown in the PNG.",
+      "intentional_capability_checks": "A general operation-failure label is appropriate to this recorded failure, rather than adopting the related reference's timeout-specific copy. The Retry rectangle is visually bounded; its physical input region was not qualified.",
+      "static_verdict": "Consistent with the assigned related logical contract; no independent exact-state reference exists.",
+      "provider_request_sha256": "670f81385cb807f6c2273587d3dfba7e55bb40626f783898796d6d3b138c7fe1",
+      "provider_evidence_reference": "Module inventory files/output/fixtures/pw5--http-search-failure.requests.json; configuration provenance is retained in the adjacent fixture JSON."
+    },
+    {
+      "case_id": "pw5--http-search-retry",
+      "immutable_input_case": "#/cases/3",
+      "png_sha256": "0bce229a6b44b958b64321feff88fd7c5b1aec666958d1ba5deeb08dcd67d681",
+      "case_json_sha256": "e53025943b323a3390c4ba5409d37d91a36c3e26f10d1ffcee60c28efc25a4da",
+      "state_sha256": "049b3b1fcd59b0225b3c2888ceb99b93af72e97124c96b2e25205251152a4097",
+      "metadata_sha256": "ada3aadf6995612aab56b8cd6394a898c110e38d52ee401616fab340fd290c63",
+      "actions_sha256": "3fca5c7796b9d11afe5bd9dc545d5f07a1e8395b7f91159e8b90bc3e5e67db1e",
+      "log_sha256": "dc121ceea011a63c29b404d6c6b75bbe2db32b326923b8fa99759f457bfd709f",
+      "reference_sha256": null,
+      "comparison_reference_ids": [
+        "pw-search--results"
+      ],
+      "exact_state_reference_status": "Unavailable; not passed or manufactured.",
+      "native_dimensions": [
+        618,
+        824
+      ],
+      "actual_image_opened": true,
+      "actual_viewing_record": "Opened this exact assigned original with tools.view_image.",
+      "observation": "The completed result layout returns after retry: one source with results, a 20-item count, three bounded preview cards and View all. The failure status and Retry button are absent. Long English titles and metadata remain ellipsized within their one-line card widths, and the source heading, cover boundaries and selected Search footer marker remain clear.",
+      "static_evidence": "The frozen actions record query fixture at 450 ms followed by retry komga at 2050 ms. Existing provider evidence records a failed series-list POST, then a successful POST and three authorized thumbnail GETs. Final state records 20 results with no pending/error state. The success and retry PNGs have the same owner-declared SHA, and both original files were actually opened independently.",
+      "intentional_capability_checks": "The restored result layout is assessed from this new retry original and its recorded retry sequence; an identical final PNG alone is not treated as execution proof.",
+      "static_verdict": "Consistent with the assigned related logical contract; no independent exact-state reference exists.",
+      "provider_request_sha256": "99fd56992dbf98de14a23389450d1a5b8c85d72def00d76d2f77ed985c2eb9d1",
+      "provider_evidence_reference": "Module inventory files/output/fixtures/pw5--http-search-retry.requests.json; configuration provenance is retained in the adjacent fixture JSON."
+    }
+  ],
+  "historical_findings": [],
+  "regression_closures": [],
+  "new_actionable": [],
+  "pending": [],
+  "limitations": [
+    "This is a bounded four-case static review using one related original reference, not an exact-state pixel qualification or a full-round/clean acceptance.",
+    "No candidate was resized, cropped or replaced. The four native originals were viewed at their actual 618x824 dimensions; the assigned reference is 1236x1648 at physical scale two.",
+    "Existing case/state/action/metadata/log, provider-request and fixture-configuration evidence was read statically. No application, test, build, probe, validator, SQL, SSH, hash command or image processing was run.",
+    "No Store/save/persistence conclusion or history regression closure is made for this assignment.",
+    "Screenshots do not qualify hidden hit regions, physical input, e-ink behavior, hardware orientation, timing or live-provider availability.",
+    "The full manifest and final required-ID/source/binary/reference/tool reconciliation remain with the owner/coordinator. No captured evidence, production, harness, plan or existing report was changed."
+  ]
+}

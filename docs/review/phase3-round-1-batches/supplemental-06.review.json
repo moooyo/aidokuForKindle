@@ -1,0 +1,160 @@
+{
+  "batch_id": "supplemental-06",
+  "reviewer": "/root/phase3_round1_review/supplemental_06",
+  "run_id": "a1baf3fe3dc2",
+  "binary_sha256": "94d7f3bbcab475ad8833a2f3c486138f7b49bead231851c2d8eab2f0c3d2ac51",
+  "source_sha256": "aef9db4e111165016a10a2a95e111f3155860b8510c7f6207ec9c79fbec5082c",
+  "review_method": "Fresh independent manual inspection of each of the eight listed candidate PNGs with tools.view_image. Only the assigned candidate images were loaded. Case sidecars, reference-scope text, HANDOFF text, and relevant prototype text were read without running an application or verification suite.",
+  "identity_verification": {
+    "all_candidate_hashes_match_input_and_case_evidence": true,
+    "all_case_run_binary_and_source_identifiers_match": true,
+    "backend": "desktop",
+    "profile": "pw5",
+    "native_capture_size": [618, 824],
+    "orientation": "portrait",
+    "method": "Get-FileHash -Algorithm SHA256 on each current candidate PNG, compared with expected_png_sha256 and case_metadata.evidence_hashes.screenshot.sha256. Case metadata identifies the supplied run, binary, and source."
+  },
+  "text_sources": [
+    "D:/Code/aidokuForKindle/docs/review/phase3-reference-scope.json",
+    "D:/Code/aidokuForKindle/docs/DESIGN_HANDOFF.md",
+    "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/HANDOFF.md",
+    "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/prototype/Main.dc.html",
+    "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/prototype/pw-history.dc.html"
+  ],
+  "reviewed_case_ids": [
+    "pw5--filter-unread-1",
+    "pw5--filter-unread-2",
+    "pw5--filter-unread-3",
+    "pw5--folio-outside-dismiss",
+    "pw5--history-clear-apply",
+    "pw5--history-clear-cancel",
+    "pw5--history-delete-entry",
+    "pw5--history-first-boundary"
+  ],
+  "reviewed_cases": [
+    {
+      "case_id": "pw5--filter-unread-1",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/pw5--filter-unread-1.png",
+      "candidate_sha256": "79edcf971e8b319f830f10fc10c3792481c0b0bdc93998efac9773757a56c27d",
+      "viewed_candidate": true,
+      "outcome": "no_actionable_issue_observed",
+      "observations": [
+        "The library-filter choices sheet is visibly open. The unread chip uses an explicit check mark, black fill, and white text, matching the include state recorded as library_filters [0, 1, 0, 0].",
+        "Eight sorting choices remain arranged in two columns. Recent-read sorting and descending direction are visibly inverted; the other sort and direction choices retain white outlined surfaces.",
+        "The sheet follows its content to the bottom edge, with a black top rule, a readable title and Done action, and four fully visible filter chips. The exposed library above it has no dimmed or stippled backdrop and no offset shadow.",
+        "Metadata records library route, choices modal, library-filter context, and page range 1 of 5. The image supports the visible include presentation; projected demo badges are not used to infer actual unread membership."
+      ],
+      "intentional_differences": []
+    },
+    {
+      "case_id": "pw5--filter-unread-2",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/pw5--filter-unread-2.png",
+      "candidate_sha256": "6bcf8e4362e6d688842c041e62d913b73ade8839f91e3c3df1dab670b2c890a9",
+      "viewed_candidate": true,
+      "outcome": "no_actionable_issue_observed",
+      "observations": [
+        "The unread chip has changed from inverse include styling to a white exclude chip with an explicit cross and dashed outline. This is distinguishable from both the include and neutral captures and matches library_filters [0, -1, 0, 0].",
+        "The exposed cover row changes with this filter state, while the sheet title, two-column sorting choices, direction controls, and Done action remain stable and unclipped.",
+        "All four chips fit on one row with clear gaps. The sheet stays white, has no shadow or backdrop mask, and ends with the content padding rather than a large unused panel area.",
+        "Case metadata records the same run and library-filter context with a changed page range of 1 of 2. The screenshot does not expose every resulting book or its underlying unread chapter count."
+      ],
+      "intentional_differences": []
+    },
+    {
+      "case_id": "pw5--filter-unread-3",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/pw5--filter-unread-3.png",
+      "candidate_sha256": "c4aa581e0da987764221d49dff541b2c196f72e9a7ae3b4132ee342eb8526ae8",
+      "viewed_candidate": true,
+      "outcome": "no_actionable_issue_observed",
+      "observations": [
+        "The unread chip returns to an unmarked white neutral control. Neither a check nor a cross remains, and all four filter chips are neutral, consistent with library_filters [0, 0, 0, 0].",
+        "Recent-read sorting and descending direction retain their selected black appearance across the filter cycle. Labels, outlines, gaps, and the Done action remain legible and aligned.",
+        "The full-width sheet retains its content-driven height and black top rule without dimming the visible library. The underlying first cover row returns to the neutral result presentation.",
+        "Metadata records page range 1 of 6, distinct from the include and exclude totals. This establishes the recorded third-state return without treating a mechanical state check as proof of all off-screen result membership."
+      ],
+      "intentional_differences": []
+    },
+    {
+      "case_id": "pw5--folio-outside-dismiss",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/pw5--folio-outside-dismiss.png",
+      "candidate_sha256": "fc37f360ba9d0c7ac18d345fbe63e55257fbb687c23114c8add630ad6d6b2603",
+      "viewed_candidate": true,
+      "outcome": "no_actionable_issue_observed",
+      "observations": [
+        "The library is unobstructed after the recorded outside dismissal. No jump grid, selected black folio center, visible capture layer, or residual popup border remains; metadata records page_jump_open false and an empty modal.",
+        "The folio shows 1 of 6 with the next-page action at the right and the unavailable previous-page allocation left empty. The center remains centered above the five-item dock.",
+        "The four-by-two cover grid is fully visible. Numeric badges and download marks sit beside the titles below the cover artwork, with no overlapping row captions or clipped bottom row.",
+        "The continuation card is a white outline with readable title/chapter text and a black progress fill of about thirty percent, consistent with its 12 of 40 page label. The screenshot has no modal shadow or backdrop stippling."
+      ],
+      "intentional_differences": []
+    },
+    {
+      "case_id": "pw5--history-clear-apply",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/pw5--history-clear-apply.png",
+      "candidate_sha256": "5e0d1a425a7c87af71dc7707f2c62fa81629a685b1868447b4847face3a15cec",
+      "viewed_candidate": true,
+      "outcome": "no_actionable_issue_observed",
+      "observations": [
+        "The confirmation has closed and the history list is empty, consistent with metadata history_count 0 and visible_history empty. No dated group, stale book row, progress bar, or per-entry remove control remains.",
+        "The recent-reading caption reports zero, the clear-history icon is visibly muted, and a centered clock symbol with a readable no-reading-records message communicates the resulting empty state.",
+        "The folio is reduced to 1 of 1 with neither previous nor next action visible. Its reserved bar and the active History dock destination remain aligned.",
+        "The reading-history tab remains selected and the chapter-updates tab retains its separate count. The white page shows no residual dialog outline, dimming, or shadow."
+      ],
+      "intentional_differences": []
+    },
+    {
+      "case_id": "pw5--history-clear-cancel",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/pw5--history-clear-cancel.png",
+      "candidate_sha256": "0087039ea5509836348045062f722f8ef66e6ac68f2a0689ca997badcf322e68",
+      "viewed_candidate": true,
+      "outcome": "no_actionable_issue_observed",
+      "observations": [
+        "Cancellation leaves a populated history page and no visible confirmation. Metadata retains history_count 20 and five visible entries, including the first partially read entry rather than the cleared empty state.",
+        "Date groups descend from November 4 to November 3 to November 1. Within the first two groups, the visible times descend from 18:20 to 07:45 and from 23:10 to 21:02, respectively.",
+        "The narrow covers share a left edge; title, chapter, and progress/time text share the text-column edge with a clear image/text gap. Per-entry crosses align at the right, and separators begin at the text column without crossing the cover artwork.",
+        "The first partial-progress bar has roughly thirty percent black fill for 12 of 40 pages. The other partial bar has roughly twenty-three percent fill for 5 of 22 pages. Completed entries use completion/time text without misleading partial tracks.",
+        "The 1 of 5 folio stays centered, the next action stays at the right, and no previous action occupies the first-page slot. All five entries and the active History dock fit without clipping."
+      ],
+      "intentional_differences": []
+    },
+    {
+      "case_id": "pw5--history-delete-entry",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/pw5--history-delete-entry.png",
+      "candidate_sha256": "0d975ecb2230f639d9ceef59f3aa9b47af16e6e124c20e5601f5b775e05770c5",
+      "viewed_candidate": true,
+      "outcome": "no_actionable_issue_observed",
+      "observations": [
+        "The previously first partial-reading entry is absent. The November 4 group now starts with its remaining completed entry at 07:45, matching metadata history_count 19 and the recorded one-entry decrease.",
+        "The reading caption changes from eight to seven, and the later date groups move upward without an orphaned date label or blank deleted row. The sequence remains November 4, November 3, then November 1.",
+        "Covers, titles, chapter labels, metadata, separators, and right-side remove controls remain aligned after the list contracts. No title or progress text collides with an adjacent row.",
+        "The remaining 5 of 22 page entry retains a short black progress fill consistent with about twenty-three percent. Completed entries retain their completion/time labels.",
+        "The page remains at 1 of 5 with no previous action and a right-aligned next action. No stale confirmation or operation overlay remains visible."
+      ],
+      "intentional_differences": []
+    },
+    {
+      "case_id": "pw5--history-first-boundary",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/pw5--history-first-boundary.png",
+      "candidate_sha256": "0087039ea5509836348045062f722f8ef66e6ac68f2a0689ca997badcf322e68",
+      "viewed_candidate": true,
+      "outcome": "no_actionable_issue_observed",
+      "observations": [
+        "This candidate was opened and inspected separately despite sharing its hash with the cancel case. The visible page remains the populated first history page, consistent with metadata page 1, page_count 5, and history_count 20.",
+        "The unavailable previous action is absent while its left allocation remains empty. The 1 of 5 center is centered, and the next-page text and chevron remain at the right edge rather than shifting into the missing previous slot.",
+        "The first entry and the descending date/time groups are unchanged at the boundary. All five rows, including the final November 1 row, remain above the folio without overlap or clipping.",
+        "Both partial-progress fills remain proportional to their 12 of 40 and 5 of 22 labels, and cover/text columns and delete controls retain their alignment. No warning, modal, or stale jump panel is visible."
+      ],
+      "intentional_differences": []
+    }
+  ],
+  "suggestions": [],
+  "limitations": [
+    "No independent reference PNG was assigned to this supplemental batch. The assessment uses reference-scope, HANDOFF, and matching prototype text for layout and UX expectations; it is not an image-to-image comparison.",
+    "The eight assigned files are desktop native Slint captures at 618 by 824 logical pixels. They are not photographs or physical e-ink captures at the 1236 by 1648 reference resolution.",
+    "Still images and recorded sidecars show the resulting states. They do not independently prove input timing, whole-control press feedback, every pointer event in outside dismissal, durable behavior after restart, or the membership of every off-screen filtered record. No application, test, build, smoke test, or runtime probe was executed by this reviewer.",
+    "In demo mode, visible_books.unread is a projected cover-update badge, as documented by the read-only src/app/view.rs book_item implementation and src/demo.rs badge comment; it is independent of the unread chapter count used by the library query. The include/exclude badge values are therefore not treated as an independent audit of filtering membership. The review confirms the displayed three-state contract, sidecar state cycle, and differing recorded page totals.",
+    "Real titles, counts, covers, progress, and dates may differ from handoff sample data. Those differences were not treated as geometry or clipping failures.",
+    "These PNGs do not qualify physical sleep/wake, a 512 MiB memory ceiling, hardware refresh waveforms, sensor behavior, unavailable hardware visibility, or authentication integration. Closed-reader artwork and its invisible hit zones are outside these eight cases.",
+    "This result covers only supplemental-06. It makes no claim that the complete round is clean or that any consecutive-clean-round requirement has been met."
+  ]
+}

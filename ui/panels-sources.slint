@@ -1,0 +1,184 @@
+import { State, Commands } from "state.slint";
+import { Theme } from "theme.slint";
+import { Strings } from "strings.slint";
+import { BodyText, Caption, TitleText, Icon, PageBar } from "widgets.slint";
+import { PanelAction, PanelHeader, DashedFrame } from "panels-common.slint";
+
+export component PairingPanel inherits Rectangle {
+    property <length> pad: State.large-screen ? 34px : 22px;
+    property <length> header-top: State.large-screen ? 30px : 20px;
+    property <length> qr-size: State.large-screen ? 200px : 168px;
+    property <length> qr-top: root.header-top + (State.large-screen ? 50px : 44px) + (State.large-screen ? 20px : 16px);
+    property <length> qr-row-height: State.large-screen ? root.qr-size : max(root.qr-size, pairing-details.content-height);
+    property <length> entry-top: root.qr-top + root.qr-row-height + (State.large-screen ? 41px : 33px);
+    height: root.entry-top + (State.large-screen ? 21px : 18px) + (State.large-screen ? 10px : 8px) + (State.large-screen ? 58px : 50px) + (State.large-screen ? 32px : 26px);
+    background: Theme.paper;
+    TouchArea { x: 0px; y: 0px; width: parent.width; height: parent.height; }
+    if !State.large-screen: Rectangle { x: 0px; y: 0px; width: parent.width; height: 2px; background: Theme.ink; }
+    if State.large-screen: Rectangle { x: 0px; y: 0px; width: parent.width; height: parent.height; border-width: 2px; border-color: Theme.ink; border-radius: Theme.control-radius; background: transparent; }
+    PanelHeader {
+        x: root.pad; y: root.header-top; width: parent.width - root.pad * 2;
+        text: State.modal-title; primary: false;
+        closed => { Commands.action("panel", "close", ""); }
+    }
+    Rectangle {
+        x: root.pad; y: State.large-screen ? root.qr-top : root.qr-top + (root.qr-row-height - root.qr-size) / 2; width: root.qr-size; height: root.qr-size;
+        background: Theme.paper; border-width: Theme.control-border; border-color: Theme.ink; border-radius: Theme.control-radius;
+        if State.pairing-url != "": Image { x: 4px; y: 4px; width: parent.width - 8px; height: parent.height - 8px; source: State.pairing-code; image-fit: contain; }
+        if State.pairing-url == "": Icon { x: (parent.width - self.width) / 2; y: (parent.height - self.height) / 2; width: State.large-screen ? 48px : 40px; height: self.width; kind: "wifi"; enabled: false; }
+    }
+    pairing-details := Rectangle {
+        property <length> content-height: State.large-screen ? root.qr-size : (State.pairing-url == "" ? pairing-token.y + pairing-token.height : pairing-waiting.y + pairing-waiting.height);
+        x: root.pad + root.qr-size + (State.large-screen ? 26px : 20px);
+        y: State.large-screen ? root.qr-top : root.qr-top + (root.qr-row-height - self.height) / 2;
+        width: parent.width - self.x - root.pad; height: State.large-screen ? root.qr-size : self.content-height;
+        pairing-instruction := BodyText { x: 0px; y: State.large-screen ? 10px : 0px; width: parent.width; height: State.large-screen ? 42px : max(26px, self.preferred-height); text: State.pairing-url == "" ? Strings.wifi-disconnected : Strings.scan-or-open; font-size: State.large-screen ? 20px : 17px; font-weight: 700; wrap: State.large-screen ? no-wrap : word-wrap; }
+        endpoint-box := Rectangle {
+            property <length> horizontal-padding: State.large-screen ? 14px : 12px;
+            x: 0px; y: State.large-screen ? 60px : pairing-instruction.y + pairing-instruction.height + 8px;
+            width: min(parent.width, endpoint.preferred-width + self.horizontal-padding * 2); height: State.large-screen ? 66px : endpoint.preferred-height + 10px;
+            DashedFrame { x: 0px; y: 0px; width: parent.width; height: parent.height; line-color: Theme.ink; }
+            endpoint := Text { x: parent.horizontal-padding; y: 5px; width: max(0px, parent.width - parent.horizontal-padding * 2); height: parent.height - 10px; text: State.pairing-url == "" ? "—" : State.pairing-url; font-family: Theme.numbers; font-size: State.large-screen ? 20px : 19px; font-weight: 700; color: Theme.ink; wrap: word-wrap; vertical-alignment: center; }
+        }
+        pairing-token := Caption {
+            x: 0px; y: State.large-screen ? 137px : endpoint-box.y + endpoint-box.height + 8px; width: parent.width; height: State.large-screen ? 24px : self.preferred-height;
+            text: State.pairing-url == "" ? Strings.not-configured : Strings.pairing-code + " " + State.pairing-token;
+            font-size: State.large-screen ? 17px : 15px; color: Theme.ink; wrap: State.large-screen ? no-wrap : word-wrap;
+        }
+        if State.pairing-url != "": Rectangle {
+            x: 0px; y: pairing-waiting.y + (pairing-waiting.height - self.height) / 2;
+            width: State.large-screen ? 10px : 8px; height: self.width;
+            border-radius: State.large-screen ? 5px : 4px; background: Theme.ink;
+            accessible-role: none;
+        }
+        pairing-waiting := Caption { x: State.large-screen ? 20px : 16px; y: State.large-screen ? 169px : pairing-token.y + pairing-token.height + 8px; width: max(0px, parent.width - self.x); height: State.large-screen ? 24px : (State.pairing-url == "" ? 0px : self.preferred-height); text: State.pairing-url == "" ? "" : Strings.waiting-connection; font-size: State.large-screen ? 16px : 14px; font-weight: 700; color: Theme.ink; wrap: State.large-screen ? no-wrap : word-wrap; }
+    }
+    Rectangle { x: root.pad; y: root.qr-top + root.qr-row-height + (State.large-screen ? 20px : 16px); width: parent.width - root.pad * 2; height: 1px; background: Theme.line; }
+    Caption { x: root.pad; y: root.entry-top; width: parent.width - root.pad * 2; height: State.large-screen ? 21px : 18px; text: Strings.repository-direct-entry; font-size: State.large-screen ? 14px : 12px; letter-spacing: 2px; }
+    Rectangle {
+        x: root.pad; y: root.entry-top + (State.large-screen ? 31px : 26px);
+        width: parent.width - root.pad * 2 - entry.width - (State.large-screen ? 10px : 8px); height: State.large-screen ? 58px : 50px;
+        border-width: Theme.control-border; border-color: Theme.ink; border-radius: Theme.control-radius; background: input-hit.pressed ? Theme.ink : Theme.paper;
+        BodyText { x: State.large-screen ? 20px : 18px; y: 0px; width: parent.width - self.x * 2; height: parent.height; text: "https://"; font-family: Theme.numbers; font-size: State.large-screen ? 18px : 16px; color: input-hit.pressed ? Theme.paper : Theme.secondary; }
+        input-hit := TouchArea { x: 0px; y: 0px; width: parent.width; height: parent.height; clicked => { Commands.action("panel", "choose", "repository"); } }
+    }
+    entry := PanelAction {
+        x: parent.width - root.pad - self.width; y: root.entry-top + (State.large-screen ? 31px : 26px);
+        width: self.preferred-width; height: State.large-screen ? 58px : 50px;
+        text: Strings.keyboard-input; primary: true; text-size: State.large-screen ? 17px : 15px;
+        clicked => { Commands.action("panel", "choose", "repository"); }
+    }
+}
+
+export component RepositoryListPanel inherits Rectangle {
+    property <length> pad: State.large-screen ? 34px : 22px;
+    property <length> header-top: State.large-screen ? 30px : 20px;
+    property <length> list-top: root.header-top + (State.large-screen ? 50px : 44px) + (State.large-screen ? 16px : 12px);
+    property <length> row-height: State.large-screen ? 94px : 86px;
+    property <length> row-gap: State.large-screen ? 16px : 12px;
+    property <length> list-height: State.modal-items.length == 0 ? 58px : State.modal-items.length * root.row-height - root.row-gap;
+    property <length> add-top: root.list-top + root.list-height + (State.large-screen ? 16px : 12px);
+    property <length> pager-height: State.panel-page-count > 1 ? Theme.pager-height : 0px;
+    height: root.add-top + (State.large-screen ? 58px : 50px) + (State.large-screen ? 32px : 26px) + root.pager-height;
+    background: Theme.paper;
+    TouchArea { x: 0px; y: 0px; width: parent.width; height: parent.height; }
+    if !State.large-screen: Rectangle { x: 0px; y: 0px; width: parent.width; height: 2px; background: Theme.ink; }
+    if State.large-screen: Rectangle { x: 0px; y: 0px; width: parent.width; height: parent.height; border-width: 2px; border-color: Theme.ink; border-radius: Theme.control-radius; background: transparent; }
+    PanelHeader { x: root.pad; y: root.header-top; width: parent.width - root.pad * 2; text: Strings.source-list; action-text: Strings.keyboard-done; action-horizontal-padding: State.large-screen ? 24px : 22px; closed => { Commands.action("panel", "close", ""); } }
+    for item[index] in State.modal-items: Rectangle {
+        x: root.pad; y: root.list-top + index * root.row-height;
+        width: parent.width - root.pad * 2; height: root.row-height - root.row-gap;
+        border-width: Theme.control-border; border-color: Theme.ink; border-radius: Theme.control-radius; background: Theme.paper;
+        BodyText { x: State.large-screen ? 18px : 16px; y: State.large-screen ? 12px : 10px; width: max(0px, parent.width - self.x * 2 - remove.width - 14px); height: State.large-screen ? 28px : 25px; text: item.title; font-size: State.large-screen ? 18px : 16px; font-weight: 700; }
+        Caption { x: State.large-screen ? 18px : 16px; y: State.large-screen ? 44px : 36px; width: max(0px, parent.width - self.x * 2 - remove.width - 14px); height: 24px; text: item.value; font-family: Theme.numbers; font-size: State.large-screen ? 14px : 13px; }
+        remove := PanelAction { x: parent.width - self.width - (State.large-screen ? 18px : 16px); y: (parent.height - self.height) / 2; width: self.preferred-width; height: State.large-screen ? 46px : 40px; text: Strings.remove; text-size: State.large-screen ? 15px : 14px; horizontal-padding: State.large-screen ? 18px : 16px; enabled: item.enabled; clicked => { Commands.action("panel", "choose", item.id); } }
+    }
+    if State.modal-items.length == 0: Caption { x: root.pad; y: root.list-top; width: parent.width - root.pad * 2; height: root.list-height; text: Strings.not-configured; horizontal-alignment: center; }
+    Rectangle {
+        x: root.pad; y: root.add-top; width: parent.width - root.pad * 2; height: State.large-screen ? 58px : 50px;
+        background: add-touch.pressed ? Theme.ink : Theme.paper;
+        DashedFrame { x: 0px; y: 0px; width: parent.width; height: parent.height; line-color: add-touch.pressed ? Theme.paper : Theme.secondary; }
+        BodyText { x: 0px; y: 0px; width: parent.width; height: parent.height; text: Strings.add-repository; font-size: State.large-screen ? 17px : 15px; font-weight: 700; color: add-touch.pressed ? Theme.paper : Theme.ink; horizontal-alignment: center; }
+        add-touch := TouchArea { x: 0px; y: 0px; width: parent.width; height: parent.height; clicked => { Commands.action("sources", "add", ""); } }
+    }
+    if State.panel-page-count > 1: PageBar { x: 0px; y: parent.height - self.height; width: parent.width; page: State.panel-page; count: State.panel-page-count; context: "panel"; turn(delta) => { Commands.action("panel", "page", delta); } }
+}
+
+component SourcePickerFooterAction inherits Rectangle {
+    in property <string> text;
+    in property <bool> primary: false;
+    in property <bool> show-plus: false;
+    in property <int> badge-count: 0;
+    in property <length> text-size: State.large-screen ? 16px : 14px;
+    in property <length> horizontal-padding: State.large-screen ? 18px : 12px;
+    callback clicked();
+    property <bool> inverted: root.primary != hit.pressed;
+    property <length> plus-space: root.show-plus ? (State.large-screen ? 24px : 22px) : 0px;
+    property <length> badge-space: root.badge-count > 0 ? badge.width + 8px : 0px;
+    preferred-width: max(Theme.touch, label.preferred-width + root.horizontal-padding * 2 + root.plus-space + root.badge-space);
+    height: State.large-screen ? 52px : 46px;
+    border-width: root.primary ? 0px : Theme.control-border;
+    border-color: Theme.ink; border-radius: Theme.control-radius;
+    background: root.inverted ? Theme.ink : Theme.paper;
+    accessible-role: button;
+    accessible-label: root.text + (root.badge-count > 0 ? " " + root.badge-count : "");
+    if root.show-plus: Icon { x: root.horizontal-padding; y: (parent.height - self.height) / 2; width: State.large-screen ? 18px : 16px; height: self.width; kind: "plus"; inverted: root.inverted; }
+    label := BodyText { x: root.horizontal-padding + root.plus-space; y: 0px; width: self.preferred-width; height: parent.height; text: root.text; font-size: root.text-size; font-weight: 700; color: root.inverted ? Theme.paper : Theme.ink; }
+    badge := Rectangle {
+        x: label.x + label.width + 8px; y: (parent.height - self.height) / 2;
+        width: badge-label.preferred-width + 12px; height: State.large-screen ? 20px : 18px;
+        visible: root.badge-count > 0; border-radius: 2px; background: root.inverted ? Theme.paper : Theme.ink;
+        badge-label := Text { x: 6px; y: 0px; width: self.preferred-width; height: parent.height; text: root.badge-count; font-family: Theme.numbers; font-size: State.large-screen ? 13px : 12px; font-weight: 700; color: root.inverted ? Theme.ink : Theme.paper; vertical-alignment: center; }
+    }
+    hit := TouchArea {
+        x: 0px; y: (parent.height - max(parent.height, Theme.touch)) / 2; width: parent.width; height: max(parent.height, Theme.touch);
+        pointer-event(event) => {
+            if event.kind == PointerEventKind.down { Commands.refresh("fast"); }
+            else if event.kind == PointerEventKind.up || event.kind == PointerEventKind.cancel { Commands.refresh("ui"); }
+        }
+        clicked => { root.clicked(); }
+    }
+}
+
+export component SourcePickerPanel inherits Rectangle {
+    property <length> group-height: State.large-screen ? 40px : 34px;
+    property <length> group-bottom-padding: 6px;
+    property <length> builtin-title-height: State.picker-builtin-count > 0 ? root.group-height + root.group-bottom-padding : 0px;
+    property <length> row-height: State.large-screen ? 64px : 58px;
+    property <length> footer-height: State.large-screen ? 84px : 72px;
+    property <length> builtins-height: root.builtin-title-height + State.picker-builtin-count * root.row-height;
+    property <length> extensions-height: State.picker-sources.length > State.picker-builtin-count ? root.group-height + root.group-bottom-padding : 0px;
+    property <length> pager-height: State.panel-page-count > 1 ? Theme.pager-height : 0px;
+    height: 10px + State.picker-sources.length * root.row-height + root.builtin-title-height + root.extensions-height + root.footer-height + root.pager-height;
+    background: Theme.paper; border-width: 2px; border-color: Theme.ink; border-radius: Theme.control-radius;
+    TouchArea { x: 0px; y: 0px; width: parent.width; height: parent.height; }
+    if root.builtin-title-height > 0px: Caption { x: 24px; y: 8px; width: parent.width - 48px; height: root.group-height; text: Strings.builtin; font-size: State.large-screen ? 13px : 12px; letter-spacing: 3px; vertical-alignment: bottom; }
+    if root.extensions-height > 0px: Caption { x: 24px; y: 8px + root.builtins-height; width: parent.width - 48px; height: root.group-height; text: Strings.extensions; font-size: State.large-screen ? 13px : 12px; letter-spacing: 3px; vertical-alignment: bottom; }
+    for source[index] in State.picker-sources: Rectangle {
+        x: 2px; y: 8px + root.builtin-title-height + index * root.row-height + (index >= State.picker-builtin-count ? root.extensions-height : 0px);
+        width: parent.width - 4px; height: root.row-height;
+        background: hit.pressed ? Theme.ink : Theme.paper;
+        accessible-role: list-item; accessible-label: source.name + " " + source.subtitle;
+        Rectangle { x: 0px; y: 0px; width: parent.width; height: 1px; background: Theme.line; }
+        Rectangle {
+            x: 22px; y: (parent.height - self.height) / 2; width: State.large-screen ? 42px : 38px; height: self.width;
+            border-width: source.available ? Theme.control-border : 0px; border-color: source.available ? Theme.ink : Theme.secondary; border-radius: Theme.control-radius;
+            background: source.builtin != hit.pressed ? Theme.ink : Theme.paper;
+            if !source.available: DashedFrame { x: 0px; y: 0px; width: parent.width; height: parent.height; line-color: hit.pressed ? Theme.paper : Theme.secondary; }
+            Text { x: 0px; y: 0px; width: parent.width; height: parent.height; text: source.initial; font-family: Theme.numbers; font-size: State.large-screen ? 16px : 15px; font-weight: 700; color: source.builtin != hit.pressed ? Theme.paper : !source.available ? Theme.muted : Theme.ink; horizontal-alignment: center; vertical-alignment: center; }
+        }
+        BodyText { x: State.large-screen ? 80px : 74px; y: 0px; width: max(0px, parent.width - self.x - 180px); height: parent.height; text: source.display-name == "" ? source.name : source.display-name; font-size: State.large-screen ? 19px : 17px; font-weight: source.id == State.source-id ? 700 : 400; color: hit.pressed ? Theme.paper : !source.available ? Theme.muted : Theme.ink; }
+        Caption { x: parent.width - 174px; y: 0px; width: 118px; height: parent.height; text: source.update ? Strings.update : !source.available ? Strings.source-unsupported-short : source.compact-status == "" ? source.subtitle : source.compact-status; font-size: State.large-screen ? 14px : 13px; color: hit.pressed ? Theme.paper : Theme.secondary; horizontal-alignment: right; }
+        if source.id == State.source-id: Icon { x: parent.width - 46px; y: (parent.height - 22px) / 2; width: 22px; height: 22px; kind: "check"; inverted: hit.pressed; }
+        hit := TouchArea { x: 0px; y: 0px; width: parent.width; height: parent.height; clicked => { Commands.action("panel", "choose", "source:" + source.id); } }
+    }
+    Rectangle {
+        x: 2px; y: parent.height - root.footer-height - root.pager-height - 2px; width: parent.width - 4px; height: root.footer-height;
+        Rectangle { x: 0px; y: 0px; width: parent.width; height: 2px; background: Theme.ink; }
+        add-source := SourcePickerFooterAction { x: 16px; y: 16px; width: self.preferred-width; text: Strings.add-source; primary: true; show-plus: true; clicked => { Commands.action("sources", "add", ""); } }
+        PanelAction { x: add-source.x + add-source.width + 10px; y: 16px; width: self.preferred-width; height: State.large-screen ? 52px : 46px; text: Strings.source-list; text-size: State.large-screen ? 16px : 14px; horizontal-padding: State.large-screen ? 18px : 12px; clicked => { Commands.action("sources", "list", ""); } }
+        SourcePickerFooterAction { x: parent.width - self.width - 16px; y: 16px; width: self.preferred-width; text: Strings.manage-sources; badge-count: State.source-update-count; horizontal-padding: State.large-screen ? 16px : 12px; clicked => { Commands.action("sources", "manage", ""); } }
+    }
+    if State.panel-page-count > 1: PageBar { x: 0px; y: parent.height - self.height; width: parent.width; page: State.panel-page; count: State.panel-page-count; context: "panel"; turn(delta) => { Commands.action("panel", "page", delta); } }
+}
+

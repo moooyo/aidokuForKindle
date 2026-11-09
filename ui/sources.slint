@@ -1,0 +1,524 @@
+import { State, Commands, SourceItem, BookItem } from "state.slint";
+import { Theme } from "theme.slint";
+import { Strings } from "strings.slint";
+import { Icon, IconButton, ActionButton, PageBar, PageHeader, Tab, EmptyState, Cover, GroupLabel } from "widgets.slint";
+import { IdentityTextFit } from "identity-text.slint";
+
+component DashedFrame inherits Rectangle {
+    in property <color> stroke-color: Theme.secondary;
+    background: transparent;
+    clip: true;
+    for dash in ceil(root.width / 7px): Rectangle { x: dash * 7px; y: 0px; width: 4px; height: 1.5px; background: root.stroke-color; }
+    for dash in ceil(root.width / 7px): Rectangle { x: dash * 7px; y: root.height - 1.5px; width: 4px; height: 1.5px; background: root.stroke-color; }
+    for dash in ceil(root.height / 7px): Rectangle { x: 0px; y: dash * 7px; width: 1.5px; height: 4px; background: root.stroke-color; }
+    for dash in ceil(root.height / 7px): Rectangle { x: root.width - 1.5px; y: dash * 7px; width: 1.5px; height: 4px; background: root.stroke-color; }
+}
+
+component SourceMark inherits Rectangle {
+    in property <string> initial;
+    in property <bool> builtin: false;
+    in property <bool> available: true;
+    in property <bool> inverted: false;
+    in property <bool> show-warning: true;
+    in property <length> type-size: State.large-screen ? 18px : 17px;
+    border-radius: Theme.control-radius;
+    border-width: root.available ? Theme.control-border : 0px;
+    border-color: root.inverted ? Theme.paper : Theme.ink;
+    background: (root.available && root.builtin) != root.inverted ? Theme.ink : Theme.paper;
+    if root.available || !root.show-warning: Text {
+        text: root.initial; font-family: Theme.numbers; font-size: root.type-size; font-weight: 700;
+        color: !root.available ? Theme.muted : root.builtin != root.inverted ? Theme.paper : Theme.ink;
+        horizontal-alignment: center; vertical-alignment: center;
+    }
+    if !root.available: DashedFrame { width: parent.width; height: parent.height; stroke-color: root.inverted ? Theme.paper : Theme.secondary; }
+    if !root.available && root.show-warning: Icon { x: (parent.width - self.width) / 2; y: (parent.height - self.height) / 2; width: State.large-screen ? 22px : 20px; height: self.width; kind: "warning"; secondary: true; inverted: root.inverted; }
+}
+
+component CountTab inherits Rectangle {
+    in property <string> text;
+    in property <int> count;
+    in property <bool> selected;
+    callback clicked();
+    preferred-width: label.preferred-width + number.preferred-width + (State.large-screen ? 12px : 10px);
+    height: State.large-screen ? 60px : 48px;
+    background: touch.pressed ? Theme.ink : Theme.paper;
+    accessible-role: tab;
+    accessible-label: root.text + " " + root.count;
+    accessible-checkable: true;
+    accessible-checked: root.selected;
+    label := Text {
+        x: 2px; y: 0px; width: self.preferred-width; height: parent.height;
+        text: root.text; font-family: Theme.sans; font-size: State.large-screen ? 19px : 17px; font-weight: root.selected ? 700 : 500;
+        color: touch.pressed ? Theme.paper : root.selected ? Theme.ink : Theme.secondary; vertical-alignment: center;
+    }
+    number := Text {
+        x: label.x + label.width + (State.large-screen ? 8px : 6px); y: 1px; width: self.preferred-width; height: parent.height - 1px;
+        text: root.count; font-family: Theme.numbers; font-size: State.large-screen ? 14px : 13px; font-weight: 600;
+        color: touch.pressed ? Theme.paper : root.selected ? Theme.ink : Theme.secondary; vertical-alignment: center;
+    }
+    if root.selected: Rectangle { x: 0px; y: parent.height - (State.large-screen ? 4px : 3px); width: parent.width; height: State.large-screen ? 4px : 3px; background: touch.pressed ? Theme.paper : Theme.ink; }
+    touch := TouchArea {
+        clicked => { root.clicked(); }
+        pointer-event(event) => { if event.kind == PointerEventKind.down { Commands.refresh("fast"); } else if event.kind == PointerEventKind.up { Commands.refresh("ui"); } }
+    }
+}
+
+component SourceBack inherits Rectangle {
+    callback clicked();
+    preferred-width: label.preferred-width + (State.large-screen ? 48px : 42px);
+    height: Theme.touch;
+    background: touch.pressed ? Theme.ink : Theme.paper;
+    accessible-role: button;
+    accessible-label: Strings.browse;
+    Icon { x: 4px; y: (parent.height - self.height) / 2; width: State.large-screen ? 26px : 24px; height: self.width; kind: "chevron-left"; inverted: touch.pressed; }
+    label := Text { x: State.large-screen ? 32px : 30px; y: 0px; width: self.preferred-width; height: parent.height; text: Strings.browse; font-family: Theme.sans; font-size: State.large-screen ? 18px : 16px; font-weight: 500; color: touch.pressed ? Theme.paper : Theme.ink; vertical-alignment: center; }
+    touch := TouchArea {
+        clicked => { root.clicked(); }
+        pointer-event(event) => { if event.kind == PointerEventKind.down { Commands.refresh("fast"); } else if event.kind == PointerEventKind.up { Commands.refresh("ui"); } }
+    }
+}
+
+component SourceHeaderAction inherits Rectangle {
+    in property <string> text;
+    in property <string> icon;
+    in property <bool> selected: false;
+    callback clicked();
+    property <bool> inverted: root.selected != touch.pressed;
+    width: 138px;
+    height: 56px;
+    accessible-role: button;
+    accessible-label: root.text;
+    Rectangle {
+        x: 0px; y: 1px; width: parent.width; height: 54px;
+        border-width: root.selected ? 0px : Theme.control-border; border-color: Theme.ink; border-radius: Theme.control-radius; background: root.inverted ? Theme.ink : Theme.paper;
+        Icon { x: root.icon == "plus" ? 18px : 20px; y: 17px; width: 20px; height: 20px; kind: root.icon; inverted: root.inverted; }
+        Text { x: root.icon == "plus" ? 46px : 48px; y: 0px; width: parent.width - self.x - 16px; height: parent.height; text: root.text; font-family: Theme.sans; font-size: 17px; font-weight: 700; color: root.inverted ? Theme.paper : Theme.ink; vertical-alignment: center; }
+    }
+    touch := TouchArea {
+        clicked => { root.clicked(); }
+        pointer-event(event) => { if event.kind == PointerEventKind.down { Commands.refresh("fast"); } else if event.kind == PointerEventKind.up { Commands.refresh("ui"); } }
+    }
+}
+
+component SourceLanguageFilter inherits Rectangle {
+    property <[string]> labels: [Strings.source-language-all, Strings.source-language-simplified, Strings.source-language-traditional, Strings.source-language-english, Strings.source-language-japanese];
+    property <[string]> codes: ["all", "zh-Hans", "zh-Hant", "en", "ja"];
+    height: State.large-screen ? 66px : 60px;
+    HorizontalLayout {
+        x: Theme.margin; y: 9px; width: parent.width - Theme.margin * 2; height: Theme.touch; alignment: start; spacing: 8px;
+        for label[index] in root.labels: Rectangle {
+            preferred-width: caption.preferred-width + 32px + Theme.control-border * 2;
+            min-width: Theme.touch;
+            height: Theme.touch;
+            property <bool> inverted: (State.source-language-index == index) != touch.pressed;
+            Rectangle { x: 0px; y: (parent.height - self.height) / 2; width: parent.width; height: State.large-screen ? 42px : 38px; border-width: Theme.control-border; border-color: Theme.ink; border-radius: Theme.control-radius; background: parent.inverted ? Theme.ink : Theme.paper; }
+            caption := Text { x: 0px; y: 0px; width: parent.width; height: parent.height; text: label; font-family: Theme.sans; font-size: State.large-screen ? 15px : 14px; font-weight: State.source-language-index == index ? 700 : 500; color: parent.inverted ? Theme.paper : Theme.ink; horizontal-alignment: center; vertical-alignment: center; }
+            accessible-role: button;
+            accessible-label: label;
+            accessible-checkable: true;
+            accessible-checked: State.source-language-index == index;
+            touch := TouchArea {
+                clicked => { Commands.action("sources", "language", root.codes[index]); }
+                pointer-event(event) => { if event.kind == PointerEventKind.down { Commands.refresh("fast"); } else if event.kind == PointerEventKind.up { Commands.refresh("ui"); } }
+            }
+        }
+    }
+}
+
+component SourceAction inherits Rectangle {
+    in property <string> text;
+    in property <string> name;
+    in property <bool> enabled: true;
+    in property <bool> selected: false;
+    callback clicked();
+    height: Theme.touch;
+    accessible-role: button;
+    accessible-label: root.text + " " + root.name;
+    accessible-enabled: root.enabled;
+    property <bool> inverted: root.selected != (touch.pressed && root.enabled);
+    Rectangle {
+        x: 0px; y: (parent.height - self.height) / 2; width: parent.width; height: State.large-screen ? 44px : 40px;
+        border-width: Theme.control-border; border-color: Theme.ink; border-radius: Theme.control-radius; background: root.inverted ? Theme.ink : Theme.paper;
+        Text { text: root.text; font-family: Theme.sans; font-size: State.large-screen ? 15px : 14px; font-weight: 700; color: root.inverted ? Theme.paper : Theme.ink; horizontal-alignment: center; vertical-alignment: center; }
+    }
+    touch := TouchArea {
+        enabled: root.enabled;
+        clicked => { root.clicked(); }
+        pointer-event(event) => { if event.kind == PointerEventKind.down { Commands.refresh("fast"); } else if event.kind == PointerEventKind.up { Commands.refresh("ui"); } }
+    }
+}
+
+component SourceRow inherits Rectangle {
+    in property <SourceItem> source;
+    in property <string> action: "open";
+    in property <string> action-text;
+    in property <bool> action-enabled: true;
+    in property <bool> show-update-version: false;
+    property <bool> shows-update-version: root.show-update-version && root.action == "update" && root.source.update-subtitle != "";
+    in property <length> left-padding: Theme.margin;
+    in property <length> right-padding: State.large-screen ? 28px : 16px;
+    property <length> mark-size: State.large-screen ? 48px : 44px;
+    property <length> content-x: root.left-padding + root.mark-size + (State.large-screen ? 16px : 14px);
+    property <length> action-width: root.action-text != "" ? (State.large-screen ? 96px : 84px) : !root.source.available ? (State.large-screen ? 64px : 62px) : State.large-screen ? 20px : 18px;
+    property <length> text-width: max(0px, root.width - root.content-x - root.right-padding - root.action-width - (State.large-screen ? 16px : 14px));
+    height: State.large-screen ? 68px : root.action-text == "" ? 58px : 64px;
+    background: body-touch.pressed ? Theme.ink : Theme.paper;
+    accessible-role: none;
+    body-touch := TouchArea {
+        enabled: (root.source.available || State.large-screen) && root.action == "open" && root.action-enabled;
+        accessible-role: button;
+        accessible-label: root.source.name + " " + root.source.compact-status + " " + root.source.subtitle;
+        accessible-enabled: self.enabled;
+        clicked => { Commands.action("sources", "open", root.source.id); }
+        pointer-event(event) => { if event.kind == PointerEventKind.down { Commands.refresh("fast"); } else if event.kind == PointerEventKind.up { Commands.refresh("ui"); } }
+    }
+    SourceMark { x: root.left-padding; y: (parent.height - self.height) / 2; width: root.mark-size; height: self.width; initial: root.source.initial; builtin: root.source.builtin; available: root.source.available; inverted: body-touch.pressed; }
+    Text {
+        x: root.content-x; y: (parent.height - (State.large-screen ? 45px : 42px)) / 2; width: root.text-width; height: State.large-screen ? 25px : 23px;
+        text: State.large-screen && root.source.display-name != "" ? root.source.display-name : root.source.name; font-family: Theme.sans; font-size: State.large-screen ? 18px : 17px; font-weight: 500;
+        color: body-touch.pressed ? Theme.paper : root.source.available ? Theme.ink : Theme.muted; vertical-alignment: center; overflow: elide;
+    }
+    Text {
+        x: root.content-x; y: (parent.height - (State.large-screen ? 45px : 42px)) / 2 + (State.large-screen ? 25px : 23px); width: root.text-width; height: State.large-screen ? 20px : 19px;
+        text: root.shows-update-version ? root.source.update-subtitle : (State.large-screen && (root.source.builtin || !root.source.available) && root.source.compact-status != "" ? root.source.compact-status : root.source.subtitle) + (State.large-screen && root.source.available && root.source.installed && root.source.update && root.action == "open" ? " · " + Strings.updates-available : "");
+        font-family: root.shows-update-version ? Theme.numbers : Theme.sans; font-size: State.large-screen ? 14px : 13px;
+        color: body-touch.pressed ? Theme.paper : Theme.secondary; vertical-alignment: center; overflow: elide;
+    }
+    if root.source.available: Rectangle { x: root.content-x; y: parent.height - 1px; width: root.text-width; height: 1px; background: body-touch.pressed ? Theme.paper : Theme.line; }
+    if root.source.available && root.action-text == "": Icon { x: parent.width - root.right-padding - self.width; y: (parent.height - self.height) / 2; width: State.large-screen ? 20px : 18px; height: self.width; kind: "chevron-right"; secondary: true; inverted: body-touch.pressed; }
+    if root.source.available && root.action-text != "": SourceAction {
+        x: parent.width - root.right-padding - self.width; y: (parent.height - self.height) / 2; width: root.action-width;
+        text: root.action-text; name: root.source.name + (root.shows-update-version ? " " + root.source.update-subtitle : ""); enabled: root.action-enabled; selected: !root.action-enabled && root.source.installed;
+        clicked => { Commands.action("sources", root.action, root.source.id); }
+    }
+    if !root.source.available: SourceAction {
+        x: parent.width - root.right-padding - self.width; y: (parent.height - self.height) / 2; width: root.action-width;
+        text: Strings.uninstall; name: root.source.name;
+        clicked => { Commands.action("sources", "uninstall", root.source.id); }
+    }
+}
+
+component SourceAdd inherits Rectangle {
+    height: State.large-screen ? 61px : 75px;
+    border-radius: Theme.control-radius;
+    background: touch.pressed ? Theme.ink : Theme.paper;
+    accessible-role: button;
+    accessible-label: State.large-screen ? Strings.source-help-short : Strings.source-help-title;
+    DashedFrame { width: parent.width; height: parent.height; stroke-color: touch.pressed ? Theme.paper : Theme.secondary; }
+    if !State.large-screen: Rectangle {
+        x: 16px; y: (parent.height - 44px) / 2; width: 44px; height: 44px; border-width: Theme.control-border; border-color: touch.pressed ? Theme.paper : Theme.ink; border-radius: Theme.control-radius; background: transparent;
+        Icon { x: 11px; y: 11px; width: 22px; height: 22px; kind: "qr"; inverted: touch.pressed; }
+    }
+    if State.large-screen: Icon { x: 18px; y: (parent.height - 26px) / 2; width: 26px; height: 26px; kind: "qr"; inverted: touch.pressed; }
+    Text { x: State.large-screen ? 58px : 74px; y: 0px; width: parent.width - self.x - (State.large-screen ? 18px : 46px); height: parent.height; text: State.large-screen ? Strings.source-help-short : Strings.source-help-title; font-family: Theme.sans; font-size: State.large-screen ? 17px : 16px; font-weight: 700; color: touch.pressed ? Theme.paper : Theme.ink; vertical-alignment: center; overflow: elide; }
+    if !State.large-screen: Icon { x: parent.width - 34px; y: (parent.height - 18px) / 2; width: 18px; height: 18px; kind: "chevron-right"; inverted: touch.pressed; }
+    touch := TouchArea {
+        clicked => { Commands.action("sources", "add", ""); }
+        pointer-event(event) => { if event.kind == PointerEventKind.down { Commands.refresh("fast"); } else if event.kind == PointerEventKind.up { Commands.refresh("ui"); } }
+    }
+}
+
+component InstalledSources inherits Rectangle {
+    property <length> row-height: State.large-screen ? 68px : 58px;
+    property <length> label-height: State.large-screen ? 46px : 38px;
+    clip: true;
+    VerticalLayout {
+        x: 0px; y: State.large-screen ? 8px : 0px; width: parent.width; height: max(0px, parent.height - self.y - (State.installed-source-page-count > 1 ? Theme.pager-height : 0px));
+        alignment: start; spacing: 0px;
+        for source[index] in State.installed-sources: Rectangle {
+            property <bool> starts-group: index == 0 || source.builtin != State.installed-sources[index - 1].builtin;
+            min-height: root.row-height + (self.starts-group ? root.label-height : 0px);
+            preferred-height: self.min-height;
+            max-height: self.min-height;
+            if index == 0 || source.builtin != State.installed-sources[index - 1].builtin: GroupLabel { x: Theme.margin; y: State.large-screen ? 18px : 12px; width: parent.width - Theme.margin - 48px; height: 22px; text: source.builtin ? Strings.builtin : Strings.extensions; }
+            if State.large-screen && (index == 0 || source.builtin != State.installed-sources[index - 1].builtin): Text { x: parent.width - 64px; y: 18px; width: 36px; height: 22px; text: source.builtin ? State.builtin-source-count : State.extension-source-count; font-family: Theme.numbers; font-size: 13px; color: Theme.secondary; horizontal-alignment: right; vertical-alignment: center; }
+            SourceRow { x: 0px; y: parent.starts-group ? root.label-height : 0px; width: parent.width; height: root.row-height; source: source; right-padding: State.large-screen ? 22px : source.available ? 18px : 12px; }
+        }
+        Rectangle {
+            min-height: (State.large-screen ? 18px : 14px) + (State.large-screen ? 61px : 75px);
+            preferred-height: self.min-height; max-height: self.min-height;
+            SourceAdd { x: State.large-screen ? 28px : 16px; y: State.large-screen ? 18px : 14px; width: parent.width - self.x - (State.large-screen ? 22px : 16px); }
+        }
+    }
+}
+
+component CatalogFilterButton inherits Rectangle {
+    property <bool> selected: State.catalog-active-filter-count > 0;
+    property <bool> inverted: root.selected != touch.pressed;
+    width: Theme.touch;
+    height: Theme.touch;
+    accessible-role: button;
+    accessible-label: Strings.filter + (State.catalog-active-filter-count > 0 ? " " + State.catalog-active-filter-count : "");
+    accessible-checkable: true;
+    accessible-checked: root.selected;
+    Rectangle {
+        x: (parent.width - 48px) / 2; y: (parent.height - 48px) / 2; width: 48px; height: 48px;
+        border-width: State.large-screen ? Theme.control-border : 0px; border-color: Theme.ink; border-radius: Theme.control-radius; background: root.inverted ? Theme.ink : Theme.paper;
+        Icon { x: (parent.width - self.width) / 2; y: (parent.height - self.height) / 2; width: State.large-screen ? 22px : 23px; height: self.width; kind: "filter"; inverted: root.inverted; }
+    }
+    if !State.large-screen && State.catalog-active-filter-count > 0: Rectangle {
+        x: parent.width - 20px; y: 2px; width: 20px; height: 20px;
+        border-width: Theme.control-border; border-color: Theme.ink; border-radius: 2px; background: Theme.paper;
+        Text { text: State.catalog-active-filter-count; font-family: Theme.numbers; font-size: 12px; font-weight: 700; color: Theme.ink; horizontal-alignment: center; vertical-alignment: center; }
+    }
+    touch := TouchArea {
+        clicked => { Commands.action("catalog", "filter-menu", ""); }
+        pointer-event(event) => { if event.kind == PointerEventKind.down { Commands.refresh("fast"); } else if event.kind == PointerEventKind.up { Commands.refresh("ui"); } }
+    }
+}
+
+component CatalogTabs inherits Rectangle {
+    property <[string]> labels: State.catalog-tabs.length > 0 ? State.catalog-tabs : [Strings.popular, Strings.recently-updated, Strings.newly-added];
+    height: State.large-screen ? 63px : 49px;
+    Rectangle { x: 0px; y: parent.height - 1px; width: parent.width; height: 1px; background: Theme.line; }
+    HorizontalLayout {
+        x: Theme.margin; y: 0px; width: State.large-screen ? parent.width - Theme.margin - 420px : parent.width - Theme.margin * 2; height: parent.height - 1px;
+        alignment: start; spacing: State.large-screen ? 30px : 24px;
+        for label[index] in root.labels: Tab { text: label; height: State.large-screen ? 62px : 48px; visual-height: self.height; selected: State.catalog-filter == index; clicked => { Commands.action("catalog", "filter", index); } }
+    }
+    if State.large-screen: Rectangle {
+        x: parent.width - 28px - 48px - 10px - self.width; y: 7px; width: 300px; height: 48px;
+        border-width: Theme.control-border; border-color: Theme.ink; border-radius: Theme.control-radius; background: touch.pressed ? Theme.ink : Theme.paper;
+        accessible-role: button; accessible-label: Strings.source-search-prefix + State.source-title + Strings.source-search-suffix;
+        Icon { x: 14px; y: 14px; width: 20px; height: 20px; kind: "search"; inverted: touch.pressed; }
+        Text { x: 44px; y: 0px; width: parent.width - 58px; height: parent.height; text: Strings.source-search-prefix + State.source-title + Strings.source-search-suffix; font-family: Theme.sans; font-size: 16px; color: touch.pressed ? Theme.paper : Theme.secondary; vertical-alignment: center; overflow: elide; }
+        touch := TouchArea {
+            y: -4px; height: 56px;
+            clicked => { Commands.action("catalog", "search", ""); }
+            pointer-event(event) => { if event.kind == PointerEventKind.down { Commands.refresh("fast"); } else if event.kind == PointerEventKind.up { Commands.refresh("ui"); } }
+        }
+    }
+    if State.large-screen: CatalogFilterButton { x: parent.width - 28px - 52px; y: 3px; }
+}
+
+export component CatalogGrid inherits Rectangle {
+    in property <[BookItem]> books;
+    in property <int> columns: 5;
+    property <length> gap: 20px;
+    property <length> card-width: (root.width - (root.columns - 1) * root.gap) / root.columns;
+    property <length> cover-width: min(152px, root.card-width);
+    clip: true;
+    for book[index] in root.books: Rectangle {
+        visible: index < 15;
+        x: mod(index, root.columns) * (root.card-width + root.gap); y: floor(index / root.columns) * 277px; width: root.card-width; height: 257px;
+        background: touch.pressed ? Theme.ink : Theme.paper;
+        accessible-role: button; accessible-label: book.title;
+        Cover { x: 0px; y: 0px; width: root.cover-width; height: 204px; book: book; opened => { Commands.action("catalog", "open", book.id); } }
+        title-fit := IdentityTextFit {
+            full-text: book.title; compact-text: book.display-title; available-width: title-label.width;
+            font-family: title-label.font-family; font-size: title-label.font-size;
+            font-weight: title-label.font-weight; letter-spacing: title-label.letter-spacing;
+        }
+        title-label := Text { x: 0px; y: 212px; width: parent.width - (book.in-library ? 22px : 0px); height: 23px; text: title-fit.display-text; accessible-label: book.title; font-family: Theme.sans; font-size: 17px; font-weight: 500; color: touch.pressed ? Theme.paper : Theme.ink; vertical-alignment: center; overflow: elide; }
+        if book.in-library: Icon { x: parent.width - 16px; y: 215px; width: 16px; height: 16px; kind: "bookmark-filled"; inverted: touch.pressed; }
+        Text { x: 0px; y: 239px; width: parent.width; height: 18px; text: book.status; font-family: Theme.sans; font-size: 14px; color: touch.pressed ? Theme.paper : Theme.secondary; vertical-alignment: center; overflow: elide; }
+        touch := TouchArea {
+            clicked => { Commands.action("catalog", "open", book.id); }
+            pointer-event(event) => { if event.kind == PointerEventKind.down { Commands.refresh("fast"); } else if event.kind == PointerEventKind.up { Commands.refresh("ui"); } }
+        }
+    }
+}
+
+export component SourcesPage inherits Rectangle {
+    property <length> header-height: State.large-screen ? 161.5px : 75.5px;
+    property <[SourceItem]> update-sources: State.large-screen ? State.available-sources : State.sources;
+    background: Theme.paper;
+    clip: true;
+    if !State.large-screen: PageHeader {
+        x: 0px; y: 0px; width: parent.width;
+        title: Strings.browse; meta: State.installed-count + " " + Strings.installed + " · " + State.source-update-count + " " + Strings.updates-available;
+        first-icon: "list"; second-icon: "plus";
+        first => { Commands.action("sources", "list", ""); }
+        second => { Commands.action("sources", "add", ""); }
+    }
+    if State.large-screen: Rectangle {
+        x: 0px; y: 0px; width: parent.width; height: root.header-height;
+        SourceBack { x: 22px; y: 2px; clicked => { Commands.action("sources", "back", ""); } }
+        Text { x: 36px; y: 60px; width: parent.width - 72px; height: 22.5px; text: State.installed-count + " " + Strings.installed + " · " + State.source-update-count + " " + Strings.updates-available + " · " + State.available-count + " " + Strings.installable; font-family: Theme.sans; font-size: 15px; letter-spacing: 3px; color: Theme.secondary; vertical-alignment: center; overflow: elide; }
+        Text { x: 36px; y: 86.5px; width: parent.width - 400px; height: 56px; text: Strings.source-management; font-family: Theme.serif; font-size: 46px; font-weight: 900; letter-spacing: 6px; color: Theme.ink; vertical-alignment: center; overflow: elide; }
+        SourceHeaderAction { x: parent.width - 36px - 138px - 12px - 138px; y: 87.5px; icon: "list"; text: Strings.source-list; clicked => { Commands.action("sources", "list", ""); } }
+        SourceHeaderAction { x: parent.width - 36px - 138px; y: 87.5px; icon: "plus"; text: Strings.add-source; selected: true; clicked => { Commands.action("sources", "add", ""); } }
+        Rectangle { x: 0px; y: parent.height - 1px; width: parent.width; height: 1px; background: Theme.line; }
+    }
+    if State.large-screen: Rectangle {
+        x: 0px; y: root.header-height; width: 400px; height: parent.height - self.y;
+        InstalledSources { width: parent.width - 1px; height: parent.height; }
+        Rectangle { x: parent.width - 1px; y: 0px; width: 1px; height: parent.height; background: Theme.line; }
+    }
+    Rectangle {
+        x: State.large-screen ? 400px : 0px; y: root.header-height; width: parent.width - self.x; height: parent.height - self.y;
+        property <length> tabs-height: State.large-screen ? 61px : 49px;
+        Rectangle { x: 0px; y: parent.tabs-height - 1px; width: parent.width; height: 1px; background: Theme.line; }
+        HorizontalLayout {
+            x: Theme.margin; y: 0px; width: parent.width - Theme.margin * 2; height: parent.tabs-height - 1px; spacing: State.large-screen ? 28px : 24px; alignment: start;
+            if !State.large-screen: CountTab { text: Strings.installed; count: State.installed-count; selected: State.source-filter == 0; clicked => { Commands.action("sources", "filter", "0"); } }
+            CountTab { text: Strings.installable; count: State.available-count; selected: State.source-filter == 1 || (State.large-screen && State.source-filter == 0); clicked => { Commands.action("sources", "filter", "1"); } }
+            CountTab { text: Strings.updates-available; count: State.source-update-count; selected: State.source-filter == 2; clicked => { Commands.action("sources", "filter", "2"); } }
+        }
+        if !State.large-screen && State.source-filter == 0: InstalledSources { x: 0px; y: parent.tabs-height; width: parent.width; height: parent.height - self.y; }
+        if State.source-filter == 1 || (State.large-screen && State.source-filter == 0): Rectangle {
+            x: 0px; y: parent.tabs-height; width: parent.width; height: parent.height - self.y;
+            SourceLanguageFilter { x: 0px; y: 0px; width: parent.width; }
+            Rectangle {
+                x: 0px; y: State.large-screen ? 66px : 60px; width: parent.width; height: max(0px, parent.height - self.y - (State.large-screen || State.page-count > 1 ? Theme.pager-height : 0px)); clip: true;
+                for source[index] in State.available-sources: SourceRow {
+                    x: 0px; y: index * (State.large-screen ? 68px : 64px); width: parent.width; source: source;
+                    action: source.update ? "update" : "install";
+                    action-text: source.update ? Strings.update : source.installed ? Strings.installed : Strings.install;
+                    action-enabled: !source.installed || source.update;
+                }
+                if State.available-sources.length == 0: EmptyState { x: 0px; y: 20px; width: parent.width; height: 280px; title: State.busy ? Strings.loading : Strings.no-results; message: ""; action: State.busy ? "" : Strings.add-source; clicked => { Commands.action("sources", "add", ""); } }
+            }
+            if State.large-screen || State.page-count > 1: PageBar { x: 0px; y: parent.height - self.height; width: parent.width; page: State.page; count: State.page-count; turn(delta) => { Commands.action("page", "turn", delta); } }
+        }
+        if State.source-filter == 2: Rectangle {
+            x: 0px; y: parent.tabs-height; width: parent.width; height: parent.height - self.y;
+            VerticalLayout {
+                x: 0px; y: State.large-screen ? 16px : 14px; width: parent.width; height: max(0px, parent.height - self.y - (State.page-count > 1 ? Theme.pager-height : 0px)); alignment: start; spacing: 0px;
+                for source in root.update-sources: Rectangle {
+                    min-height: source.update ? (State.large-screen ? 68px : 64px) : 0px; preferred-height: self.min-height; max-height: self.min-height;
+                    if source.update: SourceRow { width: parent.width; source: source; action: "update"; action-text: Strings.update; show-update-version: true; }
+                }
+                if State.source-update-count > 0: Rectangle {
+                    min-height: State.large-screen ? 78px : 70px; preferred-height: self.min-height; max-height: self.min-height;
+                    ActionButton { x: Theme.margin; y: State.large-screen ? 20px : 18px; width: parent.width - Theme.margin * 2; height: State.large-screen ? 58px : 52px; text: Strings.update-all; primary: true; enabled: !State.busy; clicked => { Commands.action("sources", "update-all", ""); } }
+                }
+            }
+            if State.source-update-count == 0: EmptyState { x: 0px; y: 80px; width: parent.width; height: 260px; title: Strings.no-updates; message: ""; }
+            if State.page-count > 1: PageBar { x: 0px; y: parent.height - self.height; width: parent.width; page: State.page; count: State.page-count; turn(delta) => { Commands.action("page", "turn", delta); } }
+        }
+    }
+    if State.installed-source-page-count > 1 && (State.large-screen || State.source-filter == 0): PageBar {
+        x: 0px; y: parent.height - self.height; width: State.large-screen ? 400px : parent.width;
+        page: State.installed-source-page; count: State.installed-source-page-count; context: "installed-sources";
+        turn(delta) => { Commands.action("sources", "installed-page", delta); }
+    }
+}
+
+export component CatalogPage inherits Rectangle {
+    property <bool> picker-open: State.modal == "choices" && State.modal-context == "source-picker";
+    property <bool> has-catalog: State.catalog.length > 0 || State.catalog-result-count > 0;
+    property <bool> show-setup: State.source-available && State.source-needs-setup && !root.has-catalog;
+    property <bool> show-catalog: State.source-available && !root.show-setup;
+    property <string> source-caption: State.source-needs-setup && root.has-catalog && State.source-connection-status != "" ? State.source-connection-status + " · " + State.source-subtitle : State.source-subtitle;
+    background: Theme.paper;
+    clip: true;
+    if !State.large-screen: Rectangle {
+        x: 0px; y: 0px; width: parent.width; height: 115.5px;
+        SourceBack { x: 8px; y: 0px; clicked => { Commands.action("catalog", "back", ""); } }
+        IconButton { x: parent.width - 10px - 148px; y: 0px; icon: "search"; label: Strings.search; clicked => { Commands.action("catalog", "search", ""); } }
+        CatalogFilterButton { x: parent.width - 10px - 98px; y: 0px; }
+        IconButton { x: parent.width - 10px - 48px; y: 0px; icon: "sliders"; label: Strings.source-preferences; clicked => { Commands.action("catalog", "settings", ""); } }
+        SourceMark { x: 22px; y: 53.75px; width: 52px; height: 52px; type-size: 20px; initial: State.source-initial; builtin: State.source-builtin; available: State.source-available; show-warning: false; }
+        Text { x: 88px; y: 52px; width: parent.width - self.x - 22px; height: 36px; text: State.source-title; font-family: Theme.numbers; font-size: 30px; font-weight: 700; color: Theme.ink; vertical-alignment: center; overflow: elide; }
+        Text { x: 88px; y: 88px; width: parent.width - self.x - 22px; height: 19.5px; text: root.source-caption + (root.show-catalog ? " · " + Strings.loaded-results + " " + State.catalog-result-count + " " + Strings.books-unit : ""); font-family: Theme.sans; font-size: 13px; letter-spacing: 1px; color: Theme.secondary; vertical-alignment: center; overflow: elide; }
+    }
+    if State.large-screen: Rectangle {
+        x: 0px; y: 0px; width: parent.width; height: 120px;
+        Text { x: 36px; y: 8px; width: parent.width - 72px; height: 26px; text: Strings.browse + " · " + State.installed-count + " " + Strings.sources-unit + " · " + State.source-update-count + " " + Strings.updates-available; font-family: Theme.sans; font-size: 15px; letter-spacing: 3px; color: Theme.secondary; vertical-alignment: center; overflow: elide; }
+        source-picker-control := Rectangle {
+            x: 34px; y: 34px; width: min(parent.width - 150px, source-name.preferred-width + 52px + 28px + source-switch-chip.width); height: 64px;
+            property <bool> chip-inverted: root.picker-open != source-picker-touch.pressed;
+            background: source-picker-touch.pressed ? Theme.ink : Theme.paper; border-radius: Theme.control-radius;
+            accessible-role: button; accessible-label: Strings.switch-source + " " + State.source-title;
+            SourceMark { x: 0px; y: 6px; width: 52px; height: 52px; type-size: 19px; initial: State.source-initial; builtin: State.source-builtin; available: State.source-available; inverted: source-picker-touch.pressed; show-warning: false; }
+            source-name := Text { x: 66px; y: 0px; width: parent.width - 66px - 14px - source-switch-chip.width; height: parent.height; text: State.source-title; font-family: Theme.numbers; font-size: 40px; font-weight: 700; color: source-picker-touch.pressed ? Theme.paper : Theme.ink; vertical-alignment: center; overflow: elide; }
+            source-switch-chip := Rectangle {
+                x: parent.width - self.width; y: 14px; width: source-switch-label.preferred-width + 12px + 8px + 4px + 16px + Theme.control-border * 2; height: 36px; border-width: Theme.control-border; border-color: source-picker-touch.pressed ? Theme.paper : Theme.ink; border-radius: Theme.control-radius; background: source-picker-control.chip-inverted ? Theme.ink : Theme.paper;
+                source-switch-label := Text { x: Theme.control-border + 12px; y: 0px; width: self.preferred-width; height: parent.height; text: Strings.switch-source; font-family: Theme.sans; font-size: 15px; font-weight: 700; color: source-picker-control.chip-inverted ? Theme.paper : Theme.ink; vertical-alignment: center; }
+                Path { x: source-switch-label.x + source-switch-label.width + 4px; y: (parent.height - self.height) / 2; width: 16px; height: 16px; viewbox-width: 24; viewbox-height: 24; fill: transparent; stroke: source-picker-control.chip-inverted ? Theme.paper : Theme.ink; stroke-width: 2.6px; stroke-line-cap: round; stroke-line-join: round; commands: root.picker-open ? "M6 15L12 9L18 15" : "M6 9L12 15L18 9"; }
+            }
+            source-picker-touch := TouchArea {
+                clicked => { Commands.action("sources", "picker", ""); }
+                pointer-event(event) => { if event.kind == PointerEventKind.down { Commands.refresh("fast"); } else if event.kind == PointerEventKind.up { Commands.refresh("ui"); } }
+            }
+        }
+        IconButton { x: parent.width - 28px - 56px; y: 38px; icon: "sliders"; label: Strings.source-preferences; clicked => { Commands.action("catalog", "settings", ""); } }
+        Text { x: 102px; y: 98px; width: parent.width - 138px; height: 22px; text: root.source-caption; font-family: Theme.sans; font-size: 15px; color: Theme.secondary; vertical-alignment: center; overflow: elide; }
+    }
+    if root.show-catalog: CatalogTabs { x: 0px; y: State.large-screen ? 132px : 115.5px; width: parent.width; }
+    if root.show-catalog && !State.large-screen: Rectangle {
+        x: 22px; y: 168.5px; width: parent.width - 44px; height: max(0px, parent.height - self.y - Theme.pager-height); clip: true;
+        for book[index] in State.catalog: Rectangle {
+            visible: index < 5;
+            x: 0px; y: index * 108px; width: parent.width; height: 108px; background: catalog-row-touch.pressed ? Theme.ink : Theme.paper;
+            accessible-role: button; accessible-label: book.title;
+            Cover { x: 0px; y: 9px; width: 66px; height: 90px; book: book; opened => { Commands.action("catalog", "open", book.id); } }
+            catalog-title-fit := IdentityTextFit {
+                full-text: book.title; compact-text: book.display-title; available-width: max(0px, parent.width - 82px - (book.in-library ? 49px + 8px : 0px));
+                font-family: catalog-title.font-family; font-size: catalog-title.font-size;
+                font-weight: catalog-title.font-weight; letter-spacing: catalog-title.letter-spacing;
+            }
+            HorizontalLayout {
+                x: 82px; y: 17px; width: parent.width - 82px; height: 26px; spacing: 8px; alignment: start;
+                catalog-title := Text { text: catalog-title-fit.display-text; accessible-label: book.title; preferred-width: catalog-title-fit.preferred-width; font-family: Theme.serif; font-size: 19px; font-weight: 900; letter-spacing: 1px; color: catalog-row-touch.pressed ? Theme.paper : Theme.ink; vertical-alignment: center; overflow: elide; horizontal-stretch: 0; }
+                if book.in-library: Rectangle { width: 49px; height: 20px; border-radius: 2px; background: catalog-row-touch.pressed ? Theme.paper : Theme.ink; Text { text: Strings.in-library; font-family: Theme.sans; font-size: 11px; font-weight: 700; color: catalog-row-touch.pressed ? Theme.ink : Theme.paper; horizontal-alignment: center; vertical-alignment: center; } }
+            }
+            Text { x: 82px; y: 46px; width: parent.width - 82px; height: 21px; text: book.author + (book.subtitle == "" ? "" : "  |  " + book.subtitle); font-family: Theme.sans; font-size: 14px; color: catalog-row-touch.pressed ? Theme.paper : Theme.secondary; vertical-alignment: center; overflow: elide; }
+            Text { x: 82px; y: 70px; width: parent.width - 82px; height: 19.5px; text: book.status; font-family: Theme.sans; font-size: 13px; color: catalog-row-touch.pressed ? Theme.paper : Theme.secondary; vertical-alignment: center; overflow: elide; }
+            Rectangle { x: 82px; y: parent.height - 1px; width: parent.width - 82px; height: 1px; background: catalog-row-touch.pressed ? Theme.paper : Theme.line; }
+            catalog-row-touch := TouchArea {
+                clicked => { Commands.action("catalog", "open", book.id); }
+                pointer-event(event) => { if event.kind == PointerEventKind.down { Commands.refresh("fast"); } else if event.kind == PointerEventKind.up { Commands.refresh("ui"); } }
+            }
+        }
+    }
+    if root.show-catalog && State.large-screen: CatalogGrid { x: 36px; y: 215px; width: parent.width - 72px; height: max(0px, parent.height - self.y - Theme.pager-height); books: State.catalog; }
+    if root.show-catalog && State.catalog.length == 0: EmptyState {
+        x: Theme.margin; y: State.large-screen ? 240px : 200px; width: parent.width - Theme.margin * 2; height: 300px;
+        title: State.busy ? Strings.loading : Strings.empty-catalog; message: State.message;
+        action: State.busy ? "" : State.catalog-has-more ? Strings.load-more : Strings.retry;
+        clicked => { Commands.action(State.catalog-has-more ? "catalog" : "sources", State.catalog-has-more ? "load-more" : "open", State.catalog-has-more ? "" : State.source-id); }
+    }
+    if root.show-setup: Rectangle {
+        x: 0px; y: State.large-screen ? 132px : 127.5px; width: parent.width; height: parent.height - self.y;
+        Rectangle { x: 0px; y: 0px; width: parent.width; height: 1px; background: Theme.line; }
+        Text { x: Theme.margin; y: State.large-screen ? 30px : 22px; width: min(640px, parent.width - Theme.margin * 2); height: 19.5px; text: Strings.server-url; font-family: Theme.sans; font-size: State.large-screen ? 13px : 12px; letter-spacing: State.large-screen ? 3px : 2px; color: Theme.secondary; vertical-alignment: center; }
+        Rectangle {
+            x: Theme.margin; y: State.large-screen ? 57.5px : 48px; width: min(640px, parent.width - Theme.margin * 2); height: State.large-screen ? 58px : 50px;
+            border-width: Theme.control-border; border-color: Theme.ink; border-radius: Theme.control-radius; background: address-touch.pressed ? Theme.ink : Theme.paper;
+            accessible-role: button; accessible-label: Strings.configure + " " + Strings.server-url;
+            Text { x: 18px; y: 0px; width: parent.width - 36px; height: parent.height; text: State.source-server-address == "" ? "http://" : State.source-server-address; font-family: Theme.numbers; font-size: State.large-screen ? 18px : 16px; color: address-touch.pressed ? Theme.paper : State.source-server-address == "" ? Theme.muted : Theme.ink; vertical-alignment: center; overflow: elide; }
+            address-touch := TouchArea {
+                clicked => { Commands.action("sources", "edit-address", State.source-id); }
+                pointer-event(event) => { if event.kind == PointerEventKind.down { Commands.refresh("fast"); } else if event.kind == PointerEventKind.up { Commands.refresh("ui"); } }
+            }
+        }
+        Text { x: Theme.margin; y: State.large-screen ? 133.5px : 116px; width: min(640px, parent.width - Theme.margin * 2); height: 19.5px; text: Strings.server-credentials; font-family: Theme.sans; font-size: State.large-screen ? 13px : 12px; letter-spacing: State.large-screen ? 3px : 2px; color: Theme.secondary; vertical-alignment: center; }
+        Rectangle {
+            x: Theme.margin; y: State.large-screen ? 161px : 142px; width: min(640px, parent.width - Theme.margin * 2); height: State.large-screen ? 58px : 50px;
+            border-width: Theme.control-border; border-color: Theme.ink; border-radius: Theme.control-radius; background: credentials-touch.pressed ? Theme.ink : Theme.paper;
+            accessible-role: button; accessible-label: Strings.configure + " " + Strings.server-credentials;
+            Text { x: 18px; y: 0px; width: parent.width - 36px; height: parent.height; text: State.source-server-credential == "" ? "[API Key]" : State.source-server-credential; font-family: Theme.numbers; font-size: State.large-screen ? 18px : 16px; color: credentials-touch.pressed ? Theme.paper : State.source-server-credential == "" ? Theme.muted : Theme.ink; vertical-alignment: center; overflow: elide; }
+            credentials-touch := TouchArea {
+                clicked => { Commands.action("sources", "edit-credential", State.source-id); }
+                pointer-event(event) => { if event.kind == PointerEventKind.down { Commands.refresh("fast"); } else if event.kind == PointerEventKind.up { Commands.refresh("ui"); } }
+            }
+        }
+        Rectangle {
+            x: Theme.margin; y: State.large-screen ? 237px : 210px; width: min(640px, parent.width - Theme.margin * 2); height: State.large-screen ? 60px : 54px;
+            ActionButton { x: 0px; y: 0px; width: (parent.width - 12px) / 2; text: Strings.fill-on-phone; height: parent.height; clicked => { Commands.action("sources", "configure", State.source-id); } }
+            ActionButton { x: (parent.width + 12px) / 2; y: 0px; width: (parent.width - 12px) / 2; text: Strings.test-and-connect; height: parent.height; primary: true; enabled: !State.busy && State.source-server-address != ""; clicked => { Commands.action("sources", "test-connect", State.source-id); } }
+        }
+        if State.source-connection-status != "": Text { x: Theme.margin; y: State.large-screen ? 315px : 282px; width: min(640px, parent.width - Theme.margin * 2); height: 66px; text: State.source-connection-status; font-family: Theme.sans; font-size: Theme.body; color: Theme.secondary; wrap: word-wrap; }
+    }
+    if !State.source-available: Rectangle {
+        x: 0px; y: State.large-screen ? 132px : 124px; width: parent.width; height: parent.height - self.y;
+        Rectangle { x: 0px; y: 0px; width: parent.width; height: 1px; background: Theme.line; }
+        Rectangle {
+            x: (parent.width - self.width) / 2; y: State.large-screen ? 91px : 60px; width: State.large-screen ? 132px : 96px; height: self.width;
+            if State.large-screen: Image { width: parent.width; height: parent.height; source: @image-url("../assets/icons/source-unavailable.svg"); image-fit: contain; accessible-role: none; }
+            if !State.large-screen: Rectangle {
+                width: parent.width; height: parent.height; border-width: Theme.control-border; border-color: Theme.ink; border-radius: self.width / 2; background: Theme.paper;
+                Icon { x: (parent.width - self.width) / 2; y: (parent.height - self.height) / 2; width: 34px; height: 34px; kind: "warning"; }
+            }
+        }
+        Text { x: State.large-screen ? 120px : Theme.margin; y: State.large-screen ? 244px : 174px; width: parent.width - self.x * 2; height: 38px; text: State.source-subtitle == "" ? Strings.unavailable : State.source-subtitle; font-family: Theme.serif; font-size: State.large-screen ? 28px : 22px; font-weight: 900; letter-spacing: 2px; color: Theme.ink; horizontal-alignment: center; vertical-alignment: center; overflow: elide; }
+        HorizontalLayout {
+            x: (parent.width - self.width) / 2; y: State.large-screen ? 306px : 240px; width: State.large-screen ? 292px : 260px; height: State.large-screen ? 58px : 52px; spacing: 12px;
+            ActionButton { width: State.large-screen ? 184px : 164px; height: parent.height; text: Strings.migrate-source; primary: true; clicked => { Commands.action("sources", "migrate", State.source-id); } }
+            ActionButton { width: State.large-screen ? 96px : 84px; height: parent.height; text: Strings.uninstall; clicked => { Commands.action("sources", "uninstall", State.source-id); } }
+        }
+    }
+    if root.show-catalog: PageBar { x: 0px; y: parent.height - self.height; width: parent.width; page: State.page; count: State.page-count; turn(delta) => { Commands.action("page", "turn", delta); } }
+}

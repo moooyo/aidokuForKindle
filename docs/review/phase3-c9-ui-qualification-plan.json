@@ -1,0 +1,42 @@
+{
+  "schema_version": 1,
+  "kind": "C9-actual-unread-and-search-identity-native-qualification",
+  "source_sha256": "b8ba5a2fc9bdf9dc386f7eb0677a5ae17143f96b21d1b7045336878c17d18b32",
+  "source_file_count": 227,
+  "binary_sha256": "80791417ef1628474cd2e23ca19cdb89d3007ce6322863122f9c60649bbb5c2e",
+  "gate_manifest_sha256": "6340e5387bff1e771e810cd33b7b0499443bf00b4d2bc0dc670609990485bc0c",
+  "entrypoint": "scripts/verify-handoff-c9.py",
+  "helpers": ["scripts/handoff_c9_counts.py", "scripts/handoff_c9_search.py"],
+  "main_harness": "scripts/verify-handoff-ui.py",
+  "formal_full_plan": "docs/review/phase3-handoff-capture-plan.json",
+  "expected_actual_captures": 31,
+  "maximum_actual_captures": 40,
+  "expected_manual_captures": 28,
+  "expected_prerequisites": 3,
+  "unread_scope": {
+    "profiles": ["pw5", "scribe"],
+    "captures_per_profile": 6,
+    "stages": ["baseline", "unread include", "unread exclude", "unread ascending", "unread descending", "actual mark-read"],
+    "oracle": "Every visible_books BookItem.unread equals its current real books.document.unread. Existing chapters supply an additional read/unread consistency check, never an invented no-chapter zero fallback.",
+    "actions": "Real library tri-state, sort-direction and selection/batch-read actions; no SQL writes to books, chapters or progress.",
+    "mark_read": "A genuinely visible unread target is selected, the actual foreground job settles, Store chapters commit read, the shown target reaches zero unread on its actual sorted page, and progress remains unchanged.",
+    "database": "The capture's actual Demo database is data_dir/demo/library.sqlite3, opened through a read-only URI and consistent transaction.",
+    "scope_limit": "The focused filter pair is unread include/exclude. No separate four-way downloaded filter sweep is claimed."
+  },
+  "search_scope": {
+    "actual_captures": 19,
+    "prerequisites": 3,
+    "pw_four": "Real four-provider search and pointer-driven More select the hidden source configured with the full name MangaDex, retaining the actual keyboard draft and input mode.",
+    "pw_twenty_five": "The actual 00 and 01 configured shortcut identities are distinguishable; native More reaches the actual final Komga row and selects it without submitting the draft.",
+    "sc_six": "A real delayed provider returns series000 through series005. Actual native title/author/cover regions and six pointer hits resolve to six distinct persisted book identities.",
+    "short_bookmark": "The first actual tile is favorited by a real detail action. A separately retained real HTTP short-title response keeps that book identity and in-library bookmark in separate visible allocations.",
+    "configuration_bound": "MangaDex is the actual full name of a public loopback Komga fixture configuration in this identity test, not a claim of official MangaDex network integration. Source configuration rows alone are fixture input.",
+    "network_bound": "Four providers each receive exactly one initial search POST. The 25-source fixture records exactly 25 initial search POSTs. Genuine cover GETs are separately retained; no claim of zero total HTTP is made.",
+    "pointer_bound": "Source shortcuts, More, eligible picker rows and book tiles use actual original-PNG geometry and native press/release events. Semantic search/open or catalog/open cannot substitute for the six identity hits."
+  },
+  "old_expectation_audit": "Main881 and planb3ad have no badge_for or fixed numeric badge assertion. The old generic sort-descending case sorts title and opens a panel, so it does not replace the focused unread-direction/native-book-row evidence.",
+  "freshness": "New source-bound output/run/data only. Preserve C7 full1, C8 work and every old native PNG, case JSON, manifest and visual finding without relabeling.",
+  "review_gate": "Independent fresh original-PNG review must confirm badges, names, suffixes, two-line titles, author positions, bookmarks and actual visible targets. Model/Store evidence is not a rendered-text visibility claim.",
+  "result_gate": "Focused exit zero qualifies only this bounded set. The retained raw main manifest remains incomplete/exit1, clean_round=false and accepted=false. After the affected original-PNG gate clears, perform two new complete full rounds on the final C9 tuple; C7 full1 supplies no C9 streak.",
+  "resource_gate": "The actual source and desktop GO is subject to the final-validation owner's Native startup quiet window. Syntax preparation may continue; no App or formal timing starts until that window is released."
+}

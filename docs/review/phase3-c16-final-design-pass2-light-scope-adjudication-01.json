@@ -1,0 +1,78 @@
+{
+  "schema_version": 1,
+  "kind": "Root capability-scope adjudication for two fresh C16 pass2 observations",
+  "actor": "/root",
+  "source_sha256_owner_declared": "1fe46f49f4b60ad455b9e870e376a571adf203aebdf50b7d8616e376801c5626",
+  "desktop_binary_sha256_owner_declared": "8aa3e37550e48fc195adf3c1511158b2dc8dd65099a7e250b32b198ca6bfd6b9",
+  "owner_release_path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate16/final-design-pass-2-original-return-01/owner-release-01.json",
+  "owner_release_sha256_owner_declared": "2eba9c5c1daca36b188992a8a418b379b23d595634e95f2c7ed7cef98816b74a",
+  "hash_basis": "Existing producer and reviewer identity declarations; no local hash verification was performed.",
+  "actual_root_original_openings": [
+    "D:/Code/aidokuForKindle/artifacts/phase3/candidate16/final-design-pass-2-modules/sc-reader-portrait/files/output/sc-reader-portrait--light.png",
+    "D:/Code/aidokuForKindle/artifacts/phase3/candidate16/final-design-pass-2-modules/sc-reader-portrait/files/references/87ea1f9d83f7551b97d7c1dbe0e838e1a9fb35725e82a4f6388e3668808e893b-sc-reader-portrait--light.png",
+    "D:/Code/aidokuForKindle/artifacts/phase3/candidate16/final-design-pass-2-modules/sc-settings/files/output/sc-settings--light.png",
+    "D:/Code/aidokuForKindle/artifacts/phase3/candidate16/final-design-pass-2-modules/sc-settings/files/references/dae1fdbd16b41bddff72d59f890f720398614206286dc5c295a73cfb7fd79417-sc-settings--light.png"
+  ],
+  "actual_root_open_count": 4,
+  "actual_root_comparison_pairs": 2,
+  "visual_observation": "Both current originals omit the automatic-brightness row visible in their exact design references. The row absence and corresponding panel-height difference are real and remain recorded.",
+  "static_evidence": [
+    {
+      "path": "D:/Code/aidokuForKindle/src/platform.rs",
+      "lines": [151, 155, 598, 607],
+      "observation": "The implemented device lighting capabilities and controller expose frontlight and warmth, with their native power properties. They do not implement automatic brightness."
+    },
+    {
+      "path": "D:/Code/aidokuForKindle/src/app/view.rs",
+      "lines": [826, 827],
+      "observation": "The application publishes the frontlight and warmth capability flags to the UI."
+    },
+    {
+      "path": "D:/Code/aidokuForKindle/ui/panels-reader.slint",
+      "lines": [476, 490],
+      "observation": "The reader lighting panel displays the implemented frontlight and warmth controls conditionally."
+    },
+    {
+      "path": "D:/Code/aidokuForKindle/ui/settings-sections.slint",
+      "lines": [78, 82],
+      "observation": "The settings lighting section displays the same implemented capabilities and an unavailable state when frontlight is absent."
+    }
+  ],
+  "current_case_capability_scope": "selected design profile and implemented application controls",
+  "current_case_capabilities": {
+    "frontlight_control_exposed": true,
+    "warmth_control_exposed": true,
+    "physical_hardware_qualified": false,
+    "automatic_brightness_support_declared": false,
+    "automatic_brightness_implemented": false
+  },
+  "reference_expected_retained": "Conditional frontlight/warmth sliders 0..24 and supported Scribe auto brightness.",
+  "reference_applicability_retained": "applicable-subject-to-evidence-based-capability-bounds",
+  "decision": "Close these applicability questions as explicit unimplemented-capability limitations within the current exposed-controls walkthrough scope. Do not add a nonfunctional switch or infer automatic-brightness hardware qualification from the selected Scribe profile. No automatic-brightness implementation, operation or unconditional reference parity is accepted.",
+  "resolved_findings": [
+    {
+      "id": "NR-b0023-light-auto-brightness",
+      "case_key": "2|c205f1b52500|sc-reader-portrait|sc-reader-portrait--light",
+      "report_path": "D:/Code/aidokuForKindle/docs/review/phase3-c16-final-design-pass2-batches/b0023.review.json",
+      "raw_new_required_retained": 1,
+      "in_scope_product_modification_required": false,
+      "classification": "explicit capability limitation; automatic-brightness parity remains unqualified"
+    },
+    {
+      "id": "B0034-LIGHT-AUTO-BRIGHTNESS-CONDITIONAL",
+      "case_key": "2|c205f1b52500|sc-settings|sc-settings--light",
+      "report_path": "D:/Code/aidokuForKindle/docs/review/phase3-c16-final-design-pass2-batches/b0034.review.json",
+      "raw_scope_pending_retained": 1,
+      "in_scope_product_modification_required": false,
+      "classification": "explicit capability limitation; automatic-brightness parity remains unqualified"
+    }
+  ],
+  "limits": [
+    "This is an independent pass2 applicability decision based on the fresh originals and current implementation, not a borrowed pass1 verdict.",
+    "This decision does not establish that Scribe hardware lacks automatic brightness.",
+    "The original reviews, screenshots, case expectations and raw findings are unchanged.",
+    "This decision does not supply missing glyph review, final pass2 completion, runtime validation or live-inversion evidence."
+  ],
+  "production_modified": false,
+  "local_validation_performed": false
+}

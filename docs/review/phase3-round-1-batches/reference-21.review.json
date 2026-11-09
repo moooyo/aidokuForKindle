@@ -1,0 +1,151 @@
+{
+  "batch_id": "reference-21",
+  "reviewer": "/root/phase3_round1_review/reference_21",
+  "run_id": "a1baf3fe3dc2",
+  "round": 1,
+  "status": "completed",
+  "scope": "Independent visual review of the four assigned Scribe landscape reference pairs only.",
+  "binary_sha256": "94d7f3bbcab475ad8833a2f3c486138f7b49bead231851c2d8eab2f0c3d2ac51",
+  "source_sha256": "aef9db4e111165016a10a2a95e111f3155860b8510c7f6207ec9c79fbec5082c",
+  "assigned_reference_set_sha256": "e7b49b456255432d74cfe41346f9d44c1a9c55bf67c5d55483e4ae3029547d18",
+  "method": {
+    "images_viewed": 8,
+    "image_tool": "tools.view_image",
+    "candidate_scale": "1240x930 native logical pixels at scale factor 1",
+    "reference_scale": "2480x1860 physical pixels, compared at the equivalent logical scale of 1240x930",
+    "hash_method": "PowerShell Get-FileHash -Algorithm SHA256 on each unmodified PNG file",
+    "identity_check": "All four case_metadata records match the assigned round, run_id, binary_sha256, source_sha256, Scribe profile, reader route, and landscape geometry. Each candidate and reference PNG byte hash independently matches its corresponding case_metadata record.",
+    "reference_set_identity": "The reference-set digest is recorded from the assignment; the individual assigned reference PNG hashes were independently checked."
+  },
+  "reviewed_case_ids": [
+    "sc-reader--light",
+    "sc-reader--mode",
+    "sc-reader--more",
+    "sc-reader--toc"
+  ],
+  "reviewed_cases": [
+    {
+      "case_id": "sc-reader--light",
+      "case_metadata": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/cases/sc-reader--light.json",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/sc-reader--light.png",
+      "candidate_sha256": "f0f26dce0f2110c576566f9a60ebd2c7f46a59c9584736e9ca8fe1424142366d",
+      "reference_png": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/screens/states/sc-reader--light.png",
+      "reference_sha256": "ed83ad9fdde07eac7def71464d9c1e005ad1d35fc9ff2c4c9dba8f04a295356c",
+      "viewed_candidate": true,
+      "viewed_reference": true,
+      "identity_matches_case_metadata": true,
+      "outcome": "pass",
+      "observations": [
+        "The open reader retains the integrated header, range progress, chapter navigation, and five-tool strip. The panel content follows the 120-logical-pixel inset and the two page allocations remain visually balanced.",
+        "Frontlight and warmth each have a visible value, rail, thumb, and endpoint icons. Candidate values 12 and 8 agree with the recorded preferences; the declared desktop profile exposes both controls.",
+        "The automatic-brightness row present in the reference is absent. This is consistent with the task's sensor capability boundary, and the shorter sheet is explained by that removed row.",
+        "The header, panel title, values, controls, and progress text remain legible in grayscale. No overlapping or clipped interface text was observed."
+      ],
+      "intentional_differences": [
+        "Automatic sensor controls are hidden where physical sensor support is unavailable; the orientation action truthfully describes manual direction.",
+        "Desktop captures expose declared profile lighting controls without qualifying physical light effects.",
+        "Saved lighting values and source artwork differ from the reference; these differences do not establish a viewport-inset defect."
+      ]
+    },
+    {
+      "case_id": "sc-reader--mode",
+      "case_metadata": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/cases/sc-reader--mode.json",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/sc-reader--mode.png",
+      "candidate_sha256": "be5c7d9c9533760dc4f64336447f75a39f4c1a9b84f474c2a502c45346c920bf",
+      "reference_png": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/screens/states/sc-reader--mode.png",
+      "reference_sha256": "001531684f22719bfe91a703357f45c7730c9a40feb4152a67a6587d5cef78cb",
+      "viewed_candidate": true,
+      "viewed_reference": true,
+      "identity_matches_case_metadata": true,
+      "outcome": "issues_found",
+      "observations": [
+        "All four direction cards are visible in one row: right-to-left, left-to-right, vertical page turns, and continuous vertical scrolling. The right-to-left card is visibly selected and matches the recorded direction.",
+        "The crop-borders toggle is visible in the left half below the cards and agrees with the enabled recorded preference.",
+        "The right half below the cards is empty where the reference exposes the independent cross-page-image splitting toggle. This omission is recorded as P3R1-REF21-1.",
+        "The right side of the panel title row lacks the reference's current-book default-direction hint. This information loss is recorded as P3R1-REF21-2.",
+        "The cards, crop label, progress section, and tool strip fit within the viewport with readable grayscale contrast and no observed text clipping."
+      ],
+      "intentional_differences": [
+        "The manual-orientation header label is consistent with the unavailable hardware sensor boundary.",
+        "Source artwork differences are not used to infer a reader viewport defect."
+      ]
+    },
+    {
+      "case_id": "sc-reader--more",
+      "case_metadata": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/cases/sc-reader--more.json",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/sc-reader--more.png",
+      "candidate_sha256": "af98a27b0b002b2a26673967ef419b0334aafcfd518951f67380a4af14c23669",
+      "reference_png": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/screens/states/sc-reader--more.png",
+      "reference_sha256": "49f8a7c6cc58a3047b0a4a9f45c4c6ed0de70cce0dddb9a7d2987a1dca3c3069",
+      "viewed_candidate": true,
+      "viewed_reference": true,
+      "identity_matches_case_metadata": true,
+      "outcome": "pass",
+      "observations": [
+        "The More sheet is anchored above the shared reader progress section, and the More tool is visibly active.",
+        "The retained show-tap-zones toggle and immediate full-refresh action are both fully visible, aligned to the 120-logical-pixel content inset, and readable.",
+        "Removing the legacy footer-preference group leaves a compact two-column row. Its resulting sheet-height difference is consistent with the explicit closed-reader override.",
+        "No clipped action, overlapping label, or unreadable grayscale state was observed in the retained visible controls."
+      ],
+      "intentional_differences": [
+        "The legacy footer display preferences are removed so they cannot restore closed-reader labels, ribbon, notifications, or an invisible footer-cycle hit region.",
+        "The remaining actions are reflowed after that removal; exact reference sheet height is not required.",
+        "The manual-orientation header label reflects the declared hardware capability boundary."
+      ]
+    },
+    {
+      "case_id": "sc-reader--toc",
+      "case_metadata": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/cases/sc-reader--toc.json",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/sc-reader--toc.png",
+      "candidate_sha256": "b1f38f4ad8b156b0a12138153d7b5c8ba8f77e52ebc05b851e105c0304167618",
+      "reference_png": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/screens/states/sc-reader--toc.png",
+      "reference_sha256": "d4c60a9384649c96db4ff84d21d29952e2f1bc08b03ddc5b5178cfef05a2cae6",
+      "viewed_candidate": true,
+      "viewed_reference": true,
+      "identity_matches_case_metadata": true,
+      "outcome": "pass_with_limitations",
+      "observations": [
+        "Chapter and bookmark tabs are visible, with the chapter tab selected. The header's table-of-contents action also has an active indicator.",
+        "The chapter list preserves two columns of three rows at approximately 50 logical pixels per row. Titles, dotted leaders, dividers, and the selected-tab underline remain legible without clipping.",
+        "The candidate shows chapters 86 through 81 and a first-of-15 folio with a next-page action. This agrees with the recorded 86-chapter data and six rows per folio.",
+        "The additional folio row explains the taller sheet and higher sheet top. The shared progress section and 76-logical-pixel tool strip remain fully visible.",
+        "The current chapter is 34 and is outside this displayed folio. The absence of a current-chapter dot or progress value on these six unrelated rows is not treated as proof that the marker is missing."
+      ],
+      "intentional_differences": [
+        "Real chapter count, chapter titles, download/read state, and displayed folio content may differ from the reference.",
+        "Dynamic pagination may increase sheet height; a changed sheet top alone is not a layout defect.",
+        "The manual-orientation header label reflects the declared hardware capability boundary."
+      ]
+    }
+  ],
+  "suggestions": [
+    {
+      "id": "P3R1-REF21-1",
+      "case_id": "sc-reader--mode",
+      "priority": "P2",
+      "description": "The Scribe landscape reading-mode panel omits the independent cross-page-image splitting control.",
+      "evidence": "After normalization to logical scale, the reference contains a labeled splitting toggle in the right half below the four direction cards, approximately x644-1120 and y657-719. The same candidate region is blank while the left crop-borders toggle remains visible. The assigned expected state explicitly requires crop and split controls, and this case has no applicable capability exclusion.",
+      "recommendation": "Restore an independently labeled and operable cross-page-image splitting toggle beside crop borders, showing its real current preference and preserving the two-column row.",
+      "status": "open",
+      "introduced_round": 1
+    },
+    {
+      "id": "P3R1-REF21-2",
+      "case_id": "sc-reader--mode",
+      "priority": "P3",
+      "description": "The reading-mode title row omits the current-book default-direction hint.",
+      "evidence": "The reference places a subdued current-book default-direction hint at the right of the reading-mode heading, above the direction cards. The corresponding candidate title-row area is empty, although the recorded state has remember_book_direction enabled and right-to-left selected.",
+      "recommendation": "Display the current book's stored default direction in the title row using the reference's subdued supporting-text treatment and the actual stored value.",
+      "status": "open",
+      "introduced_round": 1
+    }
+  ],
+  "limitations": [
+    "This review covers only the four assigned pairs and does not establish that the full round is clean.",
+    "Only existing JSON and unmodified PNG evidence were read. No application, build, test, smoke check, or runtime probe was executed, and no product file was changed.",
+    "Static screenshots establish visible fit and contrast but cannot prove hit-target operation, preference persistence, slider bounds, navigation behavior, or physical lighting effects.",
+    "The current chapter and known read/download examples are not on the captured first table-of-contents folio, so their dot, progress, read-state, and download-state rendering cannot be independently verified from this assigned screenshot.",
+    "All assigned cases have the reader menu open. The pure-artwork closed-reader override and the absence of an invisible footer-cycle hit region are not directly exercised by these images.",
+    "Binary and source identities were matched to the case_metadata records rather than recomputed from executable or source files."
+  ]
+}

@@ -1,0 +1,199 @@
+{
+  "batch_id": "supplemental-40",
+  "reviewer": "independent-visual-review-supplemental-40",
+  "run_id": "a1baf3fe3dc2",
+  "candidate_identity": {
+    "binary_sha256": "94d7f3bbcab475ad8833a2f3c486138f7b49bead231851c2d8eab2f0c3d2ac51",
+    "source_sha256": "aef9db4e111165016a10a2a95e111f3155860b8510c7f6207ec9c79fbec5082c",
+    "hash_check": "The current SHA-256 of every listed PNG matches both expected_png_sha256 in the batch input and evidence_hashes.screenshot.sha256 in its case sidecar.",
+    "metadata_check": "All eight sidecars identify the assigned run, binary, source, requested native profile, route, and captured state. Their existing mechanical checks contain no failed check; visual outcomes below come from separately viewing each candidate."
+  },
+  "reference_basis": [
+    "docs/review/phase3-reference-scope.json: precedence, profiles, capabilityBounds, and independent-reference limitations",
+    "docs/review/phase3-prototype-reference-support.json: retained user contract, global acceptance conditions, and relevant page board maps",
+    "docs/DESIGN_HANDOFF.md: capability gating, native stretched profiles, page capacities, navigation, and reader requirements",
+    "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/HANDOFF.md: sections 2, 3.4, 4, and 5",
+    "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/prototype/pw-source.dc.html: source subtitle and five-row catalog declarations",
+    "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/prototype/Main.dc.html: four-column shelf declaration",
+    "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/prototype/pw-manga.dc.html: first-page chapter structure"
+  ],
+  "reviewed_case_ids": [
+    "capability--no-frontlight-reader-menu",
+    "capability--no-frontlight-settings",
+    "pw6--stretch-catalog",
+    "pw6--stretch-detail",
+    "pw6--stretch-history",
+    "pw6--stretch-library",
+    "pw6--stretch-reader",
+    "pw6--stretch-search"
+  ],
+  "reviewed_cases": [
+    {
+      "case_id": "capability--no-frontlight-reader-menu",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/capability--no-frontlight-reader-menu.png",
+      "candidate_sha256": "53cc5975c1228aa440619daadd7750dd5e23d00191dbda8821ed2524fd1dfe41",
+      "viewed_candidate": true,
+      "outcome": "pass",
+      "observations": [
+        "Viewed the original 990x1320 candidate. The sidecar identifies scribe3-nofrontlight, reader route, menu=true, no modal, and false frontlight/warmth declarations.",
+        "The open menu header separates the book/chapter title, bookmark, table of contents, and time/battery without a visible collision. The page indicator reads 12/40, consistent with the recorded reader position.",
+        "The bottom rail contains four evenly allocated tools for reading mode, image, direction, and More. The absent brightness tool leaves no disabled lighting entry or empty tool slot; no warmth control is exposed.",
+        "The progress track, square thumb, and RTL chapter actions remain legible above the tools. Artwork dots, crosshatching, and white panel gutters belong to the displayed illustration and are not an interface scrim or a claimed viewport inset."
+      ],
+      "intentional_differences": [
+        "The absent light tool must be reviewed on the native menu; no imaginary hardware capability is enabled.",
+        "The 990x1320 Scribe 3 viewport is a native stretched profile, not an exact Scribe 1/2 reference canvas."
+      ]
+    },
+    {
+      "case_id": "capability--no-frontlight-settings",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/capability--no-frontlight-settings.png",
+      "candidate_sha256": "fdbb5c381349532b1b8942fe9fa919d190a14d39309a997915827d159390302b",
+      "viewed_candidate": true,
+      "outcome": "pass",
+      "observations": [
+        "Viewed the original 990x1320 settings capture. The actual profile is scribe3-nofrontlight with has_frontlight=false and has_warmth=false, matching the case identity.",
+        "The left navigation begins with screen/refresh, Wi-Fi/sleep/exit, and storage. There is no lighting navigation entry, dependent brightness/warmth row, or unsupported pen entry.",
+        "The fixed navigation pane and right detail pane remain separate. Refresh choices fit in one row with six pages selected; the three quality cards are visibly muted and explicitly labeled unavailable rather than showing fabricated active behavior.",
+        "The sixteen-step grayscale strip, rectangular switches, page title, and bottom settings navigation remain within their allocations. The UI uses white surfaces and rules without a shadow or dimmed mask."
+      ],
+      "intentional_differences": [
+        "This real device profile declares no frontlight; dependent controls must be absent.",
+        "Unavailable software quality choices are shown with an unavailable label and disabled appearance. This is separate from hiding absent hardware capabilities.",
+        "The 990x1320 native viewport has no independent Scribe 3 reference PNG."
+      ]
+    },
+    {
+      "case_id": "pw6--stretch-catalog",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/pw6--stretch-catalog.png",
+      "candidate_sha256": "91eaa5ab9392432c93a0bf8c66e553eb7c40735b23cfb106db82f916948b431b",
+      "viewed_candidate": true,
+      "outcome": "needs_change",
+      "observations": [
+        "Viewed the original 632x840 candidate, matching pw6 metadata and the catalog route with no modal.",
+        "Five complete catalog rows are visible, with cover, title, author/tags, and status lines. In-library labels sit beside titles, and no title or row is visibly clipped.",
+        "The return action, search, filter, and source-settings controls remain distinct. The secondary catalog correctly omits the main navigation and retains a centered 1/26 folio with a right-side next action and no first-page previous action.",
+        "The source subtitle below MangaDex reads only '多语言 · v12'. It omits the available catalog total even though the recorded catalog_count is 128. HANDOFF section 5.4 and prototype/pw-source.dc.html:53 require the source subtitle to include the total. See P3R1-SUP40-1."
+      ],
+      "intentional_differences": [
+        "A distinct native viewport is captured at this profile's actual size; it is not resized to impersonate an exact handoff canvas.",
+        "Actual record titles, status, and counts may differ from fixtures; the suggestion concerns omission of the available count rather than requiring the fixture value."
+      ]
+    },
+    {
+      "case_id": "pw6--stretch-detail",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/pw6--stretch-detail.png",
+      "candidate_sha256": "0a786b8e083a5fb9c3c961f8a4cfbeb5bcdc410e0e4afd9ac9cfb7f0516f9776",
+      "viewed_candidate": true,
+      "outcome": "pass",
+      "observations": [
+        "Viewed the original 632x840 pw6 detail capture. It shows page 1 with information and actions above exactly six chapter rows, numbered 86 through 81, consistent with visible_chapters.",
+        "The cover, serif title, author/status, three-line description, and description/tag action have separate readable allocations. The black continuation action shows chapter 34 and 12/40; membership and tracking controls remain distinct beside it.",
+        "Chapter titles, dotted rules, dates, and individual download controls do not visibly collide. The directory header and batch download control fit across the native width.",
+        "The footer shows 1/8, which is coherent with 86 chapters and the six-then-twelve capacity contract. The first-page previous action and main navigation are absent as required."
+      ],
+      "intentional_differences": [
+        "A distinct native viewport is captured at this profile's actual size; it is not resized to impersonate an exact handoff canvas.",
+        "Chapter dates, download states, record counts, and artwork are actual captured data rather than mandatory reference fixtures."
+      ]
+    },
+    {
+      "case_id": "pw6--stretch-history",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/pw6--stretch-history.png",
+      "candidate_sha256": "59b172bd1214fc210e0898706f82155b3b7212cc7723b53cffaeaa9bbb55a69e",
+      "viewed_candidate": true,
+      "outcome": "pass",
+      "observations": [
+        "Viewed the original 632x840 pw6 history capture. Five visible records are grouped as two today, two yesterday, and one Sunday, matching the sidecar's visible_history records and group starts.",
+        "Book/chapter labels, completed-read text, partial progress bars, and recorded times remain legible. The 12/40 and 5/22 progress labels correspond to the represented incomplete records.",
+        "Each row retains a separate right-side remove action. The incognito and clear controls, history/update tabs, and date headings remain distinct without visible clipping.",
+        "The 1/5 folio is above the flush five-item navigation, with History active. Boundary-aware previous-action absence and next-action placement remain stable."
+      ],
+      "intentional_differences": [
+        "A distinct native viewport is captured at this profile's actual size; it is not resized to impersonate an exact handoff canvas.",
+        "The reading summary, dates, times, progress, and total history count reflect the captured records."
+      ]
+    },
+    {
+      "case_id": "pw6--stretch-library",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/pw6--stretch-library.png",
+      "candidate_sha256": "8ec4b3d22cdd78e5410f798cd4243b40990632e8b1a8a931101b146f06dbc797",
+      "viewed_candidate": true,
+      "outcome": "pass",
+      "observations": [
+        "Viewed the original 632x840 pw6 library capture. The shelf preserves four columns and two rows with eight complete records, matching visible_books rather than adding columns for the wider native profile.",
+        "The continuation card has a white outlined surface, a separate cover, book/chapter text, a 12/40 progress display, and an isolated black arrow action. It has no offset shadow.",
+        "Unread badges and downloaded icons sit in caption rows below covers. The grid titles and bottom-row markers remain visible without covering the artwork or colliding with adjacent cards.",
+        "Category counts, current underline, header sort/More controls, 1/6 folio, and active Library navigation remain readable and within the viewport. The six-page folio is coherent with 46 records at eight per page."
+      ],
+      "intentional_differences": [
+        "A distinct native viewport is captured at this profile's actual size; it is not resized to impersonate an exact handoff canvas.",
+        "Real cover artwork, unread/download states, and counts are not required to reproduce reference fixture data."
+      ]
+    },
+    {
+      "case_id": "pw6--stretch-reader",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/pw6--stretch-reader.png",
+      "candidate_sha256": "f20055510c52d84acaf8cea6ca39490018be209428a99a81946e215d045fdd0f",
+      "viewed_candidate": true,
+      "outcome": "pass",
+      "observations": [
+        "Viewed the original 632x840 pw6 reader capture. Metadata records menu=true and no expanded panel, matching the required open-menu default rather than a closed-reader capture.",
+        "The status row and full-width toolbar retain a readable book/chapter title with distinct back, bookmark, and table-of-contents actions. The main application navigation is absent.",
+        "The bottom menu shows 12/40, a square seek thumb, and RTL adjacent chapter actions with chapter 35 on the left and chapter 33 on the right. All remain separate from the five evenly allocated tools.",
+        "Brightness remains a visible tool on this frontlight-capable profile, unlike the no-frontlight case. Illustration hatching and white panel gutters are artwork content; no interface shadow or dimmed overlay is visible."
+      ],
+      "intentional_differences": [
+        "A distinct native viewport is captured at this profile's actual size; it is not resized to impersonate an exact handoff canvas.",
+        "This is an open-menu state, so menu status/progress controls are expected; it does not evidence the artwork-only closed-reader state."
+      ]
+    },
+    {
+      "case_id": "pw6--stretch-search",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/pw6--stretch-search.png",
+      "candidate_sha256": "79d620dd104cfb2acb278f6b56293564e45a1073706bd73bc312f9fb801b2a6e",
+      "viewed_candidate": true,
+      "outcome": "pass",
+      "observations": [
+        "Viewed the original 632x840 pw6 search capture. The committed query is '雾港', scope is all, and the summary reports four searched sources with two result-bearing sources, matching the recorded search state.",
+        "MangaDex has three visible result covers and Komga has one. Their titles and metadata sit below the images, with the in-library bookmark beside the title rather than over the cover.",
+        "The local no-result row and separate failed-source row with an explicit unfinished-operation label and Retry action remain distinguishable. The failure is not presented as successful results or as a fabricated timeout.",
+        "The input and inactive scope controls have white outlined surfaces; the active all-source scope is inverted. Source headings, View all actions, and Retry fit the native width, and the hidden keyboard leaves the active Search navigation visible at the bottom."
+      ],
+      "intentional_differences": [
+        "A distinct native viewport is captured at this profile's actual size; it is not resized to impersonate an exact handoff canvas.",
+        "This supplemental case represents submitted results, not the keyboard-open prototype default. Actual source counts, titles, and independent error states may differ from fixture examples."
+      ]
+    }
+  ],
+  "suggestions": [
+    {
+      "id": "P3R1-SUP40-1",
+      "case_id": "pw6--stretch-catalog",
+      "priority": "P2",
+      "description": "The catalog source subtitle omits the available total record count.",
+      "evidence": [
+        "The viewed 632x840 candidate shows '多语言 · v12' immediately below MangaDex, with no total count before the tab row.",
+        "The case sidecar records catalog_count=128, five visible_catalog records, and page_count=26, so the captured state has an available total.",
+        "HANDOFF.md section 5.4 specifies source metadata including the total number of works.",
+        "prototype/pw-source.dc.html:53 explicitly declares '多语言 · v12 · 共 {{totalLabel}} 部'. The issue is missing information, not a difference in the fixture value or native viewport size."
+      ],
+      "recommendation": "Append the actual available catalog total to the source subtitle using the same metadata hierarchy and spacing. Derive the number from the source/catalog state rather than hardcoding the reference fixture; use an honest unknown-total treatment only when a source genuinely supplies no total.",
+      "status": "open",
+      "introduced_round": 1
+    }
+  ],
+  "coverage_gaps": [
+    "Only the eight assigned candidates were visually inspected. This batch does not establish a clean result for the full review round.",
+    "Both reader candidates have menus open. Artwork-only closed reading, absence of the hidden lower-right footer-cycle target, and notification suppression are not directly evidenced by this batch.",
+    "The PW6 detail candidate is page 1. Later twelve-row chapter pages, final-page boundaries, and page transitions are not directly observed.",
+    "No expanded modal, sheet, keyboard, or page-picker state is included, so this batch does not evaluate their content-driven heights, dismissal, or transition stability."
+  ],
+  "limitations": [
+    "The handoff has no independent PW6 or Scribe 3 reference PNG. Review used the native 632x840 and 990x1320 candidates, textual requirements, and prototype declarations. No image was resized or represented as a PW5/Scribe 1/2 exact pixel match, and no other PNG was loaded.",
+    "The review read existing PNG/JSON/text files and computed current PNG SHA-256 hashes. It did not run the local application, a build, tests, validation suites, smoke tests, or runtime probes.",
+    "Existing sidecar checks support identity and captured-state interpretation, but do not replace the per-case visual observations and are not newly executed verification.",
+    "Static screenshots do not prove invisible touch-target extents, gestures, functional navigation, disabled-control input behavior, persistence, refresh timing, physical wake restoration, driver capabilities, or a 512 MiB memory qualification.",
+    "The sidecars identify the desktop backend and explicitly withhold physical hardware qualification. No physical frontlight, warmth, sensor, pen, e-ink, or sleep/wake pass is inferred from these captures."
+  ]
+}

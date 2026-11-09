@@ -1,0 +1,139 @@
+{
+  "schema_version": 2,
+  "round": 5,
+  "reviewer": "final_fidelity_review",
+  "status": "changes_required",
+  "review_kind": "independent_static_visual_and_source_review",
+  "review_complete": true,
+  "artifact_directory": "artifacts/ui-round-5-final",
+  "frozen_candidate_sha256": "4a9b148cfdff8b7c2527f0cbbfd2d6b3f7a60b7969bd3acdffa4a1a753272111",
+  "qualifies_as_clean_round": false,
+  "consecutive_clean_rounds": 0,
+  "new_suggestion_count": 1,
+  "remaining_previous_finding_count": 2,
+  "scope_note": "All twelve new baseline screens were visually reviewed, followed by Paperwhite and Scribe selection, tagged summaries, completed-job actions and removal, queue state controls, stable first/last download pages, batch results, and online/offline catalog states. The initial ui-round-5 captures are reused unchanged in the consolidated final directory. The larger 107-case execution matrix is not represented as 107 separate manual visual inspections.",
+  "source_snapshot_note": "Conditional source findings were established before the next candidate's repairs. Product source changes reported after the freeze do not retroactively close this candidate's visual findings.",
+  "new_findings": [
+    {
+      "id": "R5-I001",
+      "priority": "P2",
+      "screen": "batch-download-feedback",
+      "location": "Feedback after an empty or entirely retained completed batch",
+      "confirmation": "conditional_source_confirmed",
+      "evidence": ["src/app/actions.rs:904", "src/app/actions.rs:908", "src/app/actions.rs:943", "src/downloads.rs:165"],
+      "observed": "The frozen enqueue_batch path reports Queued even when the next-five/next-ten selection is empty, such as at the final chapter or when no subsequent chapter is eligible. enqueue_many returns immediately for an empty slice without accepting work or producing an event. A selection containing only valid completed chapters can likewise preserve all local jobs while still reporting Queued.",
+      "why": "The feedback advertises pending work that does not exist. Preserving completed content should not be presented as a new download queue.",
+      "fix": "Use the actual accepted transaction result to report pending, retained completed, or unavailable work. Give an immediate no-downloads-needed result for an empty candidate set and avoid Queued when the accepted pending count is zero.",
+      "status": "repair_reported_for_next_candidate"
+    }
+  ],
+  "remaining_previous_findings": [
+    {
+      "id": "R3-D001",
+      "independent_alias": "R4-I003",
+      "priority": "P2",
+      "screen": "catalog-history-and-scribe-browse-tabs",
+      "location": "Selected underline at the full-width divider",
+      "confirmation": "screenshot_source_and_static_pixel_read_confirmed",
+      "evidence": ["artifacts/ui-round-5-final/pw5-catalog.png", "artifacts/ui-round-5-final/pw5-history.png", "artifacts/ui-round-5-final/scribe-sources.png", "ui/sources.slint:236", "ui/history.slint:69", "ui/widgets.slint:145"],
+      "observed": "The detached marker position is fixed, but the later full-width gray rule now paints through the middle of the three-pixel selected marker. At x=50 the Paperwhite history PNG has grayscale values 0,221,0 at y=154,155,156; catalog has the same pattern at y=190,191,192. The library places its rule behind the tabs and retains a solid marker.",
+      "why": "The selected treatment becomes two thin black rules separated by gray instead of the reference's solid heavy selection rule.",
+      "fix": "Paint the full-width divider behind the selected marker in every tab bar while retaining the restored continuous rule and the full touch area.",
+      "status": "repair_reported_for_next_candidate"
+    },
+    {
+      "id": "R4-I006",
+      "priority": "P2",
+      "screen": "chapter-download-feedback",
+      "location": "Persistent message over the last visible chapter row",
+      "confirmation": "screenshot_and_source_confirmed",
+      "evidence": ["artifacts/ui-round-5-final/detail-chapter-download-selected.png", "artifacts/ui-round-5-final/batch-all.png", "artifacts/ui-round-5-final/batch-unread.png", "artifacts/ui-round-5-final/storage-clear-cache.png", "ui/app.slint:31", "ui/app.slint:57"],
+      "observed": "The revised Paperwhite message avoids the pager but occupies approximately y=702..756. The last chapter row occupies approximately y=688..738, so its title, status, and most of its download target are hidden behind the message. This is the same obstruction transferred from the pager to a content action.",
+      "why": "Routine feedback still conceals a visible interactive item until dismissal. Moving the overlay above the pager does not provide an unobstructed content layout.",
+      "fix": "Use a reserved non-interactive status area or another treatment that covers neither content nor fixed controls. Root reported a timed top status strip for the next candidate; that new capture must be reviewed before closure.",
+      "status": "repair_reported_for_next_candidate"
+    }
+  ],
+  "resolved_previous_findings": [
+    {
+      "id": "R4-I001",
+      "result": "Book tags are present only in the positive book-summary control. The cache and About summaries remain tag-free while a tagged book is current.",
+      "evidence": ["artifacts/ui-round-5-final/summary-cache-info-tagged.png", "artifacts/ui-round-5-final/summary-about-tagged.png", "artifacts/ui-round-5-final/summary-book-tags.png"]
+    },
+    {
+      "id": "R4-D002",
+      "independent_alias": "R4-I002",
+      "result": "Completed jobs expose reading, explicit removal, and cancel instead of ineffective pause/resume/cancel transitions. Removal has a separate confirmation. Global controls are visibly disabled for an all-completed queue; the failed-only fixture enables Resume while leaving Pause and Cancel disabled.",
+      "evidence": ["artifacts/ui-round-5-final/completed-job-menu.png", "artifacts/ui-round-5-final/completed-job-read.png", "artifacts/ui-round-5-final/completed-remove-confirmation.png", "artifacts/ui-round-5-final/completed-remove-cancel.png", "artifacts/ui-round-5-final/completed-remove-apply.png", "artifacts/ui-round-5-final/downloads-disabled-global.png", "artifacts/ui-round-5-final/downloads-failed-controls.png"]
+    },
+    {
+      "id": "R4-I004",
+      "result": "The library filter and Paperwhite source preferences now use the reference sliders symbol; catalog filtering and the Settings destination keep their original distinct symbols.",
+      "evidence": ["artifacts/ui-round-5-final/pw5-library.png", "artifacts/ui-round-5-final/scribe-library.png", "artifacts/ui-round-5-final/pw5-catalog.png"]
+    },
+    {
+      "id": "R4-I005",
+      "result": "The targeted source actions and direct reader footer, orientation, and seek regions now use the device touch size. Separate seek and chapter bands avoid overlapping targets. The small reader geometry adaptation is documented below instead of requesting the previous undersized targets.",
+      "evidence": ["ui/sources.slint:324", "ui/sources.slint:330", "ui/reader.slint", "artifacts/ui-round-5-final/pw5-reader.png", "artifacts/ui-round-5-final/scribe-landscape-reader.png"]
+    },
+    {
+      "id": "R4-D001",
+      "result": "The first Paperwhite chapter row starts at y=436 after the complete selection actions ending at y=434. The six rows remain above the pager and retain approximately 50.3-pixel row heights. The Scribe two-column selection state also has clear separation.",
+      "evidence": ["artifacts/ui-round-5-final/detail-chapter-select-two.png", "artifacts/ui-round-5-final/scribe-chapter-select-two.png"]
+    },
+    {
+      "id": "R4-D003",
+      "result": "The first and one-row last download pages now share the same panel frame and pager at approximately y=634..682. The final-page next action is disabled without moving its target.",
+      "evidence": ["artifacts/ui-round-5-final/downloads-lazy-pagination-01.png", "artifacts/ui-round-5-final/downloads-lazy-pagination-12.png"]
+    },
+    {
+      "id": "R4-D004",
+      "result": "Ordinary Batch All retains nine completed jobs and queues 77; Batch Unread retains all nine completed jobs and queues 51. The completed jobs are no longer reset to waiting 40/40 states.",
+      "evidence": ["artifacts/ui-round-5-final/batch-all.state.json", "artifacts/ui-round-5-final/batch-unread.state.json", "artifacts/ui-round-5-final/downloads-lazy-pagination-01.png"]
+    },
+    {
+      "id": "R4-D005",
+      "result": "Both online and offline Komga fixtures show a localized ongoing state and retain the same provider-defined third tab label across restart. Different true local/remote page counts are not treated as a visual defect.",
+      "evidence": ["artifacts/ui-round-5-final/cache-cover-online.png", "artifacts/ui-round-5-final/cache-cover-offline.png", "artifacts/ui-round-5-final/report.json"]
+    }
+  ],
+  "baseline_coverage": [
+    {"screen": "pw5-library", "reference": "tmp/design/reference-01.png", "actual": "artifacts/ui-round-5-final/pw5-library.png", "reviewed": true, "result": "No new finding; sliders, solid library selection marker, grid, titles, continuation, progress, pagination, and navigation reviewed."},
+    {"screen": "pw5-detail", "reference": "tmp/design/reference-02.png", "actual": "artifacts/ui-round-5-final/pw5-detail.png", "reviewed": true, "result": "No new baseline finding; complete synopsis, action spacing, six valid chapter targets, directory rule, and true fifteen-page count reviewed."},
+    {"screen": "pw5-reader", "reference": "tmp/design/reference-03.png", "actual": "artifacts/ui-round-5-final/pw5-reader.png", "reviewed": true, "result": "No new finding; documented seek-band adaptation accepted, chapter and toolbar positions retained, artwork panel geometry and page labels reviewed."},
+    {"screen": "pw5-sources", "reference": "tmp/design/reference-04.png", "actual": "artifacts/ui-round-5-final/pw5-sources.png", "reviewed": true, "result": "No new finding; source states, unavailable-source treatment, uninstall, pairing card, grayscale, and navigation reviewed."},
+    {"screen": "pw5-catalog", "reference": "tmp/design/reference-05.png", "actual": "artifacts/ui-round-5-final/pw5-catalog.png", "reviewed": true, "result": "Residual R3-D001 only; context artwork, metadata, update ages, action symbols, and pagination reviewed."},
+    {"screen": "pw5-search", "reference": "tmp/design/reference-06.png", "actual": "artifacts/ui-round-5-final/pw5-search.png", "reviewed": true, "result": "No new finding; complete cover labels, real source counts, result grouping, metadata, error/retry state, and navigation reviewed."},
+    {"screen": "pw5-history", "reference": "tmp/design/reference-07.png", "actual": "artifacts/ui-round-5-final/pw5-history.png", "reviewed": true, "result": "Residual R3-D001 only; privacy action, date groups, real summary, progress, deletion targets, and pagination reviewed."},
+    {"screen": "pw5-settings", "reference": "tmp/design/reference-08.png", "actual": "artifacts/ui-round-5-final/pw5-settings.png", "reviewed": true, "result": "No new baseline finding; device card, icon meanings, labels, row spacing, page controls, and navigation reviewed."},
+    {"screen": "scribe-library", "reference": "tmp/design/reference-09.png", "actual": "artifacts/ui-round-5-final/scribe-library.png", "reviewed": true, "result": "No new finding; six-by-three covers, captions, sliders, intrinsic preview dots, continuation, counts, and pagination reviewed."},
+    {"screen": "scribe-detail", "reference": "tmp/design/reference-10.png", "actual": "artifacts/ui-round-5-final/scribe-detail.png", "reviewed": true, "result": "No new finding; sidebar proportions, synopsis weight, tags, complete directory rule, sixteen rows, and pagination reviewed."},
+    {"screen": "scribe-sources", "reference": "tmp/design/reference-11.png", "actual": "artifacts/ui-round-5-final/scribe-sources.png", "reviewed": true, "result": "Residual R3-D001 only; 56-pixel source actions, labeled header, source cards, context, cover grid, and pagination reviewed."},
+    {"screen": "scribe-landscape-reader", "reference": "tmp/design/reference-12.png", "actual": "artifacts/ui-round-5-final/scribe-landscape-reader.png", "reviewed": true, "result": "Settled committed page 12 with no inflight work; accepted seek-band adaptation, unchanged chapter/tool controls, locked orientation, spread order, and major artwork boundaries reviewed."}
+  ],
+  "expanded_coverage": {
+    "selection": ["detail-chapter-select-two", "detail-chapter-download-selected", "scribe-chapter-select-two"],
+    "summaries": ["summary-cache-info-tagged", "summary-about-tagged", "summary-book-tags"],
+    "completed_jobs": ["completed-job-menu", "completed-job-read", "completed-remove-confirmation", "completed-remove-cancel", "completed-remove-apply"],
+    "queue_and_batch": ["downloads-disabled-global", "downloads-failed-controls", "downloads-lazy-pagination-01", "downloads-lazy-pagination-12", "batch-all", "batch-unread"],
+    "cache": ["storage-clear-cache", "cache-cover-online", "cache-cover-offline"],
+    "note": "These are the manually inspected expanded screenshot states. Other cases were represented by existing remote execution reports and source inspection only."
+  },
+  "accepted_geometry_adaptation": {
+    "reason": "The original 120/132-pixel reader control band does not accommodate separate 48/56-pixel seek and chapter touch regions at their original centers without overlap.",
+    "paperwhite": "The upper description and seek area move up 16 pixels by increasing the control band to 136 pixels. Chapter buttons and bottom tools retain their absolute positions.",
+    "scribe": "The upper description and seek area move up 24 pixels by increasing the control band to 156 pixels. Chapter buttons and bottom tools retain their absolute positions.",
+    "assessment": "This is a supported physical touch-size adaptation, not a request to restore undersized or overlapping controls."
+  },
+  "accepted_source_variations": ["True fixtures determine counts, dates, completed progress, and page totals.", "The 86-chapter Paperwhite directory retains fifteen pages at six rows per page.", "One canonical comic page remains shared between device profiles.", "The orientation label truthfully describes manual locked direction.", "Previously documented platform gaps are not newly reported visual issues."],
+  "reported_remote_verification": {
+    "ui_report": "artifacts/ui-round-5-final/report.json",
+    "ui_passed": 107,
+    "ui_failed": 0,
+    "raw_report": "artifacts/raw-round-5/report.md",
+    "raw_passed": 6,
+    "raw_failed": 0,
+    "product_binary_unchanged": true
+  },
+  "verification_note": "Only fresh remote screenshots and sidecars, reference images, source text, existing reports, and static PNG pixels were read. No local application, build, test suite, smoke test, or runtime probe was executed. This report does not declare overall native or project acceptance."
+}

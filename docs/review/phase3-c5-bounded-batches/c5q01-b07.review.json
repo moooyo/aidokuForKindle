@@ -1,0 +1,176 @@
+{
+  "batch_id": "c5q01-b07",
+  "reviewer": "/root/final_validation_delivery/c4_full_review_coordinator/c5q01_b07",
+  "review_method": "Independent bounded static review using ui-ux-pro-max priority guidance and tools.view_image on every assigned original PNG; no search script or verification execution.",
+  "run_id": "43d2545cb872",
+  "round": 3,
+  "manifest_sha256": "1731e4306df0596e80edd7df2d3e5e57c34fc64feae44572011eba61c2bfc7c5",
+  "inventory_sha256": "d65f77a634219f545fa9adfdfbd4bbcb2838ca77efa04a5cb7254ad3e6434c7d",
+  "identity_source": "All SHA values are owner-provided frozen inventory or assigned reference identities. No local hashes were computed; recorded oracle results were read, not rerun.",
+  "freeze_tuple": {
+    "source_file_count": 227,
+    "source_sha256": "892f0ac73a807e4fd61a235d9ad4fe00c4f03c1e4e6881f28b2dd8bee2b7ddf1",
+    "binary_sha256": "9bd66a1f89473218e67558f763a4a7d4da7c642f9960ae5430ceb74ac365129b",
+    "harness_sha256": "94ccc78d3c11b97791618527350ce59dacf458bfc57f8f04aabec045dd544a74",
+    "capture_plan_sha256": "b3adabbf4f2d33789f381dc2ac55474d89fcd210d58ce9e5083c0d818d547eec",
+    "reference_scope_sha256": "c910bed9f02ed17b2ca0a54aca1beeeeb6caabc5a17a91afe764ddd3e7b0d33c",
+    "reference_sha256": "e7b49b456255432d74cfe41346f9d44c1a9c55bf67c5d55483e4ae3029547d18",
+    "capture_helper_sha256": {
+      "verify-ui.py": "470872e6fd22a78b474c0f862164875ad9c7237bd2f3f164512864580ac1e90d",
+      "verify-fullscreen.py": "4a6c48cef771e66e9b3058edd888dcf2d4bce02e2720b5cc00c7a5b987bc9670",
+      "handoff_c4_business.py": "6197f375b247962e3ce9acdd3779468073f11e0002ac3c7ce876a7b1a0d0d9be",
+      "handoff_c5_ui.py": "fa30ef2bf8ab512e9705f43933ff6acaf32993e5aa1dbc62be330d4c97b481f2",
+      "handoff_c5_reader.py": "5b88a0c1b8e1151a3f96decef1a3a06f98a0d9de99908709bafbfb02cea490d5"
+    }
+  },
+  "reviewed_case_ids": [
+    "pw5--c5-cold-reader-no-catalog",
+    "pw5--c5-cold-reader-to-browse",
+    "scribe--real-migration--origin-empty",
+    "scribe--real-migration--origin-selector-last",
+    "scribe--real-migration--origin-selector-cancel"
+  ],
+  "image_accounting": {"candidate_originals_viewed": 5, "reference_originals_viewed": 3, "total_opens": 8, "exact_reference_pairs": 0, "additional_crop_required": false},
+  "cases": [
+    {
+      "case_id": "pw5--c5-cold-reader-no-catalog",
+      "evidence": {
+        "png_path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate5/ui-qualification-01/pw5--c5-cold-reader-no-catalog.png",
+        "png_sha256": "99e72fc0524cab6742a606d8fd257bc1fd762c534457451aacba487d8ee9c394",
+        "case_json_sha256": "4d6c30d024a9e180ccaa261255c0d467f56f46dea1d511d834860e375eed7303",
+        "state_sha256": "bd3b302ea764d0574df489b283e57b00d6dabe41fcf5adf9d4f11b87736064a0",
+        "actions_sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+        "metadata_sha256": "19d48e358a9bc00fbf0afeb44ccda58a35438470871b77d4635d87290e7a6242",
+        "log_sha256": "dc121ceea011a63c29b404d6c6b75bbe2db32b326923b8fa99759f457bfd709f"
+      },
+      "actual_viewing": {"opened": true, "method": "tools.view_image", "image_open_ordinal": 1, "native_size": [618, 824]},
+      "observations": {
+        "geometry_boundary": "The artwork fills the viewport height. Narrow side whitespace and black panel outlines agree with the recorded processed-source destination [16,0,602,824]; they are not app gutters. Patterned panels, speech balloons, and frame edges remain distinct.",
+        "font_affordance": "No app typography or controls are painted. No status bar, bookmark glyph, folio, footer, download indicator, or debug chrome is visible.",
+        "state_identity": "Frozen route is reader, menu is closed, image is ready, and visible page is 12/40. The recorded processed input SHA is aa876c23335466eb13db29fcac24de76b724751268a46156ebe9aaddc12468e3; the supplied whole-viewport oracle records exact_match=true with zero changed or ignored pixels. These records support source-art attribution without a new oracle run."
+      },
+      "intentional_capability_check": "No declared intentional differences. Apply the artwork-only closed Reader override even though the related original reference contains a bookmark glyph and frozen reader_bookmarked=true. Desktop physical_hardware_qualified=false is retained.",
+      "static_verdict": "pass_with_limits",
+      "behavior_limits": "The snapshot and recorded catalog inventory support the existing cold Reader guard: catalog_count=0 and no generated catalog records. This review did not execute SQL, establish timing or performance, or independently prove that no unseen work occurred. The empty action list and desktop startup log provide no physical input evidence."
+    },
+    {
+      "case_id": "pw5--c5-cold-reader-to-browse",
+      "evidence": {
+        "png_path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate5/ui-qualification-01/pw5--c5-cold-reader-to-browse.png",
+        "png_sha256": "bdb9ad4a5f2979fd4f7ceba3052728a7cea8ca5d9ecc4ed50dbc21a8c863245d",
+        "case_json_sha256": "8690f0ebfb0c79fe6db54b46266e7e08d2c1038d2c6fad9371d66bb05dad826c",
+        "state_sha256": "7d08984153795351897c66cba2358680d26200bf9f66d8c8413aa21aebb402dd",
+        "actions_sha256": "4a9490c5f15980fb7f0f1d3e14f87b09c75be9c56993ccbd197e61f142713c4e",
+        "metadata_sha256": "54ead6d018e8513cd31732c894d925b4898d3dbcc8b5424c0f39720942c8c764",
+        "log_sha256": "dc121ceea011a63c29b404d6c6b75bbe2db32b326923b8fa99759f457bfd709f"
+      },
+      "actual_viewing": {"opened": true, "method": "tools.view_image", "image_open_ordinal": 3, "native_size": [618, 824]},
+      "observations": {
+        "geometry_boundary": "The source header, three tabs, five cover rows, separators, and bottom pagination follow the related Paperwhite source layout at the declared half reference size. Content begins near x22, covers occupy a consistent narrow column, and row text aligns near x104. The final row and footer are fully visible without collision.",
+        "font_affordance": "The bold serif MangaDex heading and row titles are legible, with subordinate gray metadata. Search, filter, settings, the active-tab underline, shelf badges, folio 1/26, and the next-page arrow remain recognizable and separated.",
+        "state_identity": "The five visible titles match the frozen visible_catalog IDs. Loaded count 128 and folio 1/26 agree with catalog_count=128 and page_count=26. Recorded navigation is navigation/open/1 followed by sources/open/mangadex, with the frozen cold Reader case identified as its origin."
+      },
+      "intentional_capability_check": "No declared intentional differences. The loaded-count wording describes actual captured data; no sample-count substitution or fixed row-height requirement was imposed. Desktop capability bounds remain applicable.",
+      "static_verdict": "pass_with_limits",
+      "behavior_limits": "The frozen replay, destination state, and recorded persisted-record identities support the explicit Browse transition. This review did not query the database, replay navigation, test pagination or icon hit targets, or infer catalog generation speed from the screenshot."
+    },
+    {
+      "case_id": "scribe--real-migration--origin-empty",
+      "evidence": {
+        "png_path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate5/ui-qualification-01/scribe--real-migration--origin-empty.png",
+        "png_sha256": "ea5151c214d6c4f6973def02ce329f19e05bedf27ad1277c6b2859f8f2ee568a",
+        "case_json_sha256": "4f61072e4630347178f8229a80d39a11e17a2e52ebbc9bcf54decca0925e964d",
+        "state_sha256": "a3edb6fd18a688b9d1ba74a89a9bcd0cc4d31e4c267ac72d428ca9969758292d",
+        "actions_sha256": "3fbfd98f2cf357bed71076cbe4d65124275fb9d7b6bf1b6f13b07fd1e0fb7537",
+        "metadata_sha256": "398137ac66afaf53893a2873b07b77064285568c8fbb6a26cbc56b7fec04895a",
+        "log_sha256": "7e68a4176710a866675a6b95bcf7bed2d96c58a8fd7996a4d48f3679514483a9"
+      },
+      "actual_viewing": {"opened": true, "method": "tools.view_image", "image_open_ordinal": 5, "native_size": [930, 1240]},
+      "observations": {
+        "geometry_boundary": "The compact white selector has a continuous black perimeter, approximately x145..784 and y240..417. Its disabled empty row and separator stay inside the surface. The underlying unavailable heading begins below the panel rather than painting through it.",
+        "font_affordance": "The migration heading truncates with an ellipsis before the distinct black Done control. The gray empty message remains readable as disabled content; no false selectable row or pagination strip is displayed.",
+        "state_identity": "choices/source-migration:komga-empty contains only the disabled source-migration-empty row, panel 1/1, no selected migration ID, and migration_can_start=false. This matches the displayed empty content after the recorded source open and migrate actions."
+      },
+      "intentional_capability_check": "No declared intentional differences. The actual unavailable built-in fixture and disabled empty row are accepted state bounds. The related source-picker reference supplies general white-surface and black-boundary language, not an exact empty-selector height or item-count oracle.",
+      "static_verdict": "pass_with_limits",
+      "behavior_limits": "The image supports empty-state readability and enclosure only. It does not prove disabled hit handling, focus behavior, migration business logic, or physical touch. Desktop physical_hardware_qualified=false remains explicit."
+    },
+    {
+      "case_id": "scribe--real-migration--origin-selector-last",
+      "evidence": {
+        "png_path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate5/ui-qualification-01/scribe--real-migration--origin-selector-last.png",
+        "png_sha256": "f83c265735aa9b745e03645a6b3bf7cdf36cf55f9cd5b9f021c042a214160892",
+        "case_json_sha256": "6d5da31685ea768217722a1676959835eac35c784716b16dfbf36e0e22967236",
+        "state_sha256": "d0ad0b62e9a6be6185d44da26d7a3200279e6af1bf25e71080b0c02040b9898b",
+        "actions_sha256": "cb529be1a62ec085bc65f7e055c87412970e3976aa857d62c177a40e4a5ee618",
+        "metadata_sha256": "bd3df6d11572eced2f784adf0af2111f5b54031c760c48a82afdf793d795cd2e",
+        "log_sha256": "7e68a4176710a866675a6b95bcf7bed2d96c58a8fd7996a4d48f3679514483a9"
+      },
+      "actual_viewing": {"opened": true, "method": "tools.view_image", "image_open_ordinal": 7, "native_size": [930, 1240]},
+      "observations": {
+        "geometry_boundary": "The white selector has a complete black outline at approximately [145,240,640,246]. Its single row, separator, previous-page control, and centered 3/3 folio all remain above the bottom edge around y485. No folio text escapes onto the background migration or uninstall controls. The observed perimeter agrees with the recorded native_visible_regions rectangle; its recorded edge fractions were not remeasured.",
+        "font_affordance": "The series 016 title and author are legible and separated. The truncated heading leaves clear room for Done. Previous-page text and arrow are distinct, and the absence of a next-page affordance agrees with the last page.",
+        "state_identity": "The recorded panel/page/99999 action resolves to panel 3/3 with one enabled 5:komga:series-016 row. The displayed title, author, and folio match that actual state, with no selected migration ID or committing state."
+      },
+      "intentional_capability_check": "No declared intentional differences. C4-C5-G16 is statically satisfied for this actual last page: content and folio share the enclosed white surface. No exact exported selector-state PNG exists; the related source-picker reference does not prescribe a sample row count or fixed panel height.",
+      "static_verdict": "pass_with_limits",
+      "behavior_limits": "The captured actions and snapshot support last-page clamping and the visible geometry, without a new action replay. Row selection, migration commit, physical hit targets, timing, and input mapping remain outside this static review."
+    },
+    {
+      "case_id": "scribe--real-migration--origin-selector-cancel",
+      "evidence": {
+        "png_path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate5/ui-qualification-01/scribe--real-migration--origin-selector-cancel.png",
+        "png_sha256": "7fa6146bcd8239a14e0c9c7b69c3acf71f4dff8bf5efd0dfb9c0469fed84f9b9",
+        "case_json_sha256": "dbd0470fa27a840db86fab1677ea956dccc71b25b0953eaca9560d7318c94f74",
+        "state_sha256": "085ac7d8502ab1464ee9004fb7b60dddb0244f915751c64c494285ed253a1c84",
+        "actions_sha256": "551f995d40f0caa5d9aace77e88419063de9676b304c06052e38241b9382ac4d",
+        "metadata_sha256": "fbc20014b3a515e391d094c613c43d70345713778f0c315afdc7297e8cc6f847",
+        "log_sha256": "7e68a4176710a866675a6b95bcf7bed2d96c58a8fd7996a4d48f3679514483a9"
+      },
+      "actual_viewing": {"opened": true, "method": "tools.view_image", "image_open_ordinal": 8, "native_size": [930, 1240]},
+      "observations": {
+        "geometry_boundary": "The selector surface, border, row, and folio are absent after close. The centered unavailable illustration and heading, separate migration and uninstall buttons, source header, and five-item bottom navigation are unobscured. No stale panel edge remains.",
+        "font_affordance": "The heavy source heading and unavailable heading remain legible. Filled migration and outlined uninstall controls are separated and retain clear labels; Browse remains the visibly active bottom destination.",
+        "state_identity": "The recorded panel/close action follows the last-page request. Frozen modal and modal_context are empty, panel pagination resets to 1/1, and migration_selected_id remains empty with migration_committing=false. Retained modal-item metadata is not painted in the closed state."
+      },
+      "intentional_capability_check": "No declared intentional differences. The unavailable-source view matches source_available=false; it is not replaced with the related reference's populated sample catalog. No sensor or physical qualification is inferred.",
+      "static_verdict": "pass_with_limits",
+      "behavior_limits": "The final snapshot supports visible dismissal only. This review did not execute close, verify persistence or transaction rollback, test background hit blocking, or qualify native device interaction."
+    }
+  ],
+  "references": [
+    {
+      "reference_id": "pw-reader--fullscreen",
+      "path": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/screens/states/pw-reader--fullscreen.png",
+      "sha256": "70fa45f447c4f52e2e737f7634a1838d73071e32cf22c40e6e8235e07582cee4",
+      "actual_viewing": {"opened": true, "method": "tools.view_image", "image_open_ordinal": 2, "original_size": [1236, 1648]},
+      "comparison": "Related fullscreen artwork contract only. Black panel outlines, patterned fields, and balloon marks are artwork. The reference's upper-right bookmark is excluded by the closed Reader override; exact artwork or bookmark replication is not required for the frozen processed resource."
+    },
+    {
+      "reference_id": "pw-source--default",
+      "path": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/screens/pw-source.png",
+      "sha256": "47ea9827f59640d1c13cce5693c0e4d9ba9db5d44c50cefc3549107c5053daf6",
+      "actual_viewing": {"opened": true, "method": "tools.view_image", "image_open_ordinal": 4, "original_size": [1236, 1648]},
+      "comparison": "Related source-list geometry and type hierarchy: bold serif source/title text, gray metadata, narrow cover column, separators, three tabs, and bottom folio. The candidate's actual loaded data determines text and pagination."
+    },
+    {
+      "reference_id": "sc-browse--source-picker",
+      "path": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/screens/states/sc-browse--source-picker.png",
+      "sha256": "ba31c572c5584efe71aedff182ed94b5fd5916b875080bd7aa61ee24d2ea578d",
+      "actual_viewing": {"opened": true, "method": "tools.view_image", "image_open_ordinal": 6, "original_size": [1860, 2480], "displayed_preview_size": [1368, 1824]},
+      "comparison": "Related Scribe shell and enclosed white picker language only. Its complete black perimeter and clear row/control hierarchy are relevant; its source-switcher data, size, and catalog backdrop are not exact migration-selector expectations."
+    }
+  ],
+  "new_actionable_findings": [],
+  "suggestions": [],
+  "evidence_gaps": [
+    "There is no exact exported migration-selector empty, last-page, or cancel PNG. Those cases are assessed against actual frozen state, the related source-picker reference, and C4-C5-G16.",
+    "Desktop captures and recorded actions do not establish physical touch, e-ink effects, native mapping, timing, sensor integration, or an independent live-reader lease."
+  ],
+  "limitations": [
+    "Only assigned C5 frozen artifacts and three assigned original references were used; no current production source was used to explain these candidates.",
+    "No application, tests, build, probe, SQL, hash calculation, SSH, copy, crop, image processing, or automated validation was run.",
+    "All eight allowed original-image opens were consumed. No unresolved detail required an additional crop in this batch.",
+    "This is a five-case static visual result within the owner-declared partial capture set; it is not a full-suite or clean-round qualification."
+  ]
+}

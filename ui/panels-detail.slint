@@ -1,0 +1,261 @@
+import { State, Commands } from "state.slint";
+import { Theme } from "theme.slint";
+import { Strings } from "strings.slint";
+import { BodyText, Caption, TitleText, Icon, PageBar, ToggleRow } from "widgets.slint";
+import { PanelAction, PanelHeader, ChoiceRow, DashedFrame } from "panels-common.slint";
+import { TagFlow } from "tag-flow.slint";
+
+component SummaryParagraph inherits Rectangle {
+    in property <string> text;
+    in property <string> text-font-family;
+    in property <length> text-size;
+    in property <length> desired-line-height: 0px;
+    in property <bool> indent-first: false;
+    out property <length> content-height: root.line-count == 0 ? 0px : max(root.line-count * root.line-height, (root.line-count - 1) * root.line-height + (root.line-height - root.native-pitch) / 2 + root.last-line-height);
+    // The two-em prefix formats the first segment without changing its source text.
+    property <string> rendered-text: (root.indent-first && root.text != "" ? "　　" : "") + root.text;
+    property <length> native-pitch: max(1px, pitch-probe.preferred-height / 32);
+    property <length> line-height: max(root.native-pitch, root.desired-line-height);
+    property <int> line-count: root.text == "" ? 0 : max(1, round(layout-probe.preferred-height / root.native-pitch));
+    property <length> last-line-height: root.line-count == 0 ? 0px : max(root.native-pitch, layout-probe.preferred-height - (root.line-count - 1) * root.native-pitch);
+    height: root.content-height;
+    accessible-role: AccessibleRole.text;
+    accessible-label: root.text;
+
+    // Average the native line pitch to avoid accumulating per-line pixel rounding.
+    pitch-probe := Text {
+        visible: false; accessible-role: none;
+        width: root.width;
+        text: "M\nM\nM\nM\nM\nM\nM\nM\nM\nM\nM\nM\nM\nM\nM\nM\nM\nM\nM\nM\nM\nM\nM\nM\nM\nM\nM\nM\nM\nM\nM\nM";
+        font-family: root.text-font-family; font-size: root.text-size; font-weight: 400;
+        wrap: no-wrap; overflow: clip; vertical-alignment: top;
+    }
+    layout-probe := Text {
+        visible: false; accessible-role: none;
+        width: root.width; text: root.rendered-text;
+        font-family: root.text-font-family; font-size: root.text-size; font-weight: 400;
+        wrap: word-wrap; overflow: clip; vertical-alignment: top;
+    }
+
+    // Preserve native wrapping and glyph geometry while spacing every measured line.
+    for line in root.line-count: Rectangle {
+        x: 0px; y: line * root.line-height + (root.line-height - root.native-pitch) / 2;
+        width: root.width; height: line + 1 == root.line-count ? root.last-line-height : root.native-pitch; clip: true;
+        Text {
+            x: 0px; y: -line * root.native-pitch;
+            width: root.width; height: layout-probe.preferred-height;
+            text: root.rendered-text; color: Theme.ink;
+            font-family: root.text-font-family; font-size: root.text-size; font-weight: 400;
+            wrap: word-wrap; overflow: clip; vertical-alignment: top;
+            accessible-role: none;
+        }
+    }
+}
+
+export component SummaryPanel inherits Rectangle {
+    property <length> pad-x: State.large-screen ? 32px : (State.summary-is-book ? 26px : 22px);
+    property <length> pad-top: State.large-screen ? 30px : 20px;
+    property <length> header-height: State.large-screen ? 50px : 44px;
+    property <length> body-top: root.pad-top + root.header-height + 14px;
+    property <length> body-height: body.content-height;
+    property <length> tags-top: root.body-top + root.body-height + (root.tags-height > 0px && root.body-height > 0px ? 14px : 0px);
+    property <int> tag-page: 0;
+    property <length> tags-height: summary-tags.content-height;
+    property <length> details-top: root.tags-top + root.tags-height + (root.details-height > 0px ? 14px : 0px);
+    property <length> details-height: State.summary-is-book && State.book-details.length > 0 ? State.book-details.length * (State.large-screen ? 32px : 30px) + 15px : 0px;
+    property <length> surface-inset: State.large-screen ? 2px : 0px;
+    property <length> pad-bottom: State.large-screen ? 30px : 28px;
+    property <length> pager-height: State.panel-page-count > 1 ? Theme.pager-height : 0px;
+    property <length> pager-top: root.details-top + root.details-height + (root.pager-height > 0px ? 8px : 0px);
+    height: root.pager-top + root.pager-height + root.pad-bottom;
+    background: Theme.paper;
+    border-radius: State.large-screen ? Theme.control-radius : 0px;
+    TouchArea { x: 0px; y: 0px; width: parent.width; height: parent.height; }
+    if !State.large-screen: Rectangle { x: 0px; y: 0px; width: parent.width; height: 2px; background: Theme.ink; }
+    PanelHeader {
+        x: root.pad-x; y: root.pad-top; width: parent.width - root.pad-x * 2; height: root.header-height;
+        text: State.summary-is-book ? Strings.description : State.modal-title;
+        closed => { Commands.action("panel", "close", ""); }
+    }
+    body := SummaryParagraph {
+        x: root.pad-x; y: root.body-top; width: parent.width - root.pad-x * 2;
+        height: root.body-height;
+        text: State.panel-text;
+        text-font-family: State.summary-is-book ? Theme.serif : Theme.sans;
+        text-size: State.summary-is-book ? (State.large-screen ? 20px : 18px) : Theme.body;
+        desired-line-height: State.summary-is-book ? 32px : 0px;
+        indent-first: State.summary-is-book && State.panel-page <= 1;
+    }
+    summary-tags := TagFlow {
+        x: root.pad-x; y: root.tags-top; width: parent.width - root.pad-x * 2;
+        labels: State.summary-is-book ? State.book-tag-items : [];
+        item-height: State.large-screen ? 38px : 34px;
+        text-size: State.large-screen ? 17px : 15px;
+        horizontal-padding: 14px; gap: 8px; rows-per-page: 2; intrinsic-width: true;
+        page <=> root.tag-page;
+    }
+    if State.summary-is-book && State.book-details.length > 0: Rectangle {
+        x: root.pad-x; y: root.details-top; width: parent.width - root.pad-x * 2; height: root.details-height;
+        Rectangle { x: 0px; y: 0px; width: parent.width; height: 1px; background: Theme.line; }
+        for item[index] in State.book-details: Rectangle {
+            x: 0px; y: 15px + index * (State.large-screen ? 32px : 30px); width: parent.width; height: State.large-screen ? 32px : 30px;
+            Caption { x: 0px; y: 0px; width: State.large-screen ? 112px : 88px; height: parent.height; text: item.title; font-size: State.large-screen ? 17px : 15px; }
+            BodyText { x: State.large-screen ? 112px : 88px; y: 0px; width: parent.width - self.x; height: parent.height; text: item.value; font-family: Theme.numbers; font-size: State.large-screen ? 17px : 15px; }
+        }
+    }
+    // Keep the frame outside the pager fill and below any upward page-jump surface.
+    if State.large-screen: Rectangle { x: 0px; y: 0px; width: root.width; height: root.height; border-width: 2px; border-color: Theme.ink; border-radius: Theme.control-radius; background: transparent; }
+    if State.panel-page-count > 1: PageBar {
+        x: root.surface-inset; y: root.pager-top;
+        width: max(0px, root.width - root.surface-inset * 2); height: root.pager-height;
+        page: State.panel-page; count: State.panel-page-count; context: "panel";
+        turn(delta) => { Commands.action("panel", "page", delta); }
+    }
+}
+
+export component BatchDownloadPanel inherits Rectangle {
+    property <length> pad: State.large-screen ? 30px : 22px;
+    property <length> header-top: State.large-screen ? 28px : 20px;
+    property <length> list-top: root.header-top + (State.large-screen ? 50px : 44px) + 8px;
+    property <length> row-height: State.large-screen ? 64px : 64px;
+    height: root.list-top + State.modal-items.length * root.row-height + 22px + (State.large-screen ? 32px : 26px);
+    background: Theme.paper;
+    TouchArea { x: 0px; y: 0px; width: parent.width; height: parent.height; }
+    if !State.large-screen: Rectangle { x: 0px; y: 0px; width: parent.width; height: 2px; background: Theme.ink; }
+    if State.large-screen: Rectangle { x: 0px; y: 0px; width: parent.width; height: parent.height; border-width: 2px; border-color: Theme.ink; border-radius: Theme.control-radius; background: transparent; }
+    PanelHeader {
+        x: root.pad; y: root.header-top; width: parent.width - root.pad * 2;
+        text: Strings.batch-download; action-text: Strings.cancel; primary: false;
+        closed => { Commands.action("panel", "close", ""); }
+    }
+    for item[index] in State.modal-items: ChoiceRow {
+        x: root.pad; y: root.list-top + index * root.row-height; width: parent.width - root.pad * 2;
+        height: root.row-height; item: item; line: index < State.modal-items.length - 1;
+        chosen => { Commands.action("panel", "choose", item.id); }
+    }
+    Caption {
+        x: root.pad; y: root.list-top + State.modal-items.length * root.row-height + 8px;
+        width: parent.width - root.pad * 2; height: 22px;
+        text: Strings.available-space + " " + State.free-space;
+        font-size: State.large-screen ? 16px : 14px;
+    }
+}
+
+export component TrackingPanel inherits Rectangle {
+    property <length> pad: State.large-screen ? 32px : 22px;
+    property <length> header-top: State.large-screen ? 30px : 20px;
+    property <length> first-top: root.header-top + (State.large-screen ? 50px : 44px) + 12px;
+    property <length> card-height: State.large-screen ? 92px : 82px;
+    height: root.first-top + root.card-height * 2 + 12px + (State.large-screen ? 30px : 26px);
+    background: Theme.paper;
+    TouchArea { x: 0px; y: 0px; width: parent.width; height: parent.height; }
+    if !State.large-screen: Rectangle { x: 0px; y: 0px; width: parent.width; height: 2px; background: Theme.ink; }
+    if State.large-screen: Rectangle { x: 0px; y: 0px; width: parent.width; height: parent.height; border-width: 2px; border-color: Theme.ink; border-radius: Theme.control-radius; background: transparent; }
+    PanelHeader {
+        x: root.pad; y: root.header-top; width: parent.width - root.pad * 2;
+        text: Strings.track; action-text: Strings.keyboard-done;
+        closed => { Commands.action("panel", "close", ""); }
+    }
+    for service[index] in ["AniList", "MyAnimeList"]: Rectangle {
+        x: root.pad; y: root.first-top + index * (root.card-height + 12px);
+        width: parent.width - root.pad * 2; height: root.card-height;
+        background: Theme.paper; border-width: 0px; border-radius: Theme.control-radius;
+        DashedFrame {
+            x: 0px; y: 0px; width: parent.width; height: parent.height;
+            line-color: Theme.secondary; rounded-corners: true;
+            accessible-role: none;
+        }
+        BodyText { x: State.large-screen ? 20px : 16px; y: State.large-screen ? 13px : 11px; width: max(0px, parent.width - self.x * 2 - configure.width - 16px); height: 30px; text: service; font-size: State.large-screen ? 22px : 19px; font-weight: 700; }
+        Caption { x: State.large-screen ? 20px : 16px; y: State.large-screen ? 48px : 42px; width: max(0px, parent.width - self.x * 2 - configure.width - 16px); height: 24px; text: Strings.not-configured; font-size: State.large-screen ? 16px : 14px; }
+        configure := PanelAction { x: parent.width - self.width - (State.large-screen ? 20px : 16px); y: (parent.height - self.height) / 2; width: self.preferred-width; text: Strings.configure; primary: true;
+            clicked => { Commands.action("panel", "choose", "tracking-settings"); }
+        }
+    }
+}
+
+export component ConfirmationPanel inherits Rectangle {
+    property <bool> history-clear: State.large-screen && State.modal-context == "clear-history";
+    property <length> pad-x: State.large-screen ? 32px : 24px;
+    property <length> pad-top: root.history-clear ? 32px : (State.large-screen ? 30px : 28px);
+    property <length> pad-bottom: root.history-clear ? 26px : (State.large-screen ? 28px : 22px);
+    property <length> action-height: root.history-clear ? 60px : (State.large-screen ? 58px : 50px);
+    property <length> action-gap: root.history-clear ? 12px : (State.large-screen ? 14px : 10px);
+    property <length> action-text-size: root.history-clear ? 18px : (State.large-screen ? 17px : 16px);
+    property <length> title-height: max(State.large-screen ? 42px : 33px, question.preferred-height);
+    property <length> action-top: root.pad-top + root.title-height + (root.history-clear ? 24px : 20px);
+    height: root.action-top + root.action-height + root.pad-bottom;
+    background: Theme.paper; border-width: 2px; border-color: Theme.ink; border-radius: Theme.control-radius;
+    TouchArea { x: 0px; y: 0px; width: parent.width; height: parent.height; }
+    question := TitleText {
+        x: root.pad-x; y: root.pad-top; width: parent.width - root.pad-x * 2;
+        height: root.title-height;
+        text: State.modal-context == "clear-history" ? Strings.clear-all-history-question : (State.modal-items.length > 0 ? State.modal-items[0].title : State.modal-title);
+        font-size: State.large-screen ? 28px : 22px; letter-spacing: 1px; wrap: word-wrap;
+    }
+    PanelAction {
+        x: root.pad-x; y: root.action-top; width: (parent.width - root.pad-x * 2 - root.action-gap) / 2;
+        height: root.action-height; text: Strings.cancel; text-size: root.action-text-size;
+        clicked => { Commands.action("panel", "close", ""); }
+    }
+    PanelAction {
+        x: parent.width / 2 + root.action-gap / 2; y: root.action-top;
+        width: (parent.width - root.pad-x * 2 - root.action-gap) / 2;
+        height: root.action-height; text-size: root.action-text-size;
+        text: State.modal-context == "clear-history" ? Strings.history-clear-action : Strings.remove; primary: true;
+        enabled: State.modal-items.length > 0 && State.modal-items[0].enabled;
+        clicked => { Commands.action("panel", "choose", State.modal-items[0].id); }
+    }
+}
+
+export component MigrationPanel inherits Rectangle {
+    property <length> pad: State.large-screen ? 32px : 22px;
+    property <length> pad-top: State.large-screen ? 30px : 20px;
+    property <length> title-height: State.large-screen ? 42px : 35px;
+    property <length> list-top: root.pad-top + root.title-height + 14px;
+    property <length> row-height: State.large-screen ? 84px : 70px;
+    property <length> match-width: State.large-screen ? 120px : 104px;
+    property <length> list-height: max(3, State.migration-candidates.length) * root.row-height + 1px;
+    property <length> options-top: root.list-top + root.list-height + 14px;
+    property <length> switch-height: State.large-screen ? 56px : 54px;
+    property <length> actions-top: root.options-top + root.switch-height * 3 + 20px;
+    property <length> pager-height: State.panel-page-count > 1 ? Theme.pager-height : 0px;
+    height: root.actions-top + (State.large-screen ? 58px : 50px) + (State.large-screen ? 30px : 26px) + root.pager-height;
+    background: Theme.paper;
+    TouchArea { x: 0px; y: 0px; width: parent.width; height: parent.height; }
+    if !State.large-screen: Rectangle { x: 0px; y: 0px; width: parent.width; height: 2px; background: Theme.ink; }
+    if State.large-screen: Rectangle { x: 0px; y: 0px; width: parent.width; height: parent.height; border-width: 2px; border-color: Theme.ink; border-radius: Theme.control-radius; background: transparent; }
+    TitleText { x: root.pad; y: root.pad-top; width: parent.width - root.pad * 2 - (State.migration-status != "" && State.migration-candidates.length > 0 ? (State.large-screen ? 206px : 176px) : 0px); height: root.title-height; text: Strings.migration-title; font-size: State.large-screen ? 28px : 23px; letter-spacing: 2px; }
+    if State.migration-status != "" && State.migration-candidates.length > 0: Caption { x: parent.width - root.pad - self.width; y: root.pad-top; width: State.large-screen ? 190px : 160px; height: root.title-height; text: State.migration-status; font-size: State.large-screen ? 15px : 13px; horizontal-alignment: right; }
+    Rectangle {
+        x: root.pad; y: root.list-top; width: parent.width - root.pad * 2; height: root.list-height;
+        Rectangle { x: 0px; y: 0px; width: parent.width; height: 1px; background: Theme.line; }
+        for candidate[index] in State.migration-candidates: Rectangle {
+            x: 0px; y: 1px + index * root.row-height; width: parent.width; height: root.row-height;
+            background: hit.pressed && State.migration-available ? Theme.ink : Theme.paper;
+            Rectangle { x: 0px; y: (parent.height - self.height) / 2; width: State.large-screen ? 26px : 24px; height: self.width; border-width: 2px; border-color: hit.pressed ? Theme.paper : Theme.ink; border-radius: 3px; background: transparent;
+                if State.migration-selected-id == candidate.id: Rectangle { x: (parent.width - self.width) / 2; y: (parent.height - self.height) / 2; width: 12px; height: 12px; background: hit.pressed ? Theme.paper : Theme.ink; }
+            }
+            Rectangle { x: State.large-screen ? 42px : 38px; y: (parent.height - self.height) / 2; width: State.large-screen ? 46px : 38px; height: State.large-screen ? 62px : 52px; border-width: 1px; border-color: Theme.secondary; background: Theme.paper;
+                Image { x: 1px; y: 1px; width: parent.width - 2px; height: parent.height - 2px; source: candidate.cover; image-fit: cover; }
+            }
+            BodyText { x: State.large-screen ? 104px : 90px; y: State.large-screen ? 16px : 10px; width: max(0px, parent.width - self.x - root.match-width - 16px); height: 28px; text: candidate.title; font-size: State.large-screen ? 18px : 16px; font-weight: State.migration-selected-id == candidate.id ? 700 : 500; color: hit.pressed ? Theme.paper : Theme.ink; }
+            Caption { x: State.large-screen ? 104px : 90px; y: State.large-screen ? 46px : 38px; width: max(0px, parent.width - self.x - root.match-width - 16px); height: 24px; text: candidate.subtitle; font-size: State.large-screen ? 15px : 13px; color: hit.pressed ? Theme.paper : Theme.secondary; }
+            Caption { x: parent.width - root.match-width; y: 0px; width: root.match-width; height: parent.height; text: candidate.status; font-size: State.large-screen ? 15px : 13px; horizontal-alignment: right; color: hit.pressed ? Theme.paper : Theme.secondary; }
+            Rectangle { x: 0px; y: parent.height - 1px; width: parent.width; height: 1px; background: Theme.line; }
+            hit := TouchArea { x: 0px; y: 0px; width: parent.width; height: parent.height; enabled: State.migration-available && !State.migration-loading && !State.migration-committing; clicked => { Commands.action("migration", "select", candidate.id); } }
+        }
+        if State.migration-candidates.length == 0: Rectangle {
+            x: 0px; y: 0px; width: parent.width; height: parent.height;
+            Icon { x: (parent.width - self.width) / 2; y: State.large-screen ? 40px : 26px; width: State.large-screen ? 40px : 34px; height: self.width; kind: "search"; secondary: true; }
+            Caption { x: 0px; y: State.large-screen ? 94px : 74px; width: parent.width; height: 30px; text: State.migration-status == "" ? Strings.migration-not-started : State.migration-status; font-size: State.large-screen ? 18px : 16px; horizontal-alignment: center; }
+            PanelAction { x: (parent.width - self.width) / 2; y: State.large-screen ? 146px : 122px; width: self.preferred-width; text: Strings.migration-search; enabled: !State.migration-loading && !State.migration-committing; clicked => { Commands.action("migration", "retry", ""); } }
+        }
+    }
+    ToggleRow { x: root.pad; y: root.options-top; width: parent.width - root.pad * 2; height: root.switch-height; text: Strings.migration-preserve-read; value: State.migration-preserve-read; enabled: State.migration-available && !State.migration-loading && !State.migration-committing; toggled => { Commands.action("migration", "toggle-read", ""); } }
+    ToggleRow { x: root.pad; y: root.options-top + root.switch-height; width: parent.width - root.pad * 2; height: root.switch-height; text: Strings.migration-preserve-category; value: State.migration-preserve-category; enabled: State.migration-available && !State.migration-loading && !State.migration-committing; toggled => { Commands.action("migration", "toggle-categories", ""); } }
+    ToggleRow { x: root.pad; y: root.options-top + root.switch-height * 2; width: parent.width - root.pad * 2; height: root.switch-height; text: Strings.migration-remove-downloads; value: State.migration-remove-downloads; enabled: State.migration-available && !State.migration-loading && !State.migration-committing; toggled => { Commands.action("migration", "toggle-delete-downloads", ""); } }
+    PanelAction { x: root.pad; y: root.actions-top; width: (parent.width - root.pad * 2 - 12px) / 2; height: State.large-screen ? 58px : 50px; text: Strings.cancel; text-size: State.large-screen ? 18px : 16px; enabled: !State.migration-committing; clicked => { Commands.action("migration", "cancel", ""); } }
+    PanelAction { x: parent.width / 2 + 6px; y: root.actions-top; width: (parent.width - root.pad * 2 - 12px) / 2; height: State.large-screen ? 58px : 50px; text: Strings.start-migration; primary: true; text-size: State.large-screen ? 18px : 16px; enabled: State.migration-can-start; border-width: State.migration-can-start ? 0px : Theme.control-border; border-color: State.migration-can-start ? Theme.ink : Theme.secondary; clicked => { Commands.action("migration", "start", ""); } }
+    if State.panel-page-count > 1: PageBar { x: 0px; y: parent.height - self.height; width: parent.width; page: State.panel-page; count: State.panel-page-count; context: "panel"; turn(delta) => { Commands.action("panel", "page", delta); } }
+}
+

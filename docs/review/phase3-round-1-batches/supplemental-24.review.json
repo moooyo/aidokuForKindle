@@ -1,0 +1,182 @@
+{
+  "batch_id": "supplemental-24",
+  "reviewer": "/root/phase3_round1_review/supplemental_24",
+  "run_id": "a1baf3fe3dc2",
+  "review_method": "Fresh independent visual inspection of exactly the eight assigned candidate PNGs with tools.view_image, supplemented by read-only case metadata, SHA-256 evidence, scope, handoff, and relevant prototype source text. No independent reference PNG was assigned or loaded.",
+  "artifact_identity": {
+    "binary_sha256": "94d7f3bbcab475ad8833a2f3c486138f7b49bead231851c2d8eab2f0c3d2ac51",
+    "source_sha256": "aef9db4e111165016a10a2a95e111f3155860b8510c7f6207ec9c79fbec5082c",
+    "all_case_run_and_build_identities_match": true,
+    "all_current_png_hashes_match_input_and_case_evidence": true,
+    "candidate_capture_size": [930, 1240],
+    "backend": "desktop",
+    "profile": "scribe"
+  },
+  "reviewed_case_ids": [
+    "scribe--content-stress--long-chapters",
+    "scribe--detail-first-boundary",
+    "scribe--detail-last-page",
+    "scribe--detail-page-two",
+    "scribe--empty-history",
+    "scribe--empty-library",
+    "scribe--filter-completed-1",
+    "scribe--filter-completed-2"
+  ],
+  "reviewed_cases": [
+    {
+      "case_id": "scribe--content-stress--long-chapters",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/scribe--content-stress--long-chapters.png",
+      "candidate_sha256": "7198a8c457c424ebe64d78c8c01bf9dd02ce15e213beddd59c328efb013d2ab6",
+      "viewed_candidate": true,
+      "outcome": "needs_changes",
+      "observations": [
+        "Although the launch screen is sources, the sidecar and visible candidate are the requested detail route, with demo=false, offline=false, eight provider chapters, and folio 1/1.",
+        "All eight rows are visible in descending order from 8 to 1. The 445-character chapter titles use ellipses before the dotted leader/date/download area; no title covers a download control.",
+        "The narrow information column remains separate from the directory. The long book name is truncated within that column, and the continuation action plus all three book actions remain unobscured.",
+        "The four visible English metadata tags have narrow outlined boxes, but their labels extend outside those boxes and collide with neighboring labels around x=20..283 and y=1066..1102. This is a readable-content failure, recorded as P3R1-SUP24-1.",
+        "The one-page folio is centered in the directory allocation with both edge actions absent. The white page surface has no popup shadow, dimmed backdrop, or UI screen-tone mask."
+      ],
+      "intentional_differences": []
+    },
+    {
+      "case_id": "scribe--detail-first-boundary",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/scribe--detail-first-boundary.png",
+      "candidate_sha256": "8e7ab43ffb125c3788ab4ed34b14bfaab1aa85e53dd6f3c6f9b835bb898fdf01",
+      "viewed_candidate": true,
+      "outcome": "no_visual_issue_found",
+      "observations": [
+        "The candidate matches the Scribe detail identity: demo=true, 86 chapters, 52 unread chapters, nine downloaded chapters, and page 1 of 6.",
+        "Sixteen regularly spaced chapter rows, numbered 86 through 71, fit in the right column without clipping the last row or its download control. Title, date, and download columns remain distinct.",
+        "The information area follows the fixed 384-design-pixel column allocation, with its tall cover, title, continuation, three actions, description, and four outlined tags contained on the left.",
+        "The first-page Previous action is absent, Next remains at the right edge, and 1/6 remains centered in the directory rather than shifting into the missing edge slot.",
+        "The dotted cover is fixture artwork confined to the cover; it is not an overlay mask. The page has a white surface, and the main dock is correctly absent on detail."
+      ],
+      "intentional_differences": []
+    },
+    {
+      "case_id": "scribe--detail-last-page",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/scribe--detail-last-page.png",
+      "candidate_sha256": "7fc60ca5a1b19414d5dd7bef0866df58dcaaa92a26361255ec9f7ec9abe9ccfc",
+      "viewed_candidate": true,
+      "outcome": "no_visual_issue_found",
+      "observations": [
+        "The sidecar identifies page 6 of 6 for the 86-chapter book, and the candidate shows exactly the final six chapter rows, numbered 6 through 1.",
+        "Those six rows retain the same spacing and aligned dates/download controls as a full page; they are not stretched to fill the remaining directory height. Read chapter text is visibly gray, consistent with read=true for all six records.",
+        "The book information and continuation controls retain the same left-column allocation as the first detail page, with no unnecessary collapse on this Scribe route.",
+        "Previous stays at the left of the directory footer, 6/6 stays centered, and the unavailable Next action is absent without displacing either remaining element.",
+        "The blank remainder of the chapter column is clean white and does not expose stale rows, a dock, or an extra separator."
+      ],
+      "intentional_differences": []
+    },
+    {
+      "case_id": "scribe--detail-page-two",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/scribe--detail-page-two.png",
+      "candidate_sha256": "2c513f67247c6ab5975c0f6edaa3a3ee335dda5a96089a230c197f70ee40fe97",
+      "viewed_candidate": true,
+      "outcome": "no_visual_issue_found",
+      "observations": [
+        "The page identity is 2/6 and the chapter sequence is 70 through 55, which continues after the first page's sixteen rows rather than repeating its membership.",
+        "All sixteen chapter rows remain fully visible at the same regular spacing. Date text and the right-hand download controls do not collide with chapter titles or the footer.",
+        "The full Scribe metadata column remains visible with the same cover, book name, continuation action, and three book actions; the Paperwhite-only information-collapse rule has not been applied here.",
+        "Both Previous and Next are present, with the current/total numeral centered in the same directory position used at the first and final boundaries.",
+        "The information tags and controls remain white and outlined, and no modal scrim, shadow, or persistent main navigation appears on the detail page."
+      ],
+      "intentional_differences": []
+    },
+    {
+      "case_id": "scribe--empty-history",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/scribe--empty-history.png",
+      "candidate_sha256": "abe9ccebd5855164521a0bacd6f6b336793c452d23d98fedb85b4c1c53952055",
+      "viewed_candidate": true,
+      "outcome": "needs_changes",
+      "observations": [
+        "The candidate and sidecar agree on a real empty history: history_count=0, demo=false, page 1/1, with no stale chronology entries or progress values.",
+        "The history tab is selected, the header caption reports zero read chapters, and the clear icon is muted. The centered clock icon and empty-history title are readable.",
+        "The empty-state area offers no direct browse, library, or reading action. The global dock remains available, but the handoff's explicit empty-state completion rule calls for status plus an action; this is recorded as P3R1-SUP24-2.",
+        "The 1/1 folio is centered above the 80-design-pixel dock with neither boundary action visible, and the history destination remains visibly active.",
+        "The body is white without a screen-tone illustration or dimmed layer, avoiding the prototype empty illustration's decorative stipple."
+      ],
+      "intentional_differences": []
+    },
+    {
+      "case_id": "scribe--empty-library",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/scribe--empty-library.png",
+      "candidate_sha256": "79907bcbdbb671fbfd9f452210bed005d1ace7a0827f110c864cf4244031b1a7",
+      "viewed_candidate": true,
+      "outcome": "no_visual_issue_found",
+      "observations": [
+        "The sidecar records library_count=0 and demo=false. The header consistently reports zero books, zero updates, and zero downloaded kilobytes.",
+        "The empty-library icon and large status title form a clear empty state, with a prominent black Browse Sources action below it. The state therefore provides the requested direct next action.",
+        "No stale continuation card, category record, unread badge, or cover grid remains in the empty body.",
+        "The candidate does not render page navigation for the empty library; the sidecar's logical page remains 1/1. The full-width dock remains at the bottom with Library active.",
+        "The empty state and button have sufficient separation and are not clipped. All surrounding surfaces are white without a shadow or decorative screen-tone fill."
+      ],
+      "intentional_differences": []
+    },
+    {
+      "case_id": "scribe--filter-completed-1",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/scribe--filter-completed-1.png",
+      "candidate_sha256": "ea873b79b282bafcdbfe86d4a91b93466c0b2e87b7799afb2b4ca33cdb3c3de8",
+      "viewed_candidate": true,
+      "outcome": "no_visual_issue_found",
+      "observations": [
+        "The visible choices panel matches modal_context=library-filter, and the Completed filter is visibly included using a black button with a white check mark. The sidecar agrees with filters=[0,0,0,1].",
+        "The Recent Reading sort and New to Old direction are independently selected. Eight sort choices, both direction choices, four filter controls, and Done remain legible and contained in the panel.",
+        "The white outlined float begins near the top-right trigger and extends only as far as its expanded content requires. There is no shadow, stipple backdrop, or dimming of the underlying library.",
+        "The exposed filtered titles include Paper Crane and Sword, Silver Mountains, Daytime Cat, Migratory Bird, Paper Theater, and Harbor Nocturne. Metadata records nine visible completed books, consistent with the sparse page and 1/1 folio.",
+        "The demo category count and header total are treated as category/sample data, not substituted for the actual nine filtered records or chapter unread badges. No visible cover is obscured by a UI state badge."
+      ],
+      "intentional_differences": []
+    },
+    {
+      "case_id": "scribe--filter-completed-2",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/scribe--filter-completed-2.png",
+      "candidate_sha256": "07087412287cd5cf0cb8c7a5ab4f3f22831966ae28cd33fa727b0949f9ddff55",
+      "viewed_candidate": true,
+      "outcome": "no_visual_issue_found",
+      "observations": [
+        "The Completed filter changes to a white exclusion control with a cross and dashed outline, visibly distinct from both the black include state and the neutral filters. The sidecar agrees with filters=[0,0,0,-1].",
+        "The other selected sort and direction controls remain unchanged, and the content-height float retains the same bounded white outline, spacing, and uncut Done action.",
+        "The exposed cover grid changes from the include case to ongoing works, including Harbor Tales, Train Number Seven, Stardust Diner, and other non-completed titles. Metadata records eighteen visible ongoing books and page 1/3.",
+        "Unread numerals and downloaded icons sit beside titles below covers; for example, the first visible book has a separate unread badge of 3. Those chapter unread values are distinct from the demo category counts.",
+        "The library footer keeps 1/3 centered, hides Previous at the first boundary, and retains Next at the right edge. The dock and uncovered library remain undimmed, with no popup shadow or UI screen-tone mask."
+      ],
+      "intentional_differences": []
+    }
+  ],
+  "suggestions": [
+    {
+      "id": "P3R1-SUP24-1",
+      "case_id": "scribe--content-stress--long-chapters",
+      "priority": "P2",
+      "description": "Long English metadata tag labels overflow their outlined chips and overlap neighboring labels in the Scribe detail information column.",
+      "evidence": "In the assigned candidate at approximately x=20..283, y=1066..1102, Actual tag 00 through Actual tag 03 are drawn across adjacent narrow chip borders. The first label extends to the left of its own box, and the label text intersects neighboring text. The case metadata contains the actual long provider tag list. docs/review/phase3-reference-scope.json requires content-stress states to remain readable without overlap; prototype/sc-manga.dc.html:64..69 declares wrapping chips with content padding inside the 384-pixel information column.",
+      "recommendation": "Size each chip to its label within the available information-column width and wrap chips with the declared gap. For a label wider than the column, truncate within its own outlined bounds or expose the full label through a dedicated metadata view; do not allow text to paint outside the chip or into adjacent labels.",
+      "status": "open",
+      "introduced_round": 1
+    },
+    {
+      "id": "P3R1-SUP24-2",
+      "case_id": "scribe--empty-history",
+      "priority": "P3",
+      "description": "The empty-history body provides a status but no direct next action.",
+      "evidence": "The candidate shows only a centered clock icon and the empty-history title, with no action near that status. The general bottom dock is still usable. The authoritative HANDOFF.md:392 explicitly says that empty history and other incomplete empty states need status plus an action. prototype/sc-history.dc.html:96..101 also contains only the status, so reproducing that incomplete source state does not fulfill the stated completion requirement.",
+      "recommendation": "Add a single concise primary action below the empty-history status that opens the library or source browser, using the existing Scribe button language and without explanatory body copy.",
+      "status": "open",
+      "introduced_round": 1
+    }
+  ],
+  "coverage_gaps": [
+    "No independent reference PNG was assigned for this supplemental batch. Appearance was assessed against the supplied candidates, authoritative textual requirements, and relevant prototype declarations rather than a pixel-by-pixel reference comparison.",
+    "Only the eight assigned Scribe cases were inspected. Other device profiles, other detail folios, neutral Completed-filter capture, combined filters, and other routes are outside this batch.",
+    "The two completed-filter captures show include and exclude presentation, but static PNGs do not establish cycling order, press feedback, dismissal, click targets, or actual mutation behavior.",
+    "Hardware-missing variants, quality/authentication unavailable states, and the closed-reader artwork-only scene are not present in this batch and have not been inferred from unrelated pages."
+  ],
+  "limitations": [
+    "No local application, browser prototype, build, test suite, smoke test, or runtime probe was executed. Only existing evidence and source text were read, with Get-FileHash used for PNG identity.",
+    "Case checks were read as existing capture evidence and all reported passed; their mechanical result was not used as a substitute for the visual observations above.",
+    "Desktop captures at 930x1240 do not establish physical-device touch accuracy, waveform completion, orientation sensor behavior, retained-scene wake restoration, cache performance, or compliance with a 512 MiB memory budget.",
+    "Fixture covers may contain dots, lines, and title artwork. Those image contents were distinguished from prohibited UI scrims, offset shadows, and decorative surface stipple.",
+    "This batch records two open suggestions and does not assert that the full round or implementation is clean."
+  ]
+}

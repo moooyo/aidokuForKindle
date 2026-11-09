@@ -1,0 +1,161 @@
+{
+  "batch_id": "supplemental-38",
+  "reviewer": "/root/phase3_round1_review/supplemental_38",
+  "run_id": "a1baf3fe3dc2",
+  "binary_sha256": "94d7f3bbcab475ad8833a2f3c486138f7b49bead231851c2d8eab2f0c3d2ac51",
+  "source_sha256": "aef9db4e111165016a10a2a95e111f3155860b8510c7f6207ec9c79fbec5082c",
+  "review_method": "Fresh manual inspection of all eight listed candidate PNGs with tools.view_image. No other PNG or independent reference image was opened. Current PNG SHA-256 values were read with Get-FileHash and matched both the input manifest and each case evidence hash. Case state, checks, intentional differences, the reference scope, DESIGN_HANDOFF, prototype support text, and relevant static prototype text were read as supporting evidence.",
+  "reviewed_case_ids": [
+    "scribe-portrait--seek-menu-baseline",
+    "scribe-portrait--seek-preview",
+    "scribe-portrait--seek-release",
+    "scribe-portrait--tap-boundary-center",
+    "scribe-portrait--tap-boundary-side",
+    "scribe-portrait--toc-bookmarks",
+    "scribe-portrait--toc-last-page",
+    "scribe-portrait--toc-page-jump"
+  ],
+  "reviewed_cases": [
+    {
+      "case_id": "scribe-portrait--seek-menu-baseline",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/scribe-portrait--seek-menu-baseline.png",
+      "candidate_sha256": "1a24006c0713596d49b40ad927db738c51a612247e2697f47156d6127a0cf421",
+      "viewed_candidate": true,
+      "outcome": "no_actionable_visual_issue",
+      "observations": [
+        "The open menu has a full-width integrated header with chapter 34, bookmark and ToC actions, and time/battery at the right. The five-tool rail and chapter actions remain legible without clipping.",
+        "The progress area shows 12/40 and 28 remaining pages. Its outlined square thumb sits toward the right on the RTL track, consistent with the metadata reader_page=12, committed_reader_page=12, and reader_total=40.",
+        "The artwork remains visible between the white menu bars without a dimmed mask, overlay shadow, or added stipple. No visual defect was identified in this baseline capture."
+      ],
+      "intentional_differences": []
+    },
+    {
+      "case_id": "scribe-portrait--seek-preview",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/scribe-portrait--seek-preview.png",
+      "candidate_sha256": "3b6935adf267f7fefe5a5ca4b1edea1ab27388eb43706e6a5962bff48348f240",
+      "viewed_candidate": true,
+      "outcome": "no_actionable_visual_issue",
+      "observations": [
+        "The visible preview changes to 32/40 with 8 remaining pages, and the thumb moves left on the RTL track. The header, chapter actions, and tool rail retain their baseline positions.",
+        "The visible artwork remains the same as in the baseline while metadata reader_page and committed_reader_page remain 12. This is consistent with spec-interaction.dc.html:81 and DESIGN_HANDOFF:361-362: dragging previews the number and decoding/commit occurs on release.",
+        "The difference between preview 32 and committed 12 is an expected transient state, not a page-counter defect. The number and thumb are unobscured."
+      ],
+      "intentional_differences": []
+    },
+    {
+      "case_id": "scribe-portrait--seek-release",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/scribe-portrait--seek-release.png",
+      "candidate_sha256": "f019cd0ad046560f83be742a1cfe87e3ea9108a62a28975242909dfaaac8f9f5",
+      "viewed_candidate": true,
+      "outcome": "no_actionable_visual_issue",
+      "observations": [
+        "The released state displays only the comic artwork, including the complete lower panels that were covered by the menu. No header, footer, page label, bookmark ribbon, status bar, notification, or visible application decoration remains.",
+        "Metadata identifies menu=false, reader_page=32, committed_reader_page=32, visible_reader_page=32, and a settled image. The supplied zero-difference artwork check corroborates the scene but was not used instead of viewing it.",
+        "The artwork's white side margins and panel borders were treated as content rather than an invented viewport inset. This static capture does not establish hidden hit-zone behavior."
+      ],
+      "intentional_differences": []
+    },
+    {
+      "case_id": "scribe-portrait--tap-boundary-center",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/scribe-portrait--tap-boundary-center.png",
+      "candidate_sha256": "1a24006c0713596d49b40ad927db738c51a612247e2697f47156d6127a0cf421",
+      "viewed_candidate": true,
+      "outcome": "no_actionable_visual_issue",
+      "observations": [
+        "This candidate was opened separately and visibly shows the open-menu result: chapter 34, a filled bookmark action, 12/40, 28 remaining pages, and all five bottom tools.",
+        "The result agrees with metadata menu=true and reader_page=committed_reader_page=12. Its header, seek track, chapter row, and bottom rail match the separately viewed baseline without a new overlap or clipping issue.",
+        "The PNG represents the center-boundary result; exact event coordinates, threshold classification, and exclusion of page turns cannot be independently established from this single still image."
+      ],
+      "intentional_differences": []
+    },
+    {
+      "case_id": "scribe-portrait--tap-boundary-side",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/scribe-portrait--tap-boundary-side.png",
+      "candidate_sha256": "6c77b3b52c54b347e072eded1bbf4585202ab448efeb90b1e5a95657267d5ccd",
+      "viewed_candidate": true,
+      "outcome": "no_actionable_visual_issue",
+      "observations": [
+        "The side-boundary result is an artwork-only page with a large left panel, two right panels, and a lower full-width panel. No visible reader menu, ribbon, footer, status text, or notification is present.",
+        "Metadata identifies reader_page=committed_reader_page=visible_reader_page=13 with menu=false and no inflight image. The artwork differs from the baseline as expected for the represented next-page result.",
+        "The page's asymmetric white margins and crop were accepted as actual artwork variation. The supplied exact-artwork check is supporting evidence, while the actual PNG was manually inspected."
+      ],
+      "intentional_differences": []
+    },
+    {
+      "case_id": "scribe-portrait--toc-bookmarks",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/scribe-portrait--toc-bookmarks.png",
+      "candidate_sha256": "e6e43b755bb23acc13a1cbdfc718defbd5d83aab0d080b68acc0ef00ba58d636",
+      "viewed_candidate": true,
+      "outcome": "needs_changes",
+      "observations": [
+        "The Bookmarks tab is bold and underlined, and the header bookmark icon is unfilled. These are coherent with reader_toc_tab=bookmarks, bookmark_count=0, reader_bookmarked=false, and modal_items=[].",
+        "The short white sheet above the reader progress area contains only the two tabs and an empty body. It does not explain that no bookmarks exist or indicate how to add one. This is finding P3R1-SUP38-1.",
+        "The sheet is compact, the artwork stays undimmed, and there is no shadow. The issue is the absent empty-state message and next step rather than the reduced content height."
+      ],
+      "intentional_differences": []
+    },
+    {
+      "case_id": "scribe-portrait--toc-last-page",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/scribe-portrait--toc-last-page.png",
+      "candidate_sha256": "3f707aad43e449964de0580f98bfb8f4d51ee36624e0a73f427bc21f5153f1cf",
+      "viewed_candidate": true,
+      "outcome": "no_actionable_visual_issue",
+      "observations": [
+        "The compact ToC sheet displays the final two chapter records, chapters 2 and 1, in one two-column row with read status. This agrees with the two modal items and panel_page=panel_page_count=15.",
+        "The folio reads 15/15 at the horizontal center. Only Previous is visible on the left; the unavailable Next action is absent while the right allocation remains empty, preserving the center position.",
+        "The sheet fits its reduced record count without retaining empty chapter rows. Its tabs, chapter labels, statuses, and folio are legible, with a white background and no dimming or shadow."
+      ],
+      "intentional_differences": []
+    },
+    {
+      "case_id": "scribe-portrait--toc-page-jump",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/scribe-portrait--toc-page-jump.png",
+      "candidate_sha256": "23e0448414c1a6f10e28c347e2eeeca24e5a9ef650b2bd2b9eb74a550faf2b5d",
+      "viewed_candidate": true,
+      "outcome": "needs_changes",
+      "observations": [
+        "The open panel shows a Jump to Page heading and all 15 page choices in a balanced 8+7 grid. Page 1 and the central 1/15 folio control are inverted, Previous is absent at the first page, and Next remains visible on the right.",
+        "The displayed range is coherent with page_jump_open=true, page_jump_context=panel, panel_page=1, and panel_page_count=15. The underlying reader remains at 12/40.",
+        "An extra full-width black rule at approximately y=854 runs through the first grid row, whose cells extend approximately from y=818 to y=874. It remains visible in the cell gaps and to the right of page 8. This violates the required top-rule placement above the heading and grid and is finding P3R1-SUP38-2.",
+        "The panel otherwise uses white cells, outlined inactive pages, an inverse current page, and undimmed artwork without a shadow."
+      ],
+      "intentional_differences": []
+    }
+  ],
+  "suggestions": [
+    {
+      "id": "P3R1-SUP38-1",
+      "case_id": "scribe-portrait--toc-bookmarks",
+      "priority": "P2",
+      "description": "The empty Bookmarks tab has no explanatory message or understandable next step.",
+      "evidence": "The manually viewed candidate shows the selected Bookmarks tab above an empty white body around y=972-1029. Case state has bookmark_count=0, modal_items=[], reader_toc_tab=bookmarks, and reader_bookmarked=false. No text identifies this as an empty collection or explains the header bookmark action.",
+      "recommendation": "Render a concise visible empty-state message and guidance to use the reader header bookmark action to save the current page. Keep the sheet height driven by that content and retain the white, undimmed presentation.",
+      "status": "open",
+      "introduced_round": 1
+    },
+    {
+      "id": "P3R1-SUP38-2",
+      "case_id": "scribe-portrait--toc-page-jump",
+      "priority": "P2",
+      "description": "A horizontal divider crosses the first row of the ToC page-picker grid.",
+      "evidence": "At the 930x1240 logical capture size, a black line at approximately y=854 extends across the page and remains visible between first-row cells and to the right of page 8. The first-row cells span approximately y=818-874. DESIGN_HANDOFF's Folio pager section and prototype/pager.dc.html:22 place the 2-pixel rule at the top of the jump panel above its heading and grid.",
+      "recommendation": "Anchor the jump panel rule to the expanded panel's actual top edge above the heading. Remove or cover the stale underlying separator so no rule crosses the heading or page-number cells; preserve the balanced 8+7 grid and centered folio.",
+      "status": "open",
+      "introduced_round": 1
+    }
+  ],
+  "coverage_gaps": [
+    "This batch has only Scribe portrait candidates and no independently supplied reference PNGs. It does not establish visual parity for Paperwhite, Scribe landscape, or other reader panels.",
+    "The bookmark case covers only an empty collection. Populated bookmark rows, bookmark selection, removal, and persistence are not represented by these eight PNGs.",
+    "The seek captures represent one baseline, drag preview, and release target. Endpoint seeking, cancellation, chapter crossing, repeated input, decode timing, and input-generation fencing require separate behavioral evidence.",
+    "The ToC candidates represent the last page and an open first-page picker. Selection, outside dismissal, intermediate page membership, and state persistence are not demonstrated by the still images."
+  ],
+  "limitations": [
+    "All eight candidate PNGs were actually viewed. Mechanical pass flags and zero-difference artwork diagnostics were supporting evidence rather than a replacement for manual visual review.",
+    "Static PNGs cannot prove the absence of an invisible footer-cycle hit zone, physical wake restoration, touch-threshold behavior, hardware refresh quality, or runtime decode/commit timing.",
+    "Current hashes match the manifest and case evidence, and all case identity records match run a1baf3fe3dc2 and the specified binary/source hashes. This verifies evidence identity rather than application behavior.",
+    "No application, build, test suite, smoke test, runtime probe, Git operation, or product modification was performed. Work was limited to reading existing evidence and text, computing file hashes, and writing this review document.",
+    "The closed-reader artwork-only result follows the retained user requirement. Actual artwork, scaling, white margins, titles, data counts, progress, and time values were not treated as defects merely because they differ from prototype fixtures.",
+    "These findings apply only to supplemental-38 in round 1 and do not claim a clean full review round."
+  ]
+}

@@ -1,0 +1,444 @@
+{
+  "schemaVersion": 1,
+  "kind": "partial-regression-visual-diagnostic",
+  "recordDate": "2026-11-06",
+  "reviewer": "/root/phase3_defaults_review",
+  "status": "prior-seven-targets-visually-closed; two-new-P3-findings; partial-not-clean",
+  "round": 2,
+  "run_id": "42cab7452646",
+  "binary_sha256": "ebc11d364e556b687cae8d183bf7594147c2acab907927c45e5707f89dd2c070",
+  "source_sha256": "db2b4c77dce129fc994bbd8f2ce3656fe7daa0b598df4b95189eab2f7de07bb7",
+  "reference_sha256": "e7b49b456255432d74cfe41346f9d44c1a9c55bf67c5d55483e4ae3029547d18",
+  "candidate": {
+    "id": "phase3-candidate2",
+    "backend": "desktop",
+    "evidenceRoot": "D:/Code/aidokuForKindle/artifacts/phase3/candidate2/ui-regression-diagnostic",
+    "evidenceManifest": "artifacts/phase3/candidate2/ui-regression-diagnostic/manifest.json",
+    "originalCapturesUnmodified": "Reported by parent coordinator.",
+    "sourceUnchangedDuringCapture": "Reported by parent coordinator.",
+    "provenance": "Pre-existing remote-produced captures. This review launched no application and performed no runtime verification."
+  },
+  "reference": {
+    "root": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff",
+    "designVersion": "1793901158-6c09",
+    "scope": "docs/review/phase3-reference-scope.json",
+    "handoffSummary": "docs/DESIGN_HANDOFF.md",
+    "priorDiagnostic": "docs/review/phase3-defaults-diagnostic.json"
+  },
+  "scope": {
+    "productReferenceImages": 101,
+    "defaultsReviewedOnThisCandidate": 11,
+    "referencesNotReviewedOnThisCandidate": 90,
+    "remainingDefaultReferences": 6,
+    "stateReferencesNotReviewed": 84,
+    "uniquePairsInspected": 11,
+    "uniqueImagesInspected": 22,
+    "totalImageViews": 24,
+    "mechanicalPassesReportedByExistingManifest": 11,
+    "mechanicalFailuresReportedByExistingManifest": 0,
+    "allApplicableStatesReviewed": false,
+    "runtimeControlsVerified": false,
+    "cleanRound": false,
+    "cleanRoundStreak": 0,
+    "comparison": "Reference exports are 2x and native desktop captures are logical 1x. Reviewers compared matching logical proportions; coordinates are approximate logical pixels.",
+    "assignments": [
+      {
+        "reviewer": "/root/phase3_defaults_review/c2_layout_data",
+        "boards": [
+          "Main",
+          "sc-library",
+          "pw-manga",
+          "sc-manga"
+        ],
+        "uniqueImages": 8,
+        "totalImageViews": 8
+      },
+      {
+        "reviewer": "/root/phase3_defaults_review/c2_history_readers",
+        "boards": [
+          "pw-history",
+          "sc-history",
+          "pw-reader",
+          "sc-reader-portrait"
+        ],
+        "uniqueImages": 8,
+        "totalImageViews": 8
+      },
+      {
+        "reviewer": "/root/phase3_defaults_review/c2_reader_settings",
+        "boards": [
+          "sc-reader",
+          "pw-settings",
+          "sc-settings"
+        ],
+        "uniqueImages": 6,
+        "totalImageViews": 8,
+        "boundaryFollowup": "Reopened only the sc-settings candidate/reference pair to inspect the grayscale-strip outline."
+      }
+    ],
+    "limitations": [
+      "Only these eleven default captures were reviewed on C2; coverage from C1 is not carried into this frozen candidate.",
+      "Mechanical PASS does not establish visual fidelity or working interactions.",
+      "Closure below applies to inspected default pixels, not behavior, secondary settings sections or closed readers.",
+      "No local tests, builds, runtime probes, application launches or Git operations were performed.",
+      "The coordinator inspected no images and consolidated the bounded fresh-context reviewers' observations.",
+      "The grayscale follow-up used the native 930x1240 candidate. The display layer resized its 2x reference to 1368x1824; the open-edge observation comes directly from the unscaled candidate."
+    ]
+  },
+  "reviewed_case_ids": [
+    "Main--default",
+    "sc-library--default",
+    "pw-manga--default",
+    "sc-manga--default",
+    "pw-history--default",
+    "sc-history--default",
+    "pw-reader--default",
+    "sc-reader-portrait--default",
+    "sc-reader--default",
+    "pw-settings--default",
+    "sc-settings--default"
+  ],
+  "summary": {
+    "priorFindingsChecked": 7,
+    "priorFindingsVisuallyClosedInReviewedDefaults": 7,
+    "priorFindingsRemainingInReviewedDefaults": 0,
+    "newFindings": 2,
+    "newFindingPriorities": {
+      "P3": 2
+    },
+    "conclusion": "The seven C1 targets are visually closed in the reviewed defaults. Two newly identified P3 defects require correction. Their introduction point was not determined. This partial diagnostic does not increase the zero clean-round streak."
+  },
+  "findingClosures": [
+    {
+      "id": "P3D-001",
+      "boards": [
+        "pw-history",
+        "sc-history"
+      ],
+      "status": "visually-closed-in-reviewed-defaults",
+      "evidence": [
+        "pw-history--default.png",
+        "sc-history--default.png"
+      ],
+      "observedEvidence": "PW covers begin near x=22 and text near x=84. Scribe covers begin near x=36 and x=481, with text near x=126 and x=571. The additional record inset is absent; the intended cover-to-text gaps and date-column alignment are restored."
+    },
+    {
+      "id": "P3D-002",
+      "boards": [
+        "sc-history"
+      ],
+      "status": "visually-closed-in-reviewed-default",
+      "evidence": [
+        "sc-history--default.png"
+      ],
+      "observedEvidence": "The 12/40 track spans approximately x=126..216 and its black foreground x=126..153, visibly filling the leftmost 30%."
+    },
+    {
+      "id": "P3D-003",
+      "boards": [
+        "pw-reader"
+      ],
+      "status": "visually-closed-in-reviewed-default",
+      "evidence": [
+        "pw-reader--default.png"
+      ],
+      "observedEvidence": "The menu-open 26 px status row displays time, Wi-Fi, battery percentage and a battery icon."
+    },
+    {
+      "id": "P3D-004",
+      "boards": [
+        "pw-reader",
+        "sc-reader-portrait",
+        "sc-reader"
+      ],
+      "status": "visually-closed-in-reviewed-defaults",
+      "evidence": [
+        "pw-reader--default.png",
+        "sc-reader-portrait--default.png",
+        "sc-reader--default.png"
+      ],
+      "observedEvidence": "Three ellipsis dots are visible above the More label in all three reader captures. The landscape mark is around x=1012..1027, y=878."
+    },
+    {
+      "id": "P3D-005",
+      "boards": [
+        "pw-reader",
+        "sc-reader-portrait",
+        "sc-reader"
+      ],
+      "status": "visually-closed-in-reviewed-defaults",
+      "evidence": [
+        "pw-reader--default.png",
+        "sc-reader-portrait--default.png",
+        "sc-reader--default.png"
+      ],
+      "observedEvidence": "The chapter-navigation rows have continuous white space between actions. The stray rules are absent and the intended divider above tools remains."
+    },
+    {
+      "id": "P3D-006",
+      "boards": [
+        "sc-manga"
+      ],
+      "status": "visually-closed-in-reviewed-default",
+      "evidence": [
+        "sc-manga--default.png"
+      ],
+      "observedEvidence": "The synopsis now has a regular serif appearance and approximately 31 logical px line spacing. The former heavy, compressed appearance is absent; paragraph placement and the tag boundary agree with the reference."
+    },
+    {
+      "id": "P3D-007",
+      "boards": [
+        "pw-manga"
+      ],
+      "status": "visually-closed-in-reviewed-default",
+      "evidence": [
+        "pw-manga--default.png"
+      ],
+      "observedEvidence": "The description-link chevron is near logical x=255, approximately 10 px after the label, matching the reference."
+    }
+  ],
+  "knownFixChecks": [
+    {
+      "item": "Settings header positioning",
+      "boards": [
+        "pw-settings",
+        "sc-settings"
+      ],
+      "status": "visually-closed-in-reviewed-defaults",
+      "observedEvidence": "Settings titles occupy their reference upper-left header positions."
+    },
+    {
+      "item": "Previously deferred PW first-page device card",
+      "boards": [
+        "pw-settings"
+      ],
+      "status": "visually-restored",
+      "observedEvidence": "The outlined device card is present at approximately [16,106,586,84], including the device graphic and name, specifications, free space and connection status."
+    },
+    {
+      "item": "Settings main and current-section bounds",
+      "boards": [
+        "pw-settings",
+        "sc-settings"
+      ],
+      "status": "confirmed-in-reviewed-defaults",
+      "observedEvidence": "PW grouped rows and pager are visible. Scribe retains the 320 px navigation column and bounded display detail area, with title, refresh controls, quality cards, switches and grayscale strip correctly placed.",
+      "remainingLimitation": "Secondary settings sections were not exercised. The grayscale strip has the separate new outline finding P3R-002."
+    },
+    {
+      "item": "Scribe sidebar translations and shortened labels",
+      "boards": [
+        "sc-settings"
+      ],
+      "status": "confirmed-visible-labels",
+      "observedEvidence": "Categories, Downloads, Tracking, and Reading direction and page turning now render as Chinese labels.",
+      "remainingLimitation": "Label presence does not establish working navigation or integration behavior."
+    },
+    {
+      "item": "Capability-dependent controls",
+      "boards": [
+        "sc-settings"
+      ],
+      "status": "consistent-with-authorized-exceptions",
+      "observedEvidence": "Pen and hardware-dither controls are absent. Quality choices are gray with an explicit temporarily-unavailable caption."
+    },
+    {
+      "item": "Library download indicators",
+      "boards": [
+        "sc-library"
+      ],
+      "status": "visually-consistent",
+      "observedEvidence": "Seven download indicators are visible in the first-page grid."
+    },
+    {
+      "item": "Visible cover identity",
+      "boards": [
+        "sc-library"
+      ],
+      "status": "visually-consistent-within-reviewed-page",
+      "observedEvidence": "All eighteen visible cover titles correspond to their captions.",
+      "remainingLimitation": "Removal of different-title cover reuse outside the reviewed page is parent-supplied information."
+    },
+    {
+      "item": "Generic first-thumbnail zero-progress rule",
+      "boards": [
+        "Main",
+        "sc-library"
+      ],
+      "status": "visually-consistent",
+      "observedEvidence": "The first thumbnail has no filled progress strip. The separate continuation card retains 12/40 progress."
+    },
+    {
+      "item": "Forty-six real progress records, canonical timestamps and verified download flags",
+      "status": "accepted-parent-supplied-provenance",
+      "observedEvidence": "The parent reports fresh real records and seven verified downloaded books. The default screenshots do not independently establish all records, canonicalization or backend semantics."
+    },
+    {
+      "item": "Twenty retained initial history records",
+      "status": "accepted-parent-supplied-provenance",
+      "observedEvidence": "Visible history rows are treated as fresh real data. Complete initial membership and persistence are outside this static review."
+    },
+    {
+      "item": "Scribe detail geometry",
+      "boards": [
+        "sc-manga"
+      ],
+      "status": "visually-consistent",
+      "observedEvidence": "The information column remains approximately 384 logical px, cover approximately 306x420, and directory contains sixteen rows."
+    },
+    {
+      "item": "Regular font registration and synopsis preview limits",
+      "boards": [
+        "sc-manga"
+      ],
+      "status": "visible-typography-confirmed; implementation-limits-parent-supplied",
+      "observedEvidence": "The visible synopsis fits without overflow. The parent reports SerifRegular 400 registration, a six-line clipped preview, a 2048-character cap and preservation of the complete summary; these implementation guarantees are not established by one default image."
+    },
+    {
+      "item": "Artwork-only closed reader and secondary settings sections",
+      "status": "not-exercised",
+      "observedEvidence": "The inspected reader defaults have menus open; settings captures show PW list page one and Scribe display settings.",
+      "remainingLimitation": "No closure claim is made for closed-reader decorations, secondary-section bounds, other settings states or interaction behavior."
+    }
+  ],
+  "newFindings": [
+    {
+      "id": "P3R-001",
+      "boards": [
+        "pw-reader",
+        "sc-reader-portrait",
+        "sc-reader"
+      ],
+      "state": "default/menu-open",
+      "priority": "P3",
+      "confidence": "high",
+      "owner": "Reader owner; shared header ToC action",
+      "reference": [
+        "screens/pw-reader.png",
+        "screens/sc-reader-portrait.png",
+        "screens/sc-reader.png"
+      ],
+      "evidence": [
+        "artifacts/phase3/candidate2/ui-regression-diagnostic/pw-reader--default.png",
+        "artifacts/phase3/candidate2/ui-regression-diagnostic/sc-reader-portrait--default.png",
+        "artifacts/phase3/candidate2/ui-regression-diagnostic/sc-reader--default.png"
+      ],
+      "logicalRegion": {
+        "pw-reader": {
+          "x": 576,
+          "y": 43,
+          "width": 24,
+          "height": 24
+        },
+        "sc-reader-portrait": {
+          "x": 756,
+          "y": 27,
+          "width": 28,
+          "height": 28
+        },
+        "sc-reader": {
+          "x": 1068,
+          "y": 25,
+          "width": 24,
+          "height": 28
+        }
+      },
+      "observation": "The header ToC action is rendered as three short horizontal strokes, approximately 11 px wide, without left-side list bullets.",
+      "expected": "A reference-sized bulleted-list outline icon, approximately 18-20 px across, centered in the header action.",
+      "impact": "The ToC affordance is visibly undersized and loses the reference list-icon structure.",
+      "recommendation": "Use the reference-sized bulleted-list icon in the shared reader ToC action.",
+      "retest": "Inspect all three menu-open reader headers on the next remotely captured frozen candidate."
+    },
+    {
+      "id": "P3R-002",
+      "boards": [
+        "sc-settings"
+      ],
+      "state": "default/display-refresh",
+      "priority": "P3",
+      "confidence": "high",
+      "owner": "Panels",
+      "reference": [
+        "screens/sc-settings.png"
+      ],
+      "evidence": [
+        "artifacts/phase3/candidate2/ui-regression-diagnostic/sc-settings--default.png"
+      ],
+      "logicalRegion": {
+        "x": 858,
+        "y": 821,
+        "width": 36,
+        "height": 38
+      },
+      "containingControl": {
+        "x": 356,
+        "y": 821,
+        "width": 538,
+        "height": 38
+      },
+      "observation": "The grayscale strip is open at its right edge. The final white cell has no visible vertical outline around x=893, y=823..856, while the top and bottom rules remain.",
+      "expected": "A continuous outline enclosing all sixteen cells, including the final white cell.",
+      "impact": "The control's last cell visually merges into the page background.",
+      "recommendation": "Constrain cell painting to the inner bounds or draw the outer border after the cells.",
+      "retest": "Inspect the right outline of the sixteen-cell grayscale strip on the next remotely captured frozen candidate.",
+      "evidenceLimit": "The candidate was viewed at native 930x1240; the reference was resized by the display layer. The open edge is directly visible in the candidate."
+    }
+  ],
+  "pageOutcomes": [
+    {
+      "board": "Main",
+      "outcome": "No new high-confidence visual finding; first-thumbnail rule visible."
+    },
+    {
+      "board": "sc-library",
+      "outcome": "No new high-confidence visual finding; visible cover identities and seven download indicators are consistent."
+    },
+    {
+      "board": "pw-manga",
+      "outcome": "P3D-007 visually closed; no new high-confidence finding."
+    },
+    {
+      "board": "sc-manga",
+      "outcome": "P3D-006 visually closed; no new high-confidence finding."
+    },
+    {
+      "board": "pw-history",
+      "outcome": "P3D-001 visually closed; no new high-confidence finding."
+    },
+    {
+      "board": "sc-history",
+      "outcome": "P3D-001 and P3D-002 visually closed; no new high-confidence finding."
+    },
+    {
+      "board": "pw-reader",
+      "outcome": "P3D-003, P3D-004 and P3D-005 visually closed; new shared ToC icon finding P3R-001."
+    },
+    {
+      "board": "sc-reader-portrait",
+      "outcome": "P3D-004 and P3D-005 visually closed; new shared ToC icon finding P3R-001."
+    },
+    {
+      "board": "sc-reader",
+      "outcome": "P3D-004 and P3D-005 visually closed; new shared ToC icon finding P3R-001."
+    },
+    {
+      "board": "pw-settings",
+      "outcome": "Known default title/bounds symptoms and missing first-page device card are visually resolved; no new high-confidence finding."
+    },
+    {
+      "board": "sc-settings",
+      "outcome": "Known default title/bounds/translation symptoms are visually resolved; new grayscale-outline finding P3R-002."
+    }
+  ],
+  "nonFindings": [
+    {
+      "item": "Illustrative data differences",
+      "disposition": "Real titles, history membership, dates, counts, capacities, covers and progress may differ from the reference samples. These differences do not waive geometry, clipping or honest operation states."
+    },
+    {
+      "item": "Reader artwork margins",
+      "disposition": "The reviewed prepared page-12 artwork differs from the illustrative reference. Image margins alone did not establish a viewport-inset defect; no high-confidence layout finding was inferred."
+    }
+  ],
+  "nextRequiredAction": "Correct P3R-001 and P3R-002, then freeze the next candidate for the full applicable matrix from the 101-reference inventory plus the planned supplemental checks. Preserve explicit capability and artwork-only overrides. The clean-round streak remains zero until a complete clean round is achieved."
+}

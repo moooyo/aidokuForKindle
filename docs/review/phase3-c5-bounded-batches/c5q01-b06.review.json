@@ -1,0 +1,159 @@
+{
+  "schema_version": 1,
+  "batch_id": "c5q01-b06",
+  "reviewer": "/root/final_validation_delivery/c4_full_review_coordinator/c5q01_b06",
+  "run": "43d2545cb872",
+  "round": 3,
+  "manifestSHA": "1731e4306df0596e80edd7df2d3e5e57c34fc64feae44572011eba61c2bfc7c5",
+  "inventorySHA": "d65f77a634219f545fa9adfdfbd4bbcb2838ca77efa04a5cb7254ad3e6434c7d",
+  "freeze_tuple": {
+    "source_file_count": 227,
+    "source_sha256": "892f0ac73a807e4fd61a235d9ad4fe00c4f03c1e4e6881f28b2dd8bee2b7ddf1",
+    "binary_sha256": "9bd66a1f89473218e67558f763a4a7d4da7c642f9960ae5430ceb74ac365129b",
+    "harness_sha256": "94ccc78d3c11b97791618527350ce59dacf458bfc57f8f04aabec045dd544a74",
+    "capture_plan_sha256": "b3adabbf4f2d33789f381dc2ac55474d89fcd210d58ce9e5083c0d818d547eec",
+    "reference_scope_sha256": "c910bed9f02ed17b2ca0a54aca1beeeeb6caabc5a17a91afe764ddd3e7b0d33c",
+    "reference_sha256": "e7b49b456255432d74cfe41346f9d44c1a9c55bf67c5d55483e4ae3029547d18",
+    "capture_helper_sha256": {
+      "verify-ui.py": "470872e6fd22a78b474c0f862164875ad9c7237bd2f3f164512864580ac1e90d",
+      "verify-fullscreen.py": "4a6c48cef771e66e9b3058edd888dcf2d4bce02e2720b5cc00c7a5b987bc9670",
+      "handoff_c4_business.py": "6197f375b247962e3ce9acdd3779468073f11e0002ac3c7ce876a7b1a0d0d9be",
+      "handoff_c5_ui.py": "fa30ef2bf8ab512e9705f43933ff6acaf32993e5aa1dbc62be330d4c97b481f2",
+      "handoff_c5_reader.py": "5b88a0c1b8e1151a3f96decef1a3a06f98a0d9de99908709bafbfb02cea490d5"
+    }
+  },
+  "sha_provenance": "All SHA values are owner-supplied immutable inventory identities. No local rehash or independent transfer validation was performed.",
+  "reviewed_case_ids": [
+    "scribe--c5-orientation-portrait-automatic",
+    "scribe--c5-orientation-landscape-automatic",
+    "scribe--c5-orientation-landscape-single",
+    "scribe--c5-orientation-landscape-vertical"
+  ],
+  "cases": [
+    {
+      "case_id": "scribe--c5-orientation-portrait-automatic",
+      "png_path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate5/ui-qualification-01/scribe--c5-orientation-portrait-automatic.png",
+      "evidence_sha256": {
+        "png": "75077359120690df3938a1e3ffa6fad3c738ac325fbe2c33b216c31616760a46",
+        "case_json": "50686e76e7beeccb2d3d1e9465c1ed377582b0520017fa536144e32da567412f",
+        "state": "e3e72d15a8318fb5ed93e209a48dd71d79e2dc979fd7984c5e27a0913b42a6e1",
+        "actions": "4ea10e60b47ead8dd04fa9df04ee9b8306682155b462c2c0fef9d6a0108f3329",
+        "metadata": "66063bf2fca6fb07ae0813c6daaf2abd106f083468d0694ebe1fffe726cf27b0",
+        "log": "7e68a4176710a866675a6b95bcf7bed2d96c58a8fd7996a4d48f3679514483a9"
+      },
+      "actual_view": {"opened": true, "method": "tools.view_image on assigned original PNG", "size": [930, 1240]},
+      "identity_observation": "Frozen case name, run, round, source and binary identities match the assignment; its embedded orientation screenshot SHA matches the assigned PNG SHA. State, desktop metadata and log describe portrait reader orientation choices.",
+      "observations": {
+        "geometry": "The sheet starts near native y=844. Three equal 270 by 104 cards span x=48 to 882 at y=909, with clear gutters. Their supplied frozen bounds are visually corroborated, not independently measured.",
+        "font": "The bold panel heading, centered choice labels, page counter and navigation labels are legible, with strong selected white-on-black contrast and no clipping or ellipsis.",
+        "boundary": "The sheet cleanly separates artwork from its title/cards; the progress band below and the five-item bottom navigation remain distinct and unobstructed.",
+        "semantics": "Portrait is selected. Both landscape choices visibly describe two pages and include a center seam. This correctly communicates the prospective landscape spread: State.reader_landscape_spread is true while the committed reader_effective.spread is false and only page 12 is currently visible. The panel does not claim that the current portrait frame is a spread.",
+        "reference_comparison": "The exported portrait orientation reference supports the heading, three-card hierarchy and selected portrait treatment. The shorter candidate sheet reflects removal of the prototype-only demo link. Artwork framing is not asserted to be pixel-identical."
+      },
+      "intentional_capability_checks": "The third card is a manual reverse-landscape choice rather than the sample sensor-follow choice; this is accepted by the supplied contract. The prototype landscape-demo link is absent as required. Manual mode and desktop capability metadata do not claim physical hardware qualification.",
+      "static_verdict": "pass_with_behavior_limits",
+      "behavior_limits": "Captured actions configure portrait/automatic/RTL and open the panel. This confirms the static choice presentation only; selecting landscape or manual 270 degrees, sensor response, touch mapping, timing and native framebuffer rotation are not demonstrated."
+    },
+    {
+      "case_id": "scribe--c5-orientation-landscape-automatic",
+      "png_path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate5/ui-qualification-01/scribe--c5-orientation-landscape-automatic.png",
+      "evidence_sha256": {
+        "png": "8a343324b91d63ed66f26e35fb215737b23d6c346835527e22b9f8a30db6cd3b",
+        "case_json": "6e249fa571ffcdc13575604014a0992ae3d932680f71f60e50ff85bb568dedee",
+        "state": "b7f51c747018d37d29f0521ef468e9ea8720bc991181420d25f34d93db2224fa",
+        "actions": "7fbdf10ef8f8395eb7df612ed0a088fddb302d87e22296ba029e3f4e0b8deab1",
+        "metadata": "6e8f16a1e281d858427ca09df213f78b668c91bc132b0f75e47e7ee420f23a69",
+        "log": "1b7cf8ed4ce4958b8e7f6e907802f7378c8d9d65c978e103ca66ffd8026e83b8"
+      },
+      "actual_view": {"opened": true, "method": "tools.view_image on assigned original PNG", "size": [1240, 930]},
+      "identity_observation": "Frozen case name, run, round, source and binary identities match the assignment; its embedded orientation screenshot SHA matches the assigned PNG SHA. State, desktop metadata and log agree on landscape orientation choices.",
+      "observations": {
+        "geometry": "The sheet starts near native y=534; three equal cards span approximately x=120 to 1120 at y=599 to 703. The selected middle card aligns with its neighbors and has clear gutters.",
+        "font": "Panel heading, all choice labels including reverse landscape, manual-direction header badge, and the 12-13 page range are readable without truncation.",
+        "boundary": "The two artwork pages meet near the viewport center above the sheet. The sheet, progress band beginning near y=720 and bottom navigation have clean horizontal boundaries; no artwork crosses into choice labels.",
+        "semantics": "Landscape is selected and both landscape glyphs have the two-page seam. Their two-page wording agrees with State.reader_landscape_spread=true, reader_effective.spread=true, visible pages 12 and 13, and the displayed page range.",
+        "reference_comparison": "The landscape default reference supplies the related spread, header and progress/navigation hierarchy. It has no open orientation panel, so it is not an exact panel export. The manual-direction badge truthfully replaces the sample auto-rotation presentation."
+      },
+      "intentional_capability_checks": "Manual reverse landscape and omission of the prototype demo link remain within the supplied contract. No sensor-follow or physical rotation capability is inferred from this desktop screenshot.",
+      "static_verdict": "pass_with_behavior_limits",
+      "behavior_limits": "Actions configure landscape/automatic/RTL and open the panel. Metadata rotation_degrees=90 describes the captured application state, not native framebuffer or evdev mapping. Selecting reverse landscape, sensor behavior and physical interaction remain outside this visual review."
+    },
+    {
+      "case_id": "scribe--c5-orientation-landscape-single",
+      "png_path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate5/ui-qualification-01/scribe--c5-orientation-landscape-single.png",
+      "evidence_sha256": {
+        "png": "90d80255bde68f9f57042341a601f995b683a7ae67f37891390976da7130b635",
+        "case_json": "19e794294a48e0dd21aeb0be9554b422a5325cc2d9165f2c4ba4dc6dc0e9116d",
+        "state": "19723541787bab2e79daadb52789231514fb970df98ad2aed7df53827ecee1c5",
+        "actions": "39933d81b89becc32a4881f551a4874596576d0a6c7f0289d45c05175b40d5d9",
+        "metadata": "08402573dc27313824fb7d9bc9fd7fe1c199a780da276aba50dd19898819e2b8",
+        "log": "1b7cf8ed4ce4958b8e7f6e907802f7378c8d9d65c978e103ca66ffd8026e83b8"
+      },
+      "actual_view": {"opened": true, "method": "tools.view_image on assigned original PNG", "size": [1240, 930]},
+      "identity_observation": "Frozen case name, run, round, source and binary identities match the assignment; its embedded orientation screenshot SHA matches the assigned PNG SHA. State and captured setting actions explicitly identify single-page RTL layout.",
+      "observations": {
+        "geometry": "The sheet and three equal cards use the same approximately x=120 to 1120, y=599 to 703 geometry as the automatic landscape case. One artwork page is centered above it with balanced white side margins.",
+        "font": "The single-page and reverse-single-page choice labels fit on one line. The selected middle card maintains readable white-on-black text; the heading and 12/40 counter are clear.",
+        "boundary": "Centered artwork ends at the sheet boundary without bleeding into controls. Choice borders, progress band and navigation remain separate; no horizontal label overflow is visible.",
+        "semantics": "Both landscape choices visibly say single page, and their landscape diagrams omit the center seam. This agrees with page_layout_mode=single, State.reader_landscape_spread=false, reader_effective.spread=false, the single visible page and 12/40 counter. It does not falsely claim a double-page spread.",
+        "reference_comparison": "No exact exported single-page landscape orientation state is assigned. The related landscape default reference is used only for general chrome hierarchy; its two-page content is not imposed on this state."
+      },
+      "intentional_capability_checks": "The manual-direction badge and reverse-landscape choice remain truthful within the declared desktop capability scope. The sample follow-device control and prototype demo link are not required.",
+      "static_verdict": "pass_with_behavior_limits",
+      "behavior_limits": "Actions configure single/RTL/landscape before opening the panel. The screenshot supports static labels, seam omission and current page framing, not orientation-choice activation, native input mapping or physical rotation."
+    },
+    {
+      "case_id": "scribe--c5-orientation-landscape-vertical",
+      "png_path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate5/ui-qualification-01/scribe--c5-orientation-landscape-vertical.png",
+      "evidence_sha256": {
+        "png": "6a67321235f7b960529b0e4da0395e63fea905aa16da5e71fadde2113bccd494",
+        "case_json": "07cf2dbdc150e925180ea7034bcc22907e6accf65ca4aecfef77203a152fa406",
+        "state": "79b672e76100244afc372f99b2b0832642ab4ee74487011e4760a3d4898ad709",
+        "actions": "79c9cb8724690051d934974a3aaec00839a00abdb3b5a4dee9b4895442f54f77",
+        "metadata": "a1f6ba6c653a635e5ba74848f5dfcebcf747302349407c64d25fd4d6ad226f85",
+        "log": "1b7cf8ed4ce4958b8e7f6e907802f7378c8d9d65c978e103ca66ffd8026e83b8"
+      },
+      "actual_view": {"opened": true, "method": "tools.view_image on assigned original PNG", "size": [1240, 930]},
+      "identity_observation": "Frozen case name, run, round, source and binary identities match the assignment; its embedded orientation screenshot SHA matches the assigned PNG SHA. State and actions specify vertical reading despite the double layout preference.",
+      "observations": {
+        "geometry": "The orientation sheet preserves the same three equal card rectangles and side insets as the other landscape cases. The vertical-reading artwork fills the viewport width above the sheet without a two-page center join.",
+        "font": "Both landscape single-page labels, heading, manual-direction badge and 12/40 counter remain legible and unclipped.",
+        "boundary": "The full-width artwork stops at the sheet edge. Card borders, progress band and bottom navigation are intact. The left-filled progress track and chapter ordering are coherent with the captured vertical direction rather than RTL.",
+        "semantics": "Landscape is selected; both landscape choices describe single pages and omit the seam. This correctly follows State.reader_landscape_spread=false and reader_effective.spread=false under vertical reading even though page_layout_mode is double. One visible page and the 12/40 counter support the same presentation.",
+        "reference_comparison": "No exact exported vertical landscape orientation state is assigned. The default landscape spread reference establishes general hierarchy only and does not override actual vertical-state semantics."
+      },
+      "intentional_capability_checks": "Manual reverse landscape replaces the unsupported sample sensor-follow behavior within the accepted contract. Removal of the prototype demo link is intentional. The desktop capability declaration does not claim physical hardware qualification.",
+      "static_verdict": "pass_with_behavior_limits",
+      "behavior_limits": "Actions configure double preference, vertical direction and landscape before opening the panel. Static evidence demonstrates truthful effective single-page wording, not vertical scrolling behavior, sensor response, input mapping or hardware rotation."
+    }
+  ],
+  "references": [
+    {
+      "reference_id": "sc-reader-portrait--orientation",
+      "path": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/screens/states/sc-reader-portrait--orientation.png",
+      "sha256": "ebbe1249f7d355eebc5eaca682880f398fa0d9cb1ced5b42c93a2c66d487736e",
+      "actual_view": "Opened once with tools.view_image; original 1860 by 2480, tool displayed at 1368 by 1824. Relevant UI labels and borders were readable without a crop.",
+      "observation": "Portrait is selected in a three-card orientation sheet with a landscape-spread seam, sample follow-device card and prototype landscape-demo link. The last two elements have accepted contract substitutions or removal in the candidate."
+    },
+    {
+      "reference_id": "sc-reader--default",
+      "path": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/screens/sc-reader.png",
+      "sha256": "2940ed50f4c8bb2a5b452315b0c71bab32a5fe5ceb605c9c4358f23baf8f65ee",
+      "actual_view": "Opened once with tools.view_image; original 2480 by 1860, tool displayed at 1824 by 1368. Relevant header, spread, counter and navigation details were readable without a crop.",
+      "observation": "The reference shows the landscape spread and 12-13 range with an auto-rotation badge and no open orientation sheet. It is a related global-contract reference for landscape candidates, not an exact export of their open panel, single or vertical state."
+    }
+  ],
+  "findings": [],
+  "suggestions": [],
+  "evidence_gaps": [
+    "There is no assigned exact export for an open landscape orientation panel, single-page landscape or vertical landscape; those observations are bounded by the supplied actual-state contract.",
+    "This batch has no captured activation of reverse landscape or sensor-follow. Their absence is a behavior-evidence boundary, not a request to add unsupported features."
+  ],
+  "limitations": [
+    "Six original images were opened: four new C5 candidates and two original references. No crops, image processing, programs, tests, builds, runtime probes, SSH, hashes, SQL or automatic validation were run.",
+    "Only assigned frozen case/state/metadata/action/log evidence was read. No current production source or unrelated candidate report was used to infer these verdicts.",
+    "Observed geometry is visual inspection corroborated by supplied native card coordinates, not independent pixel measurement or touch-target qualification.",
+    "Owner-reported mechanical passes were not independently executed. Desktop rotation metadata, including a possible 270-degree state elsewhere, cannot prove native framebuffer/evdev mapping, physical rotation, e-ink effects, timing or the independent live-reader lease.",
+    "This is a bounded static visual verdict for four cases only. It does not establish a full capture suite, a clean round or record review authorization."
+  ]
+}

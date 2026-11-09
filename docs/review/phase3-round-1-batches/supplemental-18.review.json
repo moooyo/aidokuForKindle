@@ -1,0 +1,142 @@
+{
+  "schema_version": 1,
+  "batch_id": "supplemental-18",
+  "reviewer": "/root/phase3_round1_review/supplemental_18",
+  "run_id": "a1baf3fe3dc2",
+  "binary_sha256": "94d7f3bbcab475ad8833a2f3c486138f7b49bead231851c2d8eab2f0c3d2ac51",
+  "source_sha256": "aef9db4e111165016a10a2a95e111f3155860b8510c7f6207ec9c79fbec5082c",
+  "review_method": "Fresh independent visual inspection of each of the eight listed candidate PNGs with tools.view_image, together with read-only case metadata, current PNG SHA-256 hashes, the frozen reference scope, HANDOFF.md, and relevant prototype text. No independent reference image was supplied or opened for this supplemental batch.",
+  "identity_checks": {
+    "all_current_png_hashes_match_batch_expected": true,
+    "all_current_png_hashes_match_case_screenshot_evidence": true,
+    "all_case_run_binary_and_source_ids_match": true,
+    "native_capture_size": [618, 824],
+    "backend": "desktop",
+    "profile": "pw5"
+  },
+  "reviewed_case_ids": [
+    "pw5-portrait--ltr-page-input",
+    "pw5-portrait--menu-suppresses-page-turn",
+    "pw5-portrait--next-chapter",
+    "pw5-portrait--odd-cbz-import",
+    "pw5-portrait--odd-final-spread",
+    "pw5-portrait--orientation-return",
+    "pw5-portrait--reader-panel-close-pure",
+    "pw5-portrait--resume-checkpoint"
+  ],
+  "reviewed_cases": [
+    {
+      "case_id": "pw5-portrait--ltr-page-input",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/pw5-portrait--ltr-page-input.png",
+      "candidate_sha256": "6b4703a4d4b2bdccf43e91f43cfba716e3cfca4ddb2cc0abd1b6a7f041c02852",
+      "viewed_candidate": true,
+      "outcome": "pass",
+      "observations": [
+        "The inspected image shows the radial panel on the left, two textured panels on the upper right, and the vertically lined lower panel. It contains artwork rather than a loading or empty frame.",
+        "No application header, status bar, bookmark ribbon, footer, notification, menu, or decorative gutter is visible. The narrow white side space is not evidence of an application viewport inset.",
+        "The case state records reading_direction=ltr, reader_page=13, reader_total=40, chapter-034, menu=false, and a displayed session agreeing with page 13. This supports the requested endpoint without making the static image proof of the preceding tap sequence."
+      ],
+      "intentional_differences": []
+    },
+    {
+      "case_id": "pw5-portrait--menu-suppresses-page-turn",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/pw5-portrait--menu-suppresses-page-turn.png",
+      "candidate_sha256": "f110a73a39ce7a666afc49ce22a0d9f5cba6f5a5238278a319429c3b8db2e50e",
+      "viewed_candidate": true,
+      "outcome": "pass",
+      "observations": [
+        "The open menu has a white top bar with the book and chapter title, back, bookmark, and contents controls. The bottom bar shows 12/40, the progress slider, neighboring chapter controls, and the five reader tools without clipped text or a dimmed background.",
+        "The underlying skyline, dotted, crosshatched, and radial artwork remains visible between the bars; the visible stipple belongs to that artwork rather than to a popup surface.",
+        "The displayed page indicator and case state both remain at page 12 with menu=true. This is consistent with the menu-open endpoint; the still image alone cannot demonstrate that every intercepted input avoided a page turn."
+      ],
+      "intentional_differences": []
+    },
+    {
+      "case_id": "pw5-portrait--next-chapter",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/pw5-portrait--next-chapter.png",
+      "candidate_sha256": "6b4703a4d4b2bdccf43e91f43cfba716e3cfca4ddb2cc0abd1b6a7f041c02852",
+      "viewed_candidate": true,
+      "outcome": "pass",
+      "observations": [
+        "The next-chapter endpoint displays populated line artwork across the portrait reading surface. No transition notification, previous-chapter label, status bar, ribbon, or footer remains visible.",
+        "The case state identifies chapter-035 at page 1/40, menu=false, reader_inflight=false, and reader_dirty=false; the displayed session agrees with that chapter and page.",
+        "This PNG is byte-identical to the LTR page-input candidate. Reused demo artwork does not visually identify a chapter, so chapter progression is supported by the state evidence rather than inferred from the image."
+      ],
+      "intentional_differences": []
+    },
+    {
+      "case_id": "pw5-portrait--odd-cbz-import",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/pw5-portrait--odd-cbz-import.png",
+      "candidate_sha256": "4fa6597e1c685f1d4659860aedd779a2a50fad6b2930a5fb8e7ead9a70864766",
+      "viewed_candidate": true,
+      "outcome": "pass",
+      "observations": [
+        "The portrait library contains one Chapter 1 cover and its continuation card, with visible progress 1/3 and a readable title. The empty shelf area is consistent with the metadata library_count=1 and is not an empty render failure.",
+        "The continuation card and saved notification use white surfaces and black outlines without shadow, stipple, or a dimmed mask. The category labels, centered 1/1 folio, and five-item bottom navigation remain separated and readable.",
+        "The saved notification is appropriate to this non-reader import endpoint. The case records a local book ID, route=library, and the same Chapter 1 visible book; no authorization, hardware, or network success claim appears in the visible UI."
+      ],
+      "intentional_differences": []
+    },
+    {
+      "case_id": "pw5-portrait--odd-final-spread",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/pw5-portrait--odd-final-spread.png",
+      "candidate_sha256": "cc5f960b896e7b1f8dff01a6cf1766f5c4f6f6c5f4a0e683baa79545e1f3993d",
+      "viewed_candidate": true,
+      "outcome": "pass",
+      "observations": [
+        "The inspected endpoint shows one full-width source page with its black page border, upper black rectangle, and OFFLINE PAGE 10 text. There is no duplicated page, phantom partner slot, central app divider, or unexplained blank half.",
+        "No status bar, reader toolbar, footer, bookmark ribbon, notification, or remaining panel is visible. The broad internal white field and outer page border are treated as source artwork, not as application chrome.",
+        "The local archive state is page 3/3 with menu=false; effective spread and the displayed session spread are false, and second_path is null. The portrait endpoint therefore demonstrates the final single page rather than independently proving a landscape odd-spread layout."
+      ],
+      "intentional_differences": []
+    },
+    {
+      "case_id": "pw5-portrait--orientation-return",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/pw5-portrait--orientation-return.png",
+      "candidate_sha256": "c82dab94dd83aff1aa8a20bffe4a0058bf48a276b6475bfdf356f66c31300fe1",
+      "viewed_candidate": true,
+      "outcome": "pass",
+      "observations": [
+        "The candidate is a portrait book-detail page with a cover and information block, continuation action for chapter 34 at 12/40, a directory heading, six chapter rows, and the bottom 1/8 folio with a next-page control.",
+        "The cover, title, description, action controls, row dates, and download controls are legible and remain inside the page. No reader menu, leftover orientation panel, rotated content, bottom dock, or clipped landscape layout is visible.",
+        "Although the case was launched with screen=reader, its final state and capture metadata both identify route=detail, display_landscape=false, and 618x824 geometry. This is the intended non-reader portrait return endpoint."
+      ],
+      "intentional_differences": []
+    },
+    {
+      "case_id": "pw5-portrait--reader-panel-close-pure",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/pw5-portrait--reader-panel-close-pure.png",
+      "candidate_sha256": "99e72fc0524cab6742a606d8fd257bc1fd762c534457451aacba487d8ee9c394",
+      "viewed_candidate": true,
+      "outcome": "pass",
+      "observations": [
+        "After the panel-close endpoint, the skyline panel reaches the top of the reading surface and the lower radial and crosshatched panels remain visible to the bottom. No white panel slab, close control, separator from the menu, shadow, or stale notification remains.",
+        "No status bar, bookmark ribbon, footer, page label, or other application decoration is visible anywhere in the closed reader.",
+        "The case state reports menu=false, reader_panel empty, modal empty, chapter-034 at page 12/40, and a settled displayed session on that page. The artwork-only pixel oracle is supporting evidence, separate from this actual visual inspection."
+      ],
+      "intentional_differences": []
+    },
+    {
+      "case_id": "pw5-portrait--resume-checkpoint",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/pw5-portrait--resume-checkpoint.png",
+      "candidate_sha256": "99e72fc0524cab6742a606d8fd257bc1fd762c534457451aacba487d8ee9c394",
+      "viewed_candidate": true,
+      "outcome": "pass",
+      "observations": [
+        "The resume endpoint contains a complete rendered skyline, dotted, radial, and crosshatched artwork page. There is no reopen prompt, loading blank, stale sleep image, menu panel, or error notification visible.",
+        "The closed reader contains no status bar, ribbon, footer, persistent page counter, or other application chrome.",
+        "The case state and displayed session agree on chapter-034 at page 20/40, offset 0, zoom 1, menu=false, reader_inflight=false, and reader_dirty=false. This image is byte-identical to the page-12 panel-close candidate, so the checkpoint identity relies on the state evidence; a static desktop capture cannot qualify physical wake restoration."
+      ],
+      "intentional_differences": []
+    }
+  ],
+  "suggestions": [],
+  "limitations": [
+    "This review covers only the eight supplemental-18 candidate PNGs. No independent reference PNG was supplied or opened; the review does not certify pixel-exact parity or a complete clean round.",
+    "Current PNG hashes were read with Get-FileHash and matched both the batch expected hashes and case screenshot evidence. All eight case metadata records matched the stated run, binary, and source identities.",
+    "The existing mechanical checks and zero-difference artwork oracles were read as supporting evidence. They did not substitute for inspecting each candidate image, and no new test, build, application run, runtime probe, or local verification suite was executed.",
+    "Static PNGs cannot prove invisible footer-cycle hit-zone removal, menu input suppression, LTR tap mapping, chapter-transition sequencing, persistence over a process restart, hardware refresh behavior, or physical sleep/wake restoration. State observations are limited to the supplied recorded endpoints.",
+    "The desktop capability declaration does not qualify physical Kindle hardware. Authentication, image-quality settings, sensor behavior, pen behavior, and hardware-only controls are not exercised by these eight visible states.",
+    "Source artwork, image scaling, source page borders, and legitimate white space were accepted. No viewport inset or unintended artwork crop was inferred solely from white margins."
+  ]
+}

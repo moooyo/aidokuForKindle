@@ -1,0 +1,67 @@
+{
+  "schema_version": 1,
+  "phase": "Phase3-C13",
+  "status": "Static prepared inputs and command only; no C13 GUI execution authorized or performed",
+  "worker_contacted": false,
+  "syntax_import_or_runtime_executed": false,
+  "new_hash_verification_executed": false,
+  "local_prepared_root": "D:/Code/aidokuForKindle/artifacts/phase3/candidate13/lease-verifier",
+  "remote_companion_root_planned": "/root/aidoku-phase3/candidate13/lease-verifier",
+  "prepared_policy": "Current scripts and review inputs were copied as artifacts only. No source, original script, UI-owner main, plan or previous result was modified.",
+  "official_c13_inputs": {
+    "source_root_planned": "/root/aidoku-phase3/candidate13/source-snapshot",
+    "source_sha256": "40b4b08f2b3529162772763414581cce37c4eb8de85d6b89f6bc4217bae14bfc",
+    "source_file_count": 227,
+    "binary_path_planned": "/root/aidoku-phase3/candidate13/desktop/aidoku",
+    "binary_sha256": "64c67a88b1c327a156620d6d9ed4761602235e2a61fc3c87baa1a396bd26c9ee",
+    "binary_bytes": null,
+    "official_source_manifest_planned": "/root/aidoku-phase3/evidence/candidate13/build-retry-02/source-after-gate-01.json",
+    "official_source_manifest_sha256": "3894af5fcd27d91acc08b4c4d38e610b2ce39b981b8cb1910fa5efea8630c10c",
+    "identity_basis": "Exact values delivered by FVD; final immutable snapshot, binary size, paths and actual file identities remain to be bound before execution. No earlier ELF or source is relabeled."
+  },
+  "parent_frozen_inputs": [
+    {"path": "scripts/verify-handoff-ui.py", "sha256": "1f2379bffd9ce9594f307fa150f56c345fe508fca47aac3be31e8ce29a72fa44"},
+    {"path": "docs/review/phase3-handoff-capture-plan.json", "sha256": "d07810abea322f7d2f86261f80e29007b3bd2f194eb2e9a3d4a53d8edcf70687"},
+    {"path": "scripts/handoff_c13_scope.py", "sha256": "b0d730fce905a9279cb8a9d614af3e769347f95f14d25d31be6b806f4b82d0e0"},
+    {"path": "scripts/handoff_c12_scope.py", "sha256": "aa78ef3b7cb74d9041f0ef2b336ac67adc383059325aeb8e79a1ae356d162b96"},
+    {"path": "docs/review/phase3-reference-scope.json", "sha256": "c910bed9f02ed17b2ca0a54aca1beeeeb6caabc5a17a91afe764ddd3e7b0d33c", "basis": "Declared reference_scope_sha256 in the current frozen capture plan"}
+  ],
+  "python_dependency_closure": {
+    "count": 12,
+    "files": ["verify-live-reader-lease.py", "verify-handoff-ui.py", "verify-cache-ui.py", "verify-ui.py", "verify-fullscreen.py", "handoff_c4_business.py", "handoff_c5_ui.py", "handoff_c5_reader.py", "handoff_c10_search.py", "handoff_c9_search.py", "handoff_c13_scope.py", "handoff_c12_scope.py"],
+    "edges": [
+      "verify-live-reader-lease.py -> verify-handoff-ui.py, verify-cache-ui.py",
+      "verify-handoff-ui.py -> verify-ui.py, verify-fullscreen.py, handoff_c4_business.py, handoff_c5_ui.py, handoff_c5_reader.py, handoff_c10_search.py, handoff_c13_scope.py",
+      "handoff_c10_search.py -> handoff_c9_search.py",
+      "handoff_c13_scope.py -> handoff_c12_scope.py",
+      "handoff_c12_scope.py -> handoff_c9_search.py"
+    ],
+    "basis": "Read-only inspection of all current import and importlib load sites across these twelve files; no syntax parser or module execution was run.",
+    "plain_import_resolution": "The actual entry script resolves plain imports from the independent scripts directory. Artifact-only preflight must put that same directory on sys.path before importlib loads the entry driver.",
+    "data_inputs": ["docs/review/phase3-handoff-capture-plan.json", "docs/review/phase3-reference-scope.json", "assets/i18n/zh-CN.json from the immutable C13 production tree"],
+    "non_edges": "Current closure does not import handoff_c11_search.py, handoff_c9_counts.py or handoff_tag_pixels.py; related available files are not silently treated as executed dependencies."
+  },
+  "complete_freeze_policy": {
+    "prepared_scripts": 12,
+    "prepared_review_inputs": 2,
+    "legacy_producer_self_recorded_tools": 8,
+    "closure_identity_status": "Structural closure complete; actual per-file size and SHA freeze verification pending the new run authorization",
+    "artifact_only_companion": "Freeze and hash all twelve copied Python files plus both JSON inputs before and after the run. Record and preserve their original bytes without editing the producer's eight-file self-check or its acceptance conditions.",
+    "known_identity_gate": "Match every supplied parent frozen identity, official source manifest, canonical 227-member source hash and actual new desktop hash before starting an App. Bind the remaining current prepared components with explicit per-file before/after records.",
+    "runtime_modules": "Record project modules actually loaded from the independent scripts tree and compare them to the declared twelve-file closure; no source or old-harness fallback for a missing dependency.",
+    "production_links": "Only src/ui/assets/vendor/examples and existing Cargo/build inputs from the final immutable C13 source-snapshot. Preserve absent optional files. Do not link C11/C12 production trees."
+  },
+  "planned_output": "/root/aidoku-phase3/evidence/candidate13/live-reader-lease/run-01",
+  "output_created": false,
+  "argv": ["/usr/bin/env", "PATH=/usr/bin:/bin", "PYTHONDONTWRITEBYTECODE=1", "PYTHONPATH=/root/aidoku-phase3/candidate13/lease-verifier/scripts", "/usr/bin/xvfb-run", "-a", "-s", "-screen 0 930x1240x24", "/usr/bin/python3", "/root/aidoku-phase3/candidate13/lease-verifier/scripts/verify-live-reader-lease.py", "--binary", "/root/aidoku-phase3/candidate13/desktop/aidoku", "--expected-sha256", "64c67a88b1c327a156620d6d9ed4761602235e2a61fc3c87baa1a396bd26c9ee", "--source-root", "/root/aidoku-phase3/candidate13/source-snapshot", "--expected-source-sha256", "40b4b08f2b3529162772763414581cce37c4eb8de85d6b89f6bc4217bae14bfc", "--expected-source-file-count", "227", "--output", "/root/aidoku-phase3/evidence/candidate13/live-reader-lease/run-01", "--timeout", "90"],
+  "launch_command_powershell_after_explicit_go": "ssh test-env 'env PATH=/usr/bin:/bin PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=/root/aidoku-phase3/candidate13/lease-verifier/scripts /usr/bin/xvfb-run -a -s \"-screen 0 930x1240x24\" /usr/bin/python3 /root/aidoku-phase3/candidate13/lease-verifier/scripts/verify-live-reader-lease.py --binary /root/aidoku-phase3/candidate13/desktop/aidoku --expected-sha256 64c67a88b1c327a156620d6d9ed4761602235e2a61fc3c87baa1a396bd26c9ee --source-root /root/aidoku-phase3/candidate13/source-snapshot --expected-source-sha256 40b4b08f2b3529162772763414581cce37c4eb8de85d6b89f6bc4217bae14bfc --expected-source-file-count 227 --output /root/aidoku-phase3/evidence/candidate13/live-reader-lease/run-01 --timeout 90'",
+  "existing_five_stage_contract": [
+    "Real fresh non-demo provider actions create all downloads, pages, pins, progress and Reader leases; only loopback source configuration is direct fixture input",
+    "Before 15 s: owned exact X11 Reader frame and fresh accepted page-2-of-6 production progress",
+    "Before 20 s: real book-removal actor removes jobs and durable pins while six raw records remain intact",
+    "Same App clear retains genuine raw/processed leases and reclaims all five unshown raw siblings",
+    "Only after actual Reader process exit does a fresh non-Reader settings process clear and reclaim both former protected files"
+  ],
+  "next_single_step": "Receive the final new C13 immutable source/desktop tuple and explicit ACTUALRUN resource GO; then materialize and verify the independent full dependency freeze before invoking this exact original producer.",
+  "preservation_and_limits": "C11/C12 original reports and raw data remain separate and untouched. No unit or exact CacheLease test substitutes for the fresh C13 GUI run. No concurrent multi-GUI, continuous physical-display or same-process reader/back claim; visual-round credit 0."
+}

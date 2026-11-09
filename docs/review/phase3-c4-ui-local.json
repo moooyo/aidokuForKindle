@@ -1,0 +1,79 @@
+{
+  "schema_version": 1,
+  "kind": "phase3-c4-ui-local-implementation",
+  "status": "source_frozen_pending_remote_verification",
+  "reference_findings": "docs/review/phase3-round-1-findings-map.json",
+  "remote_candidate3_modified": false,
+  "tests_builds_or_runtime_probes_performed": false,
+  "new_implementation_screenshots_captured": false,
+  "clean_round_credit": 0,
+  "method": "Separate fresh implementation batches inspected at most four candidate/reference pairs each. Existing C3 PNGs were diagnostic inputs. No local application, prototype, test, build, probe, or SSH verification was executed.",
+  "batches": [
+    {
+      "owner": "handoff_panels/c4_widgets",
+      "pairs_inspected": 4,
+      "files": ["ui/widgets.slint"],
+      "groups": ["P3R1-G01", "P3R1-G05", "P3R1-G47"],
+      "changes": "Anchor the complete white page-jump surface and top rule; add the centered incognito policy notice; draw one selected navigation indicator without the extra long segment. Preserve balanced grids, page contexts, navigation, and the closed-reader exception."
+    },
+    {
+      "owner": "handoff_panels/c4_reader_panels",
+      "pairs_inspected": 4,
+      "files": ["ui/panels-reader.slint"],
+      "groups": ["P3R1-G07", "P3R1-G08", "P3R1-G20", "P3R1-G21", "P3R1-G39"],
+      "changes": "Restore unavailable splitting structure, the current whole-spread state, true cover-alone controls, black enabled contrast controls, and a visible empty-bookmarks state with the actual current-page action. Keep orientation labels truthful for single/double/automatic layouts and preserve existing reverse-landscape, per-book hint, reverse-tap, input-epoch, and display-ready contracts."
+    },
+    {
+      "owner": "handoff_panels/c4_settings_policies",
+      "pairs_inspected": 4,
+      "files": ["ui/settings.slint", "ui/settings-controls.slint", "ui/settings-sections.slint"],
+      "groups": ["P3R1-G11", "P3R1-G25", "P3R1-G26", "P3R1-G27", "P3R1-G29"],
+      "changes": "Restore Paperwhite preview spacing and the 150 px preview; provide individual accurate unavailable reasons for unsupported policies, visible logging status, 118 px Scribe log actions, and a readable two-line device capability summary."
+    },
+    {
+      "owner": "handoff_panels/c4_tag_flow",
+      "pairs_inspected": 4,
+      "unique_pngs_inspected": 6,
+      "files": ["ui/tag-flow.slint", "ui/panels-catalog.slint"],
+      "groups": ["P3R1-G32", "P3R1-G33"],
+      "changes": "Measure real native label widths with a dedicated intrinsic layout, use stable contiguous pagination, preserve distinguishing suffixes for an oversized single label, and use check/cross state markers. Expose intrinsic-width and matching measurement/render text-weight inputs for shared summary/detail use. Accessibility roles are constant and decorative labels do not invent actions.",
+      "remote_gate": "The Slint intrinsic-layout getter, actual measured columns, first/final page reachability, and native glyph rendering require the C4 remote build and fresh screenshots."
+    },
+    {
+      "owner": "handoff_panels/c4_settings_data",
+      "pairs_inspected": 4,
+      "files": ["ui/settings-data.slint", "ui/settings-sections.slint"],
+      "groups": ["P3R1-G24", "P3R1-G28", "P3R1-G37", "P3R1-G38"],
+      "changes": "Render four real storage components, a bar only for a known scale, actual top-five records and totals, and accurate loading/partial/empty states from RAM State. Restore disabled category affordances and an immutable Uncategorized row. Wrap actual paths and expose the implemented full-path detail action. Separate dashed creation from solid management actions and preserve real repository pagination/removal.",
+      "data_boundary": "The scale describes tracked image data plus available filesystem space, not device capacity. Unknown components stay unknown; no UI filesystem/database query or fixture amount is introduced."
+    },
+    {
+      "owner": "handoff_panels/c4_panel_surfaces",
+      "pairs_inspected": 4,
+      "files": ["ui/panels-library.slint", "ui/panels-detail.slint"],
+      "groups": ["P3R1-G06", "P3R1-G16", "P3R1-G33", "P3R1-G42"],
+      "changes": "Prevent opaque pagers from covering queue/summary side and bottom rules. Include actual content, pagination, spacing, and padding in each surface; keep upward page-jump overlays above the frame. Use shared TagFlow for complete summary labels. Preserve native glyphs and wrapping while spacing book-summary lines to 32 px and adding a first-segment two-em rendering indent without mutating source text."
+    },
+    {
+      "owner": "handoff_panels/c4_more_icons",
+      "pairs_inspected": 2,
+      "files": ["ui/panels.slint"],
+      "groups": ["P3R1-G02", "P3R1-G19"],
+      "changes": "Use checked-square/folder library glyphs and correct Scribe detail action glyphs/gutters while preserving Paperwhite plain-text menus, real action IDs, disabled states, press inversion, confirmation dispatch, and outside capture."
+    }
+  ],
+  "prior_c4_local_repairs_preserved": [
+    "Library filter labels use the context-specific 16 px Paperwhite size and bounded widths without changing catalog tags.",
+    "Empty source preferences have an explicit contained Paperwhite sheet/Scribe popover with a real close action and an accurate empty declaration.",
+    "Source picker display names and compact connection states preserve the full accessible source name.",
+    "The current-book download-removal confirmation predicate remains connected to its real action.",
+    "The true three tap maps, independent reverse-tap preference, and cover-alone preference remain connected.",
+    "The redundant root parent-width binding in settings-tap-card.slint was removed; callers retain explicit dimensions."
+  ],
+  "coordinated_external_ui_work": {
+    "owner": "handoff_primary",
+    "groups": ["P3R1-G17", "P3R1-G40"],
+    "contract": "Library owns divider draw order. Detail uses the shared native TagFlow with 36 px items, 15 px text, weight 400, 16 px horizontal padding, 8 px gap, intrinsic widths, and at most four preview rows. More than four actual tags are previewed as the first three plus a visible remaining-count disclosure opening the full summary; the full State tag collection is preserved."
+  },
+  "verification_boundary": "Implementation dispositions are not finding closures. Root must build the complete frozen C4 source remotely, capture the complete reference/supplemental scope, and obtain two consecutive fresh clean rounds. Candidate3 reports and PNGs remain unchanged."
+}

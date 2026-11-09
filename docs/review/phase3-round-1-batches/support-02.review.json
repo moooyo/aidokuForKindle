@@ -1,0 +1,107 @@
+{
+  "batch_id": "support-02",
+  "reviewer": "/root/phase3_round1_review/support_02",
+  "reference_support_only": true,
+  "design_version": "1793901158-6c09",
+  "scope_document": "D:/Code/aidokuForKindle/docs/review/phase3-reference-scope.json",
+  "reviewed_reference_count": 3,
+  "candidate_verdict": "not-assessed",
+  "reviewed_references": [
+    {
+      "path": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/screens/pager-options.png",
+      "sha256": "F574D59F3A8C7C7DBFB004CBE9D62F41C32B73DB0DE3B1DE37CBEE6B370B92AC",
+      "viewed": true,
+      "role": "rejected-alternatives-reference",
+      "observations": [
+        "The board visibly presents three pager alternatives, with a Scribe library example on the left and a Paperwhite source-list example on the right.",
+        "Option B is explicitly marked as applied to all pages. It places text Previous/Next actions at the outer edges and a current/total folio in the center; the accompanying label says the center opens a page-jump panel.",
+        "The first-page B example shows 1/3 and only the right Next action. The 5/26 example shows both Previous and Next. The missing first-page action leaves the folio centered rather than shifting it left.",
+        "The current page numeral is darker and heavier than the total. The B pager has no enclosing control outline or numbered-button row; the line below belongs to the dock separation.",
+        "The dock has five icon-and-label destinations in the same order: Library, Browse, Search, History, Settings. Its current destination is identified with a short black top rule and darker icon/label.",
+        "Option A uses direct page numerals and ellipses, while option C uses outlined first/previous/next/last buttons. These are comparison alternatives, not additional product routes."
+      ],
+      "applicable_constraints": [
+        "Use option B as the adopted list folio. Preserve centered current/total with edge text navigation, without importing A's number strip or C's button group.",
+        "Unavailable edge navigation must retain its allocated space. The scope additionally requires first-page, last-page and one-page cases; the board itself only illustrates first-page and middle-page B examples.",
+        "The center folio is the page-jump trigger. The scoped jump panel must use a balanced page grid, an inverse current selection and outside dismissal; this board does not establish those interactions by execution.",
+        "Keep pager and dock as separate vertical regions. A pager must not replace the five-destination dock or be mistaken for an additional dock destination.",
+        "Page totals, current page and page membership must come from actual records. The displayed 1/3 and 5/26 are illustrative data.",
+        "Apply the folio only where the matching page/state contract calls for pagination. The options board does not create pagers for unpaged settings detail pages or the closed reader."
+      ],
+      "intentional_overrides": [
+        "Options A and C are intentionally excluded from implementation targets.",
+        "The adopted list folio does not authorize any closed-reader footer, ribbon or invisible footer-cycle hit zone; the user's pure-artwork reader rule remains higher priority."
+      ]
+    },
+    {
+      "path": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/overview-paperwhite.png",
+      "sha256": "61F0E7ABB0FA44FF26A7D57DA18BF40FC06A7B4256120D4AC7B37FA43AB4B4F5",
+      "viewed": true,
+      "role": "overview",
+      "observations": [
+        "The composite contains eight portrait boards, ordered left to right as Library, manga detail, menu-open reader, source management, a source catalog, search editing, history and settings.",
+        "Library presents a continuation card above a compact cover grid. Manga detail stacks book information and actions above the chapter directory rather than using the Scribe side-by-side structure.",
+        "Browse/source management is a source list. The separate MangaDex catalog is a paginated list of cover-and-text rows with a back control, rather than the top-level management screen.",
+        "The five-destination dock is visible on the top-level library, source-management, history and settings boards. Manga detail and the secondary source catalog have no dock; the reader has its own reading tools.",
+        "The search board shows a search field and source-scope controls above an on-screen keyboard occupying the bottom region. History uses a single column of date-grouped records, and settings uses a compact grouped navigation list.",
+        "List folios appear above the dock where the dock is present, and at the bottom of the content on paged secondary boards. Reader progress belongs to the open reader menu rather than the list-folio system.",
+        "The displayed reader has visible header, progress and tool chrome, so this frame documents an open menu. Its artwork and bookmark example cannot establish closed-reader decoration requirements."
+      ],
+      "applicable_constraints": [
+        "Use the existing scope mapping only: Main/library, pw-manga/manga-detail, pw-reader/reader, pw-browse/source-management, pw-source/source-catalog, pw-search/search, pw-history/history and pw-settings/settings. Adjacent overview frames are an inventory, not evidence for invented navigation transitions or new routes.",
+        "Preserve the Paperwhite distinction between top-level source management with a dock and secondary source catalog without a dock. The reader and manga detail likewise do not inherit the top-level dock.",
+        "Use option B for applicable list pagination. The scoped Paperwhite library folio sits above the 72-design-pixel dock; the individual page references remain necessary for exact placement and boundary states.",
+        "During search editing the keyboard occupies the dock region; result mode restores the dock under the scope contract. This overview supplies the editing topology only, not a result-state review.",
+        "Preserve a single-column detail and history topology. The scope specifies four-by-two library covers, six chapter rows on detail page one, twelve on later pages, and two settings-list pages; their per-state layout must be checked against the individual references.",
+        "Paperwhite non-reader routes remain portrait. The scope allows manual reader rotation and requires returning from a rotated reader to portrait non-reader pages.",
+        "The overview is support for page identity and structural relationships only. It cannot replace direct inspection of any applicable individual product reference."
+      ],
+      "intentional_overrides": [
+        "The closed reader always contains pure artwork after closing its menu and after resume. Do not retain a bookmark ribbon, footer, status or notification decoration, decorative gutter, or invisible lower-right footer-cycle hit zone from any reference example.",
+        "Hide unavailable hardware controls and their dependent rows/tools. The overview's device and reader examples do not establish frontlight, warmth, sensor, hardware dither or pen support.",
+        "Unavailable quality controls and external authentication must remain honestly disabled or explicitly unavailable. Reference selections, account examples and successful connection states are not evidence of implemented support.",
+        "Use actual titles, covers, counts, dates, capacities and operation states. Illustrative reference data does not waive navigation, clipping or geometry requirements."
+      ]
+    },
+    {
+      "path": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/overview-scribe.png",
+      "sha256": "9DA65F8706FA49AFC6E54DCFAAEADCDBDC76D6C4F3394ED00F541B92A133EBC4",
+      "viewed": true,
+      "role": "overview",
+      "observations": [
+        "The composite contains nine boards, ordered left to right as Library, manga detail, portrait menu-open reader, landscape menu-open reader, current-source catalog, source management, search editing, history and settings.",
+        "Library uses a denser cover grid with two summary cards above it. Manga detail separates the information/actions column on the left from a chapter directory on the right.",
+        "The current-source catalog is a cover grid and retains the top-level dock. Source management is a separate dock-bearing page with installed sources on the left and a paged available-source list on the right.",
+        "The search board shows an on-screen keyboard in the bottom region and a local result above it. History presents two columns of records under shared date headings. Settings uses a persistent left navigation column and a right content pane with the selected navigation row inverted.",
+        "The same Library, Browse, Search, History and Settings dock order recurs across top-level boards. Manga detail and the reader instead use their page-specific controls.",
+        "Both reader boards visibly have open menu chrome. The landscape board allocates artwork to two side-by-side pages and has a range-style progress display; portrait uses a single page allocation.",
+        "All non-reader boards shown are portrait. The two reader orientations coexist in the overview without supplying evidence of sensor availability or actual rotation behavior."
+      ],
+      "applicable_constraints": [
+        "Use the scope's existing mappings only: sc-library/library, sc-manga/manga-detail, sc-reader-portrait/reader portrait, sc-reader/reader landscape, sc-browse/source-catalog, sc-sources/source-management, sc-search/search, sc-history/history and sc-settings/settings. The overview adds no routes or transition edges.",
+        "Preserve the Scribe distinction from Paperwhite: Browse opens the current-source catalog with its dock, while source management is a separate page. Do not replace these with the Paperwhite source-list topology.",
+        "Preserve independent column ownership: manga detail has an information column plus a directory; source-management pagination applies to the right list while the installed-source column remains stable; settings navigation stays separate from its content pane.",
+        "Use the scoped geometry and matching individual images for exact values, including the 384-design-pixel manga information column, 400-design-pixel installed-source column and 320-design-pixel settings navigation column. The overview does not justify equal-width substitutions or measured pixel acceptance.",
+        "Use option B on applicable lists, above the 80-design-pixel Scribe dock where present. The scoped library is six by three and the catalog is five by three; settings has no list pager in the default two-pane view.",
+        "Keep keyboard editing in the dock region and restore the dock in result mode. Preserve the history's shared date groups across two columns rather than creating independent chronological lists.",
+        "Keep non-reader pages portrait. Reader sensor-follow is conditional on a real sensor; a rotated-reader return must restore the non-reader portrait layout.",
+        "The landscape reader's two artwork allocations do not authorize a decorative seam. Menu-open progress and tools remain separate from list navigation, and the individual reader references govern their exact form."
+      ],
+      "intentional_overrides": [
+        "The closed portrait and landscape readers always contain pure artwork. Any reference bookmark ribbon, footer label, status or notification decoration, decorative gutter, or invisible footer-cycle region is overridden, including after menu close and resume.",
+        "Hide unsupported frontlight, warmth, sensor, hardware dither and pen controls, together with dependent rows/tools. Portrait/landscape examples do not prove that automatic rotation or other device hardware exists.",
+        "Unavailable quality controls and external authentication must be honestly disabled or explicitly unavailable. Do not imitate selected quality modes, linked accounts, device codes, QR authorization, countdowns or successful completion without real integration state.",
+        "Sample covers, counts, device information, dates, capacities and source/account state remain illustrative. Actual data may differ while the applicable structural constraints remain in force."
+      ]
+    }
+  ],
+  "limitations": [
+    "Exactly the three PNG paths listed in support-02.input.json were opened and visually inspected with tools.view_image. No other reference or candidate image was loaded by this reviewer.",
+    "The wide overviews were displayed as reduced whole-board composites. They support topology and navigation-region observations, not fine typography, exact geometry or per-state pixel judgments.",
+    "Scope-backed identifiers, geometry and behavioral requirements are distinguished from visible overview observations. No route transitions were inferred merely from the order of the composite frames.",
+    "This support review does not replace the original 101 product-reference image inspections or review of every applicable frozen candidate state. Options A and C are excluded alternatives, not missing routes.",
+    "No candidate screenshot, source snapshot, binary, runtime capability declaration or interaction evidence was reviewed. This record cannot establish a candidate pass, complete matrix coverage, a clean round or progress toward the two-round acceptance streak.",
+    "Static images cannot establish actual page-jump behavior, first/last/one-page handling, outside dismissal, keyboard transitions, rotation, authorization, hardware support, real operation state, performance or resume behavior.",
+    "Only text reads, the three image reads, SHA256 hashing and this review-document write were performed. No app, runnable prototype, build, test, validation suite, runtime probe or git command was run, and no product file was changed."
+  ]
+}

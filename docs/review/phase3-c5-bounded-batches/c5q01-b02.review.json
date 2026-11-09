@@ -1,0 +1,188 @@
+{
+  "schema_version": 1,
+  "batch_id": "c5q01-b02",
+  "reviewer": "/root/final_validation_delivery/c4_full_review_coordinator/c5q01_b02",
+  "run_id": "43d2545cb872",
+  "round": 3,
+  "manifest_sha256": "1731e4306df0596e80edd7df2d3e5e57c34fc64feae44572011eba61c2bfc7c5",
+  "inventory_sha256": "d65f77a634219f545fa9adfdfbd4bbcb2838ca77efa04a5cb7254ad3e6434c7d",
+  "transfer_accounting_sha256": "7bdd0e209d11d95f60bc921405af8f360cf20332b6cacb1d784954341ab3721b",
+  "sha_provenance": "Owner-frozen inventory identities supplied by the assigned input; no local rehash or automated identity validation was performed.",
+  "freeze_tuple": {
+    "source_file_count": 227,
+    "source_sha256": "892f0ac73a807e4fd61a235d9ad4fe00c4f03c1e4e6881f28b2dd8bee2b7ddf1",
+    "binary_sha256": "9bd66a1f89473218e67558f763a4a7d4da7c642f9960ae5430ceb74ac365129b",
+    "harness_sha256": "94ccc78d3c11b97791618527350ce59dacf458bfc57f8f04aabec045dd544a74",
+    "capture_plan_sha256": "b3adabbf4f2d33789f381dc2ac55474d89fcd210d58ce9e5083c0d818d547eec",
+    "reference_scope_sha256": "c910bed9f02ed17b2ca0a54aca1beeeeb6caabc5a17a91afe764ddd3e7b0d33c",
+    "reference_sha256": "e7b49b456255432d74cfe41346f9d44c1a9c55bf67c5d55483e4ae3029547d18",
+    "capture_helper_sha256": {
+      "verify-ui.py": "470872e6fd22a78b474c0f862164875ad9c7237bd2f3f164512864580ac1e90d",
+      "verify-fullscreen.py": "4a6c48cef771e66e9b3058edd888dcf2d4bce02e2720b5cc00c7a5b987bc9670",
+      "handoff_c4_business.py": "6197f375b247962e3ce9acdd3779468073f11e0002ac3c7ce876a7b1a0d0d9be",
+      "handoff_c5_ui.py": "fa30ef2bf8ab512e9705f43933ff6acaf32993e5aa1dbc62be330d4c97b481f2",
+      "handoff_c5_reader.py": "5b88a0c1b8e1151a3f96decef1a3a06f98a0d9de99908709bafbfb02cea490d5"
+    }
+  },
+  "method": "Static reads of assigned frozen case/state/action/metadata/log fields and direct tools.view_image opens of all assigned original PNGs; UI/UX Pro Max priority guidance was read without running its search tool.",
+  "identity_observation": "All five case documents declare the supplied round, run, source and binary identities. All five capture metadata documents declare the Scribe desktop profile, portrait orientation and a 930x1240 snapshot. No conflicting declaration was observed in the fields read.",
+  "image_opens": { "candidate_originals": 5, "reference_originals": 2, "total": 7, "crops": 0 },
+  "reviewed_case_ids": [
+    "sc-browse--filter",
+    "sc-settings--default",
+    "scribe--c5-tag-control--filter-tags-first",
+    "scribe--c5-tag-control--filter-tag-page-1",
+    "scribe--c5-tag-control--filter-tag-page-6"
+  ],
+  "cases": [
+    {
+      "case_id": "sc-browse--filter",
+      "png_path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate5/ui-qualification-01/sc-browse--filter.png",
+      "evidence_sha256": {
+        "png": "ad7dd3ab86b850867499a5f9677a937d828968ec197ff5959cd4bfe0126e7138",
+        "case_json": "846164d443f45e55adb47d438569895f20e29be93294496a47ab620cc0f59818",
+        "state": "a8e3fc225efda8e4111cfe5169fcc1eeec3ec4d2aa677afd94cd1ad7c5f1cbfe",
+        "actions": "97498c0a800999be91f169be14fc8b046abbbe6d353122c462bc1e06a5f0adfc",
+        "metadata": "8edfa13686f480af94912f5710fc4e7d07d8624e8a0d6dcbe0daf4a8e4ec8d98",
+        "log": "7e68a4176710a866675a6b95bcf7bed2d96c58a8fd7996a4d48f3679514483a9"
+      },
+      "actual_view": { "original_opened": true, "reference_id": "sc-browse--filter", "basis": "Applicable exported filter design with actual data, selection and capability bounds." },
+      "observations": {
+        "chip": "Nine neutral tags form six chips then three left-aligned chips. The short final row keeps content widths and leaves visible unused space to its right.",
+        "layout": "Sort, publication status and tag groups have separate captions; reset stays at the upper right and the wide results button clears the final tag row.",
+        "font": "Chinese tag labels, the longer stopped-updating status and the loaded-128 results caption are legible without clipping or collision.",
+        "boundary": "The bordered popup remains inside the right viewport edge; individual outlined controls and inter-chip gaps are distinguishable.",
+        "affordance": "Relevance is black-selected, follows/rating are gray-disabled, and the neutral filter trigger agrees with zero active filters. Reset and apply remain recognizable actions."
+      },
+      "intentional_and_capability_check": "The case lists no intentional differences. C4-C5-G04 is visibly satisfied for these chips. Actual neutral tags, zero active filters and 128 loaded results explain differences from the selected reference sample; disabled follows/rating agree with frozen enabled=false options and C4-ACCEPT-04.",
+      "action_and_state_support": "The scheduled filter-menu action and frozen catalog/choices/catalog-filter state support the displayed popup; the log records desktop window readiness only.",
+      "static_verdict": "no_actionable_issue_observed",
+      "behavior_limits": ["No reset/apply outcome or exclusion-state cycle was observed in this PNG.", "The image does not prove hit testing, physical touch, timing or hardware behavior."]
+    },
+    {
+      "case_id": "sc-settings--default",
+      "png_path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate5/ui-qualification-01/sc-settings--default.png",
+      "evidence_sha256": {
+        "png": "f8dae2b576dcc778d4eaa7c9101f723fbcaaf4266f32d616c7cc797e17fcd8e2",
+        "case_json": "a60468fb2ec0a55b601550028b813a4138bf2306683a79322b01bb4408d54623",
+        "state": "903ee4849ec869100efb834c2d954d0c6a224637deeee28b1fa201affbd4b4e3",
+        "actions": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+        "metadata": "e129006eefde03da81121c363abc3bfdd9e4fdf419e840d18c0d58738a3fbaba",
+        "log": "7e68a4176710a866675a6b95bcf7bed2d96c58a8fd7996a4d48f3679514483a9"
+      },
+      "actual_view": { "original_opened": true, "reference_id": "sc-settings--default", "basis": "Applicable settings design under the approved truthful-unavailable and fixed-on contract." },
+      "observations": {
+        "chip": "No tag chips are present. Five refresh choices fit one row; the six-page choice is distinctly black-selected.",
+        "layout": "The sidebar and settings pane maintain clear columns. Refresh choices, unavailable quality rows, policy switches and the grayscale strip have distinct vertical groups.",
+        "font": "The explicit unavailable quality caption and fixed-on chapter-refresh caption are readable in gray; headings and sidebar labels remain legible.",
+        "boundary": "All three quality rows have separate outlines. The fixed-on switch shows a black track and a gray knob on the right, with row dividers separating adjacent switches.",
+        "affordance": "The fixed-on row looks disabled while remaining on. The editable clear-residual switch is on with a white right knob; night mode is visibly off with a left knob."
+      },
+      "intentional_and_capability_check": "The case lists no intentional differences. Unavailable quality choices, the fixed-on policy and the omitted unsupported pen control are consistent with C4-ACCEPT-04 rather than requirements to imitate enabled sample controls. The desktop capability declaration explicitly denies physical hardware qualification; profile text is not sensor evidence.",
+      "action_and_state_support": "The action file is empty. Frozen settings/screen-refresh state and refresh_every=6 agree with the selected section and interval; the captured fixed-on row meets the visible requirement.",
+      "static_verdict": "no_actionable_issue_observed",
+      "behavior_limits": ["The disabled appearance cannot establish that the policy rejects editing or persists across sessions.", "The grayscale strip and device header do not qualify e-ink, dithering, sensors or actual device hardware."]
+    },
+    {
+      "case_id": "scribe--c5-tag-control--filter-tags-first",
+      "png_path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate5/ui-qualification-01/scribe--c5-tag-control--filter-tags-first.png",
+      "evidence_sha256": {
+        "png": "511db64a58cd86b0277b1d401e326e88dd5fe3b5950a48228e9f475494eca9ac",
+        "case_json": "236360d5595d61cccfe85f7a7f5712cf03c1b14a60a1bc8c9ec4049c3652cd09",
+        "state": "8a31ec287471904a368a3d92f6063e501877716770c5a929f3ccd7643f5a7db1",
+        "actions": "93cec1c18b6b18fe09cdb3171179c6772da1899e8cc4dcb4714af18e9f08b485",
+        "metadata": "5fe2adc103da126310445401454de3e893bf1ddf8e89fe3882dce7f77693c2c8",
+        "log": "7e68a4176710a866675a6b95bcf7bed2d96c58a8fd7996a4d48f3679514483a9"
+      },
+      "actual_view": { "original_opened": true, "reference_id": null, "related_reference_id": "sc-browse--filter", "basis": "Supplemental real fixture-tag state; no exact exported reference." },
+      "observations": {
+        "chip": "Six neutral outlined chips form three columns and two rows. Actual tag 00 through 05 are fully visible with separate boundaries and stable gaps.",
+        "layout": "The longer fixture source header fits beside its switch. Tag pagination occupies its own row between the chips and the results action.",
+        "font": "Every numeric suffix is distinguishable; neither tag text nor the 1/6 folio is ellipsized or overlapped.",
+        "boundary": "The white popup border, six chip outlines and wide black apply button remain separate; no control crosses the popup edge.",
+        "affordance": "Previous is gray-disabled, next is black-enabled and the filter trigger is neutral. The apply caption truthfully says 20 loaded items."
+      },
+      "intentional_and_capability_check": "Frozen Komga state reports a connected source, 34 tag options and zero active filters. Actual fixture labels and six-page pagination are accepted data variations; the related design reference does not define an exact tag-page oracle. Disabled follows/rating agree with actual capability options.",
+      "action_and_state_support": "Three scheduled actions open Komga, open the filter and reset it. Frozen visible tag states are neutral and agree with the screenshot; native_tag_geometry declares page size six and page count six.",
+      "static_verdict": "no_actionable_issue_observed",
+      "behavior_limits": ["Only the first neutral page was viewed; no complete 34-tag sweep or exclusion state was observed.", "Frozen scheduled actions and final state are supporting artifacts, not a new independent execution."]
+    },
+    {
+      "case_id": "scribe--c5-tag-control--filter-tag-page-1",
+      "png_path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate5/ui-qualification-01/scribe--c5-tag-control--filter-tag-page-1.png",
+      "evidence_sha256": {
+        "png": "55c803aea04e76244c89b6046664773b4b50cd88b342487252fedceaa29885f1",
+        "case_json": "098c2f6433635f280157c6dd702f373dffc5c296759731542e974eb4fbf8cf80",
+        "state": "c6a245914043012296c749ca9773d83478c367abdc1cf36630ca80011afed9b9",
+        "actions": "f253f1333bfc6643534ba050ae61df8727da7dc587e0da3fb825ab911064c43a",
+        "metadata": "d45dcf17d9ffb9ebc3c7adc23e06902bc9099d45396c2ff440e7cd2bcc76ca6b",
+        "log": "7e68a4176710a866675a6b95bcf7bed2d96c58a8fd7996a4d48f3679514483a9"
+      },
+      "actual_view": { "original_opened": true, "reference_id": null, "related_reference_id": "sc-browse--filter", "basis": "Supplemental selected first tag page; no exact exported reference." },
+      "observations": {
+        "chip": "All six chips are black with distinct white checkmarks. The 00 through 05 suffixes remain fully readable after selection.",
+        "layout": "The selected controls retain the neutral page's three-by-two arrangement. Pagination and the results action remain below the chips with visible clearance.",
+        "font": "Checkmarks do not collide with label text; no selected label is truncated, wrapped or obscured.",
+        "boundary": "Adjacent black chips remain separated by white gaps, so individual control edges are identifiable.",
+        "affordance": "The filter trigger becomes black with six active tags. The first-page previous/next styling and 1/6 folio remain clear."
+      },
+      "intentional_and_capability_check": "Frozen first-six tag states are inclusion state 1 and active_filter_count=6, matching the six checks. C4-C5-G04 is satisfied for the assigned selected chips; the fixture data and loaded count are not required to match the sample reference.",
+      "action_and_state_support": "The 21 scheduled actions contain setup plus six pointer move/press/release triplets at the frozen observed chip centers. The resulting frozen tag states and displayed checks agree.",
+      "static_verdict": "no_actionable_issue_observed",
+      "behavior_limits": ["The final image supports inclusion-state presentation only; it does not demonstrate the neutral/include/exclude cycle or persistence.", "Pointer schedules and captured state do not establish physical touch mapping, timing or independent live operation."]
+    },
+    {
+      "case_id": "scribe--c5-tag-control--filter-tag-page-6",
+      "png_path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate5/ui-qualification-01/scribe--c5-tag-control--filter-tag-page-6.png",
+      "evidence_sha256": {
+        "png": "4c9529e1e430b07a15480730136074ad45198190e3bccef7e9b4f33e7d5978f8",
+        "case_json": "e99b15fc5dc26d584ef266c796cbb460f1dcff729c9e0735813ad14e76468542",
+        "state": "3ff83ac9ac979d96dc4989d27eedf8774a7f8cb8327d7067ba5624089eca93e0",
+        "actions": "0a97ba306f46fcfa1f7f4b5e00ac7c3bb0c4ff1af81eb89c0ca04d9480b449f4",
+        "metadata": "60ea63ceab3d3402a50a70c6736cc173e6b33ca4500f7d8d2bd86829db22f224",
+        "log": "7e68a4176710a866675a6b95bcf7bed2d96c58a8fd7996a4d48f3679514483a9"
+      },
+      "actual_view": { "original_opened": true, "reference_id": null, "related_reference_id": "sc-browse--filter", "basis": "Supplemental selected final tag page; no exact exported reference." },
+      "observations": {
+        "chip": "Actual tag 30, Actual tag 31 and Adventure occupy the first row; the shorter Mystery chip is alone at the left of the second row and does not stretch. All four inclusion checkmarks are visible.",
+        "layout": "The final partial row preserves unused horizontal space. The modal's 6/6 folio is spatially distinct from the underlying catalog's 1/2 folio.",
+        "font": "The 30 and 31 suffixes, Adventure and Mystery are completely readable with room between checks and text.",
+        "boundary": "The varied intrinsic widths and the short second-row boundary are clear; chips, pager and apply button do not overlap.",
+        "affordance": "Previous is black-enabled and next is gray-disabled at 6/6. The active filter trigger agrees with four selected tags."
+      },
+      "intentional_and_capability_check": "Frozen final-four tag states are inclusion state 1 with active_filter_count=4. The visible short tail row satisfies C4-C5-G04; actual fixture tags and final-page composition are data variations, not an invented exact reference pair.",
+      "action_and_state_support": "The 30 scheduled actions contain setup, five next-page pointer triplets and four tag-selection triplets. The final-page geometry declaration, four frozen inclusion states and visible 6/6 page agree.",
+      "static_verdict": "no_actionable_issue_observed",
+      "behavior_limits": ["The five intermediate transitions are supported by frozen schedules, not directly observed frames; pages 2 through 5 were not opened in this batch.", "No exclusion-state presentation, backward-navigation outcome or physical touch behavior was qualified."]
+    }
+  ],
+  "references": [
+    {
+      "reference_id": "sc-browse--filter",
+      "path": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/screens/states/sc-browse--filter.png",
+      "sha256": "fc4e1eb1a853240fc1f6019ffb447cd1a04b85fd4ddfe1af8d233e113195532e",
+      "original_opened": true,
+      "observed": "The exported design shows the bordered filter popup, grouped sort/status controls, intrinsic wrapping tags, reset and wide results action. It includes sample selections and counts; these are not imposed on actual data."
+    },
+    {
+      "reference_id": "sc-settings--default",
+      "path": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/screens/sc-settings.png",
+      "sha256": "d662725b6151b4cd4ac8d869e9548f98edfa9ee32a1b6e5906356507bdcd32fb",
+      "original_opened": true,
+      "observed": "The exported design establishes settings columns, interval choices, quality rows, switch alignment and grayscale strip. Enabled sample quality/pen/hardware controls are bounded by C4-ACCEPT-04."
+    }
+  ],
+  "findings": [],
+  "suggestions": [],
+  "evidence_gaps": [
+    "The three fixture-tag cases have related design-contract comparisons only; this batch contains two exported-reference comparisons, not five exact pairs.",
+    "Intermediate tag pages 2 through 5 and an exclusion-state image are outside the assigned seven-image view. Full tri-state behavior and the complete collection in both full rounds remain unqualified by this batch."
+  ],
+  "limitations": [
+    "Seven original files were opened. The viewer displayed each 1860x2480 reference at 1368x1824; no crop or image processing was requested, and no unreadable assigned detail required escalation.",
+    "No application, test, build, probe, hash, SQL, SSH, new capture or current-production inspection was performed. Startup logs alone are not interaction proof.",
+    "Static screenshots and frozen action/state support do not qualify physical touch, e-ink effects, sensors, native mapping, timing or the independent live-reader lease.",
+    "This is a bounded frozen-C5 static review with no new actionable observation; it is not a full-suite or clean-round claim."
+  ],
+  "sealed": true
+}

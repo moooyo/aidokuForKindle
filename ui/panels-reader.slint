@@ -1,0 +1,663 @@
+import { State, Commands } from "state.slint";
+import { Theme } from "theme.slint";
+import { Strings } from "strings.slint";
+import { BodyText, TitleText, Caption, Icon, DottedRule, PageBar } from "widgets.slint";
+
+component ReaderPanelTitle inherits TitleText {
+    x: 0px;
+    y: 0px;
+    height: State.large-screen ? 31.5px : 27px;
+    font-size: State.large-screen ? 21px : 18px;
+    letter-spacing: State.large-screen ? 3px : 2px;
+}
+
+component ReaderChoiceCard inherits Rectangle {
+    x: 0px;
+    y: 0px;
+    in property <string> text;
+    in property <string> diagram;
+    in property <bool> selected;
+    in property <bool> enabled: true;
+    in property <bool> horizontal: false;
+    in property <length> diagram-width: State.large-screen ? 56px : 48px;
+    in property <length> diagram-height: State.large-screen ? 46px : 40px;
+    in property <float> diagram-viewbox-height: 40;
+    in property <length> diagram-stroke-width: State.large-screen ? 1.7px : 1.8px;
+    callback clicked();
+    property <bool> inverted: root.enabled && (root.selected != hit.pressed);
+    property <color> foreground: !root.enabled ? Theme.disabled : root.inverted ? Theme.paper : Theme.ink;
+    border-width: 1.5px;
+    border-color: !root.enabled ? Theme.dotted : root.selected ? Theme.ink : Theme.dotted;
+    border-radius: 4px;
+    background: root.inverted ? Theme.ink : Theme.paper;
+    accessible-role: radio-button;
+    accessible-label: root.text;
+    accessible-enabled: root.enabled;
+    accessible-checkable: true;
+    accessible-checked: root.selected;
+    Path {
+        x: root.horizontal ? (parent.width - self.width - card-label.preferred-width - 6px) / 2 : (parent.width - self.width) / 2;
+        y: root.horizontal ? (parent.height - self.height) / 2 : (parent.height - root.diagram-height - (State.large-screen ? 32px : 27px)) / 2;
+        width: root.diagram-width;
+        height: root.diagram-height;
+        viewbox-width: 48;
+        viewbox-height: root.diagram-viewbox-height;
+        commands: root.diagram;
+        fill: transparent;
+        stroke: root.foreground;
+        stroke-width: root.diagram-stroke-width;
+        stroke-line-cap: round;
+        stroke-line-join: round;
+    }
+    card-label := BodyText {
+        x: root.horizontal ? (parent.width - root.diagram-width - self.preferred-width - 6px) / 2 + root.diagram-width + 6px : 2px;
+        y: root.horizontal ? 0px : (parent.height + root.diagram-height - (State.large-screen ? 16px : 15px)) / 2;
+        width: root.horizontal ? self.preferred-width : parent.width - 4px;
+        height: root.horizontal ? parent.height : State.large-screen ? 24px : 21px;
+        text: root.text;
+        font-size: State.large-screen ? 16px : 14px;
+        font-weight: root.selected ? 700 : 500;
+        color: root.foreground;
+        horizontal-alignment: center;
+    }
+    hit := TouchArea {
+        enabled: root.enabled;
+        x: (parent.width - max(parent.width, Theme.touch)) / 2;
+        y: (parent.height - max(parent.height, Theme.touch)) / 2;
+        width: max(parent.width, Theme.touch);
+        height: max(parent.height, Theme.touch);
+        pointer-event(event) => {
+            if event.kind == PointerEventKind.down { Commands.refresh("fast"); }
+            else if event.kind == PointerEventKind.up || event.kind == PointerEventKind.cancel { Commands.refresh("ui"); }
+        }
+        clicked => { root.clicked(); }
+    }
+}
+
+component ReaderSegment inherits Rectangle {
+    x: 0px;
+    y: 0px;
+    in property <string> text;
+    in property <bool> selected;
+    in property <bool> enabled: true;
+    in property <bool> outlined: true;
+    in property <bool> strong-outline: false;
+    in property <string> text-family: Theme.numbers;
+    in property <length> text-size: State.large-screen ? 15px : 14px;
+    callback clicked();
+    property <bool> inverted: root.enabled && (root.selected != hit.pressed);
+    height: State.large-screen ? 44px : 40px;
+    border-width: root.outlined ? 1.5px : 0px;
+    border-color: !root.enabled ? Theme.dotted : root.selected || root.strong-outline ? Theme.ink : Theme.dotted;
+    border-radius: 4px;
+    background: root.inverted ? Theme.ink : Theme.paper;
+    accessible-role: button;
+    accessible-label: root.text;
+    accessible-enabled: root.enabled;
+    Text {
+        x: 0px;
+        y: 0px;
+        width: parent.width;
+        height: parent.height;
+        text: root.text;
+        font-family: root.text-family;
+        font-size: root.text-size;
+        font-weight: root.selected ? 700 : 500;
+        color: !root.enabled ? Theme.disabled : root.inverted ? Theme.paper : Theme.ink;
+        horizontal-alignment: center;
+        vertical-alignment: center;
+    }
+    hit := TouchArea {
+        enabled: root.enabled;
+        x: (parent.width - max(parent.width, Theme.touch)) / 2;
+        y: (parent.height - max(parent.height, Theme.touch)) / 2;
+        width: max(parent.width, Theme.touch);
+        height: max(parent.height, Theme.touch);
+        pointer-event(event) => {
+            if event.kind == PointerEventKind.down { Commands.refresh("fast"); }
+            else if event.kind == PointerEventKind.up || event.kind == PointerEventKind.cancel { Commands.refresh("ui"); }
+        }
+        clicked => { root.clicked(); }
+    }
+}
+
+component ReaderSwitch inherits Rectangle {
+    x: 0px;
+    y: 0px;
+    in property <string> text;
+    in property <bool> value;
+    in property <bool> enabled: true;
+    in property <string> status;
+    callback toggled();
+    property <color> foreground: !root.enabled ? Theme.disabled : hit.pressed ? Theme.paper : Theme.ink;
+    height: State.large-screen ? 52px : 46px;
+    background: hit.pressed ? Theme.ink : Theme.paper;
+    accessible-role: switch;
+    accessible-label: root.status == "" ? root.text : root.text + " · " + root.status;
+    accessible-enabled: root.enabled;
+    accessible-checkable: true;
+    accessible-checked: root.value;
+    Rectangle { x: 0px; y: 0px; width: parent.width; height: 1px; background: Theme.line; }
+    BodyText {
+        x: 0px;
+        y: 0px;
+        width: max(0px, status-label.x - (root.status == "" ? 0px : 8px));
+        height: parent.height;
+        text: root.text;
+        font-size: State.large-screen ? 17px : 15px;
+        color: root.foreground;
+    }
+    status-label := Caption {
+        x: track.x - self.width - 12px;
+        y: 0px;
+        width: root.status == "" ? 0px : State.large-screen ? 90px : 80px;
+        height: parent.height;
+        text: root.status;
+        font-size: State.large-screen ? 15px : 13px;
+        horizontal-alignment: right;
+    }
+    track := Rectangle {
+        x: parent.width - self.width;
+        y: (parent.height - self.height) / 2;
+        width: State.large-screen ? 52px : 48px;
+        height: State.large-screen ? 30px : 28px;
+        border-width: 1.5px;
+        border-color: root.foreground;
+        border-radius: 4px;
+        background: root.value != hit.pressed ? Theme.ink : Theme.paper;
+        Rectangle {
+            x: root.value ? (State.large-screen ? 24px : 22px) : 3px;
+            y: 3px;
+            width: State.large-screen ? 21px : 19px;
+            height: self.width;
+            border-radius: State.large-screen ? 3px : 4px;
+            background: root.value != hit.pressed ? Theme.paper : root.foreground;
+        }
+    }
+    hit := TouchArea {
+        enabled: root.enabled;
+        x: 0px;
+        y: 0px;
+        width: parent.width;
+        height: parent.height;
+        pointer-event(event) => {
+            if event.kind == PointerEventKind.down { Commands.refresh("fast"); }
+            else if event.kind == PointerEventKind.up || event.kind == PointerEventKind.cancel { Commands.refresh("ui"); }
+        }
+        clicked => { root.toggled(); }
+    }
+}
+
+component ReaderLightSlider inherits Rectangle {
+    x: 0px;
+    y: 0px;
+    in property <string> text;
+    in property <string> setting;
+    in property <int> value;
+    in property <bool> warmth: false;
+    property <bool> dragging: false;
+    property <int> preview: root.value;
+    property <int> input-epoch: State.reader-input-epoch;
+    property <int> drag-epoch: 0;
+    property <int> shown-value: root.dragging ? root.preview : root.value;
+    property <length> control-size: State.large-screen ? 44px : 40px;
+    property <length> controls-y: State.large-screen ? 26px : 23px;
+    property <length> track-left: root.control-size + 10px;
+    property <length> track-width: max(1px, root.width - root.track-left * 2);
+    property <float> fraction: clamp(root.shown-value / 24.0, 0, 1);
+    height: State.large-screen ? 70px : 64px;
+    changed input-epoch => { root.dragging = false; }
+    function value-at(position: length) -> int {
+        return clamp(round(position / root.track-width * 24), 0, 24);
+    }
+    BodyText { x: 0px; y: 0px; width: parent.width - 72px; height: root.controls-y - 2px; text: root.text; font-size: State.large-screen ? 16px : 14px; }
+    Text {
+        x: parent.width - 72px; y: 0px; width: 72px; height: root.controls-y - 2px;
+        text: root.shown-value; font-family: Theme.numbers; font-size: State.large-screen ? 16px : 14px;
+        font-weight: 700; color: Theme.ink; horizontal-alignment: right; vertical-alignment: center;
+    }
+    Rectangle {
+        x: 0px; y: root.controls-y; width: root.control-size; height: root.control-size;
+        background: low-touch.pressed ? Theme.ink : Theme.paper;
+        Path {
+            x: (parent.width - self.width) / 2; y: (parent.height - self.height) / 2;
+            width: root.warmth ? (State.large-screen ? 22px : 20px) : (State.large-screen ? 20px : 18px);
+            height: self.width; viewbox-width: 24; viewbox-height: 24;
+            commands: root.warmth ? "M12 3v18M4.2 7.5l15.6 9M4.2 16.5l15.6-9" : "M12 9a3 3 0 1 0 0 6a3 3 0 1 0 0-6zM12 4v1.5M12 18.5V20M4 12h1.5M18.5 12H20";
+            fill: transparent; stroke: low-touch.pressed ? Theme.paper : Theme.ink; stroke-width: 2px; stroke-line-cap: round;
+        }
+        low-touch := TouchArea {
+            enabled: root.value > 0;
+            x: (parent.width - max(parent.width, Theme.touch)) / 2;
+            y: (parent.height - max(parent.height, Theme.touch)) / 2;
+            width: max(parent.width, Theme.touch);
+            height: max(parent.height, Theme.touch);
+            clicked => { Commands.action("settings", "set", root.setting + "=" + max(0, root.value - 1)); }
+            pointer-event(event) => { if event.kind == PointerEventKind.down { Commands.refresh("fast"); } else if event.kind == PointerEventKind.up || event.kind == PointerEventKind.cancel { Commands.refresh("ui"); } }
+        }
+    }
+    Rectangle {
+        x: root.track-left; y: root.controls-y + root.control-size / 2 - 2px;
+        width: root.track-width; height: 4px; background: Theme.line; border-radius: 2px;
+        Rectangle { x: 0px; y: 0px; width: parent.width * root.fraction; height: parent.height; background: Theme.ink; border-radius: 2px; }
+        Rectangle {
+            x: parent.width * root.fraction - self.width / 2; y: (parent.height - self.height) / 2;
+            width: State.large-screen ? 26px : 24px; height: self.width;
+            background: Theme.paper; border-width: 1.5px; border-color: Theme.ink; border-radius: 3px;
+            Rectangle { x: 4px; y: 4px; width: parent.width - 8px; height: parent.height - 8px; background: Theme.ink; }
+        }
+    }
+    slider-touch := TouchArea {
+        x: root.track-left; y: root.controls-y + (root.control-size - max(root.control-size, Theme.touch)) / 2;
+        width: root.track-width; height: max(root.control-size, Theme.touch);
+        accessible-role: slider; accessible-label: root.text + " " + root.shown-value;
+        moved => {
+            if self.pressed && root.dragging && root.drag-epoch == State.reader-input-epoch {
+                root.preview = root.value-at(self.mouse-x);
+                Commands.refresh("fast");
+            }
+        }
+        pointer-event(event) => {
+            if event.kind == PointerEventKind.down {
+                root.drag-epoch = State.reader-input-epoch;
+                root.preview = root.value-at(self.mouse-x);
+                root.dragging = true;
+                Commands.refresh("fast");
+            } else if event.kind == PointerEventKind.up {
+                if root.dragging && root.drag-epoch == State.reader-input-epoch {
+                    root.preview = root.value-at(self.mouse-x);
+                    root.dragging = false;
+                    Commands.action("settings", "set", root.setting + "=" + root.preview);
+                }
+                root.dragging = false;
+            } else if event.kind == PointerEventKind.cancel {
+                root.dragging = false;
+                Commands.refresh("ui");
+            }
+        }
+    }
+    Rectangle {
+        x: parent.width - root.control-size; y: root.controls-y; width: root.control-size; height: root.control-size;
+        background: high-touch.pressed ? Theme.ink : Theme.paper;
+        Path {
+            x: (parent.width - self.width) / 2; y: (parent.height - self.height) / 2;
+            width: State.large-screen ? 26px : 24px; height: self.width; viewbox-width: 24; viewbox-height: 24;
+            commands: root.warmth ? "M12 3c3 4 5 6.5 5 10a5 5 0 0 1-10 0c0-3.5 2-6 5-10z" : "M12 7.5a4.5 4.5 0 1 0 0 9a4.5 4.5 0 1 0 0-9zM12 1.5v2.5M12 20v2.5M1.5 12H4M20 12h2.5M4.6 4.6l1.8 1.8M17.6 17.6l1.8 1.8M4.6 19.4l1.8-1.8M17.6 6.4l1.8-1.8";
+            fill: transparent; stroke: high-touch.pressed ? Theme.paper : Theme.ink; stroke-width: 2px; stroke-line-cap: round;
+        }
+        high-touch := TouchArea {
+            enabled: root.value < 24;
+            x: (parent.width - max(parent.width, Theme.touch)) / 2;
+            y: (parent.height - max(parent.height, Theme.touch)) / 2;
+            width: max(parent.width, Theme.touch);
+            height: max(parent.height, Theme.touch);
+            clicked => { Commands.action("settings", "set", root.setting + "=" + min(24, root.value + 1)); }
+            pointer-event(event) => { if event.kind == PointerEventKind.down { Commands.refresh("fast"); } else if event.kind == PointerEventKind.up || event.kind == PointerEventKind.cancel { Commands.refresh("ui"); } }
+        }
+    }
+}
+
+component ReaderContrast inherits Rectangle {
+    x: 0px;
+    y: 0px;
+    height: State.large-screen ? 80px : 69px;
+    property <length> button-size: State.large-screen ? 44px : 40px;
+    property <length> controls-y: State.large-screen ? 36px : 29px;
+    property <length> gap: State.large-screen ? 6px : 5px;
+    property <length> steps-width: max(0px, root.width - root.button-size * 2 - 20px);
+    BodyText { x: 0px; y: 0px; width: parent.width - 80px; height: State.large-screen ? 24px : 21px; text: Strings.contrast; font-size: State.large-screen ? 16px : 14px; }
+    Text {
+        x: parent.width - 80px; y: 0px; width: 80px; height: State.large-screen ? 24px : 21px;
+        text: State.contrast == 0 ? Strings.standard : State.contrast > 0 ? "+" + State.contrast : "" + State.contrast;
+        font-family: State.contrast == 0 ? Theme.sans : Theme.numbers; font-size: State.large-screen ? 16px : 14px; font-weight: 700; color: Theme.ink;
+        horizontal-alignment: right; vertical-alignment: center;
+    }
+    ReaderSegment { x: 0px; y: root.controls-y; width: root.button-size; height: root.button-size; text: "−"; text-size: State.large-screen ? 22px : 20px; strong-outline: true; enabled: State.contrast > -2; clicked => { Commands.action("settings", "set", "contrast=" + max(-2, State.contrast - 1)); } }
+    for step in 5: Rectangle {
+        x: root.button-size + 10px + step * ((root.steps-width - root.gap * 4) / 5 + root.gap);
+        y: root.controls-y + (root.button-size - self.height) / 2;
+        width: (root.steps-width - root.gap * 4) / 5; height: State.large-screen ? 12px : 10px;
+        border-width: 1.5px; border-color: Theme.ink;
+        background: step <= State.contrast + 2 ? Theme.ink : Theme.paper;
+        TouchArea { x: 0px; y: (parent.height - Theme.touch) / 2; width: parent.width; height: Theme.touch; clicked => { Commands.action("settings", "set", "contrast=" + (step - 2)); } }
+    }
+    ReaderSegment { x: parent.width - root.button-size; y: root.controls-y; width: root.button-size; height: root.button-size; text: "+"; text-size: State.large-screen ? 22px : 20px; strong-outline: true; enabled: State.contrast < 2; clicked => { Commands.action("settings", "set", "contrast=" + min(2, State.contrast + 1)); } }
+}
+
+component ReaderRefreshChoices inherits Rectangle {
+    x: 0px;
+    y: 0px;
+    height: State.large-screen ? 44px : 40px;
+    property <length> gap: State.large-screen ? 8px : 6px;
+    for every[index] in [1, 3, 6, 10, 0]: ReaderSegment {
+        x: index * ((root.width - root.gap * 4) / 5 + root.gap);
+        y: 0px;
+        width: (root.width - root.gap * 4) / 5;
+        height: root.height;
+        text: every == 1 ? (State.large-screen ? Strings.refresh-each-turn : Strings.refresh-each-page) : every == 0 ? Strings.chapter-change : "" + every;
+        text-family: every == 1 || every == 0 ? Theme.sans : Theme.numbers;
+        selected: State.refresh-every == every;
+        clicked => { Commands.action("settings", "set", "refresh-every=" + every); }
+    }
+}
+
+component ReaderRefreshAction inherits Rectangle {
+    x: 0px;
+    y: 0px;
+    height: State.large-screen ? 52px : 46px;
+    background: hit.pressed ? Theme.ink : Theme.paper;
+    Rectangle { x: 0px; y: 0px; width: parent.width; height: 1px; background: Theme.line; }
+    BodyText { x: 0px; y: 0px; width: parent.width - 40px; height: parent.height; text: Strings.manual-refresh; font-size: State.large-screen ? 17px : 15px; color: hit.pressed ? Theme.paper : Theme.ink; }
+    Icon { x: parent.width - self.width; y: (parent.height - self.height) / 2; width: State.large-screen ? 20px : 18px; height: self.width; kind: "refresh"; inverted: hit.pressed; }
+    hit := TouchArea {
+        x: 0px;
+        y: 0px;
+        width: parent.width;
+        height: parent.height;
+        clicked => { Commands.action("panel", "choose", "refresh-now"); }
+        pointer-event(event) => { if event.kind == PointerEventKind.down { Commands.refresh("fast"); } else if event.kind == PointerEventKind.up || event.kind == PointerEventKind.cancel { Commands.refresh("ui"); } }
+    }
+}
+
+export component ReaderPanel inherits Rectangle {
+    x: 0px;
+    y: 0px;
+    in property <string> context: State.modal-context;
+    out property <length> content-height: root.context == "reader-mode" ? (State.large-screen ? 242.5px : 316.5px) :
+        root.context == "reader-picture" ? (State.large-screen ? 254px : 343.5px) :
+        root.context == "reader-brightness" ? (!State.has-frontlight ? 0px : State.large-screen ? 156px : State.has-warmth ? 215.5px : 137.5px) :
+        root.context == "reader-orientation" ? (State.large-screen ? 186px : 163.5px) :
+        root.context == "reader-layout" ? (State.large-screen ? 180px : 163.5px) :
+        root.context == "reader-more" ? (State.large-screen ? 124px : 201.5px) :
+        root.context == "reader-toc" ? (1.5px + (State.large-screen ? 16px : 14px) + root.toc-tab-height + root.toc-body-height + (State.large-screen ? 8px : 6px) + 1px + (State.panel-page-count > 1 ? Theme.pager-height : 0px)) : 0px;
+    property <length> inset: State.large-screen ? (State.landscape ? 120px : 48px) : 20px;
+    property <length> inner-width: max(0px, root.width - root.inset * 2);
+    property <length> top: State.large-screen ? 19.5px : 17.5px;
+    property <length> title-height: State.large-screen ? 31.5px : 27px;
+    property <length> card-gap: State.large-screen ? 12px : 8px;
+    property <length> toc-tab-height: State.large-screen ? 44px : 40px;
+    property <length> toc-row-height: State.large-screen ? 50px : 46px;
+    property <int> toc-rows: max(1, State.large-screen ? ceil(min(State.modal-items.length, 6) / 2.0) : min(State.modal-items.length, 5));
+    property <bool> empty-bookmarks: State.reader-toc-tab == "bookmarks" && State.modal-items.length == 0;
+    property <length> toc-empty-height: (State.large-screen ? 104px : 96px) + (!State.reader-image-ready ? (State.large-screen ? 30px : 26px) : 0px);
+    property <length> toc-body-height: root.empty-bookmarks ? root.toc-empty-height : root.toc-rows * root.toc-row-height;
+    property <length> toc-column-gap: State.large-screen ? 48px : 0px;
+    property <length> toc-column-width: State.large-screen ? (root.inner-width - root.toc-column-gap) / 2 : root.inner-width;
+    height: root.content-height;
+    background: Theme.paper;
+    TouchArea { x: 0px; y: 0px; width: parent.width; height: parent.height; }
+    Rectangle { x: 0px; y: 0px; width: parent.width; height: 1.5px; background: Theme.ink; }
+    Rectangle { x: 0px; y: parent.height - (State.panel-page-count > 1 && root.context == "reader-toc" ? Theme.pager-height : 0px) - 1px; width: parent.width; height: 1px; background: Theme.line; }
+
+    if root.context == "reader-mode": Rectangle {
+        x: root.inset; y: root.top; width: root.inner-width; height: parent.height - root.top;
+        ReaderPanelTitle { x: 0px; y: 0px; width: max(0px, parent.width - default-hint.width - 16px); height: root.title-height; text: Strings.reader-mode; }
+        default-hint := Caption {
+            x: parent.width - self.width; y: 0px; width: State.large-screen ? 320px : 260px; height: root.title-height;
+            text: (State.remember-book-direction ? Strings.book-default-direction : Strings.global-default-direction)
+                + (State.reader-default-direction == "vertical-pages" ? Strings.vertical-pages : State.reader-default-direction == "vertical" ? Strings.webtoon-scroll : State.reader-default-direction == "ltr" ? Strings.ltr : Strings.rtl);
+            font-size: State.large-screen ? 16px : 14px; horizontal-alignment: right;
+        }
+        for mode[index] in ["rtl", "ltr", "vertical-pages", "vertical"]: ReaderChoiceCard {
+            x: index * ((parent.width - root.card-gap * 3) / 4 + root.card-gap);
+            y: root.title-height + (State.large-screen ? 14px : 12px);
+            width: (parent.width - root.card-gap * 3) / 4; height: State.large-screen ? 100px : 88px;
+            text: mode == "rtl" ? Strings.rtl : mode == "ltr" ? Strings.ltr : mode == "vertical-pages" ? Strings.vertical-pages : Strings.webtoon-scroll;
+            diagram: mode == "rtl" ? "M8 3h15v22H8zM25 3h15v22H25zM38 34H10M15 29l-5 5 5 5" :
+                mode == "ltr" ? "M8 3h15v22H8zM25 3h15v22H25zM10 34h28M33 29l5 5-5 5" :
+                mode == "vertical-pages" ? "M14 2h16v16H14zM14 21h16v16H14zM40 8v24M35 27l5 5 5-5" :
+                "M16 1h14v38H16zM16 10h14M16 20h14M16 30h14M40 8v24M35 27l5 5 5-5";
+            selected: State.reading-direction == mode;
+            clicked => { Commands.action("settings", "set", "reading-direction=" + mode); }
+        }
+        if !State.large-screen: Rectangle {
+            x: 0px; y: root.title-height + 12px + 88px + 12px;
+            width: parent.width; height: 46px;
+            BodyText { x: 0px; y: 0px; width: 64px; height: parent.height; text: Strings.page-layout; font-size: 14px; color: Theme.secondary; }
+            for layout[index] in ["single", "double", "automatic"]: ReaderChoiceCard {
+                x: 72px + index * ((parent.width - 72px - 16px) / 3 + 8px);
+                y: 0px;
+                width: (parent.width - 72px - 16px) / 3; height: parent.height;
+                horizontal: true; diagram-width: 30px; diagram-height: 20px; diagram-viewbox-height: 32;
+                text: layout == "single" ? Strings.single-page : layout == "double" ? Strings.double-page : Strings.automatic;
+                diagram: layout == "single" ? "M17 3h14v26H17z" : layout == "double" ? "M9 3h14v26H9zM25 3h14v26H25z" : "M4 7h10v18H4zM20 6h24v20H20zM32 6v20";
+                selected: State.page-layout-mode == layout;
+                clicked => { Commands.action("settings", "set", "page-layout-mode=" + layout); }
+            }
+        }
+        crop-toggle := ReaderSwitch {
+            x: 0px; y: root.title-height + (State.large-screen ? 14px + 100px + 14px : 12px + 88px + 12px + 46px + 12px);
+            width: State.large-screen ? (parent.width - 48px) / 2 : parent.width;
+            height: State.large-screen ? 52px : 46px;
+            text: Strings.crop-borders; value: State.crop-borders;
+            toggled => { Commands.action("settings", "set", State.crop-borders ? "crop-borders=false" : "crop-borders=true"); }
+        }
+        ReaderSwitch {
+            x: State.large-screen ? (parent.width + 48px) / 2 : 0px;
+            y: crop-toggle.y + (State.large-screen ? 0px : crop-toggle.height);
+            width: crop-toggle.width; height: crop-toggle.height;
+            text: Strings.split-wide; value: false; enabled: false; status: Strings.unavailable;
+        }
+    }
+
+    if root.context == "reader-picture": Rectangle {
+        x: root.inset; y: root.top; width: root.inner-width; height: parent.height - root.top;
+        property <length> preview-size: State.large-screen ? 131px : 95px;
+        property <length> column-width: State.large-screen ? (self.width - self.preview-size - 72px) / 2 : self.width;
+        if !State.large-screen: ReaderPanelTitle { x: 0px; y: 0px; width: parent.width; height: root.title-height; text: Strings.picture; }
+        Rectangle {
+            x: 0px; y: State.large-screen ? 0px : root.title-height + 12px;
+            width: parent.preview-size; height: self.width;
+            border-width: 1.5px; border-color: Theme.ink; background: State.night-mode ? Theme.ink : Theme.paper; clip: true;
+            Image { x: 1.5px; y: 1.5px; width: parent.width - 3px; height: parent.height - 3px; source: State.reader-image; image-fit: cover; }
+        }
+        Rectangle {
+            x: State.large-screen ? parent.preview-size + 36px : parent.preview-size + 16px;
+            y: State.large-screen ? 0px : root.title-height + 12px + (parent.preview-size - 69px) / 2;
+            width: State.large-screen ? parent.column-width : parent.width - parent.preview-size - 16px;
+            height: State.large-screen ? 237.5px : 69px;
+            if State.large-screen: ReaderPanelTitle { x: 0px; y: 0px; width: parent.width; height: root.title-height; text: Strings.picture; }
+            ReaderContrast { x: 0px; y: State.large-screen ? root.title-height + 12px : 0px; width: parent.width; height: State.large-screen ? 80px : 69px; }
+            if State.large-screen: BodyText { x: 0px; y: 139.5px; width: parent.width; height: 24px; text: Strings.full-refresh; font-size: 16px; }
+            if State.large-screen: ReaderRefreshChoices { x: 0px; y: 175.5px; width: parent.width; height: 44px; }
+        }
+        if !State.large-screen: BodyText { x: 0px; y: 146px; width: parent.width; height: 21px; text: Strings.full-refresh; font-size: 14px; }
+        if !State.large-screen: ReaderRefreshChoices { x: 0px; y: 173px; width: parent.width; height: 40px; }
+        Rectangle {
+            x: State.large-screen ? parent.preview-size + 72px + parent.column-width : 0px;
+            y: State.large-screen ? 40px : 225px;
+            width: State.large-screen ? parent.column-width : parent.width;
+            height: State.large-screen ? 112px : 92px;
+            ReaderSwitch { x: 0px; y: 0px; width: parent.width; height: State.large-screen ? 56px : 46px; text: Strings.dither; value: State.dither; toggled => { Commands.action("settings", "set", State.dither ? "dither=false" : "dither=true"); } }
+            ReaderSwitch { x: 0px; y: State.large-screen ? 56px : 46px; width: parent.width; height: State.large-screen ? 56px : 46px; text: Strings.night-mode; value: State.night-mode; toggled => { Commands.action("settings", "set", State.night-mode ? "night-mode=false" : "night-mode=true"); } }
+        }
+    }
+
+    if root.context == "reader-brightness" && State.has-frontlight: Rectangle {
+        x: root.inset; y: root.top; width: root.inner-width; height: parent.height - root.top;
+        ReaderPanelTitle { x: 0px; y: 0px; width: parent.width; height: root.title-height; text: Strings.reader-brightness-title; }
+        ReaderLightSlider {
+            x: 0px; y: root.title-height + (State.large-screen ? 20px : 14px);
+            width: State.large-screen && State.has-warmth ? (parent.width - 48px) / 2 : parent.width;
+            height: State.large-screen ? 70px : 64px;
+            text: Strings.brightness; setting: "brightness"; value: State.brightness;
+        }
+        if State.has-warmth: ReaderLightSlider {
+            x: State.large-screen ? (parent.width + 48px) / 2 : 0px;
+            y: root.title-height + (State.large-screen ? 20px : 14px + 64px + 14px);
+            width: State.large-screen ? (parent.width - 48px) / 2 : parent.width;
+            height: State.large-screen ? 70px : 64px;
+            text: Strings.warmth; setting: "warmth"; value: State.warmth; warmth: true;
+        }
+    }
+
+    if root.context == "reader-orientation": Rectangle {
+        x: root.inset; y: root.top; width: root.inner-width; height: parent.height - root.top;
+        property <bool> vertical-reading: State.reading-direction == "vertical" || State.reading-direction == "vertical-pages";
+        property <bool> landscape-spread: State.large-screen && State.reader-landscape-spread;
+        property <bool> landscape-single: State.large-screen && (self.vertical-reading || State.page-layout-mode == "single");
+        ReaderPanelTitle { x: 0px; y: 0px; width: parent.width; height: root.title-height; text: Strings.screen-orientation; }
+        for orientation[index] in ["portrait", "landscape", "reverse-landscape"]: ReaderChoiceCard {
+            property <bool> scribe-glyph: State.large-screen && orientation != "reverse-landscape";
+            x: index * ((parent.width - root.card-gap * 2) / 3 + root.card-gap);
+            y: root.title-height + (State.large-screen ? 14px : 12px);
+            width: (parent.width - root.card-gap * 2) / 3; height: State.large-screen ? 104px : 92px;
+            text: orientation == "portrait" ? Strings.portrait : (orientation == "landscape" ? Strings.landscape : Strings.reverse-landscape)
+                + (parent.landscape-spread ? Strings.double-page : parent.landscape-single ? Strings.single-page : "");
+            diagram: self.scribe-glyph ? (orientation == "portrait" ? "M17 3h14v34H17zM22 33h4" : "M3 9h42v24H3z" + (parent.landscape-spread ? "M24 9v24" : "")) :
+                (orientation == "portrait" ? "M18 1h12a2 2 0 0 1 2 2v26a2 2 0 0 1-2 2H18a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2zM19 4h10v20H19z" :
+                    (orientation == "landscape" ? "M6 8h36a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V10a2 2 0 0 1 2-2zM7 11h27v12H7z" : "M6 8h36a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V10a2 2 0 0 1 2-2zM14 11h27v12H14z" + (State.large-screen ? "M22 15l-3 3 3 3M19 18h10" : ""))
+                    + (parent.landscape-spread ? (orientation == "landscape" ? "M20.5 11v12" : "M27.5 11v12") : ""));
+            diagram-width: State.large-screen ? 52px : 48px; diagram-height: State.large-screen ? 44px : 32px;
+            diagram-viewbox-height: self.scribe-glyph ? 40 : 32;
+            diagram-stroke-width: self.scribe-glyph ? 1.8px : (State.large-screen ? 1.7px : 1.8px);
+            selected: orientation == "portrait" ? !State.landscape : State.landscape && (orientation == "reverse-landscape" ? State.reverse-landscape : !State.reverse-landscape);
+            clicked => { Commands.action("settings", "set", "orientation=" + orientation); }
+        }
+    }
+
+    if root.context == "reader-layout": Rectangle {
+        x: root.inset; y: root.top; width: root.inner-width; height: parent.height - root.top;
+        property <length> choices-width: State.large-screen ? max(0px, (self.width - 48px) * 1.25 / 2.25) : self.width;
+        ReaderPanelTitle { x: 0px; y: 0px; width: parent.choices-width; height: root.title-height; text: Strings.page-layout; }
+        for layout[index] in ["single", "double", "automatic"]: ReaderChoiceCard {
+            x: index * ((parent.choices-width - root.card-gap * 2) / 3 + root.card-gap);
+            y: root.title-height + (State.large-screen ? 14px : 12px);
+            width: (parent.choices-width - root.card-gap * 2) / 3; height: State.large-screen ? 100px : 92px;
+            text: layout == "single" ? Strings.single-page : layout == "double" ? Strings.double-page : Strings.automatic;
+            diagram: layout == "single" ? "M17 3h14v26H17z" : layout == "double" ? "M9 3h14v26H9zM25 3h14v26H25z" : "M4 7h10v18H4zM20 6h24v20H20zM32 6v20";
+            diagram-width: State.large-screen ? 58px : 48px; diagram-height: State.large-screen ? 38px : 32px;
+            diagram-viewbox-height: 32;
+            selected: State.page-layout-mode == layout;
+            clicked => { Commands.action("settings", "set", "page-layout-mode=" + layout); }
+        }
+        if State.large-screen: Rectangle {
+            x: parent.choices-width + 48px;
+            y: root.title-height + 14px + 100px - 124px;
+            width: parent.width - self.x;
+            height: 62px;
+            background: cover-touch.pressed ? Theme.ink : Theme.paper;
+            accessible-role: switch;
+            accessible-label: Strings.cover-alone;
+            accessible-checkable: true;
+            accessible-checked: State.cover-alone;
+            BodyText { x: 0px; y: 0px; width: max(0px, parent.width - 64px); height: parent.height; text: Strings.cover-alone; font-size: 17px; color: cover-touch.pressed ? Theme.paper : Theme.ink; }
+            Rectangle {
+                x: parent.width - self.width; y: (parent.height - self.height) / 2;
+                width: 52px; height: 30px;
+                border-width: 1.5px; border-color: cover-touch.pressed ? Theme.paper : Theme.ink; border-radius: 4px;
+                background: State.cover-alone != cover-touch.pressed ? Theme.ink : Theme.paper;
+                Rectangle { x: State.cover-alone ? 24px : 3px; y: 3px; width: 21px; height: 21px; border-radius: 3px; background: State.cover-alone != cover-touch.pressed ? Theme.paper : Theme.ink; }
+            }
+            Rectangle { x: 0px; y: parent.height - 1px; width: parent.width; height: 1px; background: Theme.line; }
+            cover-touch := TouchArea {
+                x: 0px; y: 0px; width: parent.width; height: parent.height;
+                clicked => { Commands.action("settings", "set", State.cover-alone ? "cover-alone=false" : "cover-alone=true"); }
+                pointer-event(event) => { if event.kind == PointerEventKind.down { Commands.refresh("fast"); } else if event.kind == PointerEventKind.up || event.kind == PointerEventKind.cancel { Commands.refresh("ui"); } }
+            }
+        }
+        if State.large-screen: Rectangle {
+            x: parent.choices-width + 48px;
+            y: root.title-height + 14px + 100px - 62px;
+            width: parent.width - self.x; height: 62px;
+            BodyText { x: 0px; y: 0px; width: max(0px, parent.width - 202px); height: parent.height; text: Strings.wide-images; font-size: 17px; }
+            // Whole-page rendering is the only supported wide-image behavior.
+            Rectangle {
+                x: parent.width - 190px; y: 9px; width: 78px; height: 44px;
+                border-radius: 4px; background: Theme.ink;
+                accessible-role: radio-button; accessible-label: Strings.whole-page;
+                accessible-checkable: true; accessible-checked: true;
+                BodyText { x: 4px; y: 0px; width: parent.width - 8px; height: parent.height; text: Strings.whole-page; font-size: 15px; font-weight: 700; color: Theme.paper; horizontal-alignment: center; }
+            }
+            ReaderSegment {
+                x: parent.width - 104px; y: 0px; width: 104px; height: 40px;
+                text: Strings.split-two-pages; text-family: Theme.sans; enabled: false;
+                accessible-role: radio-button; accessible-checkable: true; accessible-checked: false;
+                accessible-label: Strings.split-two-pages + " · " + Strings.unavailable;
+            }
+            Caption { x: parent.width - 104px; y: 40px; width: 104px; height: 22px; text: Strings.unavailable; font-size: 13px; horizontal-alignment: center; }
+        }
+    }
+
+    if root.context == "reader-more": Rectangle {
+        x: root.inset; y: root.top; width: root.inner-width; height: parent.height - root.top;
+        ReaderPanelTitle { x: 0px; y: 0px; width: parent.width; height: root.title-height; text: Strings.more; }
+        ReaderSwitch {
+            x: 0px; y: root.title-height + 10px;
+            width: State.large-screen ? (parent.width - 48px) / 2 : parent.width;
+            height: State.large-screen ? 52px : 46px;
+            text: Strings.show-tap-zones; value: State.show-tap-zones;
+            toggled => { Commands.action("settings", "set", State.show-tap-zones ? "show-tap-zones=false" : "show-tap-zones=true"); }
+        }
+        if !State.large-screen: ReaderSwitch {
+            x: 0px; y: root.title-height + 10px + 46px; width: parent.width; height: 46px;
+            text: Strings.reverse-tap; value: State.reverse-taps;
+            toggled => { Commands.action("settings", "set", State.reverse-taps ? "reverse-taps=false" : "reverse-taps=true"); }
+        }
+        ReaderRefreshAction {
+            x: State.large-screen ? (parent.width + 48px) / 2 : 0px;
+            y: root.title-height + 10px + (State.large-screen ? 0px : 92px);
+            width: State.large-screen ? (parent.width - 48px) / 2 : parent.width;
+            height: State.large-screen ? 52px : 46px;
+        }
+    }
+
+    if root.context == "reader-toc": Rectangle {
+        x: root.inset; y: State.large-screen ? 17.5px : 15.5px; width: root.inner-width;
+        height: root.toc-tab-height + root.toc-body-height;
+        Rectangle { x: 0px; y: root.toc-tab-height - 1px; width: parent.width; height: 1px; background: Theme.line; }
+        for tab[index] in ["chapters", "bookmarks"]: Rectangle {
+            x: index * (State.large-screen ? 72px : 60px);
+            y: 0px;
+            width: State.large-screen ? 44px : 38px; height: root.toc-tab-height;
+            property <bool> selected: State.reader-toc-tab == tab;
+            background: tab-touch.pressed ? Theme.ink : Theme.paper;
+            BodyText { x: 0px; y: 0px; width: parent.width; height: parent.height; text: tab == "chapters" ? Strings.table-of-contents : Strings.bookmark; font-size: State.large-screen ? 18px : 16px; font-weight: parent.selected ? 700 : 400; color: tab-touch.pressed ? Theme.paper : parent.selected ? Theme.ink : Theme.secondary; horizontal-alignment: center; }
+            if self.selected: Rectangle { x: 0px; y: parent.height - 3px; width: parent.width; height: 3px; background: tab-touch.pressed ? Theme.paper : Theme.ink; }
+            tab-touch := TouchArea { x: 0px; y: 0px; width: parent.width; height: parent.height; clicked => { Commands.action("reader", "toc-tab", tab); } }
+        }
+        if root.empty-bookmarks: Rectangle {
+            x: 0px; y: root.toc-tab-height; width: parent.width; height: root.toc-empty-height;
+            Caption {
+                x: 0px; y: State.large-screen ? 8px : 6px; width: parent.width; height: State.large-screen ? 28px : 24px;
+                text: Strings.no-bookmarks; font-size: State.large-screen ? 17px : 15px; horizontal-alignment: center;
+            }
+            ReaderSegment {
+                x: (parent.width - self.width) / 2; y: State.large-screen ? 42px : 36px;
+                width: min(parent.width, State.large-screen ? 280px : 240px); height: State.large-screen ? 44px : 40px;
+                text: Strings.bookmark-current-page; text-family: Theme.sans; text-size: State.large-screen ? 16px : 14px;
+                strong-outline: true; enabled: State.reader-image-ready && !State.reader-bookmarked;
+                clicked => {
+                    if State.reader-image-ready && !State.reader-bookmarked {
+                        Commands.action("reader", "bookmark", "");
+                    }
+                }
+            }
+            if !State.reader-image-ready: Caption {
+                x: 0px; y: State.large-screen ? 92px : 82px; width: parent.width; height: State.large-screen ? 26px : 24px;
+                text: Strings.bookmark-page-not-ready; font-size: State.large-screen ? 15px : 13px; horizontal-alignment: center;
+            }
+        }
+        for item[index] in State.modal-items: Rectangle {
+            visible: index < (State.large-screen ? 6 : 5);
+            x: State.large-screen ? floor(index * 1.0 / root.toc-rows) * (root.toc-column-width + root.toc-column-gap) : 0px;
+            y: root.toc-tab-height + (State.large-screen ? mod(index, root.toc-rows) : index) * root.toc-row-height;
+            width: root.toc-column-width; height: root.toc-row-height;
+            property <bool> current: item.id == "chapter:" + State.current-chapter-id;
+            property <color> foreground: row-touch.pressed ? Theme.paper : item.group == "read" ? Theme.muted : Theme.ink;
+            background: row-touch.pressed ? Theme.ink : Theme.paper;
+            Rectangle { x: State.large-screen ? 9px : 9.5px; y: (parent.height - self.height) / 2; width: State.large-screen ? 8px : 7px; height: self.width; border-radius: 4px; background: parent.current ? parent.foreground : transparent; }
+            row-title := BodyText {
+                x: 34px; y: 0px; width: min(self.preferred-width, max(0px, parent.width - 34px - row-value.width - 24px)); height: parent.height;
+                text: item.title; font-size: State.large-screen ? 17px : 16px; font-weight: parent.current ? 700 : 400; color: parent.foreground;
+            }
+            DottedRule { x: row-title.x + row-title.width + 10px; y: parent.height / 2 + 2px; width: max(0px, row-value.x - self.x - 10px); height: 2px; }
+            row-value := Text { x: parent.width - self.width - 2px; y: 0px; width: self.preferred-width; height: parent.height; text: item.value; font-family: Theme.numbers; font-size: State.large-screen ? 15px : 14px; font-weight: parent.current ? 700 : 400; color: row-touch.pressed ? Theme.paper : Theme.secondary; vertical-alignment: center; }
+            row-touch := TouchArea { x: 0px; y: 0px; width: parent.width; height: parent.height; enabled: item.enabled; clicked => { Commands.action("panel", "choose", item.id); } }
+        }
+    }
+    if root.context == "reader-toc" && State.panel-page-count > 1: PageBar {
+        x: 0px; y: parent.height - self.height; width: parent.width; height: Theme.pager-height; page: State.panel-page; count: State.panel-page-count; context: "panel";
+        turn(delta) => { Commands.action("panel", "page", delta); }
+    }
+}

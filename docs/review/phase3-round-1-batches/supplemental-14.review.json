@@ -1,0 +1,189 @@
+{
+  "batch_id": "supplemental-14",
+  "reviewer": "/root/phase3_round1_review/supplemental_14",
+  "run_id": "a1baf3fe3dc2",
+  "binary_sha256": "94d7f3bbcab475ad8833a2f3c486138f7b49bead231851c2d8eab2f0c3d2ac51",
+  "source_sha256": "aef9db4e111165016a10a2a95e111f3155860b8510c7f6207ec9c79fbec5082c",
+  "reviewed_case_ids": [
+    "pw5--settings-spread",
+    "pw5--settings-storage",
+    "pw5--settings-tap-regions",
+    "pw5--settings-tracking",
+    "pw5--sort-added-at",
+    "pw5--sort-chapter-count",
+    "pw5--sort-cold-persistence",
+    "pw5--sort-descending"
+  ],
+  "reviewed_cases": [
+    {
+      "case_id": "pw5--settings-spread",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/pw5--settings-spread.png",
+      "candidate_sha256": "3740d5cd496b7eba363a6ae7946be8c20e5199b2d564550c4ce1ed96affe04b7",
+      "viewed_candidate": true,
+      "outcome": "issues_found",
+      "observations": [
+        "The actual candidate was viewed individually. Its current SHA-256 matches both the input manifest and the case screenshot evidence; case identity is settings/spread, PW5, portrait, with no modal.",
+        "The secondary page has a labeled back action, a heavy serif heading, retained bottom navigation, and no list pager. The landscape behavior group presents three equal outlined choices with automatic spread inverted as selected.",
+        "The wide-image whole-page/split choices are visibly muted under an unavailable label, and the cover-alone row is also muted with a disabled-looking switch. These are required software preferences rather than missing sensor controls."
+      ],
+      "intentional_differences": [
+        "Any unavailable hardware or external integration is the application's actual state; no success is simulated.",
+        "Runtime capability limits are accepted for actual hardware and integrations; they do not waive the wide-image and cover arrangement preferences."
+      ]
+    },
+    {
+      "case_id": "pw5--settings-storage",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/pw5--settings-storage.png",
+      "candidate_sha256": "6bfb5d5489e1f3419cf786c366b0e1d80193fe9d1fa3de6b8adcc6edd24e2df8",
+      "viewed_candidate": true,
+      "outcome": "issues_found",
+      "observations": [
+        "The actual candidate was viewed individually. Its current SHA-256 matches both the input manifest and the case screenshot evidence; case identity is settings/storage, PW5, portrait, with no modal.",
+        "The page displays downloaded chapters with an unknown amount and a Configure action, cache usage of 0 B, free space of 9.4 GB, and two separate cleanup actions. Text and buttons fit without clipping, and the settings dock remains visible.",
+        "The required four-part downloaded/cache/cover/free usage presentation is absent: there is no cover usage entry or usage bar/legend. The largest-storage books area is also absent, including an explicit empty state or management structure."
+      ],
+      "intentional_differences": [
+        "Any unavailable hardware or external integration is the application's actual state; no success is simulated.",
+        "The displayed storage amounts may differ from sample capacities. Unknown downloaded bytes and a zero cache do not require fabricated usage or fabricated largest-book rows."
+      ]
+    },
+    {
+      "case_id": "pw5--settings-tap-regions",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/pw5--settings-tap-regions.png",
+      "candidate_sha256": "f866d90fcef47aa306f554258596153678c9bd696c752f319d3520743743d3fa",
+      "viewed_candidate": true,
+      "outcome": "issues_found",
+      "observations": [
+        "The actual candidate was viewed individually. Its current SHA-256 matches both the input manifest and the case screenshot evidence; case identity is settings/tap-regions, PW5, portrait, with no modal.",
+        "The three-region layout is inverted as selected and has a clear diagram. The inversion and zone-display switches use normal black off-state styling, consistent with the captured thirds preference and show_tap_zones=false.",
+        "The L-shaped and swipe-only alternatives have muted labels, square indicators, diagrams, and outlines. They are presented as unavailable rather than normal unselected cards, although the handoff specifies all three software layout choices."
+      ],
+      "intentional_differences": [
+        "Any unavailable hardware or external integration is the application's actual state; no success is simulated.",
+        "No physical hardware capability exception explains removing the two alternative touch layouts."
+      ]
+    },
+    {
+      "case_id": "pw5--settings-tracking",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/pw5--settings-tracking.png",
+      "candidate_sha256": "2c3797a71889ee25ee76dcbde0767eaa5d4accc12428534bd7931fd811f6326f",
+      "viewed_candidate": true,
+      "outcome": "no_actionable_issue_observed",
+      "observations": [
+        "The actual candidate was viewed individually. Its current SHA-256 matches both the input manifest and the case screenshot evidence; case identity is settings/tracking, PW5, portrait, with no modal.",
+        "AniList and MyAnimeList are separate white outlined account cards with recognizable service marks, unconfigured status, and visibly disabled login actions. Automatic sync and offline queue preferences are also muted.",
+        "This agrees with the captured capability declaration that tracking authorization is not implemented. The candidate does not invent an authenticated account, authorization QR code, device code, countdown, or successful connection; card contents and dock are legible."
+      ],
+      "intentional_differences": [
+        "Any unavailable hardware or external integration is the application's actual state; no success is simulated.",
+        "Disabled unconfigured services replace the reference's simulated logged-in or pending authorization examples because no real authorization integration exists."
+      ]
+    },
+    {
+      "case_id": "pw5--sort-added-at",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/pw5--sort-added-at.png",
+      "candidate_sha256": "8129e98d06d099669c44e11d292fe65af5d43ba0c5ebe80980c53802353ce9c8",
+      "viewed_candidate": true,
+      "outcome": "no_actionable_issue_observed",
+      "observations": [
+        "The actual candidate was viewed individually. Its current SHA-256 matches both the input manifest and the case screenshot evidence; captured state identifies library-filter choices with added-at sorting, ascending=true, and four neutral filters.",
+        "The bottom sheet has eight sorting choices in two columns, an inverted added-date choice, an inverted old-to-new direction, four neutral filter controls, and a distinct Done action. The selected visuals agree with the captured state.",
+        "The full-width white sheet starts at its top rule and fits the visible content through the filters, without shadow, stippled scrim, clipped controls, or a fixed-height empty tail. The unchanged library header and continuation remain visible above it."
+      ],
+      "intentional_differences": []
+    },
+    {
+      "case_id": "pw5--sort-chapter-count",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/pw5--sort-chapter-count.png",
+      "candidate_sha256": "7926b11c3f2bfbf0fc4feb43e53dd82bfda10b955fffc9ff1b2b96b06b3f5f76",
+      "viewed_candidate": true,
+      "outcome": "no_actionable_issue_observed",
+      "observations": [
+        "The actual candidate was viewed individually. Its current SHA-256 matches both the input manifest and the case screenshot evidence; captured state identifies chapter-count sorting with ascending=true and four neutral filters.",
+        "The chapter-total choice and ascending direction are inverted, while all other sort choices remain white and outlined. The sheet includes all eight choices, direction controls, four filters, and Done without overlap or clipping.",
+        "The captured visible-book sidecar lists chapter totals 12, 12, 12, 19, 23, 27, 28, and 35. This is consistent with the declared ascending sort; the screenshot only exposes the top of the grid behind the sheet, so it is not treated as an independent SQL execution check.",
+        "The temporal wording of the direction buttons follows the supplied Main prototype declaration. No sort defect is inferred from fixture badge values or sample data."
+      ],
+      "intentional_differences": []
+    },
+    {
+      "case_id": "pw5--sort-cold-persistence",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/pw5--sort-cold-persistence.png",
+      "candidate_sha256": "d5850b93cb8cf62e10021a79c6f7f09a097fee9e8f45e18cacb47227fb98ad1d",
+      "viewed_candidate": true,
+      "outcome": "no_actionable_issue_observed",
+      "observations": [
+        "The actual candidate was viewed individually. Its current SHA-256 matches both the input manifest and the case screenshot evidence; the recorded cold-persistence case has title sorting, ascending=false, and no open modal.",
+        "The four-by-two library grid is fully visible. Its eight titles agree with the recorded visible_books order and with the exposed leading titles in the descending-sort case. Readable title plates serve missing covers, while unread and download markers remain beside titles below artwork.",
+        "The continuation is a white outlined card, the folio reads 1/6 with the first-page previous allocation left empty, the next-page action is present, and the library dock is retained. No caption collides with the folio or navigation.",
+        "The frame is consistent with the recorded retained sort state; actual restart and persistence behavior were not re-executed during this static review."
+      ],
+      "intentional_differences": []
+    },
+    {
+      "case_id": "pw5--sort-descending",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/pw5--sort-descending.png",
+      "candidate_sha256": "85ecd4d264713aebbd6e6ede430e71a5540a1789f2ac9aee1c91897ba6aeb7e1",
+      "viewed_candidate": true,
+      "outcome": "no_actionable_issue_observed",
+      "observations": [
+        "The actual candidate was viewed individually. Its current SHA-256 matches both the input manifest and the case screenshot evidence; captured state identifies title sorting, ascending=false, and four neutral filters.",
+        "The title-sort choice and descending direction are inverted as selected. The eight choices, two direction controls, four neutral filters, and Done action remain legible within the content-sized bottom sheet.",
+        "The leading grid covers behind the sheet agree with the corresponding cold-persistence frame. White surfaces, the top rule, outlined choices, and undimmed background follow the documented sheet treatment; no shadow or screen-tone mask is present."
+      ],
+      "intentional_differences": []
+    }
+  ],
+  "suggestions": [
+    {
+      "id": "P3R1-SUP14-1",
+      "case_id": "pw5--settings-spread",
+      "priority": "P2",
+      "description": "Wide-image handling and cover-alone preferences are presented as unavailable.",
+      "evidence": [
+        "The candidate visibly mutes both whole-page/split choices and the cover-alone switch; the wide-image group is labeled unavailable.",
+        "HANDOFF.md section 5.7, line 295, and prototype/sc-settings.dc.html lines 326-329 require landscape behavior, whole-page versus split-wide-image handling, and a cover-alone switch.",
+        "These image-layout preferences are software behavior and are not covered by the accepted missing hardware or third-party integration differences."
+      ],
+      "recommendation": "Implement and persist the wide-image and cover-alone preferences, connect them to real reader layout behavior, and present their controls as ordinary enabled choices with truthful selection state.",
+      "status": "open",
+      "introduced_round": 1
+    },
+    {
+      "id": "P3R1-SUP14-2",
+      "case_id": "pw5--settings-storage",
+      "priority": "P2",
+      "description": "The storage page omits the required cover category, four-part usage presentation, and largest-storage management area.",
+      "evidence": [
+        "The candidate contains only downloaded chapters, cache usage, free space, and two cleanup buttons. It has no separate cover usage entry, usage bar/legend, or largest-book rows/empty state.",
+        "HANDOFF.md section 5.7, line 291, requires downloaded/cache/cover/free usage with a bar and legend, largest-storage rows with management actions, and targeted cleanup.",
+        "prototype/sc-settings.dc.html lines 304-313 declare the four usage categories and the largest-storage section. Actual zero or unavailable usage does not require fabricated example rows."
+      ],
+      "recommendation": "Use maintained real storage totals to render the four categories and their usage visualization. Add the largest-storage section with real per-book management actions or a concise explicit empty state, while retaining targeted cleanup and avoiding filesystem scans during normal UI projection.",
+      "status": "open",
+      "introduced_round": 1
+    },
+    {
+      "id": "P3R1-SUP14-3",
+      "case_id": "pw5--settings-tap-regions",
+      "priority": "P2",
+      "description": "The L-shaped and swipe-only touch layouts are presented as disabled alternatives.",
+      "evidence": [
+        "The two alternative cards use muted labels, indicators, diagrams, and borders, in contrast with the normal black off-state switches below them.",
+        "HANDOFF.md section 5.7, line 293, and prototype/sc-settings.dc.html lines 318-320 specify three selectable layouts: three-region, L-shaped, and swipe-only, followed by inversion and zone-display preferences.",
+        "These touch layouts do not depend on unavailable device hardware or external authorization."
+      ],
+      "recommendation": "Provide real selectable and persistent L-shaped and swipe-only layouts, apply their mappings to reader input, and render their unselected cards with the normal enabled styling.",
+      "status": "open",
+      "introduced_round": 1
+    }
+  ],
+  "limitations": [
+    "This independent supplemental review inspected only the eight candidate PNGs listed in supplemental-14.input.json. Every image was actually displayed through view_image; no other PNG or independent reference image was loaded.",
+    "Visual findings use the supplied scope, DESIGN_HANDOFF.md, authoritative HANDOFF.md, and static prototype text. Exact screenshot-to-reference pixel comparison is unavailable for this batch.",
+    "Current PNG hashes were read with Get-FileHash and matched the input expected hashes and case evidence hashes. All case metadata binds the same run, binary, and source identifiers stated above.",
+    "Existing sidecar state and checks were read as capture evidence. No local application, build, test, validation suite, runtime probe, interaction sequence, or new remote verification was executed.",
+    "Static screenshots cannot independently prove SQL execution, cold restart persistence, hit targets, cleanup operations, physical e-ink behavior, sleep/wake restoration, or memory/performance limits.",
+    "This report covers this supplemental batch only and does not declare the entire review round clean."
+  ]
+}

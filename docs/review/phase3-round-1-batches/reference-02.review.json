@@ -1,0 +1,91 @@
+{
+  "batch_id": "reference-02",
+  "reviewer": "/root/phase3_round1_review/reference_02",
+  "review_type": "Fresh independent visual reference comparison",
+  "run_id": "a1baf3fe3dc2",
+  "round": 1,
+  "binary_sha256": "94d7f3bbcab475ad8833a2f3c486138f7b49bead231851c2d8eab2f0c3d2ac51",
+  "source_sha256": "aef9db4e111165016a10a2a95e111f3155860b8510c7f6207ec9c79fbec5082c",
+  "reference_bundle_sha256_provided": "e7b49b456255432d74cfe41346f9d44c1a9c55bf67c5d55483e4ae3029547d18",
+  "comparison_scale": {
+    "candidate_native_pixels": [618, 824],
+    "reference_physical_pixels": [1236, 1648],
+    "candidate_logical_scale": 1,
+    "reference_physical_scale": 2,
+    "method": "Each original candidate and reference PNG was opened with view_image. Geometry was compared at the same logical viewport scale; no additional images or image transformations were loaded."
+  },
+  "identity_verification": {
+    "method": "Get-FileHash SHA256 over original PNG bytes, matched against each case metadata screenshot and reference hash.",
+    "candidate_pixel_identity": "Original PNG byte SHA256",
+    "case_run_binary_source_identity_matches": true,
+    "all_candidate_and_reference_hashes_match_case_metadata": true,
+    "reference_bundle_hash_independently_recomputed": false
+  },
+  "reviewed_case_ids": [
+    "Main--select",
+    "Main--sort"
+  ],
+  "reviewed_cases": [
+    {
+      "case_id": "Main--select",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/Main--select.png",
+      "candidate_sha256": "a91ea196283e913f4555fd7512e49c473833ea929fe1d067f8d76b93497b7e6b",
+      "reference_png": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/screens/states/Main--select.png",
+      "reference_sha256": "90abb5f3ecc90acffc6928f70b5f25e98eae658d02791c46359120621e8f70b7",
+      "viewed_candidate": true,
+      "viewed_reference": true,
+      "outcome": "pass-with-intentional-state-differences",
+      "observations": [
+        "The selection heading, select-page control, Done button, category tabs, and four-column by two-row cover grid preserve the reference layout at equal logical scale.",
+        "The approximately 132 by 162 logical-pixel cover frames and the two grid rows fit without clipped covers, overlapping titles, or displaced selection controls.",
+        "The first cover has a clear inverse checked state, while the other seven checkboxes remain visible against the cover artwork.",
+        "The continuation card is hidden in this Paperwhite selection state. Four evenly spaced bulk actions replace the normal dock, and the folio and next-page control remain directly above the 72 logical-pixel bottom bar.",
+        "The serif heading and sans-serif action labels have the expected hierarchy. UI surfaces remain plain white with black or gray text and rules; no surface shadow or stipple is visible."
+      ],
+      "intentional_differences": [
+        "The candidate has one selected book and a checked first cover, while the reference shows zero selected books. The heading and checked state agree with the recorded selection state.",
+        "Book artwork and factual library data were evaluated as content, while their frames, title placement, and control geometry were still compared with the reference."
+      ]
+    },
+    {
+      "case_id": "Main--sort",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/Main--sort.png",
+      "candidate_sha256": "c4aa581e0da987764221d49dff541b2c196f72e9a7ae3b4132ee342eb8526ae8",
+      "reference_png": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/screens/states/Main--sort.png",
+      "reference_sha256": "69d5019d7305fb8049f67824eb675d7d8227eeebaf025dd7f10a327cfb6eebfe",
+      "viewed_candidate": true,
+      "viewed_reference": true,
+      "outcome": "findings",
+      "observations": [
+        "The white sorting sheet begins at approximately logical y=332, matching the reference boundary at approximately y=333, and its title, Done control, two-column options, and direction row remain fully visible.",
+        "All eight sort choices are visible in four rows. The recent-read choice and descending direction use the expected inverse black controls, and the recorded modal metadata lists eight enabled sort entries.",
+        "The four neutral filter controls are visible above the viewport bottom without clipping, but their labels and outer widths are smaller than in the reference; this is recorded as P3R1-REF02-1.",
+        "The continuation card behind the sheet retains its thin black outline, white surface, thumbnail, progress track, and forward control. The header, category tabs, and cover-grid alignment remain consistent with the reference at equal logical scale.",
+        "The sheet and continuation surfaces have no visible shadow or stipple. Text and outlines remain grayscale, and no overlapping text or truncated sort labels are visible."
+      ],
+      "intentional_differences": [
+        "The continuation thumbnail uses the candidate's actual cover artwork; artwork details were not treated as layout regressions.",
+        "Actual title, library-count, unread/download, and progress values were permitted content differences and were not used to exempt frame or control geometry."
+      ]
+    }
+  ],
+  "suggestions": [
+    {
+      "id": "P3R1-REF02-1",
+      "case_id": "Main--sort",
+      "priority": "P3",
+      "description": "The filter-chip labels and widths are undersized relative to the reference.",
+      "evidence": "At the same 618 by 824 logical viewport scale, the candidate filter labels appear approximately 14 logical pixels versus approximately 16 in the reference. Each candidate chip is approximately 81 logical pixels wide versus approximately 86 in the reference, so the four-chip row ends near x=370 instead of x=390. The neighboring sort-option labels already use the larger reference scale.",
+      "recommendation": "Match the reference filter-label size and chip widths, retaining the current approximately 44 logical-pixel height and clear spacing between all four controls.",
+      "status": "open",
+      "introduced_round": 1
+    }
+  ],
+  "limitations": [
+    "This review covers only the two listed reference pairs and four original PNGs; it does not certify the complete round as clean.",
+    "The review is based on static screenshot inspection and existing case metadata. No application, build, test, smoke check, or runtime probe was executed locally.",
+    "Static evidence establishes visible control containment but does not independently establish hit targets, navigation behavior, SQL sort behavior, or three-state filter transitions.",
+    "Native desktop screenshots do not qualify physical Kindle refresh, touch behavior, or hardware dithering.",
+    "Individual reference PNG hashes were independently matched to case metadata; the provided aggregate reference-bundle hash was recorded but not independently recomputed."
+  ]
+}

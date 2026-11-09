@@ -1,0 +1,193 @@
+{
+  "batch_id": "supplemental-03",
+  "reviewer": "/root/phase3_round1_review/supplemental_03",
+  "run_id": "a1baf3fe3dc2",
+  "binary_sha256": "94d7f3bbcab475ad8833a2f3c486138f7b49bead231851c2d8eab2f0c3d2ac51",
+  "source_sha256": "aef9db4e111165016a10a2a95e111f3155860b8510c7f6207ec9c79fbec5082c",
+  "review_basis": [
+    "Individually viewed all eight original candidate PNGs with view_image; no other PNGs were loaded.",
+    "Read the input batch, salient case state/checks/intentional differences, DESIGN_HANDOFF.md, authoritative HANDOFF.md excerpts, phase3-reference-scope.json, and phase3-prototype-reference-support.json text.",
+    "Current Get-FileHash SHA256 values match both expected_png_sha256 and each case evidence_hashes.screenshot.sha256 for all eight cases. All case metadata identifies the run, binary, and source recorded above.",
+    "Assessed visible content, honest capability states, tag identity and selection, content-dependent sheets, clipping, and access to visible pagination controls. No independent per-state reference was supplied for these supplemental cases."
+  ],
+  "reviewed_case_ids": [
+    "pw5--catalog-tag-3",
+    "pw5--catalog-tags-seed",
+    "pw5--content-stress--category-capability",
+    "pw5--content-stress--dense-sources",
+    "pw5--content-stress--description-and-tags",
+    "pw5--content-stress--description-last-page",
+    "pw5--content-stress--filter-tag-page-2",
+    "pw5--content-stress--filter-tag-page-3"
+  ],
+  "reviewed_cases": [
+    {
+      "case_id": "pw5--catalog-tag-3",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/pw5--catalog-tag-3.png",
+      "candidate_sha256": "73a74e5f168b326146a6b2ed3de80e4c7b67f98ecf26bd82b5902b3b9b000bc7",
+      "viewed_candidate": true,
+      "outcome": "no_actionable_issue_observed",
+      "observations": [
+        "The catalog filter is a white bottom-attached sheet with a black top rule, no shadow or dimmed backdrop, and the catalog still visible above it.",
+        "All nine actual Chinese tag names are individually readable across two rows. All tags are neutral, consistent with state=0, zero active filters, 128 results, and the recorded three-state cycle returning to neutral.",
+        "Relevance is inverse-selected, Latest remains available, and unsupported Follows/Rating choices use disabled gray styling. Reset, publication states, and the full-width 128-result action remain legible and unobstructed.",
+        "This capture shows the final neutral state only; it does not independently establish the intermediate include/exclude appearance."
+      ],
+      "intentional_differences": []
+    },
+    {
+      "case_id": "pw5--catalog-tags-seed",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/pw5--catalog-tags-seed.png",
+      "candidate_sha256": "73a74e5f168b326146a6b2ed3de80e4c7b67f98ecf26bd82b5902b3b9b000bc7",
+      "viewed_candidate": true,
+      "outcome": "no_actionable_issue_observed",
+      "observations": [
+        "Independently viewed this seed capture even though its bytes match catalog-tag-3. It displays the nine real loaded tags in their neutral state, with no selected-tag marker or misleading active-filter badge.",
+        "The two tag rows fit above the results action without clipped names or covered controls. The 128-result label agrees with the case state.",
+        "The filter sheet retains white surfaces, outlined secondary controls, selected black primary controls, and visible outside content without a shadow or stippled interface backdrop."
+      ],
+      "intentional_differences": []
+    },
+    {
+      "case_id": "pw5--content-stress--category-capability",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/pw5--content-stress--category-capability.png",
+      "candidate_sha256": "783e975454d098858b85e791fce237496a3226ecbc97fd70f76c860e440a5db2",
+      "viewed_candidate": true,
+      "outcome": "changes_requested",
+      "observations": [
+        "Reading, Planned, Completed, and Uncategorized rows each display the actual zero count. The secondary settings header, row separators, and selected Settings dock item are clear and unobstructed.",
+        "New category is visibly disabled, and no success or fabricated custom category is shown. However, the page has no concise unavailable status for creation or renaming, and no visible rename capability state. The metadata confirms disabled rows and an empty settings_status. See P3R1-SUP03-2.",
+        "The unavailable implementation itself is an accepted capability difference; the requested change concerns communicating that limitation explicitly."
+      ],
+      "intentional_differences": [
+        "Custom category creation/rename is unavailable in this candidate; actual category counts and disabled actions remain explicit."
+      ]
+    },
+    {
+      "case_id": "pw5--content-stress--dense-sources",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/pw5--content-stress--dense-sources.png",
+      "candidate_sha256": "b5703c3b9e5ff2afd62ea7d4b1c3744d2277349a6167d5fc1854dfe21c2ce173",
+      "viewed_candidate": true,
+      "outcome": "no_actionable_issue_observed",
+      "observations": [
+        "The source manager shows 25 installed sources and zero updates, with seven configured source rows visible on page 1/4, consistent with the metadata.",
+        "Long names elide at the right while preserving distinct source numbers 00 through 06. Source subtitles remain readable as configured self-hosted servers, and no row claims a verified connection.",
+        "Each visible row retains its trailing navigation chevron. The dashed add-source entry, Next action, folio, and dock occupy separate areas with no covered row or clipped bottom control.",
+        "The supplied page demonstrates the first seven source identities and a visible route to later pages; later source pages were not supplied in this batch."
+      ],
+      "intentional_differences": [
+        "All source rows are real saved loopback configurations. Unverified configurations are not marked connected."
+      ]
+    },
+    {
+      "case_id": "pw5--content-stress--description-and-tags",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/pw5--content-stress--description-and-tags.png",
+      "candidate_sha256": "0c6b4a043654355ebd55519544330c8d73e7eb670771cbac5e22701f67aae527",
+      "viewed_candidate": true,
+      "outcome": "changes_requested",
+      "observations": [
+        "The long description occupies a full-width white bottom sheet with a black top rule and an unobstructed Close button. The underlying long book title elides without colliding with the cover or More action.",
+        "The first eight tags, Actual tag 00 through Actual tag 07, are fully distinguishable in a four-column layout. A separate tag folio shows 1/5; the description folio at the bottom also shows 1/5.",
+        "Source metadata remains readable, with Local Komga fixture, an unavailable update value, and zero local chapters rather than fabricated values. The case retains all 34 actual tag items in metadata; this PNG shows only the first tag page.",
+        "The description ends with the incomplete word fragment 'An actual loopback p'. This is present in panel_text as well as the PNG, so it is a pagination boundary issue rather than a glyph hidden under a button. See P3R1-SUP03-3."
+      ],
+      "intentional_differences": []
+    },
+    {
+      "case_id": "pw5--content-stress--description-last-page",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/pw5--content-stress--description-last-page.png",
+      "candidate_sha256": "44df1ce7f4895466afeaa24fea3ae4d1f9e91244fe53af6af1fb21b00879ff08",
+      "viewed_candidate": true,
+      "outcome": "changes_requested",
+      "observations": [
+        "The final description folio visibly reads 5/5, keeps Previous available, and omits the unavailable final-page Next action. The case panel_page=5 and panel_page_count=5 agree with the capture.",
+        "The shorter final text lowers the sheet's top boundary relative to the first description page, consistent with content-dependent sheet height. Close, the eight first-page tag controls, the tag pager, and all metadata rows remain unobstructed.",
+        "The independent tag pager remains on 1/5; description page 5/5 does not claim that all tags have been visited.",
+        "The final description starts with the mid-word fragment 'rovider record used for native capture'. The visible English word split confirms the same reading-flow issue as the first page. See P3R1-SUP03-3."
+      ],
+      "intentional_differences": []
+    },
+    {
+      "case_id": "pw5--content-stress--filter-tag-page-2",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/pw5--content-stress--filter-tag-page-2.png",
+      "candidate_sha256": "5ad166be4f3e3804cc951b133c3945fb3300c5d2ee7ed1cd56a6db1eb1d55667",
+      "viewed_candidate": true,
+      "outcome": "changes_requested",
+      "observations": [
+        "The tag pager visibly reads 2/3 with both directions available, and the result action remains fully exposed. The active-filter badge and result count agree with one included tag and 20 loaded results.",
+        "The first tag is inverse-selected with an include prefix. Metadata and the recorded next-page selection check identify it as Actual tag 16, state=1.",
+        "All sixteen displayed long tag names are shortened to nearly identical 'Actua...' fragments; their distinguishing numeric suffixes 16 through 31 are invisible. The selected tag is likewise reduced to '+Act...'. Users cannot identify which actual tag they are selecting or including. See P3R1-SUP03-1.",
+        "No button overlap, bottom clipping, gray mask, or shadow is visible; the issue is loss of tag identity through excessive label elision."
+      ],
+      "intentional_differences": []
+    },
+    {
+      "case_id": "pw5--content-stress--filter-tag-page-3",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/pw5--content-stress--filter-tag-page-3.png",
+      "candidate_sha256": "19538a67e7a5d20b9613b8f104a9cd6421830525171daf1e908bb43cef32499a",
+      "viewed_candidate": true,
+      "outcome": "changes_requested",
+      "observations": [
+        "The final tag page visibly reads 3/3, preserves Previous, and shows disabled Next. It contains the remaining Adventure and Mystery tags rather than repeated page-two membership.",
+        "Metadata identifies Adventure as the sole included tag, state=1, and the visible badge/result action consistently report one active filter and 20 loaded results.",
+        "Mystery is fully readable, but the selected Adventure label becomes '+Adv...' despite this page containing only two tags. This is the same fixed-width tag identity problem recorded as P3R1-SUP03-1.",
+        "The sheet is visibly shorter than page two because the tag content has one row. The white background, top rule, Reset, sort/status controls, pager, and results action remain distinct and unobstructed."
+      ],
+      "intentional_differences": []
+    }
+  ],
+  "suggestions": [
+    {
+      "id": "P3R1-SUP03-1",
+      "case_id": "pw5--content-stress--filter-tag-page-2",
+      "priority": "P2",
+      "description": "The dense catalog filter elides away the distinguishing part of actual tag names, preventing informed tag selection and identification of the included tag.",
+      "evidence": [
+        "In filter-tag-page-2, sixteen cells visually reduce Actual tag 16 through Actual tag 31 to indistinguishable 'Actua...' labels; the included first cell shows only '+Act...'.",
+        "The case state and recorded real next-page selection check identify the included item as tag:Actual tag 16, state=1; this identity cannot be read from its selected control.",
+        "In filter-tag-page-3, the included Adventure tag is reduced to '+Adv...' although the last page has only two items. Mystery fits normally.",
+        "HANDOFF.md describes named three-state tags, and DESIGN_HANDOFF.md:406 requires ordering, publication states, and three-state tags; preserving actual data is not a waiver for losing visible filter identity."
+      ],
+      "recommendation": "Size tag controls from their real labels, reduce the number of columns or wrap labels, and recompute pagination so each tag retains a distinguishable name together with its include/exclude marker. Let short final pages use the available width.",
+      "status": "open",
+      "introduced_round": 1
+    },
+    {
+      "id": "P3R1-SUP03-2",
+      "case_id": "pw5--content-stress--category-capability",
+      "priority": "P2",
+      "description": "The category page does not explicitly identify creation and renaming as unavailable in this candidate.",
+      "evidence": [
+        "The PNG shows the four real category counts and a gray disabled New category button, but no unavailable status and no visible rename capability state.",
+        "Case metadata records settings_details enabled=false for every category row, an empty settings_status, and the intentional difference that custom creation/rename is unavailable.",
+        "The current review instruction explicitly requires unavailable creation/rename to be clear. DESIGN_HANDOFF.md:578-579 requires concrete behavior or an honest unavailable state; HANDOFF.md lists category Rename and New category controls.",
+        "Gray styling is a valid disabled treatment under DESIGN_HANDOFF.md:102. This finding concerns the additional explicit capability state required by the task, not a claim of fake success or a requirement to implement custom categories in this round."
+      ],
+      "recommendation": "Add a concise unavailable status for category creation and renaming, and expose the corresponding disabled action state where appropriate. Use a short status label rather than explanatory prose, preserving real counts and avoiding any success simulation.",
+      "status": "open",
+      "introduced_round": 1
+    },
+    {
+      "id": "P3R1-SUP03-3",
+      "case_id": "pw5--content-stress--description-and-tags",
+      "priority": "P3",
+      "description": "Long English descriptions are paginated inside words, interrupting normal reading at page boundaries.",
+      "evidence": [
+        "The first description page visibly ends 'An actual loopback p', exactly matching the end of its panel_text.",
+        "The supplied final description page begins 'rovider record used for native capture', exactly matching the beginning of its panel_text.",
+        "The full repeated phrase in these actual description records uses 'provider'; the screenshots therefore expose partial words rather than complete word-boundary pages. No text loss is asserted."
+      ],
+      "recommendation": "Choose description page boundaries at word or paragraph boundaries where possible while preserving every character, and continue allowing the final sheet height to follow its actual content.",
+      "status": "open",
+      "introduced_round": 1
+    }
+  ],
+  "limitations": [
+    "This is a supplemental static review of eight supplied candidate states, not an exact pixel match against independent per-state reference PNGs or a complete clean-round verdict.",
+    "Only the eight input candidate PNGs were opened. No image scaling, recoloring, cropping, generated contact sheet, or alternative candidate/reference image was used.",
+    "Existing mechanical checks and action evidence were read as case identity/context; their passed flags were not treated as visual approval. No application, build, test, smoke check, or runtime probe was executed locally or remotely for this review.",
+    "Pagination controls are visible and metadata retains 34 tags, but the screenshots do not prove every later source/tag page, pointer target, outside-dismiss action, or persistence behavior. The two neutral tag captures do not visually establish the intermediate exclude state.",
+    "Real titles, source names, counts, time, unavailable update/size values, and saved configuration states may differ from prototype fixtures. These allowances do not waive tag readability, control access, or explicit unavailable capability states.",
+    "These cases contain no closed-reader image or hardware/authentication panel. They cannot establish artwork-only closed-reader behavior, absence of an invisible footer-cycle target, absent-hardware gating, tracking authorization, waveform quality, physical wake restoration, or a 512 MiB memory qualification."
+  ]
+}

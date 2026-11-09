@@ -1,0 +1,147 @@
+{
+  "batch_id": "supplemental-42",
+  "reviewer": "/root/phase3_round1_review/supplemental_42",
+  "run_id": "a1baf3fe3dc2",
+  "binary_sha256": "94d7f3bbcab475ad8833a2f3c486138f7b49bead231851c2d8eab2f0c3d2ac51",
+  "source_sha256": "aef9db4e111165016a10a2a95e111f3155860b8510c7f6207ec9c79fbec5082c",
+  "reviewed_case_ids": [
+    "scribe-landscape--legacy-footer-1-pure",
+    "scribe-landscape--legacy-footer-2-pure",
+    "scribe-landscape--legacy-footer-3-pure",
+    "scribe-landscape--next-chapter",
+    "scribe-landscape--odd-cbz-import",
+    "scribe-landscape--odd-final-spread",
+    "scribe-landscape--orientation-return",
+    "scribe-landscape--resume-checkpoint"
+  ],
+  "reviewed_cases": [
+    {
+      "case_id": "scribe-landscape--legacy-footer-1-pure",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/scribe-landscape--legacy-footer-1-pure.png",
+      "candidate_sha256": "91ceb9e8a9b560e178d234248902dc249c94f21c6c7da60c0057ce780d16ea37",
+      "viewed_candidate": true,
+      "outcome": "pass",
+      "observations": [
+        "Directly viewed the 1240 x 930 candidate. The left page contains radial, halftone, and vertical-line panels; the right page contains skyline and speech-balloon panels. Both pages are visible without a decorative center seam.",
+        "No bookmark ribbon, footer text, status bar, notification, or menu chrome is visible. The top and bottom white bands agree with the recorded aspect-fit destinations at y=29 through y=901, rather than a reserved reader header or footer.",
+        "The sidecar identifies the Scribe reader, a closed menu, chapter 034, page 12 of 40, and persisted footer_mode=1. The current PNG SHA-256 matches both the input expectation and the case screenshot evidence, with the assigned run, binary, and source identities."
+      ],
+      "intentional_differences": [
+        "A stored legacy footer preference never restores closed-reader labels or a footer-cycle hit region."
+      ]
+    },
+    {
+      "case_id": "scribe-landscape--legacy-footer-2-pure",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/scribe-landscape--legacy-footer-2-pure.png",
+      "candidate_sha256": "91ceb9e8a9b560e178d234248902dc249c94f21c6c7da60c0057ce780d16ea37",
+      "viewed_candidate": true,
+      "outcome": "pass",
+      "observations": [
+        "Directly viewed this candidate separately. The two artwork pages retain their panel borders and speech balloons; there is no percentage, chapter label, page counter, or other footer decoration along the bottom edge.",
+        "No overlay obscures the artwork at the top, bottom, or center join. The halftone patterns belong to the artwork and are not an interface scrim. The recorded half-width page slots and proportional white bands agree with the visible composition.",
+        "The sidecar records footer_mode=2 while the reader remains closed at chapter 034, page 12 of 40. The current PNG matches the expected and screenshot-evidence SHA-256 values and the assigned run, binary, and source identities."
+      ],
+      "intentional_differences": [
+        "A stored legacy footer preference never restores closed-reader labels or a footer-cycle hit region."
+      ]
+    },
+    {
+      "case_id": "scribe-landscape--legacy-footer-3-pure",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/scribe-landscape--legacy-footer-3-pure.png",
+      "candidate_sha256": "91ceb9e8a9b560e178d234248902dc249c94f21c6c7da60c0057ce780d16ea37",
+      "viewed_candidate": true,
+      "outcome": "pass",
+      "observations": [
+        "Directly viewed the third legacy-preference capture. Artwork occupies the two landscape allocations with the same radial-panel left page and skyline right page; no visibly missing page or added gutter is present.",
+        "The closed frame has no ribbon, status bar, notification, or combined footer information despite persisted footer_mode=3. The narrow, even top and bottom white bands are consistent with proportional image fitting, and the panel content is not hidden by interface chrome.",
+        "The case state is reader/menu=false at chapter 034, page 12 of 40. Its current PNG hash matches the input and case evidence, and its run, binary, and source identities match the assigned capture set."
+      ],
+      "intentional_differences": [
+        "A stored legacy footer preference never restores closed-reader labels or a footer-cycle hit region."
+      ]
+    },
+    {
+      "case_id": "scribe-landscape--next-chapter",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/scribe-landscape--next-chapter.png",
+      "candidate_sha256": "c45bb8b3874337f6de3431d2a100773719ed0c63138dc8ce7bcd41ec96628557",
+      "viewed_candidate": true,
+      "outcome": "pass",
+      "observations": [
+        "Directly viewed the next-chapter candidate. The skyline page is on the left and the radial-panel page is on the right, with both half-width allocations populated and no blank loading region.",
+        "The completed frame remains pure artwork: no stale chapter header, footer, notification, bookmark ribbon, or menu controls remain over the new spread. The 29-pixel aspect-fit bands above and below the artwork agree with the supplied geometry.",
+        "The sidecar records chapter 035, page 1 of 40, with the displayed session and committed page agreeing. The current hash matches both expected and screenshot evidence, and the run, binary, and source identities match. The static capture cannot establish the preceding input sequence or physical full-refresh behavior."
+      ],
+      "intentional_differences": []
+    },
+    {
+      "case_id": "scribe-landscape--odd-cbz-import",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/scribe-landscape--odd-cbz-import.png",
+      "candidate_sha256": "af3526b680ad9d4b83963e6ee1ae6b76689fabfb5d760ab4e927410db1e52686",
+      "viewed_candidate": true,
+      "outcome": "pass",
+      "observations": [
+        "Directly viewed the 930 x 1240 portrait library capture. The single imported Chapter 1 record appears in both the continue-reading card and the library grid, and the continue-reading card displays 1/3 progress. A one-item library explains the unused grid area.",
+        "The saved confirmation uses a white outlined box without a shadow or stippled/dimmed backdrop. The 1/1 folio and five-item bottom navigation remain legible and separate from the toast; the title, card, category tabs, and book caption are not clipped.",
+        "The nearly white cover with a black horizontal block is visible consistently in the card and grid. No independent source-art image was supplied, so its sparse content is not treated as a failed cover. The state records one local book, route=library, display_landscape=false, and no modal. Its current hash and capture identities match the supplied input and evidence."
+      ],
+      "intentional_differences": []
+    },
+    {
+      "case_id": "scribe-landscape--odd-final-spread",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/scribe-landscape--odd-final-spread.png",
+      "candidate_sha256": "1e48d57bfb2cec9f6701860b8f69161e6015a37aeb697fcf2df5651e0f6244b8",
+      "viewed_candidate": true,
+      "outcome": "pass",
+      "observations": [
+        "Directly viewed the 1240 x 930 odd-final candidate. The only remaining artwork page is centered over the viewport midline, with its outer frame spanning approximately x=282 through x=958 and its full height visible. The text within that artwork is not a reader footer.",
+        "The image preserves its aspect ratio and has no ribbon, status bar, notification, or decorative gutter. Root explicitly clarified that an odd final page uses an intentional effective-single fallback: preferences.spread=true records the preference, while an actual span of one with second_path=null retains the full viewport. The handoff's two 50% allocations apply when two actual pages are present.",
+        "The sidecar records the real local chapter at page 3 of 3, RTL direction, second_path=null, and pure_reader_oracle geometry slot=[0,0,1240,930], destination=[280,0,960,930]. These values agree with the visible full-viewport single-page fitting and the clarified scope. The zero-difference artwork oracle remains contextual evidence rather than a substitute for direct viewing.",
+        "The earlier P3R1-SUP42-1 interpretation was withdrawn after Root clarified the intended effective-single behavior. Root also identified the prior fix for a mismatched half-width prefetch key and the analogous full-width single-cover opening behavior; these are scope context, not independently rerun checks in this review.",
+        "The current PNG SHA-256 matches the expected and screenshot-evidence values. Run, binary, and source identities match the assigned capture set."
+      ],
+      "intentional_differences": [
+        "Root-confirmed scope: an odd final page with actual span=1 and second_path=null intentionally uses the full viewport as an effective-single fallback, even when preferences.spread=true. Do not invent a second half-page allocation; two 50% allocations apply only to an actual two-page pair."
+      ]
+    },
+    {
+      "case_id": "scribe-landscape--orientation-return",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/scribe-landscape--orientation-return.png",
+      "candidate_sha256": "8e7ab43ffb125c3788ab4ed34b14bfaab1aa85e53dd6f3c6f9b835bb898fdf01",
+      "viewed_candidate": true,
+      "outcome": "pass",
+      "observations": [
+        "Directly viewed the 930 x 1240 returned detail page. It is visibly portrait, with book information on the narrower left side and the chapter directory on the wider right side, rather than a landscape reader frame.",
+        "The left cover, title, continue-reading action, three book actions, description, and tags are readable. The right directory shows chapters 86 through 71, download controls, and a 1/6 folio with a next-page action. There is no overlap or obvious clipping at the column boundary or bottom edge.",
+        "Reader artwork and reader overlays are absent from this non-reader page. The state records route=detail and display_landscape=false while retaining chapter 034 and page 12 of 40 for continuation. The current hash matches expected and screenshot evidence, and the run, binary, and source identities match."
+      ],
+      "intentional_differences": []
+    },
+    {
+      "case_id": "scribe-landscape--resume-checkpoint",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/scribe-landscape--resume-checkpoint.png",
+      "candidate_sha256": "91ceb9e8a9b560e178d234248902dc249c94f21c6c7da60c0057ce780d16ea37",
+      "viewed_candidate": true,
+      "outcome": "pass",
+      "observations": [
+        "Directly viewed the resume candidate. The radial-panel page on the left and skyline page on the right are both rendered, with no error placeholder, loading region, decorative seam, or visibly cropped panel caused by interface chrome.",
+        "The resumed frame is artwork only: the bookmark ribbon, reader footer, status bar, menu, and notifications are absent. The even aspect-fit white bands agree with the recorded page destinations.",
+        "The sidecar records chapter 034, reader_page=20, committed_reader_page=20, and displayed_session.page=20 of 40, with a closed menu. The current hash matches expected and screenshot evidence and shares the visible pixels of the legacy captures; repeated artwork alone cannot independently prove checkpoint identity or persistence. The assigned run, binary, and source identities match."
+      ],
+      "intentional_differences": []
+    }
+  ],
+  "suggestions": [],
+  "coverage_gaps": [
+    "This batch contains eight supplemental candidate PNGs and no independent reference PNG. Visual conclusions use the supplied scope, handoff, prototype text, case state, and direct inspection of these eight candidates only.",
+    "Menu-open reader geometry and interactions are outside these closed-reader captures; the default menu-open reference state was not substituted for their explicit menu=false states.",
+    "Static captures cannot establish the absence of an invisible footer-cycle hit target, pointer handling, chapter-transition sequencing, full-refresh timing, or checkpoint persistence across a real process or device lifecycle.",
+    "The imported source artwork and archive page ordering are not independently inspected beyond the assigned candidate images and their metadata. The odd-final effective-single interpretation follows Root's explicit scope clarification."
+  ],
+  "limitations": [
+    "Each of the eight assigned candidates was opened individually with view_image. No other PNG, reference image, diff image, or processed-artwork image was opened.",
+    "Get-FileHash was used to match each current candidate PNG against both expected_png_sha256 and case evidence_hashes.screenshot.sha256. All eight matches were confirmed, and all case run, binary, and source identities matched the assigned capture set.",
+    "Existing mechanical checks and zero-difference artwork-oracle results were treated as contextual evidence, not as substitutes for manual visual review or as proof of the layout specification.",
+    "Only existing JSON/text/PNG files were read and the requested review JSON was written. No application, build, tests, validation suite, runtime probe, Git operation, or product modification was performed.",
+    "These captures do not qualify physical wake behavior, hardware refresh, sensor behavior, pen support, or the 512 MiB device-memory target. Findings apply to this batch and do not establish that the full round is clean."
+  ]
+}

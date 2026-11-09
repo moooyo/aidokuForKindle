@@ -1,0 +1,184 @@
+{
+  "batch_id": "supplemental-07",
+  "reviewer": "/root/phase3_round1_review/supplemental_07",
+  "run_id": "a1baf3fe3dc2",
+  "binary_sha256": "94d7f3bbcab475ad8833a2f3c486138f7b49bead231851c2d8eab2f0c3d2ac51",
+  "source_sha256": "aef9db4e111165016a10a2a95e111f3155860b8510c7f6207ec9c79fbec5082c",
+  "reviewed_case_ids": [
+    "pw5--history-last-page",
+    "pw5--http-search-empty",
+    "pw5--http-search-failure",
+    "pw5--http-search-retry",
+    "pw5--http-search-retrying",
+    "pw5--http-search-success",
+    "pw5--http-search-success--server-connect",
+    "pw5--http-search-success--view-all"
+  ],
+  "evidence_identity": {
+    "method": "Read-only Get-FileHash SHA256 and case sidecar inspection, followed by direct tools.view_image inspection of each listed candidate PNG.",
+    "all_candidate_hashes_match_input_and_case_screenshot_evidence": true,
+    "all_case_run_binary_and_source_identifiers_match": true,
+    "references_used": [
+      "docs/review/phase3-reference-scope.json",
+      "docs/DESIGN_HANDOFF.md",
+      "docs/review/phase3-prototype-reference-support.json",
+      "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/HANDOFF.md",
+      "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/prototype/pw-search.dc.html"
+    ],
+    "standalone_reference_images_loaded": false
+  },
+  "reviewed_cases": [
+    {
+      "case_id": "pw5--history-last-page",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/pw5--history-last-page.png",
+      "candidate_sha256": "83b827c8736e9710e1ae2504a31fefebbf1952b964b5b4fcfdfd5416e5f81da3",
+      "viewed_candidate": true,
+      "outcome": "pass",
+      "observations": [
+        "The final history slice visibly contains three dated groups, with book and chapter labels, completion or page progress, timestamps, and separate remove controls. The records stay above the folio without clipping.",
+        "The folio shows 5 / 5 in the center and a previous-page action at the left. The unavailable next-page action is hidden while the center remains centered.",
+        "The full-width bottom navigation remains visible with History selected. The incognito action is outlined and the normal status bar is not inverted.",
+        "The sidecar identifies the history route, demo=true, offline=true, busy=false, history_count=20, and page=5 of 5; its final-folio check agrees with the visible boundary. Real record titles and dates are treated as data."
+      ],
+      "intentional_differences": []
+    },
+    {
+      "case_id": "pw5--http-search-empty",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/pw5--http-search-empty.png",
+      "candidate_sha256": "fdf3219a09280644a3fcc7b5342d1f7a1b719f7f460a5bf6d06ecc1bcf16eba1",
+      "viewed_candidate": true,
+      "outcome": "pass",
+      "observations": [
+        "The committed fixture query appears in a white outlined search field with distinct clear and cancel controls. The all-source scope is selected, and the fixture source remains separately identifiable.",
+        "The completed-search caption reports one searched source and zero sources with results. The Local Komga fixture section explicitly shows the no-results state, without a failure label, retry button, or fabricated cards.",
+        "The keyboard is absent and the Search-selected bottom navigation is restored. The empty content region is consistent with the labeled no-results state.",
+        "The non-demo online sidecar records a settled source with pending=false, error=false, count=0 and a matching actual-response count check."
+      ],
+      "intentional_differences": []
+    },
+    {
+      "case_id": "pw5--http-search-failure",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/pw5--http-search-failure.png",
+      "candidate_sha256": "a5db367167aad6abbe8579375701d1ebd6f1ffe373786d596cc2251cd907a1e7",
+      "viewed_candidate": true,
+      "outcome": "pass",
+      "observations": [
+        "The fixture source has an operation-incomplete status beside its name and a prominent black Retry action at the right. This is visibly distinguishable from the no-results capture.",
+        "No result cards are shown after the failed request. The query and scope controls remain available, and the Search-selected dock is visible.",
+        "The source name, status, and retry control occupy one clear row without overlap. The page uses white surfaces and has no dimmed mask or shadow.",
+        "The sidecar records demo=false, offline=false, busy=false and a settled source with error=true, pending=false, count=0. Its real HTTP failure check agrees with the displayed recovery action."
+      ],
+      "intentional_differences": []
+    },
+    {
+      "case_id": "pw5--http-search-retry",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/pw5--http-search-retry.png",
+      "candidate_sha256": "d7ea4848528ca67098797b907caa73e952404341656f04b794023eb2e3f818ed",
+      "viewed_candidate": true,
+      "outcome": "pass",
+      "observations": [
+        "The recovered source displays a 20-item count and a View all action. Exactly three cover cards are visible, consistent with the Paperwhite per-source preview capacity.",
+        "Each card keeps the title and author metadata below its cover. Long fixture titles are ellipsized within their cards without spilling into adjacent cards or covering the images.",
+        "The failed-source status and Retry action have been replaced by the result preview. The keyboard is hidden and the Search-selected dock is present.",
+        "The sidecar records pending=false, error=false and 20 source records. Its request evidence includes a failed request followed by a successful retry, supporting the recovered-state identity rather than relying on the PNG alone."
+      ],
+      "intentional_differences": []
+    },
+    {
+      "case_id": "pw5--http-search-retrying",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/pw5--http-search-retrying.png",
+      "candidate_sha256": "475efbcae581701a1b6b90f960c9bf6a737df76ad381b6d9820189d095705882",
+      "viewed_candidate": true,
+      "outcome": "pass",
+      "observations": [
+        "The fixture source row explicitly shows retry-in-progress text, and the right-hand action also displays the retrying state. It is visibly different from both the failure and recovered-result captures.",
+        "The progress caption reports zero completed sources, and the row does not prematurely display success cards or a result count.",
+        "A small white outlined reading-progress notice appears above the dock, without shadow, stipple, or a dimmed background. Search navigation remains visible while the keyboard stays hidden.",
+        "The sidecar records busy=true and source pending=true, with the prior error retained during retry. The in-flight pending-state check agrees with the visible retrying text; completion is not inferred from this image."
+      ],
+      "intentional_differences": []
+    },
+    {
+      "case_id": "pw5--http-search-success",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/pw5--http-search-success.png",
+      "candidate_sha256": "d7ea4848528ca67098797b907caa73e952404341656f04b794023eb2e3f818ed",
+      "viewed_candidate": true,
+      "outcome": "pass",
+      "observations": [
+        "The completed-search caption reports one searched source with results. The named source shows 20 items, three preview cards, and a distinct View all entry.",
+        "The cover outlines are flat, and titles and metadata sit beneath the artwork. Card labels are truncated within their own widths; no membership marker is overlaid on the cover images.",
+        "The committed query and scope selection remain visible, and the Search-selected bottom navigation replaces the keyboard in this result state.",
+        "The non-demo online sidecar records pending=false, error=false and count=20, with actual-response and authorized loopback-request checks. Its identical PNG hash to the completed-retry case is consistent with the same final visible records, not evidence that the two request histories are identical."
+      ],
+      "intentional_differences": []
+    },
+    {
+      "case_id": "pw5--http-search-success--server-connect",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/pw5--http-search-success--server-connect.png",
+      "candidate_sha256": "f74effd739ca30c54e10e67b8033fa5e25eeecb538d0173dad8612fa06859ec9",
+      "viewed_candidate": true,
+      "outcome": "pass",
+      "observations": [
+        "The final connected state presents the Local Komga fixture source header, a labeled Browse back action, and separate source-search, filter, and settings controls. No setup overlay remains open.",
+        "The selected popular tab leads into five readable catalog rows with 64-by-88-style covers, full fixture-series titles, author and tag text, and chapter/status metadata. The rows and separators stay clear of the footer.",
+        "The folio shows 1 / 5 with Next available and Previous hidden. The Paperwhite secondary source catalog correctly has no main dock.",
+        "The sidecar records route=catalog, source_needs_setup=false, source_connection_status=connected, busy=false and 20 catalog records. The connection check includes actual loopback API requests, so the final connected state is supported by supplied evidence."
+      ],
+      "intentional_differences": []
+    },
+    {
+      "case_id": "pw5--http-search-success--view-all",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/pw5--http-search-success--view-all.png",
+      "candidate_sha256": "2498298dfd5566451af3fa178314b109f6fccc0711f0b20e5f4fc3ad4d60624c",
+      "viewed_candidate": true,
+      "outcome": "needs_changes",
+      "observations": [
+        "The source header identifies Local Komga fixture and says it is configured. A labeled Browse back action and the three source controls remain visible.",
+        "Everything below the source header is blank: there are no result rows, catalog tabs, folio, loading indicator, no-results label, failure recovery action, or setup form. The lack of a dock is correct for this secondary route, but it does not explain the missing content.",
+        "The sidecar records route=catalog, busy=false, catalog_result_count=40, catalog_remote_page=2 and page=5 of 8. Its mechanical View-all check confirms stored result data, which the candidate image does not make reachable.",
+        "The same sidecar records source_needs_setup=true and an unverified connection status. The visible configured caption provides no indication of that gating state or an action to resolve it. This is recorded as suggestion P3R1-SUP07-1."
+      ],
+      "intentional_differences": []
+    }
+  ],
+  "suggestions": [
+    {
+      "id": "P3R1-SUP07-1",
+      "case_id": "pw5--http-search-success--view-all",
+      "priority": "P2",
+      "description": "View all opens a blank source catalog even though the captured state contains 40 results and a multi-page folio. No visible state or recovery action explains why the results are hidden.",
+      "evidence": {
+        "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/pw5--http-search-success--view-all.png",
+        "candidate_sha256": "2498298dfd5566451af3fa178314b109f6fccc0711f0b20e5f4fc3ad4d60624c",
+        "visible_region": "The entire content area below the source identity row, approximately y=140 through the bottom of the 618-by-824 image, is blank. The header caption says configured.",
+        "case_metadata": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/cases/pw5--http-search-success--view-all.json",
+        "state": {
+          "route": "catalog",
+          "busy": false,
+          "modal": "",
+          "catalog_result_count": 40,
+          "catalog_remote_page": 2,
+          "page": 5,
+          "page_count": 8,
+          "source_needs_setup": true,
+          "source_connection_status_meaning": "not yet verified"
+        },
+        "requirements": [
+          "HANDOFF.md section 5.4 and docs/DESIGN_HANDOFF.md lines 389-391 require real paginated source results with five Paperwhite rows and a folio.",
+          "The scope baseline requires truthful operation states; the prototype support map requires setup-needed and empty states to remain distinguishable."
+        ]
+      },
+      "recommendation": "Make the View-all destination render the returned source results and its folio. Reconcile the setup-needed state with the configured provider used by search; if setup truly blocks the catalog, display the honest setup state and a usable configuration action instead of an unexplained blank page.",
+      "status": "open",
+      "introduced_round": 1
+    }
+  ],
+  "limitations": [
+    "This is an independent static review of only the eight candidate PNGs listed in supplemental-07.input.json. Every listed candidate was directly viewed; no other PNG or standalone reference image was loaded.",
+    "The review used scope, handoff and prototype text for acceptance. Without independent reference images, it does not assert pixel-level equivalence or complete coverage of the full application matrix.",
+    "Existing case checks and provider-request evidence were inspected as supplied provenance. No application, build, test, validation suite, runtime probe, Git operation or product modification was performed locally or remotely for this review.",
+    "These HTTP cases show one fixture source. Static frames and supplied sidecars do not independently prove multi-source concurrency, tap-target sizes, focus accessibility, outside dismissal, keyboard editing behavior, or persisted interaction behavior.",
+    "No physical e-ink waveform, hardware capability, sleep/wake restoration, or 512 MiB memory qualification is inferred from these PNGs.",
+    "This batch contains one actionable suggestion and does not establish a complete clean review round."
+  ]
+}

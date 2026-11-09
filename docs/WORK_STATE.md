@@ -1,0 +1,73 @@
+# Work state
+
+Updated: 2026-11-09.
+
+After the final delivery, the user confirmed that automatic brightness is
+excluded from requirements and acceptance. Its absence is not an unfinished
+item or a delivery blocker. Manual frontlight and warmth controls remain within
+the implemented device capabilities.
+
+Candidate18 is the final frozen 236-file source
+`42b11de8d1b07e7af30665f98bb0dbf6291c0d6a6ec3355005c1402f42b21f24`.
+Actual desktop/ARM/launcher builds and source/ordinary-return identities are
+recorded in [current verification](PHASE3_VERIFICATION.md). Main's official
+source selection and launcher matched the frozen inputs with no extras or
+differences; the independently verified C18 staging supplied the package.
+
+The final C18 targeted Native sequence passed two bounded actual cases: single90 and manual90/270 touch, 270 Down/Up and retained flat wake. The same final PID6613 retained epoch5/page15/manual270 with pressure0, exact wake pixels and no image-job restart. Normal exit restored the exact stock body, policy/USB1 and left no App, sensor, guard or owned lock. These are dedicated firmware-VM synthetic-sensor/RAM-fixture results, not physical Kindle or a repeat of C16 full-matrix acceptance; original failed and unassessed attempts remain preserved.
+
+The final C18 formal sequence passed one actual exact ignored library test with twenty measured JSONL records, 21 primary timing processes, six SQL collections, one observer and one marked publication/sync audit. Source, both ELFs, all four tools and the wrapper matched before/after; the Native owner checked-restored the dedicated VM with stock/policy/USB/no-App-lock checks passing. Measurements are bounded host algorithm/render/Store evidence, not physical Kindle or a universal speedup; the 32-page counterexample, limited allocation/RSS counters and scale-dependent SQL remain documented.
+
+## Final bounded UI and package
+
+Both fresh final Search/F13/own-Reader repair rounds passed. Each reviewed
+eight/eight manual cases with three reports, nine comparisons and fourteen new
+necessary image opens; each read twenty-seven unit/completion-status columns.
+Required findings, essential reading pending and identity mismatches were zero.
+This is bounded C18 repair acceptance, not another all101-reference or 604-case
+stress pass. The original C16 second-pass visibility failure remains preserved.
+
+The one final ZIP is 29,700,422 bytes,
+`b0280e4b26330b07cdd0f86bda8636c2bd33ef5205bb30419888edc14c0aaeb1`.
+Its 4,877-byte manifest is
+`af29e678e78925e7fe40e70fb4d1cf8771220d54074658bf28f13b3c0a2414fd`.
+Strict verification passed 137 checks and 26 members/CRC, and the actual copied
+ZIP/manifest returned to test-env matched exactly. Package IO RELEASED before
+formal measurement. See [delivery](DELIVERY.md) for final copy and recovery.
+
+## Implementation and limits
+
+The closed Reader is an image-only canvas; menus provide explicit controls.
+Recognized sensor Up/Down changes active presentation between 0/180 while
+retaining chapter/page and manual 90/270 preferences. Synthetic sensor/RAM
+firmware-VM checks do not qualify physical sensor, persistent storage, waveform
+or real-device input/display behavior. Automatic brightness is not implemented
+or qualified; exposed frontlight/warmth and truthful unavailable states define
+the current capability bounds.
+
+The raw/processed cache registry is shared by canonical data root. Admission
+and origin/source limits are distinct; a foreground reservation does not promise
+an immediate third transfer for every origin. Resident render-cache limits do
+not bound live Reader arcs or whole-process RSS. Download dirty batches clear
+after successful Store writes; typed SQLite contention retry is limited to its
+implemented dequeue/checkpoint/ownership/wake paths, not every database write.
+No unmeasured speedup or constant-cost SQLite claim is made.
+
+All verification ran on test-env. Independent work uses isolated outputs and
+local mutual exclusion for genuinely shared writable resources, without a
+whole-host lease. Only the Native owner controls the dedicated VM/QMP; this work
+did not acquire or change the shared physical-Kindle lock. Local operations were
+editing, ordinary copying/extraction and image reading, with no Windows tests,
+builds, hash validation, runtime probes or image processing.
+
+## Preserved checkpoints
+
+The [original work-state document](../artifacts/phase3/candidate15/documentation-staging/current-documents-before-final-01/docs/WORK_STATE.md)
+retains its dated C12 and earlier current/pending language, source identities,
+failures and measurements. The [C16 first walkthrough](review/phase3-c16-final-design-pass1-closeout-receipt-01.json)
+and [negative second walkthrough](review/phase3-c16-final-design-pass2-closeout-receipt-01.json)
+retain their own scope; [the C18 closeout](review/phase3-c18-final-search-repair-closeout-receipt-01.json)
+records the final bounded repair. Original code-preparation, oracle, filesystem,
+helper, timeout and unassessed Native attempts are preserved, not re-signed.
+Historical Phase2 dist recovery and C11 performance/native evidence remain
+available through their original records and are not new-payload results.

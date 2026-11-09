@@ -1,0 +1,326 @@
+{
+  "schema_version": 1,
+  "batch_id": "c11r1-m012-b002",
+  "reviewer": "c11r1_tail_m012_b002",
+  "round": 1,
+  "run_id": "55c498296d35",
+  "module_id": "012-c4-c5-reader-controls",
+  "input": {
+    "path": "D:/Code/aidokuForKindle/docs/review/phase3-c11-full1-batches/c11r1-m012-b002.input.json",
+    "sha256": null,
+    "hash_basis": "pending owner declaration; no local hash was run"
+  },
+  "module_snapshot": {
+    "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate11/ui-round-1/snapshots/ui-round-1-snapshot-012-c4-c5-reader-controls/inventory.json",
+    "sha256": "2709353f3d330bb2ff599c5f0e3cb62e718d0b33a8516ba45a0d737edae9ebad"
+  },
+  "freeze_tuple": {
+    "run_id": "55c498296d35",
+    "source_sha256": "33a2d049307c398da8bfbf196d1bf8e086412c117c194b592f4a93b5bfaedb3f",
+    "binary_sha256": "1e60db345cbd6fbe580258a4a309bf42361781061dc2033f78a8a5eb4446ad72"
+  },
+  "hash_basis": "All file SHA-256 values are untouched owner declarations from the assigned input; no local hashes were computed.",
+  "reviewed_case_ids": [
+    "pw5--c4-reader--swipe-only-reverse",
+    "pw5--c4-reader--reverse-pure-input",
+    "pw5--c4-reader--reverse-restore",
+    "pw5--c4-reader--reverse-wake"
+  ],
+  "actual_original_image_opens": 6,
+  "image_open_counts": {
+    "current_candidates": 4,
+    "original_references": 2,
+    "processed_sources": 0,
+    "oracles": 0,
+    "reference_pairs": 4,
+    "total": 6,
+    "max_total": 8
+  },
+  "references": [
+    {
+      "reference_id": "pw-reader--fullscreen",
+      "path": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/screens/states/pw-reader--fullscreen.png",
+      "sha256": "70fa45f447c4f52e2e737f7634a1838d73071e32cf22c40e6e8235e07582cee4",
+      "dimensions": [
+        1236,
+        1648
+      ],
+      "actual_image_opened": true,
+      "open_count": 1,
+      "comparison_for_case_ids": [
+        "pw5--c4-reader--swipe-only-reverse"
+      ],
+      "comparison_scope": "Related fullscreen logical contract only; no independent exact-state reference.",
+      "observation": "The original portrait reference contains black-and-white comic panels. Its artwork and corner-shaped motif are not a requirement to add closed-Reader chrome.",
+      "viewing_limit": "The assigned original was opened without a generated crop or replacement."
+    },
+    {
+      "reference_id": "sc-reader--fullscreen",
+      "path": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/screens/states/sc-reader--fullscreen.png",
+      "sha256": "d3a53afd5b446e5e7a2028097666a158406d4eadbbac048e32773a88bf733107",
+      "dimensions": [
+        2480,
+        1860
+      ],
+      "actual_image_opened": true,
+      "open_count": 1,
+      "comparison_for_case_ids": [
+        "pw5--c4-reader--reverse-pure-input",
+        "pw5--c4-reader--reverse-restore",
+        "pw5--c4-reader--reverse-wake"
+      ],
+      "comparison_scope": "Related fullscreen logical contract only; no independent exact-state reference.",
+      "observation": "The original Scribe landscape reference contains a two-page black-and-white comic composition. It supplies only the related fullscreen logical contract for the PW single-page captures.",
+      "viewing_limit": "tools.view_image displayed the original through a 1824 x 1368 preview of the 2480 x 1860 file; no file was resized or processed."
+    }
+  ],
+  "cases": [
+    {
+      "case_id": "pw5--c4-reader--swipe-only-reverse",
+      "png_path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate11/ui-round-1/snapshots/ui-round-1-snapshot-012-c4-c5-reader-controls/files/output/pw5--c4-reader--swipe-only-reverse.png",
+      "png_sha256": "6b4703a4d4b2bdccf43e91f43cfba716e3cfca4ddb2cc0abd1b6a7f041c02852",
+      "case_json_sha256": "a9d05c123bfe29b2e9e92eb9db38a9366121ce8930c7ed6dcbdff33fd2d6a0ed",
+      "state_sha256": "f3c68e836c04ad7255a62147e0cbd63a84015ce41655cd77aea069d659c4efc3",
+      "metadata_sha256": "25bb0d1f6928f18f94621fcc73b68bc5a124b726fb63cfed93b9900d0183558a",
+      "actions_path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate11/ui-round-1/snapshots/ui-round-1-snapshot-012-c4-c5-reader-controls/files/output/actions/pw5--c4-reader--swipe-only-reverse.json",
+      "actions_sha256": "893b2e15caac10cc71d177e7f03b04cc1389d0b4fe5c0a740b5c8c829bf25f4a",
+      "log_sha256": "dc121ceea011a63c29b404d6c6b75bbe2db32b326923b8fa99759f457bfd709f",
+      "reference_id": "pw-reader--fullscreen",
+      "reference_sha256": "70fa45f447c4f52e2e737f7634a1838d73071e32cf22c40e6e8235e07582cee4",
+      "reference_comparison_status": "related-logical-contract-only-no-exact-state-reference",
+      "independent_exact_state_reference_available": false,
+      "actual_image_opened": true,
+      "open_count": 1,
+      "native_dimensions": [
+        618,
+        824
+      ],
+      "scope": "Visible closed-Reader viewport, panel rules, artwork allocation and absence of application chrome; related original logical contract only.",
+      "observation": "The 618 x 824 portrait original shows ray, dotted, dark and vertical-line comic panels with thin artwork rules and white side margins. No application corner marker, ribbon, menu, page counter, footer, status, debug or download overlay is visible.",
+      "static_context": {
+        "captured_route": "reader",
+        "menu": false,
+        "modal": "",
+        "reader_panel": "",
+        "reader_page": 11,
+        "reader_total": 40,
+        "visible_pages": [
+          11
+        ],
+        "landscape": false,
+        "reverse_landscape": false,
+        "rotation_degrees": 0,
+        "effective_tap_layout": "swipe-only",
+        "effective_reverse_taps": true,
+        "spread": false
+      },
+      "action_evidence_scope": "The owner action JSON records single-page mode, swipe-only, reverse-taps=true and a rightward desktop-pointer swipe from (154.5, 412) to (463.5, 412). The input's captured context ends at page 11/40 with Reader closed. This supports the final captured software state; no before-page comparison or physical gesture qualification is inferred.",
+      "source_artwork_attribution_basis": {
+        "kind": "Untouched owner-declared displayed_reader/render-source binding, with direct current-PNG and related original-reference viewing.",
+        "declared_first_path": "/root/aidoku-phase3/evidence/candidate11/ui-round-1/data/55c498296d35/pw5--c4-reader--swipe-only-reverse/demo/cache/shared-v1/processed/16/1696f7c104e39cfe4b6435913ea29a232e7af56ccb2e10505ec1d9eecccad029.png",
+        "retained_processed_sha256": "75ef5b681721a4f1e92076658595251c6596f084f09fce977e1808431b3db7f8",
+        "retained_expected_sha256": "d91e021495eb5ef00d586dccfd84422a661a7812de71649603ebdd0910bd6dd8",
+        "owner_metric_values_adopted": false,
+        "original_raw_source_page_opened": false
+      },
+      "actual_render_source_images_opened": [],
+      "intentional_capability_check": "Native profile/orientation and single-page content are retained. No physical orientation, input, sleep/wake, e-ink or performance qualification is inferred.",
+      "static_verdict": "No high-confidence new actionable visual issue within this related-contract scope; independent exact-state comparison is unavailable.",
+      "actual_actions_opened": true,
+      "action_record_count": 8,
+      "state_evidence_scope": "Relevant untouched state fields were read from the assigned input's static_capture_context; the separate complete state file was not loaded."
+    },
+    {
+      "case_id": "pw5--c4-reader--reverse-pure-input",
+      "png_path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate11/ui-round-1/snapshots/ui-round-1-snapshot-012-c4-c5-reader-controls/files/output/pw5--c4-reader--reverse-pure-input.png",
+      "png_sha256": "58aefbd825b13942c37ac8fe7ba6bd3cc24defe2c362186a51a0b904f824ea87",
+      "case_json_sha256": "e68e86dc38403a276f111c9fc3ac1b9253087ec579328377be502c2dd258c6dc",
+      "state_sha256": "4c07c7ab3a761227f73da6de95fa9b49b5535cbce4a03f9e497cfdd43c775800",
+      "metadata_sha256": "988214022b541e37d6444e644355e407f919f8e846eb23000b44a3807961ac9f",
+      "actions_path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate11/ui-round-1/snapshots/ui-round-1-snapshot-012-c4-c5-reader-controls/files/output/actions/pw5--c4-reader--reverse-pure-input.json",
+      "actions_sha256": "fc5f2317af097db625c216ae3f58b2ad7a0cd94564b4a5a48b658715ababc59d",
+      "log_sha256": "73d997f4564235750da901054aadc4c5e85dca830c52baf7732242e2091d908c",
+      "reference_id": "sc-reader--fullscreen",
+      "reference_sha256": "d3a53afd5b446e5e7a2028097666a158406d4eadbbac048e32773a88bf733107",
+      "reference_comparison_status": "related-logical-contract-only-no-exact-state-reference",
+      "independent_exact_state_reference_available": false,
+      "actual_image_opened": true,
+      "open_count": 1,
+      "native_dimensions": [
+        824,
+        618
+      ],
+      "scope": "Visible closed-Reader viewport, panel rules, artwork allocation and absence of application chrome; related original logical contract only.",
+      "observation": "The 824 x 618 original shows one upright comic page centered between broad white side regions. Ray, dotted, dark and vertical-line panels remain unobscured; no application corner marker, ribbon, page counter, menu or footer is visible.",
+      "static_context": {
+        "captured_route": "reader",
+        "menu": false,
+        "modal": "",
+        "reader_panel": "",
+        "reader_page": 13,
+        "reader_total": 40,
+        "visible_pages": [
+          13
+        ],
+        "landscape": true,
+        "reverse_landscape": true,
+        "rotation_degrees": 270,
+        "effective_tap_layout": "thirds",
+        "effective_reverse_taps": false,
+        "spread": false
+      },
+      "action_evidence_scope": "The owner action JSON records a desktop-pointer press/release at (82.4, 309). The input's captured context ends at page 13/40 with thirds, reverse-taps=false and reverse-landscape enabled. The opened screenshot supports the unobstructed final Reader surface; hardware coordinate rotation and an unrecorded before-page transition are not inferred.",
+      "source_artwork_attribution_basis": {
+        "kind": "Untouched owner-declared displayed_reader/render-source binding, with direct current-PNG and related original-reference viewing.",
+        "declared_first_path": "/root/aidoku-phase3/evidence/candidate11/ui-round-1/data/55c498296d35/pw5--c4-reader--reverse-controls/demo/cache/shared-v1/processed/63/63a1897db002d7fce86c2eb0fa5d36b2b2e7927dc17e668f0e941ae2ec390941.png",
+        "retained_processed_sha256": "3cedf6e1e25c028d062a9394e63a0f8cbe44ec37210ee26121a4b2dab939e20c",
+        "retained_expected_sha256": "88a3093c4814d9f635d3c269fd57bbfc91c7528f8ceef887e87f6758e2e40140",
+        "owner_metric_values_adopted": false,
+        "original_raw_source_page_opened": false
+      },
+      "actual_render_source_images_opened": [],
+      "intentional_capability_check": "Native profile/orientation and single-page content are retained. No physical orientation, input, sleep/wake, e-ink or performance qualification is inferred.",
+      "static_verdict": "No high-confidence new actionable visual issue within this related-contract scope; independent exact-state comparison is unavailable.",
+      "actual_actions_opened": true,
+      "action_record_count": 3,
+      "state_evidence_scope": "Relevant untouched state fields were read from the assigned input's static_capture_context; the separate complete state file was not loaded."
+    },
+    {
+      "case_id": "pw5--c4-reader--reverse-restore",
+      "png_path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate11/ui-round-1/snapshots/ui-round-1-snapshot-012-c4-c5-reader-controls/files/output/pw5--c4-reader--reverse-restore.png",
+      "png_sha256": "58aefbd825b13942c37ac8fe7ba6bd3cc24defe2c362186a51a0b904f824ea87",
+      "case_json_sha256": "29ce1ce605a1ebea42860016e4b57470de0eb3ef26cf822f963b8f3541b9f727",
+      "state_sha256": "4b8a697c53710420cb55a0c8c5de7914a86f8d29da236ebfb052472fe04c373a",
+      "metadata_sha256": "02e06af49a9f7169758ea8423b27e7849c0d82b52c8f073af33a7b4ad785c83b",
+      "actions_path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate11/ui-round-1/snapshots/ui-round-1-snapshot-012-c4-c5-reader-controls/files/output/actions/pw5--c4-reader--reverse-restore.json",
+      "actions_sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "log_sha256": "73d997f4564235750da901054aadc4c5e85dca830c52baf7732242e2091d908c",
+      "reference_id": "sc-reader--fullscreen",
+      "reference_sha256": "d3a53afd5b446e5e7a2028097666a158406d4eadbbac048e32773a88bf733107",
+      "reference_comparison_status": "related-logical-contract-only-no-exact-state-reference",
+      "independent_exact_state_reference_available": false,
+      "actual_image_opened": true,
+      "open_count": 1,
+      "native_dimensions": [
+        824,
+        618
+      ],
+      "scope": "Visible closed-Reader viewport, panel rules, artwork allocation and absence of application chrome; related original logical contract only.",
+      "observation": "The actual captured surface is Reader despite the initial library route. The 824 x 618 original shows the same unobscured single comic page and white side regions as reverse-pure-input, with no visible menu, recovery overlay, footer, counter or corner marker.",
+      "static_context": {
+        "captured_route": "reader",
+        "menu": false,
+        "modal": "",
+        "reader_panel": "",
+        "reader_page": 13,
+        "reader_total": 40,
+        "visible_pages": [
+          13
+        ],
+        "landscape": true,
+        "reverse_landscape": true,
+        "rotation_degrees": 270,
+        "effective_tap_layout": "thirds",
+        "effective_reverse_taps": false,
+        "spread": false
+      },
+      "action_evidence_scope": "The owner action JSON is empty. The initial library route and final captured Reader context at page 13/40 are retained; the opened screenshot supports only the final unobstructed Reader surface, not a separately demonstrated restore recipe or physical lifecycle.",
+      "source_artwork_attribution_basis": {
+        "kind": "Untouched owner-declared displayed_reader/render-source binding, with direct current-PNG and related original-reference viewing.",
+        "declared_first_path": "/root/aidoku-phase3/evidence/candidate11/ui-round-1/data/55c498296d35/pw5--c4-reader--reverse-controls/demo/cache/shared-v1/processed/63/63a1897db002d7fce86c2eb0fa5d36b2b2e7927dc17e668f0e941ae2ec390941.png",
+        "retained_processed_sha256": "3cedf6e1e25c028d062a9394e63a0f8cbe44ec37210ee26121a4b2dab939e20c",
+        "retained_expected_sha256": "88a3093c4814d9f635d3c269fd57bbfc91c7528f8ceef887e87f6758e2e40140",
+        "owner_metric_values_adopted": false,
+        "original_raw_source_page_opened": false
+      },
+      "actual_render_source_images_opened": [],
+      "intentional_capability_check": "Native profile/orientation and single-page content are retained. No physical orientation, input, sleep/wake, e-ink or performance qualification is inferred.",
+      "static_verdict": "No high-confidence new actionable visual issue within this related-contract scope; independent exact-state comparison is unavailable.",
+      "actual_actions_opened": true,
+      "action_record_count": 0,
+      "state_evidence_scope": "Relevant untouched state fields were read from the assigned input's static_capture_context; the separate complete state file was not loaded."
+    },
+    {
+      "case_id": "pw5--c4-reader--reverse-wake",
+      "png_path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate11/ui-round-1/snapshots/ui-round-1-snapshot-012-c4-c5-reader-controls/files/output/pw5--c4-reader--reverse-wake.png",
+      "png_sha256": "58aefbd825b13942c37ac8fe7ba6bd3cc24defe2c362186a51a0b904f824ea87",
+      "case_json_sha256": "08c2bd8fa9ee4f568babc3a289bf1f5313fe866b2943fac5a022e1db16663d26",
+      "state_sha256": "3494ebc1f77b061df5aaf1e8228edd38f9483e936116fc272bce7ba1ef8ea6fc",
+      "metadata_sha256": "8ba53ecc511e3bf1ce37607da32ef98acb99766fe2db1bdb461c2a8fa585d7cd",
+      "actions_path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate11/ui-round-1/snapshots/ui-round-1-snapshot-012-c4-c5-reader-controls/files/output/actions/pw5--c4-reader--reverse-wake.json",
+      "actions_sha256": "9aef5fd56799cf9057f518b91e3f037b846e1d4dd3cb0fd129e21857caef3f1f",
+      "log_sha256": "73d997f4564235750da901054aadc4c5e85dca830c52baf7732242e2091d908c",
+      "reference_id": "sc-reader--fullscreen",
+      "reference_sha256": "d3a53afd5b446e5e7a2028097666a158406d4eadbbac048e32773a88bf733107",
+      "reference_comparison_status": "related-logical-contract-only-no-exact-state-reference",
+      "independent_exact_state_reference_available": false,
+      "actual_image_opened": true,
+      "open_count": 1,
+      "native_dimensions": [
+        824,
+        618
+      ],
+      "scope": "Visible closed-Reader viewport, panel rules, artwork allocation and absence of application chrome; related original logical contract only.",
+      "observation": "The 824 x 618 original independently opened for this case shows the same unobscured single comic page and white side regions as reverse-restore. No visible menu, footer, counter, corner marker or wake/status notice remains.",
+      "static_context": {
+        "captured_route": "reader",
+        "menu": false,
+        "modal": "",
+        "reader_panel": "",
+        "reader_page": 13,
+        "reader_total": 40,
+        "visible_pages": [
+          13
+        ],
+        "landscape": true,
+        "reverse_landscape": true,
+        "rotation_degrees": 270,
+        "effective_tap_layout": "thirds",
+        "effective_reverse_taps": false,
+        "spread": false
+      },
+      "action_evidence_scope": "The owner action JSON records desktop lifecycle suspend, resume and frame-displayed events. The final captured context is closed Reader at page 13/40, and the independently opened screenshot retains the same artwork. This supports the final software capture after the declared recipe; no physical sleep/wake, timing or reader lease qualification is inferred.",
+      "source_artwork_attribution_basis": {
+        "kind": "Untouched owner-declared displayed_reader/render-source binding, with direct current-PNG and related original-reference viewing.",
+        "declared_first_path": "/root/aidoku-phase3/evidence/candidate11/ui-round-1/data/55c498296d35/pw5--c4-reader--reverse-controls/demo/cache/shared-v1/processed/63/63a1897db002d7fce86c2eb0fa5d36b2b2e7927dc17e668f0e941ae2ec390941.png",
+        "retained_processed_sha256": "3cedf6e1e25c028d062a9394e63a0f8cbe44ec37210ee26121a4b2dab939e20c",
+        "retained_expected_sha256": "88a3093c4814d9f635d3c269fd57bbfc91c7528f8ceef887e87f6758e2e40140",
+        "owner_metric_values_adopted": false,
+        "original_raw_source_page_opened": false
+      },
+      "actual_render_source_images_opened": [],
+      "intentional_capability_check": "Native profile/orientation and single-page content are retained. No physical orientation, input, sleep/wake, e-ink or performance qualification is inferred.",
+      "static_verdict": "No high-confidence new actionable visual issue within this related-contract scope; independent exact-state comparison is unavailable.",
+      "actual_actions_opened": true,
+      "action_record_count": 3,
+      "state_evidence_scope": "Relevant untouched state fields were read from the assigned input's static_capture_context; the separate complete state file was not loaded."
+    }
+  ],
+  "new_actionable": [],
+  "suggestions": [],
+  "pending": [],
+  "historical_findings": [],
+  "regression_closures": [],
+  "limitations": [
+    "This batch covers only the four assigned cases. It does not accept the module, complete run or clean round.",
+    "All four cases lack an independently captured exact-state HANDOFF reference; no missing exact-state comparison is marked passed.",
+    "The four owner action JSONs and the input's captured state context were read statically. They support declared desktop input recipes and final captured software state, not hidden hit-zone semantics, unrecorded before/after transitions, hardware coordinates, physical sleep/wake, timing or a live-reader lease.",
+    "Processed/oracle/raw source images were not assigned or opened. Their hashes support owner provenance only; no oracle metric was adopted as a visual verdict.",
+    "No application, test, build, validator, runtime probe, SSH session, hash command, image processing, source edit or prior-report edit was performed."
+  ],
+  "final_capture_scope": {
+    "manifest": {
+      "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate11/ui-round-1/manifest.json",
+      "sha256": "ff5fad60889a430ef0ae78e0f5c52a08e6a8d57a5785f306b303e56857a1079d"
+    },
+    "inventory": {
+      "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate11/ui-round-1/final-inventory.json",
+      "sha256": "6cd76cd5c6638159f226b38b38d1f9f49c5e9c778528e2f5939136f3bf63fd51"
+    },
+    "reviewed_case_count": 4,
+    "actual_visual_review_inferred": false,
+    "full_round_accepted": false,
+    "clean_round_credit": 0
+  },
+  "source_artwork_image_opens": 0
+}

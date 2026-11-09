@@ -1,0 +1,83 @@
+{
+  "batch_id": "reference-18",
+  "reviewer": "/root/phase3_round1_review/reference_18",
+  "status": "complete",
+  "round": 1,
+  "run_id": "a1baf3fe3dc2",
+  "binary_sha256": "94d7f3bbcab475ad8833a2f3c486138f7b49bead231851c2d8eab2f0c3d2ac51",
+  "source_sha256": "aef9db4e111165016a10a2a95e111f3155860b8510c7f6207ec9c79fbec5082c",
+  "reference_set_sha256": "e7b49b456255432d74cfe41346f9d44c1a9c55bf67c5d55483e4ae3029547d18",
+  "reviewed_case_ids": [
+    "sc-library--select",
+    "sc-library--sort"
+  ],
+  "evidence_identity": {
+    "method": "Read both existing case metadata JSON files and use PowerShell Get-FileHash SHA256 on the four unmodified PNG files; view every PNG individually with tools.view_image.",
+    "candidate_capture_method": "native Slint application --capture; unmodified original PNG",
+    "metadata_identity_matches": true,
+    "candidate_hashes_match_case_evidence": true,
+    "reference_hashes_match_case_metadata": true,
+    "candidate_logical_size": [930, 1240],
+    "reference_physical_size": [1860, 2480],
+    "reference_physical_scale": 2,
+    "comparison_basis": "Compare at the same logical scale: one candidate pixel corresponds to two source reference pixels. Image-viewer display resizing is not a layout difference.",
+    "reference_set_identity_scope": "The reference-set SHA256 is the supplied review identity. This bounded review independently verified the two individual reference PNG hashes recorded in the corresponding case metadata."
+  },
+  "reviewed_cases": [
+    {
+      "case_id": "sc-library--select",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/sc-library--select.png",
+      "candidate_sha256": "f257e18013d3348313eb70892946a8c1860a8cca8617f16f6c4b5b2c34a2cb67",
+      "reference_png": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/screens/states/sc-library--select.png",
+      "reference_sha256": "21161b712f431dbe20e96f6832c802191985d7fe5cbfcae7630900d8dffeced2",
+      "viewed_candidate": true,
+      "viewed_reference": true,
+      "outcome": "pass",
+      "observations": [
+        "The metadata identifies the requested Scribe portrait library selection state, round 1, run a1baf3fe3dc2, and the supplied candidate binary and source identities. The candidate PNG hash matches evidence_hashes.screenshot.sha256, and the reference PNG hash matches reference_sha256.",
+        "At equal logical scale, the selection heading and its two upper-right controls have the reference hierarchy and placement. The candidate shows one selected book and a filled first checkbox; the metadata also records one selected item.",
+        "The continuation card and daily-update card remain side by side above the categories. Their outlines, approximately 176-logical-pixel height, internal spacing, and distinct primary versus secondary text treatment visually agree with the reference.",
+        "All eighteen covers remain visible in six columns and three rows. The cover rectangles, gaps, title baselines, and top-left selection boxes align with the reference layout. Long titles remain legible without colliding with adjacent columns.",
+        "The centered page folio and right-aligned next-page affordance sit above the 80-logical-pixel bottom bulk-action bar. All four bulk actions have visible icons and labels, with no clipping at the lower edge.",
+        "Primary text remains black, secondary text and counters remain gray, and cards remain white with thin outlines. No unintended surface shadow or background stipple is visible; patterned content is confined to the book-cover previews."
+      ],
+      "intentional_differences": [
+        "The candidate captures one selected book while the reference captures zero. The heading count and filled first checkbox consistently reflect this actual selection state.",
+        "Real library data, cover artwork, title text, progress, counts, capacity, and time are allowed to differ. They were not used to excuse spacing, clipping, or geometry discrepancies.",
+        "Thumbnail progress strokes are treated as generic preview content rather than an independent requirement to reproduce reference fixture progress exactly."
+      ]
+    },
+    {
+      "case_id": "sc-library--sort",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/sc-library--sort.png",
+      "candidate_sha256": "3f16a3268c3c2edaddbdb21bbf6fc3b87a9b5868fcd13e726e3996fae629ee5e",
+      "reference_png": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/screens/states/sc-library--sort.png",
+      "reference_sha256": "7d4b2894a58f41cb5fe3b72b01547cb19633846809ab168c60f3194a5e4aeff8",
+      "viewed_candidate": true,
+      "viewed_reference": true,
+      "outcome": "pass",
+      "observations": [
+        "The metadata identifies the requested Scribe portrait library choices modal with library-filter context, recent-read sorting, descending direction, and four neutral filter states. Its run, binary, source, and individual candidate/reference PNG identities match the supplied evidence.",
+        "The dialog's upper-right anchor, approximately 24-logical-pixel padding, heading, two-column arrangement of eight sorting choices, and approximately 54-logical-pixel sorting-button height visually agree with the reference at equal logical scale.",
+        "The selected recent-read option uses the intended black fill and white label. Unselected sort options retain black labels, white fills, and clear thin outlines. The sorting labels and heading show no clear font-size or weight mismatch against the reference.",
+        "The candidate includes direction buttons and four filter chips beneath the eight sort options. The neutral chips are visually distinct from inverse selected controls. Their labels appear approximately 16 logical pixels high in font size and their widths approximately 84 logical pixels; these are visual estimates, not source or pixel-analysis measurements.",
+        "The complete direction row, filter row, and bottom completion button are visible within the outlined dialog. The additional content increases dialog height without clipping controls or reaching the page folio or bottom navigation.",
+        "The reference supplied for this case contains eight sorting choices and a completion button but no filter-chip row. Consequently, this pair does not establish a matching Scribe reference filter-chip size and does not substantiate the previously reported Paperwhite chip-size discrepancy on Scribe.",
+        "The exposed background preserves the six-column library geometry and title-adjacent unread/download indicators. The dialog intentionally occludes background content. Text and outlines retain the reference black/gray hierarchy with no unintended shadow or stippled modal surface."
+      ],
+      "intentional_differences": [
+        "The eight choices represent actual SQL sorting. The first choice uses an equivalent book-name sorting label rather than reproducing the reference wording exactly.",
+        "The candidate exposes actual direction and three-state filtering controls absent from this reference capture. Their presence and the resulting content-driven dialog height are accepted; the dialog top is not assumed to be fixed across differing content.",
+        "The actual library has 46 books and seven downloaded visible books. Fixture-dependent titles, covers, badges, capacity, progress, and time are accepted without relaxing geometry or legibility requirements."
+      ]
+    }
+  ],
+  "suggestions": [],
+  "limitations": [
+    "This independent review covers only the two listed cases and four viewed PNGs. It does not declare the complete round clean.",
+    "The review used only existing JSON/PNG evidence, direct image viewing, and file hashing. No application, build, test, smoke test, runtime probe, Git operation, or product-file modification was performed.",
+    "Still images establish visible control completeness and apparent reachability, not interaction behavior, SQL correctness, filter transitions, or physical-device e-ink behavior. Existing metadata is supporting evidence, not a new verification run.",
+    "The Scribe reference sort image has no filter chips. A direct reference comparison of their exact font size and width is therefore unavailable in this batch; the Paperwhite observation was not copied into a Scribe defect without matching evidence.",
+    "Geometry and font-size estimates are visual observations after accounting for the 1x candidate and 2x reference relationship; no automated pixel metric or font inspection was run."
+  ]
+}

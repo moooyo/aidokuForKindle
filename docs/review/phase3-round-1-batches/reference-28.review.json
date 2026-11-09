@@ -1,0 +1,156 @@
+{
+  "batch_id": "reference-28",
+  "reviewer": "/root/phase3_round1_review/reference_28",
+  "run_id": "a1baf3fe3dc2",
+  "round": 1,
+  "status": "reviewed-with-findings",
+  "binary_sha256": "94d7f3bbcab475ad8833a2f3c486138f7b49bead231851c2d8eab2f0c3d2ac51",
+  "source_sha256": "aef9db4e111165016a10a2a95e111f3155860b8510c7f6207ec9c79fbec5082c",
+  "expected_reference_identity_sha256": "e7b49b456255432d74cfe41346f9d44c1a9c55bf67c5d55483e4ae3029547d18",
+  "identity_verification": "All four supplied case sidecars identify round 1, run a1baf3fe3dc2, and the expected binary and source SHA-256 values. Get-FileHash SHA256 was applied to every original candidate and reference PNG; all eight hashes match the respective case-sidecar evidence. The expected reference-set identity was supplied by the coordinator; this batch independently checked its four individual reference PNG hashes.",
+  "comparison_basis": "Original candidate PNGs are 930 x 1240 at logical scale 1. Reference PNGs are 1860 x 2480 at physical scale 2. Visual geometry was compared in the same 930 x 1240 logical coordinate system. All eight original files were individually opened with tools.view_image; no transformed PNG was substituted as evidence.",
+  "reviewed_case_ids": [
+    "sc-settings--light",
+    "sc-settings--logs",
+    "sc-settings--pen",
+    "sc-settings--power"
+  ],
+  "reviewed_cases": [
+    {
+      "case_id": "sc-settings--light",
+      "case_metadata": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/cases/sc-settings--light.json",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/sc-settings--light.png",
+      "candidate_sha256": "a2babfe4de40d9bdffaa4cadcec4303f901ce0eb1b1a0b314cae65af8b2a6e5e",
+      "reference_png": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/screens/states/sc-settings--light.png",
+      "reference_sha256": "dae1fdbd16b41bddff72d59f890f720398614206286dc5c295a73cfb7fd79417",
+      "viewed_candidate": true,
+      "viewed_reference": true,
+      "identity_verified": true,
+      "outcome": "accepted-with-intentional-differences",
+      "observations": [
+        "The navigation divider is at logical x=320, the content starts at approximately x=356, and the dock occupies the bottom 80 logical pixels. The selected frontlight row has a solid black background and the navigation rows retain approximately 46-pixel visual height.",
+        "Brightness and warmth each have a visible value, minus button, track, thumb, and plus button. Candidate values 12 and 8 match the case-sidecar preferences; their thumb positions remain consistent with a 0..24 range. All slider controls fit inside the content width without clipping.",
+        "The section title, body labels, serif numeric values, white surface, thin gray boundaries, and monochrome icons preserve the reference hierarchy. No shadow or stippled page background was observed.",
+        "Every visible navigation entry and all five dock destinations fit inside the viewport. The device capability summary is ellipsized within its header area and does not overlap the right-hand status column.",
+        "No ambient-light sensor capability is established by the supplied desktop sidecar. Absence of the reference auto-brightness control is therefore not treated as a visual defect."
+      ],
+      "intentional_differences": [
+        "Candidate brightness 12 and warmth 8 differ from reference values 14 and 6; these are actual state values rather than geometry defects.",
+        "The desktop capability declaration exposes frontlight and warmth controls but does not qualify physical frontlight or sensor hardware. An unsupported sensor-follow control must not be fabricated.",
+        "The unsupported pen navigation entry is absent, shifting subsequent navigation entries upward.",
+        "The actual application version, device name, capability wording, and clock may differ from the reference placeholders."
+      ]
+    },
+    {
+      "case_id": "sc-settings--logs",
+      "case_metadata": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/cases/sc-settings--logs.json",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/sc-settings--logs.png",
+      "candidate_sha256": "cc4ae2960222c091fee31e7dcca2a16a69d3db1c306c32908b5373484767cfdb",
+      "reference_png": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/screens/states/sc-settings--logs.png",
+      "reference_sha256": "3782d39f072cf9ddb3a6161c68ced59eb7d462e06e802481af7561a903674591",
+      "viewed_candidate": true,
+      "viewed_reference": true,
+      "identity_verified": true,
+      "outcome": "findings",
+      "observations": [
+        "The logging navigation row is selected in black. The 320-pixel navigation column, approximately x=356 content alignment, title position, thin separator, white surface, and 80-pixel dock remain consistent with the shared settings shell.",
+        "The log-file toggle and both export and clear actions are rendered with disabled gray labels, borders, and switch styling. The sidecar settings_status records an unavailable state, but no explanatory status is visible in the content. This is recorded as P3R1-REF28-1.",
+        "Both action buttons are approximately 100 logical pixels wide in the candidate. Their reference counterparts are approximately 118 logical pixels wide after normalizing the physical 2x image; the inter-button gap and first-button left alignment are otherwise similar. This geometry difference is recorded as P3R1-REF28-3.",
+        "The title and action labels are legible, with no text collision or viewport clipping. The unavailable controls are fully visible but cannot satisfy the expected reachable logging actions in this captured state."
+      ],
+      "intentional_differences": [
+        "The unsupported pen navigation entry is absent, shifting subsequent navigation entries upward.",
+        "The actual application version, device name, capability wording, and clock may differ from the reference placeholders.",
+        "The case declares no logging capability exception and no intentional difference permitting disabled export or clear actions."
+      ]
+    },
+    {
+      "case_id": "sc-settings--pen",
+      "case_metadata": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/cases/sc-settings--pen.json",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/sc-settings--pen.png",
+      "candidate_sha256": "e35dca2ac34da2d37d880f7341eac759cf54e830ab975fc275bdcbabf3137338",
+      "reference_png": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/screens/states/sc-settings--pen.png",
+      "reference_sha256": "427c440e1b3143d3f79ff33d6f822d66fa1142905bbac6dea9b2188d79916e28",
+      "viewed_candidate": true,
+      "viewed_reference": true,
+      "identity_verified": true,
+      "outcome": "accepted-with-intentional-differences",
+      "observations": [
+        "The candidate captures the actual default screen-refresh section instead of forcing the reference pen page. Its sidecar settings_section is screen-refresh, pen_input_implemented is false, and visible_setting_ids excludes a pen section.",
+        "The complete visible navigation confirms that there is no pen entry between frontlight and power. No fake pen or palm-rejection switches are shown. This satisfies the explicit capability-bound capture requirement.",
+        "The default section retains the black selected screen-refresh row, a 320-pixel navigation column, content aligned at approximately x=356, and an 80-pixel dock. There is no list pager or clipped navigation entry.",
+        "Refresh interval choices, the unavailable quality group with visible status, switches, and the grayscale strip fit above the dock. Text remains legible and the surface is white with thin monochrome boundaries and no shadow.",
+        "The reference pen controls are not used to demand unsupported candidate controls; content-level equality is intentionally inapplicable for this hardware-bound case."
+      ],
+      "intentional_differences": [
+        "Pen input is not implemented. The supplied case explicitly requires capturing real navigation without a pen entry and forbids forcing a hidden section or fabricating pen controls.",
+        "Removing the pen row shifts subsequent navigation entries upward.",
+        "The actual application version, device name, capability wording, and clock may differ from the reference placeholders."
+      ]
+    },
+    {
+      "case_id": "sc-settings--power",
+      "case_metadata": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/cases/sc-settings--power.json",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/sc-settings--power.png",
+      "candidate_sha256": "aab544e43e1027631a6ff4072a3a6d9eb52f86d9caeda70b2b1b8e0a18734e4f",
+      "reference_png": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/screens/states/sc-settings--power.png",
+      "reference_sha256": "784e15a6156fbb749e6e8b0871748b92fff977feb0164a5b97ee59d8a1df4abb",
+      "viewed_candidate": true,
+      "viewed_reference": true,
+      "identity_verified": true,
+      "outcome": "findings",
+      "observations": [
+        "The power navigation row is selected in black. The title, first form row, content boundaries, 320-pixel navigation column, and 80-pixel dock retain the reference structure.",
+        "Keep-awake is displayed as enabled and on, matching the sidecar keep_awake preference. The exit action is visible with enabled black styling at the right of the final form row.",
+        "Charging-triggered automatic library updates and reading-time Wi-Fi policy controls are gray and disabled. All three screensaver choices are also disabled, with an unavailable label and no selected option. This is recorded as P3R1-REF28-2.",
+        "The three screensaver cards retain the approximate reference widths and spacing, and the exit row remains beneath them without clipping. Actual cover or reading-progress artwork may differ, but that does not explain disabled selection.",
+        "All labels, cards, and the exit button fit within the right content region and above the dock. Disabled gray text is distinguishable from the enabled keep-awake and exit controls; no shadow or stippled page surface was observed."
+      ],
+      "intentional_differences": [
+        "The unsupported pen navigation entry is absent, shifting subsequent navigation entries upward.",
+        "Actual keep-awake values, cover artwork, and reading-progress data may differ from the reference state.",
+        "The actual application version, device name, capability wording, and clock may differ from the reference placeholders.",
+        "The case declares no capability exception or intentional difference for the unavailable power policies and screensaver selection."
+      ]
+    }
+  ],
+  "suggestions": [
+    {
+      "id": "P3R1-REF28-1",
+      "case_id": "sc-settings--logs",
+      "priority": "P2",
+      "description": "The applicable logging section exposes only unavailable controls and omits the visible operation status.",
+      "evidence": "The candidate log-file toggle, export action, and clear action all use disabled gray styling. The sidecar settings_status records an unavailable state, while the screenshot contains no visible explanation. The reference has an enabled log toggle and reachable export and clear buttons. This case has no logging capability bound or intentional exception.",
+      "recommendation": "Connect log writing, export, and clear to actual logging operations and keep supported actions reachable. Render the real operation result or unavailable reason in the section so the user can understand the current state; do not enable placeholder actions.",
+      "status": "open",
+      "introduced_round": 1
+    },
+    {
+      "id": "P3R1-REF28-2",
+      "case_id": "sc-settings--power",
+      "priority": "P2",
+      "description": "Required update, Wi-Fi, and screensaver policies remain unavailable in the power section.",
+      "evidence": "The candidate charging-update and reading-time Wi-Fi switches are disabled. The current-cover, reading-progress, and system-default screensaver cards are all disabled and have no selected state; an unavailable label is shown. The reference exposes these policies and a selected screensaver. The case metadata declares no capability bound or intentional exception for these controls.",
+      "recommendation": "Implement the actual supported charging-update, Wi-Fi, and screensaver policy operations, persist their settings, and reflect the real current selection. Keep the existing reachable keep-awake and exit actions. Any genuine target limitation should have explicit capability evidence and a visible explanation rather than unconditional disabled placeholders.",
+      "status": "open",
+      "introduced_round": 1
+    },
+    {
+      "id": "P3R1-REF28-3",
+      "case_id": "sc-settings--logs",
+      "priority": "P3",
+      "description": "The logging action buttons are narrower than the normalized reference buttons.",
+      "evidence": "At candidate scale 1, export spans approximately x=356..456 and clear spans x=468..568, giving about 100 logical pixels per button. The reference buttons span approximately x=356..474 and x=486..604 after physical-scale-2 normalization, giving about 118 logical pixels per button. The discrepancy remains independent of the enabled or disabled state.",
+      "recommendation": "Restore the reference horizontal button padding or minimum width, approximately 118 logical pixels for these labels, while retaining the existing left alignment and inter-button gap.",
+      "status": "open",
+      "introduced_round": 1
+    }
+  ],
+  "limitations": [
+    "This independent review covers only the four assigned cases and eight PNGs in reference-28; it does not declare the entire round clean.",
+    "Only existing JSON and PNG evidence was read, PNG hashes were computed with Get-FileHash, and the requested review JSON was written. No application, build, test suite, runtime probe, Git operation, or product modification was performed.",
+    "Static captures and supplied sidecars establish the displayed state, not successful execution of logging, hardware, or power operations. Runtime behavior was not verified.",
+    "Geometry values are approximate manual observations in normalized logical coordinates. Reference display resizing by the image viewer was accounted for; no pixel-difference analysis or transformed evidence image was used.",
+    "The desktop profile exposes implemented frontlight and warmth controls but does not qualify physical hardware. Sensor and pen differences were evaluated within the explicit capability bounds."
+  ]
+}

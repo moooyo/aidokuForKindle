@@ -1,0 +1,107 @@
+{
+  "schema_version": 1,
+  "batch_id": "c5q01-b05",
+  "reviewer": "/root/final_validation_delivery/c4_full_review_coordinator/c5q01_b05",
+  "run_id": "43d2545cb872",
+  "round": 3,
+  "manifestSHA": "1731e4306df0596e80edd7df2d3e5e57c34fc64feae44572011eba61c2bfc7c5",
+  "inventorySHA": "d65f77a634219f545fa9adfdfbd4bbcb2838ca77efa04a5cb7254ad3e6434c7d",
+  "freeze_tuple": {
+    "source_file_count": 227,
+    "source_sha256": "892f0ac73a807e4fd61a235d9ad4fe00c4f03c1e4e6881f28b2dd8bee2b7ddf1",
+    "binary_sha256": "9bd66a1f89473218e67558f763a4a7d4da7c642f9960ae5430ceb74ac365129b",
+    "harness_sha256": "94ccc78d3c11b97791618527350ce59dacf458bfc57f8f04aabec045dd544a74",
+    "capture_plan_sha256": "b3adabbf4f2d33789f381dc2ac55474d89fcd210d58ce9e5083c0d818d547eec",
+    "reference_scope_sha256": "c910bed9f02ed17b2ca0a54aca1beeeeb6caabc5a17a91afe764ddd3e7b0d33c",
+    "reference_sha256": "e7b49b456255432d74cfe41346f9d44c1a9c55bf67c5d55483e4ae3029547d18",
+    "capture_helper_sha256": {
+      "verify-ui.py": "470872e6fd22a78b474c0f862164875ad9c7237bd2f3f164512864580ac1e90d",
+      "verify-fullscreen.py": "4a6c48cef771e66e9b3058edd888dcf2d4bce02e2720b5cc00c7a5b987bc9670",
+      "handoff_c4_business.py": "6197f375b247962e3ce9acdd3779468073f11e0002ac3c7ce876a7b1a0d0d9be",
+      "handoff_c5_ui.py": "fa30ef2bf8ab512e9705f43933ff6acaf32993e5aa1dbc62be330d4c97b481f2",
+      "handoff_c5_reader.py": "5b88a0c1b8e1151a3f96decef1a3a06f98a0d9de99908709bafbfb02cea490d5"
+    }
+  },
+  "identity_basis": "All SHA values come from the assigned owner inventory fields, including reference identities. No local rehash was performed. Selected frozen case run, source and binary fields agree with the assigned tuple; this is not independent hash verification.",
+  "reviewed_case_ids": ["pw5--c5-empty-history-body", "pw5--c5-empty-history-library", "scribe--c5-empty-history-body", "scribe--c5-empty-history-browse"],
+  "viewing": {"candidate_originals": 4, "reference_originals": 4, "total_image_opens": 8, "crops": 0, "method": "tools.view_image opened each assigned original path directly; no image processing"},
+  "cases": [
+    {
+      "case_id": "pw5--c5-empty-history-body",
+      "png_path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate5/ui-qualification-01/pw5--c5-empty-history-body.png",
+      "artifact_sha256": {"png": "4838b032122cd1b0b8e5f7b8c618b4a90be41259dd76141fec6f056963aedbd1", "case_json": "fa799223074766d92c3e9d4a276a404ecfcd36683828af7ab77b4cef741de0fe", "state": "a107b9c3860749ebd319f68c1b19735c3ddea8daab3752b3f19f50010b19df35", "actions": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570", "metadata": "1869558c6535ee92e7763ed7cb1e76b22ac25b766a317497140773a2f5259a0d", "log": "dc121ceea011a63c29b404d6c6b75bbe2db32b326923b8fa99759f457bfd709f"},
+      "actual_view": true,
+      "observations": {
+        "geometry": "At 618x824, the clock, empty-history heading and two-button row form a centered body component, separated from header tabs and the bottom dock. Frozen control bounds are [205,467,104,49] and [321,467,104,49], with a 12 px gap; the viewed fill and outline agree with that arrangement.",
+        "font": "The empty heading and both bold button labels are fully readable on one line; the large serif page title retains the reference hierarchy.",
+        "boundary": "Both action rectangles have complete visible boundaries, with no clipping, overlap or collision with the page index or dock.",
+        "affordance": "Return to Library is a filled primary action and Browse Sources is outlined. Both sit inside the empty component, independently of the global navigation. The empty-state trash icon is visually subdued."
+      },
+      "intentional_check": "No intentional differences are declared. Frozen history_count and visible_history are zero; the populated history reference is used for shell hierarchy only, not as required content.",
+      "capability_check": "Frozen metadata and capability declaration identify a desktop PW5 profile with physical hardware qualification false. No physical input or display claim is made.",
+      "static_verdict": "No new actionable design issue observed; C4-C5-G18 body-action visibility is supported.",
+      "behavior_limits": "The body case records zero pointer events and an empty action file. Its screenshot alone proves neither navigation action; only the separately captured library pair supports the primary destination."
+    },
+    {
+      "case_id": "pw5--c5-empty-history-library",
+      "png_path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate5/ui-qualification-01/pw5--c5-empty-history-library.png",
+      "artifact_sha256": {"png": "ff6f5339a5049ee922357df10835b7cb8401f87b9313073d917a6c539ebff661", "case_json": "bd5cc3e29ac2d591daafd39ee6dfe7f1f2c1c4318a8f35c47a80d01199360a12", "state": "1d4c4a15b5f1511216b4efa1026221f58b9f223a0b4b162fb2195941efca0c8b", "actions": "d9169bd0046759b0ce07187ed49d9d231d161c5449bdf4db7053723dc42ca18c", "metadata": "21067323135c5ad7f51f526d78e8fd3ba88e5e6dcdd85367f36bbb9d927d6d5b", "log": "dc121ceea011a63c29b404d6c6b75bbe2db32b326923b8fa99759f457bfd709f"},
+      "actual_view": true,
+      "observations": {
+        "geometry": "The 618x824 destination visibly has the library header and active Library dock item. The centered empty-library icon and heading remain clear of the header and dock; its filled Browse Sources action is approximately 176x48 and centered below the heading.",
+        "font": "The library heading, zero-count summary and action label are readable without wrapping or truncation; title hierarchy follows the related Main shell.",
+        "boundary": "The filled action has a complete rectangle and clear surrounding whitespace. No grid, card or pagination is falsely shown for the zero-book state.",
+        "affordance": "The selected dock state and page title make the destination unambiguous. The next Browse Sources action is visibly distinct but was not activated in this case."
+      },
+      "intentional_check": "No intentional differences are declared. Frozen library_count and visible_books are zero; the populated Main reference does not require copying sample books or counts.",
+      "capability_check": "Desktop PW5 capture only; physical hardware qualification remains false.",
+      "captured_behavior_support": "The frozen origin names the primary empty-history rectangle [205,467,104,49]. The action file records move/press/release at [257,491.25] at 450/500/600 ms, and the destination state and metadata report route=library, consistent with the viewed PNG. This supports that captured pointer sequence, not independent replay.",
+      "static_verdict": "No new actionable design issue observed; the captured PW5 primary empty-body action has a supported library destination.",
+      "behavior_limits": "No physical touch, timing, subsequent Browse Sources action, or uncaptured PW5 secondary history action is established."
+    },
+    {
+      "case_id": "scribe--c5-empty-history-body",
+      "png_path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate5/ui-qualification-01/scribe--c5-empty-history-body.png",
+      "artifact_sha256": {"png": "55e73a7abd64dcbd108c821c3b1a16d5e81c1e3faccb16a110e940d75f47c8c8", "case_json": "9ce5d7bded51be6379b3db06af03b1adb49186f0784f5f731dd28193cc92ae7e", "state": "4c672f84f7fc8fd75ed7f7b40d6f7cd04836b86cfa0d3adb832cf0978e752180", "actions": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570", "metadata": "7ed38fb3b24151ed38267a67de9e8788fdb3f3bbbb89a7c023f5eab42a279d0e", "log": "7e68a4176710a866675a6b95bcf7bed2d96c58a8fd7996a4d48f3679514483a9"},
+      "actual_view": true,
+      "observations": {
+        "geometry": "At 930x1240 the empty component remains centered in the large body. Frozen button bounds are [337,697,120,57] and [473,697,120,57], with a 16 px gap; the viewed action row is consistent with those bounds and stays well above pagination and dock.",
+        "font": "The empty heading and both bold action labels are readable and unwrapped. Header title, secondary count text and tabs maintain a clear hierarchy.",
+        "boundary": "The primary fill and secondary outline are complete and separated; no element is clipped or obscured by the shell.",
+        "affordance": "Both Return to Library and Browse Sources are visible within the body. The filled/outlined distinction matches PW5, while the History dock item remains independently selected."
+      },
+      "intentional_check": "No intentional differences are declared. Zero history is consistent with the empty component; populated sc-history rows are not required empty-state data. The retained settings_section value does not alter the visible history route.",
+      "capability_check": "Frozen capture is the desktop Scribe design profile with physical hardware qualification false; declared orientation profile support does not establish sensor or physical behavior here.",
+      "static_verdict": "No new actionable design issue observed; C4-C5-G18 body-action visibility is supported.",
+      "behavior_limits": "Zero pointer events and an empty action file do not establish either click from this screenshot. The separately captured browse pair supports only the secondary destination."
+    },
+    {
+      "case_id": "scribe--c5-empty-history-browse",
+      "png_path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate5/ui-qualification-01/scribe--c5-empty-history-browse.png",
+      "artifact_sha256": {"png": "db39ec47a2d73b9e32b8c15cd80fe4dc9fd31ea57bac3623bf32330e7ec96f11", "case_json": "fca19b0d67d4499015b2297e374c0e8a0613295353d93df34c146e413e4899d1", "state": "363974a1fceaef4bb9b90769f451a00a2bd9c4091bbe90d0b4e1e71ece98a472", "actions": "e069faca5cfb45eaee693efb877f60dbf34b148cf6a3cba72c1942020781049f", "metadata": "9db63c5c12e055405e5eeccb97b85b66dd9d42d36b9ac8b4e74803252f08dedc", "log": "7e68a4176710a866675a6b95bcf7bed2d96c58a8fd7996a4d48f3679514483a9"},
+      "actual_view": true,
+      "observations": {
+        "geometry": "The 930x1240 destination has the MangaDex catalog header, source switch, tab/search/filter row and selected Browse dock item. The empty-catalog icon, heading and Retry button are centered within the body; top controls fit without collision.",
+        "font": "The source title, tab labels, search placeholder, empty heading and Retry label remain readable. The large serif source title and bold selected tab preserve the related browse shell hierarchy.",
+        "boundary": "Search, switch, filter and Retry boundaries are complete. No clipping or overlap is visible at the tab divider, page index or dock.",
+        "affordance": "The visible source identity and selected Browse dock item distinguish the actual destination from history. Retry is clearly presented as the empty-catalog action; its result was not captured."
+      },
+      "intentional_check": "No intentional differences are declared. Frozen catalog_count, catalog_result_count and visible_catalog are zero, so the populated sc-browse cover grid and sample version/count values are not required content. The retained settings_section value does not imply a settings route.",
+      "capability_check": "Desktop Scribe profile only, with physical hardware qualification false; no remote source, physical sensor or display performance claim follows from this destination.",
+      "captured_behavior_support": "The frozen origin names the secondary empty-history rectangle [473,697,120,57]. The action file records move/press/release at [533,725.75] at 450/500/600 ms, and the destination state and metadata report route=catalog, consistent with the viewed PNG. This supports that captured pointer sequence, not independent replay.",
+      "static_verdict": "No new actionable design issue observed; the captured Scribe secondary empty-body action has a supported catalog destination.",
+      "behavior_limits": "No physical touch, source search/retry/switch result, or uncaptured Scribe primary history action is established."
+    }
+  ],
+  "references": [
+    {"reference_id": "pw-history--default", "path": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/screens/pw-history.png", "sha256": "8de847f1a262247e8b18ca1396b568d3bce7ec4023da3a585db741372d68219b", "actual_view": true, "role": "Related PW history shell and typography; populated state, not an exact empty-history export."},
+    {"reference_id": "sc-history--default", "path": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/screens/sc-history.png", "sha256": "562741444dac41a890fb1abd6a26e200e2aecab996cbf42a4a39d454522ac494", "actual_view": true, "role": "Related Scribe history shell and hierarchy; populated state, not an exact empty-history export.", "display_limit": "view_image displayed the original file resized from 1860x2480 to 1368x1824; no crop or pixel measurement was made."},
+    {"reference_id": "Main--default", "path": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/screens/Main.png", "sha256": "5bfcaf7ba4498c67521496470e127e402adea0f4d7aec77510d6c51226b53927", "actual_view": true, "role": "Related PW library shell and selected dock identity; populated reference data is outside the empty destination comparison."},
+    {"reference_id": "sc-browse--default", "path": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/screens/sc-browse.png", "sha256": "7c411218fec402c436953ffae701611203207719241797caeaac154e114d7fae", "actual_view": true, "role": "Related Scribe catalog shell, source identity and navigation; populated grid is not required for the captured empty catalog.", "display_limit": "view_image displayed the original file resized from 1860x2480 to 1368x1824; no crop or pixel measurement was made."}
+  ],
+  "root_contract_assessment": {"id": "C4-C5-G18", "result": "Supported within this assigned captured scope: both profiles expose direct body actions, and the frozen pointer records plus target state/metadata/PNG support PW5 primary to library and Scribe secondary to catalog. This does not certify every profile/button combination."},
+  "new_actionable_findings": [],
+  "suggestions": [],
+  "evidence_gaps": ["No independent exact empty-history export exists in the assigned references; comparison is limited to related shells and the Root body-action contract.", "PW5 Browse Sources and Scribe Return to Library were not replayed in the four assigned cases; their destinations remain outside this report's behavior support."],
+  "limitations": ["Only frozen C5 case/state/metadata/action/log artifacts and the eight assigned original image paths were read; no changing production files were used to explain these candidates.", "All geometry numbers for the history controls are attributed to frozen case bounds and visually corroborated, not newly measured pixels.", "No tests, builds, runtime probes, SQL, SSH, hashes, copying, crops or image processing were performed.", "No physical touch, e-ink effect, native device mapping, timing, sensor behavior or independent live-reader lease was qualified.", "This is a bounded partial review and makes no full-suite or clean-round claim. No additional image detail was needed or deferred."]
+}

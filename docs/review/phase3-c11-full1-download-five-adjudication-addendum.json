@@ -1,0 +1,33 @@
+{
+  "schema_version": 1,
+  "kind": "C11-full1-Root-next-five-download-semantics-adjudication",
+  "record_date": "2026-11-07",
+  "round": 1,
+  "run_id": "55c498296d35",
+  "source_sha256": "33a2d049307c398da8bfbf196d1bf8e086412c117c194b592f4a93b5bfaedb3f",
+  "binary_sha256": "1e60db345cbd6fbe580258a4a309bf42361781061dc2033f78a8a5eb4446ad72",
+  "authority": "Direct Root bounded decision after reading frozen actions.rs and HANDOFF178.",
+  "original_report": "D:/Code/aidokuForKindle/docs/review/phase3-c11-full1-batches/c11r1-m006-b001.review.json",
+  "case_id": "scribe--c4-book-storage--storage-book-management",
+  "png_sha256": "ebc9556cb6d3e20c747310bde3a858744f61751b853cec03a1704d6f5b22cc0c",
+  "state_sha256": "fe4f6c01a08377087afc5908866748670d30bf34f3b8b95cc250822e64698f8e",
+  "root_disposition": "The existing download-five label represents a request for the next batch of at most five eligible chapters, not a promise of exactly five remaining chapters or five jobs.",
+  "source_anchors": {
+    "HANDOFF": 178,
+    "enqueue_batch": 2042,
+    "preset_cap_five": 2105,
+    "selection": "Filter after current progress and not downloaded, then take(count); an empty eligible set returns no_downloads_needed."
+  },
+  "original_visual_observation_preserved": "The current image shows three chapters, two unread and one downloaded. No download action was triggered in this capture.",
+  "consequence": "Do not create a product defect or source change from the label versus total chapter count. Only a real same-source operation exceeding eligibility/cap or selecting the wrong book would require a new finding.",
+  "original_report_unchanged": true,
+  "new_images": 0,
+  "new_runtime_or_tests": 0,
+  "new_source_changes": 0,
+  "current_semantics_pending": false,
+  "new_actionable": [],
+  "remaining_scope": "Actual download job counts and live-reader CacheLease qualification remain tied to their separate retained same-source operation/external records, not to this unclicked screenshot.",
+  "full_complete": false,
+  "clean_round_streak": 0,
+  "record_review_authorized": false
+}

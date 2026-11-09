@@ -1,0 +1,181 @@
+{
+  "schema_version": 1,
+  "kind": "c4-frozen-original-readable-crop-requests",
+  "round": 1,
+  "run_id": "0c9ecf3777c9",
+  "status": "queued-after-explicit-remote-quiet-release; sole owner assigned by parent",
+  "module_snapshot_sha256": "95e8df5d3904a0e7fdccae75dec565fdc33c475afaf53c9d67bb5b9bb80089ff",
+  "authorization_boundary": "These requests authorize no coordinator/reviewer remote execution. Parent assigns the sole owner and explicitly releases the native/formal-performance embargo before any hashing, cropping, copy or image processing.",
+  "originals_rule": "Read only the declared original file after confirming its supplied source hash and dimensions remotely. Never rewrite any original PNG, sidecar, action, log or manifest. Write derivatives and trace manifest to a separate new path.",
+  "crop_convention": "Each crop is [x, y, width, height] in the original PNG pixel coordinate space; all proposed dimensions are bounded by the declared original geometry.",
+  "derivative_rule": "Retain an unscaled crop and, where requested, a separate exact nearest-neighbor display enlargement. No smoothing, sharpening, repainting, replacement or contrast changes.",
+  "required_trace_fields": [
+    "request_id",
+    "source_path",
+    "source_sha256",
+    "source_dimensions",
+    "crop",
+    "unscaled_crop_path",
+    "unscaled_crop_sha256",
+    "unscaled_crop_dimensions",
+    "display_path",
+    "display_sha256",
+    "display_dimensions",
+    "display_scale",
+    "interpolation",
+    "generation_command",
+    "owner"
+  ],
+  "requests": [
+    {
+      "id": "tap-layout-candidate",
+      "purpose": "Read the full tiny L-shaped diagram with a generous surrounding margin; final reviewer request.",
+      "source_path": "/tmp/aidoku-phase3-c4-ui-round-1/sc-settings--tap-zones.png",
+      "source_sha256": "588ec4cea3b9d6c079c542182c1dacc9e57b99a9462d465047e841e3c428457b",
+      "source_dimensions": [
+        930,
+        1240
+      ],
+      "crop": [
+        836,
+        300,
+        58,
+        56
+      ],
+      "display_scale": 4,
+      "interpolation": "nearest-neighbor",
+      "target_reviewer": "visual_07"
+    },
+    {
+      "id": "tap-layout-reference",
+      "purpose": "Read the full matching original L-shaped diagram with the same generous margin.",
+      "source_path": "/root/aidoku-phase3/reference/screens/states/sc-settings--tap-zones.png",
+      "source_sha256": "741d63a6f68a0e1fafec6fd4aa68d8ab0a20c2aa4de697b849b6335c655627fa",
+      "source_dimensions": [
+        1860,
+        2480
+      ],
+      "crop": [
+        1672,
+        600,
+        116,
+        112
+      ],
+      "display_scale": 2,
+      "interpolation": "nearest-neighbor",
+      "target_reviewer": "visual_07"
+    },
+    {
+      "id": "power-dock-candidate",
+      "purpose": "Determine the exact dark-segment extent for historical G47.",
+      "source_path": "/tmp/aidoku-phase3-c4-ui-round-1/sc-settings--power.png",
+      "source_sha256": "6727caa76a7397f94e79036d2eb9b2789e228a1d46245e56576683180ea17c9b",
+      "source_dimensions": [
+        930,
+        1240
+      ],
+      "crop": [
+        0,
+        1154,
+        930,
+        86
+      ],
+      "display_scale": 2,
+      "interpolation": "nearest-neighbor",
+      "target_reviewer": "visual_07"
+    },
+    {
+      "id": "power-dock-reference",
+      "purpose": "Read the matching original dock boundary and selected-tab allocation.",
+      "source_path": "/root/aidoku-phase3/reference/screens/states/sc-settings--power.png",
+      "source_sha256": "784e15a6156fbb749e6e8b0871748b92fff977feb0164a5b97ee59d8a1df4abb",
+      "source_dimensions": [
+        1860,
+        2480
+      ],
+      "crop": [
+        0,
+        2308,
+        1860,
+        172
+      ],
+      "display_scale": 1,
+      "interpolation": "none",
+      "target_reviewer": "visual_07"
+    },
+    {
+      "id": "foundation-F1",
+      "purpose": "Read component fine notes and page-number guidance.",
+      "source_path": "/root/aidoku-phase3/reference/screens/spec-foundation.png",
+      "source_sha256": "54f704194dac4718643acfd2d85aca222b4d879509f666386e271f7fdec6e1b1",
+      "source_dimensions": [
+        2800,
+        5200
+      ],
+      "crop": [
+        1260,
+        2920,
+        1440,
+        1640
+      ],
+      "display_scale": 1,
+      "interpolation": "none",
+      "target_reviewer": "visual_01"
+    },
+    {
+      "id": "foundation-F2",
+      "purpose": "Read the two left forbidden-pattern cards.",
+      "source_path": "/root/aidoku-phase3/reference/screens/spec-foundation.png",
+      "source_sha256": "54f704194dac4718643acfd2d85aca222b4d879509f666386e271f7fdec6e1b1",
+      "source_dimensions": [
+        2800,
+        5200
+      ],
+      "crop": [
+        120,
+        4620,
+        1280,
+        500
+      ],
+      "display_scale": 1,
+      "interpolation": "none",
+      "target_reviewer": "visual_01"
+    },
+    {
+      "id": "foundation-F3",
+      "purpose": "Read the two right forbidden-pattern cards.",
+      "source_path": "/root/aidoku-phase3/reference/screens/spec-foundation.png",
+      "source_sha256": "54f704194dac4718643acfd2d85aca222b4d879509f666386e271f7fdec6e1b1",
+      "source_dimensions": [
+        2800,
+        5200
+      ],
+      "crop": [
+        1400,
+        4620,
+        1280,
+        500
+      ],
+      "display_scale": 1,
+      "interpolation": "none",
+      "target_reviewer": "visual_01"
+    }
+  ],
+  "additional_static_provenance_request": {
+    "status": "pending-parent-owner-window",
+    "files": [
+      "HANDOFF.md",
+      "tokens/tokens.json",
+      "prototype/Main.dc.html",
+      "prototype/pw-source.dc.html",
+      "prototype/pw-browse.dc.html",
+      "prototype/sc-browse.dc.html",
+      "prototype/sc-sources.dc.html",
+      "prototype/sc-settings.dc.html",
+      "prototype/sc-history.dc.html",
+      "prototype/sc-manga.dc.html"
+    ],
+    "reason": "Bind the exact supporting text anchors used in current fresh visual reports. The current reference-files.json identifies all PNG originals but not every individual prototype text file. Preserve these files and add owner remote hashes; do not make a local rehash claim."
+  },
+  "review_rule": "A derivative is supplemental readability evidence. Reviewers retain the actual original-viewing ledger and must open the derivative before closing the previously unreadable check. Until then the specific check remains pending."
+}

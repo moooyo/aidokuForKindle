@@ -1,0 +1,79 @@
+{
+  "schema_version": 1,
+  "reviewer": "phase2_fidelity_review",
+  "supporting_reviewer": "expanded_ui_readonly",
+  "review_kind": "pre-freeze static UI integration review",
+  "status": "candidate 2 static fixes verified; fresh runtime and visual rounds in progress",
+  "frozen_candidate_sha256": "a9b80c9a1d8320b4090fa503d6e6550c1fff19a436303a0a07c39ac48ae2f30b",
+  "qualifies_as_clean_round": false,
+  "consecutive_clean_rounds": 0,
+  "reference_preparation": {
+    "images_read": [
+      "tmp/design/reference-01.png",
+      "tmp/design/reference-02.png",
+      "tmp/design/reference-03.png",
+      "tmp/design/reference-04.png",
+      "tmp/design/reference-05.png",
+      "tmp/design/reference-06.png",
+      "tmp/design/reference-07.png",
+      "tmp/design/reference-08.png",
+      "tmp/design/reference-09.png",
+      "tmp/design/reference-10.png",
+      "tmp/design/reference-11.png",
+      "tmp/design/reference-12.png"
+    ],
+    "reader_reference_interpretation": "The PDF Reader examples are compared against the explicitly opened menu. The latest user requirement overrides the PDF chrome for closed-menu reading: the full viewport contains only comic pixels and the fitting background, without a footer, bookmark corner, notice, status bar, navigation bar, or decorative spread gutter."
+  },
+  "findings": [
+    {
+      "id": "P2-I001",
+      "title": "Arrow keys navigate behind an open modal",
+      "priority": 2,
+      "source_paths": ["ui/app.slint", "src/app/actions.rs"],
+      "reproduction": "Open page actions by long pressing the closed-menu Reader, then press the RTL next-page arrow key. The global keyboard handler dispatches app/left without checking the modal, so the hidden Reader advances while the page-actions modal remains open. Save page or Set cover can then act on the hidden new page. Non-Reader modals also allow underlying route pagination.",
+      "disposition": "Root added modal-first arrow routing and the shared turn_panel_page helper. Choices, downloads and summaries page their own panel; other modals consume the key without underlying navigation.",
+      "static_fix_review": "The updated app/left,right branch was read directly and the modal guard closes the reported path.",
+      "runtime_verification": "Pending the fresh candidate 2 remote keyboard matrix."
+    },
+    {
+      "id": "P2-I002",
+      "title": "First Reader image failure has no visible recovery",
+      "priority": 2,
+      "source_paths": ["src/app.rs", "src/app/reader_recovery.rs", "ui/reader.slint"],
+      "reproduction": "The first image fails while Reader has no displayed frame and its menu is closed. The original show_error path only produced a four-second notice, which closed-menu reading intentionally hides, leaving an unexplained blank viewport.",
+      "disposition": "Root added a first-frame loading label and a persistent Reader recovery choice panel. The failure panel provides an explicit retry of the failed page and a return path. Successful closed-menu reading remains image-only.",
+      "static_fix_review": "Current Reader and Chapter failures use the recovery path; synchronous source/worker-start errors are also handled. Recovery reason state is an allowlisted code and translated label rather than a raw source error string.",
+      "runtime_verification": "Pending the fresh candidate 2 remote loading and recovery matrix."
+    },
+    {
+      "id": "P2-I003",
+      "title": "Failed or pending navigation leaves page actions targeting hidden pixels",
+      "priority": 2,
+      "source_paths": ["src/app.rs", "src/app/actions.rs", "src/app/reader_recovery.rs", "src/app/view.rs"],
+      "reproduction": "Page 7 is displayed, navigation requests page 8, and its image fails. The original ReaderState remained at page 8 while the texture and committed progress remained at 7. A bookmark targeted hidden page 8, the next turn skipped to 9, and save/cover actions read page 8's cached raw path when available. An uncached raw path caused save to fail instead of successfully exporting hidden content.",
+      "disposition": "Root rolls current matching Reader or Chapter failures back to the last displayed session. Retry retains its own failed destination, page offset and zoom. Bookmark, export, cover and reload actions use the displayed session, and visible menu metadata is projected from the displayed frame.",
+      "static_fix_review": "The new current-job guard ignores stale results, page actions use displayed_reader_session, and the complete ReaderTarget is passed through a newly loaded chapter manifest.",
+      "runtime_verification": "Pending the fresh candidate 2 remote page-7/page-8, retry, chapter, and page-action matrix."
+    }
+  ],
+  "candidate_2_static_fix_checks": {
+    "local_and_frozen_source_hashes_match": true,
+    "comparison_root": "/tmp/aidoku-phase2-candidate2",
+    "source_sha256": {
+      "src/app.rs": "7fa42b3d67409af9c056b2a0634d4c7547323fba72e6337007cc0da8499cf3e5",
+      "src/app/actions.rs": "0dcd2df19357ba663f615278d8e3478bba348b60276abb617927883460a0ca6a",
+      "src/app/reader_recovery.rs": "bdf8bedb7eb11602d0abb5902089c25a12fd65ee715f38e5ec0c697df013a471",
+      "src/app/view.rs": "21f74df03c6edd021b915e63cccac8b978f1a35849c9ebe954053759812a8af3",
+      "src/platform.rs": "a717492f52a8a289d3e8183573ad7350742af05148f32cc9089ff7e4b5739c3e",
+      "ui/reader.slint": "e79daad9e05d29cc83e0cfe3cbd4bd046d0d5de259209efe9316eee49332650d"
+    },
+    "status_observation": "Invalidation retains the last observation and marks its time stale. Cached Reader projection remains truthful without a device probe; an explicit observation refreshes it.",
+    "closed_menu_loading": "The centered loading label is limited to the period before a first accepted image. A loaded frame has no permanent indicator or notice."
+  },
+  "scope_limits": [
+    "This integration record does not count as a complete clean round; fresh screenshot reviews are recorded separately.",
+    "No application, build, test suite, smoke test or runtime probe was executed on the local operator computer.",
+    "Prior rounds 6 and 7 are historical evidence and do not count toward phase 2.",
+    "Firmware sleep, retained PID, input release and RGB repaint require native evidence; screenshots alone do not certify them."
+  ]
+}

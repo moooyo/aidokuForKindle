@@ -1,0 +1,274 @@
+{
+  "schema_version": 1,
+  "kind": "c4-independent-full-ui-review-preparation",
+  "status": "full-run-authorized-awaiting-first-owner-frozen-module",
+  "coordinator": "/root/final_validation_delivery/c4_full_review_coordinator",
+  "record_date": "2026-11-06",
+  "scope": {
+    "production_changes_authorized": false,
+    "harness_or_plan_changes_authorized": false,
+    "reviewers_started": false,
+    "new_candidate_images_viewed": 0,
+    "new_reference_images_viewed": 0,
+    "new_full_round_review_started": false,
+    "clean_round_streak_on_entry": 0,
+    "final_round_number_and_acceptance_owner": "Root",
+    "carry_forward_findings_and_record_review_owner": "Root"
+  },
+  "preparation_inputs": [
+    "C:/Users/moooyo/.codex/skills/ui-ux-pro-max/SKILL.md",
+    "C:/Users/moooyo/.codex/skills/ui-ux-pro-max/references/quick-reference.md",
+    "C:/Users/moooyo/.codex/skills/ui-ux-pro-max/references/pro-rules.md",
+    "docs/review/phase3-reference-scope.json",
+    "docs/review/phase3-handoff-capture-plan.json",
+    "scripts/verify-handoff-ui.py",
+    "docs/review/phase3-round-1-batches/reference-01.input.json",
+    "docs/review/phase3-round-1-batches/supplemental-01.input.json",
+    "docs/review/phase3-round-1-batches/support-01.input.json",
+    "docs/review/phase3-round-1-evidence-accounting.json",
+    "docs/review/phase3-round-1-findings-map.json"
+  ],
+  "preparation_method": "Static text and JSON field inspection only. Previous batch inputs and accounting are format examples, never current evidence or visual verdicts. No previous candidate image was viewed. No application, build, test, smoke test, validation suite, runtime probe, remote command or image processing was executed for this preparation.",
+  "parent_supplied_candidate_pins": {
+    "verification_status": "Reported by parent; not independently executed or revalidated during preparation",
+    "production_file_count": 225,
+    "source_sha256": "dc0cd6227768a5125ecf702982ce639789bc8bca390de82bab83329927ea6353",
+    "binary": "/root/aidoku-phase3/candidate4/desktop/aidoku",
+    "binary_sha256": "7c2f685ecafc7207446f0e75877b74d14cbc6e41a43f5accee8ae992256e3183",
+    "harness_sha256": "5e6f546b7abec0a377e53feafe3afe1e6c6d3259da2699b75f1c4fe44529d5e5",
+    "business_helper_sha256": "6197f375b247962e3ce9acdd3779468073f11e0002ac3c7ce876a7b1a0d0d9be",
+    "capture_plan_sha256": "ab2effba6e2cd443be49ff5b49094afede8126615a270aa0653771059b871cc9"
+  },
+  "reference_preparation": {
+    "known_local_original_root": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff",
+    "design_version": "1793901158-6c09",
+    "authoritative_runtime_binding": "Use the new run reference-files.json and parent freeze manifest. The known local root alone does not establish identity.",
+    "scope_inventory": {
+      "product_references": 101,
+      "product_defaults": 17,
+      "product_states": 84,
+      "support_references": 9,
+      "all_original_reference_png": 110,
+      "user_overridden_footer_references": 2
+    },
+    "support_reference_roles": {
+      "screens/cover.png": "Placeholder component only",
+      "screens/nav-pw.png": "Paperwhite dock component",
+      "screens/dock-sc.png": "Scribe dock component",
+      "screens/pager.png": "Folio component",
+      "screens/spec-foundation.png": "Global visual specification",
+      "screens/spec-interaction.png": "Interaction and refresh specification subject to the user override",
+      "screens/pager-options.png": "Only option B is adopted; alternatives A and C are not targets",
+      "overview-paperwhite.png": "Route overview only",
+      "overview-scribe.png": "Route overview only"
+    },
+    "original_viewing_rule": "Open all assigned new original candidate PNGs and the related original reference PNGs. A contact sheet, overview, derivative, previous review, mechanical PASS or text excerpt cannot substitute for original-image viewing.",
+    "supplemental_basis_rule": "Every supplemental case receives explicit related original references and the relevant frozen handoff or prototype contract. State whether the basis is exact-state, related-state, profile geometry or an explicit user override. Do not invent an exact reference for a supplemental state.",
+    "text_reference_rule": "Read authoritative handoff and relevant exact prototype declarations as text. Do not execute the prototype or transplant its HTML. Preserve supporting text provenance supplied by the freeze owner."
+  },
+  "required_parent_delivery_before_go": [
+    "Fresh full run immutable remote output path, local original-evidence copy path, round number and run_id",
+    "Capture-only manifest.json bytes or an immutable capture-only copy, its SHA256, and source-files.json/reference-files.json paths and SHA256 values",
+    "Full freeze tuple: source, binary, references, scope, plan, main harness and every capture helper hash",
+    "All original required PNGs, cases/*.json, *.state.json, *.metadata.json, actions/*.json and logs, with existing evidence hashes retained",
+    "All original reference PNGs at a declared local or copied root, matching the new reference manifest",
+    "Actual required_review_case_ids, required_reference_ids, reference_coverage, supplemental groups and any per-case external_evidence_required records",
+    "Explicit parent GO for visual review and the maximum allocated concurrent reviewer count",
+    "Timing embargo state and confirmation that any remote copying, hashing and optional derivative generation is complete before formal performance timing begins"
+  ],
+  "capture_manifest_boundary": {
+    "reason": "record_review rewrites canonical manifest.json in place.",
+    "rule": "Preserve the exact capture-only manifest bytes and SHA256 before record-review. Bind batch inputs and reports to that capture-only snapshot. Record the final reviewed manifest SHA256 separately after Root's authorized record-review operation.",
+    "coordinator_may_record_review": false,
+    "failed_originals": "Keep original failure results and files unchanged. A retry is a distinct run with distinct output and identity; it cannot replace a failed required full-round case or make an incomplete run clean."
+  },
+  "authorized_incremental_workflow": {
+    "authorization": "Parent relayed Root full-run GO for C4 round one; the UI owner executes the full run.",
+    "remote_run_path": "/tmp/aidoku-phase3-c4-ui-round-1",
+    "local_original_evidence_root": "D:/Code/aidokuForKindle/artifacts/phase3/candidate4/ui-round-1",
+    "module_gate": "A module may be dispatched only after the UI owner explicitly freezes it and supplies an immutable module snapshot and hash, exact case IDs, complete copied original files and hashes, reference identities and the freeze tuple. Still-running cases, changing logs and incomplete copies remain pending.",
+    "incremental_binding": "Before the final full manifest exists, batch inputs and reports bind the owner-frozen module snapshot path and SHA256. Retain the module identity rather than pretending it is the final full manifest.",
+    "final_reconciliation": "After the complete capture-only manifest arrives, reconcile every incremental actual-viewing record with its final required_review_case_ids, case evidence hashes, 110 reference identities and all tool/source/binary/reference hashes. Missing or changed identity remains pending and requires fresh inspection where appropriate.",
+    "remote_operations": "Coordinator and visual reviewers do not issue SSH, copy or image-processing commands. The UI/copy owner prepares original evidence and any optional derivatives outside the protected native or formal performance windows.",
+    "embargo_signals": ["REMOTE_QUIET_NATIVE", "formal-performance-remote-embargo"],
+    "completion_rule": "Incremental review and mechanical completion cannot establish full completion, a clean round or acceptance. Root confirmation remains mandatory before record-review."
+  },
+  "dispatch_design": {
+    "state": "No batches or reviewers instantiated yet",
+    "concurrent_visual_reviewer_cap": 8,
+    "actual_width": "The smaller of eight and the parent allocation; any coordinator doing visual inspection counts toward the same cap.",
+    "resource_rule": "Reserve the slots allocated by parent for native, performance and integration owners. Do not spawn additional visual agents without an available parent allocation.",
+    "required_case_source": "Derive the exact required set only from the new full run required_review_case_ids. Do not use the former 478-case baseline, old 454-case review format, targeted subset IDs or estimated C4 counts as the actual required set.",
+    "assignment_rule": "Assign each required case one primary visual reviewer. Group related route, profile, orientation and operation sequences together; split groups into small explicit batches. Preserve before/after relationships when an interaction state needs context.",
+    "batch_size_guidance": {
+      "exact_reference_pairs": "Normally four to six cases",
+      "supplemental_candidates": "Normally six to eight cases",
+      "complex_book_storage_or_reader_sequences": "Reduce size when the original image, state or fixture evidence requires more attention",
+      "support_reference_only": "A separate explicit batch covering the nine original support images"
+    },
+    "domain_lanes": [
+      "Paperwhite library, detail, history and download queue",
+      "Scribe library, detail, history and download queue",
+      "Paperwhite sources, catalog, search and keyboard",
+      "Scribe sources, catalog, search and keyboard",
+      "Settings, hardware capability absence, book cleanup and Storage",
+      "Paperwhite reader modes, boundaries, pure scenes and new reader capabilities",
+      "Scribe portrait reader modes, boundaries, pure scenes and new reader capabilities",
+      "Scribe landscape reader modes, boundaries and pure scenes; support references when assigned"
+    ],
+    "stretch_profile_rule": "Assign pw6, scribe3 and scribe3-nofrontlight captures by route to the relevant lane. Retain the actual native viewport and compare with the related original PW/SC references and declared profile geometry. Never resize a stretch profile to impersonate an exact reference.",
+    "new_full_round_independence": "Provide the new frozen evidence, scope, plan and review contract. Do not seed reviewers with previous candidate pixels or previous clean/defect verdicts. A later fresh round requires a new complete viewing ledger."
+  },
+  "batch_input_contract": {
+    "batch_fields": [
+      "schema_version", "batch_id", "kind", "round", "run_id", "assigned_reviewer",
+      "capture_manifest_path", "capture_manifest_sha256", "freeze_tuple", "timing_embargo",
+      "required_case_ids", "cases", "reference_only_records", "output_report_path"
+    ],
+    "case_fields": [
+      "case_id", "case_metadata_path", "case_metadata_sha256", "source_sha256", "binary_sha256",
+      "candidate_original_path", "candidate_original_sha256", "native_dimensions", "physical_reference_scale",
+      "state_path", "state_sha256", "metadata_path", "metadata_sha256", "actions_path", "actions_sha256",
+      "log_path", "log_sha256", "route", "profile", "orientation", "reference_ids",
+      "related_original_references", "expected_state", "assertions", "capability_bounds",
+      "intentional_differences", "mechanical_result", "external_evidence_required"
+    ],
+    "reference_fields": [
+      "reference_id_or_relative_path", "original_path", "original_sha256", "original_dimensions",
+      "role", "comparison_basis", "applicability", "prototype_text_basis"
+    ],
+    "identity_rule": "Resolve only paths under the declared fresh run or declared frozen reference root. Record remote original and local copied paths explicitly. Never silently substitute another round, case, retry, derivative or similarly named PNG."
+  },
+  "review_report_contract": {
+    "report_fields": [
+      "batch_id", "reviewer", "round", "run_id", "capture_manifest_sha256", "freeze_tuple",
+      "review_method", "reviewed_case_ids", "reviewed_cases", "reference_viewing_records",
+      "suggestions", "historical_findings", "regression_closures", "unresolved_evidence_gaps", "limitations"
+    ],
+    "case_fields": [
+      "case_id", "run_id", "source_sha256", "binary_sha256", "case_metadata_sha256",
+      "candidate_original_path", "candidate_original_sha256", "candidate_original_viewed",
+      "state_sha256", "metadata_sha256", "actions_sha256", "log_sha256",
+      "reference_viewing_records", "comparison_basis", "concrete_visual_observations",
+      "intentional_differences_reviewed", "capability_bounds_reviewed", "static_appearance_verdict",
+      "captured_behavior_evidence", "behavior_limitations", "suggestion_ids", "evidence_gaps"
+    ],
+    "reference_viewing_fields": [
+      "original_path", "original_sha256", "original_dimensions", "viewed", "role", "concrete_observation"
+    ],
+    "verdict_values": [
+      "no-actionable-visual-issue-observed", "actionable-visual-issue", "blocked-by-evidence"
+    ],
+    "observation_rule": "Write case-specific observations about actual layout, typography, boundaries, affordances or state. A generic PASS, copied assertion list or byte hash alone does not establish that the image was reviewed.",
+    "behavior_rule": "Describe what the captured replay, state, fixture and mechanical checks support separately from static appearance. Screenshots cannot establish touch targets, invisible hit regions, timing, physical wake, framebuffer mapping, evdev rotation or a genuine live CacheLease by themselves.",
+    "suggestion_fields_for_root_integration": [
+      "id", "case_id", "description", "evidence", "status", "introduced_round"
+    ],
+    "suggestion_rule": "Report concrete actionable discrepancies with the assigned case and original evidence. Root owns final deduplication, prior finding identifiers, status and introduced_round. Do not drop a visible issue because another reviewer may also report it. Do not add a closed historical finding to current suggestions merely to preserve its ID; record it in historical_findings and regression_closures. An actually unresolved historical defect remains a current blocker."
+  },
+  "historical_regression_design": {
+    "source": "docs/review/phase3-round-1-findings-map.json",
+    "source_identity": "Record the map file SHA256 when the new review inputs are frozen.",
+    "required_product_group_count": 47,
+    "required_id_set": "The exact groups[].id set P3R1-G01 through P3R1-G47 in the source map",
+    "all_groups_rule": "Re-evaluate every one of the 47 canonical product groups, including the early nine reported as repaired. Neither a stale source status nor a targeted C4 diagnostic verdict establishes a current closure.",
+    "historical_findings_fields": [
+      "historical_id", "source_map_path", "source_map_sha256", "source_suggestion_ids",
+      "regression_requirement", "assigned_current_case_ids", "fresh_review_status"
+    ],
+    "regression_closure_fields": [
+      "historical_id", "round", "run_id", "source_sha256", "binary_sha256", "current_case_ids",
+      "candidate_original_hashes", "reference_original_hashes", "state_hashes", "action_hashes",
+      "fresh_observation", "disposition", "capability_or_user_override_basis",
+      "supporting_external_artifacts", "unresolved_evidence_gaps", "root_acceptance_status"
+    ],
+    "disposition_values": [
+      "resolved-in-fresh-evidence", "accepted-user-override", "accepted-capability-bound",
+      "still-actionable", "blocked-by-evidence"
+    ],
+    "two_pass_rule": "The independent general visual pass uses new candidate and reference evidence without prior pixel verdicts. The separate regression audit then checks each historical requirement against actual fresh cases and their originals. Both passes retain their evidence and observations.",
+    "capability_rule": "An accepted capability disposition requires the actual current declaration and truthful visible unavailable behavior, plus Root acceptance. Do not excuse geometry, clipping, typography, false success, or a supported but unreachable interaction as a capability limit.",
+    "closure_gate": "Every canonical historical group must have a concrete fresh disposition and supporting current case evidence. Root confirms all closures before record-review. Any still-actionable or blocked group prevents a clean full-round claim, regardless of how current suggestions are categorized.",
+    "current_suggestions_boundary": "The current suggestions array contains actual current new or unresolved actionable findings. Fixed historical groups belong only in the historical fields. record_review computes new suggestions by ID difference, so even a newly supplied fixed historical ID would otherwise be counted as new.",
+    "previous_manifest_rule": "C4 round one does not pass a C3 manifest as previous. C4 round two uses only the completed C4 round-one manifest as previous. Root decides the actual round numbers and performs the operation.",
+    "not_extra_current_cases": "Historical source IDs and closure records do not inflate required_review_case_ids; only actual fresh manifest cases establish required capture coverage."
+  },
+  "visual_contract": {
+    "priority": "User instructions and closed-reader override, then the frozen handoff, matching original reference and exact prototype declaration; general skill advice is subordinate.",
+    "closed_reader": "Artwork only. No persistent footer, bookmark ribbon, page label, status bar, download notice, decorative gutter or invisible footer-cycle target. Open reader menus retain the new export contract and bookmark actions.",
+    "content_exemptions": "Real titles, counts, dates, capacities, covers and provider content may differ. This exemption never waives geometry, font hierarchy, clipping, text wrapping, control boundaries, navigation allocation, affordances or false operation states.",
+    "appearance_checks": [
+      "Correct native viewport and route/orientation; non-reader routes return to portrait",
+      "Header, content, dock, pager and overlay allocations; correct first/last page edge spaces",
+      "Declared grid/row counts, SC 384-design-pixel detail information column and settings navigation width",
+      "Serif display/book hierarchy, sans interface text, numerals, visible weights and legible clipping behavior",
+      "White outlined surfaces, declared rule weights, radius, grayscale and inverse selected/pressed states",
+      "No accidental dimmed backdrop, shadow, pill, gray card fill or content hidden behind a dock or keyboard",
+      "Truthful unavailable hardware, authorization, source, migration and operation feedback",
+      "Actual queue row visibility, Available language chips, dense Installed last-page membership and tag-flow boundaries",
+      "Reader open menus, ToC/bookmark pagination, reverse-270 choices and separate-cover transitions using the relevant captured state",
+      "Book cleanup confirmation/cancel and Storage loading/ready/top-five/management/after-cleanup appearance"
+    ],
+    "not_qualified_by_desktop_pixels": [
+      "Physical e-ink waveforms and refresh behavior",
+      "Physical light, warmth, pen, sensors, power and firmware input",
+      "Native framebuffer and evdev rotation mapping",
+      "Retained-artwork sleep/wake timing and correctness",
+      "Performance and memory targets",
+      "Independent genuine in-process live-reader CacheLease behavior"
+    ]
+  },
+  "derivative_and_remote_timing_contract": {
+    "originals": "Never modify original PNGs, sidecars, action files, logs or capture-only manifests.",
+    "optional_derivatives": "Optional side-by-side or normalized views supplement original viewing. Record every original input path and SHA256, output SHA256, original/output dimensions, scale, crop rectangle if any, interpolation algorithm and generation command.",
+    "scale_rule": "Exact PW/Scribe native PNGs are logical resolution and references use physical resolution at scale two. Declare this explicitly. Do not hide geometry changes with arbitrary scaling, cropping, repainting, sharpening or content replacement.",
+    "remote_before_timing_go": "Parent-approved owner completes remote evidence hashing, original copies and any optional image processing before formal performance timing GO.",
+    "during_timing_embargo": "Coordinator and visual reviewers perform only local static file reads and original-image viewing. No SSH commands, remote image processing, remote hashes or worker jobs until parent explicitly releases the embargo.",
+    "missing_local_evidence_during_embargo": "Record the exact missing file or identity gap and notify parent. Do not fetch or regenerate it on the occupied worker."
+  },
+  "accounting_design": {
+    "case_set_checks": [
+      "The reviewed_case_ids union equals the new manifest required_review_case_ids exactly",
+      "No missing, unexpected or duplicate primary case assignment or completion",
+      "Every required case has a named independent reviewer, matching fresh run/source/binary and original PNG/state/metadata/action/log identity",
+      "Every required candidate original was actually viewed and has concrete observations",
+      "Every associated reference identity and viewing record is explicit",
+      "All recorded intentional differences and capability bounds were inspected",
+      "All evidence gaps remain unresolved until supported by the frozen original evidence"
+    ],
+    "reference_set_checks": [
+      "The viewed original reference set equals reference-files.json files exactly",
+      "Count all 101 product and nine support references, including two user-overridden footer images",
+      "Count aliases by declared reference path/hash, not by screenshot reuse or overview inclusion",
+      "No current reference hash is taken from a previous batch input without matching the new run reference manifest"
+    ],
+    "accounting_output_fields": [
+      "run_id", "round", "capture_manifest_sha256", "freeze_tuple", "required_case_count", "reviewed_case_count",
+      "missing_case_ids", "unexpected_case_ids", "duplicate_case_ids", "identity_issues", "unviewed_case_ids",
+      "reference_required_count", "reference_viewed_count", "missing_reference_paths", "reference_identity_issues",
+      "review_report_hashes", "actionable_suggestions", "historical_findings", "regression_closures",
+      "unresolved_historical_ids", "unresolved_evidence_gaps", "external_evidence_bindings"
+    ],
+    "execution_boundary": "Any automated accounting or suite execution runs only on the designated remote environment with parent authorization and outside the formal performance embargo. Local activity remains static reading and image viewing. This preparation defines checks and does not execute them."
+  },
+  "external_evidence_and_acceptance": {
+    "owner": "Root and parent-managed native/performance owners",
+    "required_performance_coverage": [
+      "visible-cover-work", "processed-cache-reuse", "distinct-download-usage",
+      "coalesced-queue-pressure", "retained-artwork-sleep-wake"
+    ],
+    "additional_scope_rule": "Collect the actual new manifest cases external_evidence_required scopes, including native reverse-rotation mapping and independent live-reader lease where declared. Do not assume the five performance labels are the entire external requirement set.",
+    "artifact_fields": [
+      "scope_case_id", "owner", "artifact", "sha256", "source_sha256", "passed", "coverage"
+    ],
+    "binding_rule": "Retain exact external artifact paths and SHA256 values, source identity, actual native binary/environment identity and stated coverage. An external artifact cannot be replaced by a desktop image or a statement that the harness passed.",
+    "clean_round_rule": "Mechanical completion, all required supplemental groups, complete independent candidate/reference viewing, unchanged frozen identity, no new actionable findings, no unresolved required findings, Root-confirmed closure or accepted capability disposition for all 47 historical groups, and complete matching external evidence are all necessary. This coordinator cannot declare acceptance.",
+    "visual_only_signature": "Complete static visual coverage may be reported while external native/performance artifacts remain pending, but full completion and the clean-round streak remain zero until their required evidence and Root acceptance are complete.",
+    "two_round_rule": "Only two consecutive fresh complete rounds with the same source, binary, reference, scope, plan, harness, helpers and required case IDs may contribute to the new streak. Previous C3, historical C5, targeted C4 subsets and fresh diagnostic retries contribute zero."
+  },
+  "current_blockers": [
+    "The first owner-frozen module has not been delivered; module/run identity, exact case set and copied original evidence hashes are pending.",
+    "The final complete capture-only manifest and final reconciliation remain pending."
+  ],
+  "next_action": "Await the UI owner's first frozen module, then instantiate explicit hash-bound batches and dispatch no more than eight concurrent visual reviewers within the parent allocation."
+}

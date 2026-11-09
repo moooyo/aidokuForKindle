@@ -1,0 +1,154 @@
+{
+  "batch_id": "supplemental-29",
+  "reviewer": "/root/phase3_round1_review/supplemental_29",
+  "run_id": "a1baf3fe3dc2",
+  "review_round": 1,
+  "binary_sha256": "94d7f3bbcab475ad8833a2f3c486138f7b49bead231851c2d8eab2f0c3d2ac51",
+  "source_sha256": "aef9db4e111165016a10a2a95e111f3155860b8510c7f6207ec9c79fbec5082c",
+  "review_basis": [
+    "The eight candidate PNGs listed in supplemental-29.input.json were each opened individually with tools.view_image. No other PNG was opened.",
+    "Each current candidate PNG SHA256 was read with Get-FileHash and matched both the input expected_png_sha256 and the case sidecar screenshot evidence hash.",
+    "Case identities, salient state, checks, intentional differences, run identity, binary hash, and source hash were read from the eight case sidecars. Recorded mechanical passes were treated as provenance and state context, not as visual acceptance.",
+    "Applicable requirements were read from docs/review/phase3-reference-scope.json, docs/DESIGN_HANDOFF.md, the authoritative HANDOFF.md, and the sc-search/sc-library prototype text. No prototype was executed."
+  ],
+  "reviewed_case_ids": [
+    "scribe--keyboard-clear",
+    "scribe--keyboard-english",
+    "scribe--keyboard-numbers",
+    "scribe--keyboard-pinyin",
+    "scribe--keyboard-shift-space-backspace",
+    "scribe--library-first-boundary",
+    "scribe--library-last-page",
+    "scribe--library-tab-0"
+  ],
+  "reviewed_cases": [
+    {
+      "case_id": "scribe--keyboard-clear",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/scribe--keyboard-clear.png",
+      "candidate_sha256": "6fb5537eff9fcb7dfd54fe216f658034e5132a1e0beb394c87958099ecd28e30",
+      "viewed_candidate": true,
+      "outcome": "no_actionable_visual_finding",
+      "observations": [
+        "The search input has returned to its placeholder and the clear icon is absent, consistent with the sidecar's empty keyboard_text and query. The Cancel action remains separate and legible.",
+        "The English mode hint, complete lowercase QWERTY rows, shift, backspace, number/language controls, wide space key, and black Search action fit inside the viewport without overlapping labels.",
+        "The keyboard occupies the bottom region and the navigation dock is absent. Its white surface and top rule have no visible offset shadow or stippled backdrop.",
+        "The selected all-source scope is inverse and the other scope controls are white outlined. The local-library empty state is readable above the keyboard."
+      ],
+      "intentional_differences": []
+    },
+    {
+      "case_id": "scribe--keyboard-english",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/scribe--keyboard-english.png",
+      "candidate_sha256": "e69be43adbb75cc519bdd0e999892b71275ddeffe36e0d5a34742619e22aba88",
+      "viewed_candidate": true,
+      "outcome": "no_actionable_visual_finding",
+      "observations": [
+        "The input visibly contains abc, matching keyboard_text in the English-mode sidecar; its clear icon has room before the separate Cancel action.",
+        "The lowercase letter labels, shift and backspace icons, English language control, space key, and primary Search action are individually readable with consistent row spacing.",
+        "The mode hint occupies the candidate strip without fabricated Chinese candidates. The local-library no-match state remains visible and the editing keyboard replaces the dock.",
+        "The input, unselected scopes, and keyboard retain white surfaces with outlines and no visible shadow, masking pattern, or label clipping."
+      ],
+      "intentional_differences": []
+    },
+    {
+      "case_id": "scribe--keyboard-numbers",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/scribe--keyboard-numbers.png",
+      "candidate_sha256": "bbb44f366982f1e0f8e77ea8037515ca86f2c9e2b6858330c1510bbb5775cf2b",
+      "viewed_candidate": true,
+      "outcome": "no_actionable_visual_finding",
+      "observations": [
+        "The input visibly contains 123 and the keyboard shows the numbers/symbols hint, consistent with keyboard_mode=numbers and keyboard_text=123.",
+        "All ten digits fit on the first row. The punctuation rows, backspace, symbol-page control, alphabet return, language control, space, and Search action are readable without collisions.",
+        "The shorter third punctuation row is centered and leaves sufficient space around its keys; the bottom actions remain fully inside the captured viewport.",
+        "The keyboard replaces the dock and retains the same white outlined editing surface. This state is assessed against the keyboard contract and prototype text because this batch provides no independent Scribe numeric reference PNG."
+      ],
+      "intentional_differences": []
+    },
+    {
+      "case_id": "scribe--keyboard-pinyin",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/scribe--keyboard-pinyin.png",
+      "candidate_sha256": "2d8a49f2dc213fac6a45a26d693d3082f0bf6f47fce587cc2abd2ccf0d4e9469",
+      "viewed_candidate": true,
+      "outcome": "no_actionable_visual_finding",
+      "observations": [
+        "The underlined composition s is distinct from the eight Chinese candidates. All eight candidate strings are readable, including the longer multi-character entries, and have clear separation from the paging chevrons.",
+        "The candidate content agrees with the sidecar's pinyin composition and candidate list, whose recorded candidate folio is 1 of 4. The screenshot is a composition state with no committed input text.",
+        "The QWERTY rows, shift, backspace, numeric switch, Chinese language control, wide space key, and Search action remain visible beneath the candidate strip without clipping.",
+        "The local-library no-match state stays above the keyboard and the navigation dock is absent. The candidate strip and keyboard use a white surface without a shadow or stippled mask."
+      ],
+      "intentional_differences": []
+    },
+    {
+      "case_id": "scribe--keyboard-shift-space-backspace",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/scribe--keyboard-shift-space-backspace.png",
+      "candidate_sha256": "67ee01e4cd41c6200cd1a32d5869fc88bb539f94a24530a6f172a5df5ba4dcaa",
+      "viewed_candidate": true,
+      "outcome": "no_actionable_visual_finding",
+      "observations": [
+        "The input visibly contains uppercase A, consistent with the sidecar's final keyboard_text of A followed by a space. The trailing space is recorded by the sidecar and is not independently distinguishable in a still image.",
+        "The final English keyboard displays lowercase letters with an unpressed shift control, while shift, backspace, and the space key remain clearly identifiable and separated.",
+        "The input clear icon, Cancel action, source scopes, local no-match state, and black Search action remain unobstructed. The keyboard occupies the dock region.",
+        "No text/key collision, clipped bottom action, offset shadow, or stippled editing backdrop is visible. This final state does not establish the order or timing of the earlier key presses."
+      ],
+      "intentional_differences": []
+    },
+    {
+      "case_id": "scribe--library-first-boundary",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/scribe--library-first-boundary.png",
+      "candidate_sha256": "a272a0763ace9d782671578c0598fa3f4bc96e8a242957ff480ef7f517cad464",
+      "viewed_candidate": true,
+      "outcome": "no_actionable_visual_finding",
+      "observations": [
+        "The first page shows 18 books in six columns and three rows, matching the sidecar's visible records and the Scribe library capacity. Captions, title-adjacent unread badges, and downloaded icons fit below the covers.",
+        "The first and third visible books have separate unread badges of 3 and 12 respectively; these are read as application state markers below the cover rather than text or decoration embedded in demo artwork.",
+        "The continuation card is white with a black outline and contains a readable title, chapter, progress bar, 12/40 progress, and black arrow action. The adjacent daily-update card is also white outlined with three readable entries.",
+        "The folio shows 1/3 centered above the dock, hides the unavailable Previous action while preserving its left allocation, and keeps Next at the right. The grid does not intrude into the folio.",
+        "The all-books category has the heavy label and underline, while the library dock destination has the heavier icon/label and upper marker. No overlay shadow or background mask is present."
+      ],
+      "intentional_differences": []
+    },
+    {
+      "case_id": "scribe--library-last-page",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/scribe--library-last-page.png",
+      "candidate_sha256": "2cc6c20a710b3cd912f2e864feb3326fed46f4f46aa1f2b5e17e1ff3d4598c04",
+      "viewed_candidate": true,
+      "outcome": "no_actionable_visual_finding",
+      "observations": [
+        "The final page contains ten books, arranged as a full six-column row followed by four items in the next row. Ten remaining records are consistent with 46 total books after two pages of 18.",
+        "Books without rendered artwork use white outlined title plates. The longer title on the first plate in the second row wraps readably inside the plate and its caption remains fully visible below.",
+        "The folio shows 3/3 in the same centered allocation as page one, keeps Previous at the left, and hides the unavailable Next action without shifting the center. The empty grid area does not stretch the cards or move the dock.",
+        "The continuation/daily-update cards and category row retain their page-one geometry and white outlined surfaces. The active all-books category and library dock destination are still clear."
+      ],
+      "intentional_differences": []
+    },
+    {
+      "case_id": "scribe--library-tab-0",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/scribe--library-tab-0.png",
+      "candidate_sha256": "a272a0763ace9d782671578c0598fa3f4bc96e8a242957ff480ef7f517cad464",
+      "viewed_candidate": true,
+      "outcome": "no_actionable_visual_finding",
+      "observations": [
+        "The all-books category is visibly selected through its darker heavy label and underline; the other category labels and their counts remain legible and visually secondary. This agrees with library_filter=0 and four neutral filter states.",
+        "The selected category displays 46 total books and the first 18 visible records in a six-by-three grid, with readable captions, separate unread counts, and downloaded icons below the artwork.",
+        "The white continuation and daily-update cards remain visible above the categories. The 1/3 folio and active library dock sit below the grid without clipping its final captions.",
+        "This PNG was individually viewed even though its hash and visible scene equal the first-boundary case. It adds a distinct recorded all-category state, not independent evidence for another visual layout."
+      ],
+      "intentional_differences": []
+    }
+  ],
+  "suggestions": [],
+  "coverage_gaps": [
+    "No independent reference PNG is supplied for this supplemental batch. The review checks the listed candidate images against authoritative text, prototype declarations, explicit UX requirements, and recorded state; it does not claim an independent screenshot-to-screenshot pixel match.",
+    "The five keyboard images are final editing states. Search submission and dock restoration in result mode, cancel behavior, source-scope changes, local positive matches, pressed-key inversion, and the 100 ms feedback budget are not demonstrated by this batch.",
+    "Only the first pinyin candidate page is shown. Later candidate pages, candidate selection, paging boundaries, and symbol-page navigation require separate evidence.",
+    "The shift/space/backspace image and sidecar establish the recorded final text only. A still image cannot establish the interaction sequence, the trailing space independently, or each transient key state.",
+    "The library images cover the all-books tab and first/last page endpoints. Jump-panel selection, page-two membership, other category tabs, multi-selection feedback, and library action behavior are outside these eight images.",
+    "There is no sheet/dialog state in this batch from which to assess content-dependent panel height or dismissal behavior."
+  ],
+  "limitations": [
+    "This is a bounded manual review of eight supplied Scribe candidate PNGs on one frozen run, not acceptance of the complete applicable matrix or a complete clean review round.",
+    "The images are native 930 by 1240 desktop captures with a recorded Scribe profile. Their readable geometry does not qualify a physical Scribe display, waveform behavior, hardware input, actual sleep/wake, or a 512 MiB memory target.",
+    "Demo cover artwork, actual title-adjacent unread counts, and real application data were kept separate. Sample titles, counts, progress, timestamps, and cover availability are not treated as layout defects by themselves.",
+    "No application, build, test, smoke test, runtime probe, Git operation, or product modification was performed locally. Only existing evidence/text reads, image viewing, hash reads, and this review JSON write were performed."
+  ]
+}

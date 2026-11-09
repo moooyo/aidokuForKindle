@@ -1,0 +1,296 @@
+import { State, Commands, SettingItem } from "state.slint";
+import { Theme } from "theme.slint";
+import { Strings } from "strings.slint";
+import { ActionButton, BodyText, Caption, Icon } from "widgets.slint";
+
+export component SettingSymbol inherits Path {
+    in property <string> kind;
+    in property <color> foreground: Theme.ink;
+    x: 0px;
+    y: 0px;
+    width: State.large-screen ? 21px : 22px;
+    height: self.width;
+    viewbox-width: 24;
+    viewbox-height: 24;
+    fill: transparent;
+    stroke: root.foreground;
+    stroke-width: 1.7px;
+    stroke-line-cap: round;
+    stroke-line-join: round;
+    commands: root.kind == "screen-refresh" ? "M6 3h12v18H6zM9 7h6M9 11h6M9 15h4" :
+        root.kind == "frontlight-warmth" ? "M12 8a4 4 0 1 0 0 8a4 4 0 1 0 0-8zM12 2v2M12 20v2M2 12h2M20 12h2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4" :
+        root.kind == "pen" ? "M4 20l1.2-4.6L16 4.6a2 2 0 0 1 2.8 0l.6.6a2 2 0 0 1 0 2.8L8.6 18.8zM14 6.5l3.5 3.5" :
+        root.kind == "wifi-sleep-exit" ? "M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z" :
+        root.kind == "storage" ? "M4 5h16v5H4zM4 14h16v5H4zM7.5 7.5h.01M7.5 16.5h.01" :
+        root.kind == "default-direction" ? "M4 5h7v14H4zM13 5h7v14h-7z" :
+        root.kind == "tap-regions" ? "M12 3v4M12 17v4M3 12h4M17 12h4M12 9a3 3 0 1 0 0 6a3 3 0 1 0 0-6z" :
+        root.kind == "image-processing" ? "M4 5h16v14H4zM4 15l5-5 4 4 3-3 4 4M15 9h.01" :
+        root.kind == "spread" ? "M2 7h9v11H2zM13 7h9v11h-9zM6 3l-2 2 2 2M18 3l2 2-2 2" :
+        root.kind == "categories" ? "M3 7h7l2 2h9v10H3z" :
+        root.kind == "auto-update" ? "M21 4v6h-6M3 20v-6h6M5 9a8 8 0 0 1 13.5-3L21 9M3 15l2.5 3A8 8 0 0 0 19 15" :
+        root.kind == "source-lists" ? "M8 6h13M8 12h13M8 18h13M3.5 6h.01M3.5 12h.01M3.5 18h.01" :
+        root.kind == "downloads" ? "M12 4v11M7 11l5 5 5-5M5 20h14" :
+        root.kind == "tracking" ? "M3 17l6-6 4 4 8-8M15 7h6v6" :
+        root.kind == "backup" ? "M12 15V3M7 8l5-5 5 5M5 21h14" :
+        root.kind == "language" ? "M4 5h9M8.5 3v2M6 5a8 8 0 0 0 7 8M11 5a8 8 0 0 1-7 8M13 21l4-9 4 9M14.5 18h5" :
+        root.kind == "logs" ? "M6 3h9l3 3v15H6zM9 9h6M9 13h6M9 17h4" :
+        "M12 2.5a9.5 9.5 0 1 0 0 19a9.5 9.5 0 1 0 0-19zM12 11v6M12 7.5h.01";
+}
+
+export component DeviceGlyph inherits Rectangle {
+    x: 0px;
+    y: 0px;
+    width: State.large-screen ? 38px : 40px;
+    height: State.large-screen ? 50px : 54px;
+    border-width: 2px;
+    border-color: Theme.ink;
+    border-radius: State.large-screen ? 3px : 2px;
+    background: Theme.paper;
+    Rectangle {
+        x: State.large-screen ? 9px : 5px;
+        y: State.large-screen ? 4px : 5px;
+        width: parent.width - self.x - 4px;
+        height: parent.height - self.y - (State.large-screen ? 4px : 9px);
+        border-width: 1px;
+        border-color: Theme.secondary;
+        background: Theme.paper;
+        clip: true;
+        for index in 77: Rectangle {
+            x: 2px + mod(index, 7) * 4px;
+            y: 2px + floor(index / 7) * 4px;
+            width: 1.5px;
+            height: 1.5px;
+            background: Theme.ink;
+            border-radius: 1px;
+        }
+    }
+}
+
+export component SettingsListRow inherits Rectangle {
+    in property <SettingItem> item;
+    in property <bool> sidebar: false;
+    in property <bool> selected: false;
+    property <bool> inverted: root.selected != hit.pressed;
+    x: 0px;
+    y: 0px;
+    height: root.sidebar ? 46px : 52px;
+    border-radius: root.sidebar ? Theme.control-radius : 0px;
+    background: root.inverted ? Theme.ink : Theme.paper;
+    accessible-role: button;
+    accessible-label: root.item.title + " " + root.item.value;
+    SettingSymbol {
+        x: root.sidebar ? 16px : 22px;
+        y: (parent.height - self.height) / 2;
+        kind: root.item.id;
+        foreground: root.inverted ? Theme.paper : Theme.ink;
+    }
+    BodyText {
+        x: root.sidebar ? 49px : 58px;
+        y: 0px;
+        width: root.sidebar ? parent.width - self.x - 14px : max(0px, parent.width - self.x - value.width - 44px);
+        height: parent.height;
+        text: root.item.title;
+        font-size: 17px;
+        font-weight: root.selected ? 700 : 400;
+        color: root.inverted ? Theme.paper : Theme.ink;
+    }
+    value := Caption {
+        visible: !root.sidebar;
+        x: parent.width - self.width - 42px;
+        y: 0px;
+        width: min(240px, self.preferred-width);
+        height: parent.height;
+        text: root.item.value;
+        font-size: 14px;
+        color: root.inverted ? Theme.paper : Theme.secondary;
+        horizontal-alignment: right;
+    }
+    if !root.sidebar: Icon {
+        x: parent.width - 30px;
+        y: (parent.height - 16px) / 2;
+        width: 16px;
+        height: 16px;
+        kind: "chevron-right";
+        inverted: root.inverted;
+        secondary: true;
+    }
+    if !root.sidebar: Rectangle {
+        x: 58px;
+        y: parent.height - 1px;
+        width: parent.width - self.x - 16px;
+        height: 1px;
+        background: Theme.line;
+    }
+    hit := TouchArea {
+        x: 0px;
+        y: 0px;
+        width: parent.width;
+        height: parent.height;
+        pointer-event(event) => {
+            if event.kind == PointerEventKind.down { Commands.refresh("fast"); }
+            else if event.kind == PointerEventKind.up { Commands.refresh("ui"); }
+        }
+        clicked => { Commands.action("settings", "open", root.item.id); }
+    }
+}
+
+export component SettingsChoice inherits Rectangle {
+    in property <string> text;
+    in property <bool> selected: false;
+    in property <bool> enabled: true;
+    callback clicked();
+    property <bool> inverted: root.selected != (hit.pressed && root.enabled);
+    x: 0px;
+    y: 0px;
+    height: State.large-screen ? 50px : 44px;
+    border-width: Theme.control-border;
+    border-color: root.enabled ? Theme.ink : Theme.dotted;
+    border-radius: Theme.control-radius;
+    background: root.inverted ? Theme.ink : Theme.paper;
+    accessible-role: radio-button;
+    accessible-label: root.text;
+    accessible-enabled: root.enabled;
+    accessible-checkable: true;
+    accessible-checked: root.selected;
+    BodyText {
+        x: 0px;
+        y: 0px;
+        width: parent.width;
+        height: parent.height;
+        text: root.text;
+        font-size: State.large-screen ? 16px : 15px;
+        font-weight: root.selected ? 700 : 500;
+        horizontal-alignment: center;
+        color: root.inverted ? Theme.paper : root.enabled ? Theme.ink : Theme.disabled;
+    }
+    hit := TouchArea {
+        x: 0px;
+        y: (parent.height - Theme.touch) / 2;
+        width: parent.width;
+        height: Theme.touch;
+        enabled: root.enabled;
+        pointer-event(event) => {
+            if event.kind == PointerEventKind.down { Commands.refresh("fast"); }
+            else if event.kind == PointerEventKind.up { Commands.refresh("ui"); }
+        }
+        clicked => { root.clicked(); }
+    }
+}
+
+export component SettingsSlider inherits Rectangle {
+    in property <string> text;
+    in property <string> preference;
+    in property <int> value;
+    in property <bool> enabled: true;
+    property <int> target-value: clamp(floor(track-touch.mouse-x / max(1px, track.width) * 24 + 0.5), 0, 24);
+    x: 0px;
+    y: 0px;
+    height: State.large-screen ? 96px : 86px;
+    BodyText { x: 0px; y: 0px; width: parent.width - 68px; height: 26px; text: root.text; font-size: State.large-screen ? 17px : 16px; }
+    Text { x: parent.width - 64px; y: 0px; width: 64px; height: 26px; text: root.value; font-family: Theme.numbers; font-size: State.large-screen ? 17px : 16px; font-weight: 700; color: root.enabled ? Theme.ink : Theme.disabled; horizontal-alignment: right; vertical-alignment: center; }
+    ActionButton {
+        x: 0px; y: 34px; width: 48px; height: 48px;
+        text: "−"; enabled: root.enabled && root.value > 0;
+        clicked => { Commands.action("settings", "set", root.preference + "=" + max(0, root.value - 1)); }
+    }
+    track := Rectangle {
+        x: 64px; y: 38px; width: max(0px, parent.width - 128px); height: 40px;
+        Rectangle { x: 0px; y: 18px; width: parent.width; height: 4px; background: Theme.line; border-radius: 2px; }
+        Rectangle { x: 0px; y: 18px; width: parent.width * clamp(root.value / 24.0, 0, 1); height: 4px; background: root.enabled ? Theme.ink : Theme.disabled; border-radius: 2px; }
+        Rectangle {
+            x: clamp(parent.width * root.value / 24.0 - 12px, -12px, parent.width - 12px);
+            y: 8px; width: 24px; height: 24px;
+            background: Theme.paper; border-width: 1.5px; border-color: root.enabled ? Theme.ink : Theme.disabled; border-radius: 3px;
+            Rectangle { x: 3px; y: 3px; width: parent.width - 6px; height: parent.height - 6px; background: root.enabled ? Theme.ink : Theme.disabled; border-radius: 1px; }
+        }
+        track-touch := TouchArea {
+            x: 0px;
+            y: (parent.height - Theme.touch) / 2;
+            width: parent.width;
+            height: Theme.touch;
+            enabled: root.enabled;
+            accessible-role: slider;
+            accessible-label: root.text;
+            pointer-event(event) => {
+                if event.kind == PointerEventKind.down { Commands.refresh("fast"); }
+                else if event.kind == PointerEventKind.up {
+                    if root.target-value != root.value { Commands.action("settings", "set", root.preference + "=" + root.target-value); }
+                    Commands.refresh("ui");
+                }
+            }
+        }
+    }
+    ActionButton {
+        x: parent.width - 48px; y: 34px; width: 48px; height: 48px;
+        text: "+"; enabled: root.enabled && root.value < 24;
+        clicked => { Commands.action("settings", "set", root.preference + "=" + min(24, root.value + 1)); }
+    }
+}
+
+export component UnavailablePolicyRow inherits Rectangle {
+    in property <string> text;
+    in property <string> reason;
+    x: 0px;
+    y: 0px;
+    height: State.large-screen ? 60px : 54px;
+    background: Theme.paper;
+    accessible-role: switch;
+    accessible-label: root.text + " " + root.reason;
+    accessible-enabled: false;
+    accessible-checkable: true;
+    accessible-checked: false;
+    BodyText {
+        x: 0px;
+        y: State.large-screen ? 4px : 2px;
+        width: max(0px, parent.width - track.width - 12px);
+        height: State.large-screen ? 27px : 25px;
+        text: root.text;
+        font-size: State.large-screen ? 17px : 16px;
+        color: Theme.disabled;
+    }
+    Caption {
+        x: 0px;
+        y: State.large-screen ? 32px : 29px;
+        width: max(0px, parent.width - track.width - 12px);
+        height: State.large-screen ? 20px : 18px;
+        text: root.reason;
+        font-size: State.large-screen ? 14px : 12px;
+    }
+    track := Rectangle {
+        x: parent.width - self.width;
+        y: (parent.height - self.height) / 2;
+        width: State.large-screen ? 56px : 50px;
+        height: State.large-screen ? 32px : 30px;
+        border-width: Theme.control-border;
+        border-color: Theme.dotted;
+        border-radius: Theme.control-radius;
+        background: Theme.paper;
+        Rectangle {
+            x: State.large-screen ? 3.5px : 3px;
+            y: State.large-screen ? 3.5px : 3px;
+            width: State.large-screen ? 22px : 21px;
+            height: self.width;
+            border-radius: 3px;
+            background: Theme.disabled;
+        }
+    }
+    Rectangle { x: 0px; y: parent.height - 1px; width: parent.width; height: 1px; background: Theme.line; }
+}
+
+export component SettingsValueRow inherits Rectangle {
+    in property <string> text;
+    in property <string> value;
+    in property <string> detail;
+    in property <string> action;
+    in property <bool> enabled: true;
+    callback clicked();
+    x: 0px;
+    y: 0px;
+    height: State.large-screen ? 60px : 54px;
+    BodyText { x: 0px; y: root.detail == "" ? 0px : 3px; width: max(0px, parent.width - value-label.width - (root.action == "" ? 16px : button.width + 28px)); height: root.detail == "" ? parent.height : 28px; text: root.text; font-size: State.large-screen ? 17px : 16px; }
+    if root.detail != "": Caption { x: 0px; y: 31px; width: max(0px, parent.width - (root.action == "" ? 0px : button.width + 14px)); height: 22px; text: root.detail; font-size: State.large-screen ? 14px : 13px; }
+    value-label := Text { x: parent.width - self.width - (root.action == "" ? 0px : button.width + 14px); y: 0px; width: min(parent.width * 0.62, self.preferred-width); height: parent.height; text: root.value; font-family: Theme.numbers; font-size: State.large-screen ? 15px : 14px; color: Theme.secondary; horizontal-alignment: right; vertical-alignment: center; overflow: elide; }
+    button := ActionButton { visible: root.action != ""; x: parent.width - self.width; y: (parent.height - self.height) / 2; width: self.preferred-width; height: 42px; text: root.action; enabled: root.enabled; clicked => { root.clicked(); } }
+    Rectangle { x: 0px; y: parent.height - 1px; width: parent.width; height: 1px; background: Theme.line; }
+}
+

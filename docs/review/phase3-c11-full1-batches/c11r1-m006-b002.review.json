@@ -1,0 +1,263 @@
+{
+  "schema_version": 1,
+  "kind": "C11-full1-fresh-small-static-visual-review",
+  "batch_id": "c11r1-m006-b002",
+  "reviewer": "c11r1_m006_b002",
+  "record_date": "2026-11-07",
+  "round": 1,
+  "run_id": "55c498296d35",
+  "module_id": "006-sc-settings-library-keyboard",
+  "input_inventory": {
+    "path": "D:/Code/aidokuForKindle/docs/review/phase3-c11-full1-batches/c11r1-m006-b002.input.json",
+    "input_sha256_declaration": "pending owner declaration; no local hash was run",
+    "source_manifest_sha256": "e332086df1f552ae7d7c7d434491f6886a167095a86789d6e0ec93ca47975e9e",
+    "reference_manifest_sha256": "caad04a243ecbaac22c790d7918f50c8678985b9e58a9f963694fe7d69e2775a",
+    "remaining_paths_and_identities": "Immutable input source_manifest/reference_manifest and module inventory.files; remaining freeze hashes are input.freeze_tuple and module inventory.frozen_identity.",
+    "all_hashes_are_owner_declarations": true,
+    "local_rehash_performed": false
+  },
+  "module_snapshot": {
+    "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate11/ui-round-1/snapshots/ui-round-1-snapshot-006-sc-settings-library-keyboard/inventory.json",
+    "sha256": "3ff873aa1eb704d15552f051ac953edafc142ba5df3bb6813099c7ded4ed109a",
+    "archive_sha256": "166da51904b232bbb1b89448a35cfa1f30e77540920e6caa5cd225840dc759fe",
+    "transfer_accounting_sha256": "a03a34230bcaa010d119fb5ef8d247bc8bae9c3264ea13daf0c338a26a2afb5a",
+    "full_manifest_pending": true
+  },
+  "freeze_tuple": {
+    "source_sha256": "33a2d049307c398da8bfbf196d1bf8e086412c117c194b592f4a93b5bfaedb3f",
+    "binary_sha256": "1e60db345cbd6fbe580258a4a309bf42361781061dc2033f78a8a5eb4446ad72",
+    "reference_sha256": "e7b49b456255432d74cfe41346f9d44c1a9c55bf67c5d55483e4ae3029547d18",
+    "capture_plan_sha256": "b201d4ac36df8023fb12f07e0adae91f4c63201cdd441add6ddd0a0d535ca368",
+    "reference_scope_sha256": "c910bed9f02ed17b2ca0a54aca1beeeeb6caabc5a17a91afe764ddd3e7b0d33c",
+    "main_harness_sha256": "f7e2d3dc3c66479715a7d5d094a7b9165379c3e1f4b1b8ecad092b78b924a892",
+    "remaining_identity_locator": "input.freeze_tuple and immutable module inventory.frozen_identity",
+    "static_case_and_inventory_identity_observation": "All four case records and the inventory declare the assigned run/source/binary; no mismatch was observed in the supplied text."
+  },
+  "reviewed_case_ids": [
+    "scribe--c4-book-storage--delete-all-cancel",
+    "scribe--c4-book-storage--delete-all-applied",
+    "scribe--c4-book-storage--delete-all-active-confirm",
+    "scribe--c4-book-storage--delete-all-empty-disabled"
+  ],
+  "actual_original_image_opens": 6,
+  "image_open_accounting": {
+    "new_candidates": 4,
+    "original_references": 2,
+    "reference_pairs": 4,
+    "max_allowed_opens": 8
+  },
+  "references": [
+    {
+      "reference_id": "sc-manga--default",
+      "path": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/screens/sc-manga.png",
+      "sha256": "33b5f4cb64428dc8e54237bdcad03c44e556da6570b234556c0b60f8d7c1e082",
+      "declared_dimensions": [
+        1860,
+        2480
+      ],
+      "actual_image_opened": true,
+      "opens": 1,
+      "comparison_kind": "related-logical-contract-only-no-exact-state-reference",
+      "comparison_for_case_ids": [
+        "scribe--c4-book-storage--delete-all-cancel",
+        "scribe--c4-book-storage--delete-all-applied"
+      ],
+      "observation": "Actually opened the original detail reference. Its cover/detail column and chapter-list column, title hierarchy, continuation and book-action bounds, horizontal rule, chapter date/control separation and right-column folio were used for the related geometry comparison."
+    },
+    {
+      "reference_id": "sc-manga--more",
+      "path": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/screens/states/sc-manga--more.png",
+      "sha256": "c343694e9a3125c40202fad53e4e0319dcbe4e88626877fd36120f7557bcf49e",
+      "declared_dimensions": [
+        1860,
+        2480
+      ],
+      "actual_image_opened": true,
+      "opens": 1,
+      "comparison_kind": "related-logical-contract-only-no-exact-state-reference",
+      "comparison_for_case_ids": [
+        "scribe--c4-book-storage--delete-all-active-confirm",
+        "scribe--c4-book-storage--delete-all-empty-disabled"
+      ],
+      "observation": "Actually opened the original More reference. The bordered five-row action menu supplies a related action/border/hierarchy contract; it is not an independent deletion-confirmation or empty-disabled oracle."
+    }
+  ],
+  "common_geometry_observation": "The current captures retain the related detail screen's two-column proportions, cover allocation, serif title and contents heading, chapter-rule and control placement, metadata hierarchy and right-column folio. Real fixture titles, solid cover content, three chapters, dates and one-page pagination differ from reference content; those differences were not used to waive geometry or legibility. Dialog origin and height follow its actual two-line content and equal action buttons.",
+  "cases": [
+    {
+      "case_id": "scribe--c4-book-storage--delete-all-cancel",
+      "original_png_path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate11/ui-round-1/snapshots/ui-round-1-snapshot-006-sc-settings-library-keyboard/files/output/scribe--c4-book-storage--delete-all-cancel.png",
+      "png_sha256": "ebc9556cb6d3e20c747310bde3a858744f61751b853cec03a1704d6f5b22cc0c",
+      "case_json_sha256": "4053dde9cef14bca1730f054db8725fcea916f6fbbb12b2cdb496c26e5f81a66",
+      "state_sha256": "4c6549920a3ea708be3cdebbabe3ecfd289443b13f964d193c42c27dd0a2c031",
+      "metadata_sha256": "1526f8a8958ceda809b7b5abb9dcb03e8fbc845a2071266c8ce3be5d36e9cb92",
+      "actions_sha256": "dcc5eb1ff35d9fbaf7781b9ada336dd586617bc4f0b044738d77a0dc0757ba51",
+      "log_sha256": "7e68a4176710a866675a6b95bcf7bed2d96c58a8fd7996a4d48f3679514483a9",
+      "identity_paths_locator": "input.cases[0] and immutable module inventory.files",
+      "reference_sha256": null,
+      "comparison_reference_ids": [
+        "sc-manga--default"
+      ],
+      "comparison_reference_sha256": "33b5f4cb64428dc8e54237bdcad03c44e556da6570b234556c0b60f8d7c1e082",
+      "reference_comparison_status": "related-logical-contract-only-no-exact-state-reference",
+      "actual_image_opened": true,
+      "native_dimensions": [
+        930,
+        1240
+      ],
+      "observation": "The detail page is visible with no confirmation overlay. The header retains one downloaded chapter; chapter 1 keeps its black completion check and current-reading badge with 1/6 progress. The three-row chapter list, cover area, ellipsized book/chapter titles, author/provider metadata, body copy, two tag bounds and right-column 1/1 folio remain readable without collisions.",
+      "existing_action_and_state_evidence": "Existing action artifact opens book 8:suwayomi:1, requests remove-all-downloads, then closes the panel. Captured state has no modal, downloaded_count=1 and no removal completion. The statically read cancel-protection checkpoint retains the target completed job, its six download pins, the other five completed jobs and two local-file records.",
+      "supplemental_static_evidence": [
+        {
+          "role": "cancel-protection",
+          "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate11/ui-round-1/snapshots/ui-round-1-snapshot-006-sc-settings-library-keyboard/files/output/fixtures/scribe--c4-book-storage--delete-all-cancel--cancel-protection.json",
+          "sha256": "ef00e366608359c0d0cd0af5ee8b04c9829bc1c99484d088c02442b894eec13a",
+          "read_statically": true
+        }
+      ],
+      "intentional_or_capability_check": "Cancellation is a related-state contract comparison; its visible retained completion marker agrees with existing action/Store evidence.",
+      "exact_state_reference_passed": false,
+      "static_verdict": "consistent_with_related_contract_and_existing_static_evidence_no_new_actionable_visible"
+    },
+    {
+      "case_id": "scribe--c4-book-storage--delete-all-applied",
+      "original_png_path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate11/ui-round-1/snapshots/ui-round-1-snapshot-006-sc-settings-library-keyboard/files/output/scribe--c4-book-storage--delete-all-applied.png",
+      "png_sha256": "23b390ecf43e4fe15e5e4beaac44955f41ec288831a4931e8d76039babfcd409",
+      "case_json_sha256": "ee57b15e3327204a1cac5135842cc619e2ea4081ab501f7112a1debcc208201c",
+      "state_sha256": "206a85e7caa51ab99da46821ecc74f95d61a56d489f4c82dd21cc26977d2ab44",
+      "metadata_sha256": "c461df07193fd096e096114c7efee3e0630b08eeb281279fd6607ca506821f13",
+      "actions_sha256": "bf54ddd4c10edc7074b1f0630df93a81b716a3fa2a566fe7a6218e1a4c39b8c9",
+      "log_sha256": "7e68a4176710a866675a6b95bcf7bed2d96c58a8fd7996a4d48f3679514483a9",
+      "identity_paths_locator": "input.cases[1] and immutable module inventory.files",
+      "reference_sha256": null,
+      "comparison_reference_ids": [
+        "sc-manga--default"
+      ],
+      "comparison_reference_sha256": "33b5f4cb64428dc8e54237bdcad03c44e556da6570b234556c0b60f8d7c1e082",
+      "reference_comparison_status": "related-logical-contract-only-no-exact-state-reference",
+      "actual_image_opened": true,
+      "native_dimensions": [
+        930,
+        1240
+      ],
+      "observation": "The confirmation overlay has closed and the header now shows zero downloaded chapters. Chapter 1 keeps the reading badge and 1/6 progress while its completion check changes to an outlined download arrow. The same two-column allocation, metadata, rules, chapter bounds and 1/1 folio remain intact; the capture does not show a success toast.",
+      "existing_action_and_state_evidence": "Existing action artifact pauses chapter 102, opens the target book, requests and resumes its download, opens removal confirmation and chooses book-downloads-remove-confirm. Existing actor-completion reports finalized=true, removed=1, cancelled=1, failed=0 and usage_changed=true. The after-delete Store checkpoint has no target-book jobs or pins and all target downloaded flags are false; five other completed jobs, their pins and the same two local-file records remain. The shared-raw-files-after inventory retains six owner-declared raw records.",
+      "supplemental_static_evidence": [
+        {
+          "role": "provider-requests",
+          "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate11/ui-round-1/snapshots/ui-round-1-snapshot-006-sc-settings-library-keyboard/files/output/fixtures/scribe--c4-book-storage--delete-all-applied--provider-requests.json",
+          "sha256": "5e531b9ff7107245b11ac8478954f6450870721ccfea522f98bde22e6b4cf75c",
+          "read_statically": true
+        },
+        {
+          "role": "after-delete-protection",
+          "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate11/ui-round-1/snapshots/ui-round-1-snapshot-006-sc-settings-library-keyboard/files/output/fixtures/scribe--c4-book-storage--delete-all-applied--after-delete-protection.json",
+          "sha256": "4d224dfa45f5819695746c0e0bcb3094e415e9b6c7eda17ca47dd0aed03e8f42",
+          "read_statically": true
+        },
+        {
+          "role": "actor-completion",
+          "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate11/ui-round-1/snapshots/ui-round-1-snapshot-006-sc-settings-library-keyboard/files/output/fixtures/scribe--c4-book-storage--delete-all-applied--actor-completion.json",
+          "sha256": "1f0a86639977b33bfe1eb690a363fb61c2e9568fa9063ade1040679e71ddbdea",
+          "read_statically": true
+        },
+        {
+          "role": "shared-raw-files-after",
+          "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate11/ui-round-1/snapshots/ui-round-1-snapshot-006-sc-settings-library-keyboard/files/output/fixtures/scribe--c4-book-storage--delete-all-applied--shared-raw-files-after.json",
+          "sha256": "b1c7addbd0290e6dac0cd7eda8efef0cc0f59f1b2565f9c947e7441230c970a7",
+          "read_statically": true
+        }
+      ],
+      "intentional_or_capability_check": "Removal feedback is qualified by existing actor/Store evidence only. Genuine held CacheLease protection remains outside this screenshot review.",
+      "exact_state_reference_passed": false,
+      "static_verdict": "consistent_with_related_contract_and_existing_static_evidence_no_new_actionable_visible"
+    },
+    {
+      "case_id": "scribe--c4-book-storage--delete-all-active-confirm",
+      "original_png_path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate11/ui-round-1/snapshots/ui-round-1-snapshot-006-sc-settings-library-keyboard/files/output/scribe--c4-book-storage--delete-all-active-confirm.png",
+      "png_sha256": "579af672b6db2568fc0e5c11ff520f4a0e1e6cc9bd31c95b70db0e05103f10a1",
+      "case_json_sha256": "e682b39be41d172380a28806d0d2799a982fe4d0f2b7f3b7035520d5dcdd85e1",
+      "state_sha256": "46e42d2496a8643052c1301f5b4cb00692771c3046841fdba7871901b4765f52",
+      "metadata_sha256": "7616f36c106ea059ffef5d2d1124a2bc06be838ec34a0c7e820da4f905d6e7d9",
+      "actions_sha256": "689eb4d70d2b46dc0cf9a2096670f05723df5f07c64351ca4184a9727d2a85af",
+      "log_sha256": "7e68a4176710a866675a6b95bcf7bed2d96c58a8fd7996a4d48f3679514483a9",
+      "identity_paths_locator": "input.cases[2] and immutable module inventory.files",
+      "reference_sha256": null,
+      "comparison_reference_ids": [
+        "sc-manga--more"
+      ],
+      "comparison_reference_sha256": "c343694e9a3125c40202fad53e4e0319dcbe4e88626877fd36120f7557bcf49e",
+      "reference_comparison_status": "related-logical-contract-only-no-exact-state-reference",
+      "actual_image_opened": true,
+      "native_dimensions": [
+        930,
+        1240
+      ],
+      "observation": "A black-bordered, two-line confirmation displays a two-chapter removal scope and local-import retention text. The white Cancel and black Remove buttons have equal bounds, visible separation and internal padding; no dialog text or control is clipped. Behind it, one completed chapter and chapter 2's active stop square are visible, explaining the removal scope of two.",
+      "existing_action_and_state_evidence": "Existing action artifact opens the target book, starts chapter 102 and opens removal confirmation. Captured state records chapter 101 completed and chapter 102 downloading, with removal confirmation enabled and removal_completions=0. The frozen provider request record contains authorized chapter-page discovery and page 1/2 requests; it is static provenance, not a new network run.",
+      "supplemental_static_evidence": [
+        {
+          "role": "provider-requests",
+          "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate11/ui-round-1/snapshots/ui-round-1-snapshot-006-sc-settings-library-keyboard/files/output/fixtures/scribe--c4-book-storage--delete-all-active-confirm--provider-requests.json",
+          "sha256": "b6bdd4d909ddf7a071cac197aeb19aeb02f2c8e28df6f351b60e16ff8f860d48",
+          "read_statically": true
+        }
+      ],
+      "intentional_or_capability_check": "This is an intentional inflight capture. Active work is included in the removal scope; the screenshot is not evidence of completed removal.",
+      "exact_state_reference_passed": false,
+      "static_verdict": "consistent_with_related_contract_and_existing_static_evidence_no_new_actionable_visible"
+    },
+    {
+      "case_id": "scribe--c4-book-storage--delete-all-empty-disabled",
+      "original_png_path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate11/ui-round-1/snapshots/ui-round-1-snapshot-006-sc-settings-library-keyboard/files/output/scribe--c4-book-storage--delete-all-empty-disabled.png",
+      "png_sha256": "939e25449ea3535464ddfa560c5e3e9fe078ace59bc59bdc8e116a34dbd0a726",
+      "case_json_sha256": "d0cc68a8872db302fb3fc5b51de6dc489561deae7b146a7353b5bea5eb11c189",
+      "state_sha256": "8f46571427977dbb51ce0d7f07cf489ef6478b80d478c7168cc49a00a30cf022",
+      "metadata_sha256": "dfcc4f86c690b83128f53c0e24474423e52d4465ca42201d8123523573676aea",
+      "actions_sha256": "3059adc20ca2bb3cdf4512d0cb3f26ead09987bc35377be8734fe35dd34eeca8",
+      "log_sha256": "7e68a4176710a866675a6b95bcf7bed2d96c58a8fd7996a4d48f3679514483a9",
+      "identity_paths_locator": "input.cases[3] and immutable module inventory.files",
+      "reference_sha256": null,
+      "comparison_reference_ids": [
+        "sc-manga--more"
+      ],
+      "comparison_reference_sha256": "c343694e9a3125c40202fad53e4e0319dcbe4e88626877fd36120f7557bcf49e",
+      "reference_comparison_status": "related-logical-contract-only-no-exact-state-reference",
+      "actual_image_opened": true,
+      "native_dimensions": [
+        930,
+        1240
+      ],
+      "observation": "The same bounded confirmation displays a zero-chapter scope. Cancel remains dark and outlined; Remove is visibly grey with a light border and white fill. Text, border, equal button bounds and padding remain readable. The underlying header shows zero downloaded chapters and every chapter has a download arrow.",
+      "existing_action_and_state_evidence": "Existing action artifact opens the target book and requests remove-all-downloads. Captured state records downloaded_count=0, all three target chapters available, and book-downloads-remove-confirm enabled=false. No confirmation choice or removal completion is recorded for this case.",
+      "supplemental_static_evidence": [],
+      "intentional_or_capability_check": "Truthful empty-state disablement and its light border follow the accepted Root contract. No enabled-state imitation or new feature is requested.",
+      "exact_state_reference_passed": false,
+      "static_verdict": "consistent_with_related_contract_and_existing_static_evidence_no_new_actionable_visible"
+    }
+  ],
+  "new_actionable": [],
+  "pending": [
+    {
+      "scope": "independent-live-reader-lease",
+      "case_id": "scribe--c4-book-storage--delete-all-applied",
+      "status": "existing_external_evidence_required_outside_this_static_assignment",
+      "reason": "The case explicitly requires Root-owned evidence of a genuine held CacheLease during supported same-process cleanup. Sequential GUI captures and the frozen actor/Store checkpoints do not establish that lease; unsupported cross-process sharing is not claimed.",
+      "trigger_locator": "applied case JSON external_evidence_required[0]; original hashes retained in cases",
+      "reported_to_coordinator": true
+    },
+    {
+      "scope": "full-run-manifest-reconciliation",
+      "status": "owner_pending",
+      "reason": "The immutable module input declares full_manifest_pending=true. This four-case batch must be joined to the final required IDs and freeze identities before complete acceptance."
+    }
+  ],
+  "historical_findings": [],
+  "regression_closures": [],
+  "limitations": [
+    "All six opens used the assigned original paths. Candidates are declared 930x1240 logical PNGs; the two original references are declared 1860x2480 at scale two and were presented by view_image at 1368x1824. No image was copied, cropped, processed or manually resized.",
+    "Every case has only a related logical contract reference. Missing independent exact-state references are not marked passed.",
+    "Actions, provider records, actor completion and Store/file inventories were read as existing frozen text. No application, test, build, probe, validator, SQL, hash or SSH operation was performed; actual hidden hit bounds, physical input, hardware effects and genuine held live-reader lease protection are not qualified.",
+    "No previous candidate image or historical report was used. This is a bounded partial-module static review, with no full-round or clean acceptance claim."
+  ]
+}

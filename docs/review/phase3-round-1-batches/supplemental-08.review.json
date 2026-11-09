@@ -1,0 +1,179 @@
+{
+  "batch_id": "supplemental-08",
+  "reviewer": "/root/phase3_round1_review/supplemental_08",
+  "run_id": "a1baf3fe3dc2",
+  "binary_sha256": "94d7f3bbcab475ad8833a2f3c486138f7b49bead231851c2d8eab2f0c3d2ac51",
+  "source_sha256": "aef9db4e111165016a10a2a95e111f3155860b8510c7f6207ec9c79fbec5082c",
+  "review_scope": "Fresh visual inspection of exactly the eight candidate PNGs listed in supplemental-08.input.json, supported by their case metadata and the written handoff, scope, and prototype contracts. No independent reference PNG was supplied or viewed.",
+  "reviewed_case_ids": [
+    "pw5--http-search-timeout",
+    "pw5--incognito-enable",
+    "pw5--incognito-history-policy",
+    "pw5--incognito-persistence",
+    "pw5--independent-search--all-complete",
+    "pw5--independent-search--early-result",
+    "pw5--keyboard-cancel",
+    "pw5--keyboard-candidate-commit"
+  ],
+  "reviewed_cases": [
+    {
+      "case_id": "pw5--http-search-timeout",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/pw5--http-search-timeout.png",
+      "candidate_sha256": "e2a2336915461371459c4abea9b58497b8eb97032ee8b757a480ee2e9102d938",
+      "sha256_matches_expected": true,
+      "sha256_matches_case_evidence": true,
+      "viewed_candidate": true,
+      "outcome": "pass",
+      "observations": [
+        "The submitted fixture query remains in the outlined search field. The summary reports one searched source and zero sources with results.",
+        "Local Komga fixture has a legible timeout label and a distinct right-aligned Retry action. It is not presented as an empty successful result, and there is no stale loading indicator.",
+        "The keyboard is closed and the five-item bottom navigation is restored with Search selected. Source status, action, and navigation do not overlap.",
+        "The supplied case state reports a settled source error, and the recorded check classifies a real expired HTTP request as timeout=true. This review read that evidence without rerunning the request."
+      ],
+      "intentional_differences": []
+    },
+    {
+      "case_id": "pw5--incognito-enable",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/pw5--incognito-enable.png",
+      "candidate_sha256": "0514974bd4784b0cec3252a393c8bf1efd77992b4f82affb7063911357c95326",
+      "sha256_matches_expected": true,
+      "sha256_matches_case_evidence": true,
+      "viewed_candidate": true,
+      "outcome": "needs_change",
+      "observations": [
+        "The history page shows an inverted status strip and a black pressed Incognito header action, consistent with the sidecar preference incognito=true.",
+        "The inverted strip contains only the clock and connectivity/battery information. Its center is empty: the required persistent incognito/no-history policy message is missing. See P3R1-SUP08-1.",
+        "Existing history stays visible in date groups with separate cover, book/chapter text, progress/time, and remove controls. Five rows fit above the 1/5 folio and the active History navigation item.",
+        "The sidecar reports 20 existing history records. Their continued display is compatible with enabling private reading and is not treated as a requirement to erase prior history."
+      ],
+      "intentional_differences": []
+    },
+    {
+      "case_id": "pw5--incognito-history-policy",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/pw5--incognito-history-policy.png",
+      "candidate_sha256": "7edfb121c9a7bc19cff2e4ae741d5decaaba4bd10f4d849943de8e31183295e7",
+      "sha256_matches_expected": true,
+      "sha256_matches_case_evidence": true,
+      "viewed_candidate": true,
+      "outcome": "needs_change",
+      "observations": [
+        "Although the case screen label is reader, the supplied state route is detail and the PNG visibly shows the book detail page after reading. It is not a closed-reader artwork capture.",
+        "The detail page retains the inverted status strip while incognito=true. It again omits the policy message, and this route has no history header toggle to provide an additional visible mode cue. See P3R1-SUP08-1.",
+        "The continuation panel shows chapter 34 at page 20/40; the book information, chapter actions, six chapter rows, and 1/8 folio remain readable without a bottom dock or overlapping controls.",
+        "The supplied checks report that private reading left every durable history row unchanged, with 20 rows before and after. The PNG alone does not establish that database behavior, so the recorded functional result is kept separate from the visual finding."
+      ],
+      "intentional_differences": []
+    },
+    {
+      "case_id": "pw5--incognito-persistence",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/pw5--incognito-persistence.png",
+      "candidate_sha256": "0514974bd4784b0cec3252a393c8bf1efd77992b4f82affb7063911357c95326",
+      "sha256_matches_expected": true,
+      "sha256_matches_case_evidence": true,
+      "viewed_candidate": true,
+      "outcome": "needs_change",
+      "observations": [
+        "This PNG was opened separately even though its bytes match the enable capture. It shows the same inverted strip, pressed Incognito action, grouped records, 1/5 folio, and selected History dock item.",
+        "The supplied persistence check reports the persisted incognito preference as true, matching the restored visual treatment.",
+        "The restored black strip still lacks the incognito/no-history policy message. Persistence preserves the color treatment but also preserves the missing explanation. See P3R1-SUP08-1.",
+        "The first history item still displays its prior 12/40 progress and timestamp, while other entries retain their distinct completed or partial states. No row, remove control, or footer is clipped."
+      ],
+      "intentional_differences": []
+    },
+    {
+      "case_id": "pw5--independent-search--all-complete",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/pw5--independent-search--all-complete.png",
+      "candidate_sha256": "bb174beb23a3090dc498bd970727d2cd4b15a32aef05cfc01553e51404a656c7",
+      "sha256_matches_expected": true,
+      "sha256_matches_case_evidence": true,
+      "viewed_candidate": true,
+      "outcome": "pass",
+      "observations": [
+        "The summary reports four searched sources and two sources with results. The empty source retains its no-results row, and the failed source retains its separate error row and Retry action.",
+        "Both Actual fast fixture and Actual slow fixture visibly show their own count of 20, View all action, and three cover cards. All four source groups fit above the restored Search dock.",
+        "Book titles and author captions sit below their covers and truncate within their allocated columns. The sparse fixture artwork is accepted as actual data rather than compared to sample cover imagery.",
+        "The supplied final-state check reports pending=false independently for all four sources, with successful records for fast and slow and distinct empty/error outcomes for the others. The visible final layout agrees with those recorded states."
+      ],
+      "intentional_differences": []
+    },
+    {
+      "case_id": "pw5--independent-search--early-result",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/pw5--independent-search--early-result.png",
+      "candidate_sha256": "539694b664d55d7311c1addb1d36ec25521a7076c6e7b809ca342918ef1ba72e",
+      "sha256_matches_expected": true,
+      "sha256_matches_case_evidence": true,
+      "viewed_candidate": true,
+      "outcome": "pass",
+      "observations": [
+        "The early summary reports three searched sources and one source with results while the all-sources scope still identifies four configured sources.",
+        "Actual fast fixture already exposes three readable result cards, its count of 20, and View all. Actual slow fixture remains a separate searching row beneath those completed results.",
+        "The empty and error sources keep their independent outcomes and Retry action. The outlined lower loading notice does not cover the successful cards or dim the page, and the Search dock remains visible.",
+        "The supplied state records fast completion and slow pending=true. This is the intended in-flight capture, not a missing final result."
+      ],
+      "intentional_differences": [
+        "Fast, empty, failing and delayed sources are independent real loopback requests; completed results remain visible while a slower source is pending."
+      ]
+    },
+    {
+      "case_id": "pw5--keyboard-cancel",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/pw5--keyboard-cancel.png",
+      "candidate_sha256": "5741d4d0a17060be77ee233a11bbb0ccb3f675c97d06e6dac32adbe4b4ae8487",
+      "sha256_matches_expected": true,
+      "sha256_matches_case_evidence": true,
+      "viewed_candidate": true,
+      "outcome": "pass",
+      "observations": [
+        "The search field has returned to its empty placeholder with no committed text, Pinyin composition, or candidate residue.",
+        "The keyboard is absent and the five-item dock is restored with Search selected. The empty-search artwork, title, and primary Search action occupy the content area without overlap.",
+        "The white outlined field and source scopes remain legible. The supplied state has modal='', query='', keyboard_text='', and keyboard_composition='', matching the visible cancelled-edit state.",
+        "This static result supports the captured cancellation outcome; it does not independently measure the cancel control's interaction timing or hit target."
+      ],
+      "intentional_differences": []
+    },
+    {
+      "case_id": "pw5--keyboard-candidate-commit",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/pw5--keyboard-candidate-commit.png",
+      "candidate_sha256": "876f062cc622e5bbda063cd5f42c49d49c4a0bf34ff54baf7c149f7fc0686a1f",
+      "sha256_matches_expected": true,
+      "sha256_matches_case_evidence": true,
+      "viewed_candidate": true,
+      "outcome": "pass",
+      "observations": [
+        "The selected Chinese character is visible in the search field. No Latin composition string or stale candidate choices remain after the commit.",
+        "The Pinyin strip remains above a complete QWERTY keyboard with shift, backspace, numbers, language, space, and Search controls. Key labels stay within their outlines.",
+        "The editing keyboard replaces the bottom dock, and the pending four-source hint remains in the content area. No submitted network result is implied by this editing capture.",
+        "The supplied state reports modal='keyboard', keyboard_target='search', committed keyboard_text, empty keyboard_composition, and no candidates. The visible field and cleared strip agree with those recorded conditions."
+      ],
+      "intentional_differences": []
+    }
+  ],
+  "suggestions": [
+    {
+      "id": "P3R1-SUP08-1",
+      "case_id": "pw5--incognito-enable",
+      "related_case_ids": [
+        "pw5--incognito-persistence",
+        "pw5--incognito-history-policy"
+      ],
+      "priority": "P2",
+      "description": "The persistent incognito status treatment omits its no-history policy message. Color inversion and the history-page toggle do not explain what private reading changes, especially after navigating to detail.",
+      "evidence": [
+        "In the enable and persistence PNGs, the black status strip at y=0..27 contains the clock at the left and connectivity/battery information at the right, but its center is blank. The pressed Incognito action appears only in the history header.",
+        "The history-policy PNG shows the detail route with the same blank-centered black strip and no history header toggle. The case metadata reports incognito=true, so this is an active private-reading state.",
+        "HANDOFF.md section 5.6, line 269, explicitly requires a centered incognito/no-history message in the inverted strip and recommends retaining the treatment across application pages. prototype/pw-history.dc.html:23 declares that message, and phase3-prototype-reference-support.json requires the not-recording banner to remain legible."
+      ],
+      "recommendation": "Render a concise, legible incognito/no-history message in the center of the inverted status strip whenever private reading is active on normal application pages, including restored sessions and detail. Preserve the clock and device indicators, and retain the user's artwork-only exception for the closed reader.",
+      "status": "open",
+      "introduced_round": 1
+    }
+  ],
+  "limitations": [
+    "Exactly eight assigned candidate PNGs were opened through view_image. No other PNG or independent reference image was loaded, so this is a written-contract and candidate-state review rather than an exact reference pixel comparison.",
+    "Current PNG hashes were read with Get-FileHash and matched both the input's expected hashes and each case sidecar's screenshot evidence. All eight sidecars identify the assigned run, binary hash, and source hash. Other sidecar and provider records were treated as supplied evidence rather than re-executed verification.",
+    "No application, build, test suite, runtime probe, Git operation, or product modification was performed. Only the requested review JSON was written.",
+    "Static desktop PNGs do not establish physical display refresh, wake behavior, real touch dispatch or timing, maximum memory use, or a 512 MiB operating envelope.",
+    "The history-policy case captures the detail route after reading, so this batch does not visually establish closed-reader artwork purity. The private-history and persistence assertions depend on the supplied recorded checks.",
+    "A successful visual outcome here applies only to its captured state. Retry execution, input transitions, and request timing were not independently exercised in this review.",
+    "This batch contains one open actionable suggestion and does not constitute a complete clean review round."
+  ]
+}

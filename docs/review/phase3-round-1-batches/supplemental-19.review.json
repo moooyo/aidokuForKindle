@@ -1,0 +1,174 @@
+{
+  "batch_id": "supplemental-19",
+  "reviewer": "/root/phase3_round1_review/supplemental_19",
+  "run_id": "a1baf3fe3dc2",
+  "round": 1,
+  "candidate_identity": {
+    "binary_sha256": "94d7f3bbcab475ad8833a2f3c486138f7b49bead231851c2d8eab2f0c3d2ac51",
+    "source_sha256": "aef9db4e111165016a10a2a95e111f3155860b8510c7f6207ec9c79fbec5082c",
+    "profile": "pw5",
+    "orientation": "portrait",
+    "native_capture_size": [
+      618,
+      824
+    ],
+    "backend": "desktop",
+    "identity_observation": "Each case sidecar records the assigned run, binary, and source identity. Get-FileHash SHA256 of each current candidate PNG matches both expected_png_sha256 in the batch input and evidence_hashes.screenshot.sha256 in its case sidecar."
+  },
+  "review_basis": [
+    "The eight candidate PNGs listed in supplemental-19.input.json were individually opened with tools.view_image. No other PNG was opened.",
+    "Case sidecars were read for route, menu, displayed session, committed page, reading direction, tap layout, checks, intentional differences, and evidence identity.",
+    "Textual acceptance sources were docs/review/phase3-reference-scope.json, docs/review/phase3-prototype-reference-support.json, docs/DESIGN_HANDOFF.md, and the original handoff and relevant reader/interaction prototype text.",
+    "Original prototype/spec-interaction.dc.html:81 explicitly requires only the page-number preview to update during a seek drag, with target-page decoding and display deferred until release. A real pending seek number is therefore permitted to differ from the committed page.",
+    "The accepted artwork-only closed-reader override excludes a persistent ribbon, footer, status bar, notification, decorative gutter, and lower-right footer-cycle target. Image-fitting white margins and actual artwork differences are not themselves viewport defects.",
+    "The UI/UX Pro Max skill was read for visual and interaction review guidance. Existing project-specific acceptance rules take precedence."
+  ],
+  "reviewed_case_ids": [
+    "pw5-portrait--resume-restored",
+    "pw5-portrait--reversed-tap-input",
+    "pw5-portrait--rtl-page-input",
+    "pw5-portrait--seek-menu-baseline",
+    "pw5-portrait--seek-preview",
+    "pw5-portrait--seek-release",
+    "pw5-portrait--tap-boundary-center",
+    "pw5-portrait--tap-boundary-side"
+  ],
+  "reviewed_cases": [
+    {
+      "case_id": "pw5-portrait--resume-restored",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/pw5-portrait--resume-restored.png",
+      "candidate_sha256": "99e72fc0524cab6742a606d8fd257bc1fd762c534457451aacba487d8ee9c394",
+      "viewed_candidate": true,
+      "outcome": "no_actionable_visual_issue_observed",
+      "observations": [
+        "The capture shows artwork only: the wide striped skyline panel, the lower dotted and radial panels, and the tall crosshatched right panel remain visible without header, footer, ribbon, notification, or menu residue.",
+        "The narrow white side margins belong to the fitted artwork scene; there is no unexplained UI-sized blank strip or rectangular overlay.",
+        "The case starts with a library request but the restored route is reader. Its displayed session, committed_reader_page, reader_page, and visible_reader_page agree on page 20 of 40 with menu closed, offset 0, and zoom 1.",
+        "The supplied fresh --resume check and zero-error artwork oracle support the retained-scene identity; manual viewing independently confirms the absence of visible reader chrome in this frame."
+      ],
+      "intentional_differences": [
+        "The closed scene follows the accepted user override of persistent bookmark ribbons and footer decorations in the reference; this is intentional even though the case declares no additional differences."
+      ]
+    },
+    {
+      "case_id": "pw5-portrait--reversed-tap-input",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/pw5-portrait--reversed-tap-input.png",
+      "candidate_sha256": "6b4703a4d4b2bdccf43e91f43cfba716e3cfca4ddb2cc0abd1b6a7f041c02852",
+      "viewed_candidate": true,
+      "outcome": "no_actionable_visual_issue_observed",
+      "observations": [
+        "The full closed-reader scene contains the tall radial panel on the left, dotted and dark-grid panels on the right, and the striped lower panel; no menu, status, ribbon, footer, or input-zone teaching overlay is visible.",
+        "The side whitespace and panel edges are consistent with actual fitted artwork rather than a leftover control surface.",
+        "The sidecar identifies RTL reading with the reversed tap layout and a settled displayed and committed page 11 of 40. The capture has no visually inconsistent page label because the closed-reader scene intentionally contains none.",
+        "This PNG shares fixture pixels with other odd-page cases. Its image alone cannot establish inversion semantics; its supplied page-state checks distinguish the case."
+      ],
+      "intentional_differences": [
+        "Artwork-only closed-reader presentation intentionally omits reference decorations under the retained user requirement."
+      ]
+    },
+    {
+      "case_id": "pw5-portrait--rtl-page-input",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/pw5-portrait--rtl-page-input.png",
+      "candidate_sha256": "6b4703a4d4b2bdccf43e91f43cfba716e3cfca4ddb2cc0abd1b6a7f041c02852",
+      "viewed_candidate": true,
+      "outcome": "no_actionable_visual_issue_observed",
+      "observations": [
+        "The radial, dotted, dark-grid, and striped comic panels are visible without menu chrome, notification, bookmark ribbon, footer, or an unexplained blank control band.",
+        "The case sidecar records the ordinary thirds tap layout, RTL direction, menu closed, and displayed, visible, and committed page 13 of 40 with no pending reader work.",
+        "The supplied closed-reader artwork oracle reports no differing pixels. That agrees with the observed pure-artwork frame without independently proving the physical tap mapping.",
+        "Repeated odd-page fixture artwork explains the identical PNG hash shared with the reversed-input case; the different state page is not treated as an image defect."
+      ],
+      "intentional_differences": [
+        "The accepted closed-reader override removes persistent reference decorations while retaining ordinary artwork geometry."
+      ]
+    },
+    {
+      "case_id": "pw5-portrait--seek-menu-baseline",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/pw5-portrait--seek-menu-baseline.png",
+      "candidate_sha256": "f110a73a39ce7a666afc49ce22a0d9f5cba6f5a5238278a319429c3b8db2e50e",
+      "viewed_candidate": true,
+      "outcome": "no_actionable_visual_issue_observed",
+      "observations": [
+        "The menu is visibly open, matching the reader's declared menu-open baseline. The status row, book/chapter header, bookmark and contents actions, seek controls, chapter actions, and five tools are legible.",
+        "The main counter reads 12 / 40 and the remaining-page caption reads 28, matching reader_page, committed_reader_page, and visible_reader_page 12 in the sidecar.",
+        "The right-filled RTL seek track and its thumb agree with the baseline page, while the left chapter action is chapter 35 and the right action is chapter 33.",
+        "The top and bottom menu sections attach to the display edges on white surfaces without a scrim or shadow. Artwork remains visible beneath the menu and no control label appears clipped or overlapped."
+      ],
+      "intentional_differences": []
+    },
+    {
+      "case_id": "pw5-portrait--seek-preview",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/pw5-portrait--seek-preview.png",
+      "candidate_sha256": "5dd1cdc80bf83391e2cec3c1b2e2e783903ed5d027928867619855002c279d46",
+      "viewed_candidate": true,
+      "outcome": "no_actionable_visual_issue_observed",
+      "observations": [
+        "The menu remains open and the artwork matches the seek-menu baseline. The status/header and five tools remain stationary and readable.",
+        "The seek thumb has moved toward the left on the RTL track, the pending seek counter reads 32 / 40, and the remaining-page preview reads 8.",
+        "The sidecar still records reader_page, committed_reader_page, visible_reader_page, and displayed session page as 12 of 40, with no pending reader decode recorded at capture. The visible target number is a preview, not evidence that page 32 has already been committed.",
+        "Original prototype/spec-interaction.dc.html:81 explicitly permits the page-number preview to change during a drag while decoding and display wait until release. The observed 32 target with committed page 12 conforms to that rule.",
+        "No unrequested thumbnail or unrelated placeholder preview appears, and no new blank region, overlay mask, or label collision is visible."
+      ],
+      "intentional_differences": [
+        "A pending seek number of 32 is intentionally shown while the actual committed and displayed reader page remains 12, as required by the drag-preview contract in prototype/spec-interaction.dc.html:81."
+      ]
+    },
+    {
+      "case_id": "pw5-portrait--seek-release",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/pw5-portrait--seek-release.png",
+      "candidate_sha256": "99e72fc0524cab6742a606d8fd257bc1fd762c534457451aacba487d8ee9c394",
+      "viewed_candidate": true,
+      "outcome": "no_actionable_visual_issue_observed",
+      "observations": [
+        "The release capture returns to pure artwork: both menu bars, seek counter, thumb, status row, bookmark action, and tools are absent without leaving a white footer or header band.",
+        "The striped skyline, dotted panel, radial lower panel, and tall right panel fill the fitted reader scene with no visible UI residue.",
+        "The sidecar records menu closed and reader_page, committed_reader_page, visible_reader_page, and displayed session page all at 32 of 40, consistent with the preview target being committed after release.",
+        "The PNG hash matches the restored page-20 fixture because the demo artwork repeats. The artwork alone therefore cannot independently prove page decoding or release timing; the supplied state provides that case identity."
+      ],
+      "intentional_differences": [
+        "The closed-reader artwork-only override intentionally removes all persistent reference ribbon and footer decoration."
+      ]
+    },
+    {
+      "case_id": "pw5-portrait--tap-boundary-center",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/pw5-portrait--tap-boundary-center.png",
+      "candidate_sha256": "f110a73a39ce7a666afc49ce22a0d9f5cba6f5a5238278a319429c3b8db2e50e",
+      "viewed_candidate": true,
+      "outcome": "no_actionable_visual_issue_observed",
+      "observations": [
+        "The center-boundary capture visibly opens the full reader menu. Header actions, white seek section, chapter actions, and all five bottom tools are present with no clipped labels or overlapping controls.",
+        "The counter remains 12 / 40 and the caption remains 28 pages, agreeing with the committed, displayed, and visible page 12 recorded in the sidecar.",
+        "This frame matches the seek-menu baseline, supporting the visible outcome of opening the menu while retaining the current page.",
+        "The screenshot establishes the resulting menu and page presentation; exact threshold coordinates and event dispatch remain properties of the supplied case evidence rather than something visible in the image."
+      ],
+      "intentional_differences": []
+    },
+    {
+      "case_id": "pw5-portrait--tap-boundary-side",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/pw5-portrait--tap-boundary-side.png",
+      "candidate_sha256": "6b4703a4d4b2bdccf43e91f43cfba716e3cfca4ddb2cc0abd1b6a7f041c02852",
+      "viewed_candidate": true,
+      "outcome": "no_actionable_visual_issue_observed",
+      "observations": [
+        "The side-boundary capture remains a closed reader with the radial, dotted, dark-grid, and striped comic panels visible and no menu, footer, ribbon, status bar, notification, or tap-zone teaching layer.",
+        "The sidecar identifies ordinary thirds input in RTL and records displayed, committed, and visible page 13 of 40 with menu closed and no pending reader work.",
+        "The visible artwork-only result is consistent with the supplied side-boundary page-turn outcome and is distinct from the open-menu center-boundary result.",
+        "The repeated odd-page artwork and absence of visible page labels limit image-only proof of the exact threshold and page-turn semantics; no unsupported conclusion about invisible hit targets is drawn."
+      ],
+      "intentional_differences": [
+        "Persistent reference decorations are intentionally absent in the accepted artwork-only closed-reader scene."
+      ]
+    }
+  ],
+  "suggestions": [],
+  "limitations": [
+    "This supplemental assignment supplied eight candidate PNGs and no independent reference PNG. Visual review is limited to these candidates and the applicable textual reference declarations.",
+    "Only existing PNG, JSON, and text evidence was read; Get-FileHash was used for the requested identity checks. No application, prototype, build, test, smoke test, validation suite, or runtime probe was launched on the local machine.",
+    "Static captures cannot independently establish exact tap coordinates, RTL or reversed event mapping, input generation fences, release-time decoding, persistence behavior, or the absence of an invisible footer-cycle hit target.",
+    "A --resume capture and its supplied checks are not independent physical sleep/wake or e-ink hardware qualification.",
+    "The processed-artwork oracle's reported zero pixel differences were considered supporting evidence, not a substitute for individually viewing every candidate PNG.",
+    "Several differently numbered demo pages share the same even or odd fixture artwork. Repeated PNG pixels alone do not prove that the underlying committed page stayed unchanged or changed.",
+    "First/last seek endpoint placement, hidden hardware controls, authorization flows, and other states outside these eight cases were not inspected.",
+    "No new actionable visual issue was confirmed in this batch. This report does not assert a complete-matrix clean round."
+  ]
+}

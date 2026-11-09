@@ -1,0 +1,234 @@
+{
+  "schema_version": 3,
+  "phase": 2,
+  "round": 3,
+  "reviewer": "phase2_fidelity_review/expanded_ui_readonly",
+  "review_kind": "supporting_manual_screenshot_and_sidecar_review",
+  "status": "no_new_findings_in_reviewed_subset",
+  "artifact_directory": "artifacts/phase2/ui-round-3",
+  "candidate_sha256_supplied_by_parent": "472265b0ce022f4a98b38821db9c5ea2cba456d3794903d514a64ce226face0a",
+  "manual_expanded_image_count": 35,
+  "manual_capability_image_count": 6,
+  "new_suggestion_count": 0,
+  "new_findings": [],
+  "qualifies_as_complete_round": false,
+  "scope_note": "This is a fresh manual review of Candidate 5 round 3. All 35 expanded images and six capability images listed below were opened directly from the new round-3 directory with view_image, and their own round-3 sidecars were read. No earlier-round image substitutes for a round-3 inspection. Selection counts, queue states, enabled actions, stable dialog paging, summary context and notice placement agree with the reviewed sidecars. No new finding was identified in this assigned subset. Complete-round and native acceptance remain owned by the parent review; this report does not declare an overall clean round.",
+  "expanded_manual_coverage": [
+    {
+      "image": "detail-chapter-hold-600.png",
+      "observation": "One selected chapter, inverted row and checked box, separated selection toolbar, complete dates and pager.",
+      "sidecar": "selected_chapters=1; page=1/15; completed jobs=9."
+    },
+    {
+      "image": "detail-chapter-select-two.png",
+      "observation": "Two selected rows, accurate count and clear select-all, download and cancel targets.",
+      "sidecar": "selected_chapters=2; page=1/15; completed jobs=9."
+    },
+    {
+      "image": "detail-chapter-select-all.png",
+      "observation": "All six visible rows checked and inverted; the count truthfully refers to all chapters.",
+      "sidecar": "selected_chapters=86; page=1/15; completed jobs=9."
+    },
+    {
+      "image": "detail-chapter-cancel.png",
+      "observation": "Ordinary directory header and per-chapter download controls restored without clipping.",
+      "sidecar": "selected_chapters=0; modal empty; completed jobs=9."
+    },
+    {
+      "image": "detail-chapter-download-selected.png",
+      "observation": "Selection closes and queued feedback occupies the status strip without covering directory controls.",
+      "sidecar": "selected_chapters=0; completed jobs=9; queued jobs=2; busy=false."
+    },
+    {
+      "image": "scribe-chapter-select-two.png",
+      "observation": "Two-column detail retains its cover, synopsis and tags; selection toolbar and sixteen chapter rows remain separated.",
+      "sidecar": "selected_chapters=2; page=1/6; completed jobs=9."
+    },
+    {
+      "image": "batch-all.png",
+      "observation": "Queued feedback leaves content and actions readable.",
+      "sidecar": "completed jobs=9; queued jobs=77; modal empty."
+    },
+    {
+      "image": "batch-unread.png",
+      "observation": "Queued feedback is consistent with the accepted unread selection.",
+      "sidecar": "completed jobs=9; queued jobs=51; modal empty."
+    },
+    {
+      "image": "batch-completed-only.png",
+      "observation": "No-downloads-needed feedback is shown without inventing queued work.",
+      "sidecar": "Only 9 completed jobs remain; selected_chapters=0."
+    },
+    {
+      "image": "batch-empty-selected.png",
+      "observation": "Empty selection has truthful no-downloads-needed feedback and normal directory controls.",
+      "sidecar": "Only 9 completed jobs remain; selected_chapters=0."
+    },
+    {
+      "image": "batch-last-chapter-empty.png",
+      "observation": "The last-chapter boundary shows no-downloads-needed feedback rather than a false queued result.",
+      "sidecar": "Only 9 completed jobs remain; continuation points to chapter 86."
+    },
+    {
+      "image": "downloads-lazy-pagination-01.png",
+      "observation": "Full dialog frame, eight readable rows and stable first-page controls.",
+      "sidecar": "panel=1/12; pause and cancel enabled; resume disabled; completed=9, queued=77."
+    },
+    {
+      "image": "downloads-lazy-pagination-12.png",
+      "observation": "One last-page row keeps the full dialog frame and the same pager position.",
+      "sidecar": "panel=12/12; final visible job is chapter 86; completed=9, queued=77."
+    },
+    {
+      "image": "downloads-disabled-global.png",
+      "observation": "All three global actions are visibly disabled for a completed-only queue.",
+      "sidecar": "completed=9; pause/resume/cancel enabled flags are all false."
+    },
+    {
+      "image": "downloads-failed-controls.png",
+      "observation": "Failed state is readable; only the applicable global retry/resume action is active.",
+      "sidecar": "completed=8, failed=1; pause=false, resume=true, cancel=false."
+    },
+    {
+      "image": "completed-job-menu.png",
+      "observation": "Completed content offers reading, removal and cancel, with no misleading pause or retry action.",
+      "sidecar": "choices contain chapter:027, job-remove and close; completed=9."
+    },
+    {
+      "image": "completed-remove-confirmation.png",
+      "observation": "Removal has a separate confirmation explaining retained shared and imported content.",
+      "sidecar": "job-remove-confirm and close are the two actions; completed=9."
+    },
+    {
+      "image": "completed-remove-cancel.png",
+      "observation": "Cancel returns to the intact settings screen.",
+      "sidecar": "modal empty; completed jobs remain 9."
+    },
+    {
+      "image": "completed-remove-apply.png",
+      "observation": "The removed chapter no longer occupies the first row; global controls reflect the remaining completed-only jobs.",
+      "sidecar": "completed=8; first visible job is chapter 28; global controls disabled."
+    },
+    {
+      "image": "downloads-pause-all.png",
+      "observation": "Global action emphasis changes to match paused work while retained completed rows stay complete.",
+      "sidecar": "completed=9, paused=2; pause=false, resume=true, cancel=true."
+    },
+    {
+      "image": "downloads-resume-all.png",
+      "observation": "Global action emphasis changes back to queued work without relabeling completed rows.",
+      "sidecar": "completed=9, queued=2; pause=true, resume=false, cancel=true."
+    },
+    {
+      "image": "downloads-cancel-all.png",
+      "observation": "All three global actions are disabled after pending work is cancelled.",
+      "sidecar": "completed=9, cancelled=2; all three global enabled flags are false."
+    },
+    {
+      "image": "storage-clear-cache.png",
+      "observation": "Completed cache clear returns to a usable settings screen with passive feedback.",
+      "sidecar": "cache bytes=0; modal empty; busy=false. This fixture alone does not prove pin preservation."
+    },
+    {
+      "image": "storage-cache-info.png",
+      "observation": "Cache use, protection, budget and free-space reserve are readable; the one-page summary does not carry book tags.",
+      "sidecar": "modal=summary; context=cache-info; summary_is_book=false; actual cache bytes=15403, displayed as rounded MB."
+    },
+    {
+      "image": "cache-cover-online.png",
+      "observation": "Five remote fixture covers and their catalog rows are rendered consistently.",
+      "sidecar": "cover_count=5; offline=false; page=1/5; cache bytes=15403."
+    },
+    {
+      "image": "cache-cover-offline.png",
+      "observation": "The same five cover images remain visible after offline restart.",
+      "sidecar": "cover_count=5; offline=true; page=1/4; cache bytes=15403. The finite offline catalog has a different page count."
+    },
+    {
+      "image": "summary-book-tags.png",
+      "observation": "Book synopsis and its tags appear in the intended book-summary context.",
+      "sidecar": "modal=summary; context=summary; summary_is_book=true."
+    },
+    {
+      "image": "summary-cache-info-tagged.png",
+      "observation": "Cache information contains no unrelated current-book tags.",
+      "sidecar": "modal=summary; context=cache-info; summary_is_book=false."
+    },
+    {
+      "image": "summary-about-tagged.png",
+      "observation": "About text contains no unrelated current-book tags.",
+      "sidecar": "modal=summary; context=about; summary_is_book=false."
+    },
+    {
+      "image": "status-strip-baseline.png",
+      "observation": "Normal library status row leaves all content and controls visible.",
+      "sidecar": "route=library; message empty; modal empty; page=1/6."
+    },
+    {
+      "image": "status-strip-notice.png",
+      "observation": "Successful feedback replaces only the status slot; content, pager and actions remain visible.",
+      "sidecar": "route=library; saved feedback active; modal empty."
+    },
+    {
+      "image": "status-strip-expired.png",
+      "observation": "The normal status row returns after feedback expires.",
+      "sidecar": "route=library; message empty; modal empty."
+    },
+    {
+      "image": "status-strip-modal-hidden.png",
+      "observation": "The active background notice does not cover the open modal or its actions.",
+      "sidecar": "saved feedback remains active; modal=choices; context=library-more."
+    },
+    {
+      "image": "status-strip-wide-reader-baseline.png",
+      "observation": "The explicitly opened landscape reader menu retains complete title, clock, chapter, seek and tool areas.",
+      "sidecar": "menu=true; page=displayed=12; message empty; busy=false."
+    },
+    {
+      "image": "status-strip-wide-reader-notice.png",
+      "observation": "With the menu explicitly open, successful feedback occupies the clock slot and does not cover comic content or reader controls.",
+      "sidecar": "menu=true; page=displayed=12; saved feedback active; busy=false."
+    }
+  ],
+  "capability_manual_coverage": [
+    {
+      "image": "pw6-library.png",
+      "observation": "632x840 layout retains readable title, continuation, four-by-two covers, pager and navigation.",
+      "sidecar": "profile=pw6; route=library; page=1/6; busy=false."
+    },
+    {
+      "image": "scribe2-library.png",
+      "observation": "930x1240 layout retains complete six-by-three covers, continuation and daily update cards.",
+      "sidecar": "profile=scribe2; route=library; page=1/3; busy=false."
+    },
+    {
+      "image": "scribe3-library.png",
+      "observation": "990x1320 layout adapts cover size while retaining readable labels, tabs, pager and navigation.",
+      "sidecar": "profile=scribe3; route=library; page=1/3; busy=false."
+    },
+    {
+      "image": "scribe3-nofrontlight-reader.png",
+      "observation": "The entire viewport contains comic pixels without a status row, page label, bookmark corner or toolbar.",
+      "sidecar": "profile=scribe3-nofrontlight; menu=false; page=displayed=committed=12; brightness=warmth=0; busy=false."
+    },
+    {
+      "image": "scribe3-nofrontlight-settings.png",
+      "observation": "Device description identifies no frontlight and the settings list excludes unavailable light controls.",
+      "sidecar": "brightness=warmth=0; visible_setting_ids omit frontlight/warmth; page=1/2."
+    },
+    {
+      "image": "reader-menu-blank-does-not-turn.png",
+      "observation": "The final state after opening the menu and tapping its blank comic area is pure image at the same page.",
+      "sidecar": "menu=false; reader, visible, displayed and committed page all equal 12; reader_inflight=false."
+    }
+  ],
+  "coverage_limits": [
+    "The no-frontlight reader capture has its menu closed. Hiding the brightness menu button was confirmed statically in the earlier source review, not by an open-menu capability screenshot in this subset.",
+    "The closed-reader active worker-notice matrix is separate evidence owned by the parent review; its reported automated pass count is not represented as a manual inspection by this supporting reviewer.",
+    "Cache clear and offline cover screenshots do not certify throughput, cache lock fairness, file integrity or physical-device performance.",
+    "Native park and wake behavior remains owned by separate firmware verification. This supporting review does not declare the overall phase or its clean-round exit condition complete."
+  ],
+  "execution_note": "No application, build, test suite, smoke test or runtime probe was executed by this reviewer. Only existing local screenshots, sidecars and source files were read; no production file was changed.",
+  "pending_manual_images": [],
+  "review_complete_in_assigned_subset": true
+}

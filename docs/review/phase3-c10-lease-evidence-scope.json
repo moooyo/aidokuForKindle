@@ -1,0 +1,90 @@
+{
+  "schema_version": 1,
+  "phase": "Phase3-C10",
+  "status": "Bound",
+  "evidence_kind": "Read-only source extraction bound to supplied remote test evidence; no GUI lifecycle acceptance claim.",
+  "execution_binding": {
+    "command": ["cargo", "test", "--locked", "--all-targets"],
+    "cwd": "/root/aidoku-phase3/source",
+    "exit_code": 0,
+    "started_at": "2026-11-07T00:20:18.699803+00:00",
+    "ended_at": "2026-11-07T00:21:52.432149+00:00",
+    "official_source_sha256": "5dca4c420996df4d4c4556430724350f33af4223dd8edb5e91626290813008df",
+    "source_member_count": 227,
+    "source_manifest": {"local_path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate10/build/source-after-gate-01.json", "sha256": "fa57ab88225667224d7e4ebfceea2a1b27e87c998a2eac1f7e973c6660ca13e7"},
+    "gate_manifest": {"local_path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate10/build/desktop-gate-manifest.json", "sha256": "bc3788549dad76db7de41413fa60c0bbc646e35bc7b4f576b7c914b7f5290e4a"},
+    "log_local_path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate10/build/all-targets-01.log",
+    "log_remote_path": "/root/aidoku-phase3/evidence/candidate10/build/all-targets-01.log",
+    "log_sha256": "8ada4c0ce074d7fc26b7be4a42db4f35867e993d070a88aae7059fe701b22958",
+    "summary_lines": {"library": 573, "bootstrap": 582, "performance_benchmark_store_tests": 681},
+    "test_summary": "Library: 470 passed, 0 failed, 2 ignored; bootstrap: 3 passed, 0 failed; performance-benchmark: 81 passed, 0 failed.",
+    "hash_authority": "FVD remote-produced manifest and supplied authoritative hashes; not recomputed locally by this task.",
+    "verification_executed_by_this_task": false
+  },
+  "source_members": [
+    {"path": "src/cache.rs", "bytes": 137964, "sha256": "67888bcf13df5935fb8d515bfba6cdb766a27e467280ddcc514614180b4424c5"},
+    {"path": "src/downloads.rs", "bytes": 177908, "sha256": "c0917e0812714caf78f4ce7a1bbe8ce746699e2a09eba1b3bb4ff8d06a3b1135"},
+    {"path": "src/app.rs", "bytes": 82594, "sha256": "f065b0ddf1fed9b2e2763bd17f1927595aa7f49131dd0a0b58b59a3c4d6b361f"},
+    {"path": "src/app/actions.rs", "bytes": 162623, "sha256": "e95fa31f2822be74001e070308bae73089be605847d411dc49b7f8256304178f"}
+  ],
+  "support_contract": {
+    "launcher": "Single-instance launcher, as specified by the parent task; not exercised here.",
+    "process_scope": "Reader, DownloadWorker, and CacheManager owners in one App process.",
+    "sharing": "Canonical data_dir keys a process-local REGISTRY of Weak<CacheInner>; reopened handles share the live Arc.",
+    "cross_gui_process": "Unsupported and untested; no claim of cross-process lease retention."
+  },
+  "production_source": [
+    "src/cache.rs:30 REGISTRY; src/cache.rs:419 canonicalized reopen; src/cache.rs:1050 lease_path; src/cache.rs:1418 CacheLease::drop",
+    "src/app.rs:314 App cache open; src/app.rs:355 initialized DownloadWorker uses the same data_dir; src/downloads.rs:276 worker thread; src/downloads.rs:286 worker cache open",
+    "src/app.rs:1025 accepted reader image acquires raw and derivative CacheLease guards; src/app.rs:1034 retains guards in displayed_image_leases; src/app/actions.rs:1344 clears guards on reader back",
+    "src/downloads.rs:1134 completed removal; src/downloads.rs:1174 temporary removal guards; src/downloads.rs:1209 guards dropped after record removal; src/downloads.rs:3492 real managed PNG fixture publication"
+  ],
+  "tests": [
+    {
+      "name": "downloads::tests::removing_completed_download_keeps_other_owners_and_active_reader_leases",
+      "source": "src/downloads.rs:3950",
+      "held_object": "reader_lease is a real CacheLease from cache.lease_path(leased.local_path); shared raw also has the second chapter's download pin owner.",
+      "owner_scope": "Test CacheManager and a real DownloadWorker thread reopen the same canonical data directory within one test process.",
+      "held_stage": "After remove_completed(first chapter) and wait_removed: first record absent and downloaded=false; second record present and downloaded=true; shared.is_file() and leased.is_file(); pinned_entries == 1.",
+      "released_stage": "After drop(reader_lease) and cache.prune(): shared.is_file() remains true and leased.exists() is false.",
+      "limit": "The test holds a CacheLease directly; it does not construct ReaderState or exercise App GUI navigation or GUI process exit.",
+      "log_result": {"result": "ok", "line": 268}
+    },
+    {
+      "name": "cache::tests::low_space_and_clear_preserve_pinned_and_leased_files",
+      "source": "src/cache.rs:3305",
+      "held_object": "lease is a real CacheLease for leased_path; path has the separate download:keep pin owner.",
+      "owner_scope": "One CacheManager in one test process; no GUI or DownloadWorker is constructed.",
+      "held_stage": "With min_free_bytes == u64::MAX, begin_raw(cannot-fit) returns an error; clear_unpinned preserves path and leased_path; the pinned path fingerprint equals its pre-clear checksum.",
+      "released_stage": "After drop(lease) and another clear_unpinned(): leased_path.exists() is false and path.exists() is true.",
+      "limit": "Direct cache cleanup and lease-drop assertions; no independent GUI-process coverage.",
+      "log_result": {"result": "ok", "line": 211}
+    },
+    {
+      "name": "downloads::tests::book_removal_preserves_local_imports_and_has_an_idempotent_noop_result",
+      "source": "src/downloads.rs:3322",
+      "held_object": "No CacheLease is held. The local_fixture original is data_dir/page.png, outside the managed cache; bytes is its pre-removal snapshot.",
+      "owner_scope": "A real DownloadWorker thread and Store handles in the same test process; source_id == local.",
+      "held_stage": "First remove_book_downloads returns (0, 0, 0, 1, false, None); book_download_count == 0; chapter.downloaded stays true; fs::read(page) == bytes.",
+      "released_stage": "The repeated removal returns (0, 0, 0, 0, false, None) and fs::read(page) == bytes again. The local original stays preserved; reclamation is intentionally not asserted.",
+      "limit": "Local-original preservation evidence, not lease protection or post-Reader-exit reclamation evidence.",
+      "log_result": {"result": "ok", "line": 237}
+    },
+    {
+      "name": "cache::tests::clones_and_reopens_share_reservations_without_resetting_policy",
+      "source": "src/cache.rs:3201",
+      "held_object": "first is a real CacheWrite reservation for 60 bytes; other is a CacheManager reopened at data_dir/.",
+      "owner_scope": "Two CacheManager handles in one test process; Arc::ptr_eq(cache.inner, other.inner) is asserted.",
+      "held_stage": "At a 100-byte policy, other.begin_raw(second, 60) returns an error while first is held.",
+      "released_stage": "After drop(first), other.begin_raw(second, 60) succeeds; dropping second removes its staged file and cache.stats().writes_inflight == 0.",
+      "limit": "Same-process manager identity and reservation sharing; the held object is not CacheLease and no process boundary is tested.",
+      "log_result": {"result": "ok", "line": 202}
+    }
+  ],
+  "gaps": [
+    "No selected test holds App.displayed_image_leases through DownloadWorker cleanup and then invokes reader back to assert post-navigation reclamation.",
+    "A directly held CacheLease and its drop provide cache-layer protection/release evidence; they cannot establish Reader GUI exit behavior by themselves.",
+    "Local originals are excluded from managed reclamation; preservation must not be relabeled as a lease-release reclamation result.",
+    "The selected log lines report test success within the stated test scopes. They do not supply independent live Reader GUI, GUI-exit, or cross-GUI-process evidence."
+  ]
+}

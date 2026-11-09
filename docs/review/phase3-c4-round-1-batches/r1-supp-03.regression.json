@@ -1,0 +1,621 @@
+{
+  "schema_version": 1,
+  "kind": "c4-frozen-supplemental-historical-second-pass",
+  "batch_id": "r1-supp-03-regression",
+  "reviewer": "visual_03",
+  "reviewer_task": "/root/final_validation_delivery/c4_full_review_coordinator/visual_03",
+  "round": 1,
+  "run_id": "0c9ecf3777c9",
+  "capture_manifest_sha256": "d2a6a5fae352a79bd6ee82076524bf3a25afb62f8bfa822abbfa42d0fbe49ba0",
+  "final_inventory_sha256": "df15126ae8becde603dfe09c56db2a01490c123c412a1fd04fe6010a923b91d9",
+  "freeze_tuple": {
+    "source_sha256": "dc0cd6227768a5125ecf702982ce639789bc8bca390de82bab83329927ea6353",
+    "binary_sha256": "7c2f685ecafc7207446f0e75877b74d14cbc6e41a43f5accee8ae992256e3183",
+    "harness_sha256": "5e6f546b7abec0a377e53feafe3afe1e6c6d3259da2699b75f1c4fe44529d5e5",
+    "capture_plan_sha256": "ab2effba6e2cd443be49ff5b49094afede8126615a270aa0653771059b871cc9",
+    "reference_sha256": "e7b49b456255432d74cfe41346f9d44c1a9c55bf67c5d55483e4ae3029547d18",
+    "reference_scope_sha256": "c910bed9f02ed17b2ca0a54aca1beeeeb6caabc5a17a91afe764ddd3e7b0d33c",
+    "capture_helper_sha256": {
+      "verify-ui.py": "470872e6fd22a78b474c0f862164875ad9c7237bd2f3f164512864580ac1e90d",
+      "verify-fullscreen.py": "4a6c48cef771e66e9b3058edd888dcf2d4bce02e2720b5cc00c7a5b987bc9670",
+      "handoff_c4_business.py": "6197f375b247962e3ce9acdd3779468073f11e0002ac3c7ce876a7b1a0d0d9be"
+    }
+  },
+  "source_map": "D:/Code/aidokuForKindle/docs/review/phase3-round-1-findings-map.json",
+  "source_map_sha256": "Pending owner remote static accounting; no local rehash",
+  "first_pass_queue": "D:/Code/aidokuForKindle/docs/review/phase3-c4-round-1-batches/r1-supp-03.queue.json",
+  "review_method": {
+    "sequence": "The six independent small-batch first-pass reports and 48 actual original candidate views were completed before this second pass.",
+    "current_evidence": "Re-read the assigned four case JSON/state/action artifacts and re-opened all four current candidate originals. Cited related original references actually viewed by this reviewer earlier in the same frozen run.",
+    "request_evidence": "Statically read the retained 13-record View All request artifact. Its hash is transcribed from the frozen case record; no HTTP, SQL or local hash operation was performed.",
+    "identity_provenance": "All SHA values come from the assigned owner-frozen input/inventory/case records or owner retained support-text provenance. No local rehash or runtime PASS is claimed.",
+    "boundary": "Only static text reads, original-image viewing and new English audit-document authoring. No tests, builds, probes, SSH, cropping, copying, new agents, production changes, unique-map edits or old-report edits."
+  },
+  "historical_findings": [
+    {
+      "historical_id": "P3R1-G32",
+      "historical_requirement": "Catalog include/exclude tags use plus/minus instead of the specified check/cross marks across profiles.",
+      "source_suggestion_ids": [
+        "P3R1-SUP02-1",
+        "P3R1-SUP22-1",
+        "P3R1-SUP22-2"
+      ],
+      "original_source_case_ids": [
+        "pw5--catalog-tag-1",
+        "pw5--catalog-tag-2",
+        "scribe--catalog-tag-1",
+        "scribe--catalog-tag-2"
+      ],
+      "actual_current_case_ids": [
+        "pw5--catalog-tag-1",
+        "pw5--catalog-tag-2"
+      ],
+      "source_scope_not_assigned_here": [
+        "scribe--catalog-tag-1",
+        "scribe--catalog-tag-2"
+      ],
+      "current_scope_summary": "Paperwhite check/cross marks resolved in current evidence; intrinsic width remains a distinct issue.",
+      "full_group_closed": false,
+      "root_acceptance_status": "pending"
+    },
+    {
+      "historical_id": "P3R1-G35",
+      "historical_requirement": "View all hides settled source results behind an inconsistent setup gate.",
+      "source_suggestion_ids": [
+        "P3R1-SUP07-1",
+        "P3R1-SUP27-1"
+      ],
+      "original_source_case_ids": [
+        "pw5--http-search-success--view-all",
+        "scribe--http-search-success--view-all"
+      ],
+      "actual_current_case_ids": [
+        "pw5--http-search-success--view-all"
+      ],
+      "source_scope_not_assigned_here": [
+        "scribe--http-search-success--view-all"
+      ],
+      "current_scope_summary": "Existing settled Paperwhite View All success is supported; cached-unverified failure and missing tails remain unqualified.",
+      "full_group_closed": false,
+      "root_acceptance_status": "pending"
+    },
+    {
+      "historical_id": "P3R1-G46",
+      "historical_requirement": "PW6 catalog source metadata omits the known loaded or filtered-result count.",
+      "source_suggestion_ids": [
+        "P3R1-SUP40-1"
+      ],
+      "original_source_case_ids": [
+        "pw6--stretch-catalog"
+      ],
+      "actual_current_case_ids": [
+        "pw6--stretch-catalog"
+      ],
+      "source_scope_not_assigned_here": [],
+      "current_scope_summary": "PW6 known-loaded-count omission remains actionable, linked to C4-C5-G03.",
+      "full_group_closed": false,
+      "root_acceptance_status": "pending"
+    }
+  ],
+  "regression_closures": [
+    {
+      "historical_id": "P3R1-G32",
+      "current_case_id": "pw5--catalog-tag-1",
+      "case_json_sha256": "a30747d160fa6298ceabf7b8a7fd8aa39f310daa2a00089d7983b7c3f39a610e",
+      "png_sha256": "64cee67d543bb71672453cd78a3a8c443542ce8c4f933166ddc56071eb40293e",
+      "state_sha256": "6e8bfb01ec2deddb45fb656bb8507a3cec57d176342a7940e663ab748ac6bd82",
+      "actions_sha256": "4dbac91e799b81e7e96264f3be0dfba8f54dc09d906edf702062bcfd38a4aed0",
+      "reference_original_sha256": "1339b77a8346218b73343211b67163fbba6efe5b875fff5b2b37239dfcfd2c23",
+      "evidence": {
+        "case_json": {
+          "local_path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate4/ui-round-1/cases/pw5--catalog-tag-1.json",
+          "remote_path": "/tmp/aidoku-phase3-c4-ui-round-1/cases/pw5--catalog-tag-1.json",
+          "sha256": "a30747d160fa6298ceabf7b8a7fd8aa39f310daa2a00089d7983b7c3f39a610e",
+          "bytes": 38112,
+          "identity_source": "owner-frozen final inventory; no local rehash"
+        },
+        "png": {
+          "local_path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate4/ui-round-1/pw5--catalog-tag-1.png",
+          "remote_path": "/tmp/aidoku-phase3-c4-ui-round-1/pw5--catalog-tag-1.png",
+          "sha256": "64cee67d543bb71672453cd78a3a8c443542ce8c4f933166ddc56071eb40293e",
+          "bytes": 94850,
+          "identity_source": "owner-frozen final inventory; no local rehash"
+        },
+        "state": {
+          "local_path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate4/ui-round-1/pw5--catalog-tag-1.state.json",
+          "remote_path": "/tmp/aidoku-phase3-c4-ui-round-1/pw5--catalog-tag-1.state.json",
+          "sha256": "6e8bfb01ec2deddb45fb656bb8507a3cec57d176342a7940e663ab748ac6bd82",
+          "bytes": 23365,
+          "identity_source": "owner-frozen final inventory; no local rehash"
+        },
+        "metadata": {
+          "local_path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate4/ui-round-1/pw5--catalog-tag-1.metadata.json",
+          "remote_path": "/tmp/aidoku-phase3-c4-ui-round-1/pw5--catalog-tag-1.metadata.json",
+          "sha256": "e7a5f030fd584cc1e0e4b75333795eff7edcc4b5b08bc1269f16586bd365d9aa",
+          "bytes": 672,
+          "identity_source": "owner-frozen final inventory; no local rehash"
+        },
+        "actions": {
+          "local_path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate4/ui-round-1/actions/pw5--catalog-tag-1.json",
+          "remote_path": "/tmp/aidoku-phase3-c4-ui-round-1/actions/pw5--catalog-tag-1.json",
+          "sha256": "4dbac91e799b81e7e96264f3be0dfba8f54dc09d906edf702062bcfd38a4aed0",
+          "bytes": 217,
+          "identity_source": "owner-frozen final inventory; no local rehash"
+        },
+        "log": {
+          "local_path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate4/ui-round-1/pw5--catalog-tag-1.log",
+          "remote_path": "/tmp/aidoku-phase3-c4-ui-round-1/pw5--catalog-tag-1.log",
+          "sha256": "dc121ceea011a63c29b404d6c6b75bbe2db32b326923b8fa99759f457bfd709f",
+          "bytes": 68,
+          "identity_source": "owner-frozen final inventory; no local rehash"
+        },
+        "source_sha256": "dc0cd6227768a5125ecf702982ce639789bc8bca390de82bab83329927ea6353",
+        "binary_sha256": "7c2f685ecafc7207446f0e75877b74d14cbc6e41a43f5accee8ae992256e3183",
+        "run_id": "0c9ecf3777c9"
+      },
+      "candidate_actually_viewed": true,
+      "candidate_reopened_in_this_second_pass": true,
+      "original_reference_viewing": [
+        {
+          "reference_id": "pw-source--default",
+          "path": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/screens/pw-source.png",
+          "sha256": "47ea9827f59640d1c13cce5693c0e4d9ba9db5d44c50cefc3549107c5053daf6",
+          "viewed": true,
+          "reopened_in_this_second_pass": false,
+          "actual_viewing_report": "D:/Code/aidokuForKindle/docs/review/phase3-c4-round-1-batches/r1-reference-03.review.json"
+        },
+        {
+          "reference_id": "pw-source--filter",
+          "path": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/screens/states/pw-source--filter.png",
+          "sha256": "1339b77a8346218b73343211b67163fbba6efe5b875fff5b2b37239dfcfd2c23",
+          "viewed": true,
+          "reopened_in_this_second_pass": false,
+          "actual_viewing_report": "D:/Code/aidokuForKindle/docs/review/phase3-c4-round-1-batches/r1-reference-03.review.json"
+        }
+      ],
+      "fresh_observation": "The Adventure tag visibly uses a white check mark followed by its label on a black included-state control. It does not show a plus mark. The current state records tag state=1, active_filter_count=1 and 63 filtered records.",
+      "native_logical_region": [
+        22,
+        639,
+        75,
+        42
+      ],
+      "declaration_basis": {
+        "local_path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate4/ui-round-1/readable-crops/r1-01/support-text/prototype/pw-source.dc.html",
+        "owner_recorded_sha256": "323c50f9225fd36c61a05392afd6ac20b1c8d13635deff7b252f1ca2a0bf975e",
+        "lines": "188-194, especially 191-193",
+        "appearance_rule": "The frozen declaration uses a check mark for inclusion and a cross for exclusion, with black/white include styling and dashed/struck-through exclude styling. Its fake example result count is not used as a business requirement."
+      },
+      "captured_replay_support": {
+        "actions": [
+          {
+            "at_ms": 450,
+            "section": "catalog",
+            "action": "filter-menu",
+            "value": ""
+          },
+          {
+            "at_ms": 900,
+            "section": "catalog",
+            "action": "filter-choice",
+            "value": "tag:冒险"
+          }
+        ],
+        "pointer_events": 0,
+        "scope": "Semantic tag-choice replay and the final visual/state result; no physical hitbox, input timing or cross-profile claim."
+      },
+      "disposition": "resolved-in-fresh-evidence",
+      "disposition_scope": "The historical mark-shape requirement is supported for this current Paperwhite state only.",
+      "capability_or_user_override_basis": "No capability or user override is used. Current visible check/cross shapes are the basis; numeric implementation values need not match the prototype's internal representation.",
+      "current_suggestion_ids": [
+        "C4-C5-G03",
+        "C4-C5-G04"
+      ],
+      "current_suggestion_relationship": "The known header-count omission and last-row intrinsic-width issue remain separate approved repair groups. Neither is used to reopen the resolved check/cross mark requirement, and neither is closed by this disposition.",
+      "root_acceptance_status": "pending",
+      "remaining_scope": [
+        "The Scribe include/exclude cases are assigned outside this reviewer scope; no closure is inferred for them.",
+        "Full historical group acceptance belongs to Root.",
+        "The existing intrinsic tag-width repair remains open for fresh C5 evidence."
+      ]
+    },
+    {
+      "historical_id": "P3R1-G32",
+      "current_case_id": "pw5--catalog-tag-2",
+      "case_json_sha256": "f1ac36d011ef62ff9fa4f0f118207d3da82ef737dde6308c4b88107551871e45",
+      "png_sha256": "085ad311ecec943b529f9aa7d12d77b926b55e24ec8c7777cf353a6e7eea9ce8",
+      "state_sha256": "08fa16e5be85f170ab2da1a1361c9a9ec8641fb3da7fb9419fc48acaaaf3eed6",
+      "actions_sha256": "64091f4464ee8084a6bad50625a6b4bd9625389c7065243f37e70fcaaef25adc",
+      "reference_original_sha256": "1339b77a8346218b73343211b67163fbba6efe5b875fff5b2b37239dfcfd2c23",
+      "evidence": {
+        "case_json": {
+          "local_path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate4/ui-round-1/cases/pw5--catalog-tag-2.json",
+          "remote_path": "/tmp/aidoku-phase3-c4-ui-round-1/cases/pw5--catalog-tag-2.json",
+          "sha256": "f1ac36d011ef62ff9fa4f0f118207d3da82ef737dde6308c4b88107551871e45",
+          "bytes": 38126,
+          "identity_source": "owner-frozen final inventory; no local rehash"
+        },
+        "png": {
+          "local_path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate4/ui-round-1/pw5--catalog-tag-2.png",
+          "remote_path": "/tmp/aidoku-phase3-c4-ui-round-1/pw5--catalog-tag-2.png",
+          "sha256": "085ad311ecec943b529f9aa7d12d77b926b55e24ec8c7777cf353a6e7eea9ce8",
+          "bytes": 101143,
+          "identity_source": "owner-frozen final inventory; no local rehash"
+        },
+        "state": {
+          "local_path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate4/ui-round-1/pw5--catalog-tag-2.state.json",
+          "remote_path": "/tmp/aidoku-phase3-c4-ui-round-1/pw5--catalog-tag-2.state.json",
+          "sha256": "08fa16e5be85f170ab2da1a1361c9a9ec8641fb3da7fb9419fc48acaaaf3eed6",
+          "bytes": 23377,
+          "identity_source": "owner-frozen final inventory; no local rehash"
+        },
+        "metadata": {
+          "local_path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate4/ui-round-1/pw5--catalog-tag-2.metadata.json",
+          "remote_path": "/tmp/aidoku-phase3-c4-ui-round-1/pw5--catalog-tag-2.metadata.json",
+          "sha256": "52b67ccb52fe28a723b5cad00cd3e0c0c46731d67c877b4de75a7ecd975c535c",
+          "bytes": 672,
+          "identity_source": "owner-frozen final inventory; no local rehash"
+        },
+        "actions": {
+          "local_path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate4/ui-round-1/actions/pw5--catalog-tag-2.json",
+          "remote_path": "/tmp/aidoku-phase3-c4-ui-round-1/actions/pw5--catalog-tag-2.json",
+          "sha256": "64091f4464ee8084a6bad50625a6b4bd9625389c7065243f37e70fcaaef25adc",
+          "bytes": 334,
+          "identity_source": "owner-frozen final inventory; no local rehash"
+        },
+        "log": {
+          "local_path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate4/ui-round-1/pw5--catalog-tag-2.log",
+          "remote_path": "/tmp/aidoku-phase3-c4-ui-round-1/pw5--catalog-tag-2.log",
+          "sha256": "dc121ceea011a63c29b404d6c6b75bbe2db32b326923b8fa99759f457bfd709f",
+          "bytes": 68,
+          "identity_source": "owner-frozen final inventory; no local rehash"
+        },
+        "source_sha256": "dc0cd6227768a5125ecf702982ce639789bc8bca390de82bab83329927ea6353",
+        "binary_sha256": "7c2f685ecafc7207446f0e75877b74d14cbc6e41a43f5accee8ae992256e3183",
+        "run_id": "0c9ecf3777c9"
+      },
+      "candidate_actually_viewed": true,
+      "candidate_reopened_in_this_second_pass": true,
+      "original_reference_viewing": [
+        {
+          "reference_id": "pw-source--default",
+          "path": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/screens/pw-source.png",
+          "sha256": "47ea9827f59640d1c13cce5693c0e4d9ba9db5d44c50cefc3549107c5053daf6",
+          "viewed": true,
+          "reopened_in_this_second_pass": false,
+          "actual_viewing_report": "D:/Code/aidokuForKindle/docs/review/phase3-c4-round-1-batches/r1-reference-03.review.json"
+        },
+        {
+          "reference_id": "pw-source--filter",
+          "path": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/screens/states/pw-source--filter.png",
+          "sha256": "1339b77a8346218b73343211b67163fbba6efe5b875fff5b2b37239dfcfd2c23",
+          "viewed": true,
+          "reopened_in_this_second_pass": false,
+          "actual_viewing_report": "D:/Code/aidokuForKindle/docs/review/phase3-c4-round-1-batches/r1-reference-03.review.json"
+        }
+      ],
+      "fresh_observation": "The Adventure tag visibly uses an X-shaped cross before its struck-through label on a dashed white excluded-state control. It does not show a minus mark. The current state records tag state=-1, active_filter_count=1 and 65 filtered records.",
+      "native_logical_region": [
+        22,
+        639,
+        75,
+        42
+      ],
+      "declaration_basis": {
+        "local_path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate4/ui-round-1/readable-crops/r1-01/support-text/prototype/pw-source.dc.html",
+        "owner_recorded_sha256": "323c50f9225fd36c61a05392afd6ac20b1c8d13635deff7b252f1ca2a0bf975e",
+        "lines": "188-194, especially 191-193",
+        "appearance_rule": "The frozen declaration uses a check mark for inclusion and a cross for exclusion, with black/white include styling and dashed/struck-through exclude styling. Its fake example result count is not used as a business requirement."
+      },
+      "captured_replay_support": {
+        "actions": [
+          {
+            "at_ms": 450,
+            "section": "catalog",
+            "action": "filter-menu",
+            "value": ""
+          },
+          {
+            "at_ms": 900,
+            "section": "catalog",
+            "action": "filter-choice",
+            "value": "tag:冒险"
+          },
+          {
+            "at_ms": 1350,
+            "section": "catalog",
+            "action": "filter-choice",
+            "value": "tag:冒险"
+          }
+        ],
+        "pointer_events": 0,
+        "scope": "Semantic tag-choice replay and the final visual/state result; no physical hitbox, input timing or cross-profile claim."
+      },
+      "disposition": "resolved-in-fresh-evidence",
+      "disposition_scope": "The historical mark-shape requirement is supported for this current Paperwhite state only.",
+      "capability_or_user_override_basis": "No capability or user override is used. Current visible check/cross shapes are the basis; numeric implementation values need not match the prototype's internal representation.",
+      "current_suggestion_ids": [
+        "C4-C5-G03",
+        "C4-C5-G04"
+      ],
+      "current_suggestion_relationship": "The known header-count omission and last-row intrinsic-width issue remain separate approved repair groups. Neither is used to reopen the resolved check/cross mark requirement, and neither is closed by this disposition.",
+      "root_acceptance_status": "pending",
+      "remaining_scope": [
+        "The Scribe include/exclude cases are assigned outside this reviewer scope; no closure is inferred for them.",
+        "Full historical group acceptance belongs to Root.",
+        "The existing intrinsic tag-width repair remains open for fresh C5 evidence."
+      ]
+    },
+    {
+      "historical_id": "P3R1-G35",
+      "current_case_id": "pw5--http-search-success--view-all",
+      "case_json_sha256": "c0ce7809e87246e52bec830d9ec6cadc9acfc68a39c7d7cd17288b584a35c622",
+      "png_sha256": "2f58ba4358e74d554fc08cfd06fb1e6b4dcadec6238ba451fc427337a99548c7",
+      "state_sha256": "8c3f97776cf9e99037babf926120a6edc4db4fe18e0b9e90e1c5f9b25943e271",
+      "actions_sha256": "aeea72c83cf70307cbc14083b6c911b3f1108a34b72b069ec48e78fc21dc8b5a",
+      "reference_original_sha256": "47ea9827f59640d1c13cce5693c0e4d9ba9db5d44c50cefc3549107c5053daf6",
+      "evidence": {
+        "case_json": {
+          "local_path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate4/ui-round-1/cases/pw5--http-search-success--view-all.json",
+          "remote_path": "/tmp/aidoku-phase3-c4-ui-round-1/cases/pw5--http-search-success--view-all.json",
+          "sha256": "c0ce7809e87246e52bec830d9ec6cadc9acfc68a39c7d7cd17288b584a35c622",
+          "bytes": 27263,
+          "identity_source": "owner-frozen final inventory; no local rehash"
+        },
+        "png": {
+          "local_path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate4/ui-round-1/pw5--http-search-success--view-all.png",
+          "remote_path": "/tmp/aidoku-phase3-c4-ui-round-1/pw5--http-search-success--view-all.png",
+          "sha256": "2f58ba4358e74d554fc08cfd06fb1e6b4dcadec6238ba451fc427337a99548c7",
+          "bytes": 105721,
+          "identity_source": "owner-frozen final inventory; no local rehash"
+        },
+        "state": {
+          "local_path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate4/ui-round-1/pw5--http-search-success--view-all.state.json",
+          "remote_path": "/tmp/aidoku-phase3-c4-ui-round-1/pw5--http-search-success--view-all.state.json",
+          "sha256": "8c3f97776cf9e99037babf926120a6edc4db4fe18e0b9e90e1c5f9b25943e271",
+          "bytes": 15028,
+          "identity_source": "owner-frozen final inventory; no local rehash"
+        },
+        "metadata": {
+          "local_path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate4/ui-round-1/pw5--http-search-success--view-all.metadata.json",
+          "remote_path": "/tmp/aidoku-phase3-c4-ui-round-1/pw5--http-search-success--view-all.metadata.json",
+          "sha256": "d55f6e0e7c0f7ada6d4c29683f9a2b56cc2d85012e242bc6426f269f33c8573d",
+          "bytes": 673,
+          "identity_source": "owner-frozen final inventory; no local rehash"
+        },
+        "actions": {
+          "local_path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate4/ui-round-1/actions/pw5--http-search-success--view-all.json",
+          "remote_path": "/tmp/aidoku-phase3-c4-ui-round-1/actions/pw5--http-search-success--view-all.json",
+          "sha256": "aeea72c83cf70307cbc14083b6c911b3f1108a34b72b069ec48e78fc21dc8b5a",
+          "bytes": 288,
+          "identity_source": "owner-frozen final inventory; no local rehash"
+        },
+        "log": {
+          "local_path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate4/ui-round-1/pw5--http-search-success--view-all.log",
+          "remote_path": "/tmp/aidoku-phase3-c4-ui-round-1/pw5--http-search-success--view-all.log",
+          "sha256": "dc121ceea011a63c29b404d6c6b75bbe2db32b326923b8fa99759f457bfd709f",
+          "bytes": 68,
+          "identity_source": "owner-frozen final inventory; no local rehash"
+        },
+        "source_sha256": "dc0cd6227768a5125ecf702982ce639789bc8bca390de82bab83329927ea6353",
+        "binary_sha256": "7c2f685ecafc7207446f0e75877b74d14cbc6e41a43f5accee8ae992256e3183",
+        "run_id": "0c9ecf3777c9"
+      },
+      "candidate_actually_viewed": true,
+      "candidate_reopened_in_this_second_pass": true,
+      "original_reference_viewing": [
+        {
+          "reference_id": "pw-source--default",
+          "path": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/screens/pw-source.png",
+          "sha256": "47ea9827f59640d1c13cce5693c0e4d9ba9db5d44c50cefc3549107c5053daf6",
+          "viewed": true,
+          "reopened_in_this_second_pass": false,
+          "actual_viewing_report": "D:/Code/aidokuForKindle/docs/review/phase3-c4-round-1-batches/r1-reference-03.review.json"
+        }
+      ],
+      "fresh_observation": "The View All capture displays the actual populated Komga catalog, not a setup gate: five book rows with IDs series-020..024, page 5/8, route=catalog, source_needs_setup=false and connected state. The final state reports 40 loaded catalog records. The header's separate loaded-count omission remains recorded in G03; 40 is not claimed as a remote grand total.",
+      "captured_replay_support": {
+        "actions": [
+          {
+            "at_ms": 450,
+            "section": "search",
+            "action": "query",
+            "value": "fixture"
+          },
+          {
+            "at_ms": 1850,
+            "section": "search",
+            "action": "all",
+            "value": "komga"
+          },
+          {
+            "at_ms": 2300,
+            "section": "page",
+            "action": "turn",
+            "value": "999"
+          }
+        ],
+        "state": {
+          "route": "catalog",
+          "source_id": "komga",
+          "source_needs_setup": false,
+          "source_connection_status": "已连接",
+          "catalog_count": 40,
+          "catalog_result_count": 40,
+          "page": 5,
+          "page_count": 8,
+          "visible_book_ids": [
+            "5:komga:series-020",
+            "5:komga:series-021",
+            "5:komga:series-022",
+            "5:komga:series-023",
+            "5:komga:series-024"
+          ]
+        },
+        "recorded_verification_check": {
+          "description": "Successful real HTTP search persists actual server verification before View all",
+          "passed": true,
+          "actual": true
+        },
+        "request_artifact": {
+          "local_path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate4/ui-round-1/fixtures/pw5--http-search-success--view-all.requests.json",
+          "owner_recorded_sha256": "8d695f66524477e28b90dcca7fac46cac1e8847e1c7bbcfc6ec9f67174928bfc",
+          "actually_statically_read": true,
+          "observed_records": 13,
+          "observation": "The retained artifact contains actual authorized POST list requests with fullTextSearch=fixture for pages 0 and 1 and thumbnail GETs for the displayed source records. No requests were executed or revalidated by this reviewer."
+        },
+        "pointer_events": 0
+      },
+      "disposition": "resolved-in-fresh-evidence",
+      "disposition_scope": "The settled, verified-source Paperwhite View All path is supported by this existing successful frame and its retained actions/state/request artifact.",
+      "capability_or_user_override_basis": "No fabricated connection or capability waiver is used. The existing actual successful capture is evaluated; no SQL, network probe or changed C5 production source is consulted.",
+      "current_suggestion_ids": [
+        "C4-C5-G03"
+      ],
+      "current_suggestion_relationship": "The shared known-loaded-count omission remains a separate approved current issue and is not the historical setup-gate requirement.",
+      "root_acceptance_status": "pending",
+      "remaining_scope": [
+        "The Scribe View All case is assigned outside this reviewer scope.",
+        "The separate cached-unverified failed frame has zero visible cards and does not qualify cached-result retention.",
+        "Missing More/picker/selection/cancel/request-guard recipe tails remain unexecuted and are not represented as tested.",
+        "No physical cover tap or complete-group acceptance is inferred."
+      ]
+    },
+    {
+      "historical_id": "P3R1-G46",
+      "current_case_id": "pw6--stretch-catalog",
+      "case_json_sha256": "8ea9469b2e0a124f2e823767d9a949f311b7ea914962e8208352b698cdd6118c",
+      "png_sha256": "91eaa5ab9392432c93a0bf8c66e553eb7c40735b23cfb106db82f916948b431b",
+      "state_sha256": "d8e608d2e4bfa56619b479b8c764e7c29eb430588c8a98eedf0c918841e6b52b",
+      "actions_sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "reference_original_sha256": "47ea9827f59640d1c13cce5693c0e4d9ba9db5d44c50cefc3549107c5053daf6",
+      "evidence": {
+        "case_json": {
+          "local_path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate4/ui-round-1/cases/pw6--stretch-catalog.json",
+          "remote_path": "/tmp/aidoku-phase3-c4-ui-round-1/cases/pw6--stretch-catalog.json",
+          "sha256": "8ea9469b2e0a124f2e823767d9a949f311b7ea914962e8208352b698cdd6118c",
+          "bytes": 33589,
+          "identity_source": "owner-frozen final inventory; no local rehash"
+        },
+        "png": {
+          "local_path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate4/ui-round-1/pw6--stretch-catalog.png",
+          "remote_path": "/tmp/aidoku-phase3-c4-ui-round-1/pw6--stretch-catalog.png",
+          "sha256": "91eaa5ab9392432c93a0bf8c66e553eb7c40735b23cfb106db82f916948b431b",
+          "bytes": 124839,
+          "identity_source": "owner-frozen final inventory; no local rehash"
+        },
+        "state": {
+          "local_path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate4/ui-round-1/pw6--stretch-catalog.state.json",
+          "remote_path": "/tmp/aidoku-phase3-c4-ui-round-1/pw6--stretch-catalog.state.json",
+          "sha256": "d8e608d2e4bfa56619b479b8c764e7c29eb430588c8a98eedf0c918841e6b52b",
+          "bytes": 21507,
+          "identity_source": "owner-frozen final inventory; no local rehash"
+        },
+        "metadata": {
+          "local_path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate4/ui-round-1/pw6--stretch-catalog.metadata.json",
+          "remote_path": "/tmp/aidoku-phase3-c4-ui-round-1/pw6--stretch-catalog.metadata.json",
+          "sha256": "78088a72fe2c2ce80052d098283be00f2495a3699781011240bffa9b32b0d97c",
+          "bytes": 672,
+          "identity_source": "owner-frozen final inventory; no local rehash"
+        },
+        "actions": {
+          "local_path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate4/ui-round-1/actions/pw6--stretch-catalog.json",
+          "remote_path": "/tmp/aidoku-phase3-c4-ui-round-1/actions/pw6--stretch-catalog.json",
+          "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+          "bytes": 3,
+          "identity_source": "owner-frozen final inventory; no local rehash"
+        },
+        "log": {
+          "local_path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate4/ui-round-1/pw6--stretch-catalog.log",
+          "remote_path": "/tmp/aidoku-phase3-c4-ui-round-1/pw6--stretch-catalog.log",
+          "sha256": "31e150d582f861b33f72c119de359ecda230c8a196731c26dde0c1003fcede33",
+          "bytes": 68,
+          "identity_source": "owner-frozen final inventory; no local rehash"
+        },
+        "source_sha256": "dc0cd6227768a5125ecf702982ce639789bc8bca390de82bab83329927ea6353",
+        "binary_sha256": "7c2f685ecafc7207446f0e75877b74d14cbc6e41a43f5accee8ae992256e3183",
+        "run_id": "0c9ecf3777c9"
+      },
+      "candidate_actually_viewed": true,
+      "candidate_reopened_in_this_second_pass": true,
+      "original_reference_viewing": [
+        {
+          "reference_id": "pw-source--default",
+          "path": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/screens/pw-source.png",
+          "sha256": "47ea9827f59640d1c13cce5693c0e4d9ba9db5d44c50cefc3549107c5053daf6",
+          "viewed": true,
+          "reopened_in_this_second_pass": false,
+          "actual_viewing_report": "D:/Code/aidokuForKindle/docs/review/phase3-c4-round-1-batches/r1-reference-03.review.json"
+        }
+      ],
+      "fresh_observation": "The actual native 632 x 840 PW6 capture still shows only language and version beneath the MangaDex title. The available metadata line omits the known loaded count even though catalog_count=128 and catalog_result_count=128. The five rows and 1/26 pager remain readable; no overflow explains the omission.",
+      "native_logical_region": [
+        89,
+        119,
+        226,
+        16
+      ],
+      "captured_replay_support": {
+        "actions": [],
+        "state": {
+          "route": "catalog",
+          "catalog_count": 128,
+          "catalog_result_count": 128,
+          "page": 1,
+          "page_count": 26
+        },
+        "scope": "Initial native stretch capture without scheduled actions."
+      },
+      "disposition": "still-actionable",
+      "capability_or_user_override_basis": "No data or profile waiver applies to omission of an available loaded count. The observed value 128 is fixture evidence; it must not be hardcoded or described as a remote grand total.",
+      "current_suggestion_ids": [
+        "C4-C5-G03"
+      ],
+      "unique_repair_map": "D:/Code/aidokuForKindle/docs/review/phase3-c4-to-c5-findings-map.json",
+      "root_acceptance_status": "pending",
+      "remaining_scope": [
+        "Keep this historical requirement open and linked to the already approved count repair.",
+        "Fresh frozen C5 evidence is required before resolution; changing local C5 source cannot explain away the current C4 original.",
+        "No full-round or clean acceptance is asserted."
+      ]
+    }
+  ],
+  "unresolved_historical_ids": [
+    "P3R1-G32",
+    "P3R1-G35",
+    "P3R1-G46"
+  ],
+  "unresolved_historical_reasons": [
+    {
+      "historical_id": "P3R1-G32",
+      "reason": "The two reviewed Paperwhite mark states are supported, but Scribe scope and final Root group acceptance are outside this disposition."
+    },
+    {
+      "historical_id": "P3R1-G35",
+      "reason": "The existing successful Paperwhite settled-source path is supported, while other-profile scope, separate failed cached-unverified evidence, unexecuted tails and final Root acceptance remain."
+    },
+    {
+      "historical_id": "P3R1-G46",
+      "reason": "The actual PW6 metadata count omission persists in C4 and awaits the approved C5 repair and fresh evidence."
+    }
+  ],
+  "current_suggestions_added": [],
+  "limitations": [
+    "Resolved historical mark/gate requirements are not reinserted as new suggestions.",
+    "Known count/intrinsic-width issues remain in the coordinator-owned unique repair map.",
+    "The retained HTTP and verification records support only their actual current case; failed or missing flows are not silently reclassified.",
+    "No physical input, e-ink waveform, performance, sleep/wake or live-reader lease qualification is implied.",
+    "Final acceptance belongs to Root; no whole historical group is closed by this report."
+  ],
+  "counts": {
+    "historical_requirements_reviewed": 3,
+    "current_cases_reviewed": 4,
+    "current_candidate_originals_reopened": 4,
+    "scoped_case_resolutions_supported": 3,
+    "scoped_case_still_actionable": 1,
+    "full_historical_groups_closed": 0
+  },
+  "complete_round": false,
+  "clean_round_streak": 0,
+  "output_report_path": "D:/Code/aidokuForKindle/docs/review/phase3-c4-round-1-batches/r1-supp-03.regression.json"
+}

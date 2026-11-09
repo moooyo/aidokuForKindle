@@ -1,0 +1,145 @@
+{
+  "batch_id": "supplemental-09",
+  "reviewer": "phase3_round1_review/supplemental_09",
+  "run_id": "a1baf3fe3dc2",
+  "round": 1,
+  "binary_sha256": "94d7f3bbcab475ad8833a2f3c486138f7b49bead231851c2d8eab2f0c3d2ac51",
+  "source_sha256": "aef9db4e111165016a10a2a95e111f3155860b8510c7f6207ec9c79fbec5082c",
+  "input": "D:/Code/aidokuForKindle/docs/review/phase3-round-1-batches/supplemental-09.input.json",
+  "review_scope": "Fresh independent visual review of only the eight assigned candidate PNGs, using direct view_image inspection at their native 618 x 824 size. No independent reference PNG was assigned or opened.",
+  "reference_basis": [
+    "docs/review/phase3-reference-scope.json: shared visual contract, keyboard-modes and folio-boundaries requirements, real-data precedence, and capability limits.",
+    "docs/DESIGN_HANDOFF.md: folio edge allocation, library geometry, white outlined controls, search keyboard geometry, and keyboard replacement of the dock.",
+    "November export HANDOFF.md sections 4.7 and 5.5, and prototype/pw-search.dc.html keyboard and search-control declarations, read as text only."
+  ],
+  "evidence_integrity": {
+    "method": "Get-FileHash -Algorithm SHA256 on each assigned current PNG, compared with input expected_png_sha256 and case_metadata.evidence_hashes.screenshot.sha256.",
+    "all_eight_hashes_match_both_sources": true,
+    "all_eight_case_metadata_match_frozen_run_binary_and_source": true,
+    "case_metadata_review": "Read state, checks, and intentional_differences for every case. The sidecars use state rather than a separate salient_state field. All recorded checks passed; these historical checks were used for identity and state context, not as a substitute for direct image review."
+  },
+  "reviewed_case_ids": [
+    "pw5--keyboard-candidate-page-2",
+    "pw5--keyboard-clear",
+    "pw5--keyboard-english",
+    "pw5--keyboard-numbers",
+    "pw5--keyboard-pinyin",
+    "pw5--keyboard-shift-space-backspace",
+    "pw5--library-first-boundary",
+    "pw5--library-last-page"
+  ],
+  "reviewed_cases": [
+    {
+      "case_id": "pw5--keyboard-candidate-page-2",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/pw5--keyboard-candidate-page-2.png",
+      "candidate_sha256": "d4adeea85b0925e6a9b664fd7d0c14c1acf8b428717c824f1a5f57cf10cdfb2d",
+      "viewed_candidate": true,
+      "outcome": "pass",
+      "observations": [
+        "Metadata identifies PW5 portrait search with the keyboard open, pinyin composition 's', candidate page 2 of 4, and eight dictionary candidates; the visible row matches that state and differs from the first candidate page.",
+        "The underlined composition, all eight candidate labels, and the two paging chevrons fit on one row without colliding or clipping.",
+        "The empty committed-text field retains its prompt while composition remains visible below. Clear and Cancel are distinct, the QWERTY and bottom action keys remain fully readable, and the keyboard replaces the dock on a white surface without a scrim or shadow."
+      ],
+      "intentional_differences": []
+    },
+    {
+      "case_id": "pw5--keyboard-clear",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/pw5--keyboard-clear.png",
+      "candidate_sha256": "b6429c2e68193f30b787a9c49b8e868e5d0ed72868f579572ca80d7c82ae438e",
+      "viewed_candidate": true,
+      "outcome": "pass",
+      "observations": [
+        "Metadata records empty keyboard text, empty query and composition, English mode, and the keyboard still open. The image shows the restored input prompt, an empty candidate area with its English hint, and no residual query text.",
+        "The clear cross is absent once the field is empty, while Cancel remains visible outside the outlined input; the two actions do not visually merge.",
+        "Lowercase QWERTY keys, Shift, Backspace, numeric mode, language, Space, and Search all remain inside the viewport with clear labels. The keyboard occupies the dock area without overlap."
+      ],
+      "intentional_differences": []
+    },
+    {
+      "case_id": "pw5--keyboard-english",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/pw5--keyboard-english.png",
+      "candidate_sha256": "59e0665b7931e5c21592ef9f1173a92e6e5d3c7268d57d6a5cc593abf7aa8666",
+      "viewed_candidate": true,
+      "outcome": "pass",
+      "observations": [
+        "English mode and committed text 'abc' agree with the sidecar. The short query is fully visible in the search field, with a separate clear cross and Cancel action.",
+        "The candidate strip correctly displays the English-mode hint rather than stale pinyin composition or candidates.",
+        "The three centered QWERTY rows and the numeric, language, Space, and black Search actions retain even gaps and unclipped labels. The keyboard remains flush to the lower edge and replaces the dock."
+      ],
+      "intentional_differences": []
+    },
+    {
+      "case_id": "pw5--keyboard-numbers",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/pw5--keyboard-numbers.png",
+      "candidate_sha256": "02348847ef3a840a63f081275973b350457189942449544c7a570c3023af5cf2",
+      "viewed_candidate": true,
+      "outcome": "pass",
+      "observations": [
+        "The sidecar records numeric mode with text '123', and the image displays that text with a complete ten-digit first row and symbol rows below.",
+        "The numbers-and-symbols hint, '#+=' secondary symbol action, alphabetic return key, language key, Space, Backspace, and Search are visually distinct and fit their bounds.",
+        "The shorter third symbol row stays centered without stretching the keys or shifting the bottom actions. No key label or search control is obscured, and no dock is drawn behind the keyboard."
+      ],
+      "intentional_differences": []
+    },
+    {
+      "case_id": "pw5--keyboard-pinyin",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/pw5--keyboard-pinyin.png",
+      "candidate_sha256": "3c8a3ad0ef22701694967d5d80a688898fd876ac389b7a696f274d79d02b6617",
+      "viewed_candidate": true,
+      "outcome": "pass",
+      "observations": [
+        "Pinyin mode, underlined composition 's', candidate page 1 of 4, and the eight first-page dictionary candidates agree with metadata and the directly viewed row.",
+        "Mixed one-character and multi-character candidates remain readable with separation from the composition at the left and paging controls at the right; no label is truncated.",
+        "The language key displays Chinese mode, and the QWERTY, Shift, Backspace, Space, and Search controls remain fully visible. White surfaces, thin outlines, and the keyboard's top rule provide separation without a backdrop mask or shadow."
+      ],
+      "intentional_differences": []
+    },
+    {
+      "case_id": "pw5--keyboard-shift-space-backspace",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/pw5--keyboard-shift-space-backspace.png",
+      "candidate_sha256": "019434ef98bf2e8e14587e02af202681eb7e3762e56295c580af177afc41a355",
+      "viewed_candidate": true,
+      "outcome": "pass",
+      "observations": [
+        "The image shows an uppercase 'A' in the input and the English-mode hint with no stale candidates. The sidecar records the resulting text as 'A ', including its trailing space.",
+        "The final lowercase key labels and idle Shift appearance are legible, with a separate Backspace key at the right and a wide Space action below; these controls retain their full outlines and do not collide.",
+        "Clear, Cancel, and Search remain distinct. The captured final layout is coherent after the scripted edit sequence; the PNG alone does not establish each intermediate key transition or the invisible trailing space."
+      ],
+      "intentional_differences": []
+    },
+    {
+      "case_id": "pw5--library-first-boundary",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/pw5--library-first-boundary.png",
+      "candidate_sha256": "fc37f360ba9d0c7ac18d345fbe63e55257fbb687c23114c8add630ad6d6b2603",
+      "viewed_candidate": true,
+      "outcome": "pass",
+      "observations": [
+        "The first-page state is identified as page 1 of 6 with 46 library records and eight visible books. The image shows the expected four-column, two-row grid and centered '1 / 6' folio.",
+        "The unavailable Previous action is hidden while its left allocation remains empty; Next stays at the right. The pager center and bottom navigation retain the same positions as the inspected final-page state.",
+        "The continuation card is white and outlined, with readable chapter text and '12 / 40' progress. Unread badges and download marks sit beside titles below artwork; title labels and the five navigation labels are unclipped. Patterned fixture cover artwork is not used as an overlay scrim or card shadow."
+      ],
+      "intentional_differences": []
+    },
+    {
+      "case_id": "pw5--library-last-page",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/pw5--library-last-page.png",
+      "candidate_sha256": "702b2daecf4ba9896f3c7c7530c0b39695a622aadad0dcc84f1e1aeccd888c6a",
+      "viewed_candidate": true,
+      "outcome": "pass",
+      "observations": [
+        "The final-page metadata records page 6 of 6 and six remaining books from the 46-record library. The image shows four first-row books and two second-row books, preserving the four-column grid rather than stretching the partial row.",
+        "The centered '6 / 6' folio retains the first-page position, Previous is visible at the left, and the unavailable Next action is hidden while the right allocation remains empty.",
+        "All six missing-cover title plates and captions remain readable, including the longer first-row title. The continuation card, tabs, pager, and dock keep their established bounds with no overflow, artificial card fill, or offset shadow."
+      ],
+      "intentional_differences": []
+    }
+  ],
+  "suggestions": [],
+  "limitations": [
+    "No independent reference PNG exists in this assigned supplemental batch. Findings are based on the eight candidate images, frozen case metadata, and the handoff/prototype text; no exact independent pixel-match claim is made.",
+    "No local application, build, test, validation suite, smoke test, runtime probe, or git command was run. Existing mechanical checks were read as capture evidence and were not rerun.",
+    "Static final images cannot prove tap dispatch, candidate selection, cancellation, intermediate Shift/Space/Backspace transitions, latency, hidden hit targets, or trailing whitespace. The recorded state supplies context only.",
+    "These PW5 desktop captures do not qualify physical sleep/wake, e-ink waveforms, hardware capabilities, or a 512 MiB memory target. The assigned cases do not contain a closed reader, hardware-settings panel, authentication flow, or content-height sheet from which to assess those separate contracts.",
+    "No actionable visual issue was identified within this eight-case supplemental scope. This result is not a declaration that the complete round or applicable product matrix is clean."
+  ]
+}

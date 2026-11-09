@@ -1,0 +1,101 @@
+{
+  "kind": "phase3-c11-independent-bounded-app-pressure-cover-audit",
+  "reviewer": "/root/final_validation_delivery/c11_external_evidence_bind",
+  "passed": true,
+  "audit_scope": "The original four passing PW cases plus the fresh four passing Scribe retry cases support bounded actual App cover and functional queue-pressure coverage. This is not acceptance of either complete UI round or the whole production delivery.",
+  "coverage": ["visible-cover-work", "coalesced-queue-pressure"],
+  "source_sha256": "33a2d049307c398da8bfbf196d1bf8e086412c117c194b592f4a93b5bfaedb3f",
+  "source_file_count": 227,
+  "binary_sha256": "1e60db345cbd6fbe580258a4a309bf42361781061dc2033f78a8a5eb4446ad72",
+  "main_harness_sha256": "f7e2d3dc3c66479715a7d5d094a7b9165379c3e1f4b1b8ecad092b78b924a892",
+  "capture_plan_sha256": "b201d4ac36df8023fb12f07e0adae91f4c63201cdd441add6ddd0a0d535ca368",
+  "component_index": {
+    "local_path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate11/app-pressure-cover-components.json",
+    "recorded_sha256": "4562dcf2d35754c1ee796a772d2d041900f24e84823da06e0295c73a67352065",
+    "original_accepted": false,
+    "unchanged_by_this_audit": true
+  },
+  "data_files_read": [
+    "artifacts/phase3/candidate11/app-pressure-cover-components.json",
+    "artifacts/phase3/candidate11/app-pressure-cover-evidence/app-pressure-cover-evidence.json",
+    "artifacts/phase3/candidate11/app-pressure-cover-evidence-scribe-retry/app-pressure-cover-evidence.json",
+    "artifacts/phase3/candidate11/app-pressure-cover-evidence/inventory.json",
+    "artifacts/phase3/candidate11/app-pressure-cover-evidence-scribe-retry/inventory.json",
+    "artifacts/phase3/candidate11/app-pressure-cover-evidence/manifest.json",
+    "artifacts/phase3/candidate11/app-pressure-cover-evidence-scribe-retry/manifest.json",
+    "artifacts/phase3/candidate11/app-pressure-cover-evidence-scribe-retry/fixtures/scribe--app-pressure-cover--cover-page-repeat.requests.json"
+  ],
+  "method": "Read-only inspection of eight evidence data files, their embedded case state and recorded SQL observations, plus frozen harness and production code. No new application run, suite, Python execution, SSH, local hash computation, source edit or raw evidence modification occurred.",
+  "path_correction": "Both report hashes identify app-pressure-cover-evidence.json, as their inventories record. Neither report is named report.json in the delivered trees.",
+  "original_report": {
+    "artifact": "/root/aidoku-phase3/evidence/candidate11/app-pressure-cover-evidence/app-pressure-cover-evidence.json",
+    "sha256": "4b1c66dfe21fdbcdbfb40696308c060d1a72496b04798c763f31d4600965905a",
+    "manifest": "/root/aidoku-phase3/evidence/candidate11/app-pressure-cover-evidence/manifest.json",
+    "manifest_sha256": "79db3a880036179459287ea8f578aae41a322c91e621addcad2ba23f1d53b95e",
+    "run_id": "b9eec4c8cbe8",
+    "actual_apps": 8,
+    "original_passed": false,
+    "original_case_passes": 7,
+    "original_case_failures": 1,
+    "failed_case_id": "scribe--app-pressure-cover--cover-page-repeat",
+    "retained_failure": "The original zero-thumbnail observer failed on series-015 at 30.1889s and series-006 at 34.9368s. That case and the original report remain failed; no retrospective normalization is authorized.",
+    "accepted_case_scope": "pw5--app-pressure-cover--fixture-seed, --burst-reader, --cover-page-repeat and --queue-final only",
+    "source_and_binary": "Each selected case carries the exact source and binary SHA256 above; the manifest records unchanged production source before/after and unchanged binary."
+  },
+  "fresh_scribe_retry": {
+    "artifact": "/root/aidoku-phase3/evidence/candidate11/app-pressure-cover-evidence-scribe-retry/app-pressure-cover-evidence.json",
+    "sha256": "3536db4bc5e0704366e508fac77d6e675642f03eed786f1a785a5595fb6a14f1",
+    "manifest": "/root/aidoku-phase3/evidence/candidate11/app-pressure-cover-evidence-scribe-retry/manifest.json",
+    "manifest_sha256": "2c2c3259609a1f19608308795126b83baf14c738f05f7e35855a280c0ae17817",
+    "run_id": "68bd720fb56b",
+    "actual_apps": 4,
+    "original_passed": true,
+    "failed_case_ids": [],
+    "accepted_case_scope": "scribe--app-pressure-cover--fixture-seed, --burst-reader, --cover-page-repeat and --queue-final",
+    "source_and_binary": "Each selected case carries the exact source and binary SHA256 above; the manifest records unchanged production source before/after and unchanged binary."
+  },
+  "observer_change": {
+    "original_tool_sha256": "faf417be4810d3016150819f0036e227ea2e2bbe5b15b6e8b59de3a77d4a074b",
+    "retry_tool_sha256": "84f63650abaad45cafb685f0265c646f99edd4b427b4b3fecb4c2c256b98abff",
+    "recorded_tools_unchanged_within_each_run": true,
+    "narrow_change": "The observer snapshots previously fetched thumbnail URLs before pagination, rejects any repeat of those URLs and any duplicate URL within the repeat, and separately records first fetches. It also adds an explicit non-duplicated profile selector and checks exactly four captures per selected profile.",
+    "preserved_gates": "The App actions, delayed HTTP fixture, exact six chapter identities, active Reader requirement, 8/18 settled cover checks, final completed jobs and downloaded flags are unchanged. Inherited frozen binary/source guards and fresh-output guards remain enabled.",
+    "code_reference": "Frozen execution-inputs/verify-app-pressure-cover.py:76-104 and 139-177 in the retry; frozen verify-handoff-ui.py:364-368, 552-557 and 2369-2391; verify-handoff-tags.py:41-63."
+  },
+  "visible_cover_findings": {
+    "passed": true,
+    "pw": "Repeat PID 2415208 returns to library page 1 after three page round trips and queue/settings navigation: cover_count=8, cover_visible_count=8, failure_count=0, no pending/inflight/queued cover work, refresh_count=31 and six persisted jobs. The original strict observer records zero repeat thumbnail requests.",
+    "scribe": "Retry repeat PID 2417276 returns to library page 1: cover_count=18, cover_visible_count=18, failure_count=0, no pending/inflight/queued cover work, refresh_count=42 and six persisted jobs. Already fetched thumbnail requests and duplicate URLs within the repeat both equal zero.",
+    "actual_first_admissions": [
+      {"path": "/api/v1/series/series-009/thumbnail", "at_seconds": 33.2971},
+      {"path": "/api/v1/series/series-004/thumbnail", "at_seconds": 35.318}
+    ],
+    "first_admission_check": "The retry's recorded pre-repeat set contains 18 thumbnail URLs and excludes 009/004. The complete retry HTTP log has each first request once, matching the case observer, and both book IDs belong to the actual settled 18-item first-page model. Original 015/006 observations belong to the earlier failed run and are not reused as retry evidence.",
+    "http_artifact": "/root/aidoku-phase3/evidence/candidate11/app-pressure-cover-evidence-scribe-retry/fixtures/scribe--app-pressure-cover--cover-page-repeat.requests.json",
+    "http_sha256": "3727b91781fb357e16debd480c77a835e15164096165e3ff7394e3683ea72c9b",
+    "offscreen_boundary": "The actual settled resident model contains exactly its 8/18 visible covers, and the two new retry requests correspond to that visible model. Frozen src/app/cover_jobs.rs:141-147 prunes retained and queued state, :163-197 admits current visible IDs, :204-217 permits one worker and rechecks visibility, and :288-292 rejects offscreen completions. No per-request instantaneous visibility trace or universal never-offscreen network claim is inferred."
+  },
+  "queue_pressure_findings": {
+    "passed": true,
+    "pw": "Burst Reader PID 2415038 reaches the open menu while three of six actual jobs are queued/downloading; refresh_count=157 and foreground_ready_posts=23.",
+    "scribe": "Retry burst Reader PID 2417141 reaches the open menu while four of six actual jobs are queued/downloading; refresh_count=147 and foreground_ready_posts=23.",
+    "actual_pressure": "Each profile uses twenty actually favorited HTTP records and 24 real detail/download intents for six chapter IDs. Manifest checks record six unique persisted jobs, active queued/downloading work at the Reader capture and real delayed-provider page image requests.",
+    "terminal_consistency": "Both queue-final cases record exactly chapter-01 through chapter-06 in SQL, state=completed, completed=total=6, error empty and downloaded flag=1. The App queue count is six; the captured queue page displays three items, not six simultaneous visible rows.",
+    "coalescing_basis": "Actual App foreground and navigation outcomes under this pressure are observed. Frozen src/app.rs:658-749 drains events into dirty flags; :777-794 performs sync after the drained batch and schedules the background interval. This supports functional behavior of the coalescing path, not a measured event-to-refresh ratio or a bound on backlog, drain work or latency."
+  },
+  "unsupported_claims": [
+    "Exact event-per-frame or event-to-refresh ratios, measured UI latency, O(1) complexity or zero allocation",
+    "Continuous intermediate-frame or per-request instantaneous offscreen visibility qualification",
+    "Concurrent independent GUI-process leases or physical device responsiveness",
+    "A complete original eight-case PASS, complete handoff suite, clean visual round or whole delivery acceptance"
+  ],
+  "remote_summary_binding": {
+    "status": "pending; independently audited bounded basis is available, but no audited remote summary artifact/hash is created by this task",
+    "suggested_path": "/root/aidoku-phase3/evidence/candidate11/component-evidence/c11-visible-cover-and-queue-scope.json",
+    "sha256": null,
+    "required_action": "Root/FVD must write the accurately scoped remote summary, bind the original PW subset plus the fresh Scribe retry and this audit, retain the failed original report, obtain the real remote SHA256 and decide acceptance before inserting passed external coverage."
+  },
+  "visual_round_credit": 0,
+  "record_review_executed": false,
+  "original_proposal_modified": false
+}

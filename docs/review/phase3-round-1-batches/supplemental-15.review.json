@@ -1,0 +1,166 @@
+{
+  "batch_id": "supplemental-15",
+  "reviewer": "/root/phase3_round1_review/supplemental_15",
+  "run_id": "a1baf3fe3dc2",
+  "candidate_identity": {
+    "candidate": "C3",
+    "round": 1,
+    "binary_sha256": "94d7f3bbcab475ad8833a2f3c486138f7b49bead231851c2d8eab2f0c3d2ac51",
+    "source_sha256": "aef9db4e111165016a10a2a95e111f3155860b8510c7f6207ec9c79fbec5082c",
+    "identity_check": "All eight case sidecars identify the requested case, pw5 profile, route, round, run, binary, and source. Each current candidate PNG SHA-256 matches both the batch expected hash and its case evidence screenshot hash."
+  },
+  "reviewed_case_ids": [
+    "pw5--sort-latest-chapter",
+    "pw5--sort-recent-open",
+    "pw5--sort-recent-read",
+    "pw5--sort-recent-update",
+    "pw5--sort-title",
+    "pw5--sort-unread-count",
+    "pw5--source-language-all",
+    "pw5--source-language-en"
+  ],
+  "reviewed_cases": [
+    {
+      "case_id": "pw5--sort-latest-chapter",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/pw5--sort-latest-chapter.png",
+      "candidate_sha256": "6e602b1495166eb78e5c4045aca494a38f0e67210ff4b9a9a109a5f607c4815b",
+      "viewed_candidate": true,
+      "outcome": "no_actionable_visual_issue_observed",
+      "observations": [
+        "The full-width white bottom sheet begins below the category bar and retains its black top rule without a shadow, dimmed backdrop, or stippled overlay.",
+        "All eight sort choices are visible in a two-column, four-row arrangement. Latest chapter is the only inverse sort choice, in the third row on the right.",
+        "The right Old to new direction is inverse and the left New to old direction remains white, agreeing with the sidecar library_sort=latest-chapter and library_ascending=true.",
+        "The Done action, direction row, and all four neutral filter controls fit fully within the 618 by 824 image. The sheet follows its content and has visible bottom padding.",
+        "The library heading, count caption, and outlined continuation card with 12 / 40 progress remain legible above the sheet. The overlaid book captions do not provide independent evidence of SQL ordering."
+      ],
+      "intentional_differences": []
+    },
+    {
+      "case_id": "pw5--sort-recent-open",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/pw5--sort-recent-open.png",
+      "candidate_sha256": "d0d2f540b8dd8e8c2b2ad7ac61c75a5e17b900d6815c069c162140d77e299eab",
+      "viewed_candidate": true,
+      "outcome": "no_actionable_visual_issue_observed",
+      "observations": [
+        "Recent open is the only inverse sort choice, in the second row on the left; the other seven choices remain distinct outlined white controls.",
+        "The selected right Old to new direction agrees with the recorded recent-open ascending state. Both direction labels and their full control bounds are visible.",
+        "The white sheet preserves the two-column alignment, clear sort/filter section labels, and fully visible Done action. No control text collides with its border or adjacent control.",
+        "Downloaded, unread, tracked, and completed filters are all visible in their neutral state, with bottom clearance. The background library and continuation card are not dimmed.",
+        "The sidecar records a single active recent-open indicator and persisted ascending selection. This static image establishes the visible selection, not the database order or persistence behavior."
+      ],
+      "intentional_differences": []
+    },
+    {
+      "case_id": "pw5--sort-recent-read",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/pw5--sort-recent-read.png",
+      "candidate_sha256": "bb281a04cd9c7f5b5549be5fd750dcbb306c46a1872e86077dbc8d30c08adb48",
+      "viewed_candidate": true,
+      "outcome": "no_actionable_visual_issue_observed",
+      "observations": [
+        "Recent read is the only inverse sort choice, in the first row on the right. Its selected appearance is clearly different from the adjacent title choice.",
+        "Old to new is selected on the right, matching library_sort=recent-read and library_ascending=true in the existing sidecar.",
+        "The sheet title, Done action, eight choices, two direction controls, and four neutral filters are all readable and fully contained in the viewport.",
+        "The overlay is a plain white surface with a black top boundary, no shadow, and no darkening or screen-tone mask on the visible library area.",
+        "Only the upper portions of the first cover row remain exposed behind the sheet; book captions and reading timestamps are not visible enough to independently assess temporal ordering."
+      ],
+      "intentional_differences": []
+    },
+    {
+      "case_id": "pw5--sort-recent-update",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/pw5--sort-recent-update.png",
+      "candidate_sha256": "4c2335d8bb53f7d2d993e1f6bed431cf23d8f3438ae9891e43b20c682cdda122",
+      "viewed_candidate": true,
+      "outcome": "no_actionable_visual_issue_observed",
+      "observations": [
+        "Recent update is the only inverse sort choice, in the second row on the right; the Recent open and Recent read choices remain unselected.",
+        "The inverse right Old to new direction agrees with the recorded recent-update ascending state.",
+        "The complete eight-choice matrix, direction row, neutral filter row, and Done action remain within the content-sized bottom sheet, without clipped labels or overlapping borders.",
+        "The top library count, heading, continuation artwork, and progress remain at normal brightness above the sheet; the overlay has no shadow or stippled backdrop.",
+        "The screenshot distinguishes this state through the selected control, but does not expose per-book update timestamps or the complete sorted rows. SQL ordering is outside the visible evidence."
+      ],
+      "intentional_differences": []
+    },
+    {
+      "case_id": "pw5--sort-title",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/pw5--sort-title.png",
+      "candidate_sha256": "aa9b9309772d2f4abfb5184c98a510715d4683528cedc16703d76b47faef3d66",
+      "viewed_candidate": true,
+      "outcome": "no_actionable_visual_issue_observed",
+      "observations": [
+        "Title is the only inverse sort choice, at the upper left of the eight-choice matrix.",
+        "The direction row uses the explicit Descending and Ascending labels for title sorting. Ascending on the right is inverse, matching library_sort=title and library_ascending=true.",
+        "The section labels, two-column controls, Done action, and four neutral filters are readable and do not clip at the viewport edges.",
+        "The sheet remains white with its black top rule and content-driven height; the visible library background is unmasked and retains the outlined continuation card.",
+        "Most sorted book labels are covered by the sheet. The existing metadata supplies the requested title-sort identity, while the PNG alone cannot establish collation correctness."
+      ],
+      "intentional_differences": []
+    },
+    {
+      "case_id": "pw5--sort-unread-count",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/pw5--sort-unread-count.png",
+      "candidate_sha256": "3585db8ca1e64f30003f0e6add17136e11975c2191c885c79310f3afbb28a866",
+      "viewed_candidate": true,
+      "outcome": "no_actionable_visual_issue_observed",
+      "observations": [
+        "Unread chapter count is the only inverse sort choice, in the fourth row on the left; the adjacent total chapter count choice remains white.",
+        "The right Old to new direction is inverse and agrees with the sidecar ascending=true state. These non-title direction labels follow the wording explicitly declared by HANDOFF.md and Main.dc.html.",
+        "All eight choices, the direction pair, Done action, and four neutral filter controls fit within the white sheet with visible bottom padding.",
+        "The sheet and controls have clear black or neutral outlines without a shadow, scrim, or stippled overlay. Background cover patterns are artwork, not an overlay treatment.",
+        "This review does not treat demo cover badges as actual SQL unread counts and does not infer a sorting defect from them. The covered book captions do not independently establish numerical order."
+      ],
+      "intentional_differences": []
+    },
+    {
+      "case_id": "pw5--source-language-all",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/pw5--source-language-all.png",
+      "candidate_sha256": "a8d03a743e4e882add4dc50ea1ee547b573e6fc003b16b918fbef42063be1df7",
+      "viewed_candidate": true,
+      "outcome": "reviewed_with_coverage_gap",
+      "observations": [
+        "The visible route is the Paperwhite source manager with Installed active, seven installed sources, an Available count of 124, and an Updates count of two.",
+        "Four built-in rows and three extension rows are clearly grouped. Source names, setup summaries, row arrows, the blocked-source explanation and Uninstall action remain readable.",
+        "The dashed add-source action and five-item bottom dock fit below the installed rows without clipping. No pager is shown on this installed-management view.",
+        "The sidecar records source_language=all but source_filter=0. The image contains neither the available-source language controls nor the filtered available list, so visible All-language selection and results are not covered; see P3R1-SUP15-C1."
+      ],
+      "intentional_differences": []
+    },
+    {
+      "case_id": "pw5--source-language-en",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/pw5--source-language-en.png",
+      "candidate_sha256": "59e1027915b812aefb81e7831875be35b340633b9dce59e26ff1fb77de55562c",
+      "viewed_candidate": true,
+      "outcome": "reviewed_with_coverage_gap",
+      "observations": [
+        "Installed remains the bold, underlined active tab. The Available tab count is one, while the seven installed rows and Updates count of two remain visible.",
+        "The built-in and extension groups, setup summaries, truthful blocked-source explanation, Uninstall action, dashed add-source action, and dock remain fully contained and legible.",
+        "The sidecar records source_language=en, source_filter=0, and a single available MangaDex record. That metadata establishes the requested state identity but does not make an English-language control visible in this PNG.",
+        "The changed Available count is visible, but there are no language chips or available result rows to review. Visible English-language selection and filtering outcomes remain uncovered; see P3R1-SUP15-C1."
+      ],
+      "intentional_differences": []
+    }
+  ],
+  "suggestions": [],
+  "coverage_gaps": [
+    {
+      "id": "P3R1-SUP15-C1",
+      "case_ids": [
+        "pw5--source-language-all",
+        "pw5--source-language-en"
+      ],
+      "description": "The two language cases capture the Installed tab rather than the Available tab, leaving visible language selection and filtered result presentation outside this batch's image coverage.",
+      "evidence": "Both inspected PNGs underline Installed and display the same seven installed source rows. The sidecars retain source_filter=0 while source_language changes from all to en and available_count changes from 124 to 1. Neither PNG displays language controls or available-source result rows.",
+      "recommendation": "In future evidence, open the Available tab while preserving the requested All or English language state, then capture the selected language control, filtered rows or empty state, and any applicable paging. No product defect is asserted from this coverage gap.",
+      "status": "open"
+    }
+  ],
+  "limitations": [
+    "Only the eight candidate PNGs listed by supplemental-15.input.json were opened, each individually through tools.view_image. No independent reference PNG was supplied or loaded for this supplemental batch.",
+    "Criteria were read from phase3-reference-scope.json, the relevant scope and prototype-support text, docs/DESIGN_HANDOFF.md, and static HANDOFF.md/Main.dc.html/pw-browse.dc.html declarations. The prototype was not executed.",
+    "Existing case sidecars, their salient route/modal/sort/direction/language state, relevant checks, intentional differences, and evidence identities were read. Their recorded checks were not re-executed; hash agreement authenticates the reviewed files but does not independently verify implementation behavior.",
+    "The six sort images establish visible selected controls, direction presentation, complete filter controls, and overlay layout. They do not independently prove real SQL ordering, persistence, filter transitions, outside dismissal, touch target behavior, or page navigation.",
+    "Visible language selection, available-language result rows, language-specific empty states, and available-source paging are not covered by the two source-language screenshots because Installed remains active. This is recorded as coverage gap P3R1-SUP15-C1 rather than a product suggestion.",
+    "Sample records, counts, titles, covers, progress, and clock values are not treated as required reference data. Demo badges are not used to infer actual database unread counts.",
+    "These static desktop captures do not qualify physical Kindle wake behavior, e-ink waveforms, hardware controls, or a 512 MiB memory envelope. No local application, build, test, smoke test, or runtime probe was run.",
+    "This result applies only to supplemental-15 and does not establish a clean complete review round."
+  ]
+}

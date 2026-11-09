@@ -1,0 +1,600 @@
+import { State, Commands, ChapterItem } from "state.slint";
+import { Theme } from "theme.slint";
+import { Strings } from "strings.slint";
+import { BodyText, Caption, TitleText, Icon, ActionButton, PageBar, Cover, EmptyState } from "widgets.slint";
+import { IdentityTextFit } from "identity-text.slint";
+import { TagFlow } from "tag-flow.slint";
+
+component ContinueButton inherits Rectangle {
+    background: touch.pressed ? Theme.paper : Theme.ink;
+    border-width: 1.5px; border-color: Theme.ink; border-radius: 4px;
+    height: State.large-screen ? 66px : 56px;
+    accessible-role: button;
+    accessible-label: Strings.continue-reading;
+    BodyText {
+        x: State.large-screen ? 26px : 22px; y: State.large-screen ? 10px : 7px;
+        width: parent.width - self.x - (State.large-screen ? 68px : 60px); height: State.large-screen ? 25px : 22px;
+        text: State.current-chapter-number == "" ? Strings.start-reading : Strings.continue-reading + " · " + Strings.chapter-prefix + State.current-chapter-number + Strings.chapter-suffix;
+        color: touch.pressed ? Theme.ink : Theme.paper;
+        font-weight: 700; font-size: State.large-screen ? 19px : 17px;
+    }
+    Text {
+        x: State.large-screen ? 26px : 22px; y: State.large-screen ? 35px : 29px;
+        width: parent.width - self.x - (State.large-screen ? 68px : 60px); height: State.large-screen ? 20px : 17px;
+        text: State.reader-page + " / " + State.reader-total + " " + Strings.pages-unit;
+        color: touch.pressed ? Theme.ink : Theme.paper; font-family: Theme.numbers;
+        font-size: State.large-screen ? 14px : 13px; vertical-alignment: center;
+    }
+    Rectangle {
+        x: parent.width - self.width - (State.large-screen ? 10px : 8px);
+        y: (parent.height - self.height) / 2;
+        width: State.large-screen ? 44px : 40px; height: self.width;
+        border-radius: State.large-screen ? 2px : 4px;
+        background: touch.pressed ? Theme.ink : Theme.paper;
+        Icon {
+            x: (parent.width - self.width) / 2; y: (parent.height - self.height) / 2;
+            width: State.large-screen ? 22px : 20px; height: self.width;
+            kind: "arrow-right"; inverted: touch.pressed;
+        }
+    }
+    touch := TouchArea {
+        pointer-event(event) => {
+            if event.kind == PointerEventKind.down { Commands.refresh("fast"); }
+            else if event.kind == PointerEventKind.up || event.kind == PointerEventKind.cancel { Commands.refresh("ui"); }
+        }
+        clicked => { Commands.action("detail", "continue", ""); }
+    }
+}
+
+component ChapterRule inherits Rectangle {
+    in property <bool> inverted;
+    clip: true;
+    for step in ceil(root.width / 4px): Rectangle {
+        x: step * 4px; y: parent.height / 2 + 3px; width: 2px; height: 2px;
+        background: root.inverted ? Theme.paper : Theme.dotted;
+    }
+}
+
+component ChapterDownload inherits Rectangle {
+    in property <ChapterItem> chapter;
+    property <bool> completed: root.chapter.downloaded || root.chapter.download-state == "completed" || root.chapter.download-state == "done";
+    property <bool> active: root.chapter.download-state == "downloading" || root.chapter.download-state == "active";
+    property <bool> queued: root.chapter.download-state == "queued" || root.chapter.download-state == "paused";
+    property <bool> pw-available: !State.large-screen && !root.completed && !root.active && !root.queued && root.chapter.download-state == "available";
+    property <length> state-size: State.large-screen ? 34px : 30px;
+    background: touch.pressed ? Theme.ink : transparent;
+    border-radius: 4px;
+    accessible-role: button;
+    accessible-label: root.completed ? Strings.remove-download : root.active || root.queued ? Strings.cancel-download : Strings.download;
+    Rectangle {
+        x: (parent.width - self.width) / 2; y: (parent.height - self.height) / 2;
+        width: root.state-size; height: root.state-size;
+        border-width: root.queued ? 0px : 1.5px;
+        border-color: root.completed || root.active ? Theme.ink : Theme.disabled;
+        border-radius: 4px; clip: true;
+        background: root.completed != touch.pressed ? Theme.ink : Theme.paper;
+        if root.queued: Rectangle {
+            width: parent.width; height: parent.height; background: transparent;
+            for step in ceil(root.state-size / 6px): Rectangle {
+                x: step * 6px; y: 0px; width: 4px; height: 1.5px; background: Theme.ink;
+            }
+            for step in ceil(root.state-size / 6px): Rectangle {
+                x: step * 6px; y: parent.height - 1.5px; width: 4px; height: 1.5px; background: Theme.ink;
+            }
+            for step in ceil(root.state-size / 6px): Rectangle {
+                x: 0px; y: step * 6px; width: 1.5px; height: 4px; background: Theme.ink;
+            }
+            for step in ceil(root.state-size / 6px): Rectangle {
+                x: parent.width - 1.5px; y: step * 6px; width: 1.5px; height: 4px; background: Theme.ink;
+            }
+        }
+        if !root.active && !root.pw-available: Icon {
+            x: (parent.width - self.width) / 2; y: (parent.height - self.height) / 2;
+            width: State.large-screen ? 16px : 15px; height: self.width;
+            kind: root.completed ? "check" : root.queued ? "history" : "download";
+            inverted: root.completed != touch.pressed;
+        }
+        if root.pw-available: Path {
+            x: (parent.width - self.width) / 2; y: (parent.height - self.height) / 2;
+            width: 15px; height: self.width;
+            viewbox-width: 24; viewbox-height: 24;
+            fill: transparent; stroke: touch.pressed ? Theme.paper : Theme.ink;
+            stroke-width: 2.8px;
+            stroke-line-cap: round; stroke-line-join: round;
+            accessible-role: none;
+            commands: "M12 5v12M7 12l5 5 5-5";
+        }
+        if root.active: Rectangle {
+            x: (parent.width - 9px) / 2; y: (parent.height - 9px) / 2 - 1px;
+            width: 9px; height: 9px; background: touch.pressed ? Theme.paper : Theme.ink;
+        }
+        if root.active: Rectangle {
+            x: 3px; y: parent.height - 5px;
+            width: (parent.width - 6px) * clamp(root.chapter.download-progress, 0, 1);
+            height: 2px; background: touch.pressed ? Theme.paper : Theme.ink;
+        }
+    }
+    touch := TouchArea {
+        pointer-event(event) => {
+            if event.kind == PointerEventKind.down { Commands.refresh("fast"); }
+            else if event.kind == PointerEventKind.up || event.kind == PointerEventKind.cancel { Commands.refresh("ui"); }
+        }
+        clicked => {
+            Commands.action("detail", root.completed ? "remove-download" : root.active || root.queued ? "cancel-download" : "download", root.chapter.id);
+        }
+    }
+}
+
+component ChapterRow inherits Rectangle {
+    in property <ChapterItem> chapter;
+    property <bool> inverted: touch.pressed || root.chapter.selected;
+    property <bool> suppress-click: false;
+    property <length> press-x;
+    property <length> press-y;
+    property <length> download-width: State.large-screen ? 56px : 52px;
+    background: root.inverted ? Theme.ink : root.chapter.current ? Theme.fill : Theme.paper;
+    border-radius: State.large-screen ? 4px : 0px;
+    height: State.large-screen ? 60px : 52px;
+    accessible-role: button;
+    accessible-label: root.chapter.number + " " + root.chapter.title;
+    accessible-checkable: State.chapter-selection-mode;
+    accessible-checked: root.chapter.selected;
+    HorizontalLayout {
+        x: State.large-screen ? 18px : 22px;
+        width: parent.width - self.x - root.download-width - (State.large-screen ? 6px : 4px);
+        height: parent.height; spacing: State.large-screen ? 12px : 10px;
+        Text {
+            width: State.large-screen ? 40px : 46px; horizontal-stretch: 0;
+            text: root.chapter.number; font-family: Theme.numbers;
+            font-size: State.large-screen ? 19px : 17px; font-weight: root.chapter.read ? 400 : 700;
+            color: root.inverted ? Theme.paper : root.chapter.read ? Theme.muted : Theme.ink;
+            vertical-alignment: center; horizontal-alignment: right;
+        }
+        BodyText {
+            min-width: 0px; max-width: State.large-screen ? 190px : 200px; horizontal-stretch: 0;
+            text: root.chapter.title; font-weight: root.chapter.read ? 400 : 700;
+            color: root.inverted ? Theme.paper : root.chapter.read ? Theme.muted : Theme.ink;
+            font-size: State.large-screen ? 18px : 16px;
+        }
+        if root.chapter.current: Rectangle {
+            width: State.large-screen ? 40px : 36px; height: State.large-screen ? 22px : 20px;
+            horizontal-stretch: 0; border-radius: 2px;
+            background: root.inverted ? Theme.paper : Theme.ink;
+            BodyText {
+                text: Strings.reading; font-size: State.large-screen ? 12px : 11px; font-weight: 700;
+                color: root.inverted ? Theme.ink : Theme.paper; horizontal-alignment: center;
+            }
+        }
+        ChapterRule { min-width: 12px; horizontal-stretch: 1; inverted: root.inverted; }
+        Text {
+            width: self.preferred-width; horizontal-stretch: 0;
+            text: root.chapter.current ? root.chapter.progress : root.chapter.date;
+            font-family: Theme.numbers; font-size: State.large-screen ? 15px : 14px;
+            color: root.inverted ? Theme.paper : Theme.secondary;
+            vertical-alignment: center; horizontal-alignment: right;
+        }
+    }
+    touch := TouchArea {
+        width: State.chapter-selection-mode ? parent.width : parent.width - root.download-width;
+        moved => {
+            if self.pressed && (abs(self.mouse-x - root.press-x) >= 12px || abs(self.mouse-y - root.press-y) >= 12px) {
+                root.suppress-click = true; hold.running = false;
+            }
+        }
+        pointer-event(event) => {
+            if event.kind == PointerEventKind.down {
+                root.press-x = self.mouse-x; root.press-y = self.mouse-y;
+                root.suppress-click = false; hold.running = true;
+                Commands.refresh("fast");
+            } else if event.kind == PointerEventKind.cancel {
+                root.suppress-click = true; hold.running = false;
+                Commands.refresh("ui");
+            } else if event.kind == PointerEventKind.up {
+                hold.running = false; Commands.refresh("ui");
+            }
+        }
+        clicked => {
+            if !root.suppress-click { Commands.action("detail", State.chapter-selection-mode ? "select-chapter" : "open-chapter", root.chapter.id); }
+        }
+    }
+    hold := Timer {
+        interval: 500ms; running: false;
+        triggered => {
+            self.running = false;
+            if touch.pressed && !root.suppress-click {
+                root.suppress-click = true;
+                Commands.action("detail", "select-chapter", root.chapter.id);
+            }
+        }
+    }
+    if !State.chapter-selection-mode: ChapterDownload {
+        x: parent.width - root.download-width; y: (parent.height - self.height) / 2;
+        width: root.download-width; height: State.large-screen ? 56px : 52px;
+        chapter: root.chapter;
+    }
+    if State.chapter-selection-mode: Rectangle {
+        x: parent.width - root.download-width + (root.download-width - 28px) / 2;
+        y: (parent.height - 28px) / 2; width: 28px; height: 28px;
+        border-width: 1.5px; border-radius: 3px;
+        border-color: root.inverted ? Theme.paper : Theme.ink;
+        background: root.chapter.selected ? Theme.ink : Theme.paper;
+        if root.chapter.selected: Icon {
+            x: 4px; y: 4px; width: 20px; height: 20px; kind: "check"; inverted: true;
+        }
+    }
+}
+
+component DetailDescription inherits Rectangle {
+    in property <string> text;
+    callback clicked();
+    property <length> line-height: 31px;
+    property <length> native-pitch: max(1px, pitch-probe.preferred-height / 32);
+    property <int> line-count: root.text == "" ? 0 : clamp(round(layout-probe.preferred-height / root.native-pitch), 1, 6);
+    height: root.line-count * root.line-height;
+    accessible-role: button;
+    accessible-label: Strings.summary-tags;
+
+    // Measure a fixed block to average the layout engine's pixel rounding.
+    pitch-probe := Text {
+        visible: false; accessible-role: none;
+        width: root.width;
+        text: "M\nM\nM\nM\nM\nM\nM\nM\nM\nM\nM\nM\nM\nM\nM\nM\nM\nM\nM\nM\nM\nM\nM\nM\nM\nM\nM\nM\nM\nM\nM\nM";
+        font-family: Theme.serif; font-size: 17px; font-weight: 400;
+        wrap: no-wrap; overflow: clip; vertical-alignment: top;
+    }
+    layout-probe := Text {
+        visible: false; accessible-role: none;
+        width: root.width; text: root.text;
+        font-family: Theme.serif; font-size: 17px; font-weight: 400;
+        wrap: word-wrap; overflow: clip; vertical-alignment: top;
+    }
+
+    // Keep native wrapping and glyph geometry, moving each line to its own box.
+    for line in root.line-count: Rectangle {
+        x: 0px; y: line * root.line-height + (root.line-height - root.native-pitch) / 2;
+        width: root.width; height: root.native-pitch; clip: true;
+        Text {
+            x: 0px; y: -line * root.native-pitch;
+            width: root.width; height: layout-probe.preferred-height;
+            text: root.text; color: Theme.ink;
+            font-family: Theme.serif; font-size: 17px; font-weight: 400;
+            wrap: word-wrap; overflow: clip; vertical-alignment: top;
+            accessible-role: none;
+        }
+    }
+    TouchArea { clicked => { root.clicked(); } }
+}
+
+export component DetailPage inherits Rectangle {
+    background: Theme.paper;
+    property <bool> show-information: State.large-screen || State.page <= 1;
+    property <length> chapter-left: State.large-screen ? 384px : 0px;
+    property <length> chapter-width: State.large-screen ? root.width - 384px - 22px : root.width;
+    property <length> chapter-header-top: State.large-screen ? 60px : root.show-information ? 353.5px : 52px;
+    property <length> chapter-header-height: State.large-screen ? 97.5px : 53px;
+    property <length> chapter-top: root.chapter-header-top + root.chapter-header-height + (State.large-screen ? 6px : 0px);
+    property <length> chapter-row-height: State.large-screen ? 60px : 52px;
+    property <length> sidebar-content-width: 314px;
+
+    Rectangle {
+        x: 0px; y: 0px; width: parent.width; height: State.large-screen ? 60px : 52px;
+        Rectangle {
+            x: State.large-screen ? 18px : 8px; y: 0px;
+            width: State.large-screen ? 104px : 74px; height: parent.height;
+            border-radius: 4px; background: back-touch.pressed ? Theme.ink : Theme.paper;
+            accessible-role: button; accessible-label: Strings.back + Strings.library;
+            Icon {
+                x: State.large-screen ? 6px : 4px; y: (parent.height - self.height) / 2;
+                width: State.large-screen ? 28px : 24px; height: self.width;
+                kind: "chevron-left"; inverted: back-touch.pressed;
+            }
+            BodyText {
+                x: State.large-screen ? 36px : 30px; y: 0px; width: parent.width - self.x; height: parent.height;
+                text: Strings.library; font-size: State.large-screen ? 19px : 16px; font-weight: 500;
+                color: back-touch.pressed ? Theme.paper : Theme.ink;
+            }
+            back-touch := TouchArea {
+                pointer-event(event) => {
+                    if event.kind == PointerEventKind.down { Commands.refresh("fast"); }
+                    else if event.kind == PointerEventKind.up || event.kind == PointerEventKind.cancel { Commands.refresh("ui"); }
+                }
+                clicked => { Commands.action("detail", "back", ""); }
+            }
+        }
+        if !State.large-screen && !root.show-information: TitleText {
+            x: 86px; y: 0px; width: parent.width - 148px; height: parent.height;
+            text: State.current-book.title; font-size: 18px; letter-spacing: 1px; horizontal-alignment: center;
+        }
+        Rectangle {
+            x: parent.width - (State.large-screen ? 22px + 56px : 10px + 48px);
+            y: 2px; width: Theme.touch; height: Theme.touch;
+            border-radius: 4px; background: more-touch.pressed ? Theme.ink : Theme.paper;
+            accessible-role: button; accessible-label: Strings.more;
+            Icon {
+                x: (parent.width - self.width) / 2; y: (parent.height - self.height) / 2;
+                width: State.large-screen ? 27px : 24px; height: self.width; kind: "more"; inverted: more-touch.pressed;
+            }
+            more-touch := TouchArea {
+                pointer-event(event) => {
+                    if event.kind == PointerEventKind.down { Commands.refresh("fast"); }
+                    else if event.kind == PointerEventKind.up || event.kind == PointerEventKind.cancel { Commands.refresh("ui"); }
+                }
+                clicked => { Commands.action("detail", "more", ""); }
+            }
+        }
+    }
+
+    if !State.large-screen && root.show-information: Rectangle {
+        x: 22px; y: 56px; width: parent.width - 44px; height: 214px;
+        Cover {
+            x: 0px; y: 0px; width: 134px; height: 188px;
+            book: State.current-book; show-badge: false; show-progress: false;
+            opened => { Commands.action("detail", "summary", ""); }
+        }
+        pw-title-fit := IdentityTextFit {
+            full-text: State.current-book.title; compact-text: State.current-book.display-title;
+            available-width: pw-title.width;
+            font-family: pw-title.font-family; font-size: pw-title.font-size;
+            font-weight: pw-title.font-weight; letter-spacing: pw-title.letter-spacing;
+        }
+        pw-title := TitleText {
+            x: 154px; y: 0px; width: parent.width - self.x; height: 38px;
+            text: pw-title-fit.display-text; accessible-label: State.current-book.title; font-size: 30px; letter-spacing: 3px;
+        }
+        Caption {
+            x: 154px; y: 44px; width: parent.width - self.x; height: 22px;
+            text: State.current-book.author + "  " + Strings.author-credit; font-size: 15px;
+        }
+        Caption {
+            x: 154px; y: 72px; width: parent.width - self.x; height: 20px;
+            text: State.book-metadata; font-size: 14px;
+        }
+        BodyText {
+            x: 154px; y: 104px; width: parent.width - self.x; height: 72px;
+            text: State.book-description; wrap: word-wrap; font-size: 15px; vertical-alignment: top;
+        }
+        Rectangle {
+            x: 154px; y: 182px; width: summary-label.preferred-width + 18px; height: 32px;
+            background: summary-touch.pressed ? Theme.ink : Theme.paper;
+            accessible-role: button; accessible-label: Strings.summary-tags;
+            summary-label := BodyText {
+                x: 0px; y: 0px; width: self.preferred-width; height: parent.height;
+                text: Strings.summary-tags; font-size: 14px; font-weight: 700;
+                color: summary-touch.pressed ? Theme.paper : Theme.ink;
+            }
+            Icon {
+                x: summary-label.width + 2px; y: (parent.height - 16px) / 2; width: 16px; height: 16px;
+                kind: "chevron-right"; inverted: summary-touch.pressed;
+            }
+            summary-touch := TouchArea {
+                y: -4px; height: 48px;
+                pointer-event(event) => {
+                    if event.kind == PointerEventKind.down { Commands.refresh("fast"); }
+                    else if event.kind == PointerEventKind.up || event.kind == PointerEventKind.cancel { Commands.refresh("ui"); }
+                }
+                clicked => { Commands.action("detail", "summary", ""); }
+            }
+        }
+    }
+    if !State.large-screen && root.show-information: Rectangle {
+        x: 22px; y: 283.5px; width: parent.width - 44px; height: 56px;
+        ContinueButton { x: 0px; y: 0px; width: parent.width - 132px; }
+        for item in 2: Rectangle {
+            x: parent.width - 122px + item * 66px; y: 0px; width: 56px; height: 56px;
+            border-width: 1.5px; border-color: Theme.ink; border-radius: 4px;
+            property <bool> selected: item == 0 && State.current-book.in-library;
+            background: self.selected != pw-action-touch.pressed ? Theme.ink : Theme.paper;
+            accessible-role: button;
+            accessible-label: item == 0 ? (State.current-book.in-library ? Strings.in-library : Strings.add-to-library) : Strings.track;
+            accessible-checkable: item == 0;
+            accessible-checked: self.selected;
+            Icon {
+                x: (parent.width - 22px) / 2; y: (parent.height - 22px) / 2;
+                width: 22px; height: 22px;
+                kind: item == 0 ? (State.current-book.in-library ? "bookmark-filled" : "bookmark") : "track";
+                inverted: parent.selected != pw-action-touch.pressed;
+            }
+            pw-action-touch := TouchArea {
+                pointer-event(event) => {
+                    if event.kind == PointerEventKind.down { Commands.refresh("fast"); }
+                    else if event.kind == PointerEventKind.up || event.kind == PointerEventKind.cancel { Commands.refresh("ui"); }
+                }
+                clicked => { Commands.action("detail", item == 0 ? "favorite" : "track", ""); }
+            }
+        }
+    }
+
+    if State.large-screen: Rectangle {
+        x: 40px; y: 66px; width: root.sidebar-content-width; height: parent.height - 90px;
+        Cover {
+            x: 0px; y: 0px; width: 308px; height: 422px;
+            book: State.current-book; show-badge: false; show-progress: false;
+            opened => { Commands.action("detail", "summary", ""); }
+        }
+        sc-title-fit := IdentityTextFit {
+            full-text: State.current-book.title; compact-text: State.current-book.display-title;
+            available-width: sc-title.width;
+            font-family: sc-title.font-family; font-size: sc-title.font-size;
+            font-weight: sc-title.font-weight; letter-spacing: sc-title.letter-spacing;
+        }
+        sc-title := TitleText {
+            x: 0px; y: 450px; width: parent.width; height: 50px;
+            text: sc-title-fit.display-text; accessible-label: State.current-book.title; font-size: 40px; letter-spacing: 4px;
+        }
+        Caption {
+            x: 0px; y: 508px; width: parent.width; height: 25px;
+            text: State.current-book.author + "  " + Strings.author-credit; font-size: 17px;
+        }
+        Caption {
+            x: 0px; y: 547px; width: parent.width; height: 22px;
+            text: State.book-metadata; font-size: 15px;
+        }
+        ContinueButton { x: 0px; y: 591px; width: parent.width; }
+        Rectangle {
+            x: 0px; y: 671px; width: parent.width; height: 72px;
+            property <length> button-width: (parent.width - 20px) / 3;
+            for item in 3: Rectangle {
+                x: item * (parent.button-width + 10px); y: 0px; width: parent.button-width; height: parent.height;
+                border-width: 1.5px; border-color: Theme.ink; border-radius: 4px;
+                property <bool> selected: item == 0 && State.current-book.in-library;
+                background: self.selected != sc-action-touch.pressed ? Theme.ink : Theme.paper;
+                accessible-role: button;
+                accessible-label: item == 0 ? (State.current-book.in-library ? Strings.in-library : Strings.add-to-library) : item == 1 ? Strings.track : Strings.migrate;
+                accessible-checkable: item == 0;
+                accessible-checked: self.selected;
+                Icon {
+                    x: (parent.width - 24px) / 2; y: 13px; width: 24px; height: 24px;
+                    kind: item == 0 ? (State.current-book.in-library ? "bookmark-filled" : "bookmark") : item == 1 ? "track" : "migrate";
+                    inverted: parent.selected != sc-action-touch.pressed;
+                }
+                BodyText {
+                    x: 0px; y: 41px; width: parent.width; height: 22px;
+                    text: item == 0 ? (State.current-book.in-library ? Strings.in-library : Strings.add-to-library) : item == 1 ? Strings.track : Strings.migrate;
+                    font-size: 14px; font-weight: 700; horizontal-alignment: center;
+                    color: parent.selected != sc-action-touch.pressed ? Theme.paper : Theme.ink;
+                }
+                sc-action-touch := TouchArea {
+                    pointer-event(event) => {
+                        if event.kind == PointerEventKind.down { Commands.refresh("fast"); }
+                        else if event.kind == PointerEventKind.up || event.kind == PointerEventKind.cancel { Commands.refresh("ui"); }
+                    }
+                    clicked => { Commands.action("detail", item == 0 ? "favorite" : item == 1 ? "track" : "migrate", ""); }
+                }
+            }
+        }
+        description := DetailDescription {
+            x: 0px; y: 763px; width: parent.width;
+            text: State.book-description == "" ? "" : "        " + State.book-description;
+            clicked => { Commands.action("detail", "summary", ""); }
+        }
+        Rectangle {
+            x: 0px; y: description.y + description.height + 14px; width: parent.width;
+            height: preview-tags.content-height;
+            accessible-role: button;
+            accessible-label: Strings.view-all + " " + State.book-tag-items.length;
+            preview-tags := TagFlow {
+                x: 0px; y: 0px; width: parent.width;
+                labels: State.book-tag-items.length > 4 ? [
+                    State.book-tag-items[0], State.book-tag-items[1], State.book-tag-items[2],
+                    "+" + (State.book-tag-items.length - 3)
+                ] : State.book-tag-items;
+                item-height: 36px; text-size: 15px; text-weight: 400;
+                horizontal-padding: 16px; gap: 8px; rows-per-page: 4; intrinsic-width: true;
+            }
+            TouchArea {
+                clicked => { Commands.action("detail", "summary", ""); }
+            }
+        }
+    }
+
+    Rectangle {
+        x: root.chapter-left; y: root.chapter-header-top;
+        width: root.chapter-width; height: root.chapter-header-height;
+        Rectangle {
+            x: 0px; y: State.large-screen ? parent.height - 1.5px : 0px;
+            width: parent.width; height: State.large-screen ? 1.5px : 1px; background: Theme.ink;
+        }
+        if !State.chapter-selection-mode: TitleText {
+            x: 22px; y: State.large-screen ? 46px : 1px;
+            width: State.large-screen ? 140px : 54px; height: State.large-screen ? 38px : 52px;
+            text: Strings.table-of-contents; font-size: State.large-screen ? 30px : 20px;
+            letter-spacing: State.large-screen ? 8px : 4px;
+        }
+        if !State.chapter-selection-mode: Caption {
+            x: State.large-screen ? 22px : 84px; y: State.large-screen ? 24px : 1px;
+            width: State.large-screen ? parent.width - 265px : parent.width - 256px; height: State.large-screen ? 20px : 52px;
+            text: State.chapter-count + " " + Strings.chapters-unit + " · " + Strings.unread + " " + State.unread-count + " · " + Strings.downloaded + " " + State.downloaded-count;
+            font-size: State.large-screen ? 14px : 13px; letter-spacing: State.large-screen ? 2px : 0px;
+        }
+        if !State.chapter-selection-mode: Rectangle {
+            x: parent.width - (State.large-screen ? 237px : 156px);
+            y: State.large-screen ? 36px : 4.5px; width: State.large-screen ? 109px : 96px; height: State.large-screen ? 48px : 44px;
+            border-width: State.large-screen ? 1.5px : 0px; border-color: Theme.ink; border-radius: 4px;
+            background: sort-touch.pressed ? Theme.ink : Theme.paper;
+            accessible-role: button; accessible-label: State.newest-first ? Strings.new-to-old : Strings.old-to-new;
+            Icon {
+                x: State.large-screen ? 14px : 10px; y: (parent.height - self.height) / 2;
+                width: State.large-screen ? 18px : 16px; height: self.width; kind: "sort"; inverted: sort-touch.pressed;
+            }
+            BodyText {
+                x: State.large-screen ? 38px : 30px; y: 0px; width: parent.width - self.x - (State.large-screen ? 14px : 10px); height: parent.height;
+                text: State.newest-first ? Strings.new-to-old : Strings.old-to-new;
+                font-size: State.large-screen ? 16px : 14px; font-weight: 700;
+                color: sort-touch.pressed ? Theme.paper : Theme.ink;
+            }
+            sort-touch := TouchArea {
+                y: State.large-screen ? -4px : -2px; height: Theme.touch;
+                pointer-event(event) => {
+                    if event.kind == PointerEventKind.down { Commands.refresh("fast"); }
+                    else if event.kind == PointerEventKind.up || event.kind == PointerEventKind.cancel { Commands.refresh("ui"); }
+                }
+                clicked => { Commands.action("detail", "sort", ""); }
+            }
+        }
+        if !State.chapter-selection-mode: Rectangle {
+            x: parent.width - (State.large-screen ? 120px : 56px);
+            y: State.large-screen ? 36px : 4.5px; width: State.large-screen ? 120px : 44px; height: State.large-screen ? 48px : 44px;
+            border-width: State.large-screen ? 0px : 1.5px; border-color: Theme.ink; border-radius: 4px;
+            background: State.large-screen != download-touch.pressed ? Theme.ink : Theme.paper;
+            accessible-role: button; accessible-label: State.large-screen ? Strings.download-five-chapters : Strings.batch-download;
+            Icon {
+                x: State.large-screen ? 16px : 13px; y: (parent.height - 18px) / 2;
+                width: 18px; height: 18px; kind: "download"; inverted: State.large-screen != download-touch.pressed;
+            }
+            if State.large-screen: BodyText {
+                x: 40px; y: 0px; width: parent.width - 50px; height: parent.height;
+                text: Strings.download-five-chapters; font-size: 16px; font-weight: 700;
+                color: download-touch.pressed ? Theme.ink : Theme.paper;
+            }
+            download-touch := TouchArea {
+                x: State.large-screen ? 0px : -2px; y: State.large-screen ? -4px : -2px;
+                width: State.large-screen ? parent.width : 48px; height: Theme.touch;
+                pointer-event(event) => {
+                    if event.kind == PointerEventKind.down { Commands.refresh("fast"); }
+                    else if event.kind == PointerEventKind.up || event.kind == PointerEventKind.cancel { Commands.refresh("ui"); }
+                }
+                clicked => { Commands.action("detail", State.large-screen ? "download-next" : "batch-download", ""); }
+            }
+        }
+        if State.chapter-selection-mode: HorizontalLayout {
+            x: 22px; y: State.large-screen ? 36px : 3px;
+            width: parent.width - 44px; height: Theme.touch; spacing: 8px;
+            BodyText {
+                min-width: 0px; horizontal-stretch: 1;
+                text: Strings.selected-chapters + " " + State.selected-chapter-count + " " + Strings.chapters-unit;
+                font-size: State.large-screen ? 20px : 18px; font-weight: 700;
+            }
+            ActionButton {
+                width: State.large-screen ? 72px : 64px; text: Strings.select-all;
+                clicked => { Commands.action("detail", "select-all-chapters", ""); }
+            }
+            ActionButton {
+                width: State.large-screen ? 100px : 96px; text: Strings.download; primary: true; enabled: State.selected-chapter-count > 0;
+                clicked => { Commands.action("detail", "download-selected", ""); }
+            }
+            ActionButton {
+                width: State.large-screen ? 72px : 64px; text: Strings.cancel; quiet: true;
+                clicked => { Commands.action("detail", "cancel-selection", ""); }
+            }
+        }
+    }
+
+    if State.chapters.length == 0: EmptyState {
+        x: root.chapter-left; y: root.chapter-top + 24px;
+        width: root.chapter-width; height: 280px;
+        title: State.busy ? Strings.loading : Strings.chapters-empty; message: "";
+        action: State.busy ? "" : Strings.retry;
+        clicked => { Commands.action("detail", "reload", ""); }
+    }
+    for chapter[index] in State.chapters: ChapterRow {
+        x: root.chapter-left; y: root.chapter-top + index * root.chapter-row-height;
+        width: root.chapter-width; height: root.chapter-row-height; chapter: chapter;
+    }
+    PageBar {
+        x: root.chapter-left; y: parent.height - (State.large-screen ? 68px : 52px);
+        width: root.chapter-width; height: State.large-screen ? 68px : 52px;
+        page: State.page; count: State.page-count;
+        turn(direction) => { Commands.action("page", "turn", direction); }
+    }
+}
+

@@ -1,0 +1,333 @@
+{
+  "schema_version": 1,
+  "round": 4,
+  "status": "changes_required",
+  "review_kind": "manual_static_screenshot_and_state_review",
+  "review_complete": true,
+  "artifact_directory": "artifacts/ui-round-4-final",
+  "capture_provenance": {
+    "binary_sha256": "ec69abefc3f31de1061c5ba497434455bceb12d4c915cd8ba230da2abb14d4da",
+    "binary_unchanged": true,
+    "early_reader_captures_excluded": true,
+    "description": "Use the final directory. The two early reader captures were repeated after waiting for the same ELF to become ready; the original report is retained.",
+    "reported_remote_capture_checks": {
+      "passed": 95,
+      "total": 95
+    },
+    "reported_raw_pointer_checks": {
+      "passed": 6,
+      "total": 6
+    },
+    "readiness_recheck": {
+      "passed": 5,
+      "total": 5,
+      "evidence": "artifacts/ui-round-4-final/report-recheck.json"
+    }
+  },
+  "new_suggestion_count": 5,
+  "shared_additional_suggestion_count": 3,
+  "qualifies_as_clean_round": false,
+  "consecutive_clean_rounds": 0,
+  "coverage": {
+    "baseline": [
+      {
+        "id": "pw5-library",
+        "image": "artifacts/ui-round-4-final/pw5-library.png",
+        "reference": "tmp/design/reference-01.png"
+      },
+      {
+        "id": "pw5-detail",
+        "image": "artifacts/ui-round-4-final/pw5-detail.png",
+        "reference": "tmp/design/reference-02.png"
+      },
+      {
+        "id": "pw5-reader",
+        "image": "artifacts/ui-round-4-final/pw5-reader.png",
+        "reference": "tmp/design/reference-03.png"
+      },
+      {
+        "id": "pw5-sources",
+        "image": "artifacts/ui-round-4-final/pw5-sources.png",
+        "reference": "tmp/design/reference-04.png"
+      },
+      {
+        "id": "pw5-catalog",
+        "image": "artifacts/ui-round-4-final/pw5-catalog.png",
+        "reference": "tmp/design/reference-05.png"
+      },
+      {
+        "id": "pw5-search",
+        "image": "artifacts/ui-round-4-final/pw5-search.png",
+        "reference": "tmp/design/reference-06.png"
+      },
+      {
+        "id": "pw5-history",
+        "image": "artifacts/ui-round-4-final/pw5-history.png",
+        "reference": "tmp/design/reference-07.png"
+      },
+      {
+        "id": "pw5-settings",
+        "image": "artifacts/ui-round-4-final/pw5-settings.png",
+        "reference": "tmp/design/reference-08.png"
+      },
+      {
+        "id": "scribe-library",
+        "image": "artifacts/ui-round-4-final/scribe-library.png",
+        "reference": "tmp/design/reference-09.png"
+      },
+      {
+        "id": "scribe-detail",
+        "image": "artifacts/ui-round-4-final/scribe-detail.png",
+        "reference": "tmp/design/reference-10.png"
+      },
+      {
+        "id": "scribe-sources",
+        "image": "artifacts/ui-round-4-final/scribe-sources.png",
+        "reference": "tmp/design/reference-11.png"
+      },
+      {
+        "id": "scribe-landscape-reader",
+        "image": "artifacts/ui-round-4-final/scribe-landscape-reader.png",
+        "reference": "tmp/design/reference-12.png"
+      }
+    ],
+    "chapter_selection": [
+      "artifacts/ui-round-4-final/detail-chapter-hold-600.png",
+      "artifacts/ui-round-4-final/detail-chapter-select-two.png",
+      "artifacts/ui-round-4-final/detail-chapter-select-all.png",
+      "artifacts/ui-round-4-final/detail-chapter-download-selected.png",
+      "artifacts/ui-round-4-final/detail-chapter-cancel.png"
+    ],
+    "batch_downloads": [
+      "artifacts/ui-round-4-final/batch-all.png",
+      "artifacts/ui-round-4-final/batch-unread.png",
+      "artifacts/ui-round-4-final/batch-next-five.png",
+      "artifacts/ui-round-4-final/batch-next-ten.png"
+    ],
+    "download_management": [
+      "artifacts/ui-round-4-final/downloads-lazy-pagination-01.png",
+      "artifacts/ui-round-4-final/downloads-lazy-pagination-02.png",
+      "artifacts/ui-round-4-final/downloads-lazy-pagination-03.png",
+      "artifacts/ui-round-4-final/downloads-lazy-pagination-04.png",
+      "artifacts/ui-round-4-final/downloads-lazy-pagination-05.png",
+      "artifacts/ui-round-4-final/downloads-lazy-pagination-06.png",
+      "artifacts/ui-round-4-final/downloads-lazy-pagination-07.png",
+      "artifacts/ui-round-4-final/downloads-lazy-pagination-08.png",
+      "artifacts/ui-round-4-final/downloads-lazy-pagination-09.png",
+      "artifacts/ui-round-4-final/downloads-lazy-pagination-10.png",
+      "artifacts/ui-round-4-final/downloads-lazy-pagination-11.png",
+      "artifacts/ui-round-4-final/downloads-lazy-pagination-12.png",
+      "artifacts/ui-round-4-final/downloads-pause-all.png",
+      "artifacts/ui-round-4-final/downloads-resume-all.png",
+      "artifacts/ui-round-4-final/downloads-cancel-all.png"
+    ],
+    "cache_management": [
+      "artifacts/ui-round-4-final/storage-cache-info.png",
+      "artifacts/ui-round-4-final/storage-clear-cache.png",
+      "artifacts/ui-round-4-final/cache-cover-seed.png",
+      "artifacts/ui-round-4-final/cache-cover-online.png",
+      "artifacts/ui-round-4-final/cache-cover-offline.png",
+      "artifacts/ui-round-4-final/cache-local-import.png"
+    ],
+    "note": "The twelve reference screens and listed new states were manually reviewed. The 95-case execution report covers a larger runtime matrix; this document does not claim that every runtime case received a separate manual visual review."
+  },
+  "resolved_previous_findings": [
+    "R1-D012",
+    "R1-D016",
+    "R3-F001"
+  ],
+  "remaining_previous_findings": [
+    {
+      "id": "R3-D001",
+      "status": "partially_resolved",
+      "description": "The full divider is now continuous, but the Tab underline remains below it because several containing tab bars are shorter than the common Tab height. The residual geometry was independently confirmed at approximately four Paperwhite or eight Scribe design pixels.",
+      "screens": [
+        "pw5-catalog",
+        "scribe-sources"
+      ],
+      "recommendation": "Make the common Tab height follow its tab-bar container, or align each container and Tab to the same geometry."
+    }
+  ],
+  "new_findings": [
+    {
+      "id": "R4-D001",
+      "priority": "P2",
+      "title": "Selection actions overlap the first chapter row",
+      "screens": [
+        "detail-chapter-hold-600",
+        "detail-chapter-select-two",
+        "detail-chapter-select-all"
+      ],
+      "observed": "Paperwhite selection buttons span y=386..434, but the first selected row and its hit area begin at y=428. The row drawn later covers the lower six pixels of the action targets.",
+      "recommendation": "Place the first chapter row below the complete selection header and recompute row heights while retaining the 48-unit minimum.",
+      "evidence": [
+        "artifacts/ui-round-4-final/detail-chapter-hold-600.png",
+        "artifacts/ui-round-4-final/detail-chapter-select-two.png",
+        "artifacts/ui-round-4-final/detail-chapter-select-all.png"
+      ],
+      "status": "reported_to_root",
+      "bounds_design_px": [
+        22,
+        386,
+        596,
+        434
+      ],
+      "source_evidence": [
+        "ui/detail.slint"
+      ]
+    },
+    {
+      "id": "R4-D002",
+      "priority": "P2",
+      "title": "Download actions are enabled for inapplicable queue states",
+      "screens": [
+        "downloads-pause-all",
+        "downloads-resume-all",
+        "downloads-cancel-all",
+        "downloads-lazy-pagination-01"
+      ],
+      "observed": "Completed jobs still receive pause/resume/cancel choices even though the executor ignores completed jobs. Global controls also stay active when no corresponding state can be changed.",
+      "recommendation": "Expose or enable only transitions applicable to the selected job or current queue. Preserve completed jobs during global actions.",
+      "evidence": [
+        "artifacts/ui-round-4-final/downloads-pause-all.png",
+        "artifacts/ui-round-4-final/downloads-resume-all.png",
+        "artifacts/ui-round-4-final/downloads-cancel-all.png",
+        "artifacts/ui-round-4-final/downloads-lazy-pagination-01.png"
+      ],
+      "status": "reported_to_root",
+      "evidence_scope": "Screenshots and sidecars establish queue/control state; the completed-item submenu contract was confirmed by static source inspection.",
+      "source_evidence": [
+        "src/app/actions.rs",
+        "src/downloads.rs"
+      ]
+    },
+    {
+      "id": "R4-D003",
+      "priority": "P2",
+      "title": "The final downloads page moves its pager",
+      "screens": [
+        "downloads-lazy-pagination-11",
+        "downloads-lazy-pagination-12"
+      ],
+      "observed": "The first eleven pages keep the pager around y=634..682. The final one-row page shrinks the dialog and moves the pager to about y=451..499, turning the former button position into the dismissing backdrop.",
+      "recommendation": "Keep the geometry of a multi-page dialog and its pager stable across pages, including partially filled final pages.",
+      "evidence": [
+        "artifacts/ui-round-4-final/downloads-lazy-pagination-11.png",
+        "artifacts/ui-round-4-final/downloads-lazy-pagination-12.png"
+      ],
+      "status": "reported_to_root",
+      "bounds_design_px": {
+        "page_11_pager": [
+          0,
+          634,
+          618,
+          682
+        ],
+        "page_12_pager": [
+          0,
+          451,
+          618,
+          499
+        ]
+      }
+    },
+    {
+      "id": "R4-D004",
+      "priority": "P2",
+      "title": "Ordinary batch downloads reset valid completed chapters",
+      "screens": [
+        "batch-all",
+        "batch-unread"
+      ],
+      "observed": "The all-chapters sidecar replaces the initial nine completed jobs for chapters 27..35 with queued jobs. The unread batch also requeues cached chapters 34 and 35, leaving 53 queued and seven completed.",
+      "recommendation": "Skip valid locally completed chapters in ordinary bulk-download actions. Provide an explicit redownload operation if replacing existing completed content is intended.",
+      "evidence": [
+        "artifacts/ui-round-4-final/batch-all.png",
+        "artifacts/ui-round-4-final/batch-unread.png"
+      ],
+      "status": "reported_to_root",
+      "sidecar_evidence": [
+        "artifacts/ui-round-4-final/batch-all.state.json",
+        "artifacts/ui-round-4-final/batch-unread.state.json"
+      ]
+    },
+    {
+      "id": "R4-D005",
+      "priority": "P2",
+      "title": "Provider status enums bypass localization",
+      "screens": [
+        "cache-cover-online",
+        "cache-cover-offline"
+      ],
+      "observed": "The Komga fixture status row displays the raw provider enum ONGOING in the otherwise Chinese interface.",
+      "recommendation": "Normalize recognized provider enum casing and values before applying localized status labels. Preserve original book titles as content.",
+      "evidence": [
+        "artifacts/ui-round-4-final/cache-cover-online.png",
+        "artifacts/ui-round-4-final/cache-cover-offline.png"
+      ],
+      "status": "reported_to_root",
+      "bounds_design_px": [
+        104,
+        268,
+        320,
+        720
+      ],
+      "source_evidence": [
+        "src/app/view.rs"
+      ]
+    }
+  ],
+  "cross_review_references": [
+    {
+      "id": "R4-I001",
+      "reported_by": "final_fidelity_review",
+      "kind": "conditional_static_ui_context_defect",
+      "description": "The generic summary panel renders current-book tags unconditionally. The captured non-demo cache-info fixture has no tags and therefore does not visually reproduce the issue; opening cache info while a tagged book remains current would show unrelated tags.",
+      "evidence": [
+        "ui/panels.slint",
+        "artifacts/ui-round-4-final/storage-cache-info.png"
+      ],
+      "recommendation": "Gate book-specific tags on the book-summary context rather than all summary-style panels."
+    },
+    {
+      "id": "R4-I005",
+      "reported_by": "final_fidelity_review",
+      "kind": "static_hit_target_geometry",
+      "description": "Several direct reader hit surfaces remain smaller than the specified 48/56 units: seek uses 44, while some Scribe footer and orientation surfaces use 48.",
+      "recommendation": "Expand the effective interaction targets while retaining the intended visible geometry and gesture priority."
+    },
+    {
+      "id": "R4-I006",
+      "reported_by": "final_fidelity_review",
+      "kind": "visible_feedback_obstruction",
+      "description": "Persistent success/queued feedback overlays the current page controls. Examples include detail download feedback at y=762..816 and settings cache feedback at y=690..744.",
+      "evidence": [
+        "artifacts/ui-round-4-final/detail-chapter-download-selected.png",
+        "artifacts/ui-round-4-final/storage-clear-cache.png",
+        "artifacts/ui-round-4-final/cache-local-import.png"
+      ],
+      "recommendation": "Use a non-obstructing feedback area or safe inline treatment rather than covering the pager or moving the overlay onto another content row."
+    }
+  ],
+  "positive_checks": [
+    "Default baseline routes retain the reference hierarchy and major panel geometry.",
+    "Selection uses full-row black/white inversion and readable check marks; cancel returns to the ordinary directory layout.",
+    "The next-five and next-ten batch fixtures target chapters 36..40 and 36..45 respectively.",
+    "The downloads dataset has 89 menu items across twelve pages, with correct first/last disabling and no scrolling container.",
+    "Download rows are 52 units high and the Paperwhite pager targets are 48 units high.",
+    "Cache reports and clear-cache results use high-contrast text and preserve the original/imported-page workflow shown by the fixtures.",
+    "Context artwork, source counts, chapter-update counts, and relative catalog dates remain consistent with the earlier accepted data policy.",
+    "The Scribe manual-orientation label now says Locked Direction instead of claiming unsupported automatic rotation."
+  ],
+  "limits_and_unconfirmed_observations": [
+    "Selection/cache/download new-state screenshots are predominantly Paperwhite fixtures. Scribe sizing was additionally inspected in the shared 56-unit theme and larger layout definitions; a physical-device touch test is not claimed.",
+    "Online and offline Komga cache captures use different labels for the third catalog tab. This was forwarded for investigation but is not included as a confirmed defect without establishing the initialization/listing contract.",
+    "Root owns consolidation with the independent fidelity report, including any optional symbol-style observations not classified as new important defects in this review."
+  ],
+  "native_sqlite_status": {
+    "classification": "native_persistence",
+    "evidence": "artifacts/sqlite-native/analysis.md",
+    "description": "The local investigation documents an intermittent native SQLite startup failure and a change to DELETE/FULL with mmap disabled. It does not prove a specific corruption cause, and its probe results do not replace acceptance of the final ARM application build. This reviewer did not execute a native probe."
+  },
+  "verification_note": "Only static images, sidecars, source text, and existing reports were read. No local application, build, validation suite, smoke test, or runtime probe was executed. Passing capture assertions do not override the newly found interaction and queue-state problems; clean-round counting remains zero."
+}

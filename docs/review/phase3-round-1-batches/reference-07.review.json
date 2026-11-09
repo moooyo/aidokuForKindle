@@ -1,0 +1,92 @@
+{
+  "batch_id": "reference-07",
+  "reviewer": "fresh-independent-reviewer-reference-07",
+  "round": 1,
+  "run_id": "a1baf3fe3dc2",
+  "binary_sha256": "94d7f3bbcab475ad8833a2f3c486138f7b49bead231851c2d8eab2f0c3d2ac51",
+  "source_sha256": "aef9db4e111165016a10a2a95e111f3155860b8510c7f6207ec9c79fbec5082c",
+  "reference_bundle_sha256": "e7b49b456255432d74cfe41346f9d44c1a9c55bf67c5d55483e4ae3029547d18",
+  "identity_method": "Get-FileHash SHA256 over the unmodified original PNG bytes. Each candidate hash matches its case evidence_hashes.screenshot.sha256, and each reference hash matches its case reference_sha256. Both case metadata files match the assigned run, binary, and source identities. The reference bundle identity is supplied by the review assignment; individual reference PNG identities were independently checked.",
+  "comparison_scale": "Candidate 618 x 824 at logical 1x; reference 1236 x 1648 at physical 2x. Geometry observations use logical coordinates after dividing reference coordinates by two.",
+  "reviewed_case_ids": [
+    "pw-manga--more",
+    "pw-manga--tracking"
+  ],
+  "reviewed_cases": [
+    {
+      "case_id": "pw-manga--more",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/pw-manga--more.png",
+      "candidate_sha256": "fcc814350b710a1741ef2c09682d655fb70e600632db0be869281cc12a89ea39",
+      "reference_png": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/screens/states/pw-manga--more.png",
+      "reference_sha256": "f5582eb96276981c5b537524a384ef26563e530ec56701318ed88a7bb069afe8",
+      "viewed_candidate": true,
+      "viewed_reference": true,
+      "outcome": "pass",
+      "observations": [
+        "The anchored menu occupies approximately logical x=340..604 and y=76..300 in both images. Its four actions retain their ordering, row spacing, readable labels, and alignment with the top-right menu anchor.",
+        "The information cover retains the approximately 132 x 186 inner geometry plus its border. The reading, bookmark, and tracking action band aligns with the reference; the chapter section starts at the same logical height.",
+        "All six first-page chapter rows remain visible at approximately 52 logical pixels per row. Chapter numbers, titles, dotted leaders, dates, download controls, and the 1/8 footer remain within the viewport. No dock is present.",
+        "The bold serif book heading and section headings, sans-serif supporting labels, gray metadata, black primary controls, and white outlined menu surface preserve the reference hierarchy. The menu surface has no shadow or stippled fill; the cover's dots are artwork.",
+        "The menu intentionally occludes the right portion of the book information as in the reference. No unexpected clipping, overlap, or unreachable on-screen control is visible in this static state."
+      ],
+      "intentional_differences": [
+        "The sleep-cover action is visibly gray and labeled unavailable rather than appearing enabled as in the reference. This is an honest capability bound, not a request to simulate an unsupported action.",
+        "Refresh and category action labels use implementation-specific wording while retaining the same contextual purpose."
+      ]
+    },
+    {
+      "case_id": "pw-manga--tracking",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/pw-manga--tracking.png",
+      "candidate_sha256": "129fa15b4a41c505cfca49f49664814f0998467b3237096151b1574baa7e959e",
+      "reference_png": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/screens/states/pw-manga--tracking.png",
+      "reference_sha256": "d7dac3da95de8c38295a00a1798419b1cec8ee45c577a697c38566363d4d400c",
+      "viewed_candidate": true,
+      "viewed_reference": true,
+      "outcome": "pass_with_intentional_differences",
+      "observations": [
+        "The shared book cover, information area, reading action band, and chapter-section header remain aligned with the reference. The candidate metadata reports six backing chapter rows; the sheet hides the lower rows.",
+        "The tracking sheet starts at approximately logical y=547 in the candidate versus y=518 in the reference. Its heading and first service-card top are consequently about 29 logical pixels lower. These are retained visual observations, not evidence of a fixed-height violation.",
+        "The candidate AniList card is approximately 82 logical pixels high versus about 126 in the linked reference state; the candidate MyAnimeList card is approximately 82 pixels high versus about 66 in the reference login state. The candidate uses two unconfigured title/status cards, while the reference contains different state-dependent content.",
+        "DESIGN_HANDOFF.md lines 279-280 state that sheets do not declare fixed heights and follow content. The tracking section in prototype/pw-manga.dc.html lines 148-168 declares bottom anchoring, outer padding 18px 22px 26px, and a 12px gap, but no fixed sheet or card height. The linked AniList card has an additional 60px controls row separated by a 12px gap, explaining its taller intrinsic content.",
+        "The observed cards retain their horizontal alignment and approximately 16px horizontal content inset. Both service names, unconfigured labels, configuration controls, and the Done control remain readable and within the viewport. No independent internal padding or row-size violation can be established from the two already viewed pairs.",
+        "White outlined service surfaces have no shadows or stippled fills. The candidate does not display linked-account status, a device authorization code, or a successful login, consistent with tracking_authorization_implemented=false and pairing_endpoint_running=false. Configuration navigation cannot be established from the screenshot."
+      ],
+      "intentional_differences": [
+        "The reference linked AniList progress, reading status, score controls, and login action are replaced by unconfigured service states and configuration entries. External tracking authorization is not implemented and must not be simulated.",
+        "The unconfigured cards omit the linked account controls and include an unconfigured status line. Because the prototype sheet and cards have intrinsic content heights, the changed card heights and sheet top are accepted capability/state differences rather than a request to reproduce linked-state geometry.",
+        "No independent fixed card height, fixed sheet height, or clearly violated internal padding/row constraint was found in the textual reference. The original geometry suggestion was withdrawn after reading those constraints."
+      ]
+    }
+  ],
+  "suggestions": [],
+  "limitations": [
+    "This independent visual review covers only the two assigned case pairs and four original PNG files. No other images were loaded, and it does not establish a clean result for the full review round.",
+    "Only existing evidence files and the relevant textual design constraints were read and file hashes recorded. No product code or Git state was changed, and no application, build, test, smoke test, or runtime probe was executed locally or remotely.",
+    "Coordinates are approximate observations from the original screenshots, normalized to logical scale; no generated resize, composite, or automated pixel-difference artifact was used. No images were loaded again during the textual reconsideration.",
+    "Static screenshots establish visible placement and apparent reachability, not actual interaction, settings navigation, disabled-control behavior, or external authorization behavior.",
+    "These captures show first-page detail states only. The twelve-row subsequent-page layout and compact subsequent-page header cannot be reviewed from this batch."
+  ],
+  "review_revision": 2,
+  "outcome": "pass_with_intentional_differences",
+  "text_constraints_read": [
+    {
+      "path": "D:/Code/aidokuForKindle/docs/DESIGN_HANDOFF.md",
+      "lines": "279-280, 319-324",
+      "finding": "Sheets follow content rather than fixed heights; tracking declares padding and linked-state control geometry."
+    },
+    {
+      "path": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/prototype/pw-manga.dc.html",
+      "lines": "148-168",
+      "finding": "No fixed sheet or account-card height. Linked AniList adds a 60px state/progress/rating row plus a 12px gap; the login card has different intrinsic content."
+    }
+  ],
+  "withdrawn_suggestions": [
+    {
+      "id": "P3R1-REF07-1",
+      "case_id": "pw-manga--tracking",
+      "previous_priority": "P2",
+      "status": "withdrawn",
+      "reason": "The initial suggestion treated screenshot sheet/card heights as fixed. Explicit content-height rules and the prototype state structure make the observed differences reasonable for unconfigured services. No independent fixed-height or clear padding/row violation was established."
+    }
+  ]
+}

@@ -1,0 +1,1306 @@
+{
+  "schema_version": 1,
+  "kind": "c4-final-captured-historical-second-pass-review",
+  "batch_id": "r1-supp-04-regression",
+  "reviewer": "/root/final_validation_delivery/c4_full_review_coordinator/visual_04",
+  "round": 1,
+  "run_id": "0c9ecf3777c9",
+  "capture_manifest_sha256": "d2a6a5fae352a79bd6ee82076524bf3a25afb62f8bfa822abbfa42d0fbe49ba0",
+  "final_inventory_sha256": "df15126ae8becde603dfe09c56db2a01490c123c412a1fd04fe6010a923b91d9",
+  "freeze_tuple": {
+    "source_sha256": "dc0cd6227768a5125ecf702982ce639789bc8bca390de82bab83329927ea6353",
+    "binary_sha256": "7c2f685ecafc7207446f0e75877b74d14cbc6e41a43f5accee8ae992256e3183",
+    "harness_sha256": "5e6f546b7abec0a377e53feafe3afe1e6c6d3259da2699b75f1c4fe44529d5e5",
+    "capture_plan_sha256": "ab2effba6e2cd443be49ff5b49094afede8126615a270aa0653771059b871cc9",
+    "reference_sha256": "e7b49b456255432d74cfe41346f9d44c1a9c55bf67c5d55483e4ae3029547d18",
+    "reference_scope_sha256": "c910bed9f02ed17b2ca0a54aca1beeeeb6caabc5a17a91afe764ddd3e7b0d33c",
+    "capture_helper_sha256": {
+      "verify-ui.py": "470872e6fd22a78b474c0f862164875ad9c7237bd2f3f164512864580ac1e90d",
+      "verify-fullscreen.py": "4a6c48cef771e66e9b3058edd888dcf2d4bce02e2720b5cc00c7a5b987bc9670",
+      "handoff_c4_business.py": "6197f375b247962e3ce9acdd3779468073f11e0002ac3c7ce876a7b1a0d0d9be"
+    }
+  },
+  "source_map": "D:/Code/aidokuForKindle/docs/review/phase3-round-1-findings-map.json",
+  "source_map_sha256": "Pending owner remote static accounting; no local rehash",
+  "status": "historical-case-evidence-recorded-root-acceptance-pending",
+  "review_method": {
+    "order": "Performed after all six independent first-pass small-batch reports and all48 original candidate views were complete.",
+    "requirements_source": "Only the newly assigned historical input requirements were used; no old candidate pixels or prior closure verdicts were inherited.",
+    "static_reads": "Reread current case JSON/state/actions for all12 listed historical current cases and the two separately identified feature/context cases.",
+    "original_views": "Ten current originals were reopened: eight listed closure-case originals and the cached-unverified/Installed-last context originals. The other four listed originals cite this same reviewer's actual first-pass viewing; no new opening is claimed for them.",
+    "reopened_case_ids": [
+      "scribe--catalog-tag-1",
+      "scribe--catalog-tag-2",
+      "scribe--http-search-success--view-all",
+      "scribe--http-search-success--cached-unverified",
+      "scribe--content-stress--dense-sources",
+      "scribe--content-stress--dense-installed-last",
+      "scribe--independent-search--all-complete",
+      "scribe--independent-search--early-result",
+      "scribe--source-language-zh-Hans",
+      "scribe3--stretch-sources"
+    ],
+    "hash_policy": "All SHA values are owner-frozen input/inventory records. No local rehash, hash validator or runtime PASS is claimed.",
+    "execution": "Only local static text reads, original image viewing and new English report authoring. No app/test/build/probe/SQL/SSH/copy/crop/new agent or old-report edit."
+  },
+  "historical_findings": [
+    {
+      "historical_id": "P3R1-G31",
+      "historical_requirement": "The narrow installed-source row truncates its explicit unavailable status.",
+      "source_suggestion_ids": [
+        "P3R1-REF31-2",
+        "P3R1-SUP34-1",
+        "P3R1-SUP45-1"
+      ],
+      "current_case_ids_reviewed": [
+        "scribe--source-language-ja",
+        "scribe--source-language-zh-Hans",
+        "scribe--source-language-zh-Hant",
+        "scribe--sources-first-boundary",
+        "scribe--sources-last-page",
+        "scribe3--stretch-sources"
+      ],
+      "source_scope_not_assigned_here": [
+        "sc-sources--default",
+        "sc-sources--add-source",
+        "sc-sources--source-lists",
+        "sc-sources--updates"
+      ],
+      "current_case_requirement_disposition": "resolved-in-fresh-evidence",
+      "whole_group_closed": false,
+      "root_acceptance_status": "pending-root-final-historical-acceptance",
+      "remaining_scope": "Other explicitly listed cases remain outside this report; no whole-group closure is inferred."
+    },
+    {
+      "historical_id": "P3R1-G32",
+      "historical_requirement": "Catalog include/exclude tags use plus/minus instead of the specified check/cross marks across profiles.",
+      "source_suggestion_ids": [
+        "P3R1-SUP02-1",
+        "P3R1-SUP22-1",
+        "P3R1-SUP22-2"
+      ],
+      "current_case_ids_reviewed": [
+        "scribe--catalog-tag-1",
+        "scribe--catalog-tag-2"
+      ],
+      "source_scope_not_assigned_here": [
+        "pw5--catalog-tag-1",
+        "pw5--catalog-tag-2"
+      ],
+      "current_case_requirement_disposition": "resolved-in-fresh-evidence",
+      "whole_group_closed": false,
+      "root_acceptance_status": "pending-root-final-historical-acceptance",
+      "remaining_scope": "Other explicitly listed cases remain outside this report; no whole-group closure is inferred."
+    },
+    {
+      "historical_id": "P3R1-G35",
+      "historical_requirement": "View all hides settled source results behind an inconsistent setup gate.",
+      "source_suggestion_ids": [
+        "P3R1-SUP07-1",
+        "P3R1-SUP27-1"
+      ],
+      "current_case_ids_reviewed": [
+        "scribe--http-search-success--view-all"
+      ],
+      "source_scope_not_assigned_here": [
+        "pw5--http-search-success--view-all"
+      ],
+      "current_case_requirement_disposition": "resolved-in-fresh-evidence",
+      "whole_group_closed": false,
+      "root_acceptance_status": "pending-root-final-historical-acceptance",
+      "remaining_scope": "Successful View All presentation is separate from cached-unverified projection and the no-new-HTTP guard; related failed feature evidence remains unresolved."
+    },
+    {
+      "historical_id": "P3R1-G41",
+      "historical_requirement": "Installed-source truncation removes the distinguishing suffix from adjacent real configurations.",
+      "source_suggestion_ids": [
+        "P3R1-SUP23-1"
+      ],
+      "current_case_ids_reviewed": [
+        "scribe--content-stress--dense-sources"
+      ],
+      "source_scope_not_assigned_here": [],
+      "current_case_requirement_disposition": "resolved-in-fresh-evidence",
+      "whole_group_closed": false,
+      "root_acceptance_status": "pending-root-final-historical-acceptance",
+      "remaining_scope": "Root final acceptance and unexecuted broader feature scope remain separate."
+    },
+    {
+      "historical_id": "P3R1-G44",
+      "historical_requirement": "The fourth searched source has no visible scope entry or overflow affordance.",
+      "source_suggestion_ids": [
+        "P3R1-SUP28-2"
+      ],
+      "current_case_ids_reviewed": [
+        "scribe--independent-search--all-complete",
+        "scribe--independent-search--early-result"
+      ],
+      "source_scope_not_assigned_here": [],
+      "current_case_requirement_disposition": "resolved-in-fresh-evidence",
+      "whole_group_closed": false,
+      "root_acceptance_status": "pending-root-final-historical-acceptance",
+      "remaining_scope": "Original overflow visibility has evidence, while native locator failure and unexecuted picker follow-up remain missing business coverage."
+    }
+  ],
+  "regression_closures": [
+    {
+      "historical_id": "P3R1-G31",
+      "current_case_id": "scribe--source-language-ja",
+      "png_sha256": "b67e6f86f5f3ecd727c7fcb2433b440bc46cff50f2558a3ae55fe0c8eb84509e",
+      "case_json_sha256": "004a26509a2b9b285e7823797f30648b7b8a8ca26dddd20d755f4576678b08ec",
+      "state_sha256": "747b91c3f1634b9c867d0c8c17fc58ea186b72d3a13c2e0b7391ec344539bae1",
+      "actions_sha256": "7cc77c700b6b185d8d54cf64987117e588575500c1a8531e46da32e07093869a",
+      "reference_original_sha256": "afbd4c838cf5bb14ea616d3351bda2d518d3f9f712ca65de39d4b69ef0272ac6",
+      "run_id": "0c9ecf3777c9",
+      "source_sha256": "dc0cd6227768a5125ecf702982ce639789bc8bca390de82bab83329927ea6353",
+      "binary_sha256": "7c2f685ecafc7207446f0e75877b74d14cbc6e41a43f5accee8ae992256e3183",
+      "evidence": {
+        "case_id": "scribe--source-language-ja",
+        "png_path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate4/ui-round-1/scribe--source-language-ja.png",
+        "png_sha256": "b67e6f86f5f3ecd727c7fcb2433b440bc46cff50f2558a3ae55fe0c8eb84509e",
+        "case_json_path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate4/ui-round-1/cases/scribe--source-language-ja.json",
+        "case_json_sha256": "004a26509a2b9b285e7823797f30648b7b8a8ca26dddd20d755f4576678b08ec",
+        "state_path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate4/ui-round-1/scribe--source-language-ja.state.json",
+        "state_sha256": "747b91c3f1634b9c867d0c8c17fc58ea186b72d3a13c2e0b7391ec344539bae1",
+        "actions_path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate4/ui-round-1/actions/scribe--source-language-ja.json",
+        "actions_sha256": "7cc77c700b6b185d8d54cf64987117e588575500c1a8531e46da32e07093869a",
+        "references": [
+          {
+            "reference_id": "sc-sources--default",
+            "path": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/screens/sc-sources.png",
+            "sha256": "afbd4c838cf5bb14ea616d3351bda2d518d3f9f712ca65de39d4b69ef0272ac6"
+          }
+        ],
+        "first_pass_report": "D:/Code/aidokuForKindle/docs/review/phase3-c4-round-1-batches/r1-supp-04-03.review.json"
+      },
+      "original_candidate_actually_viewed": true,
+      "reopened_in_second_pass": false,
+      "viewing_basis": "Same reviewer actually opened this current original in the cited small-batch first pass; no second-pass reopening is falsely claimed.",
+      "reference_original_actually_viewed": true,
+      "reference_viewing_basis": "Matching original was actually opened by this reviewer earlier in the same frozen run; the first-pass report preserves the reference-viewing record.",
+      "fresh_observation": "Japanese is selected and the right column has one available source; the left blocked row still shows the entire leading Temporarily Unavailable label before the ellipsized longer verification reason. The source name/long reason is not claimed fully visible; the explicit state is the part required by this historical item.",
+      "actual_state_support": {
+        "route": "sources",
+        "source_language": "ja",
+        "blocked_source_id": "demo-b",
+        "blocked_available": false,
+        "explicit_prefix_translation": "Temporarily Unavailable",
+        "trailing_reason_ellipsized": true,
+        "installed_page": 1,
+        "installed_pages": 1,
+        "right_page": 1,
+        "right_pages": 1
+      },
+      "recorded_actions": [
+        {
+          "at_ms": 450,
+          "section": "sources",
+          "action": "manage",
+          "value": ""
+        },
+        {
+          "at_ms": 900,
+          "section": "sources",
+          "action": "filter",
+          "value": "1"
+        },
+        {
+          "at_ms": 1350,
+          "section": "sources",
+          "action": "language",
+          "value": "ja"
+        }
+      ],
+      "owner_mechanical_passed": true,
+      "recorded_failed_checks": [],
+      "disposition": "resolved-in-fresh-evidence",
+      "resolution_scope": "This stated historical appearance/visibility requirement in this exact current case only.",
+      "capability_or_user_override_basis": {
+        "override_used": false,
+        "assessment": "The distinguishing unavailable prefix is directly legible. This is not a waiver of missing status text, a claim of full long-alias visibility or proof of a real live connection."
+      },
+      "current_suggestion_ids": [],
+      "pending_raw_observation_ids": [],
+      "root_acceptance_status": "pending-root-final-historical-acceptance",
+      "remaining_scope": [
+        "sc-sources--default",
+        "sc-sources--add-source",
+        "sc-sources--source-lists",
+        "sc-sources--updates"
+      ],
+      "whole_group_closed": false
+    },
+    {
+      "historical_id": "P3R1-G31",
+      "current_case_id": "scribe--source-language-zh-Hans",
+      "png_sha256": "190adaab487dcd1b06167693fff47e0ba4dc75251832aa604cfdf15df4bec8a0",
+      "case_json_sha256": "385d312ba8ebbba4d850fdd98b96088033eb25fb3e2d0eac8624b68ed190cff0",
+      "state_sha256": "c7ced3d4fb600673a5eec80a9e4cad6213aaa9f4992e60aa0dacccecb4d25cd1",
+      "actions_sha256": "d20471f7d99a745bfb00b145bb3a1560bd970c71c080e2a481d27cb0fa9c72f6",
+      "reference_original_sha256": "afbd4c838cf5bb14ea616d3351bda2d518d3f9f712ca65de39d4b69ef0272ac6",
+      "run_id": "0c9ecf3777c9",
+      "source_sha256": "dc0cd6227768a5125ecf702982ce639789bc8bca390de82bab83329927ea6353",
+      "binary_sha256": "7c2f685ecafc7207446f0e75877b74d14cbc6e41a43f5accee8ae992256e3183",
+      "evidence": {
+        "case_id": "scribe--source-language-zh-Hans",
+        "png_path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate4/ui-round-1/scribe--source-language-zh-Hans.png",
+        "png_sha256": "190adaab487dcd1b06167693fff47e0ba4dc75251832aa604cfdf15df4bec8a0",
+        "case_json_path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate4/ui-round-1/cases/scribe--source-language-zh-Hans.json",
+        "case_json_sha256": "385d312ba8ebbba4d850fdd98b96088033eb25fb3e2d0eac8624b68ed190cff0",
+        "state_path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate4/ui-round-1/scribe--source-language-zh-Hans.state.json",
+        "state_sha256": "c7ced3d4fb600673a5eec80a9e4cad6213aaa9f4992e60aa0dacccecb4d25cd1",
+        "actions_path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate4/ui-round-1/actions/scribe--source-language-zh-Hans.json",
+        "actions_sha256": "d20471f7d99a745bfb00b145bb3a1560bd970c71c080e2a481d27cb0fa9c72f6",
+        "references": [
+          {
+            "reference_id": "sc-sources--default",
+            "path": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/screens/sc-sources.png",
+            "sha256": "afbd4c838cf5bb14ea616d3351bda2d518d3f9f712ca65de39d4b69ef0272ac6"
+          }
+        ],
+        "first_pass_report": "D:/Code/aidokuForKindle/docs/review/phase3-c4-round-1-batches/r1-supp-04-03.review.json"
+      },
+      "original_candidate_actually_viewed": true,
+      "reopened_in_second_pass": true,
+      "viewing_basis": "Current original reopened with tools.view_image in this historical second pass.",
+      "reference_original_actually_viewed": true,
+      "reference_viewing_basis": "Matching original was actually opened by this reviewer earlier in the same frozen run; the first-pass report preserves the reference-viewing record.",
+      "fresh_observation": "Simplified is selected with a populated right list; the left unavailable prefix is complete, and Komga Connected versus Kavita/Suwayomi Unconfigured statuses remain distinguishable. The source name/long reason is not claimed fully visible; the explicit state is the part required by this historical item.",
+      "actual_state_support": {
+        "route": "sources",
+        "source_language": "zh-Hans",
+        "blocked_source_id": "demo-b",
+        "blocked_available": false,
+        "explicit_prefix_translation": "Temporarily Unavailable",
+        "trailing_reason_ellipsized": true,
+        "installed_page": 1,
+        "installed_pages": 1,
+        "right_page": 1,
+        "right_pages": 13
+      },
+      "recorded_actions": [
+        {
+          "at_ms": 450,
+          "section": "sources",
+          "action": "manage",
+          "value": ""
+        },
+        {
+          "at_ms": 900,
+          "section": "sources",
+          "action": "filter",
+          "value": "1"
+        },
+        {
+          "at_ms": 1350,
+          "section": "sources",
+          "action": "language",
+          "value": "zh-Hans"
+        }
+      ],
+      "owner_mechanical_passed": true,
+      "recorded_failed_checks": [],
+      "disposition": "resolved-in-fresh-evidence",
+      "resolution_scope": "This stated historical appearance/visibility requirement in this exact current case only.",
+      "capability_or_user_override_basis": {
+        "override_used": false,
+        "assessment": "The distinguishing unavailable prefix is directly legible. This is not a waiver of missing status text, a claim of full long-alias visibility or proof of a real live connection."
+      },
+      "current_suggestion_ids": [],
+      "pending_raw_observation_ids": [],
+      "root_acceptance_status": "pending-root-final-historical-acceptance",
+      "remaining_scope": [
+        "sc-sources--default",
+        "sc-sources--add-source",
+        "sc-sources--source-lists",
+        "sc-sources--updates"
+      ],
+      "whole_group_closed": false
+    },
+    {
+      "historical_id": "P3R1-G31",
+      "current_case_id": "scribe--source-language-zh-Hant",
+      "png_sha256": "b40607b3c686d2148f0f38444682d2ec1459c235e2d220dc55661a1fd1dc5b2b",
+      "case_json_sha256": "e3a783d09980ed2c8b61fbf35d3e2afe88610042b79736c334402ed75203a0a4",
+      "state_sha256": "87cc774a97677fd8bd2b1b54972210bbbf8c9beb784ab22ed7dcf6510153ed8c",
+      "actions_sha256": "7e6ec6769878031e54746968749d3a20acfdd799b8a0e83e589be5aaec3d9e51",
+      "reference_original_sha256": "afbd4c838cf5bb14ea616d3351bda2d518d3f9f712ca65de39d4b69ef0272ac6",
+      "run_id": "0c9ecf3777c9",
+      "source_sha256": "dc0cd6227768a5125ecf702982ce639789bc8bca390de82bab83329927ea6353",
+      "binary_sha256": "7c2f685ecafc7207446f0e75877b74d14cbc6e41a43f5accee8ae992256e3183",
+      "evidence": {
+        "case_id": "scribe--source-language-zh-Hant",
+        "png_path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate4/ui-round-1/scribe--source-language-zh-Hant.png",
+        "png_sha256": "b40607b3c686d2148f0f38444682d2ec1459c235e2d220dc55661a1fd1dc5b2b",
+        "case_json_path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate4/ui-round-1/cases/scribe--source-language-zh-Hant.json",
+        "case_json_sha256": "e3a783d09980ed2c8b61fbf35d3e2afe88610042b79736c334402ed75203a0a4",
+        "state_path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate4/ui-round-1/scribe--source-language-zh-Hant.state.json",
+        "state_sha256": "87cc774a97677fd8bd2b1b54972210bbbf8c9beb784ab22ed7dcf6510153ed8c",
+        "actions_path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate4/ui-round-1/actions/scribe--source-language-zh-Hant.json",
+        "actions_sha256": "7e6ec6769878031e54746968749d3a20acfdd799b8a0e83e589be5aaec3d9e51",
+        "references": [
+          {
+            "reference_id": "sc-sources--default",
+            "path": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/screens/sc-sources.png",
+            "sha256": "afbd4c838cf5bb14ea616d3351bda2d518d3f9f712ca65de39d4b69ef0272ac6"
+          }
+        ],
+        "first_pass_report": "D:/Code/aidokuForKindle/docs/review/phase3-c4-round-1-batches/r1-supp-04-03.review.json"
+      },
+      "original_candidate_actually_viewed": true,
+      "reopened_in_second_pass": false,
+      "viewing_basis": "Same reviewer actually opened this current original in the cited small-batch first pass; no second-pass reopening is falsely claimed.",
+      "reference_original_actually_viewed": true,
+      "reference_viewing_basis": "Matching original was actually opened by this reviewer earlier in the same frozen run; the first-pass report preserves the reference-viewing record.",
+      "fresh_observation": "The right column is an honest zero-result Traditional state; the unchanged left row retains its full explicit unavailable prefix and visible Uninstall. The source name/long reason is not claimed fully visible; the explicit state is the part required by this historical item.",
+      "actual_state_support": {
+        "route": "sources",
+        "source_language": "zh-Hant",
+        "blocked_source_id": "demo-b",
+        "blocked_available": false,
+        "explicit_prefix_translation": "Temporarily Unavailable",
+        "trailing_reason_ellipsized": true,
+        "installed_page": 1,
+        "installed_pages": 1,
+        "right_page": 1,
+        "right_pages": 1
+      },
+      "recorded_actions": [
+        {
+          "at_ms": 450,
+          "section": "sources",
+          "action": "manage",
+          "value": ""
+        },
+        {
+          "at_ms": 900,
+          "section": "sources",
+          "action": "filter",
+          "value": "1"
+        },
+        {
+          "at_ms": 1350,
+          "section": "sources",
+          "action": "language",
+          "value": "zh-Hant"
+        }
+      ],
+      "owner_mechanical_passed": true,
+      "recorded_failed_checks": [],
+      "disposition": "resolved-in-fresh-evidence",
+      "resolution_scope": "This stated historical appearance/visibility requirement in this exact current case only.",
+      "capability_or_user_override_basis": {
+        "override_used": false,
+        "assessment": "The distinguishing unavailable prefix is directly legible. This is not a waiver of missing status text, a claim of full long-alias visibility or proof of a real live connection."
+      },
+      "current_suggestion_ids": [],
+      "pending_raw_observation_ids": [],
+      "root_acceptance_status": "pending-root-final-historical-acceptance",
+      "remaining_scope": [
+        "sc-sources--default",
+        "sc-sources--add-source",
+        "sc-sources--source-lists",
+        "sc-sources--updates"
+      ],
+      "whole_group_closed": false
+    },
+    {
+      "historical_id": "P3R1-G31",
+      "current_case_id": "scribe--sources-first-boundary",
+      "png_sha256": "ff942275fc5644b792b63144028d5f5e959ded268bef6d63ce0e793f66be4231",
+      "case_json_sha256": "59cc03b0fc9585a9439953fea2d8a3eadadcfb0cb97ad9b4cbc7b07b3b0d2e45",
+      "state_sha256": "4567ce64d5315537cc1b1f47ed60b959352e3c9522a65dabaf3ef48ee6c9e649",
+      "actions_sha256": "5828ce72a32907ba2aae792ad3ebd8d15c16d95ed75bd4597cc0b9aa75de39be",
+      "reference_original_sha256": "afbd4c838cf5bb14ea616d3351bda2d518d3f9f712ca65de39d4b69ef0272ac6",
+      "run_id": "0c9ecf3777c9",
+      "source_sha256": "dc0cd6227768a5125ecf702982ce639789bc8bca390de82bab83329927ea6353",
+      "binary_sha256": "7c2f685ecafc7207446f0e75877b74d14cbc6e41a43f5accee8ae992256e3183",
+      "evidence": {
+        "case_id": "scribe--sources-first-boundary",
+        "png_path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate4/ui-round-1/scribe--sources-first-boundary.png",
+        "png_sha256": "ff942275fc5644b792b63144028d5f5e959ded268bef6d63ce0e793f66be4231",
+        "case_json_path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate4/ui-round-1/cases/scribe--sources-first-boundary.json",
+        "case_json_sha256": "59cc03b0fc9585a9439953fea2d8a3eadadcfb0cb97ad9b4cbc7b07b3b0d2e45",
+        "state_path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate4/ui-round-1/scribe--sources-first-boundary.state.json",
+        "state_sha256": "4567ce64d5315537cc1b1f47ed60b959352e3c9522a65dabaf3ef48ee6c9e649",
+        "actions_path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate4/ui-round-1/actions/scribe--sources-first-boundary.json",
+        "actions_sha256": "5828ce72a32907ba2aae792ad3ebd8d15c16d95ed75bd4597cc0b9aa75de39be",
+        "references": [
+          {
+            "reference_id": "sc-sources--default",
+            "path": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/screens/sc-sources.png",
+            "sha256": "afbd4c838cf5bb14ea616d3351bda2d518d3f9f712ca65de39d4b69ef0272ac6"
+          }
+        ],
+        "first_pass_report": "D:/Code/aidokuForKindle/docs/review/phase3-c4-round-1-batches/r1-supp-04-02.review.json"
+      },
+      "original_candidate_actually_viewed": true,
+      "reopened_in_second_pass": false,
+      "viewing_basis": "Same reviewer actually opened this current original in the cited small-batch first pass; no second-pass reopening is falsely claimed.",
+      "reference_original_actually_viewed": true,
+      "reference_viewing_basis": "Matching original was actually opened by this reviewer earlier in the same frozen run; the first-pass report preserves the reference-viewing record.",
+      "fresh_observation": "The right Available folio is1/13; the installed blocked row on the left retains its complete unavailable prefix. This is a status observation, not an Installed-pagination substitute. The source name/long reason is not claimed fully visible; the explicit state is the part required by this historical item.",
+      "actual_state_support": {
+        "route": "sources",
+        "source_language": "all",
+        "blocked_source_id": "demo-b",
+        "blocked_available": false,
+        "explicit_prefix_translation": "Temporarily Unavailable",
+        "trailing_reason_ellipsized": true,
+        "installed_page": 1,
+        "installed_pages": 1,
+        "right_page": 1,
+        "right_pages": 13
+      },
+      "recorded_actions": [
+        {
+          "at_ms": 450,
+          "section": "sources",
+          "action": "filter",
+          "value": "1"
+        },
+        {
+          "at_ms": 900,
+          "section": "page",
+          "action": "turn",
+          "value": "-99999"
+        }
+      ],
+      "owner_mechanical_passed": true,
+      "recorded_failed_checks": [],
+      "disposition": "resolved-in-fresh-evidence",
+      "resolution_scope": "This stated historical appearance/visibility requirement in this exact current case only.",
+      "capability_or_user_override_basis": {
+        "override_used": false,
+        "assessment": "The distinguishing unavailable prefix is directly legible. This is not a waiver of missing status text, a claim of full long-alias visibility or proof of a real live connection."
+      },
+      "current_suggestion_ids": [],
+      "pending_raw_observation_ids": [],
+      "root_acceptance_status": "pending-root-final-historical-acceptance",
+      "remaining_scope": [
+        "sc-sources--default",
+        "sc-sources--add-source",
+        "sc-sources--source-lists",
+        "sc-sources--updates"
+      ],
+      "whole_group_closed": false
+    },
+    {
+      "historical_id": "P3R1-G31",
+      "current_case_id": "scribe--sources-last-page",
+      "png_sha256": "745fc077cdf6cf5af83bd0ee0052659d25414c21c972aeb4eab8db9d25c35870",
+      "case_json_sha256": "4c8df590952d4ca192329e8ef01b9e735c3b3329842bae1824697f022224a39a",
+      "state_sha256": "6d618676330fab185196fd9b48409d223a094a5cf3caf2ce5691ed52264c7002",
+      "actions_sha256": "615d9eb6424973c1cf01b003eecf54f8069a59922a00f3fa28d91355de4c9e46",
+      "reference_original_sha256": "afbd4c838cf5bb14ea616d3351bda2d518d3f9f712ca65de39d4b69ef0272ac6",
+      "run_id": "0c9ecf3777c9",
+      "source_sha256": "dc0cd6227768a5125ecf702982ce639789bc8bca390de82bab83329927ea6353",
+      "binary_sha256": "7c2f685ecafc7207446f0e75877b74d14cbc6e41a43f5accee8ae992256e3183",
+      "evidence": {
+        "case_id": "scribe--sources-last-page",
+        "png_path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate4/ui-round-1/scribe--sources-last-page.png",
+        "png_sha256": "745fc077cdf6cf5af83bd0ee0052659d25414c21c972aeb4eab8db9d25c35870",
+        "case_json_path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate4/ui-round-1/cases/scribe--sources-last-page.json",
+        "case_json_sha256": "4c8df590952d4ca192329e8ef01b9e735c3b3329842bae1824697f022224a39a",
+        "state_path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate4/ui-round-1/scribe--sources-last-page.state.json",
+        "state_sha256": "6d618676330fab185196fd9b48409d223a094a5cf3caf2ce5691ed52264c7002",
+        "actions_path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate4/ui-round-1/actions/scribe--sources-last-page.json",
+        "actions_sha256": "615d9eb6424973c1cf01b003eecf54f8069a59922a00f3fa28d91355de4c9e46",
+        "references": [
+          {
+            "reference_id": "sc-sources--default",
+            "path": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/screens/sc-sources.png",
+            "sha256": "afbd4c838cf5bb14ea616d3351bda2d518d3f9f712ca65de39d4b69ef0272ac6"
+          }
+        ],
+        "first_pass_report": "D:/Code/aidokuForKindle/docs/review/phase3-c4-round-1-batches/r1-supp-04-02.review.json"
+      },
+      "original_candidate_actually_viewed": true,
+      "reopened_in_second_pass": false,
+      "viewing_basis": "Same reviewer actually opened this current original in the cited small-batch first pass; no second-pass reopening is falsely claimed.",
+      "reference_original_actually_viewed": true,
+      "reference_viewing_basis": "Matching original was actually opened by this reviewer earlier in the same frozen run; the first-pass report preserves the reference-viewing record.",
+      "fresh_observation": "The right Available folio is13/13 with four final available rows; the left blocked row still shows the complete unavailable prefix and Uninstall without collision. The source name/long reason is not claimed fully visible; the explicit state is the part required by this historical item.",
+      "actual_state_support": {
+        "route": "sources",
+        "source_language": "all",
+        "blocked_source_id": "demo-b",
+        "blocked_available": false,
+        "explicit_prefix_translation": "Temporarily Unavailable",
+        "trailing_reason_ellipsized": true,
+        "installed_page": 1,
+        "installed_pages": 1,
+        "right_page": 13,
+        "right_pages": 13
+      },
+      "recorded_actions": [
+        {
+          "at_ms": 450,
+          "section": "sources",
+          "action": "filter",
+          "value": "1"
+        },
+        {
+          "at_ms": 900,
+          "section": "page",
+          "action": "turn",
+          "value": "99999"
+        }
+      ],
+      "owner_mechanical_passed": true,
+      "recorded_failed_checks": [],
+      "disposition": "resolved-in-fresh-evidence",
+      "resolution_scope": "This stated historical appearance/visibility requirement in this exact current case only.",
+      "capability_or_user_override_basis": {
+        "override_used": false,
+        "assessment": "The distinguishing unavailable prefix is directly legible. This is not a waiver of missing status text, a claim of full long-alias visibility or proof of a real live connection."
+      },
+      "current_suggestion_ids": [],
+      "pending_raw_observation_ids": [],
+      "root_acceptance_status": "pending-root-final-historical-acceptance",
+      "remaining_scope": [
+        "sc-sources--default",
+        "sc-sources--add-source",
+        "sc-sources--source-lists",
+        "sc-sources--updates"
+      ],
+      "whole_group_closed": false
+    },
+    {
+      "historical_id": "P3R1-G31",
+      "current_case_id": "scribe3--stretch-sources",
+      "png_sha256": "d2bed16696a1a6a865873a2ce4bfa80b4b7c1b837563f00cbe63a5b4817f64eb",
+      "case_json_sha256": "2f6afef48b7d15a8d1234245b9347bbab1633d6217cfc272fbf137789d130727",
+      "state_sha256": "06a3ebc7a698e2942a89ffb49f6969a116234b393e7b1dbecc839914651ecb0a",
+      "actions_sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "reference_original_sha256": "afbd4c838cf5bb14ea616d3351bda2d518d3f9f712ca65de39d4b69ef0272ac6",
+      "run_id": "0c9ecf3777c9",
+      "source_sha256": "dc0cd6227768a5125ecf702982ce639789bc8bca390de82bab83329927ea6353",
+      "binary_sha256": "7c2f685ecafc7207446f0e75877b74d14cbc6e41a43f5accee8ae992256e3183",
+      "evidence": {
+        "case_id": "scribe3--stretch-sources",
+        "png_path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate4/ui-round-1/scribe3--stretch-sources.png",
+        "png_sha256": "d2bed16696a1a6a865873a2ce4bfa80b4b7c1b837563f00cbe63a5b4817f64eb",
+        "case_json_path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate4/ui-round-1/cases/scribe3--stretch-sources.json",
+        "case_json_sha256": "2f6afef48b7d15a8d1234245b9347bbab1633d6217cfc272fbf137789d130727",
+        "state_path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate4/ui-round-1/scribe3--stretch-sources.state.json",
+        "state_sha256": "06a3ebc7a698e2942a89ffb49f6969a116234b393e7b1dbecc839914651ecb0a",
+        "actions_path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate4/ui-round-1/actions/scribe3--stretch-sources.json",
+        "actions_sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+        "references": [
+          {
+            "reference_id": "sc-sources--default",
+            "path": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/screens/sc-sources.png",
+            "sha256": "afbd4c838cf5bb14ea616d3351bda2d518d3f9f712ca65de39d4b69ef0272ac6"
+          }
+        ],
+        "first_pass_report": "D:/Code/aidokuForKindle/docs/review/phase3-c4-round-1-batches/r1-supp-04-06.review.json"
+      },
+      "original_candidate_actually_viewed": true,
+      "reopened_in_second_pass": true,
+      "viewing_basis": "Current original reopened with tools.view_image in this historical second pass.",
+      "reference_original_actually_viewed": true,
+      "reference_viewing_basis": "Matching original was actually opened by this reviewer earlier in the same frozen run; the first-pass report preserves the reference-viewing record.",
+      "fresh_observation": "At the original990x1320 viewport the installed column stays400px and the unavailable prefix remains fully visible. The longer trailing reason is ellipsized independently of that distinguishing state. The source name/long reason is not claimed fully visible; the explicit state is the part required by this historical item.",
+      "actual_state_support": {
+        "route": "sources",
+        "source_language": "all",
+        "blocked_source_id": "demo-b",
+        "blocked_available": false,
+        "explicit_prefix_translation": "Temporarily Unavailable",
+        "trailing_reason_ellipsized": true,
+        "installed_page": 1,
+        "installed_pages": 1,
+        "right_page": 1,
+        "right_pages": 13
+      },
+      "recorded_actions": [],
+      "owner_mechanical_passed": true,
+      "recorded_failed_checks": [],
+      "disposition": "resolved-in-fresh-evidence",
+      "resolution_scope": "This stated historical appearance/visibility requirement in this exact current case only.",
+      "capability_or_user_override_basis": {
+        "override_used": false,
+        "assessment": "The distinguishing unavailable prefix is directly legible. This is not a waiver of missing status text, a claim of full long-alias visibility or proof of a real live connection."
+      },
+      "current_suggestion_ids": [],
+      "pending_raw_observation_ids": [],
+      "root_acceptance_status": "pending-root-final-historical-acceptance",
+      "remaining_scope": [
+        "sc-sources--default",
+        "sc-sources--add-source",
+        "sc-sources--source-lists",
+        "sc-sources--updates"
+      ],
+      "whole_group_closed": false
+    },
+    {
+      "historical_id": "P3R1-G32",
+      "current_case_id": "scribe--catalog-tag-1",
+      "png_sha256": "4db8abe3a7f2284b42cfa29cf7b568030ee9c53eed9ce0fba15b509bf014c4c3",
+      "case_json_sha256": "01a536628648c4ca60ba248593e00362108da68d589d9504e5af3124d7a02b05",
+      "state_sha256": "11c0bb7c359a4212758a1108a26cd06aad99aae9df43603bf84005ecf42bfbb0",
+      "actions_sha256": "4dbac91e799b81e7e96264f3be0dfba8f54dc09d906edf702062bcfd38a4aed0",
+      "reference_original_sha256": "fc4e1eb1a853240fc1f6019ffb447cd1a04b85fd4ddfe1af8d233e113195532e",
+      "run_id": "0c9ecf3777c9",
+      "source_sha256": "dc0cd6227768a5125ecf702982ce639789bc8bca390de82bab83329927ea6353",
+      "binary_sha256": "7c2f685ecafc7207446f0e75877b74d14cbc6e41a43f5accee8ae992256e3183",
+      "evidence": {
+        "case_id": "scribe--catalog-tag-1",
+        "png_path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate4/ui-round-1/scribe--catalog-tag-1.png",
+        "png_sha256": "4db8abe3a7f2284b42cfa29cf7b568030ee9c53eed9ce0fba15b509bf014c4c3",
+        "case_json_path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate4/ui-round-1/cases/scribe--catalog-tag-1.json",
+        "case_json_sha256": "01a536628648c4ca60ba248593e00362108da68d589d9504e5af3124d7a02b05",
+        "state_path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate4/ui-round-1/scribe--catalog-tag-1.state.json",
+        "state_sha256": "11c0bb7c359a4212758a1108a26cd06aad99aae9df43603bf84005ecf42bfbb0",
+        "actions_path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate4/ui-round-1/actions/scribe--catalog-tag-1.json",
+        "actions_sha256": "4dbac91e799b81e7e96264f3be0dfba8f54dc09d906edf702062bcfd38a4aed0",
+        "references": [
+          {
+            "reference_id": "sc-browse--default",
+            "path": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/screens/sc-browse.png",
+            "sha256": "7c411218fec402c436953ffae701611203207719241797caeaac154e114d7fae"
+          },
+          {
+            "reference_id": "sc-browse--filter",
+            "path": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/screens/states/sc-browse--filter.png",
+            "sha256": "fc4e1eb1a853240fc1f6019ffb447cd1a04b85fd4ddfe1af8d233e113195532e"
+          }
+        ],
+        "first_pass_report": "D:/Code/aidokuForKindle/docs/review/phase3-c4-round-1-batches/r1-supp-04-02.review.json"
+      },
+      "original_candidate_actually_viewed": true,
+      "reopened_in_second_pass": true,
+      "viewing_basis": "Current original reopened with tools.view_image in this historical second pass.",
+      "reference_original_actually_viewed": true,
+      "reference_viewing_basis": "Matching original was actually opened by this reviewer earlier in the same frozen run; the first-pass report preserves the reference-viewing record.",
+      "fresh_observation": "The included Adventure tag visibly uses a white diagonal checkmark on a black chip, not a plus sign. Its label is readable and the captured state is1. The already approved intrinsic-width problem and pending Reset styling are separate from this corrected mark requirement.",
+      "actual_state_support": {
+        "route": "catalog",
+        "modal_context": "catalog-filter",
+        "first_tag_state": 1,
+        "active_filters": 1,
+        "result_count": 61
+      },
+      "recorded_actions": [
+        {
+          "at_ms": 450,
+          "section": "catalog",
+          "action": "filter-menu",
+          "value": ""
+        },
+        {
+          "at_ms": 900,
+          "section": "catalog",
+          "action": "filter-choice",
+          "value": "tag:冒险"
+        }
+      ],
+      "owner_mechanical_passed": true,
+      "recorded_failed_checks": [],
+      "disposition": "resolved-in-fresh-evidence",
+      "resolution_scope": "This stated historical appearance/visibility requirement in this exact current case only.",
+      "capability_or_user_override_basis": {
+        "override_used": false,
+        "assessment": "Check/cross marks are directly visible and match the frozen tag contract. Actual tag identity and result count are data, not reasons to waive mark geometry."
+      },
+      "current_suggestion_ids": [
+        "R04-T02"
+      ],
+      "pending_raw_observation_ids": [
+        "R04-T03"
+      ],
+      "root_acceptance_status": "pending-root-final-historical-acceptance",
+      "remaining_scope": [
+        "pw5--catalog-tag-1",
+        "pw5--catalog-tag-2"
+      ],
+      "whole_group_closed": false
+    },
+    {
+      "historical_id": "P3R1-G32",
+      "current_case_id": "scribe--catalog-tag-2",
+      "png_sha256": "8442dd96b8f63d3f6891fbd5246c418ac44e085f58a830c8ec9df6c23d683fa1",
+      "case_json_sha256": "15fdcdde93f4d929980573674fd5c938a164ee251d3dea67212b822f0dcf177e",
+      "state_sha256": "1a2e2282ce6728d0ad2926913777ebfb12a2ab8329850b013cf1f2b9f6c0d822",
+      "actions_sha256": "64091f4464ee8084a6bad50625a6b4bd9625389c7065243f37e70fcaaef25adc",
+      "reference_original_sha256": "fc4e1eb1a853240fc1f6019ffb447cd1a04b85fd4ddfe1af8d233e113195532e",
+      "run_id": "0c9ecf3777c9",
+      "source_sha256": "dc0cd6227768a5125ecf702982ce639789bc8bca390de82bab83329927ea6353",
+      "binary_sha256": "7c2f685ecafc7207446f0e75877b74d14cbc6e41a43f5accee8ae992256e3183",
+      "evidence": {
+        "case_id": "scribe--catalog-tag-2",
+        "png_path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate4/ui-round-1/scribe--catalog-tag-2.png",
+        "png_sha256": "8442dd96b8f63d3f6891fbd5246c418ac44e085f58a830c8ec9df6c23d683fa1",
+        "case_json_path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate4/ui-round-1/cases/scribe--catalog-tag-2.json",
+        "case_json_sha256": "15fdcdde93f4d929980573674fd5c938a164ee251d3dea67212b822f0dcf177e",
+        "state_path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate4/ui-round-1/scribe--catalog-tag-2.state.json",
+        "state_sha256": "1a2e2282ce6728d0ad2926913777ebfb12a2ab8329850b013cf1f2b9f6c0d822",
+        "actions_path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate4/ui-round-1/actions/scribe--catalog-tag-2.json",
+        "actions_sha256": "64091f4464ee8084a6bad50625a6b4bd9625389c7065243f37e70fcaaef25adc",
+        "references": [
+          {
+            "reference_id": "sc-browse--default",
+            "path": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/screens/sc-browse.png",
+            "sha256": "7c411218fec402c436953ffae701611203207719241797caeaac154e114d7fae"
+          },
+          {
+            "reference_id": "sc-browse--filter",
+            "path": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/screens/states/sc-browse--filter.png",
+            "sha256": "fc4e1eb1a853240fc1f6019ffb447cd1a04b85fd4ddfe1af8d233e113195532e"
+          }
+        ],
+        "first_pass_report": "D:/Code/aidokuForKindle/docs/review/phase3-c4-round-1-batches/r1-supp-04-02.review.json"
+      },
+      "original_candidate_actually_viewed": true,
+      "reopened_in_second_pass": true,
+      "viewing_basis": "Current original reopened with tools.view_image in this historical second pass.",
+      "reference_original_actually_viewed": true,
+      "reference_viewing_basis": "Matching original was actually opened by this reviewer earlier in the same frozen run; the first-pass report preserves the reference-viewing record.",
+      "fresh_observation": "The excluded Adventure tag visibly uses a diagonal cross with strikethrough/dashed treatment, not a minus sign. Its label is readable and the captured state is-1. The already approved intrinsic-width problem and pending Reset styling are separate from this corrected mark requirement.",
+      "actual_state_support": {
+        "route": "catalog",
+        "modal_context": "catalog-filter",
+        "first_tag_state": -1,
+        "active_filters": 1,
+        "result_count": 67
+      },
+      "recorded_actions": [
+        {
+          "at_ms": 450,
+          "section": "catalog",
+          "action": "filter-menu",
+          "value": ""
+        },
+        {
+          "at_ms": 900,
+          "section": "catalog",
+          "action": "filter-choice",
+          "value": "tag:冒险"
+        },
+        {
+          "at_ms": 1350,
+          "section": "catalog",
+          "action": "filter-choice",
+          "value": "tag:冒险"
+        }
+      ],
+      "owner_mechanical_passed": true,
+      "recorded_failed_checks": [],
+      "disposition": "resolved-in-fresh-evidence",
+      "resolution_scope": "This stated historical appearance/visibility requirement in this exact current case only.",
+      "capability_or_user_override_basis": {
+        "override_used": false,
+        "assessment": "Check/cross marks are directly visible and match the frozen tag contract. Actual tag identity and result count are data, not reasons to waive mark geometry."
+      },
+      "current_suggestion_ids": [
+        "R04-T02"
+      ],
+      "pending_raw_observation_ids": [
+        "R04-T03"
+      ],
+      "root_acceptance_status": "pending-root-final-historical-acceptance",
+      "remaining_scope": [
+        "pw5--catalog-tag-1",
+        "pw5--catalog-tag-2"
+      ],
+      "whole_group_closed": false
+    },
+    {
+      "historical_id": "P3R1-G35",
+      "current_case_id": "scribe--http-search-success--view-all",
+      "png_sha256": "df0150d8663688d844649f606cfd5be87f59bbdf72b14c7709d9ab3336262c73",
+      "case_json_sha256": "d05d134d0d9ef8ecf65ab8f7b90f517b07c0a2f3a58423fd471c266c5266d5c6",
+      "state_sha256": "5c934be3cdfa423595262ae394ae2d7452c4a8022ed18602056fcb5476d7a295",
+      "actions_sha256": "aeea72c83cf70307cbc14083b6c911b3f1108a34b72b069ec48e78fc21dc8b5a",
+      "reference_original_sha256": "7c411218fec402c436953ffae701611203207719241797caeaac154e114d7fae",
+      "run_id": "0c9ecf3777c9",
+      "source_sha256": "dc0cd6227768a5125ecf702982ce639789bc8bca390de82bab83329927ea6353",
+      "binary_sha256": "7c2f685ecafc7207446f0e75877b74d14cbc6e41a43f5accee8ae992256e3183",
+      "evidence": {
+        "case_id": "scribe--http-search-success--view-all",
+        "png_path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate4/ui-round-1/scribe--http-search-success--view-all.png",
+        "png_sha256": "df0150d8663688d844649f606cfd5be87f59bbdf72b14c7709d9ab3336262c73",
+        "case_json_path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate4/ui-round-1/cases/scribe--http-search-success--view-all.json",
+        "case_json_sha256": "d05d134d0d9ef8ecf65ab8f7b90f517b07c0a2f3a58423fd471c266c5266d5c6",
+        "state_path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate4/ui-round-1/scribe--http-search-success--view-all.state.json",
+        "state_sha256": "5c934be3cdfa423595262ae394ae2d7452c4a8022ed18602056fcb5476d7a295",
+        "actions_path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate4/ui-round-1/actions/scribe--http-search-success--view-all.json",
+        "actions_sha256": "aeea72c83cf70307cbc14083b6c911b3f1108a34b72b069ec48e78fc21dc8b5a",
+        "references": [
+          {
+            "reference_id": "sc-browse--default",
+            "path": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/screens/sc-browse.png",
+            "sha256": "7c411218fec402c436953ffae701611203207719241797caeaac154e114d7fae"
+          }
+        ],
+        "first_pass_report": "D:/Code/aidokuForKindle/docs/review/phase3-c4-round-1-batches/r1-supp-04-05.review.json"
+      },
+      "original_candidate_actually_viewed": true,
+      "reopened_in_second_pass": true,
+      "viewing_basis": "Current original reopened with tools.view_image in this historical second pass.",
+      "reference_original_actually_viewed": true,
+      "reference_viewing_basis": "Matching original was actually opened by this reviewer earlier in the same frozen run; the first-pass report preserves the reference-viewing record.",
+      "fresh_observation": "The successful View All original is a real catalog page, not the setup form: ten final series-030..039 cards are visible in five fixed columns, with3/3 folio and Previous. The source is configured and the settled search path is not hidden behind a setup gate in this exact successful case.",
+      "actual_state_support": {
+        "route": "catalog",
+        "modal": "",
+        "source_id": "komga",
+        "source_needs_setup": false,
+        "connection_status_translation": "Connected",
+        "catalog_count": 40,
+        "visible_catalog_ids": [
+          "5:komga:series-030",
+          "5:komga:series-031",
+          "5:komga:series-032",
+          "5:komga:series-033",
+          "5:komga:series-034",
+          "5:komga:series-035",
+          "5:komga:series-036",
+          "5:komga:series-037",
+          "5:komga:series-038",
+          "5:komga:series-039"
+        ],
+        "page": 3,
+        "page_count": 3
+      },
+      "recorded_actions": [
+        {
+          "at_ms": 450,
+          "section": "search",
+          "action": "query",
+          "value": "fixture"
+        },
+        {
+          "at_ms": 1850,
+          "section": "search",
+          "action": "all",
+          "value": "komga"
+        },
+        {
+          "at_ms": 2300,
+          "section": "page",
+          "action": "turn",
+          "value": "999"
+        }
+      ],
+      "owner_mechanical_passed": true,
+      "recorded_failed_checks": [],
+      "disposition": "resolved-in-fresh-evidence",
+      "resolution_scope": "This stated historical appearance/visibility requirement in this exact current case only.",
+      "capability_or_user_override_basis": {
+        "override_used": false,
+        "assessment": "The successful View All state is directly visible and supported by its recorded query/all/page actions. This does not substitute for the failed cached-unverified feature branch."
+      },
+      "current_suggestion_ids": [
+        "S04-N01"
+      ],
+      "pending_raw_observation_ids": [],
+      "root_acceptance_status": "pending-root-final-historical-acceptance",
+      "remaining_scope": [
+        "pw5--http-search-success--view-all",
+        "Related cached-unverified projection remains blocked by its frozen failed check; see separate diagnostic evidence."
+      ],
+      "whole_group_closed": false
+    },
+    {
+      "historical_id": "P3R1-G41",
+      "current_case_id": "scribe--content-stress--dense-sources",
+      "png_sha256": "c74961c78a2f62065b189c15f63f69907667079133beca844d605a6b5fdc8d93",
+      "case_json_sha256": "ec2eadd288e7adf3efc4b3d60f5691100a11431d69a67d4820e6f2d10afee139",
+      "state_sha256": "6b064777b3b6bdcc9fd8eb2a2623391bab1ce52d0f0522f02b0e6acdda9d182f",
+      "actions_sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "reference_original_sha256": "afbd4c838cf5bb14ea616d3351bda2d518d3f9f712ca65de39d4b69ef0272ac6",
+      "run_id": "0c9ecf3777c9",
+      "source_sha256": "dc0cd6227768a5125ecf702982ce639789bc8bca390de82bab83329927ea6353",
+      "binary_sha256": "7c2f685ecafc7207446f0e75877b74d14cbc6e41a43f5accee8ae992256e3183",
+      "evidence": {
+        "case_id": "scribe--content-stress--dense-sources",
+        "png_path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate4/ui-round-1/scribe--content-stress--dense-sources.png",
+        "png_sha256": "c74961c78a2f62065b189c15f63f69907667079133beca844d605a6b5fdc8d93",
+        "case_json_path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate4/ui-round-1/cases/scribe--content-stress--dense-sources.json",
+        "case_json_sha256": "ec2eadd288e7adf3efc4b3d60f5691100a11431d69a67d4820e6f2d10afee139",
+        "state_path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate4/ui-round-1/scribe--content-stress--dense-sources.state.json",
+        "state_sha256": "6b064777b3b6bdcc9fd8eb2a2623391bab1ce52d0f0522f02b0e6acdda9d182f",
+        "actions_path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate4/ui-round-1/actions/scribe--content-stress--dense-sources.json",
+        "actions_sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+        "references": [
+          {
+            "reference_id": "sc-sources--default",
+            "path": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/screens/sc-sources.png",
+            "sha256": "afbd4c838cf5bb14ea616d3351bda2d518d3f9f712ca65de39d4b69ef0272ac6"
+          }
+        ],
+        "first_pass_report": "D:/Code/aidokuForKindle/docs/review/phase3-c4-round-1-batches/r1-supp-04-06.review.json"
+      },
+      "original_candidate_actually_viewed": true,
+      "reopened_in_second_pass": true,
+      "viewing_basis": "Current original reopened with tools.view_image in this historical second pass.",
+      "reference_original_actually_viewed": true,
+      "reference_viewing_basis": "Matching original was actually opened by this reviewer earlier in the same frozen run; the first-pass report preserves the reference-viewing record.",
+      "fresh_observation": "The actual left Installed page1/3 shows eleven real rows whose middle-ellipsized names preserve distinct indices00..10. Adjacent configurations remain distinguishable; Configured status is separate and does not claim Connected. The right Available page is1/1 and is not used as Installed evidence.",
+      "actual_state_support": {
+        "route": "sources",
+        "installed_count": 25,
+        "installed_page": 1,
+        "installed_pages": 3,
+        "actual_installed_members": [
+          "configured-00",
+          "configured-01",
+          "configured-02",
+          "configured-03",
+          "configured-04",
+          "configured-05",
+          "configured-06",
+          "configured-07",
+          "configured-08",
+          "configured-09",
+          "configured-10"
+        ],
+        "distinct_visible_indices": [
+          "00",
+          "01",
+          "02",
+          "03",
+          "04",
+          "05",
+          "06",
+          "07",
+          "08",
+          "09",
+          "10"
+        ],
+        "available_page": 1,
+        "available_pages": 1
+      },
+      "recorded_actions": [],
+      "owner_mechanical_passed": true,
+      "recorded_failed_checks": [],
+      "disposition": "resolved-in-fresh-evidence",
+      "resolution_scope": "This stated historical appearance/visibility requirement in this exact current case only.",
+      "capability_or_user_override_basis": {
+        "override_used": false,
+        "assessment": "The real distinguishing identifier is retained within the displayed alias. The full long name is not claimed visible, and Available pagination does not stand in for Installed membership."
+      },
+      "current_suggestion_ids": [],
+      "pending_raw_observation_ids": [],
+      "root_acceptance_status": "pending-root-final-historical-acceptance",
+      "remaining_scope": [
+        "Final acceptance by Root; no whole source-operation or unexecuted overflow-group closure."
+      ],
+      "whole_group_closed": false
+    },
+    {
+      "historical_id": "P3R1-G44",
+      "current_case_id": "scribe--independent-search--all-complete",
+      "png_sha256": "806b70e1d7036ef8c62abfda01088a29ee3e09a2fefed11c730e1fb379f50bfe",
+      "case_json_sha256": "6b4e73272928fcae15c3a2f8f19ef2f95a7ad9b425f307bb353845ce328d47b1",
+      "state_sha256": "f7d1701ed855eb8a67d010c90c871f593ccd2d9f1c2ca107314156481c9bd9f2",
+      "actions_sha256": "9918ce377de383b7a2e9081802e96a5dad352b8c995cbd3835538336a7a13aa5",
+      "reference_original_sha256": "4e8beddc0af4eae836a26c3606c7cbd80c1308b5a255b771bd4e0672f05b61b1",
+      "run_id": "0c9ecf3777c9",
+      "source_sha256": "dc0cd6227768a5125ecf702982ce639789bc8bca390de82bab83329927ea6353",
+      "binary_sha256": "7c2f685ecafc7207446f0e75877b74d14cbc6e41a43f5accee8ae992256e3183",
+      "evidence": {
+        "case_id": "scribe--independent-search--all-complete",
+        "png_path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate4/ui-round-1/scribe--independent-search--all-complete.png",
+        "png_sha256": "806b70e1d7036ef8c62abfda01088a29ee3e09a2fefed11c730e1fb379f50bfe",
+        "case_json_path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate4/ui-round-1/cases/scribe--independent-search--all-complete.json",
+        "case_json_sha256": "6b4e73272928fcae15c3a2f8f19ef2f95a7ad9b425f307bb353845ce328d47b1",
+        "state_path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate4/ui-round-1/scribe--independent-search--all-complete.state.json",
+        "state_sha256": "f7d1701ed855eb8a67d010c90c871f593ccd2d9f1c2ca107314156481c9bd9f2",
+        "actions_path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate4/ui-round-1/actions/scribe--independent-search--all-complete.json",
+        "actions_sha256": "9918ce377de383b7a2e9081802e96a5dad352b8c995cbd3835538336a7a13aa5",
+        "references": [
+          {
+            "reference_id": "sc-search--default",
+            "path": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/screens/sc-search.png",
+            "sha256": "7f66ae6f58fee41e471fab3f308afc9170bc1465b5c66cc0b590fac30a2a72c4"
+          },
+          {
+            "reference_id": "sc-search--results",
+            "path": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/screens/states/sc-search--results.png",
+            "sha256": "4e8beddc0af4eae836a26c3606c7cbd80c1308b5a255b771bd4e0672f05b61b1"
+          }
+        ],
+        "first_pass_report": "D:/Code/aidokuForKindle/docs/review/phase3-c4-round-1-batches/r1-supp-04-06.review.json"
+      },
+      "original_candidate_actually_viewed": true,
+      "reopened_in_second_pass": true,
+      "viewing_basis": "Current original reopened with tools.view_image in this historical second pass.",
+      "reference_original_actually_viewed": true,
+      "reference_viewing_basis": "Matching original was actually opened by this reviewer earlier in the same frozen run; the first-pass report preserves the reference-viewing record.",
+      "fresh_observation": "A separately outlined More chip is directly visible near native[745,132,72,44] after the first three source shortcuts. It supplies the overflow affordance for the fourth searched source required by G44. The frozen More-locator check still fails with detector output[[37,172]]; that failed detection is preserved rather than recast as a missing product control or a successful picker flow.",
+      "actual_state_support": {
+        "route": "search",
+        "modal": "",
+        "source_count": 4,
+        "source_ids": [
+          "empty",
+          "error",
+          "fast",
+          "slow"
+        ],
+        "result_count": 40,
+        "slow_pending": false,
+        "more_chip_visible": true,
+        "owner_more_locator_check_failed": true
+      },
+      "recorded_actions": [
+        {
+          "at_ms": 450,
+          "section": "search",
+          "action": "query",
+          "value": "fixture"
+        }
+      ],
+      "owner_mechanical_passed": false,
+      "recorded_failed_checks": [
+        {
+          "description": "The actual native source shortcuts expose a separate More chip",
+          "passed": false,
+          "actual": [
+            [
+              37,
+              172
+            ]
+          ]
+        }
+      ],
+      "disposition": "resolved-in-fresh-evidence",
+      "resolution_scope": "This stated historical appearance/visibility requirement in this exact current case only.",
+      "capability_or_user_override_basis": {
+        "override_used": false,
+        "assessment": "This is direct evidence for the original visibility requirement only. It is not a capability waiver and does not establish an executed overflow picker."
+      },
+      "current_suggestion_ids": [],
+      "pending_raw_observation_ids": [],
+      "root_acceptance_status": "pending-root-final-historical-acceptance",
+      "remaining_scope": [
+        "Native More locator failed in the all-complete follow-up; no picker-open, fourth/last-source choice, cancellation or aborted later group is inferred."
+      ],
+      "whole_group_closed": false
+    },
+    {
+      "historical_id": "P3R1-G44",
+      "current_case_id": "scribe--independent-search--early-result",
+      "png_sha256": "889a42f66ac33562130bb58790034b60fc96f6c4f3599de5a0c25f64b9c6bae9",
+      "case_json_sha256": "78fd4fb5302c7e12ab597463b6358611827985b5218f1d1459e360b3ffbc985b",
+      "state_sha256": "0ca6cd22aff7093e696561e978ed1cf4f75a81d01e3d63e5eeef226768567be1",
+      "actions_sha256": "9918ce377de383b7a2e9081802e96a5dad352b8c995cbd3835538336a7a13aa5",
+      "reference_original_sha256": "4e8beddc0af4eae836a26c3606c7cbd80c1308b5a255b771bd4e0672f05b61b1",
+      "run_id": "0c9ecf3777c9",
+      "source_sha256": "dc0cd6227768a5125ecf702982ce639789bc8bca390de82bab83329927ea6353",
+      "binary_sha256": "7c2f685ecafc7207446f0e75877b74d14cbc6e41a43f5accee8ae992256e3183",
+      "evidence": {
+        "case_id": "scribe--independent-search--early-result",
+        "png_path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate4/ui-round-1/scribe--independent-search--early-result.png",
+        "png_sha256": "889a42f66ac33562130bb58790034b60fc96f6c4f3599de5a0c25f64b9c6bae9",
+        "case_json_path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate4/ui-round-1/cases/scribe--independent-search--early-result.json",
+        "case_json_sha256": "78fd4fb5302c7e12ab597463b6358611827985b5218f1d1459e360b3ffbc985b",
+        "state_path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate4/ui-round-1/scribe--independent-search--early-result.state.json",
+        "state_sha256": "0ca6cd22aff7093e696561e978ed1cf4f75a81d01e3d63e5eeef226768567be1",
+        "actions_path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate4/ui-round-1/actions/scribe--independent-search--early-result.json",
+        "actions_sha256": "9918ce377de383b7a2e9081802e96a5dad352b8c995cbd3835538336a7a13aa5",
+        "references": [
+          {
+            "reference_id": "sc-search--default",
+            "path": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/screens/sc-search.png",
+            "sha256": "7f66ae6f58fee41e471fab3f308afc9170bc1465b5c66cc0b590fac30a2a72c4"
+          },
+          {
+            "reference_id": "sc-search--results",
+            "path": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/screens/states/sc-search--results.png",
+            "sha256": "4e8beddc0af4eae836a26c3606c7cbd80c1308b5a255b771bd4e0672f05b61b1"
+          }
+        ],
+        "first_pass_report": "D:/Code/aidokuForKindle/docs/review/phase3-c4-round-1-batches/r1-supp-04-06.review.json"
+      },
+      "original_candidate_actually_viewed": true,
+      "reopened_in_second_pass": true,
+      "viewing_basis": "Current original reopened with tools.view_image in this historical second pass.",
+      "reference_original_actually_viewed": true,
+      "reference_viewing_basis": "Matching original was actually opened by this reviewer earlier in the same frozen run; the first-pass report preserves the reference-viewing record.",
+      "fresh_observation": "A separately outlined More chip is directly visible near native[745,132,72,44] after the first three source shortcuts. It supplies the overflow affordance for the fourth searched source required by G44. Fast results remain visible while the slow fourth source is pending; More remains visible in this earlier state as well.",
+      "actual_state_support": {
+        "route": "search",
+        "modal": "",
+        "source_count": 4,
+        "source_ids": [
+          "empty",
+          "error",
+          "fast",
+          "slow"
+        ],
+        "result_count": 20,
+        "slow_pending": true,
+        "more_chip_visible": true,
+        "owner_more_locator_check_failed": false
+      },
+      "recorded_actions": [
+        {
+          "at_ms": 450,
+          "section": "search",
+          "action": "query",
+          "value": "fixture"
+        }
+      ],
+      "owner_mechanical_passed": true,
+      "recorded_failed_checks": [],
+      "disposition": "resolved-in-fresh-evidence",
+      "resolution_scope": "This stated historical appearance/visibility requirement in this exact current case only.",
+      "capability_or_user_override_basis": {
+        "override_used": false,
+        "assessment": "This is direct evidence for the original visibility requirement only. It is not a capability waiver and does not establish an executed overflow picker."
+      },
+      "current_suggestion_ids": [],
+      "pending_raw_observation_ids": [],
+      "root_acceptance_status": "pending-root-final-historical-acceptance",
+      "remaining_scope": [
+        "Native More locator failed in the all-complete follow-up; no picker-open, fourth/last-source choice, cancellation or aborted later group is inferred."
+      ],
+      "whole_group_closed": false
+    }
+  ],
+  "related_feature_diagnostic_evidence": [
+    {
+      "historical_id": "P3R1-G35",
+      "current_case_id": "scribe--http-search-success--cached-unverified",
+      "case_id": "scribe--http-search-success--cached-unverified",
+      "png_path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate4/ui-round-1/scribe--http-search-success--cached-unverified.png",
+      "png_sha256": "0d8f3ec1d6ad5bfad10d6185c92f4cb2b320f8d5c9514a6fe35538a6cb9d435c",
+      "case_json_path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate4/ui-round-1/cases/scribe--http-search-success--cached-unverified.json",
+      "case_json_sha256": "f6df6572268a39bf190f749324e58a3720162131daaecfd6e085ba91f4c841ab",
+      "state_path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate4/ui-round-1/scribe--http-search-success--cached-unverified.state.json",
+      "state_sha256": "7595253e06b9c042f39a78efc09f57540bb00489b178437e2b490cdd8ac46bbf",
+      "actions_path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate4/ui-round-1/actions/scribe--http-search-success--cached-unverified.json",
+      "actions_sha256": "fac3a160b5f23f2987cbf614afe545c1da2db34ee1115253f14912b667557c0a",
+      "references": [
+        {
+          "reference_id": "sc-browse--default",
+          "path": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/screens/sc-browse.png",
+          "sha256": "7c411218fec402c436953ffae701611203207719241797caeaac154e114d7fae"
+        }
+      ],
+      "first_pass_report": "D:/Code/aidokuForKindle/docs/review/phase3-c4-round-1-batches/r1-supp-04-05.review.json",
+      "original_candidate_actually_viewed": true,
+      "reopened_in_second_pass": true,
+      "fresh_observation": "After replacing and saving the configured server address with an unverified-cache path, the actual original shows a truthful unverified setup form with masked credential and zero cards. It is not a successful cached-results scene.",
+      "disposition": "blocked-by-evidence",
+      "recorded_failed_check": {
+        "description": "Cached unverified catalog records remain projected without claiming a new connection",
+        "passed": false,
+        "actual": {
+          "visible_cards": 0,
+          "new_http_requests": 0
+        }
+      },
+      "projection_requirement": {
+        "visible_cards": 0,
+        "intended_cached_projection_established": false
+      },
+      "new_http_guard": {
+        "owner_recorded_new_http_requests": 0,
+        "independently_validated_by_reviewer": false,
+        "interpretation": "The recorded zero-request guard is distinct from the failed zero-card projection; neither component is silently converted into a passing combined flow."
+      },
+      "cause_attribution": "The trigger/address-edit and observed missing projection are recorded. Whether the absent scene is fixture/capture setup or a product issue requires owner attribution; this screenshot does not decide the cause.",
+      "root_acceptance_status": "pending-root-final-historical-acceptance",
+      "remaining_scope": [
+        "Actual cached unverified records need fresh owner-attributed evidence; no substitute scene or new HTTP request is invented."
+      ]
+    }
+  ],
+  "supporting_current_context": [
+    {
+      "historical_id": "P3R1-G41",
+      "current_case_id": "scribe--content-stress--dense-installed-last",
+      "case_id": "scribe--content-stress--dense-installed-last",
+      "png_path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate4/ui-round-1/scribe--content-stress--dense-installed-last.png",
+      "png_sha256": "755389b9893407d277e45c28b73d9017993087a8db92e6a58e891fb8bbbd4c97",
+      "case_json_path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate4/ui-round-1/cases/scribe--content-stress--dense-installed-last.json",
+      "case_json_sha256": "47ab61273465d8429d4173f4c1c210ec7753632b03a555282dcf5fdd5422c176",
+      "state_path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate4/ui-round-1/scribe--content-stress--dense-installed-last.state.json",
+      "state_sha256": "4261ec16974b9f73c9d9efa8d4e8c217bf8c19b48a7149fac2b4b4972954d7cc",
+      "actions_path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate4/ui-round-1/actions/scribe--content-stress--dense-installed-last.json",
+      "actions_sha256": "261917c6efada6d93ac1f050d37795921dd90de16093228bb9b307b95f632574",
+      "references": [
+        {
+          "reference_id": "sc-sources--default",
+          "path": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/screens/sc-sources.png",
+          "sha256": "afbd4c838cf5bb14ea616d3351bda2d518d3f9f712ca65de39d4b69ef0272ac6"
+        }
+      ],
+      "first_pass_report": "D:/Code/aidokuForKindle/docs/review/phase3-c4-round-1-batches/r1-supp-04-06.review.json",
+      "original_candidate_actually_viewed": true,
+      "reopened_in_second_pass": true,
+      "observation": "The actual left Installed page3/3 contains only configured-22, configured-23 and komga. Visible22/23 indices and the full Komga fixture alias confirm genuine Installed membership; the right Available folio remains1/1.",
+      "counted_as_extra_historical_closure": false
+    }
+  ],
+  "current_pending_observations": [
+    {
+      "id": "S04-N01",
+      "scope": "External Scribe catalog caption type.",
+      "status": "pending-root-unique-group-triage",
+      "source_report": "D:/Code/aidokuForKindle/docs/review/phase3-c4-round-1-batches/r1-supp-04-03.review.json"
+    },
+    {
+      "id": "S04-N02",
+      "scope": "Input-sheet top-rule occlusion; coordinator owns cross-profile deduplication.",
+      "status": "pending-root-existing-cross-profile-group-id",
+      "source_report": "D:/Code/aidokuForKindle/docs/review/phase3-c4-round-1-batches/r1-supp-04-04.review.json"
+    },
+    {
+      "id": "S04-N03",
+      "scope": "Migration last-page chooser folio enclosure.",
+      "status": "pending-root-unique-group-triage",
+      "source_report": "D:/Code/aidokuForKindle/docs/review/phase3-c4-round-1-batches/r1-supp-04-04.review.json"
+    },
+    {
+      "id": "S04-N04",
+      "scope": "Source-list record-card to Add fixed spacing.",
+      "status": "pending-root-precise-spacing-triage",
+      "source_report": "D:/Code/aidokuForKindle/docs/review/phase3-c4-round-1-batches/r1-supp-04-04.review.json"
+    }
+  ],
+  "existing_approved_current_issue_separation": "R04-T02 intrinsic tag widths remains a separately Root-approved C4 issue even though G32 check/cross marks are now visible. New pending observations are not inserted into the approved map. Fixed historical IDs are not current suggestions.",
+  "new_suggestions": [],
+  "unresolved_historical_ids": [
+    "P3R1-G31",
+    "P3R1-G32",
+    "P3R1-G35",
+    "P3R1-G44"
+  ],
+  "unresolved_historical_ids_meaning": "IDs with explicit outside-case evidence or related functional scope still pending. This does not assert that a directly observed current appearance fix is absent.",
+  "pending_root_acceptance_historical_ids": [
+    "P3R1-G31",
+    "P3R1-G32",
+    "P3R1-G35",
+    "P3R1-G41",
+    "P3R1-G44"
+  ],
+  "summary": {
+    "historical_requirements": 5,
+    "listed_current_case_dispositions": 12,
+    "resolved_specific_current_requirements": 12,
+    "related_cached_feature_diagnostic_unresolved": 1,
+    "installed_last_page_context_records": 1,
+    "whole_group_closures_claimed": 0,
+    "new_approved_groups_created": 0,
+    "new_pending_observation_groups_preserved": 4,
+    "complete_round": false,
+    "clean_round_streak": 0
+  },
+  "limitations": [
+    "This historical second pass is a review of the same frozen run, not a second fresh capture round.",
+    "G31 explicit state/prefix readability is distinct from long-alias or verification-reason tails; no full-tail visibility or live connection is claimed.",
+    "G32 mark restoration does not accept the separate intrinsic-width or Reset-style issues.",
+    "G35 successful View All, failed cached projection and recorded no-new-HTTP guard remain separate evidence questions.",
+    "G41 uses Installed page/member diagnostics and visible identifiers; Available pagination is not substituted.",
+    "G44 visible More resolves only the original visibility requirement. Locator failure and missing chooser/last-source/cancel follow-ups remain unaccepted.",
+    "All five historical groups retain Root final acceptance. Outside cases and unexecuted groups are not closed.",
+    "No physical/performance/timing/evdev/lease qualification, local rehash or runtime PASS is supplied."
+  ],
+  "output_report_path": "D:/Code/aidokuForKindle/docs/review/phase3-c4-round-1-batches/r1-supp-04.regression.json"
+}

@@ -1,0 +1,427 @@
+{
+  "schema_version": 1,
+  "kind": "current-c14-frozen-small-diagnostic-visual-review",
+  "batch_id": "c14r1-m010-b009",
+  "reviewer": "/root/final_validation_delivery/c4_full_review_coordinator/c14_full_lane_a/c14r1_m010_b009",
+  "reviewer_lane": "A",
+  "round": 1,
+  "module": "010-pw-library-keyboard-paging",
+  "frozen_tuple": {
+    "run_id": "1e2765959467",
+    "source_sha256": "4737c2c1b8dcdf3c5c97400e2036502c6efdf932ff25322b8ddd51fc62d7c99f",
+    "binary_sha256": "01ec3051c62598d100f2203694ed7840d4706052bdbea260f5176b7d255b5a37",
+    "reference_sha256": "e7b49b456255432d74cfe41346f9d44c1a9c55bf67c5d55483e4ae3029547d18",
+    "capture_plan_sha256": "d07810abea322f7d2f86261f80e29007b3bd2f194eb2e9a3d4a53d8edcf70687",
+    "reference_scope_sha256": "c910bed9f02ed17b2ca0a54aca1beeeeb6caabc5a17a91afe764ddd3e7b0d33c",
+    "main_harness_sha256": "1f2379bffd9ce9594f307fa150f56c345fe508fca47aac3be31e8ce29a72fa44",
+    "gate_manifest_sha256": "f1f64f72a51c81d7da300816ebcef7e4e0c48178d75d41072f7b4e3e22a38668"
+  },
+  "owner_inventory": {
+    "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate14/ui-round-1-module-snapshots/010-pw-library-keyboard-paging/inventory.json",
+    "sha256": "c18dc2b81fafb6601d0a9dd99da37621ab6a8b0a962e4d0beca8440a7ceba0eb",
+    "owner_evidence_inventory_sha256": "c18dc2b81fafb6601d0a9dd99da37621ab6a8b0a962e4d0beca8440a7ceba0eb",
+    "observation": "Selected 24 case/PNG/state/metadata/action/log entries agree with assigned owner hashes; selected reference-catalog and scope entries agree with input. Current case names, run/round/source/binary declarations and pw5 portrait metadata agree. This is static declaration inspection; no rehash or execution occurred."
+  },
+  "reference_catalog": {
+    "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate14/ui-round-1-module-snapshots/010-pw-library-keyboard-paging/files/output/reference-files.json",
+    "sha256": "d18c7f551f5ecfdffef56cf5710a4335b1f2bfeeaca02ea66802d4dc4456c37b",
+    "selected_entry_locators": [
+      "$.files[path='screens/Main.png']",
+      "$.files[path='screens/pw-search.png']"
+    ],
+    "scope_path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate14/ui-round-1-module-snapshots/010-pw-library-keyboard-paging/files/control/execution-inputs/docs/review/phase3-reference-scope.json",
+    "scope_locators": [
+      "profiles[pw5] at line 124",
+      "pageStateMatrix[Main] at line 272",
+      "pageStateMatrix[pw-search] at line 566",
+      "keyboard-modes at line 1713"
+    ]
+  },
+  "contracts": {
+    "worker": "D:/Code/aidokuForKindle/docs/review/phase3-full-fresh-worker-contract.md",
+    "token_caption": "D:/Code/aidokuForKindle/docs/review/phase3-c12-affected-review-root-disposition.json",
+    "ui_skill": "C:/Users/moooyo/.codex/skills/ui-ux-pro-max/SKILL.md",
+    "ui_skill_announced": true,
+    "skill_program_executed": false,
+    "handoff": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/HANDOFF.md",
+    "handoff_locators": [
+      "4.6 toast at line 140",
+      "4.7 keyboard at line 142",
+      "5.1 library at line 154",
+      "5.5 search at line 258"
+    ]
+  },
+  "reference_viewing": [
+    {
+      "reference_id": "Main--default",
+      "path": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/screens/Main.png",
+      "sha256": "5bfcaf7ba4498c67521496470e127e402adea0f4d7aec77510d6c51226b53927",
+      "dimensions_as_declared": [
+        1236,
+        1648
+      ],
+      "actual_viewed": true,
+      "open_index": 1,
+      "tool": "tools.view_image",
+      "tool_detail": "high",
+      "source": "Assigned original unprocessed reference file",
+      "observation": "Library heading, outlined continuation card, four-by-two cover grid, title-adjacent unread/download markers, centered 1/6 folio and 72-logical-pixel bottom dock are directly visible. Sample counts are not the current data oracle."
+    },
+    {
+      "reference_id": "pw-search--default",
+      "path": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/screens/pw-search.png",
+      "sha256": "87c66500123e3d30499b247883220ff26fe3a0dca112e19f3a0d569c9c4163b3",
+      "dimensions_as_declared": [
+        1236,
+        1648
+      ],
+      "actual_viewed": true,
+      "open_index": 2,
+      "tool": "tools.view_image",
+      "tool_detail": "high",
+      "source": "Assigned original unprocessed reference file",
+      "observation": "Outlined search input and source scopes, pending-source hint, bottom composition/candidate row and four complete keyboard rows are directly visible. This reference shows qi and sample candidates, not the assigned s/page-2/commit states."
+    }
+  ],
+  "reviewed_case_ids": [
+    "pw5--library-update-toast",
+    "pw5--keyboard-pinyin",
+    "pw5--keyboard-candidate-page-2",
+    "pw5--keyboard-candidate-commit"
+  ],
+  "image_accounting": {
+    "current_cases": 4,
+    "reference_pairs": 4,
+    "current_original_opens": 4,
+    "original_reference_opens": 2,
+    "actual_image_opens": 6,
+    "maximum_image_opens": 8,
+    "crops_or_derivatives": 0
+  },
+  "cases": [
+    {
+      "case_id": "pw5--library-update-toast",
+      "files": {
+        "case_json": {
+          "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate14/ui-round-1/cases/pw5--library-update-toast.json",
+          "sha256": "0a892ad1721aef0abacdea456459a8d7d9d42d499be04321b9df7e90236534b6"
+        },
+        "png": {
+          "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate14/ui-round-1/pw5--library-update-toast.png",
+          "sha256": "d128e0a643e4eda29ab38b235dc5f216e52e65a52621fe7ff924fe2cf0f2b765"
+        },
+        "state": {
+          "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate14/ui-round-1/pw5--library-update-toast.state.json",
+          "sha256": "c8a67d618b8b3b86510cf65531964b599ef6e91d69e7809f7d380bd2d3a50c05"
+        },
+        "metadata": {
+          "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate14/ui-round-1/pw5--library-update-toast.metadata.json",
+          "sha256": "d3d24364e5695248a869aa0316c438a06f85effbdaaf81bb38d34cd4c7fcfe7f"
+        },
+        "actions": {
+          "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate14/ui-round-1/actions/pw5--library-update-toast.json",
+          "sha256": "e95d548999b33aa8a81a03d728a8fb7fa50fe0a30c64b027adea600bdd7205c7"
+        },
+        "log": {
+          "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate14/ui-round-1/pw5--library-update-toast.log",
+          "sha256": "dc121ceea011a63c29b404d6c6b75bbe2db32b326923b8fa99759f457bfd709f"
+        }
+      },
+      "reference": {
+        "reference_id": "Main--default",
+        "path": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/screens/Main.png",
+        "sha256": "5bfcaf7ba4498c67521496470e127e402adea0f4d7aec77510d6c51226b53927",
+        "comparison_kind": "related-contract",
+        "basis": "Supplemental current state has no independent exact reference; assigned original profile/route family and HANDOFF govern."
+      },
+      "actual_viewing": {
+        "actual": true,
+        "open_index": 3,
+        "tool": "tools.view_image",
+        "tool_detail": "high",
+        "source": "Current canonical unmodified original PNG",
+        "native_size": [
+          618,
+          824
+        ],
+        "physical_reference_scale": 2
+      },
+      "visual": {
+        "actual_text": "演示模式未检查更新",
+        "geometry": "Approximate native bounds: toast x219-400/y636-684, white fill and black outline, horizontally centered. Continuation x16-602/y104-227; covers in four columns at y291-453 and y495-657; folio above dock starting y752.",
+        "fonts_padding_glyphs": "Large serif library heading, smaller serif continuation title and compact grid captions remain distinct. The toast's entire message has intact glyphs and visible side padding. It temporarily covers parts of the second-row title area; HANDOFF 4.6 governs this overlay and does not require a redesign for that overlap.",
+        "bounds_clipping_folio_markers": "Toast stays inside the viewport and does not cover the 1/6 folio, next-page control or five-item dock. First-row unread badges read 53/1/2/1, with download marks next to the first and fourth titles; visible lower-row marks remain bounded.",
+        "state_action_feedback": "Retained refresh at 450 ms has demo=true, offline=true, busy=false and message matching the actual toast; source_update_count and chapter_update_count are 0. This is honest demo feedback, not a completed network check. Timer disappearance and rectangle-only refresh were not freshly replayed.",
+        "locators": {
+          "state": "$.message, $.demo, $.offline, $.busy, $.page, $.page_count",
+          "action": "$.section='library', $.action='refresh', $.at_ms=450",
+          "case": "$.visible_ui_requirements[0]"
+        }
+      },
+      "intentional_capability_check": "Actual demo/offline refresh message is truthful. HANDOFF 4.6 transient overlap is retained. Real unread/download values differ from sample artwork; no completed network or hardware claim is added.",
+      "recorded_evidence_only": {
+        "route": "library",
+        "modal": "",
+        "exit_code": 0,
+        "pointer_events": 0,
+        "log_locator": "line 1",
+        "log_text": "aidoku: desktop window ready; profile=pw5, logical=618x824, scale=1",
+        "terminal_failure_observed": false
+      },
+      "bounded_static_verdict": "Current visual content and retained state/action declarations agree for this related-contract frame; no new actionable issue or required unreadable detail was observed. Exact bitmap/font acceptance and fresh runtime credit are not established."
+    },
+    {
+      "case_id": "pw5--keyboard-pinyin",
+      "files": {
+        "case_json": {
+          "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate14/ui-round-1/cases/pw5--keyboard-pinyin.json",
+          "sha256": "32740d4e59a690fb43a1b2ca52ef9411fc1d5f03a0970600164d6f3b591d3add"
+        },
+        "png": {
+          "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate14/ui-round-1/pw5--keyboard-pinyin.png",
+          "sha256": "096f9139201159d066c3d9094dabb0a6bcc87e85e987e2bc740f9bda2e08d08f"
+        },
+        "state": {
+          "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate14/ui-round-1/pw5--keyboard-pinyin.state.json",
+          "sha256": "5491cc52ee9b0984ccaa662dc6e6931da0e1f9971015226da78ee72698db1e5f"
+        },
+        "metadata": {
+          "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate14/ui-round-1/pw5--keyboard-pinyin.metadata.json",
+          "sha256": "5c38890e097f7f83d1c63fd1d87a770b721721b387cf466ac7f3a13615d56d6e"
+        },
+        "actions": {
+          "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate14/ui-round-1/actions/pw5--keyboard-pinyin.json",
+          "sha256": "b6e3b7b859e439f5f41511e9fda1bf22315bd46b6f8b0bf610603103fc0a2a3a"
+        },
+        "log": {
+          "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate14/ui-round-1/pw5--keyboard-pinyin.log",
+          "sha256": "dc121ceea011a63c29b404d6c6b75bbe2db32b326923b8fa99759f457bfd709f"
+        }
+      },
+      "reference": {
+        "reference_id": "pw-search--default",
+        "path": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/screens/pw-search.png",
+        "sha256": "87c66500123e3d30499b247883220ff26fe3a0dca112e19f3a0d569c9c4163b3",
+        "comparison_kind": "related-contract",
+        "basis": "Supplemental current state has no independent exact reference; assigned original profile/route family and HANDOFF govern."
+      },
+      "actual_viewing": {
+        "actual": true,
+        "open_index": 4,
+        "tool": "tools.view_image",
+        "tool_detail": "high",
+        "source": "Current canonical unmodified original PNG",
+        "native_size": [
+          618,
+          824
+        ],
+        "physical_reference_scale": 2
+      },
+      "visual": {
+        "actual_composition": "s",
+        "actual_candidates": [
+          "是",
+          "说",
+          "什么",
+          "上",
+          "时候",
+          "时",
+          "所以",
+          "时间"
+        ],
+        "geometry": "Approximate native bounds: input x16-554/y36-88; scopes y96-134; keyboard x0-618/y524-824. Candidate row y526-578, then keys at y585-637, y645-696, y704-755 and y762-814.",
+        "fonts_padding_glyphs": "Underlined s and all eight candidate words are directly readable with intact bold serif glyphs, distinct spacing and room before the right paging chevrons. QWERTY, shift, backspace, 123, language, space and black search-key labels are centered within complete key outlines.",
+        "bounds_clipping_folio_markers": "No candidate, key label or keyboard boundary is visibly clipped. Input clear/cancel and source names 本地文件/Komga are intact; the selected all-sources token shows 4. Left/right candidate chevrons are visible; no numeric candidate folio is printed and no library folio/dock is present while editing.",
+        "state_action_feedback": "Retained clear/edit, pinyin-mode action and s key at 1800 ms agree with modal=keyboard, target=search, composition=s, text empty and candidate page 1 of 4. The pending 4-source hint is visible; no result or completed search is claimed.",
+        "locators": {
+          "state": "$.keyboard_composition, $.keyboard_candidates, $.keyboard_candidate_page, $.keyboard_candidate_page_count, $.keyboard_text",
+          "action": "$[2]: keyboard.mode='pinyin'; $[3]: keyboard.key='s' at 1800 ms"
+        }
+      },
+      "intentional_capability_check": "Actual source count 4 and current source names differ from sample artwork. Visible complete name-derived tokens and intact glyphs satisfy the bounded identity contract; independent caption is only for selected hidden More scope and is not required in this all-source editor state.",
+      "recorded_evidence_only": {
+        "route": "search",
+        "modal": "keyboard",
+        "exit_code": 0,
+        "pointer_events": 0,
+        "log_locator": "line 1",
+        "log_text": "aidoku: desktop window ready; profile=pw5, logical=618x824, scale=1",
+        "terminal_failure_observed": false
+      },
+      "bounded_static_verdict": "Current visual content and retained state/action declarations agree for this related-contract frame; no new actionable issue or required unreadable detail was observed. Exact bitmap/font acceptance and fresh runtime credit are not established."
+    },
+    {
+      "case_id": "pw5--keyboard-candidate-page-2",
+      "files": {
+        "case_json": {
+          "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate14/ui-round-1/cases/pw5--keyboard-candidate-page-2.json",
+          "sha256": "e05efdd407946516a9c52c6543c64db70cd7faaab301a45a77b7a4bb04bf206c"
+        },
+        "png": {
+          "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate14/ui-round-1/pw5--keyboard-candidate-page-2.png",
+          "sha256": "bf2a2dc24231f2151fa46874250c056f8e8f0076b4d86e00354685d261b151cb"
+        },
+        "state": {
+          "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate14/ui-round-1/pw5--keyboard-candidate-page-2.state.json",
+          "sha256": "941f84fdf2c148a095cdbb1924a44c6b242c93ec640591e3c5e224a1dd50a3c8"
+        },
+        "metadata": {
+          "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate14/ui-round-1/pw5--keyboard-candidate-page-2.metadata.json",
+          "sha256": "e1016db3abfaf9b1717aaabced5ecfaf4f6b8d054f25afb81598270ae00b8c68"
+        },
+        "actions": {
+          "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate14/ui-round-1/actions/pw5--keyboard-candidate-page-2.json",
+          "sha256": "56b3d9a4edc2e048a7aac338929b742d59d1503d8be49ee8fca54ae44808d675"
+        },
+        "log": {
+          "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate14/ui-round-1/pw5--keyboard-candidate-page-2.log",
+          "sha256": "dc121ceea011a63c29b404d6c6b75bbe2db32b326923b8fa99759f457bfd709f"
+        }
+      },
+      "reference": {
+        "reference_id": "pw-search--default",
+        "path": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/screens/pw-search.png",
+        "sha256": "87c66500123e3d30499b247883220ff26fe3a0dca112e19f3a0d569c9c4163b3",
+        "comparison_kind": "related-contract",
+        "basis": "Supplemental current state has no independent exact reference; assigned original profile/route family and HANDOFF govern."
+      },
+      "actual_viewing": {
+        "actual": true,
+        "open_index": 5,
+        "tool": "tools.view_image",
+        "tool_detail": "high",
+        "source": "Current canonical unmodified original PNG",
+        "native_size": [
+          618,
+          824
+        ],
+        "physical_reference_scale": 2
+      },
+      "visual": {
+        "actual_composition": "s",
+        "actual_candidates": [
+          "使用",
+          "市场",
+          "事情",
+          "生活",
+          "上海",
+          "所有",
+          "所",
+          "虽然"
+        ],
+        "geometry": "Approximate native bounds: input x16-554/y36-88; keyboard x0-618/y524-824. Candidate row y526-578 retains s at the left, eight choices across x50-491 and paging chevrons around x572/x596. Four key rows remain fully inside y585-814.",
+        "fonts_padding_glyphs": "All eight page-2 choices, including the final 虽然, are directly readable as complete bold serif words with visible separation from each other and the chevrons. Composition underline, Latin key labels, shift/backspace and the bottom 123/language/space/search row remain intact.",
+        "bounds_clipping_folio_markers": "No candidate-word collision, key-label truncation or off-screen keyboard edge is visible. The all-sources 4 token, 本地文件, Komga and More control stay distinguishable. The image has paging chevrons but no printed 2/4 numeral; retained state supplies page 2 of 4, not an invented visible marker.",
+        "state_action_feedback": "Retained s key followed by candidate-page value 1 at 1420 ms agrees with keyboard_candidate_page=2, page_count=4 and the directly read second-page list. Query/status/results remain empty; navigation is retained software action evidence, not a fresh physical replay.",
+        "locators": {
+          "state": "$.keyboard_composition, $.keyboard_candidates, $.keyboard_candidate_page=2, $.keyboard_candidate_page_count=4",
+          "action": "$[2]: keyboard.key='s'; $[3]: keyboard.candidate-page='1' at 1420 ms"
+        }
+      },
+      "intentional_capability_check": "Actual source count 4 and current source names differ from sample artwork. Visible complete name-derived tokens and intact glyphs satisfy the bounded identity contract; independent caption is only for selected hidden More scope and is not required in this all-source editor state.",
+      "recorded_evidence_only": {
+        "route": "search",
+        "modal": "keyboard",
+        "exit_code": 0,
+        "pointer_events": 0,
+        "log_locator": "line 1",
+        "log_text": "aidoku: desktop window ready; profile=pw5, logical=618x824, scale=1",
+        "terminal_failure_observed": false
+      },
+      "bounded_static_verdict": "Current visual content and retained state/action declarations agree for this related-contract frame; no new actionable issue or required unreadable detail was observed. Exact bitmap/font acceptance and fresh runtime credit are not established."
+    },
+    {
+      "case_id": "pw5--keyboard-candidate-commit",
+      "files": {
+        "case_json": {
+          "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate14/ui-round-1/cases/pw5--keyboard-candidate-commit.json",
+          "sha256": "6d6c9193d5c86fa5133e14c5aeff7bd67bd808cb3738e472d336234c8af520a3"
+        },
+        "png": {
+          "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate14/ui-round-1/pw5--keyboard-candidate-commit.png",
+          "sha256": "f3f327bc17ed02e47b1908e30c481acc9005e74604beb438273d8907307457a8"
+        },
+        "state": {
+          "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate14/ui-round-1/pw5--keyboard-candidate-commit.state.json",
+          "sha256": "6c4d59e147443ce59d09a862deb8a347c846a8a73a9fac2a354b376d13ea0cc0"
+        },
+        "metadata": {
+          "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate14/ui-round-1/pw5--keyboard-candidate-commit.metadata.json",
+          "sha256": "51392eee7c3feeeb36d01a16e44b94933e71a65c8a605f0aa93a8e2f8ce989d9"
+        },
+        "actions": {
+          "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate14/ui-round-1/actions/pw5--keyboard-candidate-commit.json",
+          "sha256": "24a5fb7d5f12ab2ad6a11d7a14332ca8ed55061584c4556beefb181e0d12d4d0"
+        },
+        "log": {
+          "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate14/ui-round-1/pw5--keyboard-candidate-commit.log",
+          "sha256": "dc121ceea011a63c29b404d6c6b75bbe2db32b326923b8fa99759f457bfd709f"
+        }
+      },
+      "reference": {
+        "reference_id": "pw-search--default",
+        "path": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/screens/pw-search.png",
+        "sha256": "87c66500123e3d30499b247883220ff26fe3a0dca112e19f3a0d569c9c4163b3",
+        "comparison_kind": "related-contract",
+        "basis": "Supplemental current state has no independent exact reference; assigned original profile/route family and HANDOFF govern."
+      },
+      "actual_viewing": {
+        "actual": true,
+        "open_index": 6,
+        "tool": "tools.view_image",
+        "tool_detail": "high",
+        "source": "Current canonical unmodified original PNG",
+        "native_size": [
+          618,
+          824
+        ],
+        "physical_reference_scale": 2
+      },
+      "visual": {
+        "actual_input_text": "是",
+        "actual_candidate_row_label": "拼音",
+        "geometry": "Approximate native bounds: committed 是 lies near x63/y55 within input x16-554/y36-88. Keyboard remains x0-618/y524-824; empty candidate row y526-578 and four complete key rows y585-814 keep the same allocation.",
+        "fonts_padding_glyphs": "The committed 是 is fully readable in the input with ample horizontal padding. The gray 拼音 row label has intact glyphs; composition/candidate words and paging chevrons are absent. QWERTY, shift, backspace, 123, language, space and black search labels remain centered and intact.",
+        "bounds_clipping_folio_markers": "Input clear/cancel, current source tokens and every key outline remain inside the frame without visible clipping. The keyboard replaces the library dock; no search-result folio or candidate-page numeral is invented.",
+        "state_action_feedback": "Retained candidate selection value 是 at 1420 ms agrees with keyboard_text=是, composition empty, candidates empty and modal=keyboard. query/search_status/search_result_count are empty/empty/0; this is committed editor text, not an executed search result.",
+        "locators": {
+          "state": "$.keyboard_text='是', $.keyboard_composition='', $.keyboard_candidates=[], $.query, $.search_status",
+          "action": "$[2]: keyboard.key='s'; $[3]: keyboard.candidate='是' at 1420 ms"
+        }
+      },
+      "intentional_capability_check": "Actual source count 4 and current source names differ from sample artwork. Visible complete name-derived tokens and intact glyphs satisfy the bounded identity contract; independent caption is only for selected hidden More scope and is not required in this all-source editor state.",
+      "recorded_evidence_only": {
+        "route": "search",
+        "modal": "keyboard",
+        "exit_code": 0,
+        "pointer_events": 0,
+        "log_locator": "line 1",
+        "log_text": "aidoku: desktop window ready; profile=pw5, logical=618x824, scale=1",
+        "terminal_failure_observed": false
+      },
+      "bounded_static_verdict": "Current visual content and retained state/action declarations agree for this related-contract frame; no new actionable issue or required unreadable detail was observed. Exact bitmap/font acceptance and fresh runtime credit are not established."
+    }
+  ],
+  "findings": {
+    "new_actionable": [],
+    "required_unreadable": [],
+    "identity_mismatches": [],
+    "image_quota_or_tool_errors": []
+  },
+  "pending_and_scope": [
+    "C14 capture is on owner HOLD. This immutable diagnostic batch does not reconcile the complete capture and grants zero full-round, clean-round or round-2 credit.",
+    "Root's C15 detail-More 500-to-reference-400 source repair is separate from these C14 originals and cannot be cleared or credited by their pixels.",
+    "Existing Root raw library/Reader/font, geometry and source-switch dispositions remain pending; this batch preserves them while recording direct current font/padding/glyph observations.",
+    "C4-ACCEPT-01 truthful disabled/off and software capability split is preserved. No new enabled feature, physical-input, hardware lifecycle, e-ink, performance or live-reader qualification is added.",
+    "Retained action/state/log evidence establishes only captured software state. Toast duration, rectangle-only refresh, key-down inverse/DU latency and physical IME behavior were not freshly replayed."
+  ],
+  "verification_executed": false,
+  "credit": {
+    "full_round": 0,
+    "clean_round": 0,
+    "round_2": 0,
+    "fresh_replay": 0,
+    "physical_runtime": 0
+  },
+  "conclusion": "Four assigned current originals and two assigned original references were directly viewed. No new actionable or required unreadable finding; existing Root pending dispositions and owner HOLD remain."
+}

@@ -1,0 +1,133 @@
+{
+  "schema_version": 1,
+  "batch_id": "c5q01-b08",
+  "reviewer": "/root/final_validation_delivery/c4_full_review_coordinator/c5q01_b08",
+  "run_id": "43d2545cb872",
+  "round": 3,
+  "capture_manifest_sha256": "1731e4306df0596e80edd7df2d3e5e57c34fc64feae44572011eba61c2bfc7c5",
+  "final_inventory_sha256": "d65f77a634219f545fa9adfdfbd4bbcb2838ca77efa04a5cb7254ad3e6434c7d",
+  "identity_basis": "All SHA values are owner immutable inventory/transfer identities supplied in the assigned input or frozen case artifacts. No local rehash was performed.",
+  "freeze_tuple": {
+    "source_file_count": 227,
+    "source_sha256": "892f0ac73a807e4fd61a235d9ad4fe00c4f03c1e4e6881f28b2dd8bee2b7ddf1",
+    "binary_sha256": "9bd66a1f89473218e67558f763a4a7d4da7c642f9960ae5430ceb74ac365129b",
+    "harness_sha256": "94ccc78d3c11b97791618527350ce59dacf458bfc57f8f04aabec045dd544a74",
+    "capture_plan_sha256": "b3adabbf4f2d33789f381dc2ac55474d89fcd210d58ce9e5083c0d818d547eec",
+    "reference_scope_sha256": "c910bed9f02ed17b2ca0a54aca1beeeeb6caabc5a17a91afe764ddd3e7b0d33c",
+    "reference_sha256": "e7b49b456255432d74cfe41346f9d44c1a9c55bf67c5d55483e4ae3029547d18",
+    "capture_helper_sha256": {
+      "verify-ui.py": "470872e6fd22a78b474c0f862164875ad9c7237bd2f3f164512864580ac1e90d",
+      "verify-fullscreen.py": "4a6c48cef771e66e9b3058edd888dcf2d4bce02e2720b5cc00c7a5b987bc9670",
+      "handoff_c4_business.py": "6197f375b247962e3ce9acdd3779468073f11e0002ac3c7ce876a7b1a0d0d9be",
+      "handoff_c5_ui.py": "fa30ef2bf8ab512e9705f43933ff6acaf32993e5aa1dbc62be330d4c97b481f2",
+      "handoff_c5_reader.py": "5b88a0c1b8e1151a3f96decef1a3a06f98a0d9de99908709bafbfb02cea490d5"
+    }
+  },
+  "reviewed_case_ids": ["scribe--real-migration--candidates", "scribe--real-migration--selected", "scribe--real-migration--committed"],
+  "image_opens": {"new_candidate_originals": 3, "original_references": 2, "total": 5, "crops": 0},
+  "cases": [
+    {
+      "case_id": "scribe--real-migration--candidates",
+      "original_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate5/ui-qualification-01/scribe--real-migration--candidates.png",
+      "sha256": {
+        "png": "8e6c0b2f82adacbc3174b5bf16b824b7a347b8a605ea6485b1024470e7e66507",
+        "case_json": "e12d9c544aec64a5cc153a70e09699d8a6dcc53cb3c111c5cc9ead944783d85b",
+        "state": "419b2467fc4cb5fdfc5404be3eccdd3c12778cdda61d2549038f8cf84a77283a",
+        "actions": "74d53b682eebcaa3dab4c146bce1549c9ef7cf947e37947b0f677c722e904f60",
+        "metadata": "6667a62d7bcedea614a12918e2dddc8a4a17bb8b0cb8728f7be989e89c0074e6",
+        "log": "4615d2875e0f0c10e9f7de389c446be90d022c0766bf787b107dba123fc488fb"
+      },
+      "actual_view": {"tool": "tools.view_image", "original_opened": true, "native_size": [930, 1240]},
+      "observations": [
+        "The complete migration dialog occupies approximately x=125..805, y=220..848. Its black perimeter, three 84-pixel candidate rows, three option rows, and two bottom actions remain separated and fully inside the viewport, consistent with the half-size reference geometry.",
+        "The serif dialog heading is approximately 30 pixels; candidate titles use approximately 18-pixel sans text and subtitles approximately 16-pixel text. All three full candidate titles and each real eight-chapter subtitle are readable. The right hint column has visible whitespace from the subtitle and no overlap or clipping.",
+        "Three distinct title-only classifications are visible: same title for the uppercase/punctuation variant, similar title for series 017, and title requiring review for the unrelated title. Frozen candidate status fields contain those classifications, separately from the unchanged chapter-count subtitles. No numeric provider score or content/chapter match claim is shown.",
+        "All three candidate squares are empty. The disabled Start Migration action at approximately x=471..773, y=761..820 retains all four visible outline edges and a readable gray label; Cancel retains a dark outline. The preservation toggles are on and download removal is off."
+      ],
+      "intentional_capability_checks": [
+        "The underlying blank cover is accepted: the frozen state records one visible cover failure with cover work settled, and the log explicitly reports an offline-cache miss. It was not treated as an invented replacement cover.",
+        "Frozen state records choices/migration, no selected target, and migration_can_start=false. The recorded action chain opens the real source selector and chooses the origin record. The shorter category-preservation label does not promise tracking authorization, which the capability declaration marks unimplemented.",
+        "Desktop backend, portrait Scribe profile, and 930x1240 metadata agree with this original capture. Physical hardware qualification is explicitly false."
+      ],
+      "static_verdict": "pass_with_behavior_limits",
+      "behavior_limits": "The disabled appearance agrees with the recorded state; this review did not execute input. The full origin title is occluded in this modal capture, so the semantic classifier comparison was not independently recomputed. Frozen plan requirements describe real HTTP exact, near, and unrelated title variants; the screenshot is not external-service or physical-touch evidence."
+    },
+    {
+      "case_id": "scribe--real-migration--selected",
+      "original_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate5/ui-qualification-01/scribe--real-migration--selected.png",
+      "sha256": {
+        "png": "7214ed40514ecc2aaead61bbc0e10bc56ce0e5a37ac6f6610022108ab7eee0a7",
+        "case_json": "ead984d3ab2773d093d80919da88376fe26a236cbd50fc185cd2ae987a1373a8",
+        "state": "7ca17dfee99a4dced4528ecd84881773b51a9ad02cc123ebf521e08794fce020",
+        "actions": "ce514ee21554a8d28b60514bb0529996a44971193e831ff7831b222b54863212",
+        "metadata": "a59d4ac777c6abd50865410d087ad0b33c8b6c8d345dacfb471e527d048c61ea",
+        "log": "4615d2875e0f0c10e9f7de389c446be90d022c0766bf787b107dba123fc488fb"
+      },
+      "actual_view": {"tool": "tools.view_image", "original_opened": true, "native_size": [930, 1240]},
+      "observations": [
+        "Dialog footprint, typography, row dividers, and title/subtitle/hint columns remain aligned with the preceding state and the original migration reference. The three chapter-count subtitles remain fully readable and unchanged.",
+        "The first approximately 25-pixel square now contains a clear black inset; the other two squares remain empty. Start Migration is a black approximately 302x58-pixel action with a white label, while Cancel remains outlined. The visual state change is unambiguous without relying only on gray text.",
+        "All three title-only hint classes remain visible at the right edge, including the unrelated-title warning. No score or false exact content equivalence appears. The two enabled preservation switches and disabled removal switch remain clear."
+      ],
+      "intentional_capability_checks": [
+        "Frozen state selects only 15:komga-alternate:series-016 and records migration_can_start=true; the additional recorded action selects that same target. Candidate titles, eight-chapter subtitles, and the static selected indicator agree.",
+        "The accepted settled origin-cover backoff persists, with the same explicit cache-miss log and one visible failure. Category preservation remains separate from unavailable tracking authorization.",
+        "Metadata remains desktop, Scribe portrait, 930x1240; it does not claim physical Kindle qualification."
+      ],
+      "static_verdict": "pass_with_behavior_limits",
+      "behavior_limits": "The recorded selection and frozen state support this selected-state presentation only. No physical target size, touch dispatch, keyboard behavior, timing, classifier execution, or submission transaction was exercised by this reviewer."
+    },
+    {
+      "case_id": "scribe--real-migration--committed",
+      "original_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate5/ui-qualification-01/scribe--real-migration--committed.png",
+      "sha256": {
+        "png": "f2a301daaf31fffc13c1a073881f83b39498e9af8fd937c8adc33cc43a8393ed",
+        "case_json": "4c6c3c7df62aef23439727071a261750c38762c7f519cba44df9e5a1901ec505",
+        "state": "75f79f493ce0fe475051b0ba1abb8db5fbeed1c8e0794d5df6341598acdce617",
+        "actions": "4938fa023caada94232a0583871b32c5377691e81af1f4d6feacc18bb8210c99",
+        "metadata": "9464ccc3f3f121ec488431132a348273d3b32abda0eb576b6ac7af5bf331e97f",
+        "log": "4615d2875e0f0c10e9f7de389c446be90d022c0766bf787b107dba123fc488fb"
+      },
+      "actual_view": {"tool": "tools.view_image", "original_opened": true, "native_size": [930, 1240]},
+      "observations": [
+        "The modal is absent and the two-column detail layout is visible. The cover frame is approximately x=40..348, y=102..524; the chapter column begins near x=384. This preserves the default reference hierarchy, spacing, and separate chapter-date/download controls.",
+        "The target fixture cover is visible. The approximately 44-pixel serif title and long source line end with explicit ellipses within the left column. Eight chapter rows retain readable numbers, dates, approximately 20-pixel sans titles, and individually outlined download buttons without collision.",
+        "Continue Reading, In Library, Track, and Migrate affordances retain clear boundaries. The fixture description and four tag chips fit above the bottom folio. The 1/1 folio matches the smaller real chapter inventory; the reference's sample chapter count and artwork are not imposed on this record."
+      ],
+      "intentional_capability_checks": [
+        "The recorded final action is migration/start. Frozen state now identifies current_book=15:komga-alternate:series-016, source_id=komga-alternate, no modal, no selected migration target, no loading/committing flag, and eight chapters. This supports a captured target-detail outcome, rather than a synthetic success overlay.",
+        "The target's detail source is Alternate local Komga fixture. Frozen state records zero visible cover failures and settled cover work. The existing log's origin cache miss is not evidence that the now-visible target cover failed.",
+        "The capability declaration still marks tracking authorization and physical hardware qualification false. The visible tracking affordance alone does not demonstrate an authorized integration."
+      ],
+      "static_verdict": "pass_with_behavior_limits",
+      "behavior_limits": "Recorded actions and captured state support a static fixture outcome only. This reviewer did not inspect a live database, independently verify retained categories/read positions or download cleanup, execute an HTTP request, or establish real external-service connectivity. The unverified target connection status was not reinterpreted as a successful connection."
+    }
+  ],
+  "references": [
+    {
+      "reference_id": "sc-manga--migrate",
+      "path": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/screens/states/sc-manga--migrate.png",
+      "sha256": "2d78b2d3388c7052e0e1b656877ffb06daac31ca7d4d0dc107417fb66722ca3d",
+      "actual_view": {"tool": "tools.view_image", "original_opened": true, "native_size": [1860, 2480], "tool_display_size": [1368, 1824]},
+      "comparison": "Original selected migration dialog reviewed for its half-size modal footprint, typography hierarchy, row/hint separation, option controls, and paired actions. Actual fixture records and truthful title-only hints may differ. The unselected dialog is a related disabled-action contract comparison."
+    },
+    {
+      "reference_id": "sc-manga--default",
+      "path": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/screens/sc-manga.png",
+      "sha256": "33b5f4cb64428dc8e54237bdcad03c44e556da6570b234556c0b60f8d7c1e082",
+      "actual_view": {"tool": "tools.view_image", "original_opened": true, "native_size": [1860, 2480], "tool_display_size": [1368, 1824]},
+      "comparison": "Original detail page reviewed for the two-column geometry, cover/title hierarchy, outlined actions, chapter rows, tags, and folio. The committed migration outcome is a related state comparison, not an invented exact reference state."
+    }
+  ],
+  "findings": [],
+  "suggestions": [],
+  "evidence_gaps": [],
+  "limitations": [
+    "Bounded independent static review of three C5 candidate originals and two assigned original references only; no full-suite or clean-round conclusion.",
+    "Only frozen artifact text was read and original PNGs were opened. No application, test, build, probe, local validation, hash, SQL, SSH, copy, crop, or image processing was run. No current production implementation was used to explain these pixels.",
+    "Geometry and font sizes are visual approximations, not measured pixel assertions. Original reference images were resized only by tools.view_image for display and remained readable.",
+    "Screenshots and recorded state do not prove physical touch, e-ink effects, native mapping, timing, independent live-reader lease behavior, database retention, or real external services. The classifier was not independently executed and the full origin title is hidden in the assigned modal captures."
+  ],
+  "status": "completed_bounded_static_review",
+  "sealed": true
+}

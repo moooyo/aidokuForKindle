@@ -1,0 +1,159 @@
+{
+  "batch_id": "supplemental-04",
+  "reviewer": "/root/phase3_round1_review/supplemental_04",
+  "run_id": "a1baf3fe3dc2",
+  "candidate_identity": {
+    "binary_sha256": "94d7f3bbcab475ad8833a2f3c486138f7b49bead231851c2d8eab2f0c3d2ac51",
+    "source_sha256": "aef9db4e111165016a10a2a95e111f3155860b8510c7f6207ec9c79fbec5082c",
+    "profile": "pw5",
+    "logical_size": [618, 824],
+    "hash_check": "Each current candidate PNG SHA-256 matches both the batch expected_png_sha256 and its case metadata evidence_hashes.screenshot.sha256. All eight case sidecars identify the stated run, binary, and source."
+  },
+  "reviewed_case_ids": [
+    "pw5--content-stress--filter-tags-first",
+    "pw5--content-stress--long-chapters",
+    "pw5--detail-first-boundary",
+    "pw5--detail-last-page",
+    "pw5--detail-page-two",
+    "pw5--empty-history",
+    "pw5--empty-library",
+    "pw5--filter-completed-1"
+  ],
+  "reviewed_cases": [
+    {
+      "case_id": "pw5--content-stress--filter-tags-first",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/pw5--content-stress--filter-tags-first.png",
+      "candidate_sha256": "36f6d5614e04f4de413a29204d6c13580c79494ea9c29cc7bcd341b9b0dafe37",
+      "viewed_candidate": true,
+      "outcome": "actionable_finding",
+      "observations": [
+        "The image identifies Local Komga fixture and shows the catalog-filter choices sheet, matching the catalog route and modal context in the case sidecar. The supplied checks report 34 actual metadata tags, 20 loaded catalog records, and no active tag filters.",
+        "The sheet has a white surface and a black top rule without a visible shadow, stippled scrim, or dimmed backdrop. Sort, status, tag pager, reset, and apply controls remain within the viewport. The unavailable follows and rating sorts are visibly muted.",
+        "The first tag page shows sixteen chips in two rows of eight. Each visible label collapses to the same Actua... prefix, hiding the numeric suffix that distinguishes Actual tag 00 through Actual tag 15. The user cannot identify a desired tag from these labels; see P3R1-SUP04-1.",
+        "The tag folio shows 1 / 3, consistent with 34 tags and sixteen visible chips per page. Its previous action is muted and its next action remains visible; the apply action accurately refers to the 20 loaded records."
+      ],
+      "intentional_differences": []
+    },
+    {
+      "case_id": "pw5--content-stress--long-chapters",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/pw5--content-stress--long-chapters.png",
+      "candidate_sha256": "99d0153b9c9f83abb1a7283ff1eb3ff75b3e07a3a15384db8281677fde489892",
+      "viewed_candidate": true,
+      "outcome": "no_actionable_finding",
+      "observations": [
+        "The final image is a detail page for Local Komga fixture series 000, matching the sidecar detail route and current book 5:komga:series-000. The input launch screen is sources; the final captured route is detail.",
+        "The very long book name uses a single-line ellipsis. The three description lines and the separate description/tags action remain distinct from the cover, metadata, continuation button, library action, and tracking action.",
+        "Six chapter rows numbered 8 through 3 are visible, matching the sidecar records whose title lengths are 445 characters. The titles elide within their own allocations; separate numbers, dates, dotted leaders, and download controls remain visible without overlap.",
+        "The first-page information block remains present and the folio reads 1 / 2 for eight chapters, consistent with a capacity of six followed by twelve. The previous action is absent with its allocation retained, and the next action is visible."
+      ],
+      "intentional_differences": []
+    },
+    {
+      "case_id": "pw5--detail-first-boundary",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/pw5--detail-first-boundary.png",
+      "candidate_sha256": "c82dab94dd83aff1aa8a20bffe4a0058bf48a276b6475bfdf356f66c31300fe1",
+      "viewed_candidate": true,
+      "outcome": "no_actionable_finding",
+      "observations": [
+        "The first detail page retains the cover, large book title, author/source, three-line description, description/tags action, and continuation/library/tracking actions. The chapter header reports 86 chapters, 52 unread, and 9 downloaded, matching the supplied state.",
+        "All six first-page rows, numbered 86 through 81, are readable and have distinct download controls. The sixth row remains above the folio with no clipping or button obstruction.",
+        "The folio is centered at 1 / 8. Its left navigation allocation is empty and its right next-page action is visible. Eight pages agree with 1 + ceil((86 - 6) / 12).",
+        "Cover stippling is part of the fixture artwork. The surrounding information and action surfaces are white or intentionally selected black, without an added cover shadow or modal mask."
+      ],
+      "intentional_differences": []
+    },
+    {
+      "case_id": "pw5--detail-last-page",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/pw5--detail-last-page.png",
+      "candidate_sha256": "d3108571bccf9a8a9144f4df17186198f8ce227eb83bc56dbe023403677c8642",
+      "viewed_candidate": true,
+      "outcome": "no_actionable_finding",
+      "observations": [
+        "The compact return row contains the book title, while the first-page cover, information, and continuation actions are collapsed. The chapter header remains intact beneath it.",
+        "The last page contains exactly the remaining eight chapters, numbered 8 through 1, matching the case state. Their read state uses lighter text; dates and individual download controls remain distinct and fully visible.",
+        "The folio reads 8 / 8 at the same bottom center used by the other detail pages. The previous-page action remains at the left, while the unavailable next action is hidden without moving the center.",
+        "The unused white area below the eight remaining rows does not conceal another record. The supplied boundary check reports page 8 of 8, and no row or download control is obscured by the pager."
+      ],
+      "intentional_differences": []
+    },
+    {
+      "case_id": "pw5--detail-page-two",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/pw5--detail-page-two.png",
+      "candidate_sha256": "a14e62155f05d1a051b21cda4acfd643410acbaaded98a452667122a051aa251",
+      "viewed_candidate": true,
+      "outcome": "no_actionable_finding",
+      "observations": [
+        "The second detail page uses the compact title in the return row and collapses the first-page information/actions, preserving the directory header.",
+        "Twelve complete chapter rows numbered 80 through 69 are visible, matching the sidecar and continuing immediately after the first page's chapter 81. Every row retains its title, date, dotted leader, and separate download control.",
+        "The twelfth row is fully above the bottom pager. The folio reads 2 / 8 and both previous and next actions are visible; there is no overlap or change in center allocation relative to the first and last pages.",
+        "The page count and row offsets follow DESIGN_HANDOFF.md lines 292-296 rather than the obsolete fixed-six-row pagination explanation."
+      ],
+      "intentional_differences": []
+    },
+    {
+      "case_id": "pw5--empty-history",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/pw5--empty-history.png",
+      "candidate_sha256": "e38c59c5fa37c5cadd0b16abd3e97c6594c8f6a0af86655064dfd246a93ca470",
+      "viewed_candidate": true,
+      "outcome": "no_actionable_finding",
+      "observations": [
+        "The image shows the history route with a zero-read caption, the reading-history tab selected, and a centered clock icon plus an explicit no-history message. The sidecar reports history_count 0 and no visible history records.",
+        "No fabricated cover, chapter, progress, timestamp, or history row appears. The clear-history icon is visibly muted, while the incognito control and chapter-updates tab remain distinct.",
+        "The single-page folio reads 1 / 1 with no previous or next action. It remains above the dock, whose history item is visibly selected. The empty-state message and navigation do not overlap."
+      ],
+      "intentional_differences": []
+    },
+    {
+      "case_id": "pw5--empty-library",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/pw5--empty-library.png",
+      "candidate_sha256": "ff6f5339a5049ee922357df10835b7cb8401f87b9313073d917a6c539ebff661",
+      "viewed_candidate": true,
+      "outcome": "no_actionable_finding",
+      "observations": [
+        "The library header reports zero books and zero updated books, matching library_count 0 in the sidecar. The content area shows a books icon and an explicit empty-library message rather than fixture book cards or a fabricated continuation record.",
+        "The black Browse sources action is clearly separated from the message and remains fully visible. Sort/filter and More actions remain accessible in the header without overlapping its title.",
+        "The library item is selected in the bottom dock, and the empty content leaves ample separation from it. No unnecessary previous/next actions or invalid page number appear."
+      ],
+      "intentional_differences": []
+    },
+    {
+      "case_id": "pw5--filter-completed-1",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/pw5--filter-completed-1.png",
+      "candidate_sha256": "0400ee16d99117c42ef27dcbecc2c393f60cd73403e1bdc41039683a8badabfe",
+      "viewed_candidate": true,
+      "outcome": "no_actionable_finding",
+      "observations": [
+        "The library-filter choices sheet matches the sidecar library route, modal context, and library_filters [0, 0, 0, 1]. Completed is shown as a checked black chip, while the other three filter chips remain neutral.",
+        "All eight sort choices are visible in two columns. Recent read and descending order have distinct black selections, and the Done action is fully visible at the sheet's upper right.",
+        "The sheet extends from its black top rule to the bottom according to its content. Its white background has no shadow, stippled mask, or dimming. Direction and filter rows are not clipped or covered by the dock.",
+        "The background retains the library header, continuation card, and the tops of actual filtered covers. The sidecar lists eight visible books on page 1 of 2, all with completed status; the global library count remains 46. These actual counts are not treated as reference sample-value mismatches."
+      ],
+      "intentional_differences": []
+    }
+  ],
+  "suggestions": [
+    {
+      "id": "P3R1-SUP04-1",
+      "case_id": "pw5--content-stress--filter-tags-first",
+      "priority": "P2",
+      "description": "The dense catalog tag grid makes different real tags visually indistinguishable by truncating every chip to the same prefix.",
+      "evidence": [
+        "In the candidate PNG, the tag area at approximately x=22..596 and y=583..675 contains two rows of eight chips. The visible labels all end after the Actua prefix, so none exposes its distinguishing numeric suffix.",
+        "The case sidecar lists 34 real catalog_tag_options beginning with Actual tag 00 through Actual tag 31. The sixteen first-page chips correspond to distinct metadata values even though their visible labels cannot distinguish them.",
+        "phase3-reference-scope.json additionalRequiredCases content-stress requires dense content to remain readable without overlap. HANDOFF.md section 4.4 defines identifiable three-state tag choices. prototype/pw-source.dc.html lines 109-112 use content-sized labels in a wrapping collection rather than an eight-column allocation that removes their identity.",
+        "The local ui-ux-pro-max quick reference compact-label-overflow and chip-collection-reflow guidance likewise keeps essential labels available and reflows collections before shrinking their labels. The project handoff remains the governing visual contract."
+      ],
+      "recommendation": "Allocate enough width for each tag's distinguishing text, for example by using fewer columns or content-sized wrapping chips. Preserve the neutral/include/exclude mark, paginate any additional rows, and let the sheet follow its content height as specified in DESIGN_HANDOFF.md lines 279-280. Confirm that Actual tag 00 through Actual tag 15 can each be identified directly from the first-page labels.",
+      "status": "open",
+      "introduced_round": 1
+    }
+  ],
+  "limitations": [
+    "All eight listed candidate PNGs were individually opened with tools.view_image. No other candidate images or reference images were loaded for this batch.",
+    "There is no independently exported per-state pixel reference for these stress, boundary, empty, and operational variants. This review uses the reference scope, DESIGN_HANDOFF.md, HANDOFF.md, and static prototype text; it does not assert pixel matching.",
+    "Existing sidecar state and passed checks were read as supplied evidence and matched to the visible images. They were not independently rerun. No local or remote app, build, test, smoke test, runtime probe, or interactive behavioral verification was performed in this review.",
+    "A static PNG cannot establish hit-target behavior, outside dismissal, tri-state cycling, actual page navigation, retained-scene wake, physical refresh behavior, hardware capability qualification, or a 512 MiB memory bound.",
+    "These eight cases contain no closed-reader, absent-hardware, image-quality, or authentication state. No conclusion about their required artwork-only, hidden, or honestly disabled behavior is extrapolated from this subset.",
+    "This is a fresh manual supplemental subset review with one open finding. It does not establish a complete clean round, whole-matrix acceptance, or a clean-round streak."
+  ]
+}

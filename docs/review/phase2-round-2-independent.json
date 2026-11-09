@@ -1,0 +1,139 @@
+{
+  "schema_version": 3,
+  "phase": 2,
+  "round": 2,
+  "candidate": "final candidate 4",
+  "reviewer": "phase2_fidelity_review",
+  "supporting_reviewer": "expanded_ui_readonly",
+  "status": "changes_required",
+  "review_complete": true,
+  "manual_ui_review_complete": true,
+  "manual_capture_counts": {"primary": 51, "supporting": 41, "total_distinct_fresh_captures": 92},
+  "complete_round_qualified": false,
+  "qualifies_as_clean_round": false,
+  "consecutive_clean_rounds": 0,
+  "frozen_candidate_sha256": "52df429f3ecd1c8c69e61dd39dc2f7f725ad9658ba41e1c83bbcabd797d084c2",
+  "artifact_directory": "artifacts/phase2/ui-round-2",
+  "new_suggestion_count": 1,
+  "new_findings": [
+    {
+      "id": "P2-R2-I001",
+      "priority": 3,
+      "title": "The first bundled comic page still has discontinuous hidden-area continuations",
+      "actual": "artifacts/phase2/fullscreen-round-2/scribe-landscape-vertical-background-notification.png",
+      "additional_actual": "artifacts/phase2/ui-round-2/pw5-reader-fullscreen.png",
+      "source": "assets/demo/page-00.png",
+      "source_before_sha256": "0b8dfbc4da3e6cb6f2f533fcac74ab1711b7a611951835f0a7a8b8e23196a5af",
+      "retained_source_before": "artifacts/phase2/front-art-repair/page-00-before.png",
+      "source_script": "scripts/extract-design-assets.py:263",
+      "evidence": "Direct source-image inspection confirms a horizontal join at source row 178 through the rectangular speech balloon: its vertical marks change alignment across the boundary. At row 1269, the lower radial lines, crosshatch phase and silhouette change abruptly. The extraction script pastes the original PDF clip into [0,178,1172,1269) over older synthetic upper and lower art. The final candidate's closed Reader exposes these regions, and the landscape vertical case makes the upper mismatch particularly clear.",
+      "suggestion": "Continue the first page's observed geometry and pattern phases above and below its preserved PDF clip, as was done for the second page. Keep fitting, renderer behavior and the observed original clip intact.",
+      "review_note": "The round-1 asset diagnosis focused on page-01 and did not close the same continuation defect in page-00. This is now a confirmed additional source-art finding rather than a renderer defect, and this round cannot count as clean.",
+      "disposition": "Root accepted a front-page continuation repair. Its first complete after image, upper/middle/lower crops, both boundary crops at 2x and the enlarged vertical view were independently inspected. The balloon and three vertical marks, horizontal-line phase, lower ray geometry, crosshatch phase and silhouette now appear continuous with no new visible gray band. A new frozen candidate and two fresh clean rounds are still required.",
+      "repair_preflight": {
+        "after": "artifacts/phase2/front-art-repair/candidate-1/page-00-after.png",
+        "report": "artifacts/phase2/front-art-repair/candidate-1/repair-report.json",
+        "after_sha256": "c0f530d9ee0f3c7a49212cabc9fac43075b9e625d4d68a61e26c5104a2d657ad",
+        "unchanged_back_sha256": "c3d4f78ed7bbf21ef683c4af9f37de28a7d808c8e554d57d6253cf6d1f33260a",
+        "before_provenance_note": "The top-level before PNG is the original byte-for-byte asset with SHA-256 0b8d. The candidate-1 before preview was re-encoded with identical pixels and is not represented as the original byte-copy.",
+        "images_viewed": ["page-00-after.png", "front-upper-after.png", "front-middle-after.png", "front-lower-after.png", "front-upper-boundary-after-2x.png", "front-lower-boundary-after-2x.png", "front-vertical-after-2x.png"],
+        "reported_source_preservation": "The original UI header-separator row 178 is explicitly replaced, changing 1136 pixels. The preserved PDF artwork is [0,179,1172,1269), containing 1277480 pixels with zero mismatches; dimensions remain 1172 by 1648. These remote measurements were read, not rerun locally, and were not substituted for visual inspection."
+      }
+    }
+  ],
+  "remaining_previous_findings": [],
+  "scope_note": "Every screenshot listed here is a fresh round-2 capture on candidate 4, not a substituted round-1 image. The complete independent manual UI scope covers 51 primary and 41 supporting fresh captures, including all twelve PDF baselines. Both round-1 repairs are confirmed in fresh application images. One newly confirmed continuation defect in the first source page requires another asset repair, so this complete manual review does not qualify as a clean round despite all four remote automated matrices passing.",
+  "baseline_coverage": [
+    {"screen": "pw5-library", "reference": "tmp/design/reference-01.png", "actual": "artifacts/phase2/ui-round-2/pw5-library.png", "reviewed": true, "new_findings": 0, "checks": "Typography, continuation card, four-by-two covers, complete captions and badges, selected-tab rule, stable pager and navigation."},
+    {"screen": "pw5-detail", "reference": "tmp/design/reference-02.png", "actual": "artifacts/phase2/ui-round-2/pw5-detail.png", "reviewed": true, "new_findings": 0, "checks": "Synopsis, continuation and secondary actions, directory heading, six chapter rows, dotted leaders, independent controls and truthful page count."},
+    {"screen": "pw5-reader", "reference": "tmp/design/reference-03.png", "actual": "artifacts/phase2/ui-round-2/pw5-reader.png", "reviewed": true, "new_findings": 0, "checks": "Explicitly opened menu, book and chapter hierarchy, settled page information, seek/chapter separation and anchored tools."},
+    {"screen": "pw5-sources", "reference": "tmp/design/reference-04.png", "actual": "artifacts/phase2/ui-round-2/pw5-sources.png", "reviewed": true, "new_findings": 0, "checks": "Built-in and extension groups, installed and unavailable states, connection labels, uninstall, pairing card and navigation."},
+    {"screen": "pw5-catalog", "reference": "tmp/design/reference-05.png", "actual": "artifacts/phase2/ui-round-2/pw5-catalog.png", "reviewed": true, "new_findings": 0, "checks": "Source hierarchy and action icons, selected-tab rule, context artwork, metadata, dividers and stable pager."},
+    {"screen": "pw5-search", "reference": "tmp/design/reference-06.png", "actual": "artifacts/phase2/ui-round-2/pw5-search.png", "reviewed": true, "new_findings": 0, "checks": "Search and scope controls, truthful counts, complete result titles, metadata, retry state and navigation."},
+    {"screen": "pw5-history", "reference": "tmp/design/reference-07.png", "actual": "artifacts/phase2/ui-round-2/pw5-history.png", "reviewed": true, "new_findings": 0, "checks": "Privacy and deletion controls, date grouping, real summary, progress, row targets and pager."},
+    {"screen": "pw5-settings", "reference": "tmp/design/reference-08.png", "actual": "artifacts/phase2/ui-round-2/pw5-settings.png", "reviewed": true, "new_findings": 0, "checks": "Device card, storage and network labels, icon semantics, typography, section rhythm, row values, pager and navigation."},
+    {"screen": "scribe-library", "reference": "tmp/design/reference-09.png", "actual": "artifacts/phase2/ui-round-2/scribe-library.png", "reviewed": true, "new_findings": 0, "checks": "Six-by-three cover grid, captions and badges, continuation and daily-update cards, tab rule, stable pager and navigation."},
+    {"screen": "scribe-detail", "reference": "tmp/design/reference-10.png", "actual": "artifacts/phase2/ui-round-2/scribe-detail.png", "reviewed": true, "new_findings": 0, "checks": "Two-column proportions, cover and continuation block, synopsis and tags, full directory rule, sixteen rows and pager."},
+    {"screen": "scribe-sources", "reference": "tmp/design/reference-11.png", "actual": "artifacts/phase2/ui-round-2/scribe-sources.png", "reviewed": true, "new_findings": 0, "checks": "Labeled actions, source cards, search and filter regions, context metadata, five-by-two grid, complete captions and pager."},
+    {"screen": "scribe-landscape-reader", "reference": "tmp/design/reference-12.png", "actual": "artifacts/phase2/ui-round-2/scribe-landscape-reader.png", "reviewed": true, "new_findings": 0, "checks": "Explicitly opened menu, RTL spread order, clean repaired left-page artwork, locked-direction label, page information and stable seek/chapter/tool anchors."}
+  ],
+  "additional_direct_manual_coverage": {
+    "artifact_directory": "artifacts/phase2/ui-round-2",
+    "images_read": [
+      "pw5-reader-fullscreen.png", "reader-seek-commit.png", "reader-bottom-right-rtl.png", "reader-seek-preview.png",
+      "reader-panel-close-pure.png", "reader-escape-panel-pure.png", "reader-bottom-right-ltr.png", "reader-escape-closes-menu.png", "reader-toc-chapter-pure.png", "reader-bottom-right-vertical.png",
+      "session-library-checkpoint.png", "session-library-restored.png", "session-cross-book-checkpoint.png", "session-cross-book-restored.png", "session-reader-checkpoint.png", "session-reader-restored.png", "session-vertical-checkpoint.png", "session-vertical-restored.png",
+      "lifecycle-reader-baseline.png", "lifecycle-reader-resumed.png", "lifecycle-doubletap-reset.png", "lifecycle-seek-reset.png"
+    ],
+    "observations": [
+      "Default reading contains only the comic and fitting background, including the former top and bottom chrome area.",
+      "The repaired odd-page artwork is visible after seek commit and ordinary bottom-right navigation. Its upper gray background, rays, speech bubbles and bottom stripes are continuous; neither the original repeated strips nor the first repair's tone boundary is visible.",
+      "Seek preview remains in the explicitly opened menu with the desired page information; commit returns to pure imagery.",
+      "Panel closure, Escape and table-of-contents selection return to comic-only imagery. Bottom-right RTL, LTR and vertical samples perform ordinary reading navigation.",
+      "The library retains its Reading filter and page 2 of 2 after restart. The cross-book detail pair retains the second book, and the Reader restart pair retains its accepted image.",
+      "The vertical restart pair retains page 1, offset 1401 and zoom 2 with matching framing. Desktop lifecycle baseline/resume retain page 20 and two image jobs started; double-tap reset ends at its intended page 13 with zoom 1, and cancelled seek remains at page 12. These desktop observations are not native park evidence."
+    ]
+  },
+  "recovery_direct_manual_coverage": {
+    "artifact_directory": "artifacts/phase2/recovery-round-2",
+    "images_read": ["failed-next-visible.png", "retry-failed-target.png", "first-page-visible.png", "first-page-retry.png", "manifest-failure-visible.png", "manifest-retrying-visible.png", "manifest-retry-target.png", "pending-menu-displayed.png", "slow-first-image-loading.png", "slow-first-action-visible.png", "slow-first-action-dismiss.png", "pending-bookmark-save.png", "pending-set-cover.png"],
+    "observations": [
+      "The page-8 failure offers an explicit retry and continued reading of page 7; successful retry returns to pure page-8 artwork.",
+      "The first-page failure offers visible retry and return actions, and a successful retry displays the first page without permanent chrome.",
+      "Cross-chapter failure, retry and continued-reading destinations visibly identify chapter 2 and chapter 1. Retry-in-progress is disabled with loading feedback, then accepts chapter 2 and clears the panel.",
+      "Pending menu projection describes displayed page 7 while the requested page is 8. Bookmark, export and cover targets remain bound to displayed page 7.",
+      "Before the first accepted image, a centered loading label gives feedback. Attempting an image action opens a readable wait-for-image panel; dismissing it restores loading. Reviewed reason labels remain safe categories without source error text."
+    ]
+  },
+  "supporting_capability_manual_coverage": {
+    "images_read": ["pw6-library.png", "scribe2-library.png", "scribe3-library.png", "scribe3-nofrontlight-reader.png", "scribe3-nofrontlight-settings.png", "reader-menu-blank-does-not-turn.png"],
+    "artifact_directory": "artifacts/phase2/ui-round-2",
+    "observation": "All six fresh images and their sidecars were viewed again. Device-specific library geometry and captions are intact, the no-frontlight settings omit unsupported controls, and closed Reader/menu-blank results remain pure at the committed page.",
+    "fresh_data_evidence": "Inspected sidecars refer to candidate4/artifacts/ui-round-2/data/210f8712f62d, rather than round-1 data.",
+    "new_suggestion_count": 0
+  },
+  "previous_repairs": [
+    {"id": "P2-R1-I001", "status": "visually fixed in fresh application captures", "assessment": "manifest-failure-visible and manifest-retrying-visible identify failed/retry chapter 2 page 1 and continued-reading chapter 1 page 1 in their title and action captions. The retry remains disabled while loading."},
+    {"id": "P2-R1-I002", "status": "visually fixed in fresh application captures", "assessment": "The odd-page seek and bottom-right captures and landscape spread show continuous geometry and matching upper gray tones. Final source asset hash is c3d4f78ed7bbf21ef683c4af9f37de28a7d808c8e554d57d6253cf6d1f33260a."}
+  ],
+  "supporting_expanded_review": {
+    "report": "docs/review/phase2-round-2-expanded-support.json",
+    "fresh_expanded_images_read": 35,
+    "fresh_capability_images_read": 6,
+    "new_suggestions_in_supporting_subset": 0,
+    "scope": "Selection and cancellation, batch acceptance and truthful empty feedback, first/last queue pages, applicable global actions, completed removal, cache information/clear, online/offline cover continuity, summary tag context and notice placement/expiry."
+  },
+  "fullscreen_direct_manual_coverage": {
+    "artifact_directory": "artifacts/phase2/fullscreen-round-2",
+    "images_read": ["pw5-rtl-background-notification.png", "scribe-landscape-rtl-background-notification.png", "scribe-landscape-ltr-last-page.png", "scribe-landscape-vertical-background-notification.png"],
+    "observations": [
+      "Active real-worker success notices do not add visible chrome to closed Paperwhite or landscape Reader images.",
+      "The complete landscape spread shows the repaired second page without a decorative gutter, repeated sections or the former upper tone boundary.",
+      "The last-page case uses a single image with proportional fitting and no empty decorative page slot. Landscape vertical reading uses the full viewport without menu, status, page labels or bookmark marks.",
+      "The landscape vertical view additionally exposed the separately reported first-page source-art join; the exact oracle correctly verifies rendering of its source pixels, not artistic continuity."
+    ]
+  },
+  "reported_remote_verification": {
+    "ui_report": "artifacts/phase2/ui-round-2/report.json",
+    "ui_passed": 155,
+    "ui_failed": 0,
+    "ui_run_id": "210f8712f62d",
+    "recovery_report": "artifacts/phase2/recovery-round-2/report.json",
+    "recovery_passed": 32,
+    "recovery_failed": 0,
+    "recovery_run_id": "ac528b37937c",
+    "raw_report": "artifacts/phase2/raw-round-2/report.md",
+    "raw_passed": 11,
+    "raw_failed": 0,
+    "fullscreen_report": "artifacts/phase2/fullscreen-round-2/report.json",
+    "fullscreen_passed": 44,
+    "fullscreen_failed": 0,
+    "fullscreen_coverage_complete": true,
+    "fullscreen_run_id": "f2aeea2221e7",
+    "same_frozen_binary_unchanged": true,
+    "supplementary_retest_needed": false,
+    "assessment": "All automated matrices pass on the unchanged candidate. They do not override the new manually confirmed source-art finding or certify a complete clean round."
+  },
+  "pending_requirements": ["Repair and independently inspect the first-page continuations.", "Freeze the updated candidate and perform two new complete rounds with no new suggestions or required unresolved items.", "Retain native sleep/wake and complete-round integration evidence for that final candidate."],
+  "verification_note": "The reviewers only read local screenshots, retained sidecars and source/report files. No local application, build, test suite, smoke test or runtime probe is executed. All application verification is performed by the remote worker and isolated firmware guest."
+}

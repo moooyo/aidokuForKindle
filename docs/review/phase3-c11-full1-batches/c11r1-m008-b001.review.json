@@ -1,0 +1,123 @@
+{
+  "schema_version": 1,
+  "batch_id": "c11r1-m008-b001",
+  "reviewer": "c11r1_m008_b001 fresh keyboard reviewer",
+  "record_date": "2026-11-07",
+  "round": 1,
+  "run_id": "55c498296d35",
+  "module_id": "008-sc-sources-search-content",
+  "input_inventory": {
+    "path": "D:/Code/aidokuForKindle/docs/review/phase3-c11-full1-batches/c11r1-m008-b001.input.json",
+    "sha256": "pending owner declaration",
+    "remaining_identity_refs": [
+      "input.source_manifest",
+      "input.reference_manifest",
+      "input.freeze_tuple.reference_sha256",
+      "input.freeze_tuple.capture_plan_sha256",
+      "input.freeze_tuple.reference_scope_sha256",
+      "input.freeze_tuple.main_harness_sha256",
+      "input.freeze_tuple.helper_sha256",
+      "input.freeze_tuple.execution_input_sha256",
+      "input.freeze_tuple.gate_manifest_sha256"
+    ],
+    "hash_policy": "All SHA256 values are owner declarations. No local hash command or verification program was run."
+  },
+  "module_snapshot": {
+    "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate11/ui-round-1/snapshots/ui-round-1-snapshot-008-sc-sources-search-content/inventory.json",
+    "sha256": "43b3e09182a62b4dd91a956d5324d42f412a2914500544ae878d344fb3ec4186",
+    "archive_sha256": "1a867411f03f74930c4f0f8044e993e8124f64c90f9a8d619729d60e35e08b59",
+    "transfer_accounting_sha256": "26d6a7ae1662131c810758b2f13306d812d514e136a889c961e2263d3c2e1879",
+    "owner_matched_files": 528,
+    "capture_count": 74,
+    "manual_review_count": 55,
+    "full_manifest_pending": true,
+    "static_inventory_check": "Both assigned IDs occur in exact_captured_ids and manual_review_ids. Their six declared artifact paths, byte counts and hashes agree with the input."
+  },
+  "freeze_tuple": {
+    "run_id": "55c498296d35",
+    "source_sha256": "33a2d049307c398da8bfbf196d1bf8e086412c117c194b592f4a93b5bfaedb3f",
+    "binary_sha256": "1e60db345cbd6fbe580258a4a309bf42361781061dc2033f78a8a5eb4446ad72",
+    "binary": "/root/aidoku-phase3/candidate11/desktop/aidoku",
+    "source_root": "/root/aidoku-phase3/candidate11/source-snapshot",
+    "remaining_tuple_identity": "See input_inventory.remaining_identity_refs in the assigned immutable input."
+  },
+  "reviewed_case_ids": [
+    "scribe--server-address-keyboard",
+    "scribe--server-secret-keyboard"
+  ],
+  "actual_original_image_opens": 4,
+  "references": [
+    {
+      "reference_id": "sc-browse--server-setup",
+      "path": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/screens/states/sc-browse--server-setup.png",
+      "sha256": "5fd0250e5dc6d2e26b1a70ba5a2ed07cf72ad802874abfe8b36e425ca5017803",
+      "original_dimensions": [1860, 2480],
+      "actual_image_opened": true,
+      "comparison_status": "Related server-configuration contract only; not an exact keyboard-state reference.",
+      "observation": "Source heading, labeled address and credential fields, paired phone-fill and connection controls establish the same visible form hierarchy and bounds. The supplied sample has an address; the current cases are unconfigured."
+    },
+    {
+      "reference_id": "sc-search--default",
+      "path": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/screens/sc-search.png",
+      "sha256": "7f66ae6f58fee41e471fab3f308afc9170bc1465b5c66cc0b590fac30a2a72c4",
+      "original_dimensions": [1860, 2480],
+      "actual_image_opened": true,
+      "comparison_status": "Related keyboard contract only; search composition and search-submit semantics differ from server entry.",
+      "observation": "The QWERTY rows, staggered second row, serif letterforms, shift/backspace outlines and wide bottom-row controls provide the related keyboard geometry and typography contract."
+    }
+  ],
+  "cases": [
+    {
+      "case_id": "scribe--server-address-keyboard",
+      "original_png_path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate11/ui-round-1/snapshots/ui-round-1-snapshot-008-sc-sources-search-content/files/output/scribe--server-address-keyboard.png",
+      "png_sha256": "934629bb79da6a39c4f211eb8eca7e3918003a45b8b8b81ffa19199765a2fe26",
+      "case_json_sha256": "4c2f93ea3a6a8de60d90f50199bcc96ba4b020becbf8c39eca77315a3f457323",
+      "state_sha256": "50f47b790c143e8df42a47e5db4d2389ede63474b3256c8b9b3957fd7dcad8b6",
+      "metadata_sha256": "ffecde2bf35f597039afbdc0f4db4bdac1dd05bf706ec37f9d4d15d842ab712f",
+      "actions_sha256": "739791d440378c8ca7d804e8927a94a3d04d0a87dd8a1e8e4de55c7a4007ab15",
+      "log_sha256": "7e68a4176710a866675a6b95bcf7bed2d96c58a8fd7996a4d48f3679514483a9",
+      "reference_sha256": null,
+      "comparison_reference_ids": ["sc-browse--server-setup", "sc-search--default"],
+      "actual_image_opened": true,
+      "native_dimensions": [930, 1240],
+      "identity_check": "Case run/source/binary and owner evidence hashes agree with the input and snapshot inventory declarations; this is a static declaration comparison, not a rehash.",
+      "observation": "The bottom sheet has a readable server-address title, close glyph and an empty bounded entry box. All QWERTY keys, shift, backspace, 123, EN, space and the black Done control are visible without clipped labels or intersecting outlines. Serif key letters and row geometry are consistent with the related keyboard reference at its declared physical scale of two. The underlying form retains readable labels and unconfigured status; test/connect is visibly disabled for the empty address.",
+      "intentional_and_capability_checks": "The actual unconfigured Komga address-entry stage accounts for the empty field and disabled connection control. The English mode and Done label fit server entry. No exact-state match or enabled sample connection is required.",
+      "existing_action_evidence": "The frozen actions open Komga at 450 ms and invoke edit-address at 900 ms. The captured state reports catalog/keyboard, target server-address, English mode and empty keyboard_text, composition and candidates. The case records zero pointer events. No key entry, Done, cancel, save, connection or pairing action is included.",
+      "truthful_feedback": "The visible and captured unconfigured state shows no connection-success claim. This evidence supports the address-edit stage only.",
+      "static_verdict": "No new actionable issue observed within the assigned related-contract static scope. Independent exact-state reference is unavailable and was not marked passed."
+    },
+    {
+      "case_id": "scribe--server-secret-keyboard",
+      "original_png_path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate11/ui-round-1/snapshots/ui-round-1-snapshot-008-sc-sources-search-content/files/output/scribe--server-secret-keyboard.png",
+      "png_sha256": "6c227eb09d878fb600cc3b6f08e40b478d86c241c4f522365aefdd84d7dfd01b",
+      "case_json_sha256": "b7498d4adfee80615ebc7ead57df62bc4bc2ceef68d255e17cda2993f1909739",
+      "state_sha256": "800fd2ba6bf905512400a8901fded3089c3b636e6cb86333d791842423a8d066",
+      "metadata_sha256": "e9685148c90f6fe9a03893e567377c420650de72a04374e8c52b7f84286fee84",
+      "actions_sha256": "53a05ef831417d39b58bb7f3b701897706adcf71008c969c1d3e8814477996e7",
+      "log_sha256": "7e68a4176710a866675a6b95bcf7bed2d96c58a8fd7996a4d48f3679514483a9",
+      "reference_sha256": null,
+      "comparison_reference_ids": ["sc-browse--server-setup", "sc-search--default"],
+      "actual_image_opened": true,
+      "native_dimensions": [930, 1240],
+      "identity_check": "Case run/source/binary and owner evidence hashes agree with the input and snapshot inventory declarations; this is a static declaration comparison, not a rehash.",
+      "observation": "The password title and close glyph are readable. The entry displays 23 separated mask dots wholly inside its border, with no plaintext or composition/candidate exposure. The same complete English QWERTY layout, serif key letters, outlined shift/backspace and 123/EN/space controls, and black Done control remain readable and bounded. The underlying server form still shows unconfigured status and a disabled test/connect control.",
+      "intentional_and_capability_checks": "Password entry uses the English keyboard and a Done action rather than search submission. The captured target is server-password with keyboard_is_secret true. The related server and search references establish form and keyboard contracts only.",
+      "existing_action_evidence": "The frozen actions open Komga, invoke edit-credential, choose server-config:edit-password, and then contain 23 key actions from 1800 through 3340 ms. The captured state exposes only 23 mask characters with empty composition and candidates. The case records zero pointer events. These owner records corroborate the directly viewed masked entry; no Done, cancel, save, authentication, connection or pairing action is included.",
+      "truthful_feedback": "The current PNG displays masked input and no save or connection-success claim. Persisted source address and credential remain empty in the captured state; this case represents a draft keyboard stage.",
+      "static_verdict": "No new actionable issue observed within the assigned related-contract static scope. Independent exact-state reference is unavailable and was not marked passed."
+    }
+  ],
+  "historical_findings": [],
+  "regression_closures": [],
+  "new_actionable": [],
+  "pending": [],
+  "limitations": [
+    "Two assigned current originals and two assigned related originals were actually opened, with no additional images or generated crops. No required detail was unreadable.",
+    "Native captures remain 930x1240; original references remain 1860x2480 at declared physical scale two. The image tool displayed the references at 1368x1824; no file resizing, processing or exact-state reference substitution was performed.",
+    "Screenshot appearance and static owner action/state evidence cannot qualify hidden hit regions, physical pointer or keyboard input, credential persistence, authentication, network connection, pairing or device hardware. The pairing endpoint is declared unavailable and was not exercised by this batch.",
+    "Mechanical passed fields were not used as visual acceptance. Existing action evidence was only read statically; no application, test, build, probe, validator, hash, SQL, SSH or skill search program was run.",
+    "The assigned input SHA still awaits owner declaration and the module has full_manifest_pending. Final required-ID/source/binary/reference/tool reconciliation belongs to full-run acceptance; this two-case report makes no full-round or clean claim.",
+    "No historical finding was supplied or inferred for closure. The unrelated source-rule manifest was not used as keyboard evidence."
+  ]
+}

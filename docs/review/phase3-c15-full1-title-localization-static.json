@@ -1,0 +1,123 @@
+{
+  "schema_version": 1,
+  "report_id": "phase3-c15-full1-title-localization-static",
+  "status": "Static localization disposition: no additional English implementation change required",
+  "owner": "/root/c15_ui_disposition_static",
+  "supplements_unchanged_report": "D:/Code/aidokuForKindle/docs/review/phase3-c15-full1-disposition-static.json",
+  "parent_supplied_context": {
+    "confirmed_required_candidates": 3,
+    "adjudication_report_label": "root-adjudication-01.json",
+    "writer_go_received": false,
+    "old_raw_r1_capture_continues": true,
+    "visual_adjudication_performed_by_this_agent": false
+  },
+  "source_snapshot_supplied_by_parent": {
+    "file_count": 229,
+    "fingerprint": "c48c94852772b28294738a93b8590529c9e1e289441f1f5db361d8e84ee0196b",
+    "recomputed_by_this_task": false
+  },
+  "question": "Does reader_brightness_title require an explicit English value or match arm to avoid raw or humanized implementation text?",
+  "answer": "No additional English branch or value is required within the current supported UI. The application currently has no enabled English locale path. The complete existing draft must include the Chinese translation entry as well as both reader references.",
+  "actual_code_path": [
+    {
+      "step": 1,
+      "path": "D:/Code/aidokuForKindle/build.rs",
+      "line": 4,
+      "evidence": "The only translation source read by build.rs is assets/i18n/zh-CN.json. Lines 10-21 generate the global Strings definition, converting underscores to hyphens at line 16.",
+      "implication": "Adding reader_brightness_title to that map generates Strings.reader-brightness-title with the declared Chinese UI value; generated field naming is not an English translation mechanism."
+    },
+    {
+      "step": 2,
+      "path": "D:/Code/aidokuForKindle/src/lib.rs",
+      "line": 21,
+      "evidence": "crate::tr has one OnceLock-backed label map. Lines 25-26 load the bundled zh-CN.json; lines 28-31 look up the key and use unwrap_or(key). There is no locale parameter, English branch, or humanization in this function.",
+      "implication": "With the new map entry, tr(reader_brightness_title) returns the intended Chinese title. If the entry were omitted, the exact raw key reader_brightness_title would be returned."
+    },
+    {
+      "step": 3,
+      "path": "D:/Code/aidokuForKindle/ui/panels-reader.slint",
+      "line": 477,
+      "evidence": "The visible reader light heading uses a generated Strings property.",
+      "implication": "Replacing this binding with Strings.reader-brightness-title uses the new declared UI title directly."
+    },
+    {
+      "step": 4,
+      "path": "D:/Code/aidokuForKindle/src/app/actions.rs",
+      "line": 2895,
+      "evidence": "The reader brightness action sets modal-title using crate::tr.",
+      "implication": "Replacing this call with tr(reader_brightness_title) keeps the modal-title state aligned with the visible heading."
+    },
+    {
+      "step": 5,
+      "path": "D:/Code/aidokuForKindle/ui/settings-sections.slint",
+      "line": 261,
+      "evidence": "The language section lists four visible labels at line 264. Line 268 enables only index 0; line 269 styles the other options as disabled. The block through line 272 has no TouchArea or language-selection callback.",
+      "implication": "English is displayed as a disabled language option, not an enabled locale that requires a new reader-title translation in this task."
+    },
+    {
+      "step": 6,
+      "path": "D:/Code/aidokuForKindle/src/domain.rs",
+      "line": 125,
+      "evidence": "The complete Preferences definition through line 145 contains no locale or language field.",
+      "implication": "The current preference model supplies no alternate-language selection for these title paths."
+    },
+    {
+      "step": 7,
+      "path": "D:/Code/aidokuForKindle/src/app/view.rs",
+      "line": 804,
+      "evidence": "Independent static reading covered the production view implementation through line 2671. sync_base_view at line 804 and sync_overlay_view at line 1200 do not assign Strings; no runtime Strings override, sync_strings macro, or english_label function was found in that production area.",
+      "implication": "There is no existing view-layer English arm or generated-property setter list to extend."
+    },
+    {
+      "step": 8,
+      "path": "D:/Code/aidokuForKindle/ui/state.slint",
+      "line": 118,
+      "evidence": "Independent static reading covered all 317 lines and found no locale/language field or string-table override interface.",
+      "implication": "The current State API does not provide a hidden alternate-locale path for this new title."
+    }
+  ],
+  "static_test_source_context": {
+    "path": "D:/Code/aidokuForKindle/src/app/view.rs",
+    "line": 2673,
+    "note": "The localization_tests module was read as source only. Its status-label test at line 2735 compares crate::tr values; the module name does not establish English locale support. No test was executed."
+  },
+  "fallback_disposition": {
+    "current_tr_fallback_kind": "Exact raw key",
+    "current_tr_missing_key_result": "reader_brightness_title",
+    "humanized_english_fallback_in_the_reader_title_path": false,
+    "prevention": "Keep the new reader_brightness_title entry in the bundled translation map; do not apply only the two reference replacements.",
+    "english_locale_execution_claimed": false
+  },
+  "minimal_correct_title_patch_not_applied": "--- a/assets/i18n/zh-CN.json\n+++ b/assets/i18n/zh-CN.json\n@@\n   \"reader_mode\": \"阅读方式\", \"picture\": \"画面\", \"brightness\": \"亮度\", \"warmth\": \"色温\", \"orientation\": \"方向\", \"layout\": \"布局\",\n+  \"reader_brightness_title\": \"亮度与色温\",\n--- a/ui/panels-reader.slint\n+++ b/ui/panels-reader.slint\n@@\n-        ReaderPanelTitle { x: 0px; y: 0px; width: parent.width; height: root.title-height; text: Strings.frontlight-warmth; }\n+        ReaderPanelTitle { x: 0px; y: 0px; width: parent.width; height: root.title-height; text: Strings.reader-brightness-title; }\n--- a/src/app/actions.rs\n+++ b/src/app/actions.rs\n@@\n-                            .set_modal_title(tr(\"frontlight_warmth\").into());\n+                            .set_modal_title(tr(\"reader_brightness_title\").into());",
+  "additional_production_diff_beyond_original_title_draft": [],
+  "files_requiring_no_extra_edit": [
+    "D:/Code/aidokuForKindle/src/lib.rs",
+    "D:/Code/aidokuForKindle/src/app/view.rs",
+    "D:/Code/aidokuForKindle/src/domain.rs",
+    "D:/Code/aidokuForKindle/ui/state.slint",
+    "D:/Code/aidokuForKindle/build.rs"
+  ],
+  "preserved_settings_contract": {
+    "path": "D:/Code/aidokuForKindle/src/app/view.rs",
+    "line": 1412,
+    "evidence": "The settings list retains frontlight_warmth in its device group; the new key is only for reader titles.",
+    "existing_key": "frontlight_warmth",
+    "existing_ui_text": "前光与色温"
+  },
+  "constraints_and_result": {
+    "production_or_test_files_edited": 0,
+    "existing_reports_edited": 0,
+    "images_inspected": 0,
+    "ssh_calls": 0,
+    "test_build_hash_runtime_python_search_calls": 0,
+    "clean_review_rounds_asserted": 0,
+    "only_authored_file": "D:/Code/aidokuForKindle/docs/review/phase3-c15-full1-title-localization-static.json",
+    "current_raw_r1_source_remains_frozen": true,
+    "repair_frames_added_to_current_raw_r1": 0
+  },
+  "limits": [
+    "This conclusion is based on static code, not a language-selection or rendering run.",
+    "No new locale feature, English translation asset, humanized fallback, or Strings runtime override is proposed.",
+    "The previous disposition report and all production sources remain untouched by this task."
+  ]
+}

@@ -1,0 +1,177 @@
+{
+  "batch_id": "support-01",
+  "reviewer": "/root/phase3_round1_review/support_01",
+  "reference_support_only": true,
+  "review_date": "2026-11-06",
+  "reference_design_version": "1793901158-6c09",
+  "reference_root": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff",
+  "input": "docs/review/phase3-round-1-batches/support-01.input.json",
+  "scope": "docs/review/phase3-reference-scope.json",
+  "viewed_reference_count": 6,
+  "candidate_reviewed": false,
+  "candidate_acceptance_claimed": false,
+  "review_method": "Directly viewed each of the six assigned original PNGs with functions.tools.view_image. Read the batch input and relevant reference-scope text, and obtained SHA256 hashes with Get-FileHash. No other reference or candidate image was loaded.",
+  "reviewed_references": [
+    {
+      "path": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/screens/cover.png",
+      "sha256": "9CEEDCAAE62B0FD9CF5EC14F6B9D2EA0181D93C434E303FD659E4AC25E38A1B9",
+      "viewed": true,
+      "role": "component",
+      "observations": [
+        "A portrait, square-cornered illustrative cover uses a white field, a regular black halftone dot grid, one large black circle, and a vertical heavy serif title in a clear white column.",
+        "The artwork has a strong monochrome silhouette and contains no shadow, gradient, rounded card, application toolbar, or surrounding application page."
+      ],
+      "applicable_constraints": [
+        "Use this image only as support for placeholder treatment and square-cornered cover presentation; it does not define an application route.",
+        "Preserve the distinction between cover artwork and surrounding UI. Real cover content may contain its own composition and grayscale values and must not be replaced merely to match this illustrative fixture.",
+        "Do not add a shadow, a decorative rounded frame, or a gray card background when presenting a cover in the surrounding book-page interface."
+      ],
+      "intentional_overrides": [
+        "Production covers, titles, and record counts are actual data. Matching the placeholder circle, dot pattern, or sample title is not an acceptance requirement."
+      ]
+    },
+    {
+      "path": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/screens/nav-pw.png",
+      "sha256": "7800EEFDF2CEB987D07B59771ECC3357B05585DC69A3B66D76E5C7A154597C86",
+      "viewed": true,
+      "role": "component",
+      "observations": [
+        "The white Paperwhite dock has five evenly distributed destinations: library, browse, search, history, and settings. Each destination stacks an icon above its text label.",
+        "A thin black rule spans the upper edge. A short thick black indicator sits at that edge above the selected library destination.",
+        "The selected icon and bold label are black. Idle icons and labels are medium gray, with no filled tile or enclosing pill behind them."
+      ],
+      "applicable_constraints": [
+        "Embed this dock at the bottom of routes that declare it; do not expose the component image as a separate application route.",
+        "The Paperwhite dock allocation is 72 design pixels high. Preserve five equal destination allocations, icon-over-label alignment, the upper rule, and the selected top indicator.",
+        "Use black active content and the semantic idle gray for other destinations. Keep readable destination names with meaningful icons.",
+        "Preserve the dock while paginating ordinary page content. Where the workflow specifies a keyboard or a bulk-action bar, that surface replaces the dock rather than stacking over it.",
+        "A press uses whole-control inverse feedback; the persistent active state remains the depicted top indicator and black content."
+      ],
+      "intentional_overrides": [
+        "The dock is absent from the closed reader under the user's pure-artwork rule. This component must not be used to justify reader chrome."
+      ]
+    },
+    {
+      "path": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/screens/dock-sc.png",
+      "sha256": "3CA1BCF124E6A7C89688204220EDB79474E25AEAA94EDAC46FB6931DC78F029E",
+      "viewed": true,
+      "role": "component",
+      "observations": [
+        "The Scribe dock retains the same five-destination order and white icon-over-label construction as Paperwhite, with greater horizontal spacing and a taller allocation.",
+        "Library is selected with a thick black top marker, a black icon, and a bold black label. The remaining outline icons and labels are gray.",
+        "The upper black rule is continuous outside the selected marker; no shadow, raised surface, or gray active tile appears."
+      ],
+      "applicable_constraints": [
+        "The Scribe dock allocation is 80 design pixels high. Use five equal destination allocations across the available width.",
+        "Preserve the edge-attached white bar, top rule, active marker, icon-over-label order, and clear idle/active contrast.",
+        "Use the Scribe geometry and touch targets rather than uniformly scaling the Paperwhite screenshot to consume the larger display.",
+        "This is an embedded component reference, not a standalone route or evidence that any destination works."
+      ],
+      "intentional_overrides": [
+        "The closed reader remains pure artwork and does not inherit a bottom dock from this component."
+      ]
+    },
+    {
+      "path": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/screens/pager.png",
+      "sha256": "2C4FFF5F16181705184F55F2B30CBF8B0BDDA88FD974FC08255482AA0EE5E186",
+      "viewed": true,
+      "role": "component",
+      "observations": [
+        "The folio pager is a white, unframed horizontal strip. Previous-page text with a left chevron is aligned near the left edge, and next-page text with a right chevron is aligned near the right edge.",
+        "The current/total page notation is centered independently of the edge actions. The current numeral is bold black; the slash and total are gray.",
+        "There is no enclosing rule, rounded container, progress track, or filled button background."
+      ],
+      "applicable_constraints": [
+        "Use the adopted folio arrangement above the bottom dock where the route declares one. The Paperwhite allocation is 52 design pixels; the Scribe allocation is 68 design pixels.",
+        "Keep the central current/total notation geometrically centered. Hide unavailable previous/next actions at boundaries while retaining their edge allocations so the center and surviving action do not shift.",
+        "The center opens a balanced page-jump grid above the folio. The current choice is inverse, and an outside tap closes the grid. The component screenshot alone cannot establish that behavior.",
+        "Pagination uses actual page counts and membership. Horizontal list swipes and folio actions must refer to the same page state.",
+        "Do not turn this component into a separate application route or add a line above it that the adopted reference omits."
+      ],
+      "intentional_overrides": [
+        "The displayed 3/9 is sample state. Real current and total page values may differ.",
+        "This ordinary list folio does not authorize a footer, page label, or invisible cycle target in the closed reader."
+      ]
+    },
+    {
+      "path": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/screens/spec-foundation.png",
+      "sha256": "54F704194DAC4718643ACFD2D85ACA222B4D879509F666386E271F7FDEC6E1B1",
+      "viewed": true,
+      "role": "specification",
+      "observations": [
+        "The foundation board uses a book-page hierarchy: a very heavy serif headline, ample white space, thin horizontal rules, serif section headings, and dense but ordered tables and component samples.",
+        "The device table distinguishes Paperwhite 5/6 and Scribe 1/2/3 and explicitly makes hardware availability capability-dependent.",
+        "The typography samples identify Noto Serif SC 900 for display/book titles, Noto Sans SC 400/500/700 for interface/body text, and Literata 400/600/700 for numerals and Latin text.",
+        "Eight semantic UI gray swatches and their roles are shown. The examples distinguish primary, secondary, disabled, separator, and state-highlight uses.",
+        "The component samples show black primary buttons, white outlined secondary controls, dashed add/exclusion states, inverse selected segments, underlined text tabs, dotted chapter leaders, current-row highlighting, an edge-attached dock, and a rule-free folio pager.",
+        "The prohibition row rejects scrolling lists, animation/transitions, shadows/dimmed overlays/gray surfaces, pills, hover effects, and excessively thin rules."
+      ],
+      "applicable_constraints": [
+        "Treat this board as a global visual contract, not an application route or a candidate screenshot.",
+        "Keep UI colors on the 16-level grayscale lattice. The eight semantic UI values are #000000 for ink/current/primary, #555555 for secondary text and idle icons, #666666 for read or inactive content, #999999 for disabled text and unset/filter/key borders, #BBBBBB for dotted leaders/ticks/jump-cell borders, #DDDDDD for separators/progress tracks, #EEEEEE only for state highlighting, and #FFFFFF for paper.",
+        "Keep ordinary readable text at least as dark as the specified #666666 role; #999999 denotes disabled content. Do not use pale text as a substitute for hierarchy.",
+        "Use the specified serif, sans, and numeral/Latin roles and their intended weights. Preserve the heavy display hierarchy; do not substitute very light text below weight 300.",
+        "Typography in design pixels is Paperwhite/Scribe: page headings 34/46; book and list titles 17-22/19-30; body and buttons 15-17/17-19; notes and group labels 12-14/13-15.",
+        "Minimum touch targets are 48 design pixels on Paperwhite and 56 on Scribe. Page margins are 22 and 36 respectively. The board uses millimeter-based sizing with only approximately 1.15 times larger Scribe elements; the extra display area supports more rows/columns or spreads rather than a uniform 1.5 times enlargement of the Paperwhite interface.",
+        "Use 1 design pixel for fine rules, 1.5 for control outlines, and 2 for popup outlines. One design pixel corresponds to two physical pixels in the reference captures; do not use finer hairlines. The normal radius is 4 design pixels, with 2 for tags and no pill-shaped controls.",
+        "Cards, secondary buttons, inputs, filters, and popups have white interiors with black outlines. Distinguish layers by outlines and spacing; do not add shadows, a dimmed backdrop, or gray card fills.",
+        "Use whole-control inverse press feedback and inverse selected segments. Preserve dashed add/excluded states and visible check/cross distinctions for three-state filters.",
+        "Paginate lists instead of continuous scrolling. The library allocations are four columns by two rows on Paperwhite and six by three on Scribe. Preserve book-title and metadata hierarchy within those allocations.",
+        "The folio sits above navigation, has no enclosing separator, keeps previous/next edge positions stable, and exposes the page grid from the central page notation. Preserve the grid's current-page highlight and balanced layout.",
+        "Toasts are short white outlined messages that restore only their own rectangle; they do not dim the page or add a shadow.",
+        "Image artwork is content; the semantic eight-color UI palette must not be used to require identical cover pixels or fabricated book data."
+      ],
+      "intentional_overrides": [
+        "Hide controls and dependent rows for absent frontlight, warmth, orientation sensor, hardware dither, or pen capabilities. The device table is not proof that the current environment has a capability.",
+        "Image-quality operations and external authentication must be honestly disabled or unavailable if the implementation lacks the actual operation or integration. Do not present an enabled control or successful state merely to copy the example.",
+        "The closed reader always shows pure artwork: no bookmark ribbon, footer labels, status bar, notification, decorative gutter, dock, or invisible footer-cycle target. Reader menu controls remain subject to their own open-menu references."
+      ]
+    },
+    {
+      "path": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/screens/spec-interaction.png",
+      "sha256": "D7D2FE292C6222BCCB84F56E0B3062D7B606F6218B641750B8B51B53B738CD81",
+      "viewed": true,
+      "role": "specification",
+      "observations": [
+        "The interaction board diagrams ordinary RTL and LTR reader tap zones, vertical/webtoon zones, and the wider central menu zone of a Scribe landscape spread.",
+        "Its paragraph includes bookmark-ribbon and lower-right footer-cycle instructions that conflict with the user's closed-reader decision.",
+        "The refresh table assigns bounded update regions and waveform classes to press feedback, panels, popups, list pages, the page grid, manga turns, reader entry/chapter transitions, seek, cover continuation, keyboard input, and night mode.",
+        "A gesture table defines tap-on-release, long press, double tap, horizontal swipe, pinch, and a top-edge downward menu gesture. Platform notes cover sleep/Wi-Fi, an in-app keyboard, absent webview, WASM sources, limited memory/CPU, and restoration of the system environment."
+      ],
+      "applicable_constraints": [
+        "Treat this as a behavioral and refresh specification board, not an application route or proof of working candidate behavior.",
+        "Ordinary reader zones use the 33/34/33 allocation from the scope contract; the landscape spread uses 30/40/30. RTL maps left to next and right to previous, with the opposite assignment for LTR. The center opens the menu.",
+        "Vertical/webtoon navigation is discrete: previous at the top, menu in the center, next at the bottom, advancing 85 percent and retaining 15 percent. Do not animate a continuous scroll.",
+        "While a reader menu is open, page-turn zones are inactive. Tapping the center or the specified outside area closes the menu. At a chapter boundary, a next action enters the next chapter with the required full refresh.",
+        "Use fast A2/DU feedback only within the pressed control and restore it with a UI refresh on release.",
+        "Opening/closing reader chrome uses UI GL16 updates limited to the edge bars; the specified close-time flashui option is a real refresh setting, not an animation. Popups, dialogs, and toasts use UI GL16 for their own rectangle, keep the artwork/background undimmed, close on outside capture, and restore only the original rectangle.",
+        "List page/tab changes refresh the content and folio values while fixed headers and navigation remain stable. Page-grid expansion/collapse refreshes its panel above the folio; choosing a page coalesces the grid and list update.",
+        "Manga page turns use partial REAGL/GL16 updates, promoted to full after the selected interval. The shown default is every six turns, with 1, 3, 6, 10, or chapter-only choices. Entering the reader, changing chapters, and leaving a full-screen image use full GC16 to clear residuals.",
+        "Seeking updates page-number feedback while dragging; decode and display the destination only on release. The waveform progression is fast A2 to partial GL16.",
+        "Coalesce continued cover loading into 300 ms UI GL16 batches rather than repeatedly refreshing the entire page. Keyboard presses use fast DU feedback with the candidate strip refreshed as UI; inverse feedback should appear within 100 ms.",
+        "The declared refresh vocabulary is full/partial/ui/flashui/fast/a2. Unsupported waveform modes fall back to GL16. Report actual fallback behavior; a static PNG cannot establish waveform or timing compliance.",
+        "Night mode is declared as whole-screen display-driver inversion without redrawing the content. Expose that operation only where the actual driver supports it; do not infer support from the reference.",
+        "Tap activates on release. Long press is at least 500 ms. Double tap is under 300 ms, is unused in ordinary lists, and defaults off for reader zoom; enabling it entails the documented single-tap delay. Horizontal swipe is within 900 ms with at least 5.6 mm movement and follows reader direction. Reader pinch zoom refreshes fully on release; a downward gesture beginning in the top 8 mm opens the menu.",
+        "Use actual downloaded/offline state and actual integrations. An in-app Pinyin/English/numeric keyboard and supported phone/local input can replace absent system entry surfaces; source CAPTCHA, source setup, code/QR authentication, and connection success must never be simulated.",
+        "Keep image work bounded to the target display size, cache rendered 8-bit grayscale pixels, prefetch two pages, and decode long strips in chunks. Static component images provide no performance evidence.",
+        "Treat sleep as a Wi-Fi-disconnection boundary: downloads use actual keep-awake behavior, downloaded content remains readable offline, and automatic updates follow the stated charging-and-Wi-Fi condition.",
+        "Preserve the declared system coexistence and retained-artwork sleep behavior when actually supported. Emulator screenshots do not qualify physical sleep/wake, hardware inversion, e-ink waveforms, light, sensor, or pen behavior."
+      ],
+      "intentional_overrides": [
+        "User precedence overrides the board's persistent bookmark ribbon, footer labels, and lower-right footer-cycle region. The closed reader is always pure artwork, including after menu close and resume; there is no invisible footer-cycle hit zone. Bookmarks remain available as menu actions.",
+        "Absent hardware controls are hidden along with dependent tools/rows. The board does not authorize fabricated frontlight, warmth, sensor, pen, or hardware-dither state.",
+        "Unavailable image-quality and external-authentication operations use an honest disabled/unavailable state. Do not fabricate a device code, QR session, countdown, linked account, successful login, or quality effect.",
+        "Reference names, counts, dates, capacities, covers, authorization examples, and endpoints are illustrative. Display real data and real operation state while retaining the applicable geometry and hierarchy."
+      ]
+    }
+  ],
+  "limitations": [
+    "Exactly six assigned original support references were viewed. No candidate image, other reference PNG, overview, rejected alternative, or runnable prototype was opened.",
+    "This record extracts reference constraints only. It contains no candidate fidelity verdict, route-completeness verdict, clean-round result, or implementation acceptance.",
+    "The two full specification boards were resized by the image tool for display. Their layout and readable contract text were inspected; no pixel-perfect measurement claim is made from the displayed boards.",
+    "Component and specification images must not be counted as application routes. Their requirements apply only within the corresponding product surfaces and the approved scope.",
+    "Static references do not establish gestures, refresh regions, timing, performance, actual integration state, or physical hardware behavior. Those require separate evidence from the designated remote environment and actual capability declaration.",
+    "No application, build, test, validation suite, smoke test, runtime probe, Git operation, or local/remote verification was executed. No production file was changed; only this review artifact was written.",
+    "The user's pure-artwork reader rule, capability-hiding rule, and honest-disabled quality/external-authentication rule take precedence over conflicting export examples."
+  ]
+}

@@ -1,0 +1,142 @@
+{
+  "batch_id": "reference-31",
+  "reviewer": "/root/phase3_round1_review/reference_31",
+  "run_id": "a1baf3fe3dc2",
+  "round": 1,
+  "binary_sha256": "94d7f3bbcab475ad8833a2f3c486138f7b49bead231851c2d8eab2f0c3d2ac51",
+  "source_sha256": "aef9db4e111165016a10a2a95e111f3155860b8510c7f6207ec9c79fbec5082c",
+  "provided_reference_set_sha256": "e7b49b456255432d74cfe41346f9d44c1a9c55bf67c5d55483e4ae3029547d18",
+  "review_method": "Each of the eight original PNG files was opened individually with tools.view_image. Candidate PNGs are logical 930 x 1240 at 1x; references are physical 1860 x 2480 at 2x and were compared at equivalent logical proportions. Get-FileHash SHA256 was applied directly to unmodified original PNG bytes.",
+  "identity_verification": {
+    "all_case_names_match": true,
+    "all_run_ids_match": true,
+    "all_rounds_match": true,
+    "all_binary_hashes_match": true,
+    "all_source_hashes_match": true,
+    "all_candidate_png_hashes_match_case_evidence": true,
+    "all_reference_png_hashes_match_case_metadata": true,
+    "reference_set_hash_scope": "The provided reference-set identity is recorded as supplied; the four individual reference PNG hashes were independently compared with their case metadata. The aggregate reference-set digest was not recomputed."
+  },
+  "reviewed_case_ids": [
+    "sc-sources--default",
+    "sc-sources--add-source",
+    "sc-sources--source-lists",
+    "sc-sources--updates"
+  ],
+  "reviewed_cases": [
+    {
+      "case_id": "sc-sources--default",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/sc-sources--default.png",
+      "candidate_sha256": "fef0ed0b1f8f3d91e3c93a63092f0b4ce0ad082c20673a0b92d274aeaa19d78e",
+      "reference_png": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/screens/sc-sources.png",
+      "reference_sha256": "afbd4c838cf5bb14ea616d3351bda2d518d3f9f712ca65de39d4b69ef0272ac6",
+      "viewed_candidate": true,
+      "viewed_reference": true,
+      "outcome": "needs_revision",
+      "observations": [
+        "The separate source manager retains the Browse back label, large serif title, installed/available counts, source-list and add-source actions, and the five-item dock with Browse selected.",
+        "The vertical separator is at logical x=400. The seven installed sources stay in the left column, while the right column displays ten source rows with a separate 1/13 folio and next-page control near the bottom. No left-column pagination is introduced.",
+        "Primary names, bold actions, subdued metadata, thin dividers, monochrome source badges, and generous white space preserve the reference hierarchy. Buttons and pagination remain visibly inside the viewport.",
+        "The unavailable source B subtitle is ellipsized around logical x=100..286, y=754, after the Kindle wording. Its final unavailable status is hidden. This shared installed-column issue is tracked as P3R1-REF31-2."
+      ],
+      "intentional_differences": [
+        "Available-source records are the actual captured fixture records, including MangaDex, source A, and numbered demonstration sources, instead of the reference's illustrative C-L records. Counts, languages, and versions are compared as real data rather than required literal copy.",
+        "The local-file subtitle lacks the illustrative reference book count; this does not change the required source-manager geometry."
+      ]
+    },
+    {
+      "case_id": "sc-sources--add-source",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/sc-sources--add-source.png",
+      "candidate_sha256": "07cbdf16dc6978f893345b56a06608a2ac991fdfb500045e481d06e4b62b7eb0",
+      "reference_png": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/screens/states/sc-sources--add-source.png",
+      "reference_sha256": "10791f13d67fca02c2eb0898ada57eb63e69264e175900dd73e721b06c2a5d11",
+      "viewed_candidate": true,
+      "viewed_reference": true,
+      "outcome": "needs_revision",
+      "observations": [
+        "The add-source float has logical bounds approximately x=115, y=250, width=700, height=460, matching the required declared width and top position.",
+        "The float uses an opaque white surface and simple black outline without shadow, stipple, or background dimming. Its title, close action, 200-pixel QR area, endpoint region, separator, direct URL field, and keyboard-input action are fully visible.",
+        "The candidate displays a concrete HTTP endpoint, a pairing code, and a waiting-for-connection status. The case sidecar declares pairing_endpoint_running=true, modal=pairing, and modal_context=pairing. The screenshot does not claim successful connection.",
+        "The additional pairing-code line explains the small vertical redistribution beside the QR without changing the required float geometry or hiding controls.",
+        "The shared installed-column truncation remains visible below the float and is tracked once as P3R1-REF31-2."
+      ],
+      "intentional_differences": [
+        "The concrete endpoint and QR differ from the reference's illustrative address and QR artwork. Only the application's declared actual pairing endpoint is acceptable; this review does not require the illustrative address or QR pattern.",
+        "The case metadata explicitly permits only the application's actual local pairing endpoint to produce a URL or QR and keeps external installation explicit.",
+        "Source names, languages, versions, and available-source records retain the actual captured data."
+      ]
+    },
+    {
+      "case_id": "sc-sources--source-lists",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/sc-sources--source-lists.png",
+      "candidate_sha256": "08b96dd9e1f0eead9ba7a5a069d545aa55dfc70981786b2e3f2ddbbbd91b4b50",
+      "reference_png": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/screens/states/sc-sources--source-lists.png",
+      "reference_sha256": "48b869019731a57701a3b73fce935b5b94ac04e6b122ce722ba5782244263e34",
+      "viewed_candidate": true,
+      "viewed_reference": true,
+      "outcome": "needs_revision",
+      "observations": [
+        "The source-list float starts at logical x=115, y=250 and is 700 pixels wide, preserving the required geometry. Its white background and black border have no shadow or stipple.",
+        "The serif title, black Done action, neutral empty-state message, and dashed add-source-list action are clear and fully within the float. The source-manager back label and dock remain visible behind it.",
+        "The sidecar records modal=choices, modal_context=repository-list, and empty modal_items/modal_item_ids. The neutral empty state is consistent with those saved records; inventing the reference's example subscription or a remove action would be misleading.",
+        "The float naturally ends near logical y=509 because there are no subscription rows. This content-driven height is acceptable while width and top remain fixed.",
+        "The shared installed-column truncation remains visible below the float and is tracked once as P3R1-REF31-2."
+      ],
+      "intentional_differences": [
+        "The reference shows an illustrative saved source-list record and Remove action. The candidate has no saved records and truthfully shows an empty state plus the Add Source List action.",
+        "The case metadata explicitly states that repository names and counts are actual saved records and empty data must not be replaced with fictional subscriptions.",
+        "Source names, languages, versions, and available-source records retain the actual captured data."
+      ]
+    },
+    {
+      "case_id": "sc-sources--updates",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/sc-sources--updates.png",
+      "candidate_sha256": "6fdda40ab1354f7cdd4dea85c7e6d33b11aee43f0f27136b6c10043363bd1817",
+      "reference_png": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/screens/states/sc-sources--updates.png",
+      "reference_sha256": "093beaf483576891ebc8f926081e9facd83240e815e231e80cecf96415cf8b0b",
+      "viewed_candidate": true,
+      "viewed_reference": true,
+      "outcome": "needs_revision",
+      "observations": [
+        "The 400-pixel installed column remains intact, including all seven sources. The right Updates tab is selected, two real updatable sources are shown, each row has an Update action, and a full-width black Update All action appears below the rows.",
+        "The right-column row geometry and bulk-action position closely preserve the reference. No irrelevant ten-row pager appears when there is only one update page, and the dock stays visible.",
+        "The right update rows display only target-version subtitles: MangaDex has the language plus v13, and source A has the language plus v9. The reference explicitly shows v12 to v13 and v8 to v9 in those rows. The sidecar independently contains installed v12/v8 and available v13/v9, so both truthful endpoints are available. This is P3R1-REF31-1.",
+        "Unlike a missing-target presentation, this Scribe capture does show the available target versions. The defect is the omitted installed-to-available transition inside each update row; installed versions are visible separately in the left column.",
+        "The shared installed-column truncation also remains present and is tracked once as P3R1-REF31-2."
+      ],
+      "intentional_differences": [
+        "Source names and version numbers may follow actual data. Such data differences do not justify omitting either end of the installed-to-available version transition."
+      ]
+    }
+  ],
+  "suggestions": [
+    {
+      "id": "P3R1-REF31-1",
+      "case_id": "sc-sources--updates",
+      "priority": "P2",
+      "description": "Show the installed-to-available version transition in each Scribe update row.",
+      "evidence": "At logical approximately x=500, y=322 and y=390, the candidate update rows show the target subtitles containing v13 and v9 only. The reference rows show v12 to v13 and v8 to v9. The exact case sidecar records installed_sources MangaDex v12 and source A v8, while available_sources records v13 and v9. The installed column supplies old versions separately but does not restore the missing transition in the update rows.",
+      "recommendation": "Build the update-row subtitle from the matching installed and available source records and display both versions with an arrow, such as v12 -> v13 and v8 -> v9, while preserving the installed column and current update controls.",
+      "status": "open",
+      "introduced_round": 1
+    },
+    {
+      "id": "P3R1-REF31-2",
+      "case_id": "sc-sources--default",
+      "priority": "P3",
+      "description": "Keep the explicit unavailable status visible in the narrow installed-source row.",
+      "evidence": "The unavailable source B row near logical y=740..765 renders a long human-verification subtitle and ellipsizes after the Kindle wording before its final unavailable status. The case sidecar gives available=false and a subtitle ending with the unavailable message. The reference keeps a concise verification reason plus an explicit unavailable status visible. The same row is visible in all four cases.",
+      "recommendation": "Use a concise status summary or place the unavailable status before the potentially truncated explanation so the 400-pixel installed column retains the explicit status beside the warning icon and Uninstall action.",
+      "status": "open",
+      "introduced_round": 1
+    }
+  ],
+  "limitations": [
+    "This review covers only the four listed Scribe source-manager reference pairs and does not establish that the full round is clean.",
+    "Only existing JSON and original PNG evidence was read, and only PNG hashing and individual tools.view_image inspection were performed. No application, build, tests, runtime probes, Git operations, or product edits were run.",
+    "Static screenshots establish visual placement and clipping, not interaction behavior, focus handling, pagination behavior after activation, source installation, or update completion.",
+    "The add-source sidecar declares a running pairing endpoint and the screenshot shows a waiting state. Live endpoint reachability and the QR payload were not independently exercised or decoded within this read-only visual-review scope.",
+    "Reference images were displayed by tools.view_image at a reduced presentation size; comparisons used the documented 2x physical-to-logical proportion. No transformed image was substituted for the hashed original evidence.",
+    "The source-list fixture is empty, so populated-record removal and multi-page source-list layout cannot be assessed from this batch."
+  ]
+}

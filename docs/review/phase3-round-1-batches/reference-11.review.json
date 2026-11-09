@@ -1,0 +1,106 @@
+{
+  "batch_id": "reference-11",
+  "reviewer": "independent-reference-11",
+  "run_id": "a1baf3fe3dc2",
+  "binary_sha256": "94d7f3bbcab475ad8833a2f3c486138f7b49bead231851c2d8eab2f0c3d2ac51",
+  "source_sha256": "aef9db4e111165016a10a2a95e111f3155860b8510c7f6207ec9c79fbec5082c",
+  "round": 1,
+  "outcome": "no_actionable_issues_in_this_batch",
+  "identity_checks": {
+    "all_case_names_match_input": true,
+    "all_case_metadata_rounds_match": true,
+    "all_case_metadata_run_ids_match": true,
+    "all_case_metadata_binary_sha256_match": true,
+    "all_case_metadata_source_sha256_match": true,
+    "all_candidate_png_sha256_match_case_evidence": true,
+    "all_reference_png_sha256_match_case_metadata": true,
+    "hash_method": "PowerShell Get-FileHash -Algorithm SHA256 on unmodified PNG file bytes",
+    "comparison_scale": "Candidate 618x824 at logical 1x; reference 1236x1648 at physical 2x; compared at the same 618x824 logical proportions."
+  },
+  "reviewed_case_ids": [
+    "pw-search--default",
+    "pw-search--numbers",
+    "pw-search--results"
+  ],
+  "reviewed_cases": [
+    {
+      "case_id": "pw-search--default",
+      "case_metadata": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/cases/pw-search--default.json",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/pw-search--default.png",
+      "candidate_sha256": "60dc2d4a9c2407158e4f3c4f047eea2350b95f13e5d3a48621ce51061741b10a",
+      "reference_png": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/screens/pw-search.png",
+      "reference_sha256": "87c66500123e3d30499b247883220ff26fe3a0dca112e19f3a0d569c9c4163b3",
+      "viewed_candidate": true,
+      "viewed_reference": true,
+      "outcome": "pass_with_static_evidence_limitations",
+      "observations": [
+        "The white outlined search input, cancel action, selected black all-sources scope, and outlined source scopes remain aligned and fully visible in portrait geometry.",
+        "The pending-source message is separated from the scope row by a light rule and remains legible in neutral gray.",
+        "The keyboard starts near logical y=524 and retains the reference four-row key geometry, staggered letter rows, shift, backspace, number switch, language switch, space, and black search action.",
+        "The keyboard replaces the bottom dock while editing. All bottom-row keys remain inside the viewport with no visible clipping or overlap.",
+        "Text hierarchy, key outlines, neutral grayscale, and control spacing are visually consistent with the reference at equal logical proportions.",
+        "The candidate metadata identifies modal=keyboard and keyboard_mode=pinyin, with empty composition and candidate arrays; the visible idle strip is consistent with that recorded state."
+      ],
+      "intentional_differences": [
+        "The candidate has four searched sources instead of the reference five, and the source scopes follow the candidate source ordering. These are fixture and source-state differences rather than a geometry defect.",
+        "The candidate is captured with an idle Pinyin strip, while the reference shows active qi composition and Chinese candidates. The supplied candidate state explicitly records empty composition and candidates; active composition behavior is not established by this image."
+      ]
+    },
+    {
+      "case_id": "pw-search--numbers",
+      "case_metadata": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/cases/pw-search--numbers.json",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/pw-search--numbers.png",
+      "candidate_sha256": "8658a0826a59b55c8078e525b62917fb1661c173fdef2f8c39be8108ff81fb34",
+      "reference_png": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/screens/states/pw-search--numbers.png",
+      "reference_sha256": "48f83f96526d92a5d02cb94c49700bf0c66de43dbae38f6edf062ed597356fc5",
+      "viewed_candidate": true,
+      "viewed_reference": true,
+      "outcome": "pass_with_static_evidence_limitations",
+      "observations": [
+        "Search input, scopes, pending-source message, and keyboard boundary retain the geometry of the candidate Pinyin editing state.",
+        "The numeric layout shows a complete 1-to-0 first row, punctuation and bracket keys, a centered shorter third row with backspace, and the letters, language, space, and search bottom row.",
+        "The numeric key grid and bottom controls align with the reference after accounting for its 2x physical scale; no key is visibly clipped or covered.",
+        "The dock remains hidden during numeric editing, and the black search key remains fully reachable at the bottom right.",
+        "The additional symbol-page switch fits within the keyboard strip without moving the key grid or reducing the input area.",
+        "The candidate metadata records keyboard_mode=numbers and empty composition and candidate arrays, matching the visible numeric idle state."
+      ],
+      "intentional_differences": [
+        "Source count and source ordering differ with the candidate fixture, as in the Pinyin editing case.",
+        "The candidate numeric strip uses an idle numbers-and-symbols label and a symbol-page switch, while the reference retains an active Pinyin candidate strip. The candidate has no active composition in its supplied state."
+      ]
+    },
+    {
+      "case_id": "pw-search--results",
+      "case_metadata": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/cases/pw-search--results.json",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/pw-search--results.png",
+      "candidate_sha256": "2b7e4ca27e8a83030f6f04461e77f4e44d4be4b0655cd95ae29a25e255337d38",
+      "reference_png": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/screens/states/pw-search--results.png",
+      "reference_sha256": "a59eb8400889e67fb7dc0d86cc83c22d37999bdeb6ae746d638b2964f3c14a18",
+      "viewed_candidate": true,
+      "viewed_reference": true,
+      "outcome": "pass_with_static_evidence_limitations",
+      "observations": [
+        "Results are grouped by source, with the three-cover MangaDex row, one-cover Komga row, source counts, and right-aligned view-all actions visible.",
+        "The visible covers are approximately 104x122 logical pixels, and their rows, titles, subtitles, and intergroup spacing follow the reference geometry at equal logical proportions.",
+        "The local-source empty state and the separate failed-source row with its black retry button are both visible below the result groups.",
+        "The keyboard is dismissed and the five-item dock is restored near logical y=752, with search selected. The retry control and last source row remain above the dock without overlap.",
+        "Body text, title weight, muted subtitles, outlined controls, and icon contrast remain legible in neutral grayscale, with no visible clipping.",
+        "The supplied state records two nonempty source groups, an empty local match set, and an independent error source with timeout=false. The image reflects these distinct source states."
+      ],
+      "intentional_differences": [
+        "Query text, source count, book titles, and cover artwork differ from the reference fixture; their geometry remains comparable.",
+        "The candidate failed source shows a general incomplete-operation state, while the reference shows a timeout. The candidate metadata explicitly records error=true and timeout=false, so the wording reflects its actual source state.",
+        "The empty local-source row matches the candidate search_local_matches array and is not inferred from the reference fixture."
+      ]
+    }
+  ],
+  "suggestions": [],
+  "limitations": [
+    "This review covers only the three listed cases and six original PNGs in reference-11; it does not establish that the full round is clean.",
+    "Each PNG was actually viewed with tools.view_image. No PNG was resampled, modified, or regenerated for review.",
+    "Only existing JSON and PNG evidence was read, PNG bytes were hashed, and this review document was written. No application, build, test suite, smoke test, runtime probe, Git operation, or product modification was performed.",
+    "Static screenshots establish visible layout and control presence, but do not prove click behavior, successful retry execution, source selection, keyboard transitions, active Pinyin composition, candidate selection, or candidate paging.",
+    "Both candidate editing captures have empty composition and candidate arrays. The reference active qi composition cannot be directly compared with an equivalent candidate composition state in this batch.",
+    "The images establish software-rendered grayscale appearance only; physical e-ink rendering and hardware input behavior are outside this evidence."
+  ]
+}

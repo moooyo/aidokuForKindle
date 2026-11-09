@@ -1,0 +1,156 @@
+{
+  "batch_id": "reference-16",
+  "reviewer": "/root/phase3_round1_review/reference_16",
+  "run_id": "a1baf3fe3dc2",
+  "round": 1,
+  "review_scope": "Fresh independent visual review of only the four assigned reference pairs, using the eight unmodified PNG files and their existing case JSON sidecars.",
+  "identity": {
+    "expected_binary_sha256": "94d7f3bbcab475ad8833a2f3c486138f7b49bead231851c2d8eab2f0c3d2ac51",
+    "expected_source_sha256": "aef9db4e111165016a10a2a95e111f3155860b8510c7f6207ec9c79fbec5082c",
+    "expected_reference_bundle_sha256": "e7b49b456255432d74cfe41346f9d44c1a9c55bf67c5d55483e4ae3029547d18",
+    "case_metadata_identity": "All four sidecars identify round 1, the requested run, binary, source, Scribe profile, and history route. All four sidecars identify native unmodified Slint captures.",
+    "png_byte_identity": "Get-FileHash SHA256 was applied to each original candidate and reference PNG. Each candidate hash equals its sidecar evidence_hashes.screenshot.sha256, and each reference hash equals its sidecar reference_sha256.",
+    "binary_source_bundle_limit": "Binary, source, and reference-bundle identities are the supplied expected identities; this bounded review did not independently hash those non-PNG artifacts. Case-level reference PNG identities were independently checked."
+  },
+  "comparison_basis": {
+    "candidate_logical_size": [930, 1240],
+    "reference_physical_size": [1860, 2480],
+    "reference_physical_scale": 2,
+    "method": "Every candidate and every reference was individually opened with tools.view_image. Comparisons use the same logical scale, accounting for the reference's 2x physical pixels. No PNG was resampled, cropped, or modified for the review. The image viewer reduced reference display size automatically."
+  },
+  "reviewed_case_ids": [
+    "sc-history--default",
+    "sc-history--clear-confirm",
+    "sc-history--incognito",
+    "sc-history--updates"
+  ],
+  "reviewed_cases": [
+    {
+      "case_id": "sc-history--default",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/sc-history--default.png",
+      "candidate_sha256": "ffc68bacf530d3760ebd067d5a5f9e011e3bf117da5589a176c85a4a4b30bb14",
+      "reference_png": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/screens/sc-history.png",
+      "reference_sha256": "562741444dac41a890fb1abd6a26e200e2aecab996cbf42a4a39d454522ac494",
+      "viewed_candidate": true,
+      "viewed_reference": true,
+      "metadata_identity_matches_expected": true,
+      "candidate_hash_matches_case_evidence": true,
+      "reference_hash_matches_case_evidence": true,
+      "outcome": "no_findings",
+      "observations": [
+        "The two equal record columns align to the same approximate 36-logical-pixel outer inset as the reference, with a 32-logical-pixel center gap. The covers retain the expected approximately 72 by 98 logical size and the rows retain the expected 124-logical-pixel cadence where adjacent records share a date group.",
+        "Date headers apply to both columns and the visible groups descend chronologically. The candidate sidecar reports 20 real history records; the visible records, group offsets, titles, progress values, and page 1 of 5 correspond to that independent snapshot.",
+        "Black progress segments are visibly bounded by the gray tracks and reflect the displayed approximately 30 percent, 23 percent, and 36 percent values, rather than filling every track. Completed entries use subdued completion and time text.",
+        "The serif display heading and item titles, sans-serif tabs and controls, gray secondary text, fine row rules, remove controls, next-page control, and selected history navigation remain legible. No visible text clipping or footer overlap was found."
+      ],
+      "intentional_differences": [
+        "Accepted data-dependent differences: the candidate uses an independent 20-record snapshot, so the recent-read summary, visible item membership, chapter subtitles, timestamps, date-group density, and page count differ from the illustrative reference. These differences were not treated as geometry defects.",
+        "The candidate PNG is a 1x logical capture and the reference is a 2x physical image; this is a declared capture-scale difference."
+      ]
+    },
+    {
+      "case_id": "sc-history--clear-confirm",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/sc-history--clear-confirm.png",
+      "candidate_sha256": "ed7a81da2abc60a7ef123778129173a10385c91fc5cbabac7134fc226e3f325b",
+      "reference_png": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/screens/states/sc-history--clear-confirm.png",
+      "reference_sha256": "aa4da538e1370a5fa5a9761ed81c70951e525cb63718d517866d475b7635157c",
+      "viewed_candidate": true,
+      "viewed_reference": true,
+      "metadata_identity_matches_expected": true,
+      "candidate_hash_matches_case_evidence": true,
+      "reference_hash_matches_case_evidence": true,
+      "outcome": "no_findings",
+      "observations": [
+        "The candidate shows the clear-history confirmation on the actual history route; the sidecar records modal=choices and 20 history records.",
+        "The confirmation has an opaque white interior, a clean black outline, and equal-width cancel and destructive actions. The destructive action is black with white text, while cancel remains white with a black border. Both labels and the complete heading fit inside the panel.",
+        "The surrounding history remains visible without a dark scrim, shadow, or stipple pattern. The panel is horizontally centered at approximately the reference's logical width and inset. No finding was inferred solely from its content-dependent height.",
+        "The visible background retains the corrected outer content inset and proportional progress segments. The folio and bottom navigation remain unobscured."
+      ],
+      "intentional_differences": [
+        "The background reflects the candidate's independent history snapshot, with different record density and page count from the reference.",
+        "The destructive button uses an equivalent clear-action label. Its action role, contrast, and equal-width relationship with cancel are preserved."
+      ]
+    },
+    {
+      "case_id": "sc-history--incognito",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/sc-history--incognito.png",
+      "candidate_sha256": "5fd1207b0bf187a05516c3565db47177366b3c5e81a6b6ac50b55fefdfa3a335",
+      "reference_png": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/screens/states/sc-history--incognito.png",
+      "reference_sha256": "204bd725431fba2485dc74848e7b19da924466a715bb798c414185a2d96850b7",
+      "viewed_candidate": true,
+      "viewed_reference": true,
+      "metadata_identity_matches_expected": true,
+      "candidate_hash_matches_case_evidence": true,
+      "reference_hash_matches_case_evidence": true,
+      "outcome": "findings",
+      "observations": [
+        "The candidate's incognito control is visibly pressed with a black fill and white contents, and the application status strip is inverted to black with white time, network, and battery contents. The sidecar confirms preferences.incognito=true.",
+        "The center of that black status strip is empty in the candidate. At the corresponding logical location, the reference contains a centered white policy notice explaining that incognito mode does not record history. This is tracked as P3R1-REF16-1.",
+        "Previously recorded history remains visible, and the sidecar still reports 20 entries. That alone is consistent with a policy about recording future reads and is not evidence that incognito persistence is broken.",
+        "The rest of the history typography, outer insets, gray secondary text, proportionate progress bars, remove controls, folio, and navigation remain visible without clipping."
+      ],
+      "intentional_differences": [
+        "Accepted independent history data, timestamps, grouping, and page-count differences remain the same as in the default capture.",
+        "No intentional difference in the incognito status-bar policy notice was declared in the sidecar."
+      ]
+    },
+    {
+      "case_id": "sc-history--updates",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/sc-history--updates.png",
+      "candidate_sha256": "738d00f7034d030044197d76de41e112474d11be92cd7b24b64f39635b03f428",
+      "reference_png": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/screens/states/sc-history--updates.png",
+      "reference_sha256": "7bace0d570987347affaadd52cfda31a1e82cff96a19a856f0e98a0cdff32653",
+      "viewed_candidate": true,
+      "viewed_reference": true,
+      "metadata_identity_matches_expected": true,
+      "candidate_hash_matches_case_evidence": true,
+      "reference_hash_matches_case_evidence": true,
+      "outcome": "no_additional_visual_findings_with_static_state_limit",
+      "observations": [
+        "The heading changes to updates, the chapter-updates tab becomes selected, the bulk-download action is present, and each visible chapter has its own outlined download control. The footer displays page 1 of 1.",
+        "Six update records from the sidecar are arranged in two equal columns and three rows beneath a date group shared by both columns. Their approximate 36-pixel outer inset, 32-pixel intercolumn gap, 124-pixel row cadence, and 72 by 98 logical covers follow the reference geometry.",
+        "The sidecar records history_filter=1, chapter_update_count=6, and every visible update as download_state=available with zero download progress. There is no queued download in this capture; download_queue_count=0. Consequently, the reference's queued clock control cannot be judged against an equivalent candidate state in this pair.",
+        "The candidate shows unread text rather than the illustrative reference's size and check-time metadata. The case sidecar provides neither an update size nor a check timestamp, so this bounded review does not infer a lost rendered field from unavailable data. The queue and richer metadata states remain unverified.",
+        "The longer chapter subtitles, bulk-download label, per-entry controls, folio, and selected navigation fit without clipping. Secondary labels remain gray and the white canvas is free of unintended shading."
+      ],
+      "intentional_differences": [
+        "The actual snapshot contains six available updates in one date group, whereas the reference illustrates seven updates across several groups and includes a queued item. Counts, item membership, date-group density, chapter titles, availability labels, and folio are data-dependent differences.",
+        "Two candidate covers render title-based placeholders and another has different available artwork. The sidecar records settled cover work with no visible cover failures; these are recorded as snapshot asset differences rather than a proven layout regression."
+      ]
+    }
+  ],
+  "suggestions": [
+    {
+      "id": "P3R1-REF16-1",
+      "case_id": "sc-history--incognito",
+      "priority": "P2",
+      "description": "The active-incognito status bar omits the centered policy notice that explains that history is not recorded.",
+      "evidence": "The candidate's top black strip contains only the time at the left and connection/battery indicators at the right; its center is empty. The paired reference has a centered white incognito policy notice in the same strip. The candidate sidecar explicitly reports preferences.incognito=true, and the pressed black incognito button is already visible, excluding an inactive-state mismatch.",
+      "recommendation": "Render the reference-equivalent centered white policy notice inside the inverted application status bar whenever incognito mode is active, with enough space to preserve the time and device indicators.",
+      "status": "open",
+      "introduced_round": 1
+    }
+  ],
+  "prior_finding_rechecks": [
+    {
+      "id": "P3D-001",
+      "outcome": "not_reproduced_in_assigned_cases",
+      "case_ids": ["sc-history--default", "sc-history--clear-confirm", "sc-history--incognito", "sc-history--updates"],
+      "observation": "Fresh visual inspection shows the main content starting at approximately x=36 and the right column at approximately x=481 logical pixels, matching the reference's intended outer inset and intercolumn spacing after accounting for its 2x capture scale. No recurrence of an extra content inset was visible in these four cases."
+    },
+    {
+      "id": "P3D-002",
+      "outcome": "not_reproduced_in_visible_history_progress",
+      "case_ids": ["sc-history--default", "sc-history--clear-confirm", "sc-history--incognito"],
+      "observation": "The first history entry visibly fills about 30 percent of its track for 12/40 pages; the other partial entries show about 23 percent for 5/22 and about 36 percent for 8/22. Their black segments remain within gray tracks. The confirmation obscures part of the top record as expected, while other visible segments remain proportional. The updates capture contains available unread entries rather than comparable reading-progress bars."
+    }
+  ],
+  "limitations": [
+    "This review covers only reference-16's four pairs and does not claim that the full round is clean.",
+    "Static screenshots establish visual visibility and absence of obvious clipping, not actual input reachability, removal behavior, bulk-download dispatch, folio navigation, or persistence of the incognito recording policy.",
+    "The existing sidecars were read as capture evidence; their previously recorded checks were not rerun and were not treated as a substitute for viewing all eight PNGs.",
+    "The updates pair does not contain a queued candidate item or candidate size/check-time fields. Queue styling and those data-backed update details require equivalent state evidence before a definite comparison.",
+    "No application, build, test suite, runtime probe, Git command, or product modification was performed on the local machine. This task only read assigned PNG/JSON evidence, hashed the original PNG bytes, and wrote this review JSON.",
+    "Logical dimensions and spacing are visually assessed from the original screenshots and capture metadata; no pixel-analysis or screenshot transformation pipeline was run."
+  ]
+}

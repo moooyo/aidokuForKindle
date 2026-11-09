@@ -1,0 +1,549 @@
+use super::retained_scene::RetainedReaderScene;
+use super::*;
+use crate::domain::SearchSession;
+
+impl App {
+    /// Stop new work and checkpoint navigation before the native process parks.
+    pub fn prepare_suspend(&mut self) -> Result<()> {
+        if self.suspended {
+            return Ok(());
+        }
+        self.cancel_sensitive_keyboard();
+        self.clear_reader_recovery();
+        if let Some(ui) = self.ui.upgrade() {
+            let state = ui.global::<State>();
+            state.set_reader_input_epoch(state.get_reader_input_epoch().wrapping_add(1));
+        }
+        self.resume_reader_repair = self.route == "reader"
+            && self.displayed_reader.as_ref().is_none_or(|frame| {
+                !same_reader_render(&frame.preferences, &self.effective_reader_preferences())
+            });
+        self.downloads.pause_for_suspend()?;
+        self.network_control.suspend();
+        self.suspended = true;
+        self.sync_storage_details_visibility();
+        self.suspend_checkpoint_ready = false;
+        self.lifecycle_generation = self.lifecycle_generation.wrapping_add(1);
+        self.resume_network_pending = false;
+        self.resume_frame_pending = false;
+        self.network_probe_inflight = false;
+        self.network_probe_rx = None;
+        self.invalidate_reader_work();
+        self.reader_inflight = None;
+        self.prefetch_inflight = None;
+        self.cover_inflight = None;
+        self.cover_queue.clear();
+        self.cover_pending.clear();
+        self.cover_view.clear();
+        self.pending.clear();
+        for group in &mut self.search_results {
+            if group.pending {
+                group.pending = false;
+                group.error = Some(tr("request_timeout"));
+            }
+        }
+        self.busy = false;
+        self.message.clear();
+        self.message_until = None;
+        self.restore_displayed_reader()?;
+        if self.route == "reader" {
+            self.modal.clear();
+            self.modal_context.clear();
+        }
+        let _ = self.platform.abort_outbound_network_for_suspend()?;
+        self.save_reader_progress()?;
+        self.checkpoint_navigation(true)?;
+        self.suspend_checkpoint_ready = true;
+        Ok(())
+    }
+
+    /// This is a controller barrier, not a wait for a disconnected HTTP socket.
+    pub fn suspend_ready(&mut self) -> Result<bool> {
+        Ok(self.suspended && self.suspend_checkpoint_ready && self.downloads.suspend_ready())
+    }
+
+    /// Resume the retained scene before checking Wi-Fi or starting a decoder.
+    pub fn resume_after_sleep(&mut self) -> Result<()> {
+        if !self.suspended {
+            return Ok(());
+        }
+        self.network_control.resume();
+        self.downloads
+            .resume_owned(self.options.offline || self.options.demo)?;
+        self.suspended = false;
+        self.suspend_checkpoint_ready = false;
+        self.resume_frame_pending = true;
+        self.invalidate_storage_details();
+        let needs_first_image = self.route == "reader" && self.displayed_reader.is_none();
+        self.busy = needs_first_image;
+        self.resume_network_pending = !self.options.offline && !self.options.demo;
+        self.next_network_probe = Instant::now() + Duration::from_millis(750);
+        self.platform.invalidate_status_cache();
+        if let Some(reader) = &mut self.reader {
+            reader.menu_open = false;
+        }
+        if self.route == "reader" {
+            self.project_retained_reader_scene();
+        }
+        if let Some(ui) = self.ui.upgrade() {
+            let state = ui.global::<State>();
+            state.set_message("".into());
+            state.set_busy(needs_first_image);
+            if !self.options.demo && self.route != "reader" {
+                state.set_time(chrono::Local::now().format("%H:%M").to_string().into());
+            }
+        }
+        // The native coordinator repaints the retained RGB scene. Re-decoding
+        // would add latency and could replace the page before it is restored.
+        if self.route == "reader" && self.displayed_reader.is_none() {
+            self.reader_dirty = true;
+        }
+        Ok(())
+    }
+
+    /// Close retained chrome and restore image identity before native ownership
+    /// returns. Metadata and device observations wait until after that frame.
+    fn project_retained_reader_scene(&mut self) {
+        let preferences = self.effective_reader_preferences();
+        let scene = RetainedReaderScene::from_memory(
+            self.displayed_reader.as_ref().map(|frame| &frame.session),
+            self.reader.as_ref(),
+            &preferences,
+        );
+        if let Some(book_id) = scene.book_id.as_ref() {
+            self.current_book_id = Some(book_id.clone());
+        }
+        self.page = 1;
+        self.modal.clear();
+        self.modal_context.clear();
+        let Some(ui) = self.ui.upgrade() else {
+            return;
+        };
+        let state = ui.global::<State>();
+        state.set_route("reader".into());
+        state.set_reader_menu(false);
+        state.set_modal("".into());
+        state.set_summary_is_book(false);
+        state.set_busy(!scene.image_ready);
+        state.set_message("".into());
+        state.set_reader_image_ready(scene.image_ready);
+        state.set_current_chapter_id(scene.chapter_id.into());
+        state.set_current_chapter_number(scene.chapter_number.into());
+        state.set_current_chapter(scene.chapter_title.into());
+        state.set_reader_page(scene.page as i32);
+        state.set_reader_total(scene.total as i32);
+        state.set_landscape(scene.landscape);
+        state.set_spread(scene.spread);
+        state.set_cover_alone(
+            self.displayed_reader
+                .as_ref()
+                .map_or(preferences.cover_alone, |frame| {
+                    frame.preferences.cover_alone
+                }),
+        );
+        state.set_reading_direction(scene.reading_direction.into());
+        state.set_page(1);
+        state.set_page_count(1);
+        // Images, viewport offsets, zoom, collection models and cached book
+        // metadata stay resident. Opening the menu refreshes their metadata.
+    }
+
+    pub(super) fn restore_displayed_reader(&mut self) -> Result<()> {
+        if self.route != "reader" {
+            return Ok(());
+        }
+        let Some(saved) = self.displayed_navigation_reader() else {
+            if let Some(reader) = &mut self.reader {
+                reader.menu_open = false;
+            }
+            return Ok(());
+        };
+        let chapters = match self.reader.as_ref().filter(|reader| {
+            reader
+                .chapters()
+                .iter()
+                .any(|chapter| chapter.id == saved.chapter_id)
+        }) {
+            Some(reader) => reader.chapters().to_vec(),
+            None => self.store.chapters(&saved.book_id)?,
+        };
+        if !chapters
+            .iter()
+            .any(|chapter| chapter.id == saved.chapter_id)
+        {
+            return Ok(());
+        }
+        let mut reader = ReaderState::new(
+            chapters,
+            &saved.chapter_id,
+            saved.page,
+            &self.effective_reader_preferences(),
+        )?;
+        if saved.total > 0 {
+            reader.set_total(saved.total);
+        }
+        reader.page = saved.page.clamp(1, reader.total.max(1));
+        if saved.scaled_height > 0 {
+            reader.set_vertical_dimensions(saved.scaled_height, saved.viewport_height.max(1));
+        }
+        reader.vertical_offset = saved.vertical_offset;
+        reader.zoom = saved.zoom;
+        reader.menu_open = false;
+        self.current_book_id = Some(saved.book_id.clone());
+        self.reader = Some(reader);
+        if let Some(displayed) = &mut self.displayed_reader {
+            displayed.session = saved;
+        }
+        Ok(())
+    }
+
+    /// Keep the last accepted page while retaining the layout already applied to
+    /// the scene. The pixel pipeline is repaired only after the wake repaint.
+    fn displayed_navigation_reader(&self) -> Option<ReaderSession> {
+        let displayed = self.displayed_reader.as_ref()?;
+        let mut saved = displayed.session.clone();
+        let effective = self.effective_reader_preferences();
+        saved.landscape = effective.landscape;
+        saved.spread = effective.spread;
+        saved.menu_open = false;
+        if displayed.preferences.reading_direction != effective.reading_direction {
+            saved.vertical_offset = 0;
+            saved.scaled_height = 0;
+            saved.viewport_height = 0;
+        }
+        Some(saved)
+    }
+
+    /// Called only after the retained native RGB scene has been repainted. The
+    /// desktop lifecycle harness supplies the equivalent frame acknowledgement.
+    pub fn finish_resume_frame(&mut self) -> Result<()> {
+        if self.suspended {
+            return Ok(());
+        }
+        self.resume_frame_pending = false;
+        if self.route == "reader" && !self.options.demo {
+            if let Some(ui) = self.ui.upgrade() {
+                ui.global::<State>()
+                    .set_time(chrono::Local::now().format("%H:%M").to_string().into());
+            }
+        }
+        if self.route != "reader" || self.reader_inflight.is_some() {
+            return Ok(());
+        }
+        if self.resume_reader_repair || self.reader_dirty || self.displayed_reader.is_none() {
+            let result = self.request_reader_images().and_then(|()| self.sync_view());
+            if let Err(error) = result {
+                if let Some(target) = self.reader_target() {
+                    self.recover_reader_failure(target, error);
+                } else {
+                    self.show_reader_action_error(error);
+                }
+            }
+        }
+        Ok(())
+    }
+
+    pub(crate) fn checkpoint_navigation(&mut self, force: bool) -> Result<()> {
+        if !force && self.last_session_save.elapsed() < Duration::from_secs(1) {
+            return Ok(());
+        }
+        let session = self.navigation_session();
+        self.store.save_session(&session)?;
+        self.last_session_save = Instant::now();
+        Ok(())
+    }
+
+    fn navigation_session(&self) -> NavigationSession {
+        let reader = if self.prefs.incognito || self.route != "reader" {
+            None
+        } else {
+            self.displayed_navigation_reader().or_else(|| {
+                self.reader.as_ref().map(|reader| ReaderSession {
+                    book_id: reader.current_chapter().book_id.clone(),
+                    chapter_id: reader.current_chapter().id.clone(),
+                    page: reader.page,
+                    total: reader.total,
+                    vertical_offset: reader.vertical_offset,
+                    zoom: reader.zoom,
+                    landscape: reader.landscape,
+                    spread: reader.spread,
+                    menu_open: false,
+                    scaled_height: reader.image_height,
+                    viewport_height: reader.viewport_height,
+                })
+            })
+        };
+        let panel_route = match (self.modal.as_str(), self.modal_context.as_str()) {
+            ("downloads", _) => "downloads",
+            ("summary", "summary") => "summary",
+            ("summary", "about") => "about",
+            ("summary", "cache-info") => "cache-info",
+            _ => "",
+        };
+        let private_reader = self.prefs.incognito && self.route == "reader";
+        NavigationSession {
+            version: 1,
+            route: if private_reader {
+                "library".into()
+            } else {
+                self.route.clone()
+            },
+            page: self.page,
+            return_route: self.return_route.clone(),
+            current_book_id: if private_reader {
+                None
+            } else {
+                reader
+                    .as_ref()
+                    .map(|reader| reader.book_id.clone())
+                    .or_else(|| self.current_book_id.clone())
+            },
+            current_source: self.current_source.clone(),
+            library_filter: self.library_filter,
+            source_filter: self.source_filter,
+            catalog_filter: self.catalog_filter,
+            history_filter: self.history_filter,
+            newest_first: self
+                .ui
+                .upgrade()
+                .is_none_or(|ui| ui.global::<State>().get_newest_first()),
+            sort_title: self.sort_title,
+            unread_only: self.unread_only,
+            downloaded_only: self.downloaded_only,
+            catalog_unread_only: self.catalog_unread_only,
+            catalog_downloaded_only: self.catalog_downloaded_only,
+            catalog_remote_page: self.catalog_remote_page,
+            catalog_has_more: self.catalog_has_more,
+            catalog_query: self.catalog_query.clone(),
+            catalog_book_ids: self.catalog.iter().map(|book| book.id.clone()).collect(),
+            catalog_listings: self.catalog_listings.clone(),
+            query: self.query.clone(),
+            search_scope: self.search_scope.clone(),
+            search_groups: self
+                .search_results
+                .iter()
+                .map(|group| SearchSession {
+                    id: group.id.clone(),
+                    title: group.title.clone(),
+                    book_ids: group.books.iter().map(|book| book.id.clone()).collect(),
+                    failed: group.error.is_some(),
+                    has_next: group.has_next,
+                })
+                .collect(),
+            selection_mode: self.selection_mode,
+            selected: self.selected.iter().cloned().collect(),
+            selected_chapters: self.selected_chapters.iter().cloned().collect(),
+            panel_route: if private_reader {
+                String::new()
+            } else {
+                panel_route.into()
+            },
+            panel_page: self.panel_page,
+            reader,
+        }
+    }
+
+    pub(crate) fn restore_saved_session(&mut self) -> Result<()> {
+        let Some(saved) = self.store.session()? else {
+            self.network_control.resume();
+            self.downloads
+                .resume_owned(self.options.offline || self.options.demo)?;
+            return Ok(());
+        };
+        self.lifecycle_generation = self.lifecycle_generation.wrapping_add(1);
+        self.invalidate_reader_work();
+        self.reader_inflight = None;
+        self.prefetch_inflight = None;
+        self.pending.clear();
+        self.busy = false;
+        self.route = normalize_route(&saved.route).into();
+        self.return_route = normalize_route(&saved.return_route).into();
+        self.page = saved.page.max(1);
+        self.current_book_id = saved.current_book_id.clone();
+        self.current_source = saved.current_source;
+        self.library_filter = saved.library_filter;
+        self.source_filter = saved.source_filter;
+        self.catalog_filter = saved.catalog_filter;
+        self.history_filter = saved.history_filter;
+        self.sort_title = saved.sort_title;
+        self.unread_only = saved.unread_only;
+        self.downloaded_only = saved.downloaded_only;
+        self.catalog_unread_only = saved.catalog_unread_only;
+        self.catalog_downloaded_only = saved.catalog_downloaded_only;
+        self.catalog_remote_page = saved.catalog_remote_page;
+        self.catalog_has_more = saved.catalog_has_more;
+        self.catalog_query = saved.catalog_query;
+        self.catalog.clear();
+        for id in saved.catalog_book_ids {
+            if let Some(book) = self.store.book(&id)? {
+                self.catalog.push(book);
+            }
+        }
+        if !saved.catalog_listings.is_empty() {
+            self.catalog_listings = saved.catalog_listings;
+        }
+        self.query = saved.query;
+        self.search_scope = saved.search_scope;
+        self.search_results.clear();
+        for group in saved.search_groups {
+            let mut books = Vec::new();
+            for id in group.book_ids {
+                if let Some(book) = self.store.book(&id)? {
+                    books.push(book);
+                }
+            }
+            self.search_results.push(SearchResult {
+                id: group.id,
+                title: group.title,
+                books,
+                error: group.failed.then(|| tr("request_timeout")),
+                has_next: group.has_next,
+                pending: false,
+            });
+        }
+        self.selection_mode = saved.selection_mode;
+        self.selected = saved.selected.into_iter().collect();
+        self.selected_chapters = saved.selected_chapters.into_iter().collect();
+        if let Some(ui) = self.ui.upgrade() {
+            ui.global::<State>().set_newest_first(saved.newest_first);
+        }
+        self.network_control.resume();
+        self.downloads
+            .resume_owned(self.options.offline || self.options.demo)?;
+        if self.route == "reader" {
+            if let Some(reader) = saved.reader {
+                if self.store.chapter(&reader.chapter_id)?.is_some() {
+                    self.prefs.landscape = reader.landscape;
+                    self.sync_runtime_geometry()?;
+                    self.enter_reader_at(
+                        &reader.chapter_id,
+                        reader.page,
+                        reader.vertical_offset,
+                        reader.zoom,
+                    )?;
+                } else {
+                    self.route = "library".into();
+                }
+            } else {
+                self.route = "library".into();
+            }
+        }
+        match saved.panel_route.as_str() {
+            "downloads" => {
+                self.open_downloads()?;
+                self.panel_page = saved.panel_page;
+                self.refresh_download_rows()?;
+            }
+            "summary" => {
+                self.open_summary()?;
+                self.panel_page = saved
+                    .panel_page
+                    .min(self.panel_pages.len().saturating_sub(1));
+            }
+            "about" => self.open_setting("about")?,
+            "cache-info" => self.choose_panel("cache-info")?,
+            _ => {}
+        }
+        self.resume_network_pending = !self.options.offline && !self.options.demo;
+        self.next_network_probe = Instant::now();
+        Ok(())
+    }
+
+    pub(crate) fn poll_network_resume(&mut self) {
+        if !self.resume_network_pending || self.suspended {
+            return;
+        }
+        let observed = self
+            .network_probe_rx
+            .as_ref()
+            .map(|receiver| receiver.try_recv());
+        match observed {
+            Some(Ok((generation, ready))) => {
+                self.network_probe_rx = None;
+                self.network_probe_inflight = false;
+                if generation == self.lifecycle_generation && ready {
+                    if let Err(error) = self.downloads.resume_owned(true) {
+                        eprintln!("aidoku: resume downloads: {error:#}");
+                    }
+                    self.resume_network_pending = false;
+                    self.cover_view.clear();
+                    self.cover_retry_after.clear();
+                    if !self.resume_frame_pending
+                        && self.route == "reader"
+                        && (self.displayed_reader.is_none() || self.resume_reader_repair)
+                    {
+                        let retry = if self.reader_recovery.is_some() {
+                            self.retry_reader_recovery()
+                        } else {
+                            self.request_reader_images()
+                        };
+                        if let Err(error) = retry {
+                            self.show_error(error);
+                        }
+                    }
+                    if !self.resume_frame_pending && self.prefetch_dirty {
+                        if let Err(error) = self.start_reader_prefetch() {
+                            eprintln!("aidoku: wake read-ahead: {error:#}");
+                        }
+                    }
+                } else {
+                    self.next_network_probe = Instant::now() + Duration::from_secs(2);
+                }
+            }
+            Some(Err(mpsc::TryRecvError::Disconnected)) => {
+                self.network_probe_rx = None;
+                self.network_probe_inflight = false;
+                self.next_network_probe = Instant::now() + Duration::from_secs(2);
+            }
+            _ => {}
+        }
+        if !self.resume_network_pending
+            || self.network_probe_inflight
+            || Instant::now() < self.next_network_probe
+        {
+            return;
+        }
+        let (sender, receiver) = mpsc::channel();
+        let native = self.platform.is_kindle();
+        let generation = self.lifecycle_generation;
+        self.network_probe_rx = Some(receiver);
+        self.network_probe_inflight = true;
+        if let Err(error) = std::thread::Builder::new()
+            .name("aidoku-wake-network".into())
+            .spawn(move || {
+                let _ = sender.send((generation, crate::platform::probe_network_ready(native)));
+            })
+        {
+            self.network_probe_inflight = false;
+            self.network_probe_rx = None;
+            self.next_network_probe = Instant::now() + Duration::from_secs(2);
+            eprintln!("aidoku: start network observation: {error}");
+        }
+    }
+
+    /// Lifecycle diagnostics deliberately avoid SQL, device probes and decoding.
+    pub fn lifecycle_snapshot(&self) -> Value {
+        json!({
+            "route":self.route,"page":self.page,"current_book":self.current_book_id,"source_id":self.current_source,
+            "library_filter":self.library_filter,"source_filter":self.source_filter,"catalog_filter":self.catalog_filter,"history_filter":self.history_filter,
+            "reader_page":self.displayed_reader.as_ref().map(|frame| frame.session.page),
+            "current_chapter":self.displayed_reader.as_ref().map(|frame| &frame.session.chapter_id),
+            "reader_offset":self.displayed_reader.as_ref().map(|frame| frame.session.vertical_offset),
+            "reader_zoom":self.displayed_reader.as_ref().map(|frame| frame.session.zoom),
+            "landscape":self.prefs.landscape,"spread":self.prefs.spread,"suspended":self.suspended,
+            "rotation_degrees":self.platform.display_rotation_degrees(),
+            "reader_menu":self.reader.as_ref().map(|reader| reader.menu_open),
+            "lifecycle_generation":self.lifecycle_generation,"network_resume_pending":self.resume_network_pending,"reader_frame_pending":self.resume_frame_pending,"reader_repair_pending":self.resume_reader_repair,"reader_image_jobs_started":self.reader_image_jobs_started,"displayed_reader":self.displayed_reader,
+        })
+    }
+}
+
+fn same_reader_render(first: &Preferences, second: &Preferences) -> bool {
+    first.landscape == second.landscape
+        && first.spread == second.spread
+        && first.cover_alone == second.cover_alone
+        && first.reading_direction == second.reading_direction
+        && first.crop_borders == second.crop_borders
+        && first.dither == second.dither
+        && first.contrast == second.contrast
+}

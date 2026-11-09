@@ -1,0 +1,198 @@
+{
+  "batch_id": "supplemental-30",
+  "reviewer": "/root/phase3_round1_review/supplemental_30",
+  "run_id": "a1baf3fe3dc2",
+  "review_method": "Fresh manual inspection of each of the eight assigned candidate PNGs with view_image, plus read-only review of the assigned JSON metadata, scope, handoff and relevant prototype text. No independent reference PNG was assigned or opened.",
+  "provenance": {
+    "binary_sha256_declared_by_all_cases": "94d7f3bbcab475ad8833a2f3c486138f7b49bead231851c2d8eab2f0c3d2ac51",
+    "source_sha256_declared_by_all_cases": "aef9db4e111165016a10a2a95e111f3155860b8510c7f6207ec9c79fbec5082c",
+    "identity_check": "All eight case metadata records declare the assigned run, binary and source identities. Get-FileHash of each current candidate PNG matches both expected_png_sha256 in the batch input and evidence_hashes.screenshot.sha256 in the case metadata.",
+    "profile": "scribe",
+    "native_capture_size": [930, 1240],
+    "backend_declared_by_metadata": "desktop"
+  },
+  "reviewed_case_ids": [
+    "scribe--library-tab-1",
+    "scribe--library-tab-2",
+    "scribe--library-tab-3",
+    "scribe--library-tab-4",
+    "scribe--library-update-toast",
+    "scribe--migration-cancel",
+    "scribe--migration-options",
+    "scribe--real-migration--candidates"
+  ],
+  "reviewed_cases": [
+    {
+      "case_id": "scribe--library-tab-1",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/scribe--library-tab-1.png",
+      "candidate_sha256": "61f26c32e48ff834edadd3fd206ed33cd48694306eeb74e42cdd724331a578a7",
+      "viewed_candidate": true,
+      "outcome": "pass",
+      "observations": [
+        "The Reading tab is bold and underlined, with count 12; all five Scribe categories are visible, including Uncategorized 0. This agrees with library_filter=1 and reading_count=12.",
+        "The six-column grid contains the 12 visible_books records in two rows. Unread badges and downloaded icons sit beside titles below the cover art. The displayed fixture badges agree with the per-book unread values and are not treated as a claim about the aggregate actual unread_count.",
+        "The continue-reading card shows page 12/40 with a matching partial progress bar, and the adjacent new-chapter summary remains separate and readable.",
+        "The 1/1 folio stays centered above the five-item dock. The one-page boundary has no misleading next action. White outlined summary cards have no shadow or dimmed surface."
+      ],
+      "intentional_differences": []
+    },
+    {
+      "case_id": "scribe--library-tab-2",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/scribe--library-tab-2.png",
+      "candidate_sha256": "e01d9b548f9ae5f44f1ffb7b25452ef34a664e08f265a0321410fb6b65f5ae65",
+      "viewed_candidate": true,
+      "outcome": "pass",
+      "observations": [
+        "The Planned tab is bold and underlined, with count 9, matching library_filter=2 and planned_count=9. Reading and Completed are visibly unselected.",
+        "Nine book records occupy six cells on the first row and three on the second. The three missing-art entries use readable title plates; their labels remain identifiable below the plates.",
+        "The badges 9, 1 and 2, and the downloaded markers, appear on the corresponding records rather than covering the artwork. The longer title on the last title plate wraps without colliding with its adjacent cell.",
+        "The stable 1/1 folio and dock do not move upward into the shorter grid. No cut-off grid row, shadow or backdrop tint is visible."
+      ],
+      "intentional_differences": []
+    },
+    {
+      "case_id": "scribe--library-tab-3",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/scribe--library-tab-3.png",
+      "candidate_sha256": "fea643545cc39318a5f19e9f71a0d8b95f58f78d1a56089e941d4a449073f2a5",
+      "viewed_candidate": true,
+      "outcome": "pass",
+      "observations": [
+        "The Completed tab has the required bold underline and count 25, agreeing with library_filter=3 and completed_count=25.",
+        "Eighteen title plates fill the six-by-three Scribe page. All three rows and their title labels fit above the pager; the first record's roughly 82-percent progress bar agrees with its recorded progress.",
+        "The pager reads 1/2 and exposes a right-aligned Next page action with a chevron. The unavailable previous action leaves the center allocation stable.",
+        "The 25-item category total is not confused with the 18 records on this page. The visible title plates and separators remain readable without an overlay or gray card surface."
+      ],
+      "intentional_differences": []
+    },
+    {
+      "case_id": "scribe--library-tab-4",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/scribe--library-tab-4.png",
+      "candidate_sha256": "2702bdd2e61932e10a2ea30bfbc61dc7873966b8a515f614d7e9580e4da9b565",
+      "viewed_candidate": true,
+      "outcome": "pass",
+      "observations": [
+        "The fifth Scribe category, Uncategorized 0, is present and visibly selected, agreeing with library_filter=4 and an empty visible_books array.",
+        "The empty content area provides a book icon, a prominent No results state and an All action. This supplies clear empty feedback instead of leaving an unexplained blank grid.",
+        "The summary cards remain legible above the empty state. A centered 1/1 folio and the normal dock retain their positions without stale book tiles or clipped controls.",
+        "The prototype text describes an empty uncategorized grid without a dedicated message; the added feedback is consistent with the explicit empty-state usability requirement."
+      ],
+      "intentional_differences": []
+    },
+    {
+      "case_id": "scribe--library-update-toast",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/scribe--library-update-toast.png",
+      "candidate_sha256": "d9e16b92f456b6452179727b69f8588e32a7aaeaf0de736b6f493bdc02a82a3c",
+      "viewed_candidate": true,
+      "outcome": "issues_found",
+      "observations": [
+        "The All category is selected, 18 records fill the six-by-three grid, and the 1/3 folio with Next page agrees with the recorded library_count=46 and page_count=3.",
+        "The toast is a horizontally centered white rectangle with a black outline and readable text, approximately 140 pixels from the bottom. It has no shadow or dimmed backdrop.",
+        "The visible toast says Saved, matching state.message. The case is an actual library refresh action, while the metadata records offline=true and busy=false; the acknowledgement does not communicate a checking state, an update result or an offline reason. See P3R1-SUP30-1.",
+        "The screenshot alone does not establish that an online update happened, and the Saved label is not treated as proof of online success."
+      ],
+      "intentional_differences": []
+    },
+    {
+      "case_id": "scribe--migration-cancel",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/scribe--migration-cancel.png",
+      "candidate_sha256": "8e7ab43ffb125c3788ab4ed34b14bfaab1aa85e53dd6f3c6f9b835bb898fdf01",
+      "viewed_candidate": true,
+      "outcome": "pass",
+      "observations": [
+        "The migration panel is closed and the normal two-column detail page is visible. No migration-start or migration-success toast is shown.",
+        "The metadata agrees with this visible cancellation state: modal is empty, migration_candidates is empty and migration_selected_id is empty.",
+        "The left metadata column retains the cover, title, source/status, continue-reading callout, three actions, synopsis and four tags. The right column shows chapter 86 through 71, total 86, unread 52, downloaded 9, and folio 1/6.",
+        "The content fits within the portrait viewport and there is no global dock on this secondary page. Cancellation's persistent storage effects cannot be established from this final-state PNG."
+      ],
+      "intentional_differences": []
+    },
+    {
+      "case_id": "scribe--migration-options",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/scribe--migration-options.png",
+      "candidate_sha256": "a5cdd375933c44bae3862235bf40fe9f9d9094d2731f615ef8097a03f73b00c9",
+      "viewed_candidate": true,
+      "outcome": "pass",
+      "observations": [
+        "The centered migration panel is white with a black outline, with the underlying detail page undimmed. Its header, empty candidate feedback, options and bottom actions fit within its bounds.",
+        "The panel explicitly says no migration books were found in the offline cache and offers Find matches. This agrees with offline=true, an empty migration_candidates array and migration_loading=false.",
+        "Keep read state and Keep categories are visibly off, while Delete original-source downloads after migration is on. These switch positions agree with the three recorded false, false and true option values.",
+        "Cancel remains outlined and enabled-looking; Start migration is muted while no candidate is selected. The visible empty-state explanation makes this business-disabled state understandable and does not fabricate a migration result."
+      ],
+      "intentional_differences": []
+    },
+    {
+      "case_id": "scribe--real-migration--candidates",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/scribe--real-migration--candidates.png",
+      "candidate_sha256": "575d37751669ed6caabd2b34bc02e213e797dc45e6a36d6d54e5fbb3328770b8",
+      "viewed_candidate": true,
+      "outcome": "issues_found",
+      "observations": [
+        "The migration panel shows three unselected actual alternate-source records, Local fixture series 000, 001 and 002, with cover thumbnails, source names and author text. These match the three metadata candidates from komga-alternate in a demo=false, offline=false case.",
+        "Keep read state and Keep categories are on, Delete original downloads is off, and Start migration remains muted. The header asks the user to select a target; this agrees with an empty migration_selected_id and migration_can_start=false.",
+        "The candidate rows and option controls remain legible inside the white outlined panel without a scrim. No commit, completion or external service authorization is claimed.",
+        "The uncovered real-content tag row beneath the panel has labels extending beyond their outlined chips, including Adventure and Long metadata. The metadata contains five tags, while only four cramped chips are visible and there is no disclosure for the remaining Pagination tag. See P3R1-SUP30-2.",
+        "No candidate row includes the exact-title or approximate-match indicator required by the handoff and prototype migration row. See P3R1-SUP30-3."
+      ],
+      "intentional_differences": []
+    }
+  ],
+  "suggestions": [
+    {
+      "id": "P3R1-SUP30-1",
+      "case_id": "scribe--library-update-toast",
+      "priority": "P2",
+      "description": "The library refresh action ends with an unrelated Saved acknowledgement instead of an update status or an offline result.",
+      "evidence": [
+        "The candidate PNG shows a Saved toast in the lower center of the library, around x410..520 and y1041..1100.",
+        "Case metadata records the same message with offline=true and busy=false. Its actual-refresh check accepts any nonempty message, so mechanical success does not establish that this message accurately explains refresh.",
+        "Read-only scenario text at scripts/verify-handoff-ui.py:988-992 triggers library/refresh for this exact case. HANDOFF.md section 5.1 requires update feedback, subject to the scope's actual-record and honest-state rules."
+      ],
+      "recommendation": "Provide feedback derived from the real refresh state: active checking when a worker is actually checking, the actual completion/error result, or an explicit offline/unavailable result when no check can run. Keep the existing outlined toast presentation and avoid a fabricated online checking or success message.",
+      "status": "open",
+      "introduced_round": 1
+    },
+    {
+      "id": "P3R1-SUP30-2",
+      "case_id": "scribe--real-migration--candidates",
+      "priority": "P2",
+      "description": "Real English metadata tags overflow their chip borders, and the tag collection drops a fifth value without a visible disclosure.",
+      "evidence": [
+        "In the uncovered detail area around x28..295 and y1065..1102, Adventure extends outside its first chip and Long metadata crowds beyond its outlined chip toward the neighboring label.",
+        "The sidecar book_tag_items are Adventure, Local, Long metadata, Mystery and Pagination. Only the first four chips are visible in the screenshot, with no second row or overflow action.",
+        "The scope's content-stress requirement calls for real long content to remain readable without overlap. The Scribe detail prototype at prototype/sc-manga.dc.html:64 uses a wrapping tag collection with text-sized padding."
+      ],
+      "recommendation": "Measure each tag label with its horizontal padding, wrap the chip collection within the detail column and allow its height to follow the resulting rows. Preserve every tag, or provide an operable overflow disclosure when an intentional limit is necessary; keep text inside each outlined chip.",
+      "status": "open",
+      "introduced_round": 1
+    },
+    {
+      "id": "P3R1-SUP30-3",
+      "case_id": "scribe--real-migration--candidates",
+      "priority": "P3",
+      "description": "Migration candidates omit the match classification that helps distinguish the intended replacement from similarly named results.",
+      "evidence": [
+        "All three rows show a title and source/author subtitle, but their right-hand area contains no exact-title or approximate-match indicator.",
+        "The current book is series-000 while the candidate list includes series-000, series-001 and series-002 from the alternate source.",
+        "HANDOFF.md section 5.2 specifies a right-side match indication; prototype/sc-manga.dc.html:155 renders m.match in that position. No intentional difference is recorded for this case."
+      ],
+      "recommendation": "Expose a concise match classification based on actual candidate metadata, such as exact normalized title or approximate title. If no reliable comparison is available, state that honestly instead of inventing a confidence score.",
+      "status": "open",
+      "introduced_round": 1
+    }
+  ],
+  "coverage_gaps": [
+    "This supplemental batch has no independent reference PNGs. Geometry and state expectations were checked against scope, handoff and prototype text, not against an unassigned visual reference.",
+    "The library category captures cover the first pages only; later Completed pages, category transitions, press feedback and pager interaction were not exercised by this review.",
+    "No selected migration candidate, enabled Start migration state, commit result, retained read/category outcome or download removal result is shown in these eight PNGs.",
+    "The cancellation image establishes the final visible state only; it cannot prove that persistent data remained unchanged.",
+    "The update image does not establish real network activity, update counts, error propagation or timer behavior. These need independent behavioral evidence."
+  ],
+  "limitations": [
+    "Only the eight assigned candidate PNGs were opened. No other PNG, reference image or application UI was inspected.",
+    "No local application, build, test, validation suite, smoke test or runtime probe was run. Existing JSON/text and PNG files were read, current PNG hashes were computed, and this review artifact was written.",
+    "Metadata checks support identity and captured-state interpretation, but were not used as a substitute for inspecting each image.",
+    "The desktop backend and logical geometry do not qualify physical Kindle wake behavior, memory use under 512 MiB, hardware capabilities, input hit areas, partial refresh timing or outside-tap behavior.",
+    "Fixture cover artwork and per-book unread badges were assessed as display data independently of aggregate actual unread counts. Different real record titles, counts, progress, dates, time and covers are not findings by themselves.",
+    "This is a bounded supplemental review with open findings; it does not assert that the full round or candidate is clean."
+  ]
+}

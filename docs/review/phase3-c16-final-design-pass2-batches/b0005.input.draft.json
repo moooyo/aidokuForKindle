@@ -1,0 +1,709 @@
+{
+  "schema_version": 1,
+  "kind": "Actual C16 final-design-pass2 bounded fresh input draft",
+  "scope": "FINAL_DESIGN_REFERENCE_PASS2",
+  "coordinator": "/root/c15_visual_coordinator",
+  "batch_id": "b0005",
+  "pass": 2,
+  "run_id": "c205f1b52500",
+  "draft_only": true,
+  "formal_input": false,
+  "assigned_owner": null,
+  "actual_worker_parent": null,
+  "proxy_lane": null,
+  "slot_id": null,
+  "task_name": null,
+  "status": "queued",
+  "assignment_status": "Sole coordinator registration and actual dispatch are pending; proposal fields do not create primary ownership.",
+  "proposed_registration": {
+    "proxy_lane": "Root",
+    "slot_id": "Root-C16-R2-03",
+    "required_parent": "/root/c15_visual_coordinator",
+    "task_name": "c16fd2_root_b0005",
+    "proposed_owner": "/root/c15_visual_coordinator/c16fd2_root_b0005",
+    "fork_turns": "none",
+    "registrar": "/root/c15_visual_coordinator",
+    "actual_registered": false,
+    "slot_registration_rule": "Register only after the actual prior worker naturally releases this slot; sole coordinator registration is required."
+  },
+  "primary_ownership_audit": {
+    "ledger_path": "D:/Code/aidokuForKindle/docs/review/phase3-c16-final-design-pass2-ledger.json",
+    "ledger_sha256_owner_declared": null,
+    "ledger_actual_run_id": "c205f1b52500",
+    "ledger_pass": 2,
+    "matching_primary_owner_count": 0,
+    "scope": "Exact selected case IDs checked by static reading of the new pass2 ledger immediately before this draft; no ledger mutation."
+  },
+  "freeze": {
+    "source_file_count": 229,
+    "source_sha256": "1fe46f49f4b60ad455b9e870e376a571adf203aebdf50b7d8616e376801c5626",
+    "desktop_sha256": "8aa3e37550e48fc195adf3c1511158b2dc8dd65099a7e250b32b198ca6bfd6b9",
+    "desktop_bytes": 265909992,
+    "core_manifest_sha256": "cf91ea316b335fbcbb09528c51205a49a01bd1452cc3695edc15b297e477ecb0",
+    "shared_preparation_sha256": null,
+    "input_binding_sha256": "d363238f693e495659570cb2592355a9b977a19a4ee668a1b7ca39adbf3c92f3"
+  },
+  "module": {
+    "id": "pw-manga",
+    "snapshot_path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate16/final-design-pass-2-modules/pw-manga/snapshot.json",
+    "snapshot_sha256": "d4a707a288776d200a2c380766316386eaa3c7628a90dd0c8b179f37bc5159b5",
+    "snapshot_sha256_owner_record_path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate16/final-design-pass-2-modules/PW-modules-local-return-verification-01.json",
+    "snapshot_sha256_owner_record_json_pointer": "/modules/0/snapshot_sha256",
+    "inventory_field": "members",
+    "originals_modified": false,
+    "actual_manual_ids": [
+      "pw-manga--batch-download",
+      "pw-manga--chapters-p2",
+      "pw-manga--default",
+      "pw-manga--description",
+      "pw-manga--more",
+      "pw-manga--tracking"
+    ],
+    "actual_prerequisite_ids": [],
+    "independent_directory_binding": "D:/Code/aidokuForKindle/artifacts/phase3/candidate16/final-design-pass-2-modules/pw-manga",
+    "path_binding_rule": "Join only actual snapshot.members.path to this independent pass2 module directory. Do not use historical outputs or observations."
+  },
+  "modules_local_return_receipt_binding": {
+    "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate16/final-design-pass-2-modules/PW-modules-local-return-verification-01.json",
+    "sha256_owner_declared": "c4a22137e2c1c6f8bce8506cd5cfa407c523738777e452dc03612103e4dd3aca",
+    "run_id_owner_declared": "c205f1b52500",
+    "round_owner_declared": 2,
+    "matched_members_owner_declared": 258,
+    "matched_bytes_owner_declared": 8671875,
+    "module_count_owner_declared": 7,
+    "viewer_count_owner_declared": 0,
+    "hash_source": "Sole coordinator owner declaration for this actual pass2 receipt; snapshot identities are copied from its module entries. No local hash computation."
+  },
+  "stable_module_index_binding": null,
+  "global_final_manifest": null,
+  "global_final_inventory": null,
+  "global_final_reconciliation": null,
+  "global_status": "New shared preparation, stable index and global final declarations remain pending; their hashes are null. This draft carries no global closure credit.",
+  "case_ids": [
+    "pw-manga--default",
+    "pw-manga--batch-download",
+    "pw-manga--chapters-p2",
+    "pw-manga--description"
+  ],
+  "manual_case_count": 4,
+  "cases": [
+    {
+      "case_id": "pw-manga--default",
+      "module_id": "pw-manga",
+      "run_id": "c205f1b52500",
+      "round": 2,
+      "source_sha256_owner_declared": "1fe46f49f4b60ad455b9e870e376a571adf203aebdf50b7d8616e376801c5626",
+      "binary_sha256_owner_declared": "8aa3e37550e48fc195adf3c1511158b2dc8dd65099a7e250b32b198ca6bfd6b9",
+      "manual_review_required": true,
+      "prerequisite": false,
+      "native_capture_size": [
+        618,
+        824
+      ],
+      "actual_route": "detail",
+      "reader_panel_owner_declared": "",
+      "capability_declaration": {
+        "backend": "desktop",
+        "frontlight_control_exposed": true,
+        "hardware_dither_qualified": false,
+        "orientation_profile_declared": false,
+        "pairing_endpoint_running": false,
+        "pen_input_implemented": false,
+        "physical_hardware_qualified": false,
+        "profile": "pw5",
+        "scope": "selected design profile and implemented application controls",
+        "server_configuration_implemented": true,
+        "software_dither": true,
+        "tracking_authorization_implemented": false,
+        "warmth_control_exposed": true
+      },
+      "artifacts": {
+        "case_json": {
+          "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate16/final-design-pass-2-modules/pw-manga/files/output/cases/pw-manga--default.json",
+          "sha256": "66a0dd20d399e4aae1464fd1bd0c1640752b0c893bb8150714cd7389412a6c8c",
+          "bytes": 26627,
+          "module_relative_path": "files/output/cases/pw-manga--default.json",
+          "original_path": "/root/aidoku-phase3/evidence/candidate16/final-design-pass-2/cases/pw-manga--default.json",
+          "owner_inventory_json_pointer": "/members/3"
+        },
+        "screenshot": {
+          "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate16/final-design-pass-2-modules/pw-manga/files/output/pw-manga--default.png",
+          "sha256": "92e95e6e7da0b3de05d75c9e0d2e80b79b1d065983afaa809f8a68a822f70f80",
+          "bytes": 128412,
+          "module_relative_path": "files/output/pw-manga--default.png",
+          "original_path": "/root/aidoku-phase3/evidence/candidate16/final-design-pass-2/pw-manga--default.png",
+          "owner_inventory_json_pointer": "/members/19"
+        },
+        "state": {
+          "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate16/final-design-pass-2-modules/pw-manga/files/output/pw-manga--default.state.json",
+          "sha256": "bcaa6015db5cccda916de6b58c9bc44dfab3457a53b195f8081e902ccb4dde8e",
+          "bytes": 15466,
+          "module_relative_path": "files/output/pw-manga--default.state.json",
+          "original_path": "/root/aidoku-phase3/evidence/candidate16/final-design-pass-2/pw-manga--default.state.json",
+          "owner_inventory_json_pointer": "/members/20"
+        },
+        "metadata": {
+          "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate16/final-design-pass-2-modules/pw-manga/files/output/pw-manga--default.metadata.json",
+          "sha256": "2e163057cc67d46a7f1f5859af5a3b0ded99559010714682c4a3aac0c2f45330",
+          "bytes": 672,
+          "module_relative_path": "files/output/pw-manga--default.metadata.json",
+          "original_path": "/root/aidoku-phase3/evidence/candidate16/final-design-pass-2/pw-manga--default.metadata.json",
+          "owner_inventory_json_pointer": "/members/21"
+        },
+        "actions": {
+          "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate16/final-design-pass-2-modules/pw-manga/files/output/actions/pw-manga--default.json",
+          "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+          "bytes": 3,
+          "module_relative_path": "files/output/actions/pw-manga--default.json",
+          "original_path": "/root/aidoku-phase3/evidence/candidate16/final-design-pass-2/actions/pw-manga--default.json",
+          "owner_inventory_json_pointer": "/members/22"
+        },
+        "log": {
+          "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate16/final-design-pass-2-modules/pw-manga/files/output/pw-manga--default.log",
+          "sha256": "dc121ceea011a63c29b404d6c6b75bbe2db32b326923b8fa99759f457bfd709f",
+          "bytes": 68,
+          "module_relative_path": "files/output/pw-manga--default.log",
+          "original_path": "/root/aidoku-phase3/evidence/candidate16/final-design-pass-2/pw-manga--default.log",
+          "owner_inventory_json_pointer": "/members/23"
+        }
+      },
+      "reference": {
+        "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate16/final-design-pass-2-modules/pw-manga/files/references/18b052844a8b90a2a558d2225301b2e273a6cb6bb2f457d7cc017294e89bd274-pw-manga.png",
+        "sha256": "18b052844a8b90a2a558d2225301b2e273a6cb6bb2f457d7cc017294e89bd274",
+        "bytes": 70194,
+        "module_relative_path": "files/references/18b052844a8b90a2a558d2225301b2e273a6cb6bb2f457d7cc017294e89bd274-pw-manga.png",
+        "original_path": "/root/aidoku-phase3/evidence/candidate16/final-design-preparation-01/references/screens/pw-manga.png",
+        "owner_inventory_json_pointer": "/members/24",
+        "kind": "exact-published-design-reference",
+        "applicability": "applicable",
+        "case_declared_sha256": "18b052844a8b90a2a558d2225301b2e273a6cb6bb2f457d7cc017294e89bd274",
+        "case_reference_id_owner_declared": "pw-manga--default",
+        "applicability_rule": "Retain the actual case applicability and capability declaration, including null or unavailable controls. Do not add unobserved operation or hardware acceptance."
+      },
+      "reference_expected": null,
+      "intentional_differences": [],
+      "visible_ui_requirements": null,
+      "native_visible_regions": null,
+      "extra_required_originals": [],
+      "artwork_content_contract": null,
+      "pure_reader_oracle": null,
+      "pure_oracle": null,
+      "own_closed_source_chain_required": null,
+      "same_case_closed_prerequisite": null,
+      "same_case_dependencies": null,
+      "acceptance_scope_limit": "Bounded captured native UI within actual reference applicability and capability declarations. An open panel supports UI observations only.",
+      "closed_or_post_close_effect_acceptance": null,
+      "owner_json_pointers": {
+        "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate16/final-design-pass-2-modules/pw-manga/files/output/cases/pw-manga--default.json",
+        "sha256": "66a0dd20d399e4aae1464fd1bd0c1640752b0c893bb8150714cd7389412a6c8c",
+        "state": "/state",
+        "metadata": "/metadata",
+        "actions": "/actions",
+        "checks": "/checks",
+        "command": "/command",
+        "capability_declaration": "/state/capability_declaration",
+        "reference_applicability": "/reference_applicability",
+        "pure_reader_oracle": "/pure_reader_oracle",
+        "pure_oracle": "/pure_oracle",
+        "own_closed_source_chain_required": "/own_closed_source_chain_required",
+        "same_case_closed_prerequisite": "/same_case_closed_prerequisite",
+        "same_case_dependencies": "/same_case_dependencies",
+        "closed_or_post_close_effect_acceptance": "/closed_or_post_close_effect_acceptance"
+      }
+    },
+    {
+      "case_id": "pw-manga--batch-download",
+      "module_id": "pw-manga",
+      "run_id": "c205f1b52500",
+      "round": 2,
+      "source_sha256_owner_declared": "1fe46f49f4b60ad455b9e870e376a571adf203aebdf50b7d8616e376801c5626",
+      "binary_sha256_owner_declared": "8aa3e37550e48fc195adf3c1511158b2dc8dd65099a7e250b32b198ca6bfd6b9",
+      "manual_review_required": true,
+      "prerequisite": false,
+      "native_capture_size": [
+        618,
+        824
+      ],
+      "actual_route": "detail",
+      "reader_panel_owner_declared": "",
+      "capability_declaration": {
+        "backend": "desktop",
+        "frontlight_control_exposed": true,
+        "hardware_dither_qualified": false,
+        "orientation_profile_declared": false,
+        "pairing_endpoint_running": false,
+        "pen_input_implemented": false,
+        "physical_hardware_qualified": false,
+        "profile": "pw5",
+        "scope": "selected design profile and implemented application controls",
+        "server_configuration_implemented": true,
+        "software_dither": true,
+        "tracking_authorization_implemented": false,
+        "warmth_control_exposed": true
+      },
+      "artifacts": {
+        "case_json": {
+          "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate16/final-design-pass-2-modules/pw-manga/files/output/cases/pw-manga--batch-download.json",
+          "sha256": "a17ad8efa00219ed52eea28114bdc8a6f99b6865b3136ec7ec4c36dfc704f0b8",
+          "bytes": 27772,
+          "module_relative_path": "files/output/cases/pw-manga--batch-download.json",
+          "original_path": "/root/aidoku-phase3/evidence/candidate16/final-design-pass-2/cases/pw-manga--batch-download.json",
+          "owner_inventory_json_pointer": "/members/1"
+        },
+        "screenshot": {
+          "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate16/final-design-pass-2-modules/pw-manga/files/output/pw-manga--batch-download.png",
+          "sha256": "667cd5fa298c29465a9162f7d0317aa5add28fadcaba703597c5f432c1c7d652",
+          "bytes": 115548,
+          "module_relative_path": "files/output/pw-manga--batch-download.png",
+          "original_path": "/root/aidoku-phase3/evidence/candidate16/final-design-pass-2/pw-manga--batch-download.png",
+          "owner_inventory_json_pointer": "/members/7"
+        },
+        "state": {
+          "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate16/final-design-pass-2-modules/pw-manga/files/output/pw-manga--batch-download.state.json",
+          "sha256": "a68e1e9e982ea5bbdc36412a61e1de7e2b631c3189a151d74fe3d83b4e05ad4b",
+          "bytes": 16061,
+          "module_relative_path": "files/output/pw-manga--batch-download.state.json",
+          "original_path": "/root/aidoku-phase3/evidence/candidate16/final-design-pass-2/pw-manga--batch-download.state.json",
+          "owner_inventory_json_pointer": "/members/8"
+        },
+        "metadata": {
+          "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate16/final-design-pass-2-modules/pw-manga/files/output/pw-manga--batch-download.metadata.json",
+          "sha256": "65639c5b7435445e449d2afb21402716d573628ea3a6a2117855585710c80673",
+          "bytes": 672,
+          "module_relative_path": "files/output/pw-manga--batch-download.metadata.json",
+          "original_path": "/root/aidoku-phase3/evidence/candidate16/final-design-pass-2/pw-manga--batch-download.metadata.json",
+          "owner_inventory_json_pointer": "/members/9"
+        },
+        "actions": {
+          "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate16/final-design-pass-2-modules/pw-manga/files/output/actions/pw-manga--batch-download.json",
+          "sha256": "a254a29a43065634ceb46e084db448288d4ed2eaad44d4ac49eb6341b7dc9b59",
+          "bytes": 103,
+          "module_relative_path": "files/output/actions/pw-manga--batch-download.json",
+          "original_path": "/root/aidoku-phase3/evidence/candidate16/final-design-pass-2/actions/pw-manga--batch-download.json",
+          "owner_inventory_json_pointer": "/members/10"
+        },
+        "log": {
+          "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate16/final-design-pass-2-modules/pw-manga/files/output/pw-manga--batch-download.log",
+          "sha256": "dc121ceea011a63c29b404d6c6b75bbe2db32b326923b8fa99759f457bfd709f",
+          "bytes": 68,
+          "module_relative_path": "files/output/pw-manga--batch-download.log",
+          "original_path": "/root/aidoku-phase3/evidence/candidate16/final-design-pass-2/pw-manga--batch-download.log",
+          "owner_inventory_json_pointer": "/members/11"
+        }
+      },
+      "reference": {
+        "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate16/final-design-pass-2-modules/pw-manga/files/references/bf955d46adf4588b06ae33aca771b5df9d9921fb6fec44bb8ca78b261905ac75-pw-manga--batch-download.png",
+        "sha256": "bf955d46adf4588b06ae33aca771b5df9d9921fb6fec44bb8ca78b261905ac75",
+        "bytes": 68488,
+        "module_relative_path": "files/references/bf955d46adf4588b06ae33aca771b5df9d9921fb6fec44bb8ca78b261905ac75-pw-manga--batch-download.png",
+        "original_path": "/root/aidoku-phase3/evidence/candidate16/final-design-preparation-01/references/screens/states/pw-manga--batch-download.png",
+        "owner_inventory_json_pointer": "/members/12",
+        "kind": "exact-published-design-reference",
+        "applicability": "applicable-subject-to-evidence-based-capability-bounds",
+        "case_declared_sha256": "bf955d46adf4588b06ae33aca771b5df9d9921fb6fec44bb8ca78b261905ac75",
+        "case_reference_id_owner_declared": "pw-manga--batch-download",
+        "applicability_rule": "Retain the actual case applicability and capability declaration, including null or unavailable controls. Do not add unobserved operation or hardware acceptance."
+      },
+      "reference_expected": "Next five, all unread, custom range and remove-read-download actions plus real free space.",
+      "intentional_differences": [],
+      "visible_ui_requirements": null,
+      "native_visible_regions": null,
+      "extra_required_originals": [],
+      "artwork_content_contract": null,
+      "pure_reader_oracle": null,
+      "pure_oracle": null,
+      "own_closed_source_chain_required": null,
+      "same_case_closed_prerequisite": null,
+      "same_case_dependencies": null,
+      "acceptance_scope_limit": "Bounded captured native UI within actual reference applicability and capability declarations. An open panel supports UI observations only.",
+      "closed_or_post_close_effect_acceptance": null,
+      "owner_json_pointers": {
+        "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate16/final-design-pass-2-modules/pw-manga/files/output/cases/pw-manga--batch-download.json",
+        "sha256": "a17ad8efa00219ed52eea28114bdc8a6f99b6865b3136ec7ec4c36dfc704f0b8",
+        "state": "/state",
+        "metadata": "/metadata",
+        "actions": "/actions",
+        "checks": "/checks",
+        "command": "/command",
+        "capability_declaration": "/state/capability_declaration",
+        "reference_applicability": "/reference_applicability",
+        "pure_reader_oracle": "/pure_reader_oracle",
+        "pure_oracle": "/pure_oracle",
+        "own_closed_source_chain_required": "/own_closed_source_chain_required",
+        "same_case_closed_prerequisite": "/same_case_closed_prerequisite",
+        "same_case_dependencies": "/same_case_dependencies",
+        "closed_or_post_close_effect_acceptance": "/closed_or_post_close_effect_acceptance"
+      }
+    },
+    {
+      "case_id": "pw-manga--chapters-p2",
+      "module_id": "pw-manga",
+      "run_id": "c205f1b52500",
+      "round": 2,
+      "source_sha256_owner_declared": "1fe46f49f4b60ad455b9e870e376a571adf203aebdf50b7d8616e376801c5626",
+      "binary_sha256_owner_declared": "8aa3e37550e48fc195adf3c1511158b2dc8dd65099a7e250b32b198ca6bfd6b9",
+      "manual_review_required": true,
+      "prerequisite": false,
+      "native_capture_size": [
+        618,
+        824
+      ],
+      "actual_route": "detail",
+      "reader_panel_owner_declared": "",
+      "capability_declaration": {
+        "backend": "desktop",
+        "frontlight_control_exposed": true,
+        "hardware_dither_qualified": false,
+        "orientation_profile_declared": false,
+        "pairing_endpoint_running": false,
+        "pen_input_implemented": false,
+        "physical_hardware_qualified": false,
+        "profile": "pw5",
+        "scope": "selected design profile and implemented application controls",
+        "server_configuration_implemented": true,
+        "software_dither": true,
+        "tracking_authorization_implemented": false,
+        "warmth_control_exposed": true
+      },
+      "artifacts": {
+        "case_json": {
+          "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate16/final-design-pass-2-modules/pw-manga/files/output/cases/pw-manga--chapters-p2.json",
+          "sha256": "4bc6b5302fa5bf87a8cf55dc7d05bcc1870ce1ad32c0eeb2c0f9d317f74aee48",
+          "bytes": 29069,
+          "module_relative_path": "files/output/cases/pw-manga--chapters-p2.json",
+          "original_path": "/root/aidoku-phase3/evidence/candidate16/final-design-pass-2/cases/pw-manga--chapters-p2.json",
+          "owner_inventory_json_pointer": "/members/2"
+        },
+        "screenshot": {
+          "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate16/final-design-pass-2-modules/pw-manga/files/output/pw-manga--chapters-p2.png",
+          "sha256": "80547fa5422ff3d62b5d685fc74d41db6d914ac5603429d331d53ea41b0ab598",
+          "bytes": 88376,
+          "module_relative_path": "files/output/pw-manga--chapters-p2.png",
+          "original_path": "/root/aidoku-phase3/evidence/candidate16/final-design-pass-2/pw-manga--chapters-p2.png",
+          "owner_inventory_json_pointer": "/members/13"
+        },
+        "state": {
+          "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate16/final-design-pass-2-modules/pw-manga/files/output/pw-manga--chapters-p2.state.json",
+          "sha256": "82b51e30ba56362cdd4196c89004b3f342e03c89d369f2ea2c8153fbf4034fbd",
+          "bytes": 17384,
+          "module_relative_path": "files/output/pw-manga--chapters-p2.state.json",
+          "original_path": "/root/aidoku-phase3/evidence/candidate16/final-design-pass-2/pw-manga--chapters-p2.state.json",
+          "owner_inventory_json_pointer": "/members/14"
+        },
+        "metadata": {
+          "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate16/final-design-pass-2-modules/pw-manga/files/output/pw-manga--chapters-p2.metadata.json",
+          "sha256": "b2dbaf601c10d1918b50a0a0b56f7838ef340587b189df00f3e3a8176b7a6d6d",
+          "bytes": 672,
+          "module_relative_path": "files/output/pw-manga--chapters-p2.metadata.json",
+          "original_path": "/root/aidoku-phase3/evidence/candidate16/final-design-pass-2/pw-manga--chapters-p2.metadata.json",
+          "owner_inventory_json_pointer": "/members/15"
+        },
+        "actions": {
+          "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate16/final-design-pass-2-modules/pw-manga/files/output/actions/pw-manga--chapters-p2.json",
+          "sha256": "599edbed6512f2b73640655f0193c2babd0bdecd5d79eb77447e05c299af824c",
+          "bytes": 92,
+          "module_relative_path": "files/output/actions/pw-manga--chapters-p2.json",
+          "original_path": "/root/aidoku-phase3/evidence/candidate16/final-design-pass-2/actions/pw-manga--chapters-p2.json",
+          "owner_inventory_json_pointer": "/members/16"
+        },
+        "log": {
+          "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate16/final-design-pass-2-modules/pw-manga/files/output/pw-manga--chapters-p2.log",
+          "sha256": "dc121ceea011a63c29b404d6c6b75bbe2db32b326923b8fa99759f457bfd709f",
+          "bytes": 68,
+          "module_relative_path": "files/output/pw-manga--chapters-p2.log",
+          "original_path": "/root/aidoku-phase3/evidence/candidate16/final-design-pass-2/pw-manga--chapters-p2.log",
+          "owner_inventory_json_pointer": "/members/17"
+        }
+      },
+      "reference": {
+        "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate16/final-design-pass-2-modules/pw-manga/files/references/53dd5de9ebc57a7794457f92857e25b8cbe1235df110ae24f71f84e86da42586-pw-manga--chapters-p2.png",
+        "sha256": "53dd5de9ebc57a7794457f92857e25b8cbe1235df110ae24f71f84e86da42586",
+        "bytes": 51292,
+        "module_relative_path": "files/references/53dd5de9ebc57a7794457f92857e25b8cbe1235df110ae24f71f84e86da42586-pw-manga--chapters-p2.png",
+        "original_path": "/root/aidoku-phase3/evidence/candidate16/final-design-preparation-01/references/screens/states/pw-manga--chapters-p2.png",
+        "owner_inventory_json_pointer": "/members/18",
+        "kind": "exact-published-design-reference",
+        "applicability": "applicable-subject-to-evidence-based-capability-bounds",
+        "case_declared_sha256": "53dd5de9ebc57a7794457f92857e25b8cbe1235df110ae24f71f84e86da42586",
+        "case_reference_id_owner_declared": "pw-manga--chapters-p2",
+        "applicability_rule": "Retain the actual case applicability and capability declaration, including null or unavailable controls. Do not add unobserved operation or hardware acceptance."
+      },
+      "reference_expected": "Compact book header, information collapsed, twelve chapter rows and folio.",
+      "intentional_differences": [],
+      "visible_ui_requirements": null,
+      "native_visible_regions": null,
+      "extra_required_originals": [],
+      "artwork_content_contract": null,
+      "pure_reader_oracle": null,
+      "pure_oracle": null,
+      "own_closed_source_chain_required": null,
+      "same_case_closed_prerequisite": null,
+      "same_case_dependencies": null,
+      "acceptance_scope_limit": "Bounded captured native UI within actual reference applicability and capability declarations. An open panel supports UI observations only.",
+      "closed_or_post_close_effect_acceptance": null,
+      "owner_json_pointers": {
+        "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate16/final-design-pass-2-modules/pw-manga/files/output/cases/pw-manga--chapters-p2.json",
+        "sha256": "4bc6b5302fa5bf87a8cf55dc7d05bcc1870ce1ad32c0eeb2c0f9d317f74aee48",
+        "state": "/state",
+        "metadata": "/metadata",
+        "actions": "/actions",
+        "checks": "/checks",
+        "command": "/command",
+        "capability_declaration": "/state/capability_declaration",
+        "reference_applicability": "/reference_applicability",
+        "pure_reader_oracle": "/pure_reader_oracle",
+        "pure_oracle": "/pure_oracle",
+        "own_closed_source_chain_required": "/own_closed_source_chain_required",
+        "same_case_closed_prerequisite": "/same_case_closed_prerequisite",
+        "same_case_dependencies": "/same_case_dependencies",
+        "closed_or_post_close_effect_acceptance": "/closed_or_post_close_effect_acceptance"
+      }
+    },
+    {
+      "case_id": "pw-manga--description",
+      "module_id": "pw-manga",
+      "run_id": "c205f1b52500",
+      "round": 2,
+      "source_sha256_owner_declared": "1fe46f49f4b60ad455b9e870e376a571adf203aebdf50b7d8616e376801c5626",
+      "binary_sha256_owner_declared": "8aa3e37550e48fc195adf3c1511158b2dc8dd65099a7e250b32b198ca6bfd6b9",
+      "manual_review_required": true,
+      "prerequisite": false,
+      "native_capture_size": [
+        618,
+        824
+      ],
+      "actual_route": "detail",
+      "reader_panel_owner_declared": "",
+      "capability_declaration": {
+        "backend": "desktop",
+        "frontlight_control_exposed": true,
+        "hardware_dither_qualified": false,
+        "orientation_profile_declared": false,
+        "pairing_endpoint_running": false,
+        "pen_input_implemented": false,
+        "physical_hardware_qualified": false,
+        "profile": "pw5",
+        "scope": "selected design profile and implemented application controls",
+        "server_configuration_implemented": true,
+        "software_dither": true,
+        "tracking_authorization_implemented": false,
+        "warmth_control_exposed": true
+      },
+      "artifacts": {
+        "case_json": {
+          "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate16/final-design-pass-2-modules/pw-manga/files/output/cases/pw-manga--description.json",
+          "sha256": "bd24a776bb2c137b786c3c179b224eb37f73720de279ec1d0f6a875c7f0df2d8",
+          "bytes": 27480,
+          "module_relative_path": "files/output/cases/pw-manga--description.json",
+          "original_path": "/root/aidoku-phase3/evidence/candidate16/final-design-pass-2/cases/pw-manga--description.json",
+          "owner_inventory_json_pointer": "/members/4"
+        },
+        "screenshot": {
+          "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate16/final-design-pass-2-modules/pw-manga/files/output/pw-manga--description.png",
+          "sha256": "19f0f960a61b33f828210d24c357306436c1dd3fed528bf2a206cc237988c3c0",
+          "bytes": 151900,
+          "module_relative_path": "files/output/pw-manga--description.png",
+          "original_path": "/root/aidoku-phase3/evidence/candidate16/final-design-pass-2/pw-manga--description.png",
+          "owner_inventory_json_pointer": "/members/25"
+        },
+        "state": {
+          "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate16/final-design-pass-2-modules/pw-manga/files/output/pw-manga--description.state.json",
+          "sha256": "7cbd7b9d2b4b36bd419a180fcee870a8ff767b6c58eb7f515b94d1740c7c0bc3",
+          "bytes": 15660,
+          "module_relative_path": "files/output/pw-manga--description.state.json",
+          "original_path": "/root/aidoku-phase3/evidence/candidate16/final-design-pass-2/pw-manga--description.state.json",
+          "owner_inventory_json_pointer": "/members/26"
+        },
+        "metadata": {
+          "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate16/final-design-pass-2-modules/pw-manga/files/output/pw-manga--description.metadata.json",
+          "sha256": "4c1e7151fb36de471e7a5447dc2368db7b9fa801d083b3ed38a7c6c355c04c3b",
+          "bytes": 672,
+          "module_relative_path": "files/output/pw-manga--description.metadata.json",
+          "original_path": "/root/aidoku-phase3/evidence/candidate16/final-design-pass-2/pw-manga--description.metadata.json",
+          "owner_inventory_json_pointer": "/members/27"
+        },
+        "actions": {
+          "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate16/final-design-pass-2-modules/pw-manga/files/output/actions/pw-manga--description.json",
+          "sha256": "145fd647aed7d2cd7a6eb2a9292b9810dcc752e6203459a62640653be04c5e5e",
+          "bytes": 96,
+          "module_relative_path": "files/output/actions/pw-manga--description.json",
+          "original_path": "/root/aidoku-phase3/evidence/candidate16/final-design-pass-2/actions/pw-manga--description.json",
+          "owner_inventory_json_pointer": "/members/28"
+        },
+        "log": {
+          "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate16/final-design-pass-2-modules/pw-manga/files/output/pw-manga--description.log",
+          "sha256": "dc121ceea011a63c29b404d6c6b75bbe2db32b326923b8fa99759f457bfd709f",
+          "bytes": 68,
+          "module_relative_path": "files/output/pw-manga--description.log",
+          "original_path": "/root/aidoku-phase3/evidence/candidate16/final-design-pass-2/pw-manga--description.log",
+          "owner_inventory_json_pointer": "/members/29"
+        }
+      },
+      "reference": {
+        "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate16/final-design-pass-2-modules/pw-manga/files/references/470b7e99526c882e74a1b3cdedde9dd83378e97bb22c62981da1a642b1f73bd8-pw-manga--description.png",
+        "sha256": "470b7e99526c882e74a1b3cdedde9dd83378e97bb22c62981da1a642b1f73bd8",
+        "bytes": 95996,
+        "module_relative_path": "files/references/470b7e99526c882e74a1b3cdedde9dd83378e97bb22c62981da1a642b1f73bd8-pw-manga--description.png",
+        "original_path": "/root/aidoku-phase3/evidence/candidate16/final-design-preparation-01/references/screens/states/pw-manga--description.png",
+        "owner_inventory_json_pointer": "/members/30",
+        "kind": "exact-published-design-reference",
+        "applicability": "applicable-subject-to-evidence-based-capability-bounds",
+        "case_declared_sha256": "470b7e99526c882e74a1b3cdedde9dd83378e97bb22c62981da1a642b1f73bd8",
+        "case_reference_id_owner_declared": "pw-manga--description",
+        "applicability_rule": "Retain the actual case applicability and capability declaration, including null or unavailable controls. Do not add unobserved operation or hardware acceptance."
+      },
+      "reference_expected": "Full description, tag controls and source/update/size metadata in a bottom sheet.",
+      "intentional_differences": [],
+      "visible_ui_requirements": null,
+      "native_visible_regions": null,
+      "extra_required_originals": [],
+      "artwork_content_contract": null,
+      "pure_reader_oracle": null,
+      "pure_oracle": null,
+      "own_closed_source_chain_required": null,
+      "same_case_closed_prerequisite": null,
+      "same_case_dependencies": null,
+      "acceptance_scope_limit": "Bounded captured native UI within actual reference applicability and capability declarations. An open panel supports UI observations only.",
+      "closed_or_post_close_effect_acceptance": null,
+      "owner_json_pointers": {
+        "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate16/final-design-pass-2-modules/pw-manga/files/output/cases/pw-manga--description.json",
+        "sha256": "bd24a776bb2c137b786c3c179b224eb37f73720de279ec1d0f6a875c7f0df2d8",
+        "state": "/state",
+        "metadata": "/metadata",
+        "actions": "/actions",
+        "checks": "/checks",
+        "command": "/command",
+        "capability_declaration": "/state/capability_declaration",
+        "reference_applicability": "/reference_applicability",
+        "pure_reader_oracle": "/pure_reader_oracle",
+        "pure_oracle": "/pure_oracle",
+        "own_closed_source_chain_required": "/own_closed_source_chain_required",
+        "same_case_closed_prerequisite": "/same_case_closed_prerequisite",
+        "same_case_dependencies": "/same_case_dependencies",
+        "closed_or_post_close_effect_acceptance": "/closed_or_post_close_effect_acceptance"
+      }
+    }
+  ],
+  "image_open_plan": [
+    {
+      "case_id": "pw-manga--default",
+      "role": "actual-current-native-original",
+      "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate16/final-design-pass-2-modules/pw-manga/files/output/pw-manga--default.png",
+      "sha256": "92e95e6e7da0b3de05d75c9e0d2e80b79b1d065983afaa809f8a68a822f70f80",
+      "mandatory": true,
+      "covered_case_ids": [
+        "pw-manga--default"
+      ]
+    },
+    {
+      "case_id": "pw-manga--default",
+      "role": "exact-published-design-reference",
+      "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate16/final-design-pass-2-modules/pw-manga/files/references/18b052844a8b90a2a558d2225301b2e273a6cb6bb2f457d7cc017294e89bd274-pw-manga.png",
+      "sha256": "18b052844a8b90a2a558d2225301b2e273a6cb6bb2f457d7cc017294e89bd274",
+      "mandatory": true,
+      "covered_case_ids": [
+        "pw-manga--default"
+      ]
+    },
+    {
+      "case_id": "pw-manga--batch-download",
+      "role": "actual-current-native-original",
+      "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate16/final-design-pass-2-modules/pw-manga/files/output/pw-manga--batch-download.png",
+      "sha256": "667cd5fa298c29465a9162f7d0317aa5add28fadcaba703597c5f432c1c7d652",
+      "mandatory": true,
+      "covered_case_ids": [
+        "pw-manga--batch-download"
+      ]
+    },
+    {
+      "case_id": "pw-manga--batch-download",
+      "role": "exact-published-design-reference",
+      "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate16/final-design-pass-2-modules/pw-manga/files/references/bf955d46adf4588b06ae33aca771b5df9d9921fb6fec44bb8ca78b261905ac75-pw-manga--batch-download.png",
+      "sha256": "bf955d46adf4588b06ae33aca771b5df9d9921fb6fec44bb8ca78b261905ac75",
+      "mandatory": true,
+      "covered_case_ids": [
+        "pw-manga--batch-download"
+      ]
+    },
+    {
+      "case_id": "pw-manga--chapters-p2",
+      "role": "actual-current-native-original",
+      "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate16/final-design-pass-2-modules/pw-manga/files/output/pw-manga--chapters-p2.png",
+      "sha256": "80547fa5422ff3d62b5d685fc74d41db6d914ac5603429d331d53ea41b0ab598",
+      "mandatory": true,
+      "covered_case_ids": [
+        "pw-manga--chapters-p2"
+      ]
+    },
+    {
+      "case_id": "pw-manga--chapters-p2",
+      "role": "exact-published-design-reference",
+      "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate16/final-design-pass-2-modules/pw-manga/files/references/53dd5de9ebc57a7794457f92857e25b8cbe1235df110ae24f71f84e86da42586-pw-manga--chapters-p2.png",
+      "sha256": "53dd5de9ebc57a7794457f92857e25b8cbe1235df110ae24f71f84e86da42586",
+      "mandatory": true,
+      "covered_case_ids": [
+        "pw-manga--chapters-p2"
+      ]
+    },
+    {
+      "case_id": "pw-manga--description",
+      "role": "actual-current-native-original",
+      "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate16/final-design-pass-2-modules/pw-manga/files/output/pw-manga--description.png",
+      "sha256": "19f0f960a61b33f828210d24c357306436c1dd3fed528bf2a206cc237988c3c0",
+      "mandatory": true,
+      "covered_case_ids": [
+        "pw-manga--description"
+      ]
+    },
+    {
+      "case_id": "pw-manga--description",
+      "role": "exact-published-design-reference",
+      "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate16/final-design-pass-2-modules/pw-manga/files/references/470b7e99526c882e74a1b3cdedde9dd83378e97bb22c62981da1a642b1f73bd8-pw-manga--description.png",
+      "sha256": "470b7e99526c882e74a1b3cdedde9dd83378e97bb22c62981da1a642b1f73bd8",
+      "mandatory": true,
+      "covered_case_ids": [
+        "pw-manga--description"
+      ]
+    }
+  ],
+  "source_composition_comparison_pairs": [],
+  "reference_pair_count": 4,
+  "source_oracle_pair_count": 0,
+  "comparison_pair_count": 4,
+  "planned_minimum_image_opens": 8,
+  "own_processed_original_open_count": 0,
+  "own_expected_original_open_count": 0,
+  "diagnostic_difference_image_opens": 0,
+  "image_open_count_policy": "Open every mandatory actual unique path independently. A legitimately shared exact path has one actual opening with covered-case bindings; equal SHA across different paths gives no reuse credit.",
+  "maximum_manual_cases": 4,
+  "maximum_reference_pairs": 4,
+  "maximum_comparison_pairs": 4,
+  "maximum_image_opens": 8,
+  "fork_turns": "none",
+  "model_selection": "Intentional inheritance because current tool metadata does not distinguish model capabilities.",
+  "worker_contract": "D:/Code/aidokuForKindle/docs/review/phase3-full-fresh-worker-contract.md",
+  "skill_path": "C:/Users/moooyo/.codex/skills/ui-ux-pro-max/SKILL.md",
+  "requirements": [
+    "Actually open every mandatory current, reference and own processed/expected unique path in image_open_plan. Retain explicit covered-case bindings for lawful same-path sharing; matching SHA alone supplies no opening credit.",
+    "Count own source-oracle composition pairs together with design-reference pairs within four total pairs and eight required opens. Own expected is a source composition, never a design reference. Do not open diagnostic difference images.",
+    "Read required actual glyph hierarchy, clipping, icons, visible feedback, pure reader content and supported normal use from the new originals. Required issues block closure; extra non-required optimizations remain deferred.",
+    "Preserve actual raw reference applicability and capability declarations, including null, empty and unavailable controls. A captured desktop control does not prove hardware operation.",
+    "An open panel supports captured UI only. Preserve raw closed/source acceptance fields and do not infer closing operations, post-close effects or unobserved functional proof.",
+    "Old pass1 images or observations, Source parameters and automatic PASS cannot replace new glyph, purity or closing-operation observations.",
+    "Required unread text or uncertain extent needs a precise own-source ROI request and reading_pending. Do not generate or process the ROI in this worker.",
+    "Typeface and numeric weights such as 500 or 700 remain unmeasured limitations unless actual new evidence exists. Static parameters do not replace visible glyph and extent observations.",
+    "The assigned worker may read static local text and use tools.view_image for the required originals only. No SSH, hashing, tests, builds, validation, probes, App/capture, Python/PIL, cropping, resizing, image processing, extra images, child agents, Source edits, old report edits or registry edits.",
+    "Write a new compact English report at report_path and use Chinese team messages. Record actual actor, parent, proxy and slot; path-role-SHA openings; reference/source/total pair counts; bounded findings; new_required, reading_pending, identity and deferred.",
+    "No hidden, hardware, unobserved operation, lease, performance, full-stress, package or global clean credit."
+  ],
+  "required_member_pending": [],
+  "report_path": "D:/Code/aidokuForKindle/docs/review/phase3-c16-final-design-pass2-batches/b0005.review.json",
+  "credit": {
+    "full_stress": 0,
+    "clean": 0,
+    "package": 0,
+    "pass1": 0
+  },
+  "static_draft_helper_image_opens": 0,
+  "declared_hash_basis": "Actual independent pass2 snapshot.members, actual pass2 local-return receipt module SHA declarations and sole coordinator receipt SHA declaration only; no local or Source hashing."
+}

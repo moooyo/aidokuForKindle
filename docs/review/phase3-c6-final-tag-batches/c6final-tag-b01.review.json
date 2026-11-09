@@ -1,0 +1,120 @@
+{
+  "schema_version": 1,
+  "batch_id": "c6final-tag-b01",
+  "reviewer": "c6final_tag_b01",
+  "kind": "independent-focused-original-image-review",
+  "record_date": "2026-11-07",
+  "run_id": "a2f53f0c33db",
+  "round": 5,
+  "capture_manifest_sha256": "aa389850a0c5c2f41c266307964ffc95faa9b4b1a3247ab568ed5833c8b2547e",
+  "inventory_sha256": "029ca8231c5c230f4240dcd5be69e71cf1b41302c56c52e736e06d0dcc3a2cc6",
+  "freeze_tuple": {
+    "source_file_count": 227,
+    "source_sha256": "adafa23e6e1e4906990c3162025dd26d85e20e2f2bb4bed2f21c980bc4d565f5",
+    "binary_sha256": "baafaf4b29a7a6629e8ef95da9dae38da323adccaa89288a92afe3bc4318e0ee",
+    "harness_sha256": "8811746a09e761bfff55879a018d71f98d1d957d5ba79e8f008bdcaf90d5f55e",
+    "capture_plan_sha256": "b3adabbf4f2d33789f381dc2ac55474d89fcd210d58ce9e5083c0d818d547eec",
+    "reference_scope_sha256": "c910bed9f02ed17b2ca0a54aca1beeeeb6caabc5a17a91afe764ddd3e7b0d33c",
+    "reference_sha256": "e7b49b456255432d74cfe41346f9d44c1a9c55bf67c5d55483e4ae3029547d18",
+    "capture_helper_sha256": {
+      "verify-ui.py": "470872e6fd22a78b474c0f862164875ad9c7237bd2f3f164512864580ac1e90d",
+      "verify-fullscreen.py": "4a6c48cef771e66e9b3058edd888dcf2d4bce02e2720b5cc00c7a5b987bc9670",
+      "handoff_c4_business.py": "6197f375b247962e3ce9acdd3779468073f11e0002ac3c7ce876a7b1a0d0d9be",
+      "handoff_c5_ui.py": "fa30ef2bf8ab512e9705f43933ff6acaf32993e5aa1dbc62be330d4c97b481f2",
+      "handoff_c5_reader.py": "5b88a0c1b8e1151a3f96decef1a3a06f98a0d9de99908709bafbfb02cea490d5"
+    },
+    "qualification_driver_sha256": "7cd32588578edff343a33dc2a70b99cb6f838f6063de175c4e269935c53eb0b6",
+    "qualification_pixels_sha256": "f97014cfca910b30a75cea484e57dcd9e4566ca1401785b096ab5851add979a1"
+  },
+  "identity_basis": "Owner immutable FINAL C6 inventory hashes were transcribed without local rehash. Each read case declares the expected round, run, source and binary identities.",
+  "reviewed_case_ids": ["pw-source--filter", "pw5--content-stress--filter-tag-page-1", "pw5--c6-tag-excluded"],
+  "actual_image_opens": 4,
+  "comparison_groups": 3,
+  "review_scope": "Three affected-tag cases and one original basic-filter reference only. Static case/state/action/metadata/log reading and tools.view_image viewing; no execution or replay.",
+  "cases": [
+    {
+      "case_id": "pw-source--filter",
+      "evidence": {
+        "png": {"path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate6/ui-tag-qualification-final-01/pw-source--filter.png", "sha256": "d76b901de996b8351f5711ba6b93c2d4763df806013f4464f90b78081c0bdac2"},
+        "case_json": {"path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate6/ui-tag-qualification-final-01/cases/pw-source--filter.json", "sha256": "033ffb0cbf4f26868fd96c22b910f6b0dee68599d5c490aad2119af04a98d7b5"},
+        "state": {"path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate6/ui-tag-qualification-final-01/pw-source--filter.state.json", "sha256": "7e77564bb35ac45675b7c6f942bb41d0984317f166a5e7d11ba0316ee8004997"},
+        "actions": {"path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate6/ui-tag-qualification-final-01/actions/pw-source--filter.json", "sha256": "97498c0a800999be91f169be14fc8b046abbbe6d353122c462bc1e06a5f0adfc"},
+        "metadata": {"path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate6/ui-tag-qualification-final-01/pw-source--filter.metadata.json", "sha256": "028fce8e7795997f6ec146f465f197c6b1158b91d73d967c4d8d95ef8cd73e43"},
+        "log": {"path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate6/ui-tag-qualification-final-01/pw-source--filter.log", "sha256": "dc121ceea011a63c29b404d6c6b75bbe2db32b326923b8fa99759f457bfd709f"}
+      },
+      "actual_view": {"tool": "tools.view_image", "original_opened": true, "native_size": [618, 824], "derived_image_used": false},
+      "static_context": "The recorded 650 ms catalog filter-menu action ends in catalog/catalog-filter; the tag states and active filter count are zero. Metadata and log declare desktop PW5, 618x824, scale 1.",
+      "observations": [
+        "Nine Chinese neutral chips occupy six positions on the first row and three on the second. All nine two-character labels are legible, with complete thin outlines and approximately balanced left/right padding.",
+        "The labels are horizontally centered within compact content-width chips. No blank marker gutter is visible before a neutral label; adjacent chips do not overlap.",
+        "The original reference shows the same centered neutral outline treatment at twice the native scale. Its twelve-tag content differs from this nine-tag catalog, so the reference's eight/four row split is not imposed on this image.",
+        "The filter trigger is visibly neutral without a count badge. The disabled follow/rating sort controls are visibly gray and agree with the static enabled flags."
+      ],
+      "intentional_capability_check": "intentional_differences is empty. The selected desktop PW5 profile and implemented controls are declared; physical_hardware_qualified and hardware_dither_qualified are false. Data and capability context do not excuse any chip centering or marker defect.",
+      "verdict": "pass-for-focused-neutral-geometry",
+      "limits": ["Visual centering is judged from the original displayed PNG, without pixel measurement.", "The reference supplies neutral styling and related geometry; tag content is not identical."]
+    },
+    {
+      "case_id": "pw5--content-stress--filter-tag-page-1",
+      "evidence": {
+        "png": {"path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate6/ui-tag-qualification-final-01/pw5--content-stress--filter-tag-page-1.png", "sha256": "3a8d5aa688a33c61ea49d51b63dc995176c6e4067b0dc8876ff879ad9a2c0ced"},
+        "case_json": {"path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate6/ui-tag-qualification-final-01/cases/pw5--content-stress--filter-tag-page-1.json", "sha256": "1b6d4ab04c0643957efe2234b7848cd77d1bdc0d424029643f506026eeab06d8"},
+        "state": {"path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate6/ui-tag-qualification-final-01/pw5--content-stress--filter-tag-page-1.state.json", "sha256": "7c8759a05619ce98cc56d63fa1ab52ce7d41f697542d69ddb1c553bd341231a2"},
+        "actions": {"path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate6/ui-tag-qualification-final-01/actions/pw5--content-stress--filter-tag-page-1.json", "sha256": "3167fc146a601c45df47942cfd5f673990e44dcb8c84970cf4b9b94b78d8ffc9"},
+        "metadata": {"path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate6/ui-tag-qualification-final-01/pw5--content-stress--filter-tag-page-1.metadata.json", "sha256": "30bac2f6d118256e6c80e185eb2e6f4f8a36056e901473ef5788a7ece8693b44"},
+        "log": {"path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate6/ui-tag-qualification-final-01/pw5--content-stress--filter-tag-page-1.log", "sha256": "dc121ceea011a63c29b404d6c6b75bbe2db32b326923b8fa99759f457bfd709f"}
+      },
+      "actual_view": {"tool": "tools.view_image", "original_opened": true, "native_size": [618, 824], "derived_image_used": false},
+      "static_context": "The action record opens Komga, opens/resets the filter, and records six pointer press/release sequences across centers (348,654), (216,654), (84,654), (348,604), (216,604), (84,604). State declares six selected tags and active count 6; metadata/log declare desktop PW5 618x824 scale 1.",
+      "observations": [
+        "Six black chips form three columns and two rows. Each has a separate white check before its white label, with both check strokes visible and clear space between marker and text.",
+        "The original image visibly reads Actual tag 00, 01 and 02 in the first row and Actual tag 03, 04 and 05 in the second. All distinguishing two-digit suffixes remain inside the black chip boundaries without clipping or collision.",
+        "The page indicator visibly reads 1 / 6; the previous action is gray and the next action is dark. This three-column/six-page observation applies to this dense34-tag fixture only.",
+        "The top filter trigger visibly has a count badge of 6, consistent with the six selected markers in this frozen capture."
+      ],
+      "intentional_capability_check": "intentional_differences is empty. Case, state, metadata and log agree on the catalog-filter desktop PW5 context. Physical hardware and hardware dither are unqualified. The neutral original reference supplies related visual geometry, with no invented exact selected-state reference.",
+      "verdict": "pass-for-focused-selected-markers-and-suffixes",
+      "limits": ["The final image and recorded pointer trace support this captured outcome; the interaction was not independently replayed.", "Other fixture pages and physical Kindle behavior are outside this review."]
+    },
+    {
+      "case_id": "pw5--c6-tag-excluded",
+      "evidence": {
+        "png": {"path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate6/ui-tag-qualification-final-01/pw5--c6-tag-excluded.png", "sha256": "797346c9211d3c3694676483f8496b7a770abad1113ccde5eb469495f471146f"},
+        "case_json": {"path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate6/ui-tag-qualification-final-01/cases/pw5--c6-tag-excluded.json", "sha256": "fc5f8d7c384a4123df3538e73a50a236ac6de2aa847471482d348ec85e94d932"},
+        "state": {"path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate6/ui-tag-qualification-final-01/pw5--c6-tag-excluded.state.json", "sha256": "c2862d14b6486cda126e1a80bc0ee6b474602c8e2500e509014db923c051f694"},
+        "actions": {"path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate6/ui-tag-qualification-final-01/actions/pw5--c6-tag-excluded.json", "sha256": "4e97c2921fa4e7b0fcff7729d4455d54df0b1fe4302853350856e29dc25e75a2"},
+        "metadata": {"path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate6/ui-tag-qualification-final-01/pw5--c6-tag-excluded.metadata.json", "sha256": "1719d4528d7c08c6a1dd09fbe03409305fc4fc6da7d1ed36fee28d09537e3778"},
+        "log": {"path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate6/ui-tag-qualification-final-01/pw5--c6-tag-excluded.log", "sha256": "dc121ceea011a63c29b404d6c6b75bbe2db32b326923b8fa99759f457bfd709f"}
+      },
+      "actual_view": {"tool": "tools.view_image", "original_opened": true, "native_size": [618, 824], "derived_image_used": false},
+      "static_context": "After opening/resetting the Komga filter, the record contains two pointer press/release sequences at (84,604), targeting Actual tag 00. State declares that tag excluded and active count 1; metadata/log declare desktop PW5 618x824 scale 1.",
+      "observations": [
+        "The first chip visibly has a gray cross before Actual tag 00, a dashed outline on all four sides, and a horizontal strike through the gray label. The cross remains distinct from the label strike.",
+        "Actual tag 00 and its final 00 are readable in the original PNG despite the strike. Marker, label and suffix remain within the dashed rectangle; no edge truncation is visible.",
+        "Adjacent neutral Actual tag 01 through Actual tag 05 remain readable inside solid thin outlines and have centered labels without blank marker gutters. The excluded chip is wider to accommodate its real cross.",
+        "The grid has three columns and two visible rows, with a visible 1 / 6 folio. The filter trigger count is 1. These observations are confined to this dense34-tag fixture."
+      ],
+      "intentional_capability_check": "intentional_differences is empty. Static pointer-origin and action records are consistent with the excluded state, while visible cross/dashes/strike are independently observed in the original image. The declared capability scope is desktop PW5 implemented controls; physical hardware and hardware dither are unqualified. No exact excluded-state reference is asserted.",
+      "verdict": "pass-for-focused-excluded-marker-and-boundaries",
+      "limits": ["Only the final captured exclusion outcome was inspected; no pointer replay or exclusion-cycle verification was performed.", "Other fixture pages and physical Kindle behavior are outside this review."]
+    }
+  ],
+  "reference": {
+    "reference_id": "pw-source--filter",
+    "path": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/screens/states/pw-source--filter.png",
+    "sha256": "1339b77a8346218b73343211b67163fbba6efe5b875fff5b2b37239dfcfd2c23",
+    "actual_view": {"tool": "tools.view_image", "original_opened": true, "native_size": [1236, 1648], "derived_image_used": false},
+    "observations": "Twelve neutral two-character Chinese chips wrap eight/four. Labels are centered in light outlines with balanced padding and no leading marker slot. The reference has no selected or excluded tag marker.",
+    "application": "Direct neutral treatment comparison at physical_reference_scale 2, and related filter geometry for supplemental states. Different tag content and selected/excluded fixture states are not assigned invented exact-reference expectations."
+  },
+  "new_actionable_findings": [],
+  "unreadable_items": [],
+  "identity_mismatches": [],
+  "suggestions": [],
+  "gaps": [
+    "Manual coverage is limited to these three affected-tag cases and one original reference; the remaining final qualification cases were not inspected by this reviewer.",
+    "The selected and excluded supplemental captures have related neutral reference geometry, without an exact matching reference state.",
+    "Immutable evidence hashes were accepted from the supplied inventory identity records without recomputation."
+  ],
+  "conclusion": "The focused neutral centering/intrinsic-width, selected marker, excluded marker and visible suffix checks pass for these three FINAL C6 captures. No new actionable issue or unreadable item was observed. Overall qualification remains partial."
+}

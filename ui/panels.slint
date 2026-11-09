@@ -1,0 +1,244 @@
+import { State, Commands } from "state.slint";
+import { Theme } from "theme.slint";
+import { Strings } from "strings.slint";
+import { BodyText, Caption, Icon, PageBar } from "widgets.slint";
+import { ReaderMetrics } from "reader.slint";
+import { PanelHeader, ChoiceRow } from "panels-common.slint";
+import { LibrarySortPanel, DownloadQueuePanel } from "panels-library.slint";
+import { SummaryPanel, BatchDownloadPanel, TrackingPanel, ConfirmationPanel, MigrationPanel } from "panels-detail.slint";
+import { PairingPanel, RepositoryListPanel, SourcePickerPanel } from "panels-sources.slint";
+import { KeyboardPanel } from "panels-keyboard.slint";
+import { ReaderPanel } from "panels-reader.slint";
+import { CatalogFilterPanel } from "panels-catalog.slint";
+import { SourceSettingsPanel } from "panels-source-settings.slint";
+
+component MoreMenuGlyph inherits Path {
+    in property <string> action-id;
+    in property <color> foreground: Theme.ink;
+    width: State.large-screen ? 24px : 22px;
+    height: self.width;
+    viewbox-width: 24;
+    viewbox-height: 24;
+    fill: transparent;
+    stroke: root.foreground;
+    stroke-width: State.large-screen ? 1.8px : 1.9px;
+    stroke-line-cap: round;
+    stroke-line-join: round;
+    accessible-role: none;
+    commands: root.action-id == "refresh" || root.action-id == "reload" ? "M21 4v6h-6M3 20v-6h6M5 9a8 8 0 0 1 13.5-3L21 9M3 15l2.5 3A8 8 0 0 0 19 15" :
+        root.action-id == "downloads" ? "M12 4v11M7 11l5 5 5-5M5 20h14" :
+        root.action-id == "selection" ? "M4 4h16v16H4zM8 12l3 3 5-6" :
+        root.action-id == "manage-categories" || root.action-id == "category" ? (State.large-screen ? "M3 7h7l2 2h9v10H3z" : "M8 6h13M8 12h13M8 18h13M3.5 6h.01M3.5 12h.01M3.5 18h.01") :
+        root.action-id == "migrate" ? "M17 3l4 4-4 4M3 7h18M7 21l-4-4 4-4M21 17H3" :
+        root.action-id == "screensaver" ? "M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z" :
+        root.action-id == "remove-all-downloads" ? "M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3" : "";
+}
+
+component MoreMenu inherits Rectangle {
+    property <bool> detail: State.modal-context == "detail-more";
+    property <bool> with-icons: !root.detail || State.large-screen;
+    property <length> inset: State.large-screen ? 22px : (root.detail ? 20px : 18px);
+    property <length> icon-size: State.large-screen ? 24px : 22px;
+    property <length> icon-gap: State.large-screen ? 16px : 14px;
+    property <length> pad-y: State.large-screen ? 10px : 8px;
+    property <length> row-height: State.large-screen ? 62px : (root.detail ? 52px : 54px);
+    height: root.pad-y * 2 + State.modal-items.length * root.row-height;
+    background: Theme.paper;
+    border-width: 2px; border-color: Theme.ink; border-radius: Theme.control-radius;
+    TouchArea { x: 0px; y: 0px; width: parent.width; height: parent.height; }
+    for item[index] in State.modal-items: Rectangle {
+        x: 2px; y: root.pad-y + index * root.row-height; width: parent.width - 4px; height: root.row-height;
+        property <bool> inverted: item.enabled && hit.pressed;
+        property <color> foreground: !item.enabled ? Theme.disabled : self.inverted ? Theme.paper : Theme.ink;
+        background: self.inverted ? Theme.ink : Theme.paper;
+        accessible-role: button;
+        accessible-label: item.title + " " + item.value;
+        accessible-enabled: item.enabled;
+        if root.with-icons: MoreMenuGlyph {
+            x: root.inset; y: (parent.height - self.height) / 2;
+            width: root.icon-size; height: self.width;
+            action-id: item.id; foreground: parent.foreground;
+        }
+        BodyText {
+            x: root.inset + (root.with-icons ? root.icon-size + root.icon-gap : 0px);
+            y: 0px;
+            width: max(0px, parent.width - self.x - root.inset - (item.value == "" ? 0px : value.width + 12px));
+            height: parent.height; text: item.title;
+            font-size: State.large-screen ? 19px : 17px;
+            font-weight: 400;
+            color: parent.foreground;
+        }
+        value := Caption {
+            x: parent.width - self.width - root.inset; y: 0px;
+            width: item.value == "" ? 0px : min(parent.width * 0.42, self.preferred-width);
+            height: parent.height; text: item.value;
+            font-family: Theme.numbers; font-size: State.large-screen ? 15px : 14px;
+            color: !item.enabled ? Theme.disabled : parent.inverted ? Theme.paper : Theme.secondary;
+            horizontal-alignment: right;
+        }
+        hit := TouchArea {
+            enabled: item.enabled;
+            x: 0px; y: 0px; width: parent.width; height: parent.height;
+            pointer-event(event) => {
+                if event.kind == PointerEventKind.down { Commands.refresh("fast"); }
+                else if event.kind == PointerEventKind.up || event.kind == PointerEventKind.cancel { Commands.refresh("ui"); }
+            }
+            clicked => { Commands.action("panel", "choose", item.id); }
+        }
+    }
+}
+
+component ChoicePanel inherits Rectangle {
+    property <length> pad: State.large-screen ? 28px : 22px;
+    property <length> pad-top: State.large-screen ? 26px : 20px;
+    property <length> row-height: State.large-screen ? 62px : 54px;
+    property <length> list-top: root.pad-top + (State.large-screen ? 50px : 44px) + 12px;
+    property <length> list-height: max(1, State.modal-items.length) * root.row-height;
+    property <length> pager-height: State.panel-page-count > 1 ? Theme.pager-height : 0px;
+    height: root.list-top + root.list-height + (State.large-screen ? 28px : 24px) + root.pager-height;
+    background: Theme.paper;
+    if !State.large-screen: Rectangle { x: 0px; y: 0px; width: parent.width; height: 2px; background: Theme.ink; }
+    TouchArea { x: 0px; y: 0px; width: parent.width; height: parent.height; }
+    PanelHeader { x: root.pad; y: root.pad-top; width: parent.width - root.pad * 2; text: State.modal-title; action-text: Strings.keyboard-done; closed => { Commands.action("panel", "close", ""); } }
+    for item[index] in State.modal-items: ChoiceRow {
+        x: root.pad; y: root.list-top + index * root.row-height;
+        width: parent.width - root.pad * 2; height: root.row-height;
+        item: item;
+        selected: item.value == "✓";
+        chosen => { Commands.action("panel", "choose", item.id); }
+    }
+    if State.modal-items.length == 0: BodyText {
+        x: root.pad; y: root.list-top; width: parent.width - root.pad * 2; height: root.row-height;
+        text: State.message == "" ? Strings.not-configured : State.message;
+        color: Theme.secondary; wrap: word-wrap;
+    }
+    if State.panel-page-count > 1: PageBar {
+        x: 0px; y: parent.height - self.height; width: parent.width;
+        page: State.panel-page; count: State.panel-page-count; context: "panel";
+        turn(delta) => { Commands.action("panel", "page", delta); }
+    }
+    // Keep the complete outline above the pager's opaque white background.
+    if State.large-screen: Rectangle { x: 0px; y: 0px; width: parent.width; height: parent.height; border-width: 2px; border-color: Theme.ink; border-radius: Theme.control-radius; background: transparent; accessible-role: none; }
+}
+
+export component Panels inherits Rectangle {
+    x: 0px; y: 0px;
+    visible: State.modal != "";
+    background: transparent;
+    property <bool> reader-panel: State.route == "reader" && State.reader-panel != "";
+    property <bool> menu: State.modal == "choices" && (State.modal-context == "library-more" || State.modal-context == "detail-more");
+    property <bool> sort: State.modal == "choices" && State.modal-context == "library-filter";
+    property <bool> batch: State.modal == "choices" && State.modal-context == "batch-download";
+    property <bool> tracking: State.modal == "choices" && State.modal-context == "tracking";
+    property <bool> repository-list: State.modal == "choices" && State.modal-context == "repository-list";
+    property <bool> source-picker: State.modal == "choices" && State.modal-context == "source-picker";
+    property <bool> catalog-filter: State.modal == "choices" && State.modal-context == "catalog-filter";
+    property <bool> source-settings: State.modal == "choices" && State.modal-context == "source-settings";
+    property <bool> migration: State.modal == "choices" && State.modal-context == "migration";
+    property <bool> confirmation: State.modal == "choices" && State.modal-items.length == 2 &&
+        (State.modal-items[0].id == "clear-history-confirm" || State.modal-items[0].id == "remove-book-confirm" ||
+         State.modal-items[0].id == "chapter-remove-confirm" || State.modal-items[0].id == "job-remove-confirm" ||
+         State.modal-items[0].id == "remove-read-downloads-confirm" || State.modal-items[0].id == "repository-remove-confirm" ||
+         State.modal-items[0].id == "book-downloads-remove-confirm");
+    property <bool> generic: !root.reader-panel && State.modal != "keyboard" && State.modal != "downloads" &&
+        State.modal != "summary" && State.modal != "pairing" && !root.menu && !root.sort && !root.batch &&
+        !root.tracking && !root.repository-list && !root.source-picker && !root.catalog-filter && !root.source-settings && !root.migration && !root.confirmation;
+
+    if State.modal != "keyboard" && !root.reader-panel: TouchArea {
+        x: 0px; y: 0px; width: parent.width; height: parent.height;
+        clicked => {
+            if root.migration { if !State.migration-committing { Commands.action("migration", "cancel", ""); } }
+            else { Commands.action("panel", "close", ""); }
+        }
+    }
+    if root.reader-panel: TouchArea {
+        x: 0px; width: parent.width;
+        y: ReaderMetrics.header-height;
+        height: max(0px, root.height - ReaderMetrics.header-height - ReaderMetrics.bottom-height);
+        clicked => { Commands.action("panel", "close", ""); }
+    }
+    if State.modal == "keyboard" && State.keyboard-target != "search" && State.keyboard-target != "source-query": TouchArea {
+        x: 0px; y: 0px; width: parent.width; height: parent.height;
+        clicked => { Commands.action("keyboard", "cancel", ""); }
+    }
+
+    if root.menu: MoreMenu {
+        x: parent.width - self.width - (State.large-screen ? (State.modal-context == "detail-more" ? 24px : 28px) : 14px);
+        y: State.large-screen ? (State.modal-context == "detail-more" ? 92px : 112px) : (State.modal-context == "detail-more" ? 76px : 84px);
+        width: State.large-screen ? 344px : State.modal-context == "detail-more" ? 264px : 276px;
+    }
+    if root.sort: LibrarySortPanel {
+        x: State.large-screen ? parent.width - self.width - 28px : 0px;
+        y: State.large-screen ? 112px : parent.height - self.height;
+        width: State.large-screen ? 488px : parent.width;
+    }
+    if State.modal == "downloads": DownloadQueuePanel {
+        x: State.large-screen ? (parent.width - self.width) / 2 : 0px;
+        y: State.large-screen ? min(300px, parent.height - self.height - Theme.status-height) : parent.height - self.height;
+        width: State.large-screen ? 640px : parent.width;
+    }
+    if State.modal == "summary": SummaryPanel {
+        x: State.large-screen ? (parent.width - self.width) / 2 : 0px;
+        y: State.large-screen ? min(240px, max(Theme.status-height, (parent.height - self.height) / 2)) : parent.height - self.height;
+        width: State.large-screen ? 700px : parent.width;
+    }
+    if root.batch: BatchDownloadPanel {
+        x: State.large-screen ? (parent.width - self.width) / 2 : 0px;
+        y: State.large-screen ? min(260px, parent.height - self.height - Theme.status-height) : parent.height - self.height;
+        width: State.large-screen ? 640px : parent.width;
+    }
+    if root.tracking: TrackingPanel {
+        x: State.large-screen ? (parent.width - self.width) / 2 : 0px;
+        y: State.large-screen ? 260px : parent.height - self.height;
+        width: State.large-screen ? 640px : parent.width;
+    }
+    if root.confirmation: ConfirmationPanel {
+        x: State.large-screen ? (parent.width - self.width) / 2 : 44px;
+        y: State.large-screen ? min(360px, parent.height - self.height - Theme.status-height) : min(250px, parent.height - self.height - Theme.status-height);
+        width: State.large-screen ? 560px : parent.width - 88px;
+    }
+    if State.modal == "pairing": PairingPanel {
+        x: State.large-screen ? (parent.width - self.width) / 2 : 0px;
+        y: State.large-screen ? min(250px, parent.height - self.height - Theme.status-height) : parent.height - self.height;
+        width: State.large-screen ? 700px : parent.width;
+    }
+    if root.repository-list: RepositoryListPanel {
+        x: State.large-screen ? (parent.width - self.width) / 2 : 0px;
+        y: State.large-screen ? min(250px, parent.height - self.height - Theme.status-height) : parent.height - self.height;
+        width: State.large-screen ? 700px : parent.width;
+    }
+    if root.source-picker: SourcePickerPanel {
+        x: State.large-screen ? 28px : (parent.width - self.width) / 2;
+        y: State.large-screen ? min(162px, parent.height - self.height - Theme.status-height) : Theme.status-height + 56px;
+        width: State.large-screen ? 620px : parent.width - 44px;
+    }
+    if root.reader-panel: ReaderPanel {
+        x: 0px; y: parent.height - ReaderMetrics.bottom-height - self.height;
+        width: parent.width;
+    }
+    if root.catalog-filter: CatalogFilterPanel {
+        x: State.large-screen ? parent.width - self.width - 28px : 0px;
+        y: State.large-screen ? min(282px, parent.height - self.height - Theme.status-height) : parent.height - self.height;
+        width: State.large-screen ? 620px : parent.width;
+    }
+    if root.source-settings: SourceSettingsPanel {
+        x: State.large-screen ? parent.width - self.width - 28px : 0px;
+        y: State.large-screen ? min(112px, parent.height - self.height - Theme.status-height) : parent.height - self.height;
+        width: State.large-screen ? 540px : parent.width;
+    }
+    if root.migration: MigrationPanel {
+        x: State.large-screen ? (parent.width - self.width) / 2 : 0px;
+        y: State.large-screen ? min(220px, parent.height - self.height - Theme.status-height) : parent.height - self.height;
+        width: State.large-screen ? 680px : parent.width;
+    }
+    if root.generic: ChoicePanel {
+        x: State.large-screen ? (State.modal-context == "source-settings" ? parent.width - self.width - 28px : (parent.width - self.width) / 2) : 0px;
+        y: State.large-screen ? min(State.modal-context == "source-settings" ? 112px : State.modal-context == "migration" ? 220px : 240px, parent.height - self.height - Theme.status-height) : parent.height - self.height;
+        width: State.large-screen ? (State.modal-context == "source-settings" ? 540px : State.modal-context == "migration" ? 680px : 640px) : parent.width;
+    }
+    if State.modal == "keyboard": KeyboardPanel {
+        x: 0px; y: parent.height - self.height; width: parent.width;
+    }
+}
+
+

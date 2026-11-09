@@ -1,0 +1,131 @@
+{
+  "schema_version": 1,
+  "batch_id": "c6final-tag-b04",
+  "reviewer": "/root/final_validation_delivery/c4_full_review_coordinator/c6final_tag_b04",
+  "run_id": "a2f53f0c33db",
+  "round": 5,
+  "manifest_sha256": "aa389850a0c5c2f41c266307964ffc95faa9b4b1a3247ab568ed5833c8b2547e",
+  "inventory_sha256": "029ca8231c5c230f4240dcd5be69e71cf1b41302c56c52e736e06d0dcc3a2cc6",
+  "freeze_tuple": {
+    "source_file_count": 227,
+    "source_sha256": "adafa23e6e1e4906990c3162025dd26d85e20e2f2bb4bed2f21c980bc4d565f5",
+    "binary_sha256": "baafaf4b29a7a6629e8ef95da9dae38da323adccaa89288a92afe3bc4318e0ee",
+    "harness_sha256": "8811746a09e761bfff55879a018d71f98d1d957d5ba79e8f008bdcaf90d5f55e",
+    "capture_plan_sha256": "b3adabbf4f2d33789f381dc2ac55474d89fcd210d58ce9e5083c0d818d547eec",
+    "reference_scope_sha256": "c910bed9f02ed17b2ca0a54aca1beeeeb6caabc5a17a91afe764ddd3e7b0d33c",
+    "reference_sha256": "e7b49b456255432d74cfe41346f9d44c1a9c55bf67c5d55483e4ae3029547d18",
+    "capture_helper_sha256": {
+      "verify-ui.py": "470872e6fd22a78b474c0f862164875ad9c7237bd2f3f164512864580ac1e90d",
+      "verify-fullscreen.py": "4a6c48cef771e66e9b3058edd888dcf2d4bce02e2720b5cc00c7a5b987bc9670",
+      "handoff_c4_business.py": "6197f375b247962e3ce9acdd3779468073f11e0002ac3c7ce876a7b1a0d0d9be",
+      "handoff_c5_ui.py": "fa30ef2bf8ab512e9705f43933ff6acaf32993e5aa1dbc62be330d4c97b481f2",
+      "handoff_c5_reader.py": "5b88a0c1b8e1151a3f96decef1a3a06f98a0d9de99908709bafbfb02cea490d5"
+    },
+    "qualification_driver_sha256": "7cd32588578edff343a33dc2a70b99cb6f838f6063de175c4e269935c53eb0b6",
+    "qualification_pixels_sha256": "f97014cfca910b30a75cea484e57dcd9e4566ca1401785b096ab5851add979a1"
+  },
+  "identity_basis": "Owner immutable FINAL C6 inventory SHA labels; no local rehash. The three case sidecars agree on source, binary, run and round.",
+  "reviewed_case_ids": [
+    "scribe--c6-tag-long-neutral",
+    "scribe--c6-tag-long-excluded",
+    "scribe--content-stress--filter-tag-page-6"
+  ],
+  "actual_image_opens": 4,
+  "cases": [
+    {
+      "case_id": "scribe--c6-tag-long-neutral",
+      "png_path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate6/ui-tag-qualification-final-01/scribe--c6-tag-long-neutral.png",
+      "evidence_sha256": {
+        "png": "a16beb7d6fc5ed229d76547177ada858408766a5cb279b412e597280c377ac1c",
+        "case_json": "ee41943d8c5fbd09d14012ff278768a353444dd1f2debaad24b5dc52c4ca469a",
+        "state": "9af233e7020d64de19c10cfc5b13dd6329922e3a9a41aba1d201276761266da4",
+        "actions": "93cec1c18b6b18fe09cdb3171179c6772da1899e8cc4dcb4714af18e9f08b485",
+        "metadata": "215138fc4a5428507d92af0edd079c1c1e0aecc9afed1bb5188800695b4567bf",
+        "log": "7e68a4176710a866675a6b95bcf7bed2d96c58a8fd7996a4d48f3679514483a9"
+      },
+      "actual_view": {"tool": "tools.view_image", "original_png_opened": true, "native_size": [930, 1240]},
+      "observations": [
+        "Directly readable suffix: DISTINCT-SUFFIX-00. The long chip displays a leading ellipsis and the final provider-metadata text on one bounded line; Actual tag 01 occupies the next row. No selection or exclusion glyph is visible in the neutral chip.",
+        "The suffix stays inside the right edge with visible padding. Text placement does not show an empty marker gutter.",
+        "The long chip's solid top and bottom outlines both have a visible white interruption near the left text start, approximately x328-345 at y597 and y642. Its left edge and the remaining outline are present. This is a frame defect despite readable text.",
+        "The tag folio visibly reads 1/17, with disabled previous and enabled next controls. Both rows remain clear of the folio and result button."
+      ],
+      "interaction_and_state": "Recorded actions open komga, open the filter and reset it. State records the long tag as neutral, zero active filters and the catalog-filter context; the visible image agrees. Case request evidence identifies the actual HTTP label fixture, but requests were not replayed.",
+      "intentional_and_capability_check": "No intentional differences are declared. The basic reference supplies related modal and chip geometry, not an exact long-label state. Desktop Scribe capture at scale 1 agrees with metadata; physical hardware, hardware dithering and pen input are unqualified.",
+      "verdict": "fail-frame-integrity",
+      "limits": "Suffix visibility passes direct inspection. The outline defect is a visual finding; no current production explanation or runtime reproduction was used."
+    },
+    {
+      "case_id": "scribe--c6-tag-long-excluded",
+      "png_path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate6/ui-tag-qualification-final-01/scribe--c6-tag-long-excluded.png",
+      "evidence_sha256": {
+        "png": "34da4a8c00c71b55b6f16f52f873af1ea06514b5e182551fcfe14ca9384cb848",
+        "case_json": "b89ae70ad57beff38d0c632c788cff5792ddde37eeef47d90f3882c34eac8e40",
+        "state": "6da0a8fb0958cbff8f05ee6564f872360ba8dd2a91f83b99056a954a3a1dba58",
+        "actions": "0e27d1bbb114bdae0dfdfc80f8fd63e8c5b0521e6f947a77d8a2c736c4a1e9ba",
+        "metadata": "1217373515f2c5195848973e65fd941c23f4b2959ea45ce05f4cdffdbc83cbce",
+        "log": "7e68a4176710a866675a6b95bcf7bed2d96c58a8fd7996a4d48f3679514483a9"
+      },
+      "actual_view": {"tool": "tools.view_image", "original_png_opened": true, "native_size": [930, 1240]},
+      "observations": [
+        "Directly readable suffix: DISTINCT-SUFFIX-00. The gray cross at the left, dashed frame and horizontal strike are visible; the strike crosses the letters but does not prevent distinguishing the suffix, including 00.",
+        "The excluded label stays inside the chip and retains separation from Actual tag 01 below it. The tag folio visibly reads 1/17 with disabled previous and enabled next controls.",
+        "The filter icon is filled and the result button indicates zero loaded results, consistent with the visibly active exclusion. No suffix or marker is swallowed by the frame or adjacent controls."
+      ],
+      "interaction_and_state": "The action sidecar records two native pointer press/release cycles at 610,620 after reset, and the origin sidecar anchors that point to the neutral original PNG. State records the long tag at -1 and one active filter; the excluded image agrees.",
+      "intentional_and_capability_check": "No intentional differences are declared. The original reference has no excluded or long-label counterpart, so comparison is limited to related modal geometry and actual state. Metadata identifies desktop Scribe at scale 1; physical hardware, hardware dithering and pen input are unqualified.",
+      "verdict": "pass-focused-suffix-and-marker",
+      "limits": "No independent runtime input replay or pixel processing. This pass is limited to the excluded label, marker treatment and visible bounds in this original PNG."
+    },
+    {
+      "case_id": "scribe--content-stress--filter-tag-page-6",
+      "png_path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate6/ui-tag-qualification-final-01/scribe--content-stress--filter-tag-page-6.png",
+      "evidence_sha256": {
+        "png": "4c9529e1e430b07a15480730136074ad45198190e3bccef7e9b4f33e7d5978f8",
+        "case_json": "5772756a61231d246fd459714eb537824500828889dbb2bb02dd7832d78ddae3",
+        "state": "7ce67e95d94e173c396bbb42deece166545ac23a1bedb941ada131b5a1fa67f1",
+        "actions": "7b9f92faf8d5da84e005da3f83f6bf4c53a4a0131f103da8a74cd2ceea04997e",
+        "metadata": "d82716a9a7e86c4722ee5ed1d09884436f95f2b76018714d747d68f1eee549ed",
+        "log": "7e68a4176710a866675a6b95bcf7bed2d96c58a8fd7996a4d48f3679514483a9"
+      },
+      "actual_view": {"tool": "tools.view_image", "original_png_opened": true, "native_size": [930, 1240]},
+      "observations": [
+        "The actual tag folio is 6/6. Previous is black and next is gray. The background catalog folio is separately 1/2 and was not mistaken for tag pagination.",
+        "The first row contains Actual tag 30, Actual tag 31 and Adventure; Mystery is alone on the second row. All four have black fill, readable white labels and intact white checkmarks.",
+        "The chip boundaries are complete and separated. The unused right side of the second row is consistent with four remaining members of this 34-tag fixture. No chip overlaps the folio or result button, and the modal frame is intact."
+      ],
+      "interaction_and_state": "Recorded actions include five next-page pointer cycles followed by selecting the four final-page members. State lists exactly these four tags at 1 with four active filters. The case records native page 6 of 6 for the 34-tag fixture; the visible membership and folio agree.",
+      "intentional_and_capability_check": "No intentional differences are declared. The basic reference's selected chip provides the black-fill/white-check treatment. The observed three-column, six-page result applies only to this fixture; no C4 Paperwhite or other dataset capacity was used. Metadata identifies desktop Scribe at scale 1 with hardware and pen limits unchanged.",
+      "verdict": "pass-focused-last-page",
+      "limits": "Only this final page was opened. Earlier-page membership, every transition and other profiles were not independently inspected in this package."
+    }
+  ],
+  "reference": {
+    "reference_id": "sc-browse--filter",
+    "path": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/screens/states/sc-browse--filter.png",
+    "sha256": "fc4e1eb1a853240fc1f6019ffb447cd1a04b85fd4ddfe1af8d233e113195532e",
+    "actual_view": {"tool": "tools.view_image", "original_png_opened": true, "native_size": [1860, 2480], "displayed_size": [1368, 1824]},
+    "observations": "The original shows complete neutral chip outlines, centered short labels and a selected fantasy chip with black fill and a white check. Its modal position, width and control hierarchy provide related geometry. It has no long excluded tag or tag folio, so it is not an exact supplemental-state oracle."
+  },
+  "new_actionable_issues": [
+    {
+      "id": "b04-neutral-long-frame-gap",
+      "priority": 2,
+      "case_id": "scribe--c6-tag-long-neutral",
+      "trigger": "Reset the actual HTTP long-tag filter to neutral; inspect the long chip's top and bottom outline near its left text start.",
+      "png_sha256": "a16beb7d6fc5ed229d76547177ada858408766a5cb279b412e597280c377ac1c",
+      "reference_sha256": "fc4e1eb1a853240fc1f6019ffb447cd1a04b85fd4ddfe1af8d233e113195532e",
+      "finding": "White gaps interrupt both solid horizontal edges near x328-345, although the distinguishing suffix is readable.",
+      "suggestion": "Restore an uninterrupted neutral chip frame while retaining the readable suffix, then qualify a new immutable original capture.",
+      "coordinator_notified": true
+    }
+  ],
+  "suggestions": ["Resolve b04-neutral-long-frame-gap before treating this focused affected-tag gate as passed."],
+  "gaps": [
+    "Three candidate originals and one reference were manually opened; the other 21 final qualification manual cases were not inspected by this reviewer.",
+    "Only local static sidecar reads and tools.view_image were used. No tests, builds, runtime probes, hashes, SQL, SSH, copying, crop or image processing were performed.",
+    "Supplied SHA identities were not independently recomputed. The mechanical pass was not used as visual proof.",
+    "This focused result does not complete the final36 qualification; it remains partial."
+  ],
+  "conclusion": "Focused gate fails on one neutral long-chip frame defect. Both actual suffixes are readable; the excluded marker treatment and actual final-page membership pass their focused checks."
+}

@@ -1,0 +1,70 @@
+import { State, Commands } from "state.slint";
+import { Theme } from "theme.slint";
+import { Strings } from "strings.slint";
+import { StatusBar, Navigation, BodyText } from "widgets.slint";
+import { LibraryPage } from "library.slint";
+import { DetailPage } from "detail.slint";
+import { SourcesPage, CatalogPage } from "sources.slint";
+import { SearchPage } from "search.slint";
+import { HistoryPage } from "history.slint";
+import { SettingsPage } from "settings.slint";
+import { ReaderPage } from "reader.slint";
+import { Panels } from "panels.slint";
+
+export { State, Commands, BookItem, ChapterItem, SourceItem, HistoryItem, SearchGroup, SettingItem, DownloadItem, FilterOption, SourcePreferenceGroup } from "state.slint";
+export { Theme } from "theme.slint";
+
+export component AppWindow inherits Window {
+    in-out property <length> canvas-width: 618px;
+    in-out property <length> canvas-height: 824px;
+    title: "Aidoku for Kindle";
+    preferred-width: root.canvas-width;
+    preferred-height: root.canvas-height;
+    min-width: root.canvas-width;
+    max-width: root.canvas-width;
+    min-height: root.canvas-height;
+    max-height: root.canvas-height;
+    background: Theme.paper;
+    default-font-family: Theme.sans;
+    default-font-size: Theme.body;
+    property <bool> has-navigation: State.route != "reader" && State.route != "detail" && (State.route != "catalog" || State.large-screen) && State.modal != "keyboard";
+    if State.route != "reader": StatusBar { y: 0px; width: root.width; }
+    content := Rectangle {
+        x: 0px; y: State.route == "reader" ? 0px : Theme.status-height;
+        width: root.width;
+        height: root.height - (State.route == "reader" ? 0px : Theme.status-height) - (root.has-navigation ? Theme.nav-height : 0px);
+        if State.route == "library": LibraryPage {}
+        if State.route == "detail": DetailPage {}
+        if State.route == "sources": SourcesPage {}
+        if State.route == "catalog": CatalogPage {}
+        if State.route == "search": SearchPage {}
+        if State.route == "history": HistoryPage {}
+        if State.route == "settings": SettingsPage {}
+        if State.route == "reader": ReaderPage {}
+    }
+    if root.has-navigation: Navigation { y: root.height - Theme.nav-height; width: root.width; }
+    if State.modal != "": Panels { width: root.width; height: root.height; }
+    if (State.message != "" || State.busy) && State.modal == "" && (State.route != "reader" || State.reader-menu): Rectangle {
+        x: (root.width - self.width) / 2;
+        y: root.height - 140px - self.height;
+        width: min(root.width - Theme.margin * 2, notice-text.preferred-width + (State.large-screen ? 56px : 48px));
+        height: State.large-screen ? 59px : 50.5px;
+        background: Theme.paper;
+        border-width: Theme.popup-border;
+        border-color: Theme.ink;
+        border-radius: Theme.control-radius;
+        accessible-role: text;
+        accessible-label: State.message != "" ? State.message : Strings.loading;
+        notice-text := BodyText { x: State.large-screen ? 28px : 24px; width: parent.width - self.x * 2; height: parent.height; text: State.message != "" ? State.message : Strings.loading; color: Theme.ink; font-size: State.large-screen ? 18px : 15px; font-weight: 500; horizontal-alignment: center; overflow: elide; }
+    }
+    forward-focus: keys;
+    keys := FocusScope {
+        key-pressed(event) => {
+            if event.text == Key.Escape { Commands.action("app", "back", ""); return accept; }
+            if event.text == Key.LeftArrow { Commands.action("app", "left", ""); return accept; }
+            if event.text == Key.RightArrow { Commands.action("app", "right", ""); return accept; }
+            if State.modal == "keyboard" && event.text != "" { Commands.action("keyboard", "hardware", event.text); return accept; }
+            return reject;
+        }
+    }
+}

@@ -1,0 +1,178 @@
+{
+  "batch_id": "reference-08",
+  "kind": "reference-pairs",
+  "reviewer": "/root/phase3_round1_review/reference_08",
+  "run_id": "a1baf3fe3dc2",
+  "round": 1,
+  "binary_sha256": "94d7f3bbcab475ad8833a2f3c486138f7b49bead231851c2d8eab2f0c3d2ac51",
+  "source_sha256": "aef9db4e111165016a10a2a95e111f3155860b8510c7f6207ec9c79fbec5082c",
+  "reference_bundle_sha256_supplied": "e7b49b456255432d74cfe41346f9d44c1a9c55bf67c5d55483e4ae3029547d18",
+  "identity_checks": {
+    "candidate_identity_method": "Get-FileHash SHA256 of the original PNG file bytes",
+    "all_candidate_hashes_match_case_evidence": true,
+    "all_reference_hashes_match_case_metadata": true,
+    "all_case_metadata_matches_supplied_run_binary_source": true,
+    "candidate_logical_size": [
+      618,
+      824
+    ],
+    "reference_physical_size": [
+      1236,
+      1648
+    ],
+    "reference_physical_scale": 2,
+    "comparison_basis": "Candidate logical 1x compared against reference physical 2x at the same logical proportion."
+  },
+  "reviewed_case_ids": [
+    "pw-reader--default",
+    "pw-reader--fullscreen-footer",
+    "pw-reader--fullscreen",
+    "pw-reader--image"
+  ],
+  "reviewed_cases": [
+    {
+      "case_id": "pw-reader--default",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/pw-reader--default.png",
+      "candidate_sha256": "f110a73a39ce7a666afc49ce22a0d9f5cba6f5a5238278a319429c3b8db2e50e",
+      "reference_png": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/screens/pw-reader.png",
+      "reference_sha256": "b67b1618519e877e60ab4ac4ad20306fb33bd48f0af6a8b129926900ae98e16d",
+      "viewed_candidate": true,
+      "viewed_reference": true,
+      "outcome": "pass",
+      "observations": [
+        "The candidate is menu open, matching the required default state; the status row, two-line chapter header, progress area, chapter navigation and five reader tools are visible.",
+        "The header bottom and the 68-logical-pixel tool strip align with the reference at the same logical proportion. Chapter title, page counter and both chapter navigation labels fit without clipping.",
+        "The top-right table-of-contents icon has a roughly 18-logical-pixel list silhouette with three bullets and rules. The lower More tool shows three distinct dots.",
+        "The status time, Wi-Fi symbol, battery percentage and battery outline fit within the top band. White header and control surfaces have no visible shadow or stipple.",
+        "The visible artwork contains different panel scaling and page-internal white edges; these content differences do not establish an application viewport inset."
+      ],
+      "intentional_differences": [
+        "The candidate uses its actual rendered artwork rather than requiring identical reference artwork pixels."
+      ]
+    },
+    {
+      "case_id": "pw-reader--fullscreen-footer",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/pw-reader--fullscreen-footer.png",
+      "candidate_sha256": "99e72fc0524cab6742a606d8fd257bc1fd762c534457451aacba487d8ee9c394",
+      "reference_png": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/screens/states/pw-reader--fullscreen-footer.png",
+      "reference_sha256": "fb9d1ace61b8656559417e388dbd0087dfa3d8c96526f8efe913e4bce80076e4",
+      "viewed_candidate": true,
+      "viewed_reference": true,
+      "outcome": "pass-with-user-override",
+      "observations": [
+        "The candidate contains artwork only. No status bar, menu header, notification, bookmark ribbon, chapter caption or page-counter footer is visible.",
+        "Artwork extends to the top and bottom capture boundaries; the narrow side white regions belong to the rendered page evidence and are not sufficient evidence of a viewport inset.",
+        "The reference includes a top-right bookmark ribbon and lower chapter/page labels, which are excluded by the explicit closed-reader override.",
+        "The candidate PNG is byte-identical to the reviewed fullscreen candidate, consistent with this reference-only footer alias resolving to the same artwork-only scene."
+      ],
+      "intentional_differences": [
+        "The user explicitly overrides the reference footer and ribbon. The closed reader must remain artwork only.",
+        "The candidate uses actual rendered artwork whose internal panel geometry differs from the reference."
+      ]
+    },
+    {
+      "case_id": "pw-reader--fullscreen",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/pw-reader--fullscreen.png",
+      "candidate_sha256": "99e72fc0524cab6742a606d8fd257bc1fd762c534457451aacba487d8ee9c394",
+      "reference_png": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/screens/states/pw-reader--fullscreen.png",
+      "reference_sha256": "70fa45f447c4f52e2e737f7634a1838d73071e32cf22c40e6e8235e07582cee4",
+      "viewed_candidate": true,
+      "viewed_reference": true,
+      "outcome": "pass-with-user-override",
+      "observations": [
+        "The candidate is artwork only, with no visible ribbon, footer, notification, status area or reader tool overlay.",
+        "The artwork's line, halftone and black regions remain visible through the bottom of the capture. No separate bottom strip displaces the art.",
+        "The reference retains a bookmark ribbon, which is intentionally absent from the candidate under the closed-reader override.",
+        "The page-internal white side regions and different panel proportions are treated as artwork differences rather than a proven viewport defect."
+      ],
+      "intentional_differences": [
+        "The persistent reference bookmark ribbon is absent under the explicit user override.",
+        "Actual candidate artwork is not required to match the reference artwork pixel for pixel."
+      ]
+    },
+    {
+      "case_id": "pw-reader--image",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/pw-reader--image.png",
+      "candidate_sha256": "f8116bbb1edf0154a7381ebf1e09a00c76211823f3bedba09ef63a0b473c92ee",
+      "reference_png": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/screens/states/pw-reader--image.png",
+      "reference_sha256": "0029f0de4a2dbc2cd98eeb9e75fc7b7bedd23bf2845170ebf21acf5f65f185ca",
+      "viewed_candidate": true,
+      "viewed_reference": true,
+      "outcome": "minor-visual-issue",
+      "observations": [
+        "The picture panel shows a miniature of actual candidate artwork, five contrast positions with three filled segments, both contrast step buttons, five refresh choices, dither on and night mode off.",
+        "The refresh choice 6 is visibly selected with a black fill and white text. The dither and night switches have clearly different on/off knob positions.",
+        "The panel, progress area, chapter navigation and bottom tool strip fit within the viewport with no clipped controls. The picture tool is selected by a black top marker and bold label.",
+        "The header, title and approximately 18-logical-pixel bulleted table-of-contents icon remain visible. White panel surfaces have no visible shadow or decorative stipple.",
+        "The contrast minus/plus outlines are pale gray in the candidate while the reference outlines are black. The candidate Standard value is regular weight while the reference value is bold; see P3R1-REF08-1."
+      ],
+      "intentional_differences": [
+        "The preview uses actual rendered candidate artwork rather than the reference's designed thumbnail.",
+        "The candidate explicitly labels the available software dither as 16-level grayscale dither. No separate hardware-dither option is visible, consistent with hardware_dither_qualified=false."
+      ]
+    }
+  ],
+  "suggestions": [
+    {
+      "id": "P3R1-REF08-1",
+      "case_id": "pw-reader--image",
+      "priority": 3,
+      "description": "The contrast controls lose the active-state emphasis shown in the reference.",
+      "evidence": "At the same logical proportion, the candidate minus and plus buttons beside the five contrast segments have pale-gray outlines, while the reference uses black outlines. The candidate Standard label is regular weight while the reference label is bold. The case metadata records contrast=0, so neither step direction is at a contrast endpoint.",
+      "recommendation": "Use black outlines for the enabled contrast minus/plus buttons and bold the Standard value to match the reference.",
+      "status": "open",
+      "introduced_round": 1
+    }
+  ],
+  "prior_finding_rechecks": [
+    {
+      "finding_id": "P3D-003",
+      "reviewed_case_ids": [
+        "pw-reader--default",
+        "pw-reader--image"
+      ],
+      "outcome": "confirmed-fixed-in-visible-scope",
+      "observations": [
+        "The status time, Wi-Fi symbol, battery percentage and battery outline are visible, aligned within the status band and not clipped in both menu-open captures."
+      ]
+    },
+    {
+      "finding_id": "P3D-004",
+      "reviewed_case_ids": [
+        "pw-reader--default",
+        "pw-reader--image"
+      ],
+      "outcome": "confirmed-fixed-in-visible-scope",
+      "observations": [
+        "The More tool at the bottom right has three distinct horizontal dots in both captures."
+      ]
+    },
+    {
+      "finding_id": "P3D-005",
+      "reviewed_case_ids": [],
+      "outcome": "not-observable-in-this-batch",
+      "observations": [
+        "This batch does not show the chapter tools targeted by the prior finding; no conclusion is made about that repair."
+      ]
+    },
+    {
+      "finding_id": "P3R-001",
+      "reviewed_case_ids": [
+        "pw-reader--default",
+        "pw-reader--image"
+      ],
+      "outcome": "confirmed-fixed-in-visible-scope",
+      "observations": [
+        "The top-right table-of-contents control uses a roughly 18-logical-pixel icon with bullets and three rules rather than an undersized three-line glyph."
+      ]
+    }
+  ],
+  "limitations": [
+    "This review covers only the four supplied reference pairs and does not establish a clean complete round.",
+    "All eight supplied PNGs were viewed directly with view_image. No additional image files or product source files were loaded.",
+    "The candidate identity is the SHA256 of original PNG bytes, not a decoded-pixel or perceptual hash.",
+    "Only existing PNG/JSON evidence and file identity were inspected. No local or remote application execution, build, test, smoke check or runtime probe was performed.",
+    "Static captures cannot establish functional reachability, absence of an invisible footer-cycle hit region, physical e-ink output, hardware dither behavior or control response.",
+    "The table-of-contents panel and its five rows are not open in these captures, so their row geometry is not reviewed here."
+  ]
+}

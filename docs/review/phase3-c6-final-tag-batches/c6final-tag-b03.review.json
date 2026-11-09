@@ -1,0 +1,131 @@
+{
+  "schema_version": 1,
+  "batch_id": "c6final-tag-b03",
+  "reviewer": "/root/final_validation_delivery/c4_full_review_coordinator/c6final_tag_b03",
+  "run_id": "a2f53f0c33db",
+  "round": 5,
+  "capture_manifest_sha256": "aa389850a0c5c2f41c266307964ffc95faa9b4b1a3247ab568ed5833c8b2547e",
+  "inventory_sha256": "029ca8231c5c230f4240dcd5be69e71cf1b41302c56c52e736e06d0dcc3a2cc6",
+  "freeze_tuple": {
+    "source_file_count": 227,
+    "source_sha256": "adafa23e6e1e4906990c3162025dd26d85e20e2f2bb4bed2f21c980bc4d565f5",
+    "binary_sha256": "baafaf4b29a7a6629e8ef95da9dae38da323adccaa89288a92afe3bc4318e0ee",
+    "harness_sha256": "8811746a09e761bfff55879a018d71f98d1d957d5ba79e8f008bdcaf90d5f55e",
+    "capture_plan_sha256": "b3adabbf4f2d33789f381dc2ac55474d89fcd210d58ce9e5083c0d818d547eec",
+    "reference_scope_sha256": "c910bed9f02ed17b2ca0a54aca1beeeeb6caabc5a17a91afe764ddd3e7b0d33c",
+    "reference_sha256": "e7b49b456255432d74cfe41346f9d44c1a9c55bf67c5d55483e4ae3029547d18",
+    "capture_helper_sha256": {
+      "verify-ui.py": "470872e6fd22a78b474c0f862164875ad9c7237bd2f3f164512864580ac1e90d",
+      "verify-fullscreen.py": "4a6c48cef771e66e9b3058edd888dcf2d4bce02e2720b5cc00c7a5b987bc9670",
+      "handoff_c4_business.py": "6197f375b247962e3ce9acdd3779468073f11e0002ac3c7ce876a7b1a0d0d9be",
+      "handoff_c5_ui.py": "fa30ef2bf8ab512e9705f43933ff6acaf32993e5aa1dbc62be330d4c97b481f2",
+      "handoff_c5_reader.py": "5b88a0c1b8e1151a3f96decef1a3a06f98a0d9de99908709bafbfb02cea490d5"
+    },
+    "qualification_driver_sha256": "7cd32588578edff343a33dc2a70b99cb6f838f6063de175c4e269935c53eb0b6",
+    "qualification_pixels_sha256": "f97014cfca910b30a75cea484e57dcd9e4566ca1401785b096ab5851add979a1"
+  },
+  "identity_method": "Static comparison of supplied frozen identities and case fields; no local rehash or execution. All three case run, source, binary and native-size fields agree with the supplied FINAL C6 tuple.",
+  "reviewed_case_ids": ["pw5--c6-tag-long-neutral", "pw5--c6-tag-long-excluded", "pw5--content-stress--filter-tag-page-6"],
+  "actual_image_opens": 4,
+  "reference": {
+    "reference_id": "pw-source--filter",
+    "path": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/screens/states/pw-source--filter.png",
+    "sha256": "1339b77a8346218b73343211b67163fbba6efe5b875fff5b2b37239dfcfd2c23",
+    "actual_view": true,
+    "viewer": "tools.view_image",
+    "dimensions": [1236, 1648],
+    "observations": "Original basic filter has two rows of compact neutral chips, intact solid outlines, centered labels without marker gutters, and a bounded primary button. It supplies related filter geometry at physical scale 2, not an exact long-label, excluded, or dense-page oracle."
+  },
+  "cases": [
+    {
+      "case_id": "pw5--c6-tag-long-neutral",
+      "evidence": {
+        "png": {"path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate6/ui-tag-qualification-final-01/pw5--c6-tag-long-neutral.png", "sha256": "af67525758a2da77ffdaf6475a9fdaff01258eea13c2144ac2022eb297b350d7"},
+        "case_json_sha256": "47ab90cbafacf9c4817866ed7102102d05f9c8c7711dd961756de6d2039a692c",
+        "state_sha256": "c588835fb40f70e9b5d2114dea9432bb975dab20410a5c87bf7697212ca9012b",
+        "actions_sha256": "93cec1c18b6b18fe09cdb3171179c6772da1899e8cc4dcb4714af18e9f08b485",
+        "metadata_sha256": "fe27ec8459c5023cbcb20ab9facb0487b6956a957419e6f942bb3915d0709dcd",
+        "log_sha256": "dc121ceea011a63c29b404d6c6b75bbe2db32b326923b8fa99759f457bfd709f"
+      },
+      "actual_view": true,
+      "viewer": "tools.view_image; unchanged original PNG",
+      "native_size": [618, 824],
+      "suffix_read_directly": "DISTINCT-SUFFIX-00",
+      "observations": [
+        "The suffix is directly readable at the right of the first long chip. The repeated metadata prefix is elided at the left. Actual tag 01 occupies the next row; the visible folio is 1/17.",
+        "The neutral long chip is unfilled with dark text and no check or cross; no empty marker gutter is visible before its truncated text.",
+        "The long chip remains inside the panel and clear of the second row, pager and apply button. Its solid top and bottom outlines visibly stop near the left cap and resume farther right, leaving an extra gap around x38-54; coordinates are visual estimates, not pixel measurements."
+      ],
+      "interaction_state_check": "Frozen actions open komga and reset the filter without pointer presses. First long tag state 0, active-filter count 0, and 20 loaded/results agree with the neutral chip, unbadged filter icon and visible button. No interaction was replayed.",
+      "intentional_check": "No intentional differences are declared. Bounded long-prefix truncation is an explicit frozen requirement; the visible outline interruption has no declared exception.",
+      "capability_check": "pw5 desktop capture, catalog route and catalog-filter modal agree across frozen case, state and metadata. Disabled follows/rating controls agree with snapshot sort-option capabilities. Physical hardware and hardware dither are unqualified. The frozen actual-HTTP role cites provider-request SHA 1f42b6718e8480694bb0e35c305c519f6ec7ba6be0c5804adebb5ad5dba812f6; that request file was not separately opened or replayed.",
+      "verdict": "suffix_visibility_pass; frame_continuity_needs_follow_up",
+      "finding_ids": ["C6TAG-FRAME-01"],
+      "limits": "Original-image review only. Suffix readability is established; complete outline continuity is not certified. A fresh lawful readable-detail package is needed to confirm the visible left gap."
+    },
+    {
+      "case_id": "pw5--c6-tag-long-excluded",
+      "evidence": {
+        "png": {"path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate6/ui-tag-qualification-final-01/pw5--c6-tag-long-excluded.png", "sha256": "8dfa95b4da595d2207da01a7e35a594750367fce59e4e3d523f24367e4fed02e"},
+        "case_json_sha256": "b6927957baab815a7ae74477f89f40e2893b4891440530187f6a81ed23d6d0db",
+        "state_sha256": "80cdd5b786f69e1284ba9a2863082357e35f9c8239e5f87562509e6927275596",
+        "actions_sha256": "288de9f0ff9f78ae6f59f9b848b5dd41f0da2156b2b4ebede37f86d2f1e556c6",
+        "metadata_sha256": "8dd687e7fc4b1a7c43c78a609eee6a49d49e6b2ab5c68345cbdf99b4d68a9d7d",
+        "log_sha256": "dc121ceea011a63c29b404d6c6b75bbe2db32b326923b8fa99759f457bfd709f"
+      },
+      "actual_view": true,
+      "viewer": "tools.view_image; unchanged original PNG",
+      "native_size": [618, 824],
+      "suffix_read_directly": "DISTINCT-SUFFIX-00",
+      "observations": [
+        "The exact suffix remains readable through the gray strike. The gray cross at the left, gray text, strike and dashed frame clearly distinguish exclusion from the neutral long chip. None consumes the distinguishing suffix.",
+        "The first chip stays bounded inside the panel; Actual tag 01 remains neutral on the second row and the folio reads 1/17.",
+        "The left frame has an extra blank interval just right of the cross, around x55-73, visibly longer than nearby short dash intervals. This resembles the neutral frame interruption; exact continuity needs a fresh detail review."
+      ],
+      "interaction_state_check": "Frozen actions contain two press/release cycles at 325.5,604 after the neutral reset. First long tag state -1, active-filter count 1 and zero results agree with the exclusion treatment, badge 1, empty catalog and zero-result apply button. No interaction was replayed.",
+      "intentional_check": "No intentional differences are declared. Exclusion cross, gray strike and dashed outline are the required true state; the extra left frame gap has no declared exception.",
+      "capability_check": "pw5 desktop capture, catalog route and catalog-filter modal agree across frozen case, state and metadata. Disabled follows/rating controls agree with snapshot sort-option capabilities. Physical hardware and hardware dither are unqualified. The frozen request receipt cites SHA f396a1dddec7d1eeb68e73c1d42a00a95959189b348a8746263d85999c741f9c; that request file was not separately opened or replayed.",
+      "verdict": "suffix_and_exclusion_markers_pass; frame_continuity_needs_follow_up",
+      "finding_ids": ["C6TAG-FRAME-01"],
+      "limits": "Direct suffix and marker observations are established from the original PNG. The dashed frame is not certified complete; this package performed no crop, pixel processing or interaction replay."
+    },
+    {
+      "case_id": "pw5--content-stress--filter-tag-page-6",
+      "evidence": {
+        "png": {"path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate6/ui-tag-qualification-final-01/pw5--content-stress--filter-tag-page-6.png", "sha256": "4c056effa4326feb5063a0a03fe5f7ebe9f1220505e2fc49041b473e11dce56f"},
+        "case_json_sha256": "c4ea1235e98b8dce351cc53749897ac7de836b818cd9754cbc638f24e7980ee7",
+        "state_sha256": "f29ad34f1cbf2522befc09f544e5298df87c3c2c75606939e54323b73d11be4a",
+        "actions_sha256": "c7e04fbb42b1231336e61c1a5752c79e84295289150a11433c630ab72634d0b8",
+        "metadata_sha256": "8d46d47b0d481374242df9228b0a4ceba11f4c403f53008c4cf22873691e85cb",
+        "log_sha256": "dc121ceea011a63c29b404d6c6b75bbe2db32b326923b8fa99759f457bfd709f"
+      },
+      "actual_view": true,
+      "viewer": "tools.view_image; unchanged original PNG",
+      "native_size": [618, 824],
+      "labels_read_directly": ["Actual tag 30", "Actual tag 31", "Adventure", "Mystery"],
+      "observations": [
+        "Actual tag 30, Actual tag 31 and Adventure form the first row; Mystery alone forms the second. All four have readable white checks and white labels on black chips with complete bounded shapes.",
+        "The folio visibly reads 6/6. Previous is dark and Next is gray. The four members match the final four state entries, all state 1, and the filter badge reads 4.",
+        "The unoccupied area to the right of Adventure and Mystery is consistent with the final four members of this 34-tag fixture. No placeholder chip, clipped member or overlap with the pager or apply button is visible; no missing-member claim is inferred from blank space."
+      ],
+      "interaction_state_check": "Frozen actions contain five Next press/release cycles followed by presses on Mystery, Adventure, Actual tag 31 and Actual tag 30. The final state marks exactly those four selected, while loaded/results remain 20. The screenshot agrees. Global state page 1/page_count 4 describes the catalog; tag folio 6/6 is read directly from the PNG and corroborated by the frozen native tag geometry.",
+      "intentional_check": "No intentional differences are declared. Three columns and six pages are supported for this specific 34-tag fixture. The old C4 four-column/five-page value is not used as an expectation.",
+      "capability_check": "pw5 desktop, 618x824, catalog route and catalog-filter modal agree across frozen case, state and metadata. Physical hardware and hardware dither remain unqualified; no hardware claim follows from this visual result.",
+      "verdict": "pass_for_focused_last_page_membership_markers_and_boundaries",
+      "finding_ids": [],
+      "limits": "This original last page does not prove all preceding pages, all 24 focused manual candidates, final36, other fixtures, or physical-device interaction. No action sequence was replayed."
+    }
+  ],
+  "suggestions": [
+    {
+      "id": "C6TAG-FRAME-01",
+      "status": "visible_frame_interruption_requires_confirmation",
+      "cases": ["pw5--c6-tag-long-neutral", "pw5--c6-tag-long-excluded"],
+      "trigger": "Extra blank intervals interrupt the long chip outline near its left text boundary in the original PNGs; the solid neutral frame makes the discontinuity easiest to see.",
+      "requested_follow_up": "Coordinator should create a fresh lawful readable-detail package from these exact originals to confirm frame continuity before accepting the complete-outline contract. This sealed reviewer must not crop or process the images.",
+      "reference_sha256": "1339b77a8346218b73343211b67163fbba6efe5b875fff5b2b37239dfcfd2c23"
+    }
+  ],
+  "gaps": ["Long-chip outline continuity remains pending separate detail review.", "The actual-HTTP classification and request receipts are frozen evidence identities, not a new network verification.", "Only these three FINAL C6 candidates and one original reference were viewed; final36 qualification remains partial."],
+  "conclusion": "Three focused originals reviewed. Both long suffixes and the exclusion markers are readable; the actual last-page members, markers, blank space and boundaries pass this bounded review. Two long-chip cases retain one shared frame-continuity follow-up. No full qualification claim."
+}

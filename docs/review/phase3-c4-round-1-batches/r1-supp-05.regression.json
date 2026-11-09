@@ -1,0 +1,2660 @@
+{
+  "schema_version": 1,
+  "batch_id": "r1-supp-05-regression",
+  "reviewer": "/root/final_validation_delivery/c4_full_review_coordinator/visual_05",
+  "round": 1,
+  "run_id": "0c9ecf3777c9",
+  "capture_manifest_sha256": "d2a6a5fae352a79bd6ee82076524bf3a25afb62f8bfa822abbfa42d0fbe49ba0",
+  "final_inventory_sha256": "df15126ae8becde603dfe09c56db2a01490c123c412a1fd04fe6010a923b91d9",
+  "freeze_tuple": {
+    "source_sha256": "dc0cd6227768a5125ecf702982ce639789bc8bca390de82bab83329927ea6353",
+    "binary_sha256": "7c2f685ecafc7207446f0e75877b74d14cbc6e41a43f5accee8ae992256e3183",
+    "harness_sha256": "5e6f546b7abec0a377e53feafe3afe1e6c6d3259da2699b75f1c4fe44529d5e5",
+    "capture_plan_sha256": "ab2effba6e2cd443be49ff5b49094afede8126615a270aa0653771059b871cc9",
+    "reference_sha256": "e7b49b456255432d74cfe41346f9d44c1a9c55bf67c5d55483e4ae3029547d18",
+    "reference_scope_sha256": "c910bed9f02ed17b2ca0a54aca1beeeeb6caabc5a17a91afe764ddd3e7b0d33c",
+    "capture_helper_sha256": {
+      "verify-ui.py": "470872e6fd22a78b474c0f862164875ad9c7237bd2f3f164512864580ac1e90d",
+      "verify-fullscreen.py": "4a6c48cef771e66e9b3058edd888dcf2d4bce02e2720b5cc00c7a5b987bc9670",
+      "handoff_c4_business.py": "6197f375b247962e3ce9acdd3779468073f11e0002ac3c7ce876a7b1a0d0d9be"
+    }
+  },
+  "source_map": "D:/Code/aidokuForKindle/docs/review/phase3-round-1-findings-map.json",
+  "source_map_sha256": "Pending owner remote static accounting; no local rehash",
+  "status": "fresh-historical-second-pass-recorded-with-bounded-scope",
+  "review_method": {
+    "ordering": "All 51 first-pass candidates and seven independent reports were completed before reading this historical requirement input.",
+    "current_originals": "The 12 current candidates listed in regression_closures were reopened with tools.view_image in this second pass. Their frozen case/state/metadata/actions/log text was reread. No old candidate pixels or prior closure verdict was used.",
+    "references": "Every associated original reference was actually viewed earlier by this same reviewer in the same frozen run; exact prior viewing reports are cited. No new reference view is falsely claimed here.",
+    "hash_origin": "Owner-frozen final inventory, assigned input and case records; no local rehash or byte verification.",
+    "behavior": "Existing pointer/action/state/source-oracle records support bounded software behavior. No oracle, program, test, build, probe, SQL, SSH, copy/crop or image processing is run.",
+    "preservation": "Production, raw artifacts and all prior small-batch reports remain untouched. No C5 source change explains a C4 frame."
+  },
+  "counts": {
+    "historical_groups_reviewed": 5,
+    "current_cases_reopened": 12,
+    "whole_groups_finally_closed": 0,
+    "new_current_suggestions": 0
+  },
+  "historical_findings": [
+    {
+      "historical_id": "P3R1-G01",
+      "historical_requirement": "Page-jump surfaces draw their top separator inside the page grid.",
+      "source_suggestion_ids": [
+        "P3R1-REF01-1",
+        "P3R1-REF17-2",
+        "P3R1-SUP20-2",
+        "P3R1-SUP38-2",
+        "P3R1-SUP44-1"
+      ],
+      "actual_current_case_ids": [
+        "pw5-portrait--toc-page-jump"
+      ],
+      "fresh_assessment": "The current PW ToC jump surface places its top boundary above the grid. Other library/Scribe jump surfaces remain outside this assignment.",
+      "source_scope_not_assigned_here": [
+        "Main--jump-pages",
+        "sc-library--jump-pages",
+        "scribe-portrait--toc-page-jump",
+        "scribe-landscape--toc-page-jump"
+      ],
+      "additional_remaining_scope": [
+        "Only the current PW ToC jump case is assessed; four other source cases are assigned elsewhere."
+      ],
+      "whole_group_closed": false,
+      "root_acceptance_status": "pending-root-final-acceptance"
+    },
+    {
+      "historical_id": "P3R1-G05",
+      "historical_requirement": "Active incognito status strips omit the centered no-history policy notice.",
+      "source_suggestion_ids": [
+        "P3R1-REF05-1",
+        "P3R1-REF16-1",
+        "P3R1-SUP08-1",
+        "P3R1-SUP28-1"
+      ],
+      "actual_current_case_ids": [
+        "pw5--incognito-history-policy"
+      ],
+      "fresh_assessment": "The current active-incognito PW detail strip visibly includes the centered no-history disclosure. Other active/incognito/persistence cases and all Scribe cases remain outside this assignment.",
+      "source_scope_not_assigned_here": [
+        "pw-history--incognito",
+        "sc-history--incognito",
+        "pw5--incognito-enable",
+        "pw5--incognito-persistence",
+        "scribe--incognito-enable",
+        "scribe--incognito-history-policy",
+        "scribe--incognito-persistence"
+      ],
+      "additional_remaining_scope": [
+        "Visible disclosure is assessed; no new SQL/history-write policy or persistence test is performed."
+      ],
+      "whole_group_closed": false,
+      "root_acceptance_status": "pending-root-final-acceptance"
+    },
+    {
+      "historical_id": "P3R1-G09",
+      "historical_requirement": "Paperwhite manual orientation omits reverse landscape.",
+      "source_suggestion_ids": [
+        "P3R1-REF09-2"
+      ],
+      "actual_current_case_ids": [
+        "pw5--c4-reader--reverse-controls",
+        "pw5--c4-reader--reverse-pure-input",
+        "pw5--c4-reader--reverse-restore",
+        "pw5--c4-reader--reverse-wake"
+      ],
+      "fresh_assessment": "The visible reverse-landscape choice and the four current canonical software records support the software component. Native framebuffer/evdev rotation and physical wake require separate Root artifacts.",
+      "source_scope_not_assigned_here": [
+        "pw-reader--rotate"
+      ],
+      "additional_remaining_scope": [
+        "Root native-reverse-rotation-mapping artifacts",
+        "Root physical sleep/wake/retained-frame artifacts",
+        "The original reference case is outside this assignment and may be joined from its separate review."
+      ],
+      "whole_group_closed": false,
+      "root_acceptance_status": "pending-root-final-acceptance"
+    },
+    {
+      "historical_id": "P3R1-G30",
+      "historical_requirement": "Muted L-shaped and swipe-only layout cards lack an explicit truthful availability explanation.",
+      "source_suggestion_ids": [
+        "P3R1-REF30-1",
+        "P3R1-SUP14-3"
+      ],
+      "actual_current_case_ids": [
+        "pw5--c4-reader--l-shaped-forward",
+        "pw5--c4-reader--l-shaped-reverse",
+        "pw5--c4-reader--swipe-only-tap",
+        "pw5--c4-reader--swipe-only-forward",
+        "pw5--c4-reader--swipe-only-reverse"
+      ],
+      "fresh_assessment": "The five current actual pointer/state/source-oracle records support implemented L-shaped and swipe-only software behavior, including independent reversal and tap suppression. These pure frames do not assess the original settings-card explanation/presentation. The approved independent G13 preview-map defect is not disposed of.",
+      "source_scope_not_assigned_here": [
+        "sc-settings--tap-zones",
+        "pw5--settings-tap-regions"
+      ],
+      "additional_remaining_scope": [
+        "Original PW/Scribe settings-card availability explanation and presentation",
+        "Independent current preview-drawing scope P3R1-G13 remains separate and unresolved by these frames",
+        "Native physical input qualification"
+      ],
+      "whole_group_closed": false,
+      "root_acceptance_status": "pending-root-final-acceptance"
+    },
+    {
+      "historical_id": "P3R1-G39",
+      "historical_requirement": "Empty Bookmarks tabs provide a blank list without status or a clear next step.",
+      "source_suggestion_ids": [
+        "P3R1-SUP20-1",
+        "P3R1-SUP35-1",
+        "P3R1-SUP38-1"
+      ],
+      "actual_current_case_ids": [
+        "pw5-portrait--toc-bookmarks"
+      ],
+      "fresh_assessment": "The current PW case is an actual empty Bookmarks tab with status and a clear next step, supported by ready state and a log without page-not-ready rejection. Scribe empty-tab cases are outside this assignment.",
+      "source_scope_not_assigned_here": [
+        "scribe-landscape--toc-bookmarks",
+        "scribe-portrait--toc-bookmarks"
+      ],
+      "additional_remaining_scope": [
+        "Two Scribe empty-Bookmarks UI cases",
+        "Actual activation/result of the visible Add Current Page button is not exercised here"
+      ],
+      "whole_group_closed": false,
+      "root_acceptance_status": "pending-root-final-acceptance"
+    }
+  ],
+  "regression_closures": [
+    {
+      "historical_id": "P3R1-G01",
+      "current_case_id": "pw5-portrait--toc-page-jump",
+      "run_id": "0c9ecf3777c9",
+      "source_sha256": "dc0cd6227768a5125ecf702982ce639789bc8bca390de82bab83329927ea6353",
+      "binary_sha256": "7c2f685ecafc7207446f0e75877b74d14cbc6e41a43f5accee8ae992256e3183",
+      "case_json_sha256": "9eea2413ed1b01d0b6f5ac78023848d1c017ae7758573694b4d6d3565a96d6a4",
+      "png_sha256": "bcfd46eb640f098e2eeda05e601aec211d25f183208b9640f50364279f884c8b",
+      "state_sha256": "86b2ac14ee7dff80a0a89edd7f48092a683762ae00e51e459172867dba057108",
+      "actions_sha256": "73d25ee371d721f1feb7db2a65707107bc6488892dfdf3c2207a506cdf91eeb0",
+      "reference_original_sha256": "f66825556e844eff175f196cbd33179b0cd8d0e401129667d575f198f3d2e543",
+      "primary_reference_id": "pw-reader--toc",
+      "original_png_path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate4/ui-round-1/pw5-portrait--toc-page-jump.png",
+      "state_path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate4/ui-round-1/pw5-portrait--toc-page-jump.state.json",
+      "actions_path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate4/ui-round-1/actions/pw5-portrait--toc-page-jump.json",
+      "case_json_path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate4/ui-round-1/cases/pw5-portrait--toc-page-jump.json",
+      "log": {
+        "local_path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate4/ui-round-1/pw5-portrait--toc-page-jump.log",
+        "remote_path": "/tmp/aidoku-phase3-c4-ui-round-1/pw5-portrait--toc-page-jump.log",
+        "sha256": "dc121ceea011a63c29b404d6c6b75bbe2db32b326923b8fa99759f457bfd709f",
+        "bytes": 68,
+        "identity_source": "owner-frozen final inventory; no local rehash",
+        "static_text_read": true,
+        "observed_rejection": "No page-not-ready or other rejection appears in this exact frozen log."
+      },
+      "metadata": {
+        "local_path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate4/ui-round-1/pw5-portrait--toc-page-jump.metadata.json",
+        "remote_path": "/tmp/aidoku-phase3-c4-ui-round-1/pw5-portrait--toc-page-jump.metadata.json",
+        "sha256": "e44ee206a2c9c09072b54689c65aa9145d77fc16f2444de3c9ab1e0c0943da46",
+        "bytes": 671,
+        "identity_source": "owner-frozen final inventory; no local rehash"
+      },
+      "first_pass_report": "D:/Code/aidokuForKindle/docs/review/phase3-c4-round-1-batches/r1-supp-05-04.review.json",
+      "original_candidate_actually_viewed": true,
+      "candidate_reopened_in_this_second_pass": true,
+      "original_references": [
+        {
+          "reference_id": "pw-reader--default",
+          "path": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/screens/pw-reader.png",
+          "sha256": "b67b1618519e877e60ab4ac4ad20306fb33bd48f0af6a8b129926900ae98e16d",
+          "original_actually_viewed": true,
+          "new_view_this_second_pass": false,
+          "prior_viewing_report": "D:/Code/aidokuForKindle/docs/review/phase3-c4-round-1-batches/r1-reference-05.review.json"
+        },
+        {
+          "reference_id": "pw-reader--fullscreen",
+          "path": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/screens/states/pw-reader--fullscreen.png",
+          "sha256": "70fa45f447c4f52e2e737f7634a1838d73071e32cf22c40e6e8235e07582cee4",
+          "original_actually_viewed": true,
+          "new_view_this_second_pass": false,
+          "prior_viewing_report": "D:/Code/aidokuForKindle/docs/review/phase3-c4-round-1-batches/r1-reference-05.review.json"
+        },
+        {
+          "reference_id": "pw-reader--toc",
+          "path": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/screens/states/pw-reader--toc.png",
+          "sha256": "f66825556e844eff175f196cbd33179b0cd8d0e401129667d575f198f3d2e543",
+          "original_actually_viewed": true,
+          "new_view_this_second_pass": false,
+          "prior_viewing_report": "D:/Code/aidokuForKindle/docs/review/phase3-c4-round-1-batches/r1-reference-05.review.json"
+        }
+      ],
+      "fresh_observation": "The page-jump surface's strong horizontal top boundary sits above its heading and grid. It does not cross the numbered cells. All 18 cells form a balanced six-column by three-row grid, with complete outlines and an inverse-selected 11. The folio and Previous/Next controls remain below the cells and separate from menu progress.",
+      "static_appearance_observation": "The page-jump surface's strong horizontal top boundary sits above its heading and grid. It does not cross the numbered cells. All 18 cells form a balanced six-column by three-row grid, with complete outlines and an inverse-selected 11. The folio and Previous/Next controls remain below the cells and separate from menu progress.",
+      "captured_software_support": {
+        "summary": "page_jump_open=true, page_jump_context=panel, panel_page=11/18 and menu=true after menu, toc and page.jump-toggle(panel). The committed reader remains12/40.",
+        "actions": [
+          {
+            "at_ms": 3500,
+            "section": "reader",
+            "action": "menu",
+            "value": ""
+          },
+          {
+            "at_ms": 3950,
+            "section": "reader",
+            "action": "toc",
+            "value": ""
+          },
+          {
+            "at_ms": 4400,
+            "section": "page",
+            "action": "jump-toggle",
+            "value": "panel"
+          }
+        ],
+        "metadata": {
+          "route": "reader",
+          "profile": "pw5",
+          "backend": "desktop",
+          "design_logical_size": [
+            618,
+            824
+          ],
+          "logical_size": [
+            618,
+            824
+          ],
+          "window_size": [
+            618,
+            824
+          ],
+          "snapshot_size": [
+            618,
+            824
+          ],
+          "scale_factor": 1,
+          "landscape": false,
+          "rotation_degrees": 0,
+          "refresh_count": 5,
+          "last_refresh": "ui",
+          "process_id": 699757,
+          "font_initializations": 1,
+          "lifecycle": {
+            "requested": false,
+            "render_paused": false,
+            "input_released": false,
+            "parked": false,
+            "activity_paused": false,
+            "pause_count": 0,
+            "resume_count": 0,
+            "frame_write_count": 0,
+            "resume_full_frame_count": 0
+          }
+        }
+      },
+      "owner_recorded_oracle_not_reexecuted": null,
+      "disposition": "resolved-in-fresh-evidence",
+      "disposition_scope": "PW ToC page-jump separator placement in this actual frame",
+      "capability_or_user_override_basis": "No capability waiver applies to separator geometry. Root's content-driven sheet-height acceptance does not waive an internal misplaced line.",
+      "current_suggestion_ids": [],
+      "root_acceptance_status": "pending-root-final-acceptance",
+      "remaining_scope": [
+        "Main--jump-pages",
+        "sc-library--jump-pages",
+        "scribe-portrait--toc-page-jump",
+        "scribe-landscape--toc-page-jump",
+        "Only the current PW ToC jump case is assessed; four other source cases are assigned elsewhere."
+      ],
+      "whole_group_closed": false,
+      "required_original_crop": null
+    },
+    {
+      "historical_id": "P3R1-G05",
+      "current_case_id": "pw5--incognito-history-policy",
+      "run_id": "0c9ecf3777c9",
+      "source_sha256": "dc0cd6227768a5125ecf702982ce639789bc8bca390de82bab83329927ea6353",
+      "binary_sha256": "7c2f685ecafc7207446f0e75877b74d14cbc6e41a43f5accee8ae992256e3183",
+      "case_json_sha256": "aab9f172c69da82940249f46c715cdfb925ebbb4f7535f5f2b2d89bda0131b13",
+      "png_sha256": "e89388ebee0c6b754b6d49fd749c207e4e464c7a7ac27f261fdd90f53e96eb9c",
+      "state_sha256": "d44b8ad73653363c437402ba55234886b8dbd43682e1f1b2f57e55600a8ff99e",
+      "actions_sha256": "de254600818416032e598dcb11fb13f55f8aa7ff2550fe08951f88fcbc6bae07",
+      "reference_original_sha256": "18b052844a8b90a2a558d2225301b2e273a6cb6bb2f457d7cc017294e89bd274",
+      "primary_reference_id": "pw-manga--default",
+      "original_png_path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate4/ui-round-1/pw5--incognito-history-policy.png",
+      "state_path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate4/ui-round-1/pw5--incognito-history-policy.state.json",
+      "actions_path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate4/ui-round-1/actions/pw5--incognito-history-policy.json",
+      "case_json_path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate4/ui-round-1/cases/pw5--incognito-history-policy.json",
+      "log": {
+        "local_path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate4/ui-round-1/pw5--incognito-history-policy.log",
+        "remote_path": "/tmp/aidoku-phase3-c4-ui-round-1/pw5--incognito-history-policy.log",
+        "sha256": "dc121ceea011a63c29b404d6c6b75bbe2db32b326923b8fa99759f457bfd709f",
+        "bytes": 68,
+        "identity_source": "owner-frozen final inventory; no local rehash",
+        "static_text_read": true,
+        "observed_rejection": "No page-not-ready or other rejection appears in this exact frozen log."
+      },
+      "metadata": {
+        "local_path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate4/ui-round-1/pw5--incognito-history-policy.metadata.json",
+        "remote_path": "/tmp/aidoku-phase3-c4-ui-round-1/pw5--incognito-history-policy.metadata.json",
+        "sha256": "d77e50a28c4da37a7a0b405494178c968ff71999109371d2664d9113ec40e026",
+        "bytes": 671,
+        "identity_source": "owner-frozen final inventory; no local rehash"
+      },
+      "first_pass_report": "D:/Code/aidokuForKindle/docs/review/phase3-c4-round-1-batches/r1-supp-05-01.review.json",
+      "original_candidate_actually_viewed": true,
+      "candidate_reopened_in_this_second_pass": true,
+      "original_references": [
+        {
+          "reference_id": "pw-manga--default",
+          "path": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/screens/pw-manga.png",
+          "sha256": "18b052844a8b90a2a558d2225301b2e273a6cb6bb2f457d7cc017294e89bd274",
+          "original_actually_viewed": true,
+          "new_view_this_second_pass": false,
+          "prior_viewing_report": "D:/Code/aidokuForKindle/docs/review/phase3-c4-round-1-batches/r1-supp-05-01.review.json"
+        }
+      ],
+      "fresh_observation": "The active black status strip contains a centered white incognito/no-history notice between the time and device icons. The notice remains legible without touching those edge groups. It is visibly present on the portrait detail route, above the book header.",
+      "static_appearance_observation": "The active black status strip contains a centered white incognito/no-history notice between the time and device icons. The notice remains legible without touching those edge groups. It is visibly present on the portrait detail route, above the book header.",
+      "captured_software_support": {
+        "summary": "preferences.incognito=true; history_count=20; route=detail and reader_page20 after recorded seek(20) and back. The frozen log has only the desktop-ready line.",
+        "actions": [
+          {
+            "at_ms": 2500,
+            "section": "reader",
+            "action": "seek",
+            "value": "20"
+          },
+          {
+            "at_ms": 5000,
+            "section": "reader",
+            "action": "back",
+            "value": ""
+          }
+        ],
+        "metadata": {
+          "route": "detail",
+          "profile": "pw5",
+          "backend": "desktop",
+          "design_logical_size": [
+            618,
+            824
+          ],
+          "logical_size": [
+            618,
+            824
+          ],
+          "window_size": [
+            618,
+            824
+          ],
+          "snapshot_size": [
+            618,
+            824
+          ],
+          "scale_factor": 1,
+          "landscape": false,
+          "rotation_degrees": 0,
+          "refresh_count": 6,
+          "last_refresh": "ui",
+          "process_id": 691772,
+          "font_initializations": 1,
+          "lifecycle": {
+            "requested": false,
+            "render_paused": false,
+            "input_released": false,
+            "parked": false,
+            "activity_paused": false,
+            "pause_count": 0,
+            "resume_count": 0,
+            "frame_write_count": 0,
+            "resume_full_frame_count": 0
+          }
+        }
+      },
+      "owner_recorded_oracle_not_reexecuted": null,
+      "disposition": "resolved-in-fresh-evidence",
+      "disposition_scope": "Centered visible no-history policy disclosure on this PW active-incognito detail frame",
+      "capability_or_user_override_basis": "This is a detail status strip. The closed-reader artwork-only override does not authorize an incognito status overlay in a closed reader, and no such frame is claimed here.",
+      "current_suggestion_ids": [],
+      "root_acceptance_status": "pending-root-final-acceptance",
+      "remaining_scope": [
+        "pw-history--incognito",
+        "sc-history--incognito",
+        "pw5--incognito-enable",
+        "pw5--incognito-persistence",
+        "scribe--incognito-enable",
+        "scribe--incognito-history-policy",
+        "scribe--incognito-persistence",
+        "Visible disclosure is assessed; no new SQL/history-write policy or persistence test is performed."
+      ],
+      "whole_group_closed": false,
+      "required_original_crop": null
+    },
+    {
+      "historical_id": "P3R1-G09",
+      "current_case_id": "pw5--c4-reader--reverse-controls",
+      "run_id": "0c9ecf3777c9",
+      "source_sha256": "dc0cd6227768a5125ecf702982ce639789bc8bca390de82bab83329927ea6353",
+      "binary_sha256": "7c2f685ecafc7207446f0e75877b74d14cbc6e41a43f5accee8ae992256e3183",
+      "case_json_sha256": "73246896fbc1e26604836c5f9ca5d89ffe26fd09dd7d27f3be4c8b4b1266ea03",
+      "png_sha256": "380c505198683a6280472d1a276d92618d1cfd882977911a6d0a8af77e1be6d2",
+      "state_sha256": "326c2fb1983329e04035f61ad4a2866016642fb6fdeca22664e5e3743223e8ab",
+      "actions_sha256": "93188ed3c528aff113c522158ca9766de069fee6200096f554c6ef7b694fa9c5",
+      "reference_original_sha256": "e53b7cced39e13d9a4c597c847a54a55d643675530cc71e6b37855fa047e3b16",
+      "primary_reference_id": "pw-reader--rotate",
+      "original_png_path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate4/ui-round-1/pw5--c4-reader--reverse-controls.png",
+      "state_path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate4/ui-round-1/pw5--c4-reader--reverse-controls.state.json",
+      "actions_path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate4/ui-round-1/actions/pw5--c4-reader--reverse-controls.json",
+      "case_json_path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate4/ui-round-1/cases/pw5--c4-reader--reverse-controls.json",
+      "log": {
+        "local_path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate4/ui-round-1/pw5--c4-reader--reverse-controls.log",
+        "remote_path": "/tmp/aidoku-phase3-c4-ui-round-1/pw5--c4-reader--reverse-controls.log",
+        "sha256": "dc121ceea011a63c29b404d6c6b75bbe2db32b326923b8fa99759f457bfd709f",
+        "bytes": 68,
+        "identity_source": "owner-frozen final inventory; no local rehash",
+        "static_text_read": true,
+        "observed_rejection": "No page-not-ready or other rejection appears in this exact frozen log."
+      },
+      "metadata": {
+        "local_path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate4/ui-round-1/pw5--c4-reader--reverse-controls.metadata.json",
+        "remote_path": "/tmp/aidoku-phase3-c4-ui-round-1/pw5--c4-reader--reverse-controls.metadata.json",
+        "sha256": "8bc9c18a7dc6f011ebd0733cd94ab24a1680ec25b8e483fab9008dd4ca552e90",
+        "bytes": 672,
+        "identity_source": "owner-frozen final inventory; no local rehash"
+      },
+      "first_pass_report": "D:/Code/aidokuForKindle/docs/review/phase3-c4-round-1-batches/r1-supp-05-06.review.json",
+      "original_candidate_actually_viewed": true,
+      "candidate_reopened_in_this_second_pass": true,
+      "original_references": [
+        {
+          "reference_id": "pw-reader--default",
+          "path": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/screens/pw-reader.png",
+          "sha256": "b67b1618519e877e60ab4ac4ad20306fb33bd48f0af6a8b129926900ae98e16d",
+          "original_actually_viewed": true,
+          "new_view_this_second_pass": false,
+          "prior_viewing_report": "D:/Code/aidokuForKindle/docs/review/phase3-c4-round-1-batches/r1-reference-05.review.json"
+        },
+        {
+          "reference_id": "pw-reader--fullscreen",
+          "path": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/screens/states/pw-reader--fullscreen.png",
+          "sha256": "70fa45f447c4f52e2e737f7634a1838d73071e32cf22c40e6e8235e07582cee4",
+          "original_actually_viewed": true,
+          "new_view_this_second_pass": false,
+          "prior_viewing_report": "D:/Code/aidokuForKindle/docs/review/phase3-c4-round-1-batches/r1-reference-05.review.json"
+        },
+        {
+          "reference_id": "pw-reader--rotate",
+          "path": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/screens/states/pw-reader--rotate.png",
+          "sha256": "e53b7cced39e13d9a4c597c847a54a55d643675530cc71e6b37855fa047e3b16",
+          "original_actually_viewed": true,
+          "new_view_this_second_pass": false,
+          "prior_viewing_report": "D:/Code/aidokuForKindle/docs/review/phase3-c4-round-1-batches/r1-reference-05.review.json"
+        }
+      ],
+      "fresh_observation": "The landscape menu contains three complete manual orientation cards, with reverse landscape inverse-selected. Its device icon and label are readable, separate from ordinary landscape, and clear of the progress/tools boundaries. The heading and chapter title preserve their heavy hierarchy.",
+      "static_appearance_observation": "The landscape menu contains three complete manual orientation cards, with reverse landscape inverse-selected. Its device icon and label are readable, separate from ordinary landscape, and clear of the progress/tools boundaries. The heading and chapter title preserve their heavy hierarchy.",
+      "captured_software_support": {
+        "summary": "The recorded orientation=reverse-landscape action precedes menu/orientation. Actual metadata is824x618, landscape=true, rotation270; the reverse-landscape modal item is enabled and selected.",
+        "actions": [
+          {
+            "at_ms": 3500,
+            "section": "settings",
+            "action": "set",
+            "value": "orientation=reverse-landscape"
+          },
+          {
+            "at_ms": 6000,
+            "section": "reader",
+            "action": "menu",
+            "value": ""
+          },
+          {
+            "at_ms": 6450,
+            "section": "reader",
+            "action": "orientation",
+            "value": ""
+          }
+        ],
+        "metadata": {
+          "route": "reader",
+          "profile": "pw5",
+          "backend": "desktop",
+          "design_logical_size": [
+            824,
+            618
+          ],
+          "logical_size": [
+            824,
+            618
+          ],
+          "window_size": [
+            824,
+            618
+          ],
+          "snapshot_size": [
+            824,
+            618
+          ],
+          "scale_factor": 1,
+          "landscape": true,
+          "rotation_degrees": 270,
+          "refresh_count": 6,
+          "last_refresh": "ui",
+          "process_id": 704346,
+          "font_initializations": 1,
+          "lifecycle": {
+            "requested": false,
+            "render_paused": false,
+            "input_released": false,
+            "parked": false,
+            "activity_paused": false,
+            "pause_count": 0,
+            "resume_count": 0,
+            "frame_write_count": 0,
+            "resume_full_frame_count": 0
+          }
+        }
+      },
+      "owner_recorded_oracle_not_reexecuted": null,
+      "disposition": "resolved-in-fresh-evidence",
+      "disposition_scope": "Visible reverse-landscape manual choice and canonical software selection",
+      "capability_or_user_override_basis": "Manual orientation remains applicable without an orientation sensor. Canonical desktop270 metadata/cards are software evidence and do not replace Root native framebuffer/evdev qualification.",
+      "current_suggestion_ids": [],
+      "root_acceptance_status": "pending-root-final-acceptance",
+      "remaining_scope": [
+        "pw-reader--rotate",
+        "Root native-reverse-rotation-mapping artifacts",
+        "Root physical sleep/wake/retained-frame artifacts",
+        "The original reference case is outside this assignment and may be joined from its separate review."
+      ],
+      "whole_group_closed": false,
+      "required_original_crop": null
+    },
+    {
+      "historical_id": "P3R1-G09",
+      "current_case_id": "pw5--c4-reader--reverse-pure-input",
+      "run_id": "0c9ecf3777c9",
+      "source_sha256": "dc0cd6227768a5125ecf702982ce639789bc8bca390de82bab83329927ea6353",
+      "binary_sha256": "7c2f685ecafc7207446f0e75877b74d14cbc6e41a43f5accee8ae992256e3183",
+      "case_json_sha256": "276d5d2daba4840040f2542ff20183bf0ae4beb02e4aca2d61f74dc60ed86ca8",
+      "png_sha256": "58aefbd825b13942c37ac8fe7ba6bd3cc24defe2c362186a51a0b904f824ea87",
+      "state_sha256": "d99c039d09958ef1f72ff9e4ce3bc7fd82554021cb40c8cfc24b0f390b9d94a6",
+      "actions_sha256": "fc5f2317af097db625c216ae3f58b2ad7a0cd94564b4a5a48b658715ababc59d",
+      "reference_original_sha256": "70fa45f447c4f52e2e737f7634a1838d73071e32cf22c40e6e8235e07582cee4",
+      "primary_reference_id": "pw-reader--fullscreen",
+      "original_png_path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate4/ui-round-1/pw5--c4-reader--reverse-pure-input.png",
+      "state_path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate4/ui-round-1/pw5--c4-reader--reverse-pure-input.state.json",
+      "actions_path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate4/ui-round-1/actions/pw5--c4-reader--reverse-pure-input.json",
+      "case_json_path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate4/ui-round-1/cases/pw5--c4-reader--reverse-pure-input.json",
+      "log": {
+        "local_path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate4/ui-round-1/pw5--c4-reader--reverse-pure-input.log",
+        "remote_path": "/tmp/aidoku-phase3-c4-ui-round-1/pw5--c4-reader--reverse-pure-input.log",
+        "sha256": "73d997f4564235750da901054aadc4c5e85dca830c52baf7732242e2091d908c",
+        "bytes": 68,
+        "identity_source": "owner-frozen final inventory; no local rehash",
+        "static_text_read": true,
+        "observed_rejection": "No page-not-ready or other rejection appears in this exact frozen log."
+      },
+      "metadata": {
+        "local_path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate4/ui-round-1/pw5--c4-reader--reverse-pure-input.metadata.json",
+        "remote_path": "/tmp/aidoku-phase3-c4-ui-round-1/pw5--c4-reader--reverse-pure-input.metadata.json",
+        "sha256": "f070c8b57e0e12fbb520f6b12afc4b0ac56b258171d9d0b53d610f3f12648765",
+        "bytes": 677,
+        "identity_source": "owner-frozen final inventory; no local rehash"
+      },
+      "first_pass_report": "D:/Code/aidokuForKindle/docs/review/phase3-c4-round-1-batches/r1-supp-05-06.review.json",
+      "original_candidate_actually_viewed": true,
+      "candidate_reopened_in_this_second_pass": true,
+      "original_references": [
+        {
+          "reference_id": "pw-reader--default",
+          "path": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/screens/pw-reader.png",
+          "sha256": "b67b1618519e877e60ab4ac4ad20306fb33bd48f0af6a8b129926900ae98e16d",
+          "original_actually_viewed": true,
+          "new_view_this_second_pass": false,
+          "prior_viewing_report": "D:/Code/aidokuForKindle/docs/review/phase3-c4-round-1-batches/r1-reference-05.review.json"
+        },
+        {
+          "reference_id": "pw-reader--fullscreen",
+          "path": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/screens/states/pw-reader--fullscreen.png",
+          "sha256": "70fa45f447c4f52e2e737f7634a1838d73071e32cf22c40e6e8235e07582cee4",
+          "original_actually_viewed": true,
+          "new_view_this_second_pass": false,
+          "prior_viewing_report": "D:/Code/aidokuForKindle/docs/review/phase3-c4-round-1-batches/r1-reference-05.review.json"
+        }
+      ],
+      "fresh_observation": "The separate landscape original is artwork only: the centered upright comic page and proportional blank sides contain no footer, bookmark ribbon, status/page label or menu remnant. The black panel borders belong to the recorded source image.",
+      "static_appearance_observation": "The separate landscape original is artwork only: the centered upright comic page and proportional blank sides contain no footer, bookmark ribbon, status/page label or menu remnant. The black panel borders belong to the recorded source image.",
+      "captured_software_support": {
+        "summary": "A recorded pointer press/release at82.4,309 leaves displayed/committed page13/40, menu=false and reverse_landscape=true with rotation270. The existing whole-viewport oracle records exact_match=true, changed_pixels=0 and ignored_pixels=0 for its retained source identity.",
+        "actions": [
+          {
+            "at_ms": 3500,
+            "section": "pointer",
+            "action": "move",
+            "value": "82.4,309"
+          },
+          {
+            "at_ms": 3550,
+            "section": "pointer",
+            "action": "press",
+            "value": "82.4,309"
+          },
+          {
+            "at_ms": 3650,
+            "section": "pointer",
+            "action": "release",
+            "value": "82.4,309"
+          }
+        ],
+        "metadata": {
+          "route": "reader",
+          "profile": "pw5",
+          "backend": "desktop",
+          "design_logical_size": [
+            824,
+            618
+          ],
+          "logical_size": [
+            824,
+            618
+          ],
+          "window_size": [
+            824,
+            618
+          ],
+          "snapshot_size": [
+            824,
+            618
+          ],
+          "scale_factor": 1,
+          "landscape": true,
+          "rotation_degrees": 270,
+          "refresh_count": 3,
+          "last_refresh": "partial",
+          "process_id": 704396,
+          "font_initializations": 1,
+          "lifecycle": {
+            "requested": false,
+            "render_paused": false,
+            "input_released": false,
+            "parked": false,
+            "activity_paused": false,
+            "pause_count": 0,
+            "resume_count": 0,
+            "frame_write_count": 0,
+            "resume_full_frame_count": 0
+          }
+        }
+      },
+      "owner_recorded_oracle_not_reexecuted": {
+        "sampler_contract": "slint-software-1.17.1-shared-rgb8-fixed8-v1",
+        "metrics": {
+          "exact_match": true,
+          "changed_pixels": 0,
+          "maximum_channel_difference": 0,
+          "rgb_mae_diagnostic_only": 0,
+          "difference_bbox": null,
+          "regions_diagnostic_only": {
+            "top_96": {
+              "rectangle": [
+                0,
+                0,
+                824,
+                96
+              ],
+              "changed_pixels": 0
+            },
+            "bottom_96": {
+              "rectangle": [
+                0,
+                522,
+                824,
+                618
+              ],
+              "changed_pixels": 0
+            },
+            "left_32": {
+              "rectangle": [
+                0,
+                0,
+                32,
+                618
+              ],
+              "changed_pixels": 0
+            },
+            "right_32": {
+              "rectangle": [
+                792,
+                0,
+                824,
+                618
+              ],
+              "changed_pixels": 0
+            },
+            "center_seam_8": {
+              "rectangle": [
+                408,
+                0,
+                416,
+                618
+              ],
+              "changed_pixels": 0
+            }
+          },
+          "pixel_error_tolerance": 0,
+          "ignored_pixels": 0
+        },
+        "processed_inputs": [
+          {
+            "field": "first_path",
+            "application_path": "/tmp/aidoku-phase3-c4-ui-round-1/data/0c9ecf3777c9/pw5--c4-reader--reverse-controls/demo/cache/shared-v1/processed/79/797305ddfddb44fb4a224854d5ec1f343a5b017f9b031a26f61e465378127d2d.png",
+            "retained_path": "/tmp/aidoku-phase3-c4-ui-round-1/processed/pw5--c4-reader--reverse-pure-input/first_path.png",
+            "sha256": "5d212387ab7dd19fe5fe93997c0321b34f7d132e54b2439bdd019ebf6dd38ae7",
+            "geometry": {
+              "source_size": [
+                879,
+                1236
+              ],
+              "slot": [
+                0,
+                0,
+                824,
+                618
+              ],
+              "destination": [
+                192,
+                0,
+                632,
+                618
+              ],
+              "dx8": 511,
+              "dy8": 512,
+              "sample_origin": [
+                0,
+                0
+              ],
+              "sample_center_offset": 0
+            }
+          }
+        ]
+      },
+      "disposition": "resolved-in-fresh-evidence",
+      "disposition_scope": "Canonical reverse-landscape software pointer result and pure visible scene",
+      "capability_or_user_override_basis": "The frozen input explicitly requires separate native-reverse-rotation-mapping evidence. The owner source/oracle is read without reexecution; no physical input or native mapping result is inferred.",
+      "current_suggestion_ids": [],
+      "root_acceptance_status": "pending-root-final-acceptance",
+      "remaining_scope": [
+        "pw-reader--rotate",
+        "Root native-reverse-rotation-mapping artifacts",
+        "Root physical sleep/wake/retained-frame artifacts",
+        "The original reference case is outside this assignment and may be joined from its separate review."
+      ],
+      "whole_group_closed": false,
+      "required_original_crop": null
+    },
+    {
+      "historical_id": "P3R1-G09",
+      "current_case_id": "pw5--c4-reader--reverse-restore",
+      "run_id": "0c9ecf3777c9",
+      "source_sha256": "dc0cd6227768a5125ecf702982ce639789bc8bca390de82bab83329927ea6353",
+      "binary_sha256": "7c2f685ecafc7207446f0e75877b74d14cbc6e41a43f5accee8ae992256e3183",
+      "case_json_sha256": "82cba243def664c4d263404b9759c151222b06de3971c6e7be00909a373d0607",
+      "png_sha256": "58aefbd825b13942c37ac8fe7ba6bd3cc24defe2c362186a51a0b904f824ea87",
+      "state_sha256": "c22a66e09b411a0a7e2d803cf46ea1d137fa5ce5c80130086fdd5a81c39d3c61",
+      "actions_sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "reference_original_sha256": "70fa45f447c4f52e2e737f7634a1838d73071e32cf22c40e6e8235e07582cee4",
+      "primary_reference_id": "pw-reader--fullscreen",
+      "original_png_path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate4/ui-round-1/pw5--c4-reader--reverse-restore.png",
+      "state_path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate4/ui-round-1/pw5--c4-reader--reverse-restore.state.json",
+      "actions_path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate4/ui-round-1/actions/pw5--c4-reader--reverse-restore.json",
+      "case_json_path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate4/ui-round-1/cases/pw5--c4-reader--reverse-restore.json",
+      "log": {
+        "local_path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate4/ui-round-1/pw5--c4-reader--reverse-restore.log",
+        "remote_path": "/tmp/aidoku-phase3-c4-ui-round-1/pw5--c4-reader--reverse-restore.log",
+        "sha256": "73d997f4564235750da901054aadc4c5e85dca830c52baf7732242e2091d908c",
+        "bytes": 68,
+        "identity_source": "owner-frozen final inventory; no local rehash",
+        "static_text_read": true,
+        "observed_rejection": "No page-not-ready or other rejection appears in this exact frozen log."
+      },
+      "metadata": {
+        "local_path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate4/ui-round-1/pw5--c4-reader--reverse-restore.metadata.json",
+        "remote_path": "/tmp/aidoku-phase3-c4-ui-round-1/pw5--c4-reader--reverse-restore.metadata.json",
+        "sha256": "86c0f3ad44aeff8a9a4dcaebb85743ce670907413a7149e61ca2d5630bc4dcdb",
+        "bytes": 674,
+        "identity_source": "owner-frozen final inventory; no local rehash"
+      },
+      "first_pass_report": "D:/Code/aidokuForKindle/docs/review/phase3-c4-round-1-batches/r1-supp-05-06.review.json",
+      "original_candidate_actually_viewed": true,
+      "candidate_reopened_in_this_second_pass": true,
+      "original_references": [
+        {
+          "reference_id": "pw-reader--default",
+          "path": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/screens/pw-reader.png",
+          "sha256": "b67b1618519e877e60ab4ac4ad20306fb33bd48f0af6a8b129926900ae98e16d",
+          "original_actually_viewed": true,
+          "new_view_this_second_pass": false,
+          "prior_viewing_report": "D:/Code/aidokuForKindle/docs/review/phase3-c4-round-1-batches/r1-reference-05.review.json"
+        },
+        {
+          "reference_id": "pw-reader--fullscreen",
+          "path": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/screens/states/pw-reader--fullscreen.png",
+          "sha256": "70fa45f447c4f52e2e737f7634a1838d73071e32cf22c40e6e8235e07582cee4",
+          "original_actually_viewed": true,
+          "new_view_this_second_pass": false,
+          "prior_viewing_report": "D:/Code/aidokuForKindle/docs/review/phase3-c4-round-1-batches/r1-reference-05.review.json"
+        }
+      ],
+      "fresh_observation": "The restored original remains the same centered pure comic composition with blank side allocations and no restored page/status or bookmark decoration. No UI control or menu edge is visible.",
+      "static_appearance_observation": "The restored original remains the same centered pure comic composition with blank side allocations and no restored page/status or bookmark decoration. No UI control or menu edge is visible.",
+      "captured_software_support": {
+        "summary": "The action list is empty; a new process704463 uses the reverse-controls data directory. Final page13/40, rotation270 and source identity remain recorded, with image ready and not inflight.",
+        "actions": [],
+        "metadata": {
+          "route": "reader",
+          "profile": "pw5",
+          "backend": "desktop",
+          "design_logical_size": [
+            824,
+            618
+          ],
+          "logical_size": [
+            824,
+            618
+          ],
+          "window_size": [
+            824,
+            618
+          ],
+          "snapshot_size": [
+            824,
+            618
+          ],
+          "scale_factor": 1,
+          "landscape": true,
+          "rotation_degrees": 270,
+          "refresh_count": 1,
+          "last_refresh": "full",
+          "process_id": 704463,
+          "font_initializations": 1,
+          "lifecycle": {
+            "requested": false,
+            "render_paused": false,
+            "input_released": false,
+            "parked": false,
+            "activity_paused": false,
+            "pause_count": 0,
+            "resume_count": 0,
+            "frame_write_count": 0,
+            "resume_full_frame_count": 0
+          }
+        }
+      },
+      "owner_recorded_oracle_not_reexecuted": {
+        "sampler_contract": "slint-software-1.17.1-shared-rgb8-fixed8-v1",
+        "metrics": {
+          "exact_match": true,
+          "changed_pixels": 0,
+          "maximum_channel_difference": 0,
+          "rgb_mae_diagnostic_only": 0,
+          "difference_bbox": null,
+          "regions_diagnostic_only": {
+            "top_96": {
+              "rectangle": [
+                0,
+                0,
+                824,
+                96
+              ],
+              "changed_pixels": 0
+            },
+            "bottom_96": {
+              "rectangle": [
+                0,
+                522,
+                824,
+                618
+              ],
+              "changed_pixels": 0
+            },
+            "left_32": {
+              "rectangle": [
+                0,
+                0,
+                32,
+                618
+              ],
+              "changed_pixels": 0
+            },
+            "right_32": {
+              "rectangle": [
+                792,
+                0,
+                824,
+                618
+              ],
+              "changed_pixels": 0
+            },
+            "center_seam_8": {
+              "rectangle": [
+                408,
+                0,
+                416,
+                618
+              ],
+              "changed_pixels": 0
+            }
+          },
+          "pixel_error_tolerance": 0,
+          "ignored_pixels": 0
+        },
+        "processed_inputs": [
+          {
+            "field": "first_path",
+            "application_path": "/tmp/aidoku-phase3-c4-ui-round-1/data/0c9ecf3777c9/pw5--c4-reader--reverse-controls/demo/cache/shared-v1/processed/79/797305ddfddb44fb4a224854d5ec1f343a5b017f9b031a26f61e465378127d2d.png",
+            "retained_path": "/tmp/aidoku-phase3-c4-ui-round-1/processed/pw5--c4-reader--reverse-restore/first_path.png",
+            "sha256": "5d212387ab7dd19fe5fe93997c0321b34f7d132e54b2439bdd019ebf6dd38ae7",
+            "geometry": {
+              "source_size": [
+                879,
+                1236
+              ],
+              "slot": [
+                0,
+                0,
+                824,
+                618
+              ],
+              "destination": [
+                192,
+                0,
+                632,
+                618
+              ],
+              "dx8": 511,
+              "dy8": 512,
+              "sample_origin": [
+                0,
+                0
+              ],
+              "sample_center_offset": 0
+            }
+          }
+        ]
+      },
+      "disposition": "resolved-in-fresh-evidence",
+      "disposition_scope": "Recorded cold canonical software restoration projection",
+      "capability_or_user_override_basis": "The association is existing frozen software evidence, not a new restart/SQL check. It does not establish native framebuffer/evdev mapping or physical wake.",
+      "current_suggestion_ids": [],
+      "root_acceptance_status": "pending-root-final-acceptance",
+      "remaining_scope": [
+        "pw-reader--rotate",
+        "Root native-reverse-rotation-mapping artifacts",
+        "Root physical sleep/wake/retained-frame artifacts",
+        "The original reference case is outside this assignment and may be joined from its separate review."
+      ],
+      "whole_group_closed": false,
+      "required_original_crop": null
+    },
+    {
+      "historical_id": "P3R1-G09",
+      "current_case_id": "pw5--c4-reader--reverse-wake",
+      "run_id": "0c9ecf3777c9",
+      "source_sha256": "dc0cd6227768a5125ecf702982ce639789bc8bca390de82bab83329927ea6353",
+      "binary_sha256": "7c2f685ecafc7207446f0e75877b74d14cbc6e41a43f5accee8ae992256e3183",
+      "case_json_sha256": "ddbd547193aedb4d1f7bf0fff4885fb48f92c42e2e1779f25038e0bd291cffc4",
+      "png_sha256": "58aefbd825b13942c37ac8fe7ba6bd3cc24defe2c362186a51a0b904f824ea87",
+      "state_sha256": "44237a4f75f8762900a2a0cbef5e8f10df8da8660953d43b657fdb49872067a8",
+      "actions_sha256": "9aef5fd56799cf9057f518b91e3f037b846e1d4dd3cb0fd129e21857caef3f1f",
+      "reference_original_sha256": "70fa45f447c4f52e2e737f7634a1838d73071e32cf22c40e6e8235e07582cee4",
+      "primary_reference_id": "pw-reader--fullscreen",
+      "original_png_path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate4/ui-round-1/pw5--c4-reader--reverse-wake.png",
+      "state_path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate4/ui-round-1/pw5--c4-reader--reverse-wake.state.json",
+      "actions_path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate4/ui-round-1/actions/pw5--c4-reader--reverse-wake.json",
+      "case_json_path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate4/ui-round-1/cases/pw5--c4-reader--reverse-wake.json",
+      "log": {
+        "local_path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate4/ui-round-1/pw5--c4-reader--reverse-wake.log",
+        "remote_path": "/tmp/aidoku-phase3-c4-ui-round-1/pw5--c4-reader--reverse-wake.log",
+        "sha256": "73d997f4564235750da901054aadc4c5e85dca830c52baf7732242e2091d908c",
+        "bytes": 68,
+        "identity_source": "owner-frozen final inventory; no local rehash",
+        "static_text_read": true,
+        "observed_rejection": "No page-not-ready or other rejection appears in this exact frozen log."
+      },
+      "metadata": {
+        "local_path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate4/ui-round-1/pw5--c4-reader--reverse-wake.metadata.json",
+        "remote_path": "/tmp/aidoku-phase3-c4-ui-round-1/pw5--c4-reader--reverse-wake.metadata.json",
+        "sha256": "4b9f04bbb2d5f749823d18ec6442cc9e8aaf681c26a6d6326377e4e19108718f",
+        "bytes": 672,
+        "identity_source": "owner-frozen final inventory; no local rehash"
+      },
+      "first_pass_report": "D:/Code/aidokuForKindle/docs/review/phase3-c4-round-1-batches/r1-supp-05-07.review.json",
+      "original_candidate_actually_viewed": true,
+      "candidate_reopened_in_this_second_pass": true,
+      "original_references": [
+        {
+          "reference_id": "pw-reader--default",
+          "path": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/screens/pw-reader.png",
+          "sha256": "b67b1618519e877e60ab4ac4ad20306fb33bd48f0af6a8b129926900ae98e16d",
+          "original_actually_viewed": true,
+          "new_view_this_second_pass": false,
+          "prior_viewing_report": "D:/Code/aidokuForKindle/docs/review/phase3-c4-round-1-batches/r1-reference-05.review.json"
+        },
+        {
+          "reference_id": "pw-reader--fullscreen",
+          "path": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/screens/states/pw-reader--fullscreen.png",
+          "sha256": "70fa45f447c4f52e2e737f7634a1838d73071e32cf22c40e6e8235e07582cee4",
+          "original_actually_viewed": true,
+          "new_view_this_second_pass": false,
+          "prior_viewing_report": "D:/Code/aidokuForKindle/docs/review/phase3-c4-round-1-batches/r1-reference-05.review.json"
+        }
+      ],
+      "fresh_observation": "The wake-named original remains the centered artwork-only landscape scene without a visible wake notice, page label, bookmark ribbon or residual menu. The source allocation matches the canonical reverse scene.",
+      "static_appearance_observation": "The wake-named original remains the centered artwork-only landscape scene without a visible wake notice, page label, bookmark ribbon or residual menu. The source allocation matches the canonical reverse scene.",
+      "captured_software_support": {
+        "summary": "Application lifecycle suspend, resume and frame-displayed are recorded; final suspended=false, page13/40, rotation270 and settled image. Backend metadata pause_count/resume_count remain0, so physical backend sleep/wake is not demonstrated.",
+        "actions": [
+          {
+            "at_ms": 3500,
+            "section": "lifecycle",
+            "action": "suspend",
+            "value": ""
+          },
+          {
+            "at_ms": 4000,
+            "section": "lifecycle",
+            "action": "resume",
+            "value": ""
+          },
+          {
+            "at_ms": 4100,
+            "section": "lifecycle",
+            "action": "frame-displayed",
+            "value": ""
+          }
+        ],
+        "metadata": {
+          "route": "reader",
+          "profile": "pw5",
+          "backend": "desktop",
+          "design_logical_size": [
+            824,
+            618
+          ],
+          "logical_size": [
+            824,
+            618
+          ],
+          "window_size": [
+            824,
+            618
+          ],
+          "snapshot_size": [
+            824,
+            618
+          ],
+          "scale_factor": 1,
+          "landscape": true,
+          "rotation_degrees": 270,
+          "refresh_count": 4,
+          "last_refresh": "ui",
+          "process_id": 704509,
+          "font_initializations": 1,
+          "lifecycle": {
+            "requested": false,
+            "render_paused": false,
+            "input_released": false,
+            "parked": false,
+            "activity_paused": false,
+            "pause_count": 0,
+            "resume_count": 0,
+            "frame_write_count": 0,
+            "resume_full_frame_count": 0
+          }
+        }
+      },
+      "owner_recorded_oracle_not_reexecuted": {
+        "sampler_contract": "slint-software-1.17.1-shared-rgb8-fixed8-v1",
+        "metrics": {
+          "exact_match": true,
+          "changed_pixels": 0,
+          "maximum_channel_difference": 0,
+          "rgb_mae_diagnostic_only": 0,
+          "difference_bbox": null,
+          "regions_diagnostic_only": {
+            "top_96": {
+              "rectangle": [
+                0,
+                0,
+                824,
+                96
+              ],
+              "changed_pixels": 0
+            },
+            "bottom_96": {
+              "rectangle": [
+                0,
+                522,
+                824,
+                618
+              ],
+              "changed_pixels": 0
+            },
+            "left_32": {
+              "rectangle": [
+                0,
+                0,
+                32,
+                618
+              ],
+              "changed_pixels": 0
+            },
+            "right_32": {
+              "rectangle": [
+                792,
+                0,
+                824,
+                618
+              ],
+              "changed_pixels": 0
+            },
+            "center_seam_8": {
+              "rectangle": [
+                408,
+                0,
+                416,
+                618
+              ],
+              "changed_pixels": 0
+            }
+          },
+          "pixel_error_tolerance": 0,
+          "ignored_pixels": 0
+        },
+        "processed_inputs": [
+          {
+            "field": "first_path",
+            "application_path": "/tmp/aidoku-phase3-c4-ui-round-1/data/0c9ecf3777c9/pw5--c4-reader--reverse-controls/demo/cache/shared-v1/processed/79/797305ddfddb44fb4a224854d5ec1f343a5b017f9b031a26f61e465378127d2d.png",
+            "retained_path": "/tmp/aidoku-phase3-c4-ui-round-1/processed/pw5--c4-reader--reverse-wake/first_path.png",
+            "sha256": "5d212387ab7dd19fe5fe93997c0321b34f7d132e54b2439bdd019ebf6dd38ae7",
+            "geometry": {
+              "source_size": [
+                879,
+                1236
+              ],
+              "slot": [
+                0,
+                0,
+                824,
+                618
+              ],
+              "destination": [
+                192,
+                0,
+                632,
+                618
+              ],
+              "dx8": 511,
+              "dy8": 512,
+              "sample_origin": [
+                0,
+                0
+              ],
+              "sample_center_offset": 0
+            }
+          }
+        ]
+      },
+      "disposition": "resolved-in-fresh-evidence",
+      "disposition_scope": "Recorded application lifecycle recovery projection in the canonical desktop reader",
+      "capability_or_user_override_basis": "Application action names and a retained canonical PNG cannot substitute for physical sleep/wake, native framebuffer retention or evdev artifacts owned by Root.",
+      "current_suggestion_ids": [],
+      "root_acceptance_status": "pending-root-final-acceptance",
+      "remaining_scope": [
+        "pw-reader--rotate",
+        "Root native-reverse-rotation-mapping artifacts",
+        "Root physical sleep/wake/retained-frame artifacts",
+        "The original reference case is outside this assignment and may be joined from its separate review."
+      ],
+      "whole_group_closed": false,
+      "required_original_crop": null
+    },
+    {
+      "historical_id": "P3R1-G30",
+      "current_case_id": "pw5--c4-reader--l-shaped-forward",
+      "run_id": "0c9ecf3777c9",
+      "source_sha256": "dc0cd6227768a5125ecf702982ce639789bc8bca390de82bab83329927ea6353",
+      "binary_sha256": "7c2f685ecafc7207446f0e75877b74d14cbc6e41a43f5accee8ae992256e3183",
+      "case_json_sha256": "5c9dab2ea5a43208e5e765e2ea7fa3a64863a6290bdae58f2c11a57ddac0f7b1",
+      "png_sha256": "6b4703a4d4b2bdccf43e91f43cfba716e3cfca4ddb2cc0abd1b6a7f041c02852",
+      "state_sha256": "3833bb5cf1db049063430e330d8773332468060997f1ebcb6c8fdbddd28012e6",
+      "actions_sha256": "5384c8fd57001065bfb3e16ce505350e7d324ecbcfc09bb1486a764a87005cc1",
+      "reference_original_sha256": "70fa45f447c4f52e2e737f7634a1838d73071e32cf22c40e6e8235e07582cee4",
+      "primary_reference_id": "pw-reader--fullscreen",
+      "original_png_path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate4/ui-round-1/pw5--c4-reader--l-shaped-forward.png",
+      "state_path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate4/ui-round-1/pw5--c4-reader--l-shaped-forward.state.json",
+      "actions_path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate4/ui-round-1/actions/pw5--c4-reader--l-shaped-forward.json",
+      "case_json_path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate4/ui-round-1/cases/pw5--c4-reader--l-shaped-forward.json",
+      "log": {
+        "local_path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate4/ui-round-1/pw5--c4-reader--l-shaped-forward.log",
+        "remote_path": "/tmp/aidoku-phase3-c4-ui-round-1/pw5--c4-reader--l-shaped-forward.log",
+        "sha256": "dc121ceea011a63c29b404d6c6b75bbe2db32b326923b8fa99759f457bfd709f",
+        "bytes": 68,
+        "identity_source": "owner-frozen final inventory; no local rehash",
+        "static_text_read": true,
+        "observed_rejection": "No page-not-ready or other rejection appears in this exact frozen log."
+      },
+      "metadata": {
+        "local_path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate4/ui-round-1/pw5--c4-reader--l-shaped-forward.metadata.json",
+        "remote_path": "/tmp/aidoku-phase3-c4-ui-round-1/pw5--c4-reader--l-shaped-forward.metadata.json",
+        "sha256": "a91db36191b40696e796a5b130a8aa836455ac2a66130fe8719acb9f34ad2581",
+        "bytes": 676,
+        "identity_source": "owner-frozen final inventory; no local rehash"
+      },
+      "first_pass_report": "D:/Code/aidokuForKindle/docs/review/phase3-c4-round-1-batches/r1-supp-05-06.review.json",
+      "original_candidate_actually_viewed": true,
+      "candidate_reopened_in_this_second_pass": true,
+      "original_references": [
+        {
+          "reference_id": "pw-reader--default",
+          "path": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/screens/pw-reader.png",
+          "sha256": "b67b1618519e877e60ab4ac4ad20306fb33bd48f0af6a8b129926900ae98e16d",
+          "original_actually_viewed": true,
+          "new_view_this_second_pass": false,
+          "prior_viewing_report": "D:/Code/aidokuForKindle/docs/review/phase3-c4-round-1-batches/r1-reference-05.review.json"
+        },
+        {
+          "reference_id": "pw-reader--fullscreen",
+          "path": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/screens/states/pw-reader--fullscreen.png",
+          "sha256": "70fa45f447c4f52e2e737f7634a1838d73071e32cf22c40e6e8235e07582cee4",
+          "original_actually_viewed": true,
+          "new_view_this_second_pass": false,
+          "prior_viewing_report": "D:/Code/aidokuForKindle/docs/review/phase3-c4-round-1-batches/r1-reference-05.review.json"
+        }
+      ],
+      "fresh_observation": "The reopened original shows only burst/dotted/striped source artwork. There is no tap-guide preview, direction badge, footer, bookmark ribbon or page/status overlay.",
+      "static_appearance_observation": "The reopened original shows only burst/dotted/striped source artwork. There is no tap-guide preview, direction badge, footer, bookmark ribbon or page/status overlay.",
+      "captured_software_support": {
+        "summary": "The existing actual settings/actions select single layout, l-shaped and reverse_taps=false, then replay lower-right pointer556.2,741.6. Final committed/displayed page13/40 and the existing zero-difference source oracle support the software result.",
+        "actions": [
+          {
+            "at_ms": 3500,
+            "section": "settings",
+            "action": "set",
+            "value": "page-layout-mode=single"
+          },
+          {
+            "at_ms": 5000,
+            "section": "settings",
+            "action": "set",
+            "value": "tap-layout=l-shaped"
+          },
+          {
+            "at_ms": 5100,
+            "section": "settings",
+            "action": "set",
+            "value": "reverse-taps=false"
+          },
+          {
+            "at_ms": 5200,
+            "section": "pointer",
+            "action": "move",
+            "value": "556.2,741.6"
+          },
+          {
+            "at_ms": 5250,
+            "section": "pointer",
+            "action": "press",
+            "value": "556.2,741.6"
+          },
+          {
+            "at_ms": 5350,
+            "section": "pointer",
+            "action": "release",
+            "value": "556.2,741.6"
+          }
+        ],
+        "metadata": {
+          "route": "reader",
+          "profile": "pw5",
+          "backend": "desktop",
+          "design_logical_size": [
+            618,
+            824
+          ],
+          "logical_size": [
+            618,
+            824
+          ],
+          "window_size": [
+            618,
+            824
+          ],
+          "snapshot_size": [
+            618,
+            824
+          ],
+          "scale_factor": 1,
+          "landscape": false,
+          "rotation_degrees": 0,
+          "refresh_count": 6,
+          "last_refresh": "partial",
+          "process_id": 704057,
+          "font_initializations": 1,
+          "lifecycle": {
+            "requested": false,
+            "render_paused": false,
+            "input_released": false,
+            "parked": false,
+            "activity_paused": false,
+            "pause_count": 0,
+            "resume_count": 0,
+            "frame_write_count": 0,
+            "resume_full_frame_count": 0
+          }
+        }
+      },
+      "owner_recorded_oracle_not_reexecuted": {
+        "sampler_contract": "slint-software-1.17.1-shared-rgb8-fixed8-v1",
+        "metrics": {
+          "exact_match": true,
+          "changed_pixels": 0,
+          "maximum_channel_difference": 0,
+          "rgb_mae_diagnostic_only": 0,
+          "difference_bbox": null,
+          "regions_diagnostic_only": {
+            "top_96": {
+              "rectangle": [
+                0,
+                0,
+                618,
+                96
+              ],
+              "changed_pixels": 0
+            },
+            "bottom_96": {
+              "rectangle": [
+                0,
+                728,
+                618,
+                824
+              ],
+              "changed_pixels": 0
+            },
+            "left_32": {
+              "rectangle": [
+                0,
+                0,
+                32,
+                824
+              ],
+              "changed_pixels": 0
+            },
+            "right_32": {
+              "rectangle": [
+                586,
+                0,
+                618,
+                824
+              ],
+              "changed_pixels": 0
+            },
+            "center_seam_8": {
+              "rectangle": [
+                305,
+                0,
+                313,
+                824
+              ],
+              "changed_pixels": 0
+            }
+          },
+          "pixel_error_tolerance": 0,
+          "ignored_pixels": 0
+        },
+        "processed_inputs": [
+          {
+            "field": "first_path",
+            "application_path": "/tmp/aidoku-phase3-c4-ui-round-1/data/0c9ecf3777c9/pw5--c4-reader--l-shaped-forward/demo/cache/shared-v1/processed/54/540b6334f50843345cb20dacd44575c6fbb8ce4fcf2b38bd44ee262837eb46ee.png",
+            "retained_path": "/tmp/aidoku-phase3-c4-ui-round-1/processed/pw5--c4-reader--l-shaped-forward/first_path.png",
+            "sha256": "654be65cfdb578894e26fbbe2d6a3587af890f58c137b553badc342ecb65c1d9",
+            "geometry": {
+              "source_size": [
+                1172,
+                1648
+              ],
+              "slot": [
+                0,
+                0,
+                618,
+                824
+              ],
+              "destination": [
+                16,
+                0,
+                602,
+                824
+              ],
+              "dx8": 512,
+              "dy8": 512,
+              "sample_origin": [
+                0,
+                0
+              ],
+              "sample_center_offset": 0
+            }
+          }
+        ]
+      },
+      "disposition": "partial-software-support",
+      "disposition_scope": "Implemented L-shaped forward software input only",
+      "capability_or_user_override_basis": "Existing pointer/state/source-oracle evidence is valid software functionality support. It does not show the settings-card availability explanation or dispose of independent preview-drawing G13.",
+      "current_suggestion_ids": [],
+      "root_acceptance_status": "pending-root-final-acceptance",
+      "remaining_scope": [
+        "sc-settings--tap-zones",
+        "pw5--settings-tap-regions",
+        "Original PW/Scribe settings-card availability explanation and presentation",
+        "Independent current preview-drawing scope P3R1-G13 remains separate and unresolved by these frames",
+        "Native physical input qualification"
+      ],
+      "whole_group_closed": false,
+      "required_original_crop": null
+    },
+    {
+      "historical_id": "P3R1-G30",
+      "current_case_id": "pw5--c4-reader--l-shaped-reverse",
+      "run_id": "0c9ecf3777c9",
+      "source_sha256": "dc0cd6227768a5125ecf702982ce639789bc8bca390de82bab83329927ea6353",
+      "binary_sha256": "7c2f685ecafc7207446f0e75877b74d14cbc6e41a43f5accee8ae992256e3183",
+      "case_json_sha256": "2bedabbb1f2eff96348ef6ca21dbf77541f3c5d8db54c5f0610450dd86b16bdc",
+      "png_sha256": "6b4703a4d4b2bdccf43e91f43cfba716e3cfca4ddb2cc0abd1b6a7f041c02852",
+      "state_sha256": "6396f153fa310b3a3211d9c6817ab1b64f414c031e25078be4cb7820bd5d52b4",
+      "actions_sha256": "434f75ac52c5d4d479245d11138af8a5737b833149bd4566dbb890468ef5811e",
+      "reference_original_sha256": "70fa45f447c4f52e2e737f7634a1838d73071e32cf22c40e6e8235e07582cee4",
+      "primary_reference_id": "pw-reader--fullscreen",
+      "original_png_path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate4/ui-round-1/pw5--c4-reader--l-shaped-reverse.png",
+      "state_path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate4/ui-round-1/pw5--c4-reader--l-shaped-reverse.state.json",
+      "actions_path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate4/ui-round-1/actions/pw5--c4-reader--l-shaped-reverse.json",
+      "case_json_path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate4/ui-round-1/cases/pw5--c4-reader--l-shaped-reverse.json",
+      "log": {
+        "local_path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate4/ui-round-1/pw5--c4-reader--l-shaped-reverse.log",
+        "remote_path": "/tmp/aidoku-phase3-c4-ui-round-1/pw5--c4-reader--l-shaped-reverse.log",
+        "sha256": "dc121ceea011a63c29b404d6c6b75bbe2db32b326923b8fa99759f457bfd709f",
+        "bytes": 68,
+        "identity_source": "owner-frozen final inventory; no local rehash",
+        "static_text_read": true,
+        "observed_rejection": "No page-not-ready or other rejection appears in this exact frozen log."
+      },
+      "metadata": {
+        "local_path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate4/ui-round-1/pw5--c4-reader--l-shaped-reverse.metadata.json",
+        "remote_path": "/tmp/aidoku-phase3-c4-ui-round-1/pw5--c4-reader--l-shaped-reverse.metadata.json",
+        "sha256": "deec5ae23aceb3048cec295dc9e6454d406693a3ffd4dbdcad6912350bbf2a27",
+        "bytes": 676,
+        "identity_source": "owner-frozen final inventory; no local rehash"
+      },
+      "first_pass_report": "D:/Code/aidokuForKindle/docs/review/phase3-c4-round-1-batches/r1-supp-05-06.review.json",
+      "original_candidate_actually_viewed": true,
+      "candidate_reopened_in_this_second_pass": true,
+      "original_references": [
+        {
+          "reference_id": "pw-reader--default",
+          "path": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/screens/pw-reader.png",
+          "sha256": "b67b1618519e877e60ab4ac4ad20306fb33bd48f0af6a8b129926900ae98e16d",
+          "original_actually_viewed": true,
+          "new_view_this_second_pass": false,
+          "prior_viewing_report": "D:/Code/aidokuForKindle/docs/review/phase3-c4-round-1-batches/r1-reference-05.review.json"
+        },
+        {
+          "reference_id": "pw-reader--fullscreen",
+          "path": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/screens/states/pw-reader--fullscreen.png",
+          "sha256": "70fa45f447c4f52e2e737f7634a1838d73071e32cf22c40e6e8235e07582cee4",
+          "original_actually_viewed": true,
+          "new_view_this_second_pass": false,
+          "prior_viewing_report": "D:/Code/aidokuForKindle/docs/review/phase3-c4-round-1-batches/r1-reference-05.review.json"
+        }
+      ],
+      "fresh_observation": "The separate reversed L-shaped original is also artwork only, with no UI guide, status text or control band. Identical demo patterns are not used to infer page identity.",
+      "static_appearance_observation": "The separate reversed L-shaped original is also artwork only, with no UI guide, status text or control band. Identical demo patterns are not used to infer page identity.",
+      "captured_software_support": {
+        "summary": "The same lower-right pointer replay with l-shaped and reverse_taps=true ends at committed/displayed page11/40. Its distinct retained source identity and existing zero-difference oracle associate the result.",
+        "actions": [
+          {
+            "at_ms": 3500,
+            "section": "settings",
+            "action": "set",
+            "value": "page-layout-mode=single"
+          },
+          {
+            "at_ms": 5000,
+            "section": "settings",
+            "action": "set",
+            "value": "tap-layout=l-shaped"
+          },
+          {
+            "at_ms": 5100,
+            "section": "settings",
+            "action": "set",
+            "value": "reverse-taps=true"
+          },
+          {
+            "at_ms": 5200,
+            "section": "pointer",
+            "action": "move",
+            "value": "556.2,741.6"
+          },
+          {
+            "at_ms": 5250,
+            "section": "pointer",
+            "action": "press",
+            "value": "556.2,741.6"
+          },
+          {
+            "at_ms": 5350,
+            "section": "pointer",
+            "action": "release",
+            "value": "556.2,741.6"
+          }
+        ],
+        "metadata": {
+          "route": "reader",
+          "profile": "pw5",
+          "backend": "desktop",
+          "design_logical_size": [
+            618,
+            824
+          ],
+          "logical_size": [
+            618,
+            824
+          ],
+          "window_size": [
+            618,
+            824
+          ],
+          "snapshot_size": [
+            618,
+            824
+          ],
+          "scale_factor": 1,
+          "landscape": false,
+          "rotation_degrees": 0,
+          "refresh_count": 6,
+          "last_refresh": "partial",
+          "process_id": 704110,
+          "font_initializations": 1,
+          "lifecycle": {
+            "requested": false,
+            "render_paused": false,
+            "input_released": false,
+            "parked": false,
+            "activity_paused": false,
+            "pause_count": 0,
+            "resume_count": 0,
+            "frame_write_count": 0,
+            "resume_full_frame_count": 0
+          }
+        }
+      },
+      "owner_recorded_oracle_not_reexecuted": {
+        "sampler_contract": "slint-software-1.17.1-shared-rgb8-fixed8-v1",
+        "metrics": {
+          "exact_match": true,
+          "changed_pixels": 0,
+          "maximum_channel_difference": 0,
+          "rgb_mae_diagnostic_only": 0,
+          "difference_bbox": null,
+          "regions_diagnostic_only": {
+            "top_96": {
+              "rectangle": [
+                0,
+                0,
+                618,
+                96
+              ],
+              "changed_pixels": 0
+            },
+            "bottom_96": {
+              "rectangle": [
+                0,
+                728,
+                618,
+                824
+              ],
+              "changed_pixels": 0
+            },
+            "left_32": {
+              "rectangle": [
+                0,
+                0,
+                32,
+                824
+              ],
+              "changed_pixels": 0
+            },
+            "right_32": {
+              "rectangle": [
+                586,
+                0,
+                618,
+                824
+              ],
+              "changed_pixels": 0
+            },
+            "center_seam_8": {
+              "rectangle": [
+                305,
+                0,
+                313,
+                824
+              ],
+              "changed_pixels": 0
+            }
+          },
+          "pixel_error_tolerance": 0,
+          "ignored_pixels": 0
+        },
+        "processed_inputs": [
+          {
+            "field": "first_path",
+            "application_path": "/tmp/aidoku-phase3-c4-ui-round-1/data/0c9ecf3777c9/pw5--c4-reader--l-shaped-reverse/demo/cache/shared-v1/processed/5f/5f9441865bdf2271a3cbbfeb70651ea3159194c704474c644149e6e31eb240ea.png",
+            "retained_path": "/tmp/aidoku-phase3-c4-ui-round-1/processed/pw5--c4-reader--l-shaped-reverse/first_path.png",
+            "sha256": "21d0a61aa957b8fce2951fe40940266937b81c04a43778241dae28162cea2295",
+            "geometry": {
+              "source_size": [
+                1172,
+                1648
+              ],
+              "slot": [
+                0,
+                0,
+                618,
+                824
+              ],
+              "destination": [
+                16,
+                0,
+                602,
+                824
+              ],
+              "dx8": 512,
+              "dy8": 512,
+              "sample_origin": [
+                0,
+                0
+              ],
+              "sample_center_offset": 0
+            }
+          }
+        ]
+      },
+      "disposition": "partial-software-support",
+      "disposition_scope": "Implemented independent reversal of L-shaped software input only",
+      "capability_or_user_override_basis": "The current action/state/oracle supports software capability. Settings-card presentation and the independent G13 preview drawing remain separate assigned scopes.",
+      "current_suggestion_ids": [],
+      "root_acceptance_status": "pending-root-final-acceptance",
+      "remaining_scope": [
+        "sc-settings--tap-zones",
+        "pw5--settings-tap-regions",
+        "Original PW/Scribe settings-card availability explanation and presentation",
+        "Independent current preview-drawing scope P3R1-G13 remains separate and unresolved by these frames",
+        "Native physical input qualification"
+      ],
+      "whole_group_closed": false,
+      "required_original_crop": null
+    },
+    {
+      "historical_id": "P3R1-G30",
+      "current_case_id": "pw5--c4-reader--swipe-only-tap",
+      "run_id": "0c9ecf3777c9",
+      "source_sha256": "dc0cd6227768a5125ecf702982ce639789bc8bca390de82bab83329927ea6353",
+      "binary_sha256": "7c2f685ecafc7207446f0e75877b74d14cbc6e41a43f5accee8ae992256e3183",
+      "case_json_sha256": "d8525914cc6bef8cd488ed206ac64da1c9377d38716497474973cf762c657f9b",
+      "png_sha256": "99e72fc0524cab6742a606d8fd257bc1fd762c534457451aacba487d8ee9c394",
+      "state_sha256": "5d6787aceba5b98cb0b2d192b2d7aba619f7b59996279ca8eb51350a57b51eac",
+      "actions_sha256": "1e3dbfbe222d382e8881c5ff3e7c4a2a955274f22d22062a936f1221ad354fdc",
+      "reference_original_sha256": "70fa45f447c4f52e2e737f7634a1838d73071e32cf22c40e6e8235e07582cee4",
+      "primary_reference_id": "pw-reader--fullscreen",
+      "original_png_path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate4/ui-round-1/pw5--c4-reader--swipe-only-tap.png",
+      "state_path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate4/ui-round-1/pw5--c4-reader--swipe-only-tap.state.json",
+      "actions_path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate4/ui-round-1/actions/pw5--c4-reader--swipe-only-tap.json",
+      "case_json_path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate4/ui-round-1/cases/pw5--c4-reader--swipe-only-tap.json",
+      "log": {
+        "local_path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate4/ui-round-1/pw5--c4-reader--swipe-only-tap.log",
+        "remote_path": "/tmp/aidoku-phase3-c4-ui-round-1/pw5--c4-reader--swipe-only-tap.log",
+        "sha256": "dc121ceea011a63c29b404d6c6b75bbe2db32b326923b8fa99759f457bfd709f",
+        "bytes": 68,
+        "identity_source": "owner-frozen final inventory; no local rehash",
+        "static_text_read": true,
+        "observed_rejection": "No page-not-ready or other rejection appears in this exact frozen log."
+      },
+      "metadata": {
+        "local_path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate4/ui-round-1/pw5--c4-reader--swipe-only-tap.metadata.json",
+        "remote_path": "/tmp/aidoku-phase3-c4-ui-round-1/pw5--c4-reader--swipe-only-tap.metadata.json",
+        "sha256": "965cb7bb630c2574ad852d0ede6485627b5698e364f37a0f6679be5b30bcab79",
+        "bytes": 671,
+        "identity_source": "owner-frozen final inventory; no local rehash"
+      },
+      "first_pass_report": "D:/Code/aidokuForKindle/docs/review/phase3-c4-round-1-batches/r1-supp-05-06.review.json",
+      "original_candidate_actually_viewed": true,
+      "candidate_reopened_in_this_second_pass": true,
+      "original_references": [
+        {
+          "reference_id": "pw-reader--default",
+          "path": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/screens/pw-reader.png",
+          "sha256": "b67b1618519e877e60ab4ac4ad20306fb33bd48f0af6a8b129926900ae98e16d",
+          "original_actually_viewed": true,
+          "new_view_this_second_pass": false,
+          "prior_viewing_report": "D:/Code/aidokuForKindle/docs/review/phase3-c4-round-1-batches/r1-reference-05.review.json"
+        },
+        {
+          "reference_id": "pw-reader--fullscreen",
+          "path": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/screens/states/pw-reader--fullscreen.png",
+          "sha256": "70fa45f447c4f52e2e737f7634a1838d73071e32cf22c40e6e8235e07582cee4",
+          "original_actually_viewed": true,
+          "new_view_this_second_pass": false,
+          "prior_viewing_report": "D:/Code/aidokuForKindle/docs/review/phase3-c4-round-1-batches/r1-reference-05.review.json"
+        }
+      ],
+      "fresh_observation": "The tap result remains the skyline/dotted/burst pure source scene, without opening visible menu chrome or adding tap-zone instructions.",
+      "static_appearance_observation": "The tap result remains the skyline/dotted/burst pure source scene, without opening visible menu chrome or adding tap-zone instructions.",
+      "captured_software_support": {
+        "summary": "With single layout, swipe-only and reverse_taps=false, the actual recorded left-side tap61.8,412 leaves page12/40 and menu=false. The committed source and existing exact whole-viewport oracle support the unchanged software page.",
+        "actions": [
+          {
+            "at_ms": 3500,
+            "section": "settings",
+            "action": "set",
+            "value": "page-layout-mode=single"
+          },
+          {
+            "at_ms": 5000,
+            "section": "settings",
+            "action": "set",
+            "value": "tap-layout=swipe-only"
+          },
+          {
+            "at_ms": 5100,
+            "section": "settings",
+            "action": "set",
+            "value": "reverse-taps=false"
+          },
+          {
+            "at_ms": 5200,
+            "section": "pointer",
+            "action": "move",
+            "value": "61.8,412"
+          },
+          {
+            "at_ms": 5250,
+            "section": "pointer",
+            "action": "press",
+            "value": "61.8,412"
+          },
+          {
+            "at_ms": 5350,
+            "section": "pointer",
+            "action": "release",
+            "value": "61.8,412"
+          }
+        ],
+        "metadata": {
+          "route": "reader",
+          "profile": "pw5",
+          "backend": "desktop",
+          "design_logical_size": [
+            618,
+            824
+          ],
+          "logical_size": [
+            618,
+            824
+          ],
+          "window_size": [
+            618,
+            824
+          ],
+          "snapshot_size": [
+            618,
+            824
+          ],
+          "scale_factor": 1,
+          "landscape": false,
+          "rotation_degrees": 0,
+          "refresh_count": 4,
+          "last_refresh": "ui",
+          "process_id": 704167,
+          "font_initializations": 1,
+          "lifecycle": {
+            "requested": false,
+            "render_paused": false,
+            "input_released": false,
+            "parked": false,
+            "activity_paused": false,
+            "pause_count": 0,
+            "resume_count": 0,
+            "frame_write_count": 0,
+            "resume_full_frame_count": 0
+          }
+        }
+      },
+      "owner_recorded_oracle_not_reexecuted": {
+        "sampler_contract": "slint-software-1.17.1-shared-rgb8-fixed8-v1",
+        "metrics": {
+          "exact_match": true,
+          "changed_pixels": 0,
+          "maximum_channel_difference": 0,
+          "rgb_mae_diagnostic_only": 0,
+          "difference_bbox": null,
+          "regions_diagnostic_only": {
+            "top_96": {
+              "rectangle": [
+                0,
+                0,
+                618,
+                96
+              ],
+              "changed_pixels": 0
+            },
+            "bottom_96": {
+              "rectangle": [
+                0,
+                728,
+                618,
+                824
+              ],
+              "changed_pixels": 0
+            },
+            "left_32": {
+              "rectangle": [
+                0,
+                0,
+                32,
+                824
+              ],
+              "changed_pixels": 0
+            },
+            "right_32": {
+              "rectangle": [
+                586,
+                0,
+                618,
+                824
+              ],
+              "changed_pixels": 0
+            },
+            "center_seam_8": {
+              "rectangle": [
+                305,
+                0,
+                313,
+                824
+              ],
+              "changed_pixels": 0
+            }
+          },
+          "pixel_error_tolerance": 0,
+          "ignored_pixels": 0
+        },
+        "processed_inputs": [
+          {
+            "field": "first_path",
+            "application_path": "/tmp/aidoku-phase3-c4-ui-round-1/data/0c9ecf3777c9/pw5--c4-reader--swipe-only-tap/demo/cache/shared-v1/processed/38/3883dcca14818a813b27f8ddb751cfd0efdbe5f8bafb1b16761c6de4b21c893e.png",
+            "retained_path": "/tmp/aidoku-phase3-c4-ui-round-1/processed/pw5--c4-reader--swipe-only-tap/first_path.png",
+            "sha256": "6384b83d82f65c456be71655a250ad93b9dbb69b713f4c8dd94156aa33f780be",
+            "geometry": {
+              "source_size": [
+                1172,
+                1648
+              ],
+              "slot": [
+                0,
+                0,
+                618,
+                824
+              ],
+              "destination": [
+                16,
+                0,
+                602,
+                824
+              ],
+              "dx8": 512,
+              "dy8": 512,
+              "sample_origin": [
+                0,
+                0
+              ],
+              "sample_center_offset": 0
+            }
+          }
+        ]
+      },
+      "disposition": "partial-software-support",
+      "disposition_scope": "Implemented swipe-only software tap suppression only",
+      "capability_or_user_override_basis": "This existing pointer/state/source evidence supports software behavior. It does not prove a preview map, settings-card wording, all hidden regions or physical touch semantics.",
+      "current_suggestion_ids": [],
+      "root_acceptance_status": "pending-root-final-acceptance",
+      "remaining_scope": [
+        "sc-settings--tap-zones",
+        "pw5--settings-tap-regions",
+        "Original PW/Scribe settings-card availability explanation and presentation",
+        "Independent current preview-drawing scope P3R1-G13 remains separate and unresolved by these frames",
+        "Native physical input qualification"
+      ],
+      "whole_group_closed": false,
+      "required_original_crop": null
+    },
+    {
+      "historical_id": "P3R1-G30",
+      "current_case_id": "pw5--c4-reader--swipe-only-forward",
+      "run_id": "0c9ecf3777c9",
+      "source_sha256": "dc0cd6227768a5125ecf702982ce639789bc8bca390de82bab83329927ea6353",
+      "binary_sha256": "7c2f685ecafc7207446f0e75877b74d14cbc6e41a43f5accee8ae992256e3183",
+      "case_json_sha256": "59fad8fb2867223100d34b6b9f488d2dbd9c5eedd1b03e1bf36b1f276eb166a7",
+      "png_sha256": "6b4703a4d4b2bdccf43e91f43cfba716e3cfca4ddb2cc0abd1b6a7f041c02852",
+      "state_sha256": "cc25cc4884e5a71bd3607864d3e546c55a9ae6058a1412c97a4e9a1ceaab6a6c",
+      "actions_sha256": "7a9256a88b90f737fd49313e01d5e71c46290e28c42430fd501c3f62b07baaaa",
+      "reference_original_sha256": "70fa45f447c4f52e2e737f7634a1838d73071e32cf22c40e6e8235e07582cee4",
+      "primary_reference_id": "pw-reader--fullscreen",
+      "original_png_path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate4/ui-round-1/pw5--c4-reader--swipe-only-forward.png",
+      "state_path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate4/ui-round-1/pw5--c4-reader--swipe-only-forward.state.json",
+      "actions_path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate4/ui-round-1/actions/pw5--c4-reader--swipe-only-forward.json",
+      "case_json_path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate4/ui-round-1/cases/pw5--c4-reader--swipe-only-forward.json",
+      "log": {
+        "local_path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate4/ui-round-1/pw5--c4-reader--swipe-only-forward.log",
+        "remote_path": "/tmp/aidoku-phase3-c4-ui-round-1/pw5--c4-reader--swipe-only-forward.log",
+        "sha256": "dc121ceea011a63c29b404d6c6b75bbe2db32b326923b8fa99759f457bfd709f",
+        "bytes": 68,
+        "identity_source": "owner-frozen final inventory; no local rehash",
+        "static_text_read": true,
+        "observed_rejection": "No page-not-ready or other rejection appears in this exact frozen log."
+      },
+      "metadata": {
+        "local_path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate4/ui-round-1/pw5--c4-reader--swipe-only-forward.metadata.json",
+        "remote_path": "/tmp/aidoku-phase3-c4-ui-round-1/pw5--c4-reader--swipe-only-forward.metadata.json",
+        "sha256": "a274b9ebae0142096548daf3b604c7d5448e8ce97cd255b8a6ab54433b11ebca",
+        "bytes": 676,
+        "identity_source": "owner-frozen final inventory; no local rehash"
+      },
+      "first_pass_report": "D:/Code/aidokuForKindle/docs/review/phase3-c4-round-1-batches/r1-supp-05-06.review.json",
+      "original_candidate_actually_viewed": true,
+      "candidate_reopened_in_this_second_pass": true,
+      "original_references": [
+        {
+          "reference_id": "pw-reader--default",
+          "path": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/screens/pw-reader.png",
+          "sha256": "b67b1618519e877e60ab4ac4ad20306fb33bd48f0af6a8b129926900ae98e16d",
+          "original_actually_viewed": true,
+          "new_view_this_second_pass": false,
+          "prior_viewing_report": "D:/Code/aidokuForKindle/docs/review/phase3-c4-round-1-batches/r1-reference-05.review.json"
+        },
+        {
+          "reference_id": "pw-reader--fullscreen",
+          "path": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/screens/states/pw-reader--fullscreen.png",
+          "sha256": "70fa45f447c4f52e2e737f7634a1838d73071e32cf22c40e6e8235e07582cee4",
+          "original_actually_viewed": true,
+          "new_view_this_second_pass": false,
+          "prior_viewing_report": "D:/Code/aidokuForKindle/docs/review/phase3-c4-round-1-batches/r1-reference-05.review.json"
+        }
+      ],
+      "fresh_observation": "The reopened forward-swipe original contains only the burst/dotted/striped artwork. Its source panels are not crossed by a page/status line, footer or application frame.",
+      "static_appearance_observation": "The reopened forward-swipe original contains only the burst/dotted/striped artwork. Its source panels are not crossed by a page/status line, footer or application frame.",
+      "captured_software_support": {
+        "summary": "The recorded swipe-only path154.5→309→463.5 at y412, with press/release and reverse_taps=false, ends at committed/displayed page13/40. Existing source/oracle records associate that software result.",
+        "actions": [
+          {
+            "at_ms": 3500,
+            "section": "settings",
+            "action": "set",
+            "value": "page-layout-mode=single"
+          },
+          {
+            "at_ms": 5000,
+            "section": "settings",
+            "action": "set",
+            "value": "tap-layout=swipe-only"
+          },
+          {
+            "at_ms": 5100,
+            "section": "settings",
+            "action": "set",
+            "value": "reverse-taps=false"
+          },
+          {
+            "at_ms": 5200,
+            "section": "pointer",
+            "action": "move",
+            "value": "154.5,412"
+          },
+          {
+            "at_ms": 5250,
+            "section": "pointer",
+            "action": "press",
+            "value": "154.5,412"
+          },
+          {
+            "at_ms": 5350,
+            "section": "pointer",
+            "action": "move",
+            "value": "309,412"
+          },
+          {
+            "at_ms": 5450,
+            "section": "pointer",
+            "action": "move",
+            "value": "463.5,412"
+          },
+          {
+            "at_ms": 5550,
+            "section": "pointer",
+            "action": "release",
+            "value": "463.5,412"
+          }
+        ],
+        "metadata": {
+          "route": "reader",
+          "profile": "pw5",
+          "backend": "desktop",
+          "design_logical_size": [
+            618,
+            824
+          ],
+          "logical_size": [
+            618,
+            824
+          ],
+          "window_size": [
+            618,
+            824
+          ],
+          "snapshot_size": [
+            618,
+            824
+          ],
+          "scale_factor": 1,
+          "landscape": false,
+          "rotation_degrees": 0,
+          "refresh_count": 6,
+          "last_refresh": "partial",
+          "process_id": 704214,
+          "font_initializations": 1,
+          "lifecycle": {
+            "requested": false,
+            "render_paused": false,
+            "input_released": false,
+            "parked": false,
+            "activity_paused": false,
+            "pause_count": 0,
+            "resume_count": 0,
+            "frame_write_count": 0,
+            "resume_full_frame_count": 0
+          }
+        }
+      },
+      "owner_recorded_oracle_not_reexecuted": {
+        "sampler_contract": "slint-software-1.17.1-shared-rgb8-fixed8-v1",
+        "metrics": {
+          "exact_match": true,
+          "changed_pixels": 0,
+          "maximum_channel_difference": 0,
+          "rgb_mae_diagnostic_only": 0,
+          "difference_bbox": null,
+          "regions_diagnostic_only": {
+            "top_96": {
+              "rectangle": [
+                0,
+                0,
+                618,
+                96
+              ],
+              "changed_pixels": 0
+            },
+            "bottom_96": {
+              "rectangle": [
+                0,
+                728,
+                618,
+                824
+              ],
+              "changed_pixels": 0
+            },
+            "left_32": {
+              "rectangle": [
+                0,
+                0,
+                32,
+                824
+              ],
+              "changed_pixels": 0
+            },
+            "right_32": {
+              "rectangle": [
+                586,
+                0,
+                618,
+                824
+              ],
+              "changed_pixels": 0
+            },
+            "center_seam_8": {
+              "rectangle": [
+                305,
+                0,
+                313,
+                824
+              ],
+              "changed_pixels": 0
+            }
+          },
+          "pixel_error_tolerance": 0,
+          "ignored_pixels": 0
+        },
+        "processed_inputs": [
+          {
+            "field": "first_path",
+            "application_path": "/tmp/aidoku-phase3-c4-ui-round-1/data/0c9ecf3777c9/pw5--c4-reader--swipe-only-forward/demo/cache/shared-v1/processed/d8/d814866fb7e1437a8ebf3e6dafa8ccca4c04628f06cb09c0fd37068034e176d0.png",
+            "retained_path": "/tmp/aidoku-phase3-c4-ui-round-1/processed/pw5--c4-reader--swipe-only-forward/first_path.png",
+            "sha256": "2f0b09e06bc9f852b5fbdd3e8acb1c5d083dc100c166f22300a34af17b8e72f2",
+            "geometry": {
+              "source_size": [
+                1172,
+                1648
+              ],
+              "slot": [
+                0,
+                0,
+                618,
+                824
+              ],
+              "destination": [
+                16,
+                0,
+                602,
+                824
+              ],
+              "dx8": 512,
+              "dy8": 512,
+              "sample_origin": [
+                0,
+                0
+              ],
+              "sample_center_offset": 0
+            }
+          }
+        ]
+      },
+      "disposition": "partial-software-support",
+      "disposition_scope": "Implemented swipe-only forward software input only",
+      "capability_or_user_override_basis": "Existing actual pointer/state/oracle evidence supports software function; it is independent of G13 preview rendering and does not qualify native physical input.",
+      "current_suggestion_ids": [],
+      "root_acceptance_status": "pending-root-final-acceptance",
+      "remaining_scope": [
+        "sc-settings--tap-zones",
+        "pw5--settings-tap-regions",
+        "Original PW/Scribe settings-card availability explanation and presentation",
+        "Independent current preview-drawing scope P3R1-G13 remains separate and unresolved by these frames",
+        "Native physical input qualification"
+      ],
+      "whole_group_closed": false,
+      "required_original_crop": null
+    },
+    {
+      "historical_id": "P3R1-G30",
+      "current_case_id": "pw5--c4-reader--swipe-only-reverse",
+      "run_id": "0c9ecf3777c9",
+      "source_sha256": "dc0cd6227768a5125ecf702982ce639789bc8bca390de82bab83329927ea6353",
+      "binary_sha256": "7c2f685ecafc7207446f0e75877b74d14cbc6e41a43f5accee8ae992256e3183",
+      "case_json_sha256": "7b082e84ea19435ede919209aa832dcd63a5469ee4e9a3503a6b75dce29d2301",
+      "png_sha256": "6b4703a4d4b2bdccf43e91f43cfba716e3cfca4ddb2cc0abd1b6a7f041c02852",
+      "state_sha256": "25fb00962b2bb7cb1acdc999fe09e3c55e484374a3963f521485c071272a538b",
+      "actions_sha256": "893b2e15caac10cc71d177e7f03b04cc1389d0b4fe5c0a740b5c8c829bf25f4a",
+      "reference_original_sha256": "70fa45f447c4f52e2e737f7634a1838d73071e32cf22c40e6e8235e07582cee4",
+      "primary_reference_id": "pw-reader--fullscreen",
+      "original_png_path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate4/ui-round-1/pw5--c4-reader--swipe-only-reverse.png",
+      "state_path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate4/ui-round-1/pw5--c4-reader--swipe-only-reverse.state.json",
+      "actions_path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate4/ui-round-1/actions/pw5--c4-reader--swipe-only-reverse.json",
+      "case_json_path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate4/ui-round-1/cases/pw5--c4-reader--swipe-only-reverse.json",
+      "log": {
+        "local_path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate4/ui-round-1/pw5--c4-reader--swipe-only-reverse.log",
+        "remote_path": "/tmp/aidoku-phase3-c4-ui-round-1/pw5--c4-reader--swipe-only-reverse.log",
+        "sha256": "dc121ceea011a63c29b404d6c6b75bbe2db32b326923b8fa99759f457bfd709f",
+        "bytes": 68,
+        "identity_source": "owner-frozen final inventory; no local rehash",
+        "static_text_read": true,
+        "observed_rejection": "No page-not-ready or other rejection appears in this exact frozen log."
+      },
+      "metadata": {
+        "local_path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate4/ui-round-1/pw5--c4-reader--swipe-only-reverse.metadata.json",
+        "remote_path": "/tmp/aidoku-phase3-c4-ui-round-1/pw5--c4-reader--swipe-only-reverse.metadata.json",
+        "sha256": "4d0d5048123ad4fd0b065a2bffb1109a8d66a0114bf221a78b428bf34909e00f",
+        "bytes": 676,
+        "identity_source": "owner-frozen final inventory; no local rehash"
+      },
+      "first_pass_report": "D:/Code/aidokuForKindle/docs/review/phase3-c4-round-1-batches/r1-supp-05-06.review.json",
+      "original_candidate_actually_viewed": true,
+      "candidate_reopened_in_this_second_pass": true,
+      "original_references": [
+        {
+          "reference_id": "pw-reader--default",
+          "path": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/screens/pw-reader.png",
+          "sha256": "b67b1618519e877e60ab4ac4ad20306fb33bd48f0af6a8b129926900ae98e16d",
+          "original_actually_viewed": true,
+          "new_view_this_second_pass": false,
+          "prior_viewing_report": "D:/Code/aidokuForKindle/docs/review/phase3-c4-round-1-batches/r1-reference-05.review.json"
+        },
+        {
+          "reference_id": "pw-reader--fullscreen",
+          "path": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/screens/states/pw-reader--fullscreen.png",
+          "sha256": "70fa45f447c4f52e2e737f7634a1838d73071e32cf22c40e6e8235e07582cee4",
+          "original_actually_viewed": true,
+          "new_view_this_second_pass": false,
+          "prior_viewing_report": "D:/Code/aidokuForKindle/docs/review/phase3-c4-round-1-batches/r1-reference-05.review.json"
+        }
+      ],
+      "fresh_observation": "The separate reversed swipe result is pure source artwork without a reversed-direction badge or menu remnant. No UI typography or footer is drawn in the closed scene.",
+      "static_appearance_observation": "The separate reversed swipe result is pure source artwork without a reversed-direction badge or menu remnant. No UI typography or footer is drawn in the closed scene.",
+      "captured_software_support": {
+        "summary": "The same actual swipe-only path with reverse_taps=true ends at committed/displayed page11/40. The retained source identity and existing zero-difference oracle support that software association.",
+        "actions": [
+          {
+            "at_ms": 3500,
+            "section": "settings",
+            "action": "set",
+            "value": "page-layout-mode=single"
+          },
+          {
+            "at_ms": 5000,
+            "section": "settings",
+            "action": "set",
+            "value": "tap-layout=swipe-only"
+          },
+          {
+            "at_ms": 5100,
+            "section": "settings",
+            "action": "set",
+            "value": "reverse-taps=true"
+          },
+          {
+            "at_ms": 5200,
+            "section": "pointer",
+            "action": "move",
+            "value": "154.5,412"
+          },
+          {
+            "at_ms": 5250,
+            "section": "pointer",
+            "action": "press",
+            "value": "154.5,412"
+          },
+          {
+            "at_ms": 5350,
+            "section": "pointer",
+            "action": "move",
+            "value": "309,412"
+          },
+          {
+            "at_ms": 5450,
+            "section": "pointer",
+            "action": "move",
+            "value": "463.5,412"
+          },
+          {
+            "at_ms": 5550,
+            "section": "pointer",
+            "action": "release",
+            "value": "463.5,412"
+          }
+        ],
+        "metadata": {
+          "route": "reader",
+          "profile": "pw5",
+          "backend": "desktop",
+          "design_logical_size": [
+            618,
+            824
+          ],
+          "logical_size": [
+            618,
+            824
+          ],
+          "window_size": [
+            618,
+            824
+          ],
+          "snapshot_size": [
+            618,
+            824
+          ],
+          "scale_factor": 1,
+          "landscape": false,
+          "rotation_degrees": 0,
+          "refresh_count": 6,
+          "last_refresh": "partial",
+          "process_id": 704287,
+          "font_initializations": 1,
+          "lifecycle": {
+            "requested": false,
+            "render_paused": false,
+            "input_released": false,
+            "parked": false,
+            "activity_paused": false,
+            "pause_count": 0,
+            "resume_count": 0,
+            "frame_write_count": 0,
+            "resume_full_frame_count": 0
+          }
+        }
+      },
+      "owner_recorded_oracle_not_reexecuted": {
+        "sampler_contract": "slint-software-1.17.1-shared-rgb8-fixed8-v1",
+        "metrics": {
+          "exact_match": true,
+          "changed_pixels": 0,
+          "maximum_channel_difference": 0,
+          "rgb_mae_diagnostic_only": 0,
+          "difference_bbox": null,
+          "regions_diagnostic_only": {
+            "top_96": {
+              "rectangle": [
+                0,
+                0,
+                618,
+                96
+              ],
+              "changed_pixels": 0
+            },
+            "bottom_96": {
+              "rectangle": [
+                0,
+                728,
+                618,
+                824
+              ],
+              "changed_pixels": 0
+            },
+            "left_32": {
+              "rectangle": [
+                0,
+                0,
+                32,
+                824
+              ],
+              "changed_pixels": 0
+            },
+            "right_32": {
+              "rectangle": [
+                586,
+                0,
+                618,
+                824
+              ],
+              "changed_pixels": 0
+            },
+            "center_seam_8": {
+              "rectangle": [
+                305,
+                0,
+                313,
+                824
+              ],
+              "changed_pixels": 0
+            }
+          },
+          "pixel_error_tolerance": 0,
+          "ignored_pixels": 0
+        },
+        "processed_inputs": [
+          {
+            "field": "first_path",
+            "application_path": "/tmp/aidoku-phase3-c4-ui-round-1/data/0c9ecf3777c9/pw5--c4-reader--swipe-only-reverse/demo/cache/shared-v1/processed/3a/3a31f4762ac43e16e7ba3a82ab4188d990c619266b9fc1c08a878e6d755439a9.png",
+            "retained_path": "/tmp/aidoku-phase3-c4-ui-round-1/processed/pw5--c4-reader--swipe-only-reverse/first_path.png",
+            "sha256": "06c3795ce24f7c94fced827381779f5ca797ac200e5843056ee540b042bdc364",
+            "geometry": {
+              "source_size": [
+                1172,
+                1648
+              ],
+              "slot": [
+                0,
+                0,
+                618,
+                824
+              ],
+              "destination": [
+                16,
+                0,
+                602,
+                824
+              ],
+              "dx8": 512,
+              "dy8": 512,
+              "sample_origin": [
+                0,
+                0
+              ],
+              "sample_center_offset": 0
+            }
+          }
+        ]
+      },
+      "disposition": "partial-software-support",
+      "disposition_scope": "Implemented independent reversal of swipe-only software input only",
+      "capability_or_user_override_basis": "Software input evidence does not close settings-card availability presentation or preview drawing G13; native physical input remains external.",
+      "current_suggestion_ids": [],
+      "root_acceptance_status": "pending-root-final-acceptance",
+      "remaining_scope": [
+        "sc-settings--tap-zones",
+        "pw5--settings-tap-regions",
+        "Original PW/Scribe settings-card availability explanation and presentation",
+        "Independent current preview-drawing scope P3R1-G13 remains separate and unresolved by these frames",
+        "Native physical input qualification"
+      ],
+      "whole_group_closed": false,
+      "required_original_crop": null
+    },
+    {
+      "historical_id": "P3R1-G39",
+      "current_case_id": "pw5-portrait--toc-bookmarks",
+      "run_id": "0c9ecf3777c9",
+      "source_sha256": "dc0cd6227768a5125ecf702982ce639789bc8bca390de82bab83329927ea6353",
+      "binary_sha256": "7c2f685ecafc7207446f0e75877b74d14cbc6e41a43f5accee8ae992256e3183",
+      "case_json_sha256": "58f6be1097055714e7b1c37d4ffd6d717b44b331dd0b929d76224d71068e4fe5",
+      "png_sha256": "59b17b03a8618f34c4036eab75b25ba8a70d5157923bd86076c67f0c36fa775c",
+      "state_sha256": "d3b4103785b60f95fea3131b8b3733ca95fff2a666cb10443591fca40a25a729",
+      "actions_sha256": "aec1f6073f69603328a70956f878d5d913a4c358e02ae6b8eea12466ea3f5dcb",
+      "reference_original_sha256": "f66825556e844eff175f196cbd33179b0cd8d0e401129667d575f198f3d2e543",
+      "primary_reference_id": "pw-reader--toc",
+      "original_png_path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate4/ui-round-1/pw5-portrait--toc-bookmarks.png",
+      "state_path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate4/ui-round-1/pw5-portrait--toc-bookmarks.state.json",
+      "actions_path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate4/ui-round-1/actions/pw5-portrait--toc-bookmarks.json",
+      "case_json_path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate4/ui-round-1/cases/pw5-portrait--toc-bookmarks.json",
+      "log": {
+        "local_path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate4/ui-round-1/pw5-portrait--toc-bookmarks.log",
+        "remote_path": "/tmp/aidoku-phase3-c4-ui-round-1/pw5-portrait--toc-bookmarks.log",
+        "sha256": "dc121ceea011a63c29b404d6c6b75bbe2db32b326923b8fa99759f457bfd709f",
+        "bytes": 68,
+        "identity_source": "owner-frozen final inventory; no local rehash",
+        "static_text_read": true,
+        "observed_rejection": "No page-not-ready or other rejection appears in this exact frozen log."
+      },
+      "metadata": {
+        "local_path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate4/ui-round-1/pw5-portrait--toc-bookmarks.metadata.json",
+        "remote_path": "/tmp/aidoku-phase3-c4-ui-round-1/pw5-portrait--toc-bookmarks.metadata.json",
+        "sha256": "ae0975269e931f7f7082f511d06eaa9f5127eaa78d9b81a703c70125c4f26f99",
+        "bytes": 671,
+        "identity_source": "owner-frozen final inventory; no local rehash"
+      },
+      "first_pass_report": "D:/Code/aidokuForKindle/docs/review/phase3-c4-round-1-batches/r1-supp-05-02.review.json",
+      "original_candidate_actually_viewed": true,
+      "candidate_reopened_in_this_second_pass": true,
+      "original_references": [
+        {
+          "reference_id": "pw-reader--default",
+          "path": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/screens/pw-reader.png",
+          "sha256": "b67b1618519e877e60ab4ac4ad20306fb33bd48f0af6a8b129926900ae98e16d",
+          "original_actually_viewed": true,
+          "new_view_this_second_pass": false,
+          "prior_viewing_report": "D:/Code/aidokuForKindle/docs/review/phase3-c4-round-1-batches/r1-reference-05.review.json"
+        },
+        {
+          "reference_id": "pw-reader--fullscreen",
+          "path": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/screens/states/pw-reader--fullscreen.png",
+          "sha256": "70fa45f447c4f52e2e737f7634a1838d73071e32cf22c40e6e8235e07582cee4",
+          "original_actually_viewed": true,
+          "new_view_this_second_pass": false,
+          "prior_viewing_report": "D:/Code/aidokuForKindle/docs/review/phase3-c4-round-1-batches/r1-reference-05.review.json"
+        },
+        {
+          "reference_id": "pw-reader--toc",
+          "path": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/screens/states/pw-reader--toc.png",
+          "sha256": "f66825556e844eff175f196cbd33179b0cd8d0e401129667d575f198f3d2e543",
+          "original_actually_viewed": true,
+          "new_view_this_second_pass": false,
+          "prior_viewing_report": "D:/Code/aidokuForKindle/docs/review/phase3-c4-round-1-batches/r1-reference-05.review.json"
+        }
+      ],
+      "fresh_observation": "An actual empty Bookmarks tab is visible and active, with a bold tab label/underline, a concise No bookmarks message and a complete outlined Add Current Page button. No bookmark row is present. The empty-state content is readable and separate from the progress/tools block.",
+      "static_appearance_observation": "An actual empty Bookmarks tab is visible and active, with a bold tab label/underline, a concise No bookmarks message and a complete outlined Add Current Page button. No bookmark row is present. The empty-state content is readable and separate from the progress/tools block.",
+      "captured_software_support": {
+        "summary": "The recorded bookmark toggle, menu, toc and toc-tab(bookmarks) end with reader_toc_tab=bookmarks, modal_items=[], bookmark_count=0, reader_bookmarked=false, reader_image_ready=true and reader_inflight=false. The exact frozen log contains only desktop window ready and no page-not-ready rejection.",
+        "actions": [
+          {
+            "at_ms": 3500,
+            "section": "reader",
+            "action": "bookmark",
+            "value": ""
+          },
+          {
+            "at_ms": 3950,
+            "section": "reader",
+            "action": "menu",
+            "value": ""
+          },
+          {
+            "at_ms": 4400,
+            "section": "reader",
+            "action": "toc",
+            "value": ""
+          },
+          {
+            "at_ms": 4850,
+            "section": "reader",
+            "action": "toc-tab",
+            "value": "bookmarks"
+          }
+        ],
+        "metadata": {
+          "route": "reader",
+          "profile": "pw5",
+          "backend": "desktop",
+          "design_logical_size": [
+            618,
+            824
+          ],
+          "logical_size": [
+            618,
+            824
+          ],
+          "window_size": [
+            618,
+            824
+          ],
+          "snapshot_size": [
+            618,
+            824
+          ],
+          "scale_factor": 1,
+          "landscape": false,
+          "rotation_degrees": 0,
+          "refresh_count": 6,
+          "last_refresh": "ui",
+          "process_id": 699229,
+          "font_initializations": 1,
+          "lifecycle": {
+            "requested": false,
+            "render_paused": false,
+            "input_released": false,
+            "parked": false,
+            "activity_paused": false,
+            "pause_count": 0,
+            "resume_count": 0,
+            "frame_write_count": 0,
+            "resume_full_frame_count": 0
+          }
+        }
+      },
+      "owner_recorded_oracle_not_reexecuted": null,
+      "disposition": "resolved-in-fresh-evidence",
+      "disposition_scope": "Actual PW empty-Bookmarks status and visible next-step UI only",
+      "capability_or_user_override_basis": "The disposition uses the actual empty tab and its ready-state/log association. Pure-frame count0, toggle or cold-persistence captures are not substituted for empty UI evidence. The Add button is not claimed activated.",
+      "current_suggestion_ids": [],
+      "root_acceptance_status": "pending-root-final-acceptance",
+      "remaining_scope": [
+        "scribe-landscape--toc-bookmarks",
+        "scribe-portrait--toc-bookmarks",
+        "Two Scribe empty-Bookmarks UI cases",
+        "Actual activation/result of the visible Add Current Page button is not exercised here"
+      ],
+      "whole_group_closed": false,
+      "required_original_crop": null
+    }
+  ],
+  "unresolved_historical_ids": [
+    "P3R1-G01",
+    "P3R1-G05",
+    "P3R1-G09",
+    "P3R1-G30",
+    "P3R1-G39"
+  ],
+  "unresolved_historical_ids_meaning": "These IDs retain whole-group/outside-scope/final-Root obligations; they do not mean the observed PW separator, centered notice or actual empty-tab UI remains missing.",
+  "independent_current_issue_not_disposed": [
+    {
+      "historical_id": "P3R1-G13",
+      "scope": "L/swipe preview drawing map",
+      "status": "independent-of-implemented-software-input; not-closed-by-this-report",
+      "basis": "Explicit coordinator boundary; no unreviewed preview map is inferred from pure reader frames."
+    }
+  ],
+  "current_suggestions": [],
+  "unresolved_evidence_gaps": [
+    {
+      "scope": "native-reverse-rotation-mapping",
+      "owner": "Root",
+      "status": "not-supplied-by-canonical-software-frames",
+      "case_ids": [
+        "pw5--c4-reader--reverse-controls",
+        "pw5--c4-reader--reverse-pure-input",
+        "pw5--c4-reader--reverse-restore",
+        "pw5--c4-reader--reverse-wake"
+      ]
+    },
+    {
+      "scope": "physical-sleep-wake",
+      "owner": "Root",
+      "status": "not-qualified-by-application-lifecycle-actions-or-PNG",
+      "case_ids": [
+        "pw5--c4-reader--reverse-wake"
+      ]
+    },
+    {
+      "scope": "G30 original settings-card presentation",
+      "status": "outside-this-assignment",
+      "case_ids": [
+        "sc-settings--tap-zones",
+        "pw5--settings-tap-regions"
+      ]
+    }
+  ],
+  "full_complete": false,
+  "clean_round_streak": 0,
+  "limitations": [
+    "Only actual declared current cases are assessed. Missing/aborted groups, unviewed Scribe cases and other source cases are not closed.",
+    "G39 is supported by an actually empty Bookmarks tab, not by pure-frame bookmark counts. The current case has zero modal rows and a ready reader; its exact log has no page-not-ready rejection.",
+    "G30 software functionality may be supported by existing real pointer/state/source-oracle evidence. That does not resolve the independent G13 preview-map defect or unseen settings-card wording.",
+    "G09 canonical reverse input/restore/wake are software records only; native framebuffer/evdev mapping and physical wake remain Root external scopes.",
+    "The source-map digest is owner-pending. All other SHA values are transcribed owner identities, not results of local hashing or automatic validation.",
+    "Historical dispositions remain in historical_findings/regression_closures; fixed IDs are not inserted as new current suggestions. Final acceptance is Root only."
+  ]
+}

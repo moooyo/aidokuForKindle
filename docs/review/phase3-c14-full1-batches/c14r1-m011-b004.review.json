@@ -1,0 +1,415 @@
+{
+  "schema_version": 1,
+  "kind": "bounded-C14R1-diagnostic-visual-review",
+  "batch_id": "c14r1-m011-b004",
+  "reviewer_lane": "A",
+  "reviewer": "/root/final_validation_delivery/c4_full_review_coordinator/c14_full_lane_a/c14r1_m011_b004",
+  "module": "011-pw-tags-history-migration-http-search",
+  "freeze": {
+    "round": 1,
+    "run_id": "1e2765959467",
+    "source_sha256": "4737c2c1b8dcdf3c5c97400e2036502c6efdf932ff25322b8ddd51fc62d7c99f",
+    "binary_sha256": "01ec3051c62598d100f2203694ed7840d4706052bdbea260f5176b7d255b5a37",
+    "reference_sha256": "e7b49b456255432d74cfe41346f9d44c1a9c55bf67c5d55483e4ae3029547d18",
+    "capture_plan_sha256": "d07810abea322f7d2f86261f80e29007b3bd2f194eb2e9a3d4a53d8edcf70687",
+    "reference_scope_sha256": "c910bed9f02ed17b2ca0a54aca1beeeeb6caabc5a17a91afe764ddd3e7b0d33c",
+    "main_harness_sha256": "1f2379bffd9ce9594f307fa150f56c345fe508fca47aac3be31e8ce29a72fa44",
+    "gate_manifest_sha256": "f1f64f72a51c81d7da300816ebcef7e4e0c48178d75d41072f7b4e3e22a38668"
+  },
+  "immutable_binding": {
+    "inventory": {
+      "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate14/ui-round-1-module-snapshots/011-pw-tags-history-migration-http-search/inventory.json",
+      "sha256": "bcaab92957ba6b220f3f402ced8f3dc68b27355de8b3df72d215b9708e82bbb8",
+      "roles": [
+        "immutable_module_inventory",
+        "owner_evidence_inventory"
+      ],
+      "basis": "Selected owner declarations and unchanged original-copy inventory; no local rehash."
+    },
+    "reference_catalog": {
+      "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate14/ui-round-1-module-snapshots/011-pw-tags-history-migration-http-search/files/output/reference-files.json",
+      "sha256": "d18c7f551f5ecfdffef56cf5710a4335b1f2bfeeaca02ea66802d4dc4456c37b"
+    },
+    "frozen_scope_path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate14/ui-round-1-module-snapshots/011-pw-tags-history-migration-http-search/files/control/execution-inputs/docs/review/phase3-reference-scope.json",
+    "reconciliation": "Final capture-only manifest reconciliation remains with the coordinator."
+  },
+  "contracts_read": {
+    "worker": "D:/Code/aidokuForKindle/docs/review/phase3-full-fresh-worker-contract.md",
+    "token_caption": "D:/Code/aidokuForKindle/docs/review/phase3-c12-affected-review-root-disposition.json",
+    "ui_skill": "C:/Users/moooyo/.codex/skills/ui-ux-pro-max/SKILL.md",
+    "handoff": {
+      "path": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/HANDOFF.md",
+      "declared_sha256": "39F54E1B43FECFB1678A9BF70B27DEE3525435E18293E9DE3772E24F3107E91A",
+      "relevant_sections": [
+        "3.2-3.5",
+        "4.1-4.6",
+        "4.8",
+        "5.2",
+        "5.6",
+        "10",
+        "11.4"
+      ]
+    }
+  },
+  "review_scope": {
+    "owner_status": "HOLD",
+    "current_immutable_local_diagnostic_only": true,
+    "candidate_case_count": 4,
+    "related_contract_pair_count": 4,
+    "actual_candidate_opens": 4,
+    "actual_original_reference_opens": 3,
+    "actual_image_opens": 7,
+    "maximum_image_opens": 8,
+    "full_round_credit": 0,
+    "clean_round_credit": 0,
+    "round_two_credit": 0,
+    "verification_executed": false,
+    "image_processing_executed": false
+  },
+  "reference_views": [
+    {
+      "reference_id": "pw-history--default",
+      "path": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/screens/pw-history.png",
+      "sha256": "8de847f1a262247e8b18ca1396b568d3bce7ec4023da3a585db741372d68219b",
+      "declared_dimensions": [
+        1236,
+        1648
+      ],
+      "actual_view_image_open": true,
+      "open_sequence": 2,
+      "observation": "Normal white 28-design-pixel status bar; serif History heading, two tabs, grouped records, right-side controls, folio and 72-design-pixel dock."
+    },
+    {
+      "reference_id": "pw-history--incognito",
+      "path": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/screens/states/pw-history--incognito.png",
+      "sha256": "0c31c58650b054b6316b24eadae1575386a4ea1d407e83c859ca769e8b4bb999",
+      "declared_dimensions": [
+        1236,
+        1648
+      ],
+      "actual_view_image_open": true,
+      "open_sequence": 4,
+      "observation": "Whole-width black status bar with intact centered incognito caption; black incognito control with white icon and label; grouped rows retain white backgrounds."
+    },
+    {
+      "reference_id": "pw-manga--default",
+      "path": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/screens/pw-manga.png",
+      "sha256": "18b052844a8b90a2a558d2225301b2e273a6cb6bb2f457d7cc017294e89bd274",
+      "declared_dimensions": [
+        1236,
+        1648
+      ],
+      "actual_view_image_open": true,
+      "open_sequence": 6,
+      "observation": "Portrait detail page with information cover, serif title, three-line description, continuation/bookmark/tracking actions, six 52-design-pixel chapter rows, folio and no dock."
+    }
+  ],
+  "retained_contracts": [
+    "C4-ACCEPT-01 truthful disabled/off software split remains accepted; unsupported behavior does not require a newly enabled feature.",
+    "A distinguishable complete name-derived token with intact glyphs is sufficient; the whole compact prefix is not required. Independent caption applies only to hidden More.",
+    "The visible list glyph meets the current menu contract; previously known tiny dots do not create a new patch request.",
+    "Closed Reader remains artwork only under Root's override. The policy capture is a final Detail frame and gives no fresh Closed Reader credit."
+  ],
+  "inherited_pending": [
+    {
+      "id": "accepted-detailMore-weight-repair",
+      "status": "preserved",
+      "observation": "Root's accepted C15 one-line detailMore weight repair from 500 to reference 400 is separate from these C14 originals. This batch neither verifies C15 nor clears the C14R1 nonclean disposition."
+    },
+    {
+      "id": "raw-font-geometry-and-source-switch-adjudication",
+      "status": "preserved",
+      "observation": "Previously pending raw library/Reader/font and source-switch observations are not self-waived. Current readable fonts and approximate geometry do not establish exact font-weight or pixel equivalence."
+    }
+  ],
+  "cases": [
+    {
+      "case_id": "pw5--history-clear-apply",
+      "evidence": {
+        "png": {
+          "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate14/ui-round-1/pw5--history-clear-apply.png",
+          "sha256": "6ea398533104590c8c4c7f13458c8504bafcc80a90d9aff5837c8485c1d9a45f"
+        },
+        "case": {
+          "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate14/ui-round-1/cases/pw5--history-clear-apply.json",
+          "sha256": "d148e83bd697876cfd922b398cb2c4497d569d7099eaf208aa40ac7cc4bba787"
+        },
+        "state": {
+          "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate14/ui-round-1/pw5--history-clear-apply.state.json",
+          "sha256": "291327e29e30db9ef5bca76c80d45014130b8b391632ab25097a3f948310b389"
+        },
+        "metadata": {
+          "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate14/ui-round-1/pw5--history-clear-apply.metadata.json",
+          "sha256": "faf49874b6610d945097e2f66d09d95927f1ca05b51ab123e9a7a4428ee8580b"
+        },
+        "actions": {
+          "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate14/ui-round-1/actions/pw5--history-clear-apply.json",
+          "sha256": "906067703d091ecdaa72cc4e9b1a74e3ab558e9cbdc7dba68497a07d011c7b0c"
+        },
+        "log": {
+          "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate14/ui-round-1/pw5--history-clear-apply.log",
+          "sha256": "dc121ceea011a63c29b404d6c6b75bbe2db32b326923b8fa99759f457bfd709f"
+        }
+      },
+      "comparison": {
+        "kind": "related-contract",
+        "reference_id": "pw-history--default",
+        "reference_sha256": "8de847f1a262247e8b18ca1396b568d3bce7ec4023da3a585db741372d68219b",
+        "reference_view_locator": "reference_views[0]",
+        "exact_supplemental_reference_available": false
+      },
+      "actual_view": {
+        "original_opened": true,
+        "tool": "tools.view_image",
+        "open_sequence": 1,
+        "native_dimensions": [
+          618,
+          824
+        ],
+        "physical_reference_scale": 2
+      },
+      "visual": {
+        "geometry_padding_bounds": "Approximate native coordinates: 22-pixel page margin; incognito control at x475/y56, about 79x40; empty-state clock centered near x315/y361, status near y429, two 104x48 actions at y467 with a 12-pixel gap. Content remains clear of the folio and dock.",
+        "fonts_glyphs": "Heavy serif History and empty-state headings, readable sans action labels and smaller numeric folio/status text. All displayed glyphs are intact; no ellipsis or identity loss.",
+        "clipping_rules": "No visible overlap or clipped text. White empty canvas, intact tab underline and thin full-width tab/dock rules; no overlay or dimming.",
+        "folio": "Centered 1/1 near y727; previous and next labels absent with stable edge allocation. Dock starts near y752 and retains the active History marker.",
+        "markers_feedback": "Empty history has no record markers. Gray clear icon expresses unavailable clearing in the empty result; incognito remains outlined/off. Empty status and return/browse actions are visible; no false success toast."
+      },
+      "retained_static": {
+        "artifact_reads_separate": true,
+        "route": "history",
+        "incognito": false,
+        "history_count": 0,
+        "visible_history_count": 0,
+        "modal": "",
+        "actions": "At 450 ms history clear; at 900 ms panel choose clear-history-confirm.",
+        "log": "aidoku: desktop window ready; profile=pw5, logical=618x824, scale=1",
+        "terminal_failure_observed": false,
+        "limit": "Recorded action/state supports the retained empty final frame. No new clear replay, deletion or shared-file-preservation result is inferred."
+      },
+      "intentional_capability_check": "Declared intentional differences are empty. Empty data and a disabled clear control fit the current truthful availability contract.",
+      "verdict": "No new actionable visual issue observed in this assigned final frame; bounded diagnostic only."
+    },
+    {
+      "case_id": "pw5--incognito-enable",
+      "evidence": {
+        "png": {
+          "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate14/ui-round-1/pw5--incognito-enable.png",
+          "sha256": "ec5c1b8b3c25698f446ba7ddbb77729fdcbd933e051fb2f4345840c27a86c7b4"
+        },
+        "case": {
+          "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate14/ui-round-1/cases/pw5--incognito-enable.json",
+          "sha256": "993fdbeedb397f0e81d73ac4a9a5d8e6d0ed5b541c3359e43c7c1ee4696037a8"
+        },
+        "state": {
+          "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate14/ui-round-1/pw5--incognito-enable.state.json",
+          "sha256": "90d11b2a0cfbc23a906168ed9d78aa55d491a73d4818d77220647a035a0b2552"
+        },
+        "metadata": {
+          "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate14/ui-round-1/pw5--incognito-enable.metadata.json",
+          "sha256": "e81e3a6e8508673aa1d25ff4c279fa222afd17b91ecfae1ad69f7055a983ce65"
+        },
+        "actions": {
+          "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate14/ui-round-1/actions/pw5--incognito-enable.json",
+          "sha256": "4907ed9128e165a02f6d725d464f141174159e044132431deb4b624f0106f0f8"
+        },
+        "log": {
+          "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate14/ui-round-1/pw5--incognito-enable.log",
+          "sha256": "dc121ceea011a63c29b404d6c6b75bbe2db32b326923b8fa99759f457bfd709f"
+        }
+      },
+      "comparison": {
+        "kind": "related-contract",
+        "reference_id": "pw-history--incognito",
+        "reference_sha256": "0c31c58650b054b6316b24eadae1575386a4ea1d407e83c859ca769e8b4bb999",
+        "reference_view_locator": "reference_views[1]",
+        "exact_supplemental_reference_available": false
+      },
+      "actual_view": {
+        "original_opened": true,
+        "tool": "tools.view_image",
+        "open_sequence": 3,
+        "native_dimensions": [
+          618,
+          824
+        ],
+        "physical_reference_scale": 2
+      },
+      "visual": {
+        "geometry_padding_bounds": "Whole-width 28-pixel inverse status bar; black incognito control near x475/y56, about 79x40. Date groups start near y174/370/566; framed covers near x22 are about 48x66, text starts at x84, and per-entry remove controls remain at the right margin.",
+        "fonts_glyphs": "Serif History/date/book hierarchy and readable sans chapter labels; progress/time and folio numerals remain distinct. Centered incognito caption, all five book titles, chapter numbers and dates have intact glyphs.",
+        "clipping_rules": "No visible glyph clipping, caption collision, dimming or card background. Progress tracks and row rules remain separate from text and right-side remove controls.",
+        "folio": "Centered 1/5 near y727, next-page label at the right, no previous-page label. Active History dock marker and 72-pixel dock remain below the folio.",
+        "markers_feedback": "Incognito control is entirely black with white icon/label and status bar is fully inverse. Existing progress and completed-state labels stay visible; no new press timing or input qualification is inferred."
+      },
+      "retained_static": {
+        "artifact_reads_separate": true,
+        "route": "history",
+        "incognito": true,
+        "history_count": 20,
+        "visible_history_count": 5,
+        "actions": "At 450 ms settings set incognito=true.",
+        "log": "aidoku: desktop window ready; profile=pw5, logical=618x824, scale=1",
+        "terminal_failure_observed": false,
+        "limit": "Recorded preference/action and visible inverse state support this retained frame only; history suppression and fresh activation behavior are not replayed."
+      },
+      "intentional_capability_check": "Declared intentional differences are empty. Actual count/page data differs from sample 1/4 and read-count data without waiving layout or fonts; truthful software capability split remains accepted.",
+      "verdict": "No new actionable visual issue observed in this assigned final frame; bounded diagnostic only."
+    },
+    {
+      "case_id": "pw5--incognito-history-policy",
+      "evidence": {
+        "png": {
+          "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate14/ui-round-1/pw5--incognito-history-policy.png",
+          "sha256": "e89388ebee0c6b754b6d49fd749c207e4e464c7a7ac27f261fdd90f53e96eb9c"
+        },
+        "case": {
+          "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate14/ui-round-1/cases/pw5--incognito-history-policy.json",
+          "sha256": "49108f030747e602301ff2e809534df34a4366ac3468273a6bfc22f4a8441fec"
+        },
+        "state": {
+          "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate14/ui-round-1/pw5--incognito-history-policy.state.json",
+          "sha256": "c6bd882d24e556b51220fdebed8c5b8b5ab24e9976daedc80c056e4d0e52906e"
+        },
+        "metadata": {
+          "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate14/ui-round-1/pw5--incognito-history-policy.metadata.json",
+          "sha256": "e92a41660aa102dd3078864676465911f58eb6af20b61c5c8467a8dfe9941195"
+        },
+        "actions": {
+          "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate14/ui-round-1/actions/pw5--incognito-history-policy.json",
+          "sha256": "de254600818416032e598dcb11fb13f55f8aa7ff2550fe08951f88fcbc6bae07"
+        },
+        "log": {
+          "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate14/ui-round-1/pw5--incognito-history-policy.log",
+          "sha256": "dc121ceea011a63c29b404d6c6b75bbe2db32b326923b8fa99759f457bfd709f"
+        }
+      },
+      "comparison": {
+        "kind": "related-contract",
+        "reference_id": "pw-manga--default",
+        "reference_sha256": "18b052844a8b90a2a558d2225301b2e273a6cb6bb2f457d7cc017294e89bd274",
+        "reference_view_locator": "reference_views[2]",
+        "exact_supplemental_reference_available": false
+      },
+      "actual_view": {
+        "original_opened": true,
+        "tool": "tools.view_image",
+        "open_sequence": 5,
+        "native_dimensions": [
+          618,
+          824
+        ],
+        "physical_reference_scale": 2
+      },
+      "visual": {
+        "geometry_padding_bounds": "Final portrait Detail frame. Cover frame near x22/y84 is about 134x188, information text starts at x176, description occupies three lines, action row at y312 is about 56 pixels high, directory rule is near y382, and six chapter rows preserve roughly 52-pixel spacing.",
+        "fonts_glyphs": "Heavy serif book/directory titles, readable sans description and chapter names, distinct bold chapter numbers and lighter dates. Title, description and all six chapter identities are intact. Exact weight acceptance remains pending separately.",
+        "clipping_rules": "No visible clipping or overlap among information, continuation/bookmark/tracking controls, dotted guides, dates and download controls. Top More dots remain visible within their control; no dock or overlay.",
+        "folio": "Centered 1/8 near the bottom with next-page text at the right and stable empty previous-page allocation; no navigation dock.",
+        "markers_feedback": "Inverse incognito status bar persists on this final Detail route. Continuation shows recorded 20/40; bookmark action is inverse and tracking action outlined. Six visible chapters are 86 through 81, with no current/read marker matching their retained state."
+      },
+      "retained_static": {
+        "artifact_reads_separate": true,
+        "initial_recipe_screen": "reader",
+        "final_route": "detail",
+        "incognito": true,
+        "history_count": 20,
+        "reader_page": 20,
+        "reader_total": 40,
+        "visible_chapter_count": 6,
+        "actions": "At 2500 ms reader seek 20; at 5000 ms reader back. Recipe points to the declared enable-case data directory; it was not accessed.",
+        "log": "aidoku: desktop window ready; profile=pw5, logical=618x824, scale=1",
+        "terminal_failure_observed": false,
+        "limit": "The original, state and metadata agree on the final Detail route. Retained reader/policy fields do not establish a newly viewed Reader frame, live lease, fresh history suppression or runtime replay."
+      },
+      "intentional_capability_check": "Declared intentional differences are empty. Persistent incognito status on the final non-reader route follows HANDOFF 5.6; changed continuation progress is data-level. Accepted detailMore repair and truthful availability remain separate.",
+      "verdict": "No new actionable visual issue observed in this assigned final frame; bounded diagnostic only."
+    },
+    {
+      "case_id": "pw5--incognito-persistence",
+      "evidence": {
+        "png": {
+          "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate14/ui-round-1/pw5--incognito-persistence.png",
+          "sha256": "ec5c1b8b3c25698f446ba7ddbb77729fdcbd933e051fb2f4345840c27a86c7b4"
+        },
+        "case": {
+          "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate14/ui-round-1/cases/pw5--incognito-persistence.json",
+          "sha256": "364caa92f608abd58e5e0ccab8576b786ee8e23bd4ede157d701f18bae277ef1"
+        },
+        "state": {
+          "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate14/ui-round-1/pw5--incognito-persistence.state.json",
+          "sha256": "6d3891a42f4fc3b35afd2b1f5c5f71508c7b2075a45a70764721b109111b273f"
+        },
+        "metadata": {
+          "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate14/ui-round-1/pw5--incognito-persistence.metadata.json",
+          "sha256": "007d8e9881be40c3f729a9bb7fc2bc921938c409492ec12b7b56382fefb5e2de"
+        },
+        "actions": {
+          "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate14/ui-round-1/actions/pw5--incognito-persistence.json",
+          "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+        },
+        "log": {
+          "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate14/ui-round-1/pw5--incognito-persistence.log",
+          "sha256": "dc121ceea011a63c29b404d6c6b75bbe2db32b326923b8fa99759f457bfd709f"
+        }
+      },
+      "comparison": {
+        "kind": "related-contract",
+        "reference_id": "pw-history--incognito",
+        "reference_sha256": "0c31c58650b054b6316b24eadae1575386a4ea1d407e83c859ca769e8b4bb999",
+        "reference_view_locator": "reference_views[1]",
+        "reference_open_reused_within_this_batch": true,
+        "exact_supplemental_reference_available": false
+      },
+      "actual_view": {
+        "original_opened": true,
+        "tool": "tools.view_image",
+        "open_sequence": 7,
+        "native_dimensions": [
+          618,
+          824
+        ],
+        "physical_reference_scale": 2,
+        "same_declared_png_sha_as_enable_did_not_skip_open": true
+      },
+      "visual": {
+        "geometry_padding_bounds": "Independently viewed final History frame. Full 28-pixel inverse status bar, black incognito control near x475/y56, 22-pixel left margin, five covers/text rows across three date groups, and clear right-side remove controls.",
+        "fonts_glyphs": "Centered incognito caption, serif title/book/date labels, smaller chapter/progress/time text and folio are readable with intact glyphs. No compact-name or caption-contract failure is visible.",
+        "clipping_rules": "No visible caption collision, row overflow, clipped title, dimmed backdrop or overlap with progress tracks and rules.",
+        "folio": "Visible 1/5, right-side next-page action and no previous-page label; active History marker and dock remain below the folio.",
+        "markers_feedback": "Black incognito control and whole-status inverse persist in the captured frame. Existing completed/progress labels and remove affordances remain visible; no fresh persistence or lifecycle execution is claimed."
+      },
+      "retained_static": {
+        "artifact_reads_separate": true,
+        "route": "history",
+        "incognito": true,
+        "history_count": 20,
+        "visible_history_count": 5,
+        "actions": "Empty action array. Declared recipe reuses the enable-case data directory; it was not accessed.",
+        "log": "aidoku: desktop window ready; profile=pw5, logical=618x824, scale=1",
+        "terminal_failure_observed": false,
+        "limit": "Retained preference and final frame support recorded persisted appearance only. Empty actions, recipe name and mechanical PASS do not qualify fresh persistence, restart, physical input or runtime behavior."
+      },
+      "intentional_capability_check": "Declared intentional differences are empty. Data counts and truthful software availability remain within the retained contract; no enabled feature requirement is added.",
+      "verdict": "No new actionable visual issue observed in this assigned final frame; bounded diagnostic only."
+    }
+  ],
+  "findings": {
+    "new_actionable_count": 0,
+    "new_required_unreadable_count": 0,
+    "true_identity_mismatch_count": 0,
+    "image_quota_or_tool_error_count": 0,
+    "current_terminal_failure_count": 0,
+    "new_pending_count": 0,
+    "inherited_pending_preserved": true,
+    "escalation_required": false
+  },
+  "limitations": [
+    "All positions are approximate direct visual observations in native logical coordinates; no image processing, crop, local hash, validator or application execution occurred.",
+    "All four comparisons are related-contract; no independent exact screenshot exists for these supplemental cases.",
+    "Selected owner inventory, case identity and metadata are consistent with the supplied declarations. This is declaration-based identity binding, not local byte verification.",
+    "Physical input, e-ink effects, performance, hardware lifecycle, fresh clear/history suppression/persistence and live Reader behavior remain outside this screenshot review.",
+    "Ordinary SQL retries remain Root's nonvisual classification. The four exact current logs contain only the desktop-ready line and no explicit terminal failure.",
+    "Only this new report is written. C14 owner HOLD and all prior accepted scope/capability dispositions remain in effect."
+  ]
+}

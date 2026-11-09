@@ -1,0 +1,156 @@
+{
+  "batch_id": "supplemental-16",
+  "reviewer": "/root/phase3_round1_review/supplemental_16",
+  "run_id": "a1baf3fe3dc2",
+  "evidence_identity": {
+    "candidate": "C3",
+    "round": 1,
+    "binary_sha256": "94d7f3bbcab475ad8833a2f3c486138f7b49bead231851c2d8eab2f0c3d2ac51",
+    "source_sha256": "aef9db4e111165016a10a2a95e111f3155860b8510c7f6207ec9c79fbec5082c",
+    "identity_observation": "All eight case sidecars identify the requested run, binary, source, PW5 profile, and 618 by 824 native capture. Get-FileHash SHA256 for every viewed candidate equals both its input expected hash and its case evidence screenshot hash.",
+    "inspection_method": "Each of the eight input-listed candidate PNGs was individually opened with tools.view_image. No other PNG was opened. Existing JSON and text were read without running application code or verification."
+  },
+  "textual_basis": [
+    "D:/Code/aidokuForKindle/docs/review/phase3-reference-scope.json: precedence, sharedContract, capabilityBounds, source-management and reader state assertions, additionalRequiredCases",
+    "D:/Code/aidokuForKindle/docs/review/phase3-prototype-reference-support.json: retained_user_contract, reference_overrides, global_ui_acceptance_conditions, PW source-management and folio declarations",
+    "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/HANDOFF.md: sections 3.4, 4.2, 4.6, and 5.4, subject to the retained artwork-only reader override",
+    "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/prototype/pw-browse.dc.html: installed rows, available rows and language controls, source-list sheet, and language-filter declarations"
+  ],
+  "reviewed_case_ids": [
+    "pw5--source-language-ja",
+    "pw5--source-language-zh-Hans",
+    "pw5--source-language-zh-Hant",
+    "pw5--source-list-operation--added",
+    "pw5--source-list-operation--removed",
+    "pw5--sources-first-boundary",
+    "pw5--sources-last-page",
+    "pw5-portrait--bookmark-baseline"
+  ],
+  "reviewed_cases": [
+    {
+      "case_id": "pw5--source-language-ja",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/pw5--source-language-ja.png",
+      "candidate_sha256": "59e1027915b812aefb81e7831875be35b340633b9dce59e26ff1fb77de55562c",
+      "viewed_candidate": true,
+      "outcome": "no_actionable_visual_issue_in_visible_state; language_filter_coverage_limited",
+      "observations": [
+        "The visible scene is the Installed tab, with seven installed sources, one available source, and two updates. This agrees with source_filter=0, source_language=ja, installed_count=7, and available_count=1 in the sidecar.",
+        "Four black built-in tiles precede three outlined extension tiles. Source names, secondary connection/version text, chevrons, separators, and the dashed add-source action remain readable and separated.",
+        "The unavailable extension has a dashed warning tile, muted source name, explicit browser-verification limitation, and an Uninstall action. It does not show a fabricated usable state.",
+        "The Browse dock selection and Installed tab emphasis are clear. No shadow, gray overlay, or patterned UI surface is visible.",
+        "No language chips or available-source rows are visible because this capture remains on Installed. The stored Japanese language state and Available count do not establish the visible Japanese selection or its filtered-result presentation."
+      ],
+      "intentional_differences": []
+    },
+    {
+      "case_id": "pw5--source-language-zh-Hans",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/pw5--source-language-zh-Hans.png",
+      "candidate_sha256": "a8d03a743e4e882add4dc50ea1ee547b573e6fc003b16b918fbef42063be1df7",
+      "viewed_candidate": true,
+      "outcome": "no_actionable_visual_issue_in_visible_state; language_filter_coverage_limited",
+      "observations": [
+        "The screenshot shows Installed selected, seven installed records, 124 available records, and two updates. The sidecar records source_filter=0 and source_language=zh-Hans, so the visible tab identity is consistent with the supplied state.",
+        "The built-in and extension groups fit above the dashed add-source action without clipping. The configured Komga status, unconfigured Kavita and Suwayomi statuses, extension versions, and blocked-source action remain legible.",
+        "The increased three-digit Available count does not collide with the neighboring Updates tab. The header actions, active Browse dock marker, white surfaces, and thin row rules are visually coherent.",
+        "The Simplified Chinese chip and filtered available rows are not shown in this Installed-tab capture. This image cannot establish selected-language styling, result membership, or the available-list page range for that language."
+      ],
+      "intentional_differences": []
+    },
+    {
+      "case_id": "pw5--source-language-zh-Hant",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/pw5--source-language-zh-Hant.png",
+      "candidate_sha256": "f0c10dbad464a22176a72464d877ed6b8a5b5b27469710751438cddc420b0c1d",
+      "viewed_candidate": true,
+      "outcome": "no_actionable_visual_issue_in_visible_state; language_filter_coverage_limited",
+      "observations": [
+        "Installed remains selected and all seven installed records are visible; the Available label reports zero. The sidecar records source_filter=0, source_language=zh-Hant, and available_count=0, matching the visible scene.",
+        "The installed list retains its built-in/extension hierarchy and readable blocked-source warning. The zero Available count introduces no overlap or loss of the active-tab underline.",
+        "The add-source action and five-item bottom navigation remain fully visible. White surfaces, outlined extension controls, and the dashed unavailable tile have no shadow or dimmed backdrop.",
+        "Because this is the Installed tab, neither the Traditional Chinese selected chip nor the zero-result available-list feedback is visible. The zero count alone is not visual evidence that the filtered empty state has been reviewed."
+      ],
+      "intentional_differences": []
+    },
+    {
+      "case_id": "pw5--source-list-operation--added",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/pw5--source-list-operation--added.png",
+      "candidate_sha256": "b7fef1fb45241351e6442b4c981034202a852d105eb4dbd4d049a324b7b5826e",
+      "viewed_candidate": true,
+      "outcome": "no_actionable_visual_issue_observed",
+      "observations": [
+        "A full-width white Source Lists sheet is attached to the bottom, with a black top rule, serif title, top-right Done action, one outlined repository card, and a dashed Add Source List action. The exposed page remains undimmed.",
+        "The card shows the actual fixture repository title and local HTTP index address without clipping, with a distinct Remove action. Its content matches the sidecar's single repository-remove modal item and the supplied successful saved-row check.",
+        "The sheet is approximately 250 logical pixels tall and accommodates its single card and actions. It has no offset shadow, stipple, or fixed oversized empty area.",
+        "Behind the sheet, Available is selected, All is the black selected language control, and zero available sources are represented by a readable No Results scene and Add Source action. This empty available state is separate from the nonempty saved repository list.",
+        "The PNG displays the operation result; the actual HTTP request and persistence behavior are supported only by the supplied case evidence, not by a new execution in this review."
+      ],
+      "intentional_differences": []
+    },
+    {
+      "case_id": "pw5--source-list-operation--removed",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/pw5--source-list-operation--removed.png",
+      "candidate_sha256": "ef25490b238d6861a15b920b1e40b6f4490dc7d0d3d71a30d3a335792a8d79eb",
+      "viewed_candidate": true,
+      "outcome": "no_actionable_visual_issue_observed",
+      "observations": [
+        "The Source Lists sheet contains an explicit unconfigured/empty status, Done, and the dashed Add Source List action. The prior fixture repository card and its Remove action are absent, matching the empty modal_items and supplied persisted-row deletion check.",
+        "The bottom-attached white sheet is shorter than the added-record sheet, approximately 222 logical pixels tall. Its top rule, title/action alignment, and whitespace remain coherent with its empty content.",
+        "The exposed Installed page shows one Local Komga fixture record, an explicit configured status, and the dashed add-source action. Its Installed count of one and zero update count agree with the sidecar.",
+        "No stale repository title, contradictory success label, dimmed backdrop, patterned UI surface, shadow, or clipped action is visible. The single static result does not independently verify durability after restarting the application."
+      ],
+      "intentional_differences": []
+    },
+    {
+      "case_id": "pw5--sources-first-boundary",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/pw5--sources-first-boundary.png",
+      "candidate_sha256": "7ad3cf647ae8f0cb31702ee904c72d047bcce87ddca2d9f384fa34618794af28",
+      "viewed_candidate": true,
+      "outcome": "no_actionable_visual_issue_observed",
+      "observations": [
+        "Available is the active tab and All is the selected black language control; the remaining four language controls are white outlined choices. Header counts show seven installed, 124 available, and two updates, consistent with the sidecar.",
+        "Seven available rows fit at the declared row density: MangaDex and source A offer Update, followed by fixture sources 001 through 005 offering Install. Titles, subtitles, tiles, and right-side actions are readable without collisions.",
+        "The folio reads 1 / 18 above the navigation. Previous is absent at the first boundary, the center stays centered, and Next remains at the right edge with its reserved allocation intact.",
+        "The Browse dock and header remain fully visible. The list uses white surfaces and light separators without a shadow, mask, or extra pager divider. The visible first-page membership agrees with the sidecar's available source IDs."
+      ],
+      "intentional_differences": []
+    },
+    {
+      "case_id": "pw5--sources-last-page",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/pw5--sources-last-page.png",
+      "candidate_sha256": "7a874dc746df63917376c9017bddaeed1bac4a3cde3aba87668428808ab1eea9",
+      "viewed_candidate": true,
+      "outcome": "no_actionable_visual_issue_observed",
+      "observations": [
+        "Available and All retain their selected presentation. The final page contains five fixture records, 118 through 122, each with a separate readable Install action and version/language subtitle; no placeholder rows fill the remainder.",
+        "The folio reads 18 / 18. Previous remains at the left, Next is absent at the last boundary, and the current/total label stays in the same centered allocation as on the first-page image.",
+        "Five final rows are consistent with 124 records at seven records per preceding page, and the visible IDs match the supplied sidecar. The white space below the final row does not move the header, pager, or dock.",
+        "The source tiles, thin separators, language controls, and bottom navigation have no overlap, clipping, dimming, or shadow. The image demonstrates the final-page presentation but not actual boundary-control dispatch."
+      ],
+      "intentional_differences": []
+    },
+    {
+      "case_id": "pw5-portrait--bookmark-baseline",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/pw5-portrait--bookmark-baseline.png",
+      "candidate_sha256": "99e72fc0524cab6742a606d8fd257bc1fd762c534457451aacba487d8ee9c394",
+      "viewed_candidate": true,
+      "outcome": "no_actionable_visual_issue_observed",
+      "observations": [
+        "The entire visible scene is the monochrome comic fixture: a striped skyline panel, two patterned panels, and a radial panel. No application status bar, reader menu, dock, page number, footer badge, notification, or bookmark ribbon overlays the artwork.",
+        "This is explicitly a closed-menu bookmarked baseline: the sidecar records route=reader, menu=false, reader_bookmarked=true, reader_page=12, reader_total=40, and reader_image_ready=true. Its lack of a persistent bookmark decoration conforms to the retained artwork-only override.",
+        "The narrow white areas and patterned regions are compatible with the supplied artwork and fit geometry. They do not establish an artificial UI gutter or an inset viewport defect.",
+        "The supplied pure-reader oracle reports an exact match to its processed-artwork projection. This is supporting recorded evidence; the visual judgment here comes from the actual candidate, and no separate oracle/reference PNG was opened.",
+        "A static pure-artwork image cannot establish the absence of an invisible footer-cycle hit zone, bookmark menu behavior, the initial menu-open default, persistence across restart, or physical sleep/wake restoration."
+      ],
+      "intentional_differences": []
+    }
+  ],
+  "suggestions": [],
+  "limitations": [
+    "This fresh independent review covers only the eight candidate PNGs listed in supplemental-16.input.json. No independent reference PNG was supplied or viewed; comparisons use the designated scope, HANDOFF, and prototype text. The report does not establish a clean full review round.",
+    "The Japanese, Simplified Chinese, and Traditional Chinese cases all capture Installed with source_filter=0. Their source_language sidecar values do not expose selected-language chips or filtered available-list contents. Selected-language styling, language-specific row membership and page limits, and the Traditional Chinese empty-result feedback remain outside this batch's visible coverage. This is a capture-coverage limitation, not a confirmed product defect.",
+    "The All-language empty available scene is visible behind the added-repository sheet, and an empty saved-repository scene is visible after removal. Neither substitutes for the missing Traditional Chinese filtered empty-state capture.",
+    "Source-list addition/deletion and pure-reader exact-projection assertions are existing case evidence. This review did not execute network operations, persistence checks, the application, builds, tests, validation suites, smoke tests, or runtime probes locally or remotely.",
+    "Static captures do not verify press feedback, outside dismissal, control hit zones, folio jump behavior, menu-open input suppression, timing, hidden footer-cycle targets, restart persistence, or physical sleep/wake behavior. The reader case is a closed-menu baseline and supplies no initial menu-open-default coverage.",
+    "No hardware capability, authorization, quality-control, physical waveform, or 512 MiB memory qualification is inferred from these PNGs. The recorded desktop capture environment is not physical Kindle qualification.",
+    "Case metadata declares no additional intentional differences for these eight cases. Real fixture titles, URLs, source counts, versions, and artwork content are accepted as recorded data; the established artwork-only closed-reader override remains authoritative."
+  ]
+}

@@ -1,0 +1,1380 @@
+{
+  "schema_version": 1,
+  "audit_kind": "bounded additional old Aidoku Cargo leaf preservation candidate audit",
+  "environment": "ssh test-env",
+  "remote_root": "/root/aidoku-build",
+  "scope": {
+    "exact_leaf_count": 4,
+    "source_leaf_mutations": [],
+    "full_target_scan_performed": false,
+    "broad_inode_link_scan_performed": false,
+    "reason_no_broad_link_scan": "All four exact regular files have nlink=1.",
+    "unrelated_process_command_lines_disclosed": false,
+    "shared_crate_file_content_read": false,
+    "tests_builds_apps_runtime_probes_performed": false
+  },
+  "parent_provided_protected_context": {
+    "independently_reverified_by_this_audit": false,
+    "production": "227",
+    "source_sha256": "40b4b08f2b3529162772763414581cce37c4eb8de85d6b89f6bc4217bae14bfc",
+    "desktop_sha256": "64c67a88b1c327a156620d6d9ed4761602235e2a61fc3c87baa1a396bd26c9ee",
+    "native_sha256": "bf32b35a1d4fc90546305d951b2b38f425b1924a3f7e37c9b67cadec8e098051",
+    "protected_current_c13_test_elf": "/root/aidoku-build/target/debug/deps/aidoku_kindle-dc74463d0bb17e86",
+    "protected_current_c13_test_elf_bytes": 118180376,
+    "protected_current_c13_test_elf_sha256": "b9b8591ecc3e8482df2d043b6d9e1a130cb16b19a8dfeb81f54d1b54e5a63f99",
+    "other_protected_scope": [
+      "Current C13 source and frozen failures",
+      "Shared crates",
+      "Weread",
+      "VM and guest state"
+    ]
+  },
+  "method": {
+    "path_identity": "lstat and literal realpath equality; O_RDONLY|O_NOFOLLOW descriptor identity; regular file and nlink=1 required",
+    "full_sha256": "Entire exact leaf read in 1048576-byte blocks; byte count equals stat size",
+    "metadata_stability": "Device, inode, nlink, mode, bytes, allocated bytes, mtime_ns, ctime_ns, regular/non-symlink state and resolved path compared before open, through descriptor, and after hash",
+    "cargo_gate": "All numeric /proc comm entries inspected before audit, before and after each leaf hash, and after audit; active cargo/rustc or inspection error fails eligibility closed",
+    "open_reference_scan": "Read /proc/<pid>/maps and stat /proc/<pid>/fd/*; report only matching device/inode identities for the four exact leaves",
+    "scan_error_policy": "Any non-transient process scan error, including permission errors, fails eligibility closed",
+    "fingerprint_scope": "Only the three exact aidoku-kindle fingerprint directories corresponding to the four artifact hash suffixes",
+    "numeric_precision": "remote_observation is embedded from the raw Python JSON output without JavaScript numeric reserialization; full nanosecond metadata and Cargo u64 values remain exact"
+  },
+  "result": {
+    "eligibility": "candidate for full independent local preservation",
+    "deletion_ready": false,
+    "leaf_count": 4,
+    "total_logical_bytes": 350729856,
+    "total_allocated_bytes": 349732864,
+    "total_allocated_mib": 333.53125,
+    "all_full_hashes_complete": true,
+    "all_metadata_stable": true,
+    "all_nlink_one": true,
+    "exact_inode_maps_fd_references_observed": false,
+    "scan_permission_errors": [],
+    "scan_other_errors": [],
+    "active_cargo_or_rustc_observed": [],
+    "original_files_copied": false,
+    "original_files_unlinked": false
+  },
+  "candidate_leaves": [
+    {
+      "remote_path": "/root/aidoku-build/target/release/deps/libaidoku_kindle-4c608c45460e38aa.rlib",
+      "device": 2049,
+      "device_major": 8,
+      "device_minor": 1,
+      "inode": 566062,
+      "nlink": 1,
+      "mode": "0o644",
+      "bytes": 158580816,
+      "allocated_bytes": 158588928,
+      "sha256": "6dccdaa24522c3726a6ccec86faa134bfec71f30db298483cefb6049f5240dec",
+      "eligibility": "candidate for full independent local preservation",
+      "future_local_preservation_relative_path": "artifacts/phase3/candidate13/old-release-leaf-preservation/libaidoku_kindle-4c608c45460e38aa.rlib",
+      "future_local_preservation_absolute_path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate13/old-release-leaf-preservation/libaidoku_kindle-4c608c45460e38aa.rlib",
+      "local_preservation_status": "not created by this audit",
+      "overwrite_existing_local_file": false
+    },
+    {
+      "remote_path": "/root/aidoku-build/target/release/deps/libaidoku_kindle-4c608c45460e38aa.rmeta",
+      "device": 2049,
+      "device_major": 8,
+      "device_minor": 1,
+      "inode": 566042,
+      "nlink": 1,
+      "mode": "0o644",
+      "bytes": 52398544,
+      "allocated_bytes": 52404224,
+      "sha256": "0bdfd336f26823ebd66739d1f99941838d45eb241e7156d05355f09004435816",
+      "eligibility": "candidate for full independent local preservation",
+      "future_local_preservation_relative_path": "artifacts/phase3/candidate13/old-release-leaf-preservation/libaidoku_kindle-4c608c45460e38aa.rmeta",
+      "future_local_preservation_absolute_path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate13/old-release-leaf-preservation/libaidoku_kindle-4c608c45460e38aa.rmeta",
+      "local_preservation_status": "not created by this audit",
+      "overwrite_existing_local_file": false
+    },
+    {
+      "remote_path": "/root/aidoku-build/target/release/deps/aidoku_kindle-db6741e33c5d59b4",
+      "device": 2049,
+      "device_major": 8,
+      "device_minor": 1,
+      "inode": 570447,
+      "nlink": 1,
+      "mode": "0o755",
+      "bytes": 21037544,
+      "allocated_bytes": 21020672,
+      "sha256": "55bcbe2b809164a4b8e5cb43fb4242f22f37ff5e499be68a7efb5555a51a4832",
+      "eligibility": "candidate for full independent local preservation",
+      "future_local_preservation_relative_path": "artifacts/phase3/candidate13/old-release-leaf-preservation/aidoku_kindle-db6741e33c5d59b4",
+      "future_local_preservation_absolute_path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate13/old-release-leaf-preservation/aidoku_kindle-db6741e33c5d59b4",
+      "local_preservation_status": "not created by this audit",
+      "overwrite_existing_local_file": false
+    },
+    {
+      "remote_path": "/root/aidoku-build/target/debug/deps/aidoku_kindle-980e7b318b2f0141",
+      "device": 2049,
+      "device_major": 8,
+      "device_minor": 1,
+      "inode": 566055,
+      "nlink": 1,
+      "mode": "0o755",
+      "bytes": 118712952,
+      "allocated_bytes": 117719040,
+      "sha256": "af173020e36665bca13c903c2a74e5acde3f813943f5b0dbb6e50a3cf34837cc",
+      "eligibility": "candidate for full independent local preservation",
+      "future_local_preservation_relative_path": "artifacts/phase3/candidate13/old-release-leaf-preservation/aidoku_kindle-980e7b318b2f0141",
+      "future_local_preservation_absolute_path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate13/old-release-leaf-preservation/aidoku_kindle-980e7b318b2f0141",
+      "local_preservation_status": "not created by this audit",
+      "overwrite_existing_local_file": false
+    }
+  ],
+  "fingerprint_association": {
+    "release_library_directory": "/root/aidoku-build/target/release/.fingerprint/aidoku-kindle-4c608c45460e38aa",
+    "release_library_metadata": "lib-aidoku_kindle.json",
+    "release_library_features": "[]",
+    "release_test_library_directory": "/root/aidoku-build/target/release/.fingerprint/aidoku-kindle-db6741e33c5d59b4",
+    "release_test_library_metadata": "test-lib-aidoku_kindle.json",
+    "release_test_library_features": "[]",
+    "old_c12_debug_test_library_directory": "/root/aidoku-build/target/debug/.fingerprint/aidoku-kindle-980e7b318b2f0141",
+    "old_c12_debug_test_library_metadata": "test-lib-aidoku_kindle.json",
+    "old_c12_debug_test_library_features": "[\"default\", \"desktop\", \"kindle\"]",
+    "association_limit": "Exact same-package fingerprint names and metadata were inspected. The old C12/current C13 distinction and current production authority come from the parent context."
+  },
+  "proof_gaps_before_any_unlink": [
+    "No full independent local preservation copy or local-copy SHA256 verification exists from this audit.",
+    "No deletion authorization is established by this audit; the only eligibility is candidate for full independent local preservation.",
+    "Process/reference observations are snapshots, not a lock. Parent must re-establish the no-Cargo gate and recheck exact path identity, link count, size, SHA256 and maps/fd references immediately before sequential preservation and any authorized unlink.",
+    "An existing local preservation destination must never be overwritten; parent must use an exclusive-create destination and independently verify its full contents.",
+    "If nlink increases above one, the leaf is not eligible pending an exact link audit.",
+    "Current C13 protected identities and frozen failure completeness were not inspected or changed by this bounded audit."
+  ],
+  "remote_observation": {
+  "started_utc": "2026-11-07T14:04:03.026411+00:00",
+  "finished_utc": "2026-11-07T14:04:03.414952+00:00",
+  "initial_metadata_errors": [],
+  "gate_before_audit": {
+    "observed_utc": "2026-11-07T14:04:03.028156+00:00",
+    "active_cargo_or_rustc": [],
+    "errors": [],
+    "vanished_processes": 0
+  },
+  "reference_scan_before_hash": {
+    "observed_utc": "2026-11-07T14:04:03.050423+00:00",
+    "processes_examined": 251,
+    "fd_entries_examined": 3806,
+    "vanished_process_or_fd_entries": 0,
+    "references": {
+      "/root/aidoku-build/target/release/deps/libaidoku_kindle-4c608c45460e38aa.rlib": {
+        "maps": [],
+        "fds": []
+      },
+      "/root/aidoku-build/target/release/deps/libaidoku_kindle-4c608c45460e38aa.rmeta": {
+        "maps": [],
+        "fds": []
+      },
+      "/root/aidoku-build/target/release/deps/aidoku_kindle-db6741e33c5d59b4": {
+        "maps": [],
+        "fds": []
+      },
+      "/root/aidoku-build/target/debug/deps/aidoku_kindle-980e7b318b2f0141": {
+        "maps": [],
+        "fds": []
+      }
+    },
+    "errors": []
+  },
+  "leaves": [
+    {
+      "path": "/root/aidoku-build/target/release/deps/libaidoku_kindle-4c608c45460e38aa.rlib",
+      "before": {
+        "path": "/root/aidoku-build/target/release/deps/libaidoku_kindle-4c608c45460e38aa.rlib",
+        "resolved_path": "/root/aidoku-build/target/release/deps/libaidoku_kindle-4c608c45460e38aa.rlib",
+        "is_regular": true,
+        "is_symlink": false,
+        "device": 2049,
+        "device_major": 8,
+        "device_minor": 1,
+        "inode": 566062,
+        "nlink": 1,
+        "mode": "0o644",
+        "bytes": 158580816,
+        "allocated_bytes": 158588928,
+        "mtime_ns": 1794042823748488450,
+        "ctime_ns": 1794042823784486958
+      },
+      "gate_before_hash": {
+        "observed_utc": "2026-11-07T14:04:03.052159+00:00",
+        "active_cargo_or_rustc": [],
+        "errors": [],
+        "vanished_processes": 0
+      },
+      "opened": {
+        "path": "/root/aidoku-build/target/release/deps/libaidoku_kindle-4c608c45460e38aa.rlib",
+        "resolved_path": "/root/aidoku-build/target/release/deps/libaidoku_kindle-4c608c45460e38aa.rlib",
+        "is_regular": true,
+        "is_symlink": false,
+        "device": 2049,
+        "device_major": 8,
+        "device_minor": 1,
+        "inode": 566062,
+        "nlink": 1,
+        "mode": "0o644",
+        "bytes": 158580816,
+        "allocated_bytes": 158588928,
+        "mtime_ns": 1794042823748488450,
+        "ctime_ns": 1794042823784486958
+      },
+      "sha256": "6dccdaa24522c3726a6ccec86faa134bfec71f30db298483cefb6049f5240dec",
+      "hashed_bytes": 158580816,
+      "descriptor_after_hash": {
+        "path": "/root/aidoku-build/target/release/deps/libaidoku_kindle-4c608c45460e38aa.rlib",
+        "resolved_path": "/root/aidoku-build/target/release/deps/libaidoku_kindle-4c608c45460e38aa.rlib",
+        "is_regular": true,
+        "is_symlink": false,
+        "device": 2049,
+        "device_major": 8,
+        "device_minor": 1,
+        "inode": 566062,
+        "nlink": 1,
+        "mode": "0o644",
+        "bytes": 158580816,
+        "allocated_bytes": 158588928,
+        "mtime_ns": 1794042823748488450,
+        "ctime_ns": 1794042823784486958
+      },
+      "after": {
+        "path": "/root/aidoku-build/target/release/deps/libaidoku_kindle-4c608c45460e38aa.rlib",
+        "resolved_path": "/root/aidoku-build/target/release/deps/libaidoku_kindle-4c608c45460e38aa.rlib",
+        "is_regular": true,
+        "is_symlink": false,
+        "device": 2049,
+        "device_major": 8,
+        "device_minor": 1,
+        "inode": 566062,
+        "nlink": 1,
+        "mode": "0o644",
+        "bytes": 158580816,
+        "allocated_bytes": 158588928,
+        "mtime_ns": 1794042823748488450,
+        "ctime_ns": 1794042823784486958
+      },
+      "gate_after_hash": {
+        "observed_utc": "2026-11-07T14:04:03.212034+00:00",
+        "active_cargo_or_rustc": [],
+        "errors": [],
+        "vanished_processes": 0
+      },
+      "metadata_stable": true,
+      "hash_complete": true,
+      "references_observed": false,
+      "eligibility": "candidate for full independent local preservation"
+    },
+    {
+      "path": "/root/aidoku-build/target/release/deps/libaidoku_kindle-4c608c45460e38aa.rmeta",
+      "before": {
+        "path": "/root/aidoku-build/target/release/deps/libaidoku_kindle-4c608c45460e38aa.rmeta",
+        "resolved_path": "/root/aidoku-build/target/release/deps/libaidoku_kindle-4c608c45460e38aa.rmeta",
+        "is_regular": true,
+        "is_symlink": false,
+        "device": 2049,
+        "device_major": 8,
+        "device_minor": 1,
+        "inode": 566042,
+        "nlink": 1,
+        "mode": "0o644",
+        "bytes": 52398544,
+        "allocated_bytes": 52404224,
+        "mtime_ns": 1794042720148777881,
+        "ctime_ns": 1794042720148777881
+      },
+      "gate_before_hash": {
+        "observed_utc": "2026-11-07T14:04:03.213556+00:00",
+        "active_cargo_or_rustc": [],
+        "errors": [],
+        "vanished_processes": 0
+      },
+      "opened": {
+        "path": "/root/aidoku-build/target/release/deps/libaidoku_kindle-4c608c45460e38aa.rmeta",
+        "resolved_path": "/root/aidoku-build/target/release/deps/libaidoku_kindle-4c608c45460e38aa.rmeta",
+        "is_regular": true,
+        "is_symlink": false,
+        "device": 2049,
+        "device_major": 8,
+        "device_minor": 1,
+        "inode": 566042,
+        "nlink": 1,
+        "mode": "0o644",
+        "bytes": 52398544,
+        "allocated_bytes": 52404224,
+        "mtime_ns": 1794042720148777881,
+        "ctime_ns": 1794042720148777881
+      },
+      "sha256": "0bdfd336f26823ebd66739d1f99941838d45eb241e7156d05355f09004435816",
+      "hashed_bytes": 52398544,
+      "descriptor_after_hash": {
+        "path": "/root/aidoku-build/target/release/deps/libaidoku_kindle-4c608c45460e38aa.rmeta",
+        "resolved_path": "/root/aidoku-build/target/release/deps/libaidoku_kindle-4c608c45460e38aa.rmeta",
+        "is_regular": true,
+        "is_symlink": false,
+        "device": 2049,
+        "device_major": 8,
+        "device_minor": 1,
+        "inode": 566042,
+        "nlink": 1,
+        "mode": "0o644",
+        "bytes": 52398544,
+        "allocated_bytes": 52404224,
+        "mtime_ns": 1794042720148777881,
+        "ctime_ns": 1794042720148777881
+      },
+      "after": {
+        "path": "/root/aidoku-build/target/release/deps/libaidoku_kindle-4c608c45460e38aa.rmeta",
+        "resolved_path": "/root/aidoku-build/target/release/deps/libaidoku_kindle-4c608c45460e38aa.rmeta",
+        "is_regular": true,
+        "is_symlink": false,
+        "device": 2049,
+        "device_major": 8,
+        "device_minor": 1,
+        "inode": 566042,
+        "nlink": 1,
+        "mode": "0o644",
+        "bytes": 52398544,
+        "allocated_bytes": 52404224,
+        "mtime_ns": 1794042720148777881,
+        "ctime_ns": 1794042720148777881
+      },
+      "gate_after_hash": {
+        "observed_utc": "2026-11-07T14:04:03.262343+00:00",
+        "active_cargo_or_rustc": [],
+        "errors": [],
+        "vanished_processes": 0
+      },
+      "metadata_stable": true,
+      "hash_complete": true,
+      "references_observed": false,
+      "eligibility": "candidate for full independent local preservation"
+    },
+    {
+      "path": "/root/aidoku-build/target/release/deps/aidoku_kindle-db6741e33c5d59b4",
+      "before": {
+        "path": "/root/aidoku-build/target/release/deps/aidoku_kindle-db6741e33c5d59b4",
+        "resolved_path": "/root/aidoku-build/target/release/deps/aidoku_kindle-db6741e33c5d59b4",
+        "is_regular": true,
+        "is_symlink": false,
+        "device": 2049,
+        "device_major": 8,
+        "device_minor": 1,
+        "inode": 570447,
+        "nlink": 1,
+        "mode": "0o755",
+        "bytes": 21037544,
+        "allocated_bytes": 21020672,
+        "mtime_ns": 1794043070110272408,
+        "ctime_ns": 1794043070114272242
+      },
+      "gate_before_hash": {
+        "observed_utc": "2026-11-07T14:04:03.263746+00:00",
+        "active_cargo_or_rustc": [],
+        "errors": [],
+        "vanished_processes": 0
+      },
+      "opened": {
+        "path": "/root/aidoku-build/target/release/deps/aidoku_kindle-db6741e33c5d59b4",
+        "resolved_path": "/root/aidoku-build/target/release/deps/aidoku_kindle-db6741e33c5d59b4",
+        "is_regular": true,
+        "is_symlink": false,
+        "device": 2049,
+        "device_major": 8,
+        "device_minor": 1,
+        "inode": 570447,
+        "nlink": 1,
+        "mode": "0o755",
+        "bytes": 21037544,
+        "allocated_bytes": 21020672,
+        "mtime_ns": 1794043070110272408,
+        "ctime_ns": 1794043070114272242
+      },
+      "sha256": "55bcbe2b809164a4b8e5cb43fb4242f22f37ff5e499be68a7efb5555a51a4832",
+      "hashed_bytes": 21037544,
+      "descriptor_after_hash": {
+        "path": "/root/aidoku-build/target/release/deps/aidoku_kindle-db6741e33c5d59b4",
+        "resolved_path": "/root/aidoku-build/target/release/deps/aidoku_kindle-db6741e33c5d59b4",
+        "is_regular": true,
+        "is_symlink": false,
+        "device": 2049,
+        "device_major": 8,
+        "device_minor": 1,
+        "inode": 570447,
+        "nlink": 1,
+        "mode": "0o755",
+        "bytes": 21037544,
+        "allocated_bytes": 21020672,
+        "mtime_ns": 1794043070110272408,
+        "ctime_ns": 1794043070114272242
+      },
+      "after": {
+        "path": "/root/aidoku-build/target/release/deps/aidoku_kindle-db6741e33c5d59b4",
+        "resolved_path": "/root/aidoku-build/target/release/deps/aidoku_kindle-db6741e33c5d59b4",
+        "is_regular": true,
+        "is_symlink": false,
+        "device": 2049,
+        "device_major": 8,
+        "device_minor": 1,
+        "inode": 570447,
+        "nlink": 1,
+        "mode": "0o755",
+        "bytes": 21037544,
+        "allocated_bytes": 21020672,
+        "mtime_ns": 1794043070110272408,
+        "ctime_ns": 1794043070114272242
+      },
+      "gate_after_hash": {
+        "observed_utc": "2026-11-07T14:04:03.287078+00:00",
+        "active_cargo_or_rustc": [],
+        "errors": [],
+        "vanished_processes": 0
+      },
+      "metadata_stable": true,
+      "hash_complete": true,
+      "references_observed": false,
+      "eligibility": "candidate for full independent local preservation"
+    },
+    {
+      "path": "/root/aidoku-build/target/debug/deps/aidoku_kindle-980e7b318b2f0141",
+      "before": {
+        "path": "/root/aidoku-build/target/debug/deps/aidoku_kindle-980e7b318b2f0141",
+        "resolved_path": "/root/aidoku-build/target/debug/deps/aidoku_kindle-980e7b318b2f0141",
+        "is_regular": true,
+        "is_symlink": false,
+        "device": 2049,
+        "device_major": 8,
+        "device_minor": 1,
+        "inode": 566055,
+        "nlink": 1,
+        "mode": "0o755",
+        "bytes": 118712952,
+        "allocated_bytes": 117719040,
+        "mtime_ns": 1793988199935527963,
+        "ctime_ns": 1793988199939527795
+      },
+      "gate_before_hash": {
+        "observed_utc": "2026-11-07T14:04:03.288380+00:00",
+        "active_cargo_or_rustc": [],
+        "errors": [],
+        "vanished_processes": 0
+      },
+      "opened": {
+        "path": "/root/aidoku-build/target/debug/deps/aidoku_kindle-980e7b318b2f0141",
+        "resolved_path": "/root/aidoku-build/target/debug/deps/aidoku_kindle-980e7b318b2f0141",
+        "is_regular": true,
+        "is_symlink": false,
+        "device": 2049,
+        "device_major": 8,
+        "device_minor": 1,
+        "inode": 566055,
+        "nlink": 1,
+        "mode": "0o755",
+        "bytes": 118712952,
+        "allocated_bytes": 117719040,
+        "mtime_ns": 1793988199935527963,
+        "ctime_ns": 1793988199939527795
+      },
+      "sha256": "af173020e36665bca13c903c2a74e5acde3f813943f5b0dbb6e50a3cf34837cc",
+      "hashed_bytes": 118712952,
+      "descriptor_after_hash": {
+        "path": "/root/aidoku-build/target/debug/deps/aidoku_kindle-980e7b318b2f0141",
+        "resolved_path": "/root/aidoku-build/target/debug/deps/aidoku_kindle-980e7b318b2f0141",
+        "is_regular": true,
+        "is_symlink": false,
+        "device": 2049,
+        "device_major": 8,
+        "device_minor": 1,
+        "inode": 566055,
+        "nlink": 1,
+        "mode": "0o755",
+        "bytes": 118712952,
+        "allocated_bytes": 117719040,
+        "mtime_ns": 1793988199935527963,
+        "ctime_ns": 1793988199939527795
+      },
+      "after": {
+        "path": "/root/aidoku-build/target/debug/deps/aidoku_kindle-980e7b318b2f0141",
+        "resolved_path": "/root/aidoku-build/target/debug/deps/aidoku_kindle-980e7b318b2f0141",
+        "is_regular": true,
+        "is_symlink": false,
+        "device": 2049,
+        "device_major": 8,
+        "device_minor": 1,
+        "inode": 566055,
+        "nlink": 1,
+        "mode": "0o755",
+        "bytes": 118712952,
+        "allocated_bytes": 117719040,
+        "mtime_ns": 1793988199935527963,
+        "ctime_ns": 1793988199939527795
+      },
+      "gate_after_hash": {
+        "observed_utc": "2026-11-07T14:04:03.389091+00:00",
+        "active_cargo_or_rustc": [],
+        "errors": [],
+        "vanished_processes": 0
+      },
+      "metadata_stable": true,
+      "hash_complete": true,
+      "references_observed": false,
+      "eligibility": "candidate for full independent local preservation"
+    }
+  ],
+  "reference_scan_after_hash": {
+    "observed_utc": "2026-11-07T14:04:03.409825+00:00",
+    "processes_examined": 251,
+    "fd_entries_examined": 3805,
+    "vanished_process_or_fd_entries": 0,
+    "references": {
+      "/root/aidoku-build/target/release/deps/libaidoku_kindle-4c608c45460e38aa.rlib": {
+        "maps": [],
+        "fds": []
+      },
+      "/root/aidoku-build/target/release/deps/libaidoku_kindle-4c608c45460e38aa.rmeta": {
+        "maps": [],
+        "fds": []
+      },
+      "/root/aidoku-build/target/release/deps/aidoku_kindle-db6741e33c5d59b4": {
+        "maps": [],
+        "fds": []
+      },
+      "/root/aidoku-build/target/debug/deps/aidoku_kindle-980e7b318b2f0141": {
+        "maps": [],
+        "fds": []
+      }
+    },
+    "errors": []
+  },
+  "gate_after_audit": {
+    "observed_utc": "2026-11-07T14:04:03.411381+00:00",
+    "active_cargo_or_rustc": [],
+    "errors": [],
+    "vanished_processes": 0
+  },
+  "fingerprints": [
+    {
+      "directory": "/root/aidoku-build/target/release/.fingerprint/aidoku-kindle-4c608c45460e38aa",
+      "resolved_directory": "/root/aidoku-build/target/release/.fingerprint/aidoku-kindle-4c608c45460e38aa",
+      "exists": true,
+      "is_directory": true,
+      "is_symlink": false,
+      "device": 2049,
+      "inode": 673663,
+      "entries": [
+        {
+          "path": "/root/aidoku-build/target/release/.fingerprint/aidoku-kindle-4c608c45460e38aa/dep-lib-aidoku_kindle",
+          "resolved_path": "/root/aidoku-build/target/release/.fingerprint/aidoku-kindle-4c608c45460e38aa/dep-lib-aidoku_kindle",
+          "is_regular": true,
+          "is_symlink": false,
+          "device": 2049,
+          "device_major": 8,
+          "device_minor": 1,
+          "inode": 676524,
+          "nlink": 1,
+          "mode": "0o644",
+          "bytes": 4563,
+          "allocated_bytes": 8192,
+          "mtime_ns": 1794042670622826673,
+          "ctime_ns": 1794042823868483478
+        },
+        {
+          "path": "/root/aidoku-build/target/release/.fingerprint/aidoku-kindle-4c608c45460e38aa/invoked.timestamp",
+          "resolved_path": "/root/aidoku-build/target/release/.fingerprint/aidoku-kindle-4c608c45460e38aa/invoked.timestamp",
+          "is_regular": true,
+          "is_symlink": false,
+          "device": 2049,
+          "device_major": 8,
+          "device_minor": 1,
+          "inode": 676464,
+          "nlink": 1,
+          "mode": "0o644",
+          "bytes": 48,
+          "allocated_bytes": 4096,
+          "mtime_ns": 1794042670622826673,
+          "ctime_ns": 1794042670622826673
+        },
+        {
+          "path": "/root/aidoku-build/target/release/.fingerprint/aidoku-kindle-4c608c45460e38aa/lib-aidoku_kindle",
+          "resolved_path": "/root/aidoku-build/target/release/.fingerprint/aidoku-kindle-4c608c45460e38aa/lib-aidoku_kindle",
+          "is_regular": true,
+          "is_symlink": false,
+          "device": 2049,
+          "device_major": 8,
+          "device_minor": 1,
+          "inode": 676737,
+          "nlink": 1,
+          "mode": "0o644",
+          "bytes": 16,
+          "allocated_bytes": 4096,
+          "mtime_ns": 1794042823872483313,
+          "ctime_ns": 1794042823872483313
+        },
+        {
+          "path": "/root/aidoku-build/target/release/.fingerprint/aidoku-kindle-4c608c45460e38aa/lib-aidoku_kindle.json",
+          "resolved_path": "/root/aidoku-build/target/release/.fingerprint/aidoku-kindle-4c608c45460e38aa/lib-aidoku_kindle.json",
+          "is_regular": true,
+          "is_symlink": false,
+          "device": 2049,
+          "device_major": 8,
+          "device_minor": 1,
+          "inode": 676738,
+          "nlink": 1,
+          "mode": "0o644",
+          "bytes": 1854,
+          "allocated_bytes": 4096,
+          "mtime_ns": 1794042823872483313,
+          "ctime_ns": 1794042823872483313,
+          "cargo_fingerprint_json": {
+            "rustc": 11835527281324007204,
+            "features": "[]",
+            "declared_features": "[\"default\", \"desktop\", \"kindle\"]",
+            "target": 4261732485584818514,
+            "profile": 16800038387977276118,
+            "path": 10763286916239946207,
+            "deps": [
+              [
+                176887397837324762,
+                "zip",
+                false,
+                2848860572775146580
+              ],
+              [
+                1528297757488249563,
+                "url",
+                false,
+                8603642205907600421
+              ],
+              [
+                1823399657867702949,
+                "png",
+                false,
+                14095871875868284690
+              ],
+              [
+                2987262961022079395,
+                "image",
+                false,
+                3033914815712588071
+              ],
+              [
+                4878511589877685828,
+                "rusqlite",
+                false,
+                1060773982131606410
+              ],
+              [
+                5116641950707739775,
+                "wasmi",
+                false,
+                5089773611671375985
+              ],
+              [
+                6048604446020663314,
+                "slint",
+                false,
+                939618257798337440
+              ],
+              [
+                6557439603276904804,
+                "serde",
+                false,
+                12373353033203021351
+              ],
+              [
+                8160210889872729633,
+                "serde_json",
+                false,
+                451813271969036928
+              ],
+              [
+                8699875171042161596,
+                "clap",
+                false,
+                18428925652788616511
+              ],
+              [
+                9606489664311267077,
+                "ego_tree",
+                false,
+                9438742983066395582
+              ],
+              [
+                9857275760291862238,
+                "sha2",
+                false,
+                7927580074405496462
+              ],
+              [
+                10073157864167360109,
+                "scraper",
+                false,
+                8488750999171550774
+              ],
+              [
+                10364619138950789809,
+                "anyhow",
+                false,
+                1646950600574443341
+              ],
+              [
+                11768676370128199097,
+                "build_script_build",
+                false,
+                16865815642577567184
+              ],
+              [
+                13077212702700853852,
+                "base64",
+                false,
+                7519570028500658624
+              ],
+              [
+                14804767875103038591,
+                "roxmltree",
+                false,
+                12897955558159598615
+              ],
+              [
+                15239504618383797584,
+                "postcard",
+                false,
+                8799296959624450110
+              ],
+              [
+                15750875812789105499,
+                "qrcode",
+                false,
+                17636832941957635433
+              ],
+              [
+                16096353056231309054,
+                "flate2",
+                false,
+                16087186886452871866
+              ],
+              [
+                16117757646811882223,
+                "chrono",
+                false,
+                11747666558165205557
+              ],
+              [
+                17325453097244291330,
+                "reqwest",
+                false,
+                11027612652519495397
+              ],
+              [
+                17866805608252134857,
+                "tokio",
+                false,
+                3731870446593124534
+              ],
+              [
+                18070707816531966863,
+                "libc",
+                false,
+                17088386524166447795
+              ],
+              [
+                18408407127522236545,
+                "getrandom",
+                false,
+                16870822905193374282
+              ]
+            ],
+            "local": [
+              {
+                "CheckDepInfo": {
+                  "dep_info": "release/.fingerprint/aidoku-kindle-4c608c45460e38aa/dep-lib-aidoku_kindle",
+                  "checksum": false
+                }
+              }
+            ],
+            "rustflags": [],
+            "config": 9396254390672932401,
+            "compile_kind": 0
+          }
+        },
+        {
+          "path": "/root/aidoku-build/target/release/.fingerprint/aidoku-kindle-4c608c45460e38aa/output-lib-aidoku_kindle",
+          "resolved_path": "/root/aidoku-build/target/release/.fingerprint/aidoku-kindle-4c608c45460e38aa/output-lib-aidoku_kindle",
+          "is_regular": true,
+          "is_symlink": false,
+          "device": 2049,
+          "device_major": 8,
+          "device_minor": 1,
+          "inode": 655364,
+          "nlink": 1,
+          "mode": "0o644",
+          "bytes": 12408,
+          "allocated_bytes": 16384,
+          "mtime_ns": 1794042823796486461,
+          "ctime_ns": 1794042823796486461
+        }
+      ]
+    },
+    {
+      "directory": "/root/aidoku-build/target/release/.fingerprint/aidoku-kindle-db6741e33c5d59b4",
+      "resolved_directory": "/root/aidoku-build/target/release/.fingerprint/aidoku-kindle-db6741e33c5d59b4",
+      "exists": true,
+      "is_directory": true,
+      "is_symlink": false,
+      "device": 2049,
+      "inode": 1056353,
+      "entries": [
+        {
+          "path": "/root/aidoku-build/target/release/.fingerprint/aidoku-kindle-db6741e33c5d59b4/dep-test-lib-aidoku_kindle",
+          "resolved_path": "/root/aidoku-build/target/release/.fingerprint/aidoku-kindle-db6741e33c5d59b4/dep-test-lib-aidoku_kindle",
+          "is_regular": true,
+          "is_symlink": false,
+          "device": 2049,
+          "device_major": 8,
+          "device_minor": 1,
+          "inode": 1056358,
+          "nlink": 1,
+          "mode": "0o644",
+          "bytes": 4675,
+          "allocated_bytes": 8192,
+          "mtime_ns": 1794042864550797858,
+          "ctime_ns": 1794043070158270416
+        },
+        {
+          "path": "/root/aidoku-build/target/release/.fingerprint/aidoku-kindle-db6741e33c5d59b4/invoked.timestamp",
+          "resolved_path": "/root/aidoku-build/target/release/.fingerprint/aidoku-kindle-db6741e33c5d59b4/invoked.timestamp",
+          "is_regular": true,
+          "is_symlink": false,
+          "device": 2049,
+          "device_major": 8,
+          "device_minor": 1,
+          "inode": 1056355,
+          "nlink": 1,
+          "mode": "0o644",
+          "bytes": 48,
+          "allocated_bytes": 4096,
+          "mtime_ns": 1794042864550797858,
+          "ctime_ns": 1794042864550797858
+        },
+        {
+          "path": "/root/aidoku-build/target/release/.fingerprint/aidoku-kindle-db6741e33c5d59b4/output-test-lib-aidoku_kindle",
+          "resolved_path": "/root/aidoku-build/target/release/.fingerprint/aidoku-kindle-db6741e33c5d59b4/output-test-lib-aidoku_kindle",
+          "is_regular": true,
+          "is_symlink": false,
+          "device": 2049,
+          "device_major": 8,
+          "device_minor": 1,
+          "inode": 1052165,
+          "nlink": 1,
+          "mode": "0o644",
+          "bytes": 7340,
+          "allocated_bytes": 8192,
+          "mtime_ns": 1794043070130271579,
+          "ctime_ns": 1794043070130271579
+        },
+        {
+          "path": "/root/aidoku-build/target/release/.fingerprint/aidoku-kindle-db6741e33c5d59b4/test-lib-aidoku_kindle",
+          "resolved_path": "/root/aidoku-build/target/release/.fingerprint/aidoku-kindle-db6741e33c5d59b4/test-lib-aidoku_kindle",
+          "is_regular": true,
+          "is_symlink": false,
+          "device": 2049,
+          "device_major": 8,
+          "device_minor": 1,
+          "inode": 1056359,
+          "nlink": 1,
+          "mode": "0o644",
+          "bytes": 16,
+          "allocated_bytes": 4096,
+          "mtime_ns": 1794043070162270250,
+          "ctime_ns": 1794043070162270250
+        },
+        {
+          "path": "/root/aidoku-build/target/release/.fingerprint/aidoku-kindle-db6741e33c5d59b4/test-lib-aidoku_kindle.json",
+          "resolved_path": "/root/aidoku-build/target/release/.fingerprint/aidoku-kindle-db6741e33c5d59b4/test-lib-aidoku_kindle.json",
+          "is_regular": true,
+          "is_symlink": false,
+          "device": 2049,
+          "device_major": 8,
+          "device_minor": 1,
+          "inode": 1056360,
+          "nlink": 1,
+          "mode": "0o644",
+          "bytes": 1973,
+          "allocated_bytes": 4096,
+          "mtime_ns": 1794043070162270250,
+          "ctime_ns": 1794043070162270250,
+          "cargo_fingerprint_json": {
+            "rustc": 11835527281324007204,
+            "features": "[]",
+            "declared_features": "[\"default\", \"desktop\", \"kindle\"]",
+            "target": 4261732485584818514,
+            "profile": 11584638048171146339,
+            "path": 10763286916239946207,
+            "deps": [
+              [
+                176887397837324762,
+                "zip",
+                false,
+                2848860572775146580
+              ],
+              [
+                1528297757488249563,
+                "url",
+                false,
+                8603642205907600421
+              ],
+              [
+                1823399657867702949,
+                "png",
+                false,
+                14095871875868284690
+              ],
+              [
+                2987262961022079395,
+                "image",
+                false,
+                3033914815712588071
+              ],
+              [
+                4878511589877685828,
+                "rusqlite",
+                false,
+                1060773982131606410
+              ],
+              [
+                5116641950707739775,
+                "wasmi",
+                false,
+                5089773611671375985
+              ],
+              [
+                6048604446020663314,
+                "slint",
+                false,
+                939618257798337440
+              ],
+              [
+                6557439603276904804,
+                "serde",
+                false,
+                12373353033203021351
+              ],
+              [
+                8160210889872729633,
+                "serde_json",
+                false,
+                451813271969036928
+              ],
+              [
+                8699875171042161596,
+                "clap",
+                false,
+                18428925652788616511
+              ],
+              [
+                8782239171282771184,
+                "wat",
+                false,
+                9368602850393133502
+              ],
+              [
+                9606489664311267077,
+                "ego_tree",
+                false,
+                9438742983066395582
+              ],
+              [
+                9723370144619655183,
+                "tempfile",
+                false,
+                15229036094701649206
+              ],
+              [
+                9857275760291862238,
+                "sha2",
+                false,
+                7927580074405496462
+              ],
+              [
+                10073157864167360109,
+                "scraper",
+                false,
+                8488750999171550774
+              ],
+              [
+                10364619138950789809,
+                "anyhow",
+                false,
+                1646950600574443341
+              ],
+              [
+                11768676370128199097,
+                "build_script_build",
+                false,
+                16865815642577567184
+              ],
+              [
+                13077212702700853852,
+                "base64",
+                false,
+                7519570028500658624
+              ],
+              [
+                14804767875103038591,
+                "roxmltree",
+                false,
+                12897955558159598615
+              ],
+              [
+                15239504618383797584,
+                "postcard",
+                false,
+                8799296959624450110
+              ],
+              [
+                15750875812789105499,
+                "qrcode",
+                false,
+                17636832941957635433
+              ],
+              [
+                16096353056231309054,
+                "flate2",
+                false,
+                16087186886452871866
+              ],
+              [
+                16117757646811882223,
+                "chrono",
+                false,
+                11747666558165205557
+              ],
+              [
+                17325453097244291330,
+                "reqwest",
+                false,
+                11027612652519495397
+              ],
+              [
+                17866805608252134857,
+                "tokio",
+                false,
+                3731870446593124534
+              ],
+              [
+                18070707816531966863,
+                "libc",
+                false,
+                17088386524166447795
+              ],
+              [
+                18408407127522236545,
+                "getrandom",
+                false,
+                16870822905193374282
+              ]
+            ],
+            "local": [
+              {
+                "CheckDepInfo": {
+                  "dep_info": "release/.fingerprint/aidoku-kindle-db6741e33c5d59b4/dep-test-lib-aidoku_kindle",
+                  "checksum": false
+                }
+              }
+            ],
+            "rustflags": [],
+            "config": 9396254390672932401,
+            "compile_kind": 0
+          }
+        }
+      ]
+    },
+    {
+      "directory": "/root/aidoku-build/target/debug/.fingerprint/aidoku-kindle-980e7b318b2f0141",
+      "resolved_directory": "/root/aidoku-build/target/debug/.fingerprint/aidoku-kindle-980e7b318b2f0141",
+      "exists": true,
+      "is_directory": true,
+      "is_symlink": false,
+      "device": 2049,
+      "inode": 3295844,
+      "entries": [
+        {
+          "path": "/root/aidoku-build/target/debug/.fingerprint/aidoku-kindle-980e7b318b2f0141/dep-test-lib-aidoku_kindle",
+          "resolved_path": "/root/aidoku-build/target/debug/.fingerprint/aidoku-kindle-980e7b318b2f0141/dep-test-lib-aidoku_kindle",
+          "is_regular": true,
+          "is_symlink": false,
+          "device": 2049,
+          "device_major": 8,
+          "device_minor": 1,
+          "inode": 3295860,
+          "nlink": 1,
+          "mode": "0o644",
+          "bytes": 4703,
+          "allocated_bytes": 8192,
+          "mtime_ns": 1793988157337315388,
+          "ctime_ns": 1793988200039523599
+        },
+        {
+          "path": "/root/aidoku-build/target/debug/.fingerprint/aidoku-kindle-980e7b318b2f0141/invoked.timestamp",
+          "resolved_path": "/root/aidoku-build/target/debug/.fingerprint/aidoku-kindle-980e7b318b2f0141/invoked.timestamp",
+          "is_regular": true,
+          "is_symlink": false,
+          "device": 2049,
+          "device_major": 8,
+          "device_minor": 1,
+          "inode": 3295855,
+          "nlink": 1,
+          "mode": "0o644",
+          "bytes": 48,
+          "allocated_bytes": 4096,
+          "mtime_ns": 1793988157337315388,
+          "ctime_ns": 1793988157337315388
+        },
+        {
+          "path": "/root/aidoku-build/target/debug/.fingerprint/aidoku-kindle-980e7b318b2f0141/output-test-lib-aidoku_kindle",
+          "resolved_path": "/root/aidoku-build/target/debug/.fingerprint/aidoku-kindle-980e7b318b2f0141/output-test-lib-aidoku_kindle",
+          "is_regular": true,
+          "is_symlink": false,
+          "device": 2049,
+          "device_major": 8,
+          "device_minor": 1,
+          "inode": 3295858,
+          "nlink": 1,
+          "mode": "0o644",
+          "bytes": 7340,
+          "allocated_bytes": 8192,
+          "mtime_ns": 1793988199999525277,
+          "ctime_ns": 1793988199999525277
+        },
+        {
+          "path": "/root/aidoku-build/target/debug/.fingerprint/aidoku-kindle-980e7b318b2f0141/test-lib-aidoku_kindle",
+          "resolved_path": "/root/aidoku-build/target/debug/.fingerprint/aidoku-kindle-980e7b318b2f0141/test-lib-aidoku_kindle",
+          "is_regular": true,
+          "is_symlink": false,
+          "device": 2049,
+          "device_major": 8,
+          "device_minor": 1,
+          "inode": 3295863,
+          "nlink": 1,
+          "mode": "0o644",
+          "bytes": 16,
+          "allocated_bytes": 4096,
+          "mtime_ns": 1793988200039523599,
+          "ctime_ns": 1793988200039523599
+        },
+        {
+          "path": "/root/aidoku-build/target/debug/.fingerprint/aidoku-kindle-980e7b318b2f0141/test-lib-aidoku_kindle.json",
+          "resolved_path": "/root/aidoku-build/target/debug/.fingerprint/aidoku-kindle-980e7b318b2f0141/test-lib-aidoku_kindle.json",
+          "is_regular": true,
+          "is_symlink": false,
+          "device": 2049,
+          "device_major": 8,
+          "device_minor": 1,
+          "inode": 3295864,
+          "nlink": 1,
+          "mode": "0o644",
+          "bytes": 2081,
+          "allocated_bytes": 4096,
+          "mtime_ns": 1793988200039523599,
+          "ctime_ns": 1793988200039523599,
+          "cargo_fingerprint_json": {
+            "rustc": 11835527281324007204,
+            "features": "[\"default\", \"desktop\", \"kindle\"]",
+            "declared_features": "[\"default\", \"desktop\", \"kindle\"]",
+            "target": 4261732485584818514,
+            "profile": 14317819268458157334,
+            "path": 10763286916239946207,
+            "deps": [
+              [
+                176887397837324762,
+                "zip",
+                false,
+                9293264749000311632
+              ],
+              [
+                1528297757488249563,
+                "url",
+                false,
+                11571299779085784969
+              ],
+              [
+                1823399657867702949,
+                "png",
+                false,
+                1293932983769804320
+              ],
+              [
+                2987262961022079395,
+                "image",
+                false,
+                8065808400808594626
+              ],
+              [
+                4878511589877685828,
+                "rusqlite",
+                false,
+                16395208858652359126
+              ],
+              [
+                5116641950707739775,
+                "wasmi",
+                false,
+                16010426660947593686
+              ],
+              [
+                6048604446020663314,
+                "slint",
+                false,
+                18235371943700902779
+              ],
+              [
+                6557439603276904804,
+                "serde",
+                false,
+                3409537595313509690
+              ],
+              [
+                8160210889872729633,
+                "serde_json",
+                false,
+                764372156828328133
+              ],
+              [
+                8699875171042161596,
+                "clap",
+                false,
+                10540395279053040283
+              ],
+              [
+                8782239171282771184,
+                "wat",
+                false,
+                13037077126655406238
+              ],
+              [
+                9606489664311267077,
+                "ego_tree",
+                false,
+                7763809111901563269
+              ],
+              [
+                9723370144619655183,
+                "tempfile",
+                false,
+                7982601021208042179
+              ],
+              [
+                9857275760291862238,
+                "sha2",
+                false,
+                10011673688611196805
+              ],
+              [
+                10073157864167360109,
+                "scraper",
+                false,
+                7950929060784865522
+              ],
+              [
+                10364619138950789809,
+                "anyhow",
+                false,
+                13137811165166210146
+              ],
+              [
+                11768676370128199097,
+                "build_script_build",
+                false,
+                12272256929479765969
+              ],
+              [
+                13077212702700853852,
+                "base64",
+                false,
+                5640739700472615371
+              ],
+              [
+                14804767875103038591,
+                "roxmltree",
+                false,
+                16992304753902897462
+              ],
+              [
+                14858941681709501900,
+                "slint_backend_kindle",
+                false,
+                18019743958791519890
+              ],
+              [
+                15239504618383797584,
+                "postcard",
+                false,
+                7736757749710476000
+              ],
+              [
+                15750875812789105499,
+                "qrcode",
+                false,
+                4596458145999046320
+              ],
+              [
+                16096353056231309054,
+                "flate2",
+                false,
+                11918772530216760164
+              ],
+              [
+                16117757646811882223,
+                "chrono",
+                false,
+                12518209221141171727
+              ],
+              [
+                17325453097244291330,
+                "reqwest",
+                false,
+                863786791220382926
+              ],
+              [
+                17866805608252134857,
+                "tokio",
+                false,
+                15020691658367416813
+              ],
+              [
+                18070707816531966863,
+                "libc",
+                false,
+                14502339314153604662
+              ],
+              [
+                18408407127522236545,
+                "getrandom",
+                false,
+                200687205440089002
+              ]
+            ],
+            "local": [
+              {
+                "CheckDepInfo": {
+                  "dep_info": "debug/.fingerprint/aidoku-kindle-980e7b318b2f0141/dep-test-lib-aidoku_kindle",
+                  "checksum": false
+                }
+              }
+            ],
+            "rustflags": [],
+            "config": 9396254390672932401,
+            "compile_kind": 0
+          }
+        }
+      ]
+    }
+  ],
+  "total_bytes": 350729856,
+  "total_allocated_bytes": 349732864,
+  "all_scan_errors": [],
+  "all_observed_active_cargo_or_rustc": []
+}
+}

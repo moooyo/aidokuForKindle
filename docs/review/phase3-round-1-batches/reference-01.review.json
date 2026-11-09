@@ -1,0 +1,147 @@
+{
+  "batch_id": "reference-01",
+  "reviewer": "/root/phase3_round1_review/reference_01",
+  "run_id": "a1baf3fe3dc2",
+  "review_kind": "Fresh independent visual review of four assigned reference pairs",
+  "reviewed_case_ids": [
+    "Main--default",
+    "Main--download-queue",
+    "Main--jump-pages",
+    "Main--more"
+  ],
+  "comparison_basis": {
+    "candidate_native_size": [
+      618,
+      824
+    ],
+    "candidate_scale": "1x logical",
+    "reference_physical_size": [
+      1236,
+      1648
+    ],
+    "reference_scale": "2x physical",
+    "comparison": "Reference coordinates were interpreted at half their physical values. The overall image-size difference was not treated as a finding.",
+    "identity_method": "Get-FileHash SHA256 over each original PNG file; candidate byte SHA256 is the pixel identity.",
+    "viewed_images": 8,
+    "image_transformations_performed": false
+  },
+  "provenance": {
+    "binary_sha256": "94d7f3bbcab475ad8833a2f3c486138f7b49bead231851c2d8eab2f0c3d2ac51",
+    "source_sha256": "aef9db4e111165016a10a2a95e111f3155860b8510c7f6207ec9c79fbec5082c",
+    "supplied_reference_package_sha256": "e7b49b456255432d74cfe41346f9d44c1a9c55bf67c5d55483e4ae3029547d18",
+    "case_metadata_run_binary_source_match": true,
+    "all_candidate_hashes_match_case_screenshot_evidence": true,
+    "all_reference_hashes_match_case_reference_metadata": true,
+    "reference_package_hash_independently_verified": false,
+    "note": "The four case metadata files identify the requested run, binary, and source. Package-level reference SHA256 is not present in the assigned case JSON files; individual reference PNG hashes were verified."
+  },
+  "reviewed_cases": [
+    {
+      "case_id": "Main--default",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/Main--default.png",
+      "candidate_sha256": "fc37f360ba9d0c7ac18d345fbe63e55257fbb687c23114c8add630ad6d6b2603",
+      "reference_png": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/screens/Main.png",
+      "reference_sha256": "5bfcaf7ba4498c67521496470e127e402adea0f4d7aec77510d6c51226b53927",
+      "viewed_candidate": true,
+      "viewed_reference": true,
+      "outcome": "pass",
+      "observations": [
+        "At equal logical scale, the white continuation card is approximately x16..602 and y104..227, and the four-column, two-row cover grid starts around y291, matching the reference allocations.",
+        "Unread badges and downloaded icons remain next to book titles below the cover frames. All eight visible titles and their state markers fit without unintended clipping.",
+        "The heavy serif page and continuation titles, smaller body labels, black primary text, secondary gray text, and light gray progress track preserve the reference hierarchy. White interface surfaces show no offset shadow or stippled backdrop.",
+        "The centered folio remains around y727 above the 72 px dock, whose top is around y752. The next-page action and all five dock items remain visible."
+      ],
+      "intentional_differences": [
+        "Cover artwork and raster detail differ from the reference artwork; cover-frame geometry and title-adjacent state placement were still reviewed."
+      ]
+    },
+    {
+      "case_id": "Main--download-queue",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/Main--download-queue.png",
+      "candidate_sha256": "aefba74f952e73d29463990e409379aed218e4289bbae5812c2204f3f3bafc42",
+      "reference_png": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/screens/states/Main--download-queue.png",
+      "reference_sha256": "469fb0191d453afc3a3cdfedbc2bb4004db45174a8076b359ee4f324d6f99804",
+      "viewed_candidate": true,
+      "viewed_reference": true,
+      "outcome": "pass_with_intentional_differences",
+      "observations": [
+        "The full-width white queue sheet starts at approximately y423 in the candidate and y475 logical in the reference. Its header and three visible queue rows retain the reference-relative spacing, cover allocations, and progress-track geometry.",
+        "Three queue rows show complete cover frames, title/chapter text, progress tracks, and reserved right-side counter or waiting-state space. Long fixture titles ellipsize before the status allocation instead of colliding with it.",
+        "The pause-all and close controls remain fully visible in the header. The two-page folio and next-page control remain fully visible at the bottom, with no row or control clipping.",
+        "The heavy serif sheet title, body type, black progress fill, secondary gray status text, white surface, and plain top rule preserve the reference hierarchy without shadow or stippled overlay."
+      ],
+      "intentional_differences": [
+        "Actual download workers produced a five-item queue and a two-page folio, while the reference contains three fixture queue entries. Titles, cover content, counters, progress, time, and library counts are data differences.",
+        "The candidate sheet is approximately 401 px high rather than the reference's 349 px because it adds the required 52 px folio. This is a supported content expansion: prototype/Main.dc.html:174 anchors the sheet at bottom:0 without a fixed height, and docs/DESIGN_HANDOFF.md:279-280 explicitly states that sheets follow content rather than fixed heights."
+      ]
+    },
+    {
+      "case_id": "Main--jump-pages",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/Main--jump-pages.png",
+      "candidate_sha256": "06fdc499631522b586a060d24d5dec6fbdea707ee8819531dc00a4ebe9967495",
+      "reference_png": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/screens/states/Main--jump-pages.png",
+      "reference_sha256": "1b381b140df164e5e0f9491d2cb28dfe182792bceeb4e75803ac8408be54ffff",
+      "viewed_candidate": true,
+      "viewed_reference": true,
+      "outcome": "issues_found",
+      "observations": [
+        "The white jump panel begins at approximately y583. Its heading around y604 and the six page buttons at approximately y638..684 align with the reference at logical scale.",
+        "The six page cells keep approximately 72 x 46 px allocations and 8 px gaps. The current page and center folio have the intended black inverse treatment; the folio and 72 px dock remain fully visible.",
+        "The full-width black rule appears around y641 in the candidate, behind the upper portion of the page-button row, rather than at the top of the panel. The reference rule is around physical y1168, or logical y584, above the heading.",
+        "No additional font, grayscale, or text-clipping defect was observed in this captured state. The visible page controls have clear contrast and no overlapping labels."
+      ],
+      "intentional_differences": [
+        "Cover artwork and raster detail differ from the reference artwork; this does not explain or exempt the misplaced panel rule."
+      ]
+    },
+    {
+      "case_id": "Main--more",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/Main--more.png",
+      "candidate_sha256": "09c94b26316a72d041334060e8daeacb5685d804ea9ce995492560c83c933fc4",
+      "reference_png": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/screens/states/Main--more.png",
+      "reference_sha256": "cc740c4be85a90bba48238897d459e0819245937ae0e878f6a8d28cb9107a2d0",
+      "viewed_candidate": true,
+      "viewed_reference": true,
+      "outcome": "issues_found",
+      "observations": [
+        "The anchored menu occupies approximately x328..604 and y84..316, matching the reference outer geometry at logical scale. Its four 54 px rows preserve the icon and text columns.",
+        "The menu has a white surface, 2 px dark outline, small corner radius, and no shadow or background scrim. Labels are legible, aligned, and fully visible.",
+        "The third row uses a standalone check mark in the candidate. The reference uses an outlined square checkbox with an internal check mark; prototype/Main.dc.html:278 includes the square outline in its icon path.",
+        "All four context actions are visible. Static imagery and case metadata support their displayed context, but their interaction behavior was not executed in this review."
+      ],
+      "intentional_differences": [
+        "The candidate uses download-management wording and omits the reference queue count of three because its case metadata records an empty queue. This truthful data/context difference was not treated as a defect.",
+        "Cover artwork and raster detail behind the menu differ from the reference artwork."
+      ]
+    }
+  ],
+  "suggestions": [
+    {
+      "id": "P3R1-REF01-1",
+      "case_id": "Main--jump-pages",
+      "priority": "P2",
+      "description": "The page-jump panel's separator rule is drawn through the page-button row instead of along the panel's top edge.",
+      "evidence": "The original candidate PNG shows the white panel starting at about y583 and the page buttons at y638..684, but the full-width black rule is at about y641. The reference rule is at physical y1168, or logical y584, above the heading. docs/DESIGN_HANDOFF.md:152-153 and the supplied HANDOFF.md:114 specify a 2 px top rule.",
+      "recommendation": "Anchor the 2 px rule to the top edge of the white jump panel, approximately y584 logical for this state, and keep it outside the heading and page-button content. Preserve the current button, folio, and dock allocations.",
+      "status": "open",
+      "introduced_round": 1
+    },
+    {
+      "id": "P3R1-REF01-2",
+      "case_id": "Main--more",
+      "priority": "P3",
+      "description": "The multiselect menu icon omits the outlined square shown in the reference.",
+      "evidence": "The candidate's third menu row shows a standalone check near x351/y219 logical, while the reference shows a square checkbox with a check at the same allocation. prototype/Main.dc.html:278 specifies the square path M4 4h16v16H4z before the check path.",
+      "recommendation": "Use the reference's outlined square with an internal check for the multiselect action while preserving the existing row spacing and icon alignment.",
+      "status": "open",
+      "introduced_round": 1
+    }
+  ],
+  "limitations": [
+    "This review covers only the four assigned case pairs and eight original PNGs in reference-01. It does not assert a clean complete round.",
+    "No application, build, test suite, smoke test, runtime probe, or interactive dismissal/navigation check was run. Reachability conclusions are limited to visible, unclipped controls and the supplied case metadata.",
+    "Binary and source SHA256 values were checked against the declared values in each case metadata file, not recalculated from binary or source artifacts. The supplied package-level reference hash was not independently verified from these case files.",
+    "Coordinates are approximate visual readings interpreted at matched logical scale. No PNG was rescaled, cropped, regenerated, or overwritten for this review.",
+    "No product code, git state, or files outside this single review output were modified."
+  ]
+}

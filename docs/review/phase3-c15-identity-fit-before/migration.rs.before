@@ -1,0 +1,884 @@
+//! Transient migration matching, preparation, and guarded commit orchestration.
+
+use super::*;
+
+use crate::store::migration::MigrationOptions;
+use crate::ui::BookItem;
+
+const MAX_CANDIDATES: usize = 12;
+const MAX_CANDIDATES_PER_SOURCE: usize = 3;
+const MAX_SEARCH_SOURCES: usize = 12;
+const CANDIDATES_PER_PAGE: usize = 3;
+const MAX_TITLE_HINT_CHARS: usize = 256;
+const MIN_APPROXIMATE_TITLE_CHARS: usize = 8;
+
+#[derive(Debug, Clone)]
+struct RequestStamp {
+    generation: u64,
+    origin_book_id: String,
+    source_revision: u64,
+    network_epoch: u64,
+    lifecycle_generation: u64,
+}
+
+pub(crate) struct CandidateResult {
+    stamp: RequestStamp,
+    candidates: Vec<Book>,
+    source_names: HashMap<String, String>,
+    errors: Vec<String>,
+    cached: bool,
+    limited: bool,
+}
+
+pub(crate) struct PreparedMigration {
+    stamp: RequestStamp,
+    selected_id: String,
+    result: std::result::Result<(Book, Vec<Chapter>), String>,
+}
+
+pub(crate) struct MigrationState {
+    generation: u64,
+    cancellation: Arc<AtomicU64>,
+    origin_book_id: String,
+    origin_title: String,
+    candidates: Vec<Book>,
+    source_names: HashMap<String, String>,
+    selected_id: String,
+    preserve_read: bool,
+    preserve_category: bool,
+    remove_downloads: bool,
+    loading: bool,
+    committing: bool,
+    status: String,
+    request: Option<RequestStamp>,
+    inflight: Option<u64>,
+}
+
+impl Default for MigrationState {
+    fn default() -> Self {
+        Self {
+            generation: 0,
+            cancellation: Arc::new(AtomicU64::new(0)),
+            origin_book_id: String::new(),
+            origin_title: String::new(),
+            candidates: Vec::new(),
+            source_names: HashMap::new(),
+            selected_id: String::new(),
+            preserve_read: true,
+            preserve_category: true,
+            remove_downloads: false,
+            loading: false,
+            committing: false,
+            status: String::new(),
+            request: None,
+            inflight: None,
+        }
+    }
+}
+
+impl App {
+    pub(crate) fn open_migration(&mut self) -> Result<()> {
+        let origin = self.current_book()?;
+        self.cancel_migration();
+        self.migration.origin_book_id = origin.id;
+        self.migration.origin_title = origin.title;
+        self.migration.preserve_read = true;
+        self.migration.preserve_category = true;
+        self.migration.remove_downloads = false;
+        self.show_choices(&tr("migrate_source"), "migration", Vec::new())?;
+        if let Err(error) = self.search_migration_candidates() {
+            self.record_migration_failure(&error);
+        }
+        Ok(())
+    }
+
+    pub(crate) fn cancel_migration(&mut self) {
+        if let Some(id) = self.migration.inflight.take() {
+            self.pending.remove(&id);
+            self.busy = !self.pending.is_empty();
+        }
+        self.migration.generation = self.migration.generation.wrapping_add(1);
+        self.migration
+            .cancellation
+            .store(self.migration.generation, Ordering::Release);
+        self.migration.loading = false;
+        self.migration.committing = false;
+        self.migration.request = None;
+        self.migration.inflight = None;
+        self.migration.origin_title.clear();
+        self.migration.candidates.clear();
+        self.migration.source_names.clear();
+        self.migration.selected_id.clear();
+        self.migration.status.clear();
+        if self.modal_context == "migration" {
+            self.modal.clear();
+            self.modal_context.clear();
+            self.choice_rows.clear();
+            self.choice_total = 0;
+            self.panel_page = 0;
+        }
+    }
+
+    pub(crate) fn migration_action(&mut self, action: &str, value: &str) -> Result<()> {
+        if action == "cancel" {
+            self.cancel_migration();
+            return Ok(());
+        }
+        if self.modal_context != "migration" || self.modal.is_empty() {
+            return Ok(());
+        }
+        if self
+            .migration
+            .inflight
+            .is_some_and(|id| !self.pending.contains(&id))
+        {
+            self.migration.inflight = None;
+            self.migration.loading = false;
+            self.migration.committing = false;
+        }
+        if self
+            .migration
+            .request
+            .as_ref()
+            .is_some_and(|stamp| !self.migration_stamp_is_current(stamp))
+        {
+            self.migration.loading = false;
+            self.migration.committing = false;
+        }
+        match action {
+            "select" if !self.migration.loading && !self.migration.committing => {
+                anyhow::ensure!(
+                    self.migration
+                        .candidates
+                        .iter()
+                        .any(|book| book.id == value),
+                    "The selected migration candidate is unavailable"
+                );
+                self.migration.selected_id = value.into();
+            }
+            "toggle-read" if !self.migration.committing => {
+                self.migration.preserve_read = !self.migration.preserve_read;
+            }
+            "toggle-categories" if !self.migration.committing => {
+                self.migration.preserve_category = !self.migration.preserve_category;
+            }
+            "toggle-delete-downloads" if !self.migration.committing => {
+                self.migration.remove_downloads = !self.migration.remove_downloads;
+            }
+            "retry" if !self.migration.committing => {
+                if let Err(error) = self.search_migration_candidates() {
+                    self.record_migration_failure(&error);
+                }
+            }
+            "start" => {
+                if let Err(error) = self.prepare_migration() {
+                    self.record_migration_failure(&error);
+                }
+            }
+            "page" => {
+                if let Some(ui) = self.ui.upgrade() {
+                    ui.global::<State>().set_page_jump_open(false);
+                }
+                let delta = value.parse::<i32>()?;
+                let count = self
+                    .migration
+                    .candidates
+                    .len()
+                    .div_ceil(CANDIDATES_PER_PAGE)
+                    .max(1);
+                self.panel_page = (self.panel_page as i64 + i64::from(delta))
+                    .clamp(0, count.saturating_sub(1) as i64)
+                    as usize;
+            }
+            _ => {}
+        }
+        Ok(())
+    }
+
+    fn record_migration_failure(&mut self, error: &anyhow::Error) {
+        self.migration.loading = false;
+        self.migration.committing = false;
+        self.migration.status = format!("{}: {error:#}", tr("migration_failed"));
+    }
+
+    fn migration_stamp(&self) -> RequestStamp {
+        RequestStamp {
+            generation: self.migration.generation,
+            origin_book_id: self.migration.origin_book_id.clone(),
+            source_revision: self.source_configuration_revision.load(Ordering::Acquire),
+            network_epoch: self.network_control.epoch(),
+            lifecycle_generation: self.lifecycle_generation,
+        }
+    }
+
+    fn migration_stamp_is_current(&self, stamp: &RequestStamp) -> bool {
+        stamp.generation == self.migration.generation
+            && stamp.origin_book_id == self.migration.origin_book_id
+            && self.current_book_id.as_deref() == Some(stamp.origin_book_id.as_str())
+            && self.route == "detail"
+            && self.modal_context == "migration"
+            && !self.modal.is_empty()
+            && stamp.source_revision == self.source_configuration_revision.load(Ordering::Acquire)
+            && stamp.network_epoch == self.network_control.epoch()
+            && stamp.lifecycle_generation == self.lifecycle_generation
+            && !self.suspended
+    }
+
+    pub(crate) fn finish_migration_job(
+        &mut self,
+        job_id: u64,
+        error: Option<&anyhow::Error>,
+    ) -> bool {
+        if self.migration.inflight != Some(job_id) {
+            return false;
+        }
+        self.migration.inflight = None;
+        self.migration.loading = false;
+        self.migration.committing = false;
+        if !self
+            .migration
+            .request
+            .as_ref()
+            .is_some_and(|stamp| self.migration_stamp_is_current(stamp))
+        {
+            self.migration.origin_title.clear();
+            self.migration.candidates.clear();
+            self.migration.selected_id.clear();
+            if self.modal_context == "migration" {
+                self.choice_total = 0;
+                self.panel_page = 0;
+            }
+            self.migration.status = tr("migration_retry_required");
+        } else if let Some(error) = error {
+            self.migration.status = format!("{}: {error:#}", tr("migration_failed"));
+        }
+        true
+    }
+
+    pub(crate) fn migration_job_is_active(&self, job_id: u64) -> bool {
+        self.migration.inflight == Some(job_id)
+    }
+
+    fn search_migration_candidates(&mut self) -> Result<()> {
+        let origin = self.current_book()?;
+        anyhow::ensure!(
+            origin.id == self.migration.origin_book_id,
+            "The manga selected for migration changed"
+        );
+        self.migration.origin_title.clone_from(&origin.title);
+        let mut sources = self
+            .store
+            .sources()?
+            .into_iter()
+            .filter(|source| source.enabled && source.id != origin.source_id)
+            .collect::<Vec<_>>();
+        sources.sort_by(|first, second| first.id.cmp(&second.id));
+        let limited = sources.len() > MAX_SEARCH_SOURCES;
+        sources.truncate(MAX_SEARCH_SOURCES);
+        self.migration.generation = self.migration.generation.wrapping_add(1);
+        self.migration
+            .cancellation
+            .store(self.migration.generation, Ordering::Release);
+        self.migration.candidates.clear();
+        self.migration.source_names.clear();
+        self.migration.selected_id.clear();
+        self.migration.loading = !sources.is_empty();
+        self.migration.committing = false;
+        self.migration.status = tr(if sources.is_empty() {
+            "migration_no_sources"
+        } else {
+            "migration_searching"
+        });
+        self.choice_rows.clear();
+        self.choice_total = 0;
+        self.panel_page = 0;
+        let stamp = self.migration_stamp();
+        self.migration.request = Some(stamp.clone());
+        if sources.is_empty() {
+            return Ok(());
+        }
+        let cached = self.options.offline || self.options.demo;
+        let cancellation = self.migration.cancellation.clone();
+        let database = self.data_dir.join("library.sqlite3");
+        let query = origin.title.trim().to_owned();
+        anyhow::ensure!(!query.is_empty(), "The manga title is empty");
+        let operation = move |manager: Option<Arc<SourceManager>>| {
+            let mut candidates = Vec::new();
+            let mut source_names = HashMap::new();
+            let mut errors = Vec::new();
+            let mut seen = HashSet::new();
+            let store = Store::open_read_only(&database)?;
+            for source in sources {
+                if cancellation.load(Ordering::Acquire) != stamp.generation {
+                    break;
+                }
+                if candidates.len() >= MAX_CANDIDATES {
+                    break;
+                }
+                source_names.insert(source.id.clone(), source.name.clone());
+                let result = if cached || source.kind == "local" {
+                    store.source_search_matches(&query, &source.id, MAX_CANDIDATES_PER_SOURCE)
+                } else {
+                    manager
+                        .as_ref()
+                        .context("The migration source manager is unavailable")?
+                        .search_page(&source.id, &query, 1)
+                        .map(|result| result.books)
+                };
+                match result {
+                    Ok(books) => {
+                        let available =
+                            (MAX_CANDIDATES - candidates.len()).min(MAX_CANDIDATES_PER_SOURCE);
+                        candidates.extend(
+                            books
+                                .into_iter()
+                                .filter(|book| valid_candidate(book, &source.id, &origin.id))
+                                .filter(|book| seen.insert(book.id.clone()))
+                                .take(available),
+                        );
+                    }
+                    Err(error) => errors.push(format!("{}: {error:#}", source.name)),
+                }
+            }
+            Ok(JobResult::MigrationCandidates(CandidateResult {
+                stamp,
+                candidates,
+                source_names,
+                errors,
+                cached,
+                limited,
+            }))
+        };
+        self.migration.inflight = Some(self.next_job);
+        let result = if cached {
+            self.spawn_local_job(true, JobKind::Migration, move || operation(None))
+                .map(|_| ())
+        } else {
+            self.spawn_job_kind(true, JobKind::Migration, move |manager| {
+                operation(Some(manager))
+            })
+            .map(|_| ())
+        };
+        if result.is_err() {
+            self.migration.inflight = None;
+            self.migration.loading = false;
+            self.migration.status = tr("migration_failed");
+        }
+        result
+    }
+
+    pub(crate) fn accept_migration_candidates(&mut self, result: CandidateResult) -> Result<()> {
+        if !self.migration_stamp_is_current(&result.stamp) {
+            return Ok(());
+        }
+        self.migration.inflight = None;
+        self.migration.loading = false;
+        self.migration.candidates = result.candidates;
+        self.migration.source_names = result.source_names;
+        self.migration.selected_id.clear();
+        let mut status = vec![tr(if self.migration.candidates.is_empty() {
+            "migration_no_candidates"
+        } else {
+            "migration_candidates"
+        })];
+        if result.cached {
+            status.push(tr("migration_cached"));
+        }
+        if result.limited {
+            status.push(tr("migration_source_limit"));
+        }
+        status.extend(result.errors);
+        self.migration.status = status.join(" · ");
+        self.choice_total = self.migration.candidates.len();
+        self.panel_page = 0;
+        self.cover_view.clear();
+        Ok(())
+    }
+
+    fn prepare_migration(&mut self) -> Result<()> {
+        if self.migration.loading || self.migration.committing {
+            return Ok(());
+        }
+        anyhow::ensure!(
+            self.migration
+                .request
+                .as_ref()
+                .is_some_and(|stamp| self.migration_stamp_is_current(stamp)),
+            "{}",
+            tr("migration_retry_required")
+        );
+        let selected = self
+            .migration
+            .candidates
+            .iter()
+            .find(|book| book.id == self.migration.selected_id)
+            .cloned()
+            .context("Select a migration target first")?;
+        let config = self
+            .store
+            .source(&selected.source_id)?
+            .filter(|source| source.enabled)
+            .context("The migration source is unavailable")?;
+        self.migration.generation = self.migration.generation.wrapping_add(1);
+        self.migration
+            .cancellation
+            .store(self.migration.generation, Ordering::Release);
+        self.migration.committing = true;
+        self.migration.status = tr("migration_preparing");
+        let stamp = self.migration_stamp();
+        self.migration.request = Some(stamp.clone());
+        let selected_id = selected.id.clone();
+        let cached = self.options.offline || self.options.demo || config.kind == "local";
+        let preserve_read = self.migration.preserve_read;
+        let cancellation = self.migration.cancellation.clone();
+        let database = self.data_dir.join("library.sqlite3");
+        let operation = move |manager: Option<Arc<SourceManager>>| {
+            let prepared = (|| -> Result<(Book, Vec<Chapter>)> {
+                anyhow::ensure!(cancellation.load(Ordering::Acquire) == stamp.generation,
+                    "The migration request was cancelled");
+                let (book, mut chapters) = if cached {
+                    let store = Store::open_read_only(&database)?;
+                    let book = store.book(&selected.id)?.context("The cached migration target is missing")?;
+                    let chapters = store.chapters(&book.id)?;
+                    (book, chapters)
+                } else {
+                    let manager = manager.as_ref().context("The migration source manager is unavailable")?;
+                    let book = manager.details(&selected)?;
+                    anyhow::ensure!(cancellation.load(Ordering::Acquire) == stamp.generation,
+                        "The migration request was cancelled");
+                    let chapters = manager.chapters(&book)?;
+                    (book, chapters)
+                };
+                anyhow::ensure!(book.id == selected.id && book.source_id == selected.source_id
+                    && book.remote_id == selected.remote_id,
+                    "The source changed the migration target identity");
+                anyhow::ensure!(!chapters.is_empty(), "The migration target has no available chapters");
+                if preserve_read {
+                    let store = Store::open_read_only(&database)?;
+                    let plan = store.preview_book_migration(&stamp.origin_book_id, &book, &chapters)?;
+                    if plan.needs_target_page_count {
+                        let chapter_id = plan.resume_target_chapter_id.as_deref()
+                            .context("The current chapter cannot be matched reliably")?;
+                        let chapter = chapters.iter_mut().find(|chapter| chapter.id == chapter_id)
+                            .context("The matched migration chapter is missing")?;
+                        let page_count = if cached {
+                            store.page_window(&chapter.id, 0, 0)?.total
+                        } else {
+                            anyhow::ensure!(cancellation.load(Ordering::Acquire) == stamp.generation,
+                                "The migration request was cancelled");
+                            manager.as_ref().context("The migration source manager is unavailable")?
+                                .pages(&book, chapter)?.len()
+                        };
+                        anyhow::ensure!(page_count > 0,
+                            "The matched target chapter has no cached or remotely available page count");
+                        chapter.page_count = u32::try_from(page_count)
+                            .context("The target chapter has too many pages")?;
+                    }
+                }
+                Ok((book, chapters))
+            })().map_err(|error| format!("{error:#}"));
+            Ok(JobResult::MigrationPrepared(PreparedMigration {
+                stamp,
+                selected_id,
+                result: prepared,
+            }))
+        };
+        self.migration.inflight = Some(self.next_job);
+        let result = if cached {
+            self.spawn_local_job(true, JobKind::Migration, move || operation(None))
+                .map(|_| ())
+        } else {
+            self.spawn_job_kind(true, JobKind::Migration, move |manager| {
+                operation(Some(manager))
+            })
+            .map(|_| ())
+        };
+        if result.is_err() {
+            self.migration.inflight = None;
+            self.migration.committing = false;
+            self.migration.status = tr("migration_failed");
+        }
+        result
+    }
+
+    pub(crate) fn accept_prepared_migration(&mut self, prepared: PreparedMigration) -> Result<()> {
+        if !self.migration_stamp_is_current(&prepared.stamp)
+            || self.migration.selected_id != prepared.selected_id
+        {
+            return Ok(());
+        }
+        self.migration.inflight = None;
+        self.migration.committing = false;
+        let (book, chapters) = match prepared.result {
+            Ok(result) => result,
+            Err(error) => {
+                self.migration.status = format!("{}: {error}", tr("migration_failed"));
+                return Ok(());
+            }
+        };
+        let options = MigrationOptions {
+            preserve_read: self.migration.preserve_read,
+            preserve_category: self.migration.preserve_category,
+        };
+        let report = match self.store.migrate_book(
+            &prepared.stamp.origin_book_id,
+            &book,
+            &chapters,
+            &options,
+        ) {
+            Ok(report) => report,
+            Err(error) => {
+                self.migration.status = format!("{}: {error:#}", tr("migration_failed"));
+                return Ok(());
+            }
+        };
+        let mut outcome = vec![tr("migration_complete")];
+        if options.preserve_read {
+            outcome.push(format!(
+                "{} {}",
+                tr("migration_read_copied"),
+                report.read_copied
+            ));
+            if report.unmatched > 0 {
+                outcome.push(format!(
+                    "{} {}",
+                    tr("migration_unmatched"),
+                    report.unmatched
+                ));
+            }
+            if report.ambiguous > 0 {
+                outcome.push(format!(
+                    "{} {}",
+                    tr("migration_ambiguous"),
+                    report.ambiguous
+                ));
+            }
+            if report.progress_conflict {
+                outcome.push(tr("migration_progress_conflict"));
+            }
+            if report.progress_page_reset {
+                outcome.push(tr("migration_page_reset"));
+            }
+        }
+        if report.category_conflict {
+            outcome.push(tr("migration_category_conflict"));
+        }
+        let mut removal_requested = 0usize;
+        let mut removal_errors = Vec::new();
+        if self.migration.remove_downloads {
+            for job in report.source_downloads {
+                let removed = self
+                    .downloads
+                    .remove_or_cancel(&prepared.stamp.origin_book_id, &job.chapter_id);
+                match removed {
+                    Ok(()) => removal_requested += 1,
+                    Err(error) => removal_errors.push(format!("{error:#}")),
+                }
+            }
+        }
+        self.current_book_id = Some(report.book.id.clone());
+        self.current_source = report.book.source_id;
+        self.selected_chapters.clear();
+        self.page = 1;
+        self.cover_view.clear();
+        self.cancel_migration();
+        if removal_requested > 0 {
+            outcome.push(format!(
+                "{} ({removal_requested})",
+                tr("migration_delete_pending")
+            ));
+        }
+        if !removal_errors.is_empty() {
+            outcome.push(format!(
+                "{}: {}",
+                tr("migration_delete_failed"),
+                removal_errors.join(" · ")
+            ));
+        }
+        self.notify(outcome.join(" · "));
+        Ok(())
+    }
+
+    pub(crate) fn sync_migration_state(&self) {
+        let Some(ui) = self.ui.upgrade() else {
+            return;
+        };
+        let state = ui.global::<State>();
+        let current = self
+            .migration
+            .request
+            .as_ref()
+            .is_some_and(|stamp| self.migration_stamp_is_current(stamp));
+        let pending = self
+            .migration
+            .inflight
+            .is_some_and(|id| self.pending.contains(&id));
+        let interrupted = (self.migration.loading || self.migration.committing) && !pending;
+        state.set_migration_available(true);
+        state.set_migration_loading(self.migration.loading && current && pending);
+        state.set_migration_committing(self.migration.committing && current && pending);
+        state.set_migration_preserve_read(self.migration.preserve_read);
+        state.set_migration_preserve_category(self.migration.preserve_category);
+        state.set_migration_remove_downloads(self.migration.remove_downloads);
+        state.set_migration_selected_id(self.migration.selected_id.clone().into());
+        state.set_migration_status(
+            if ((!current && self.migration.request.is_some()) || interrupted)
+                && !self.migration.origin_book_id.is_empty()
+                && self.modal_context == "migration"
+            {
+                tr("migration_retry_required")
+            } else {
+                self.migration.status.clone()
+            }
+            .into(),
+        );
+        state.set_migration_can_start(
+            current
+                && !interrupted
+                && !self.migration.loading
+                && !self.migration.committing
+                && self
+                    .migration
+                    .candidates
+                    .iter()
+                    .any(|book| book.id == self.migration.selected_id),
+        );
+        state.set_migration_candidates(model(
+            self.migration
+                .candidates
+                .iter()
+                .filter(|_| current)
+                .skip(self.panel_page * CANDIDATES_PER_PAGE)
+                .take(CANDIDATES_PER_PAGE)
+                .map(|book| {
+                    let cached_path = self
+                        .cover_paths
+                        .get(&book.id)
+                        .filter(|_| self.cover_uris.get(&book.id) == Some(&book.cover));
+                    let cover = cached_path
+                        .and_then(|path| self.cover_cache.get(&(book.id.clone(), path.clone())))
+                        .or_else(|| {
+                            self.cover_cache
+                                .get(&(book.id.clone(), PathBuf::from(&book.cover)))
+                        })
+                        .cloned()
+                        .unwrap_or_default();
+                    let source = self
+                        .migration
+                        .source_names
+                        .get(&book.source_id)
+                        .map(String::as_str)
+                        .unwrap_or(&book.source_id);
+                    let mut meta = if book.author.is_empty() {
+                        source.to_owned()
+                    } else {
+                        format!("{source} · {}", book.author)
+                    };
+                    if book.chapter_count > 0 {
+                        meta.push_str(&format!(
+                            " · {} {}",
+                            book.chapter_count,
+                            tr("chapters_unit")
+                        ));
+                    }
+                    BookItem {
+                        id: book.id.clone().into(),
+                        title: book.title.clone().into(),
+                        author: book.author.clone().into(),
+                        subtitle: meta.into(),
+                        status: tr(migration_title_hint(
+                            &self.migration.origin_title,
+                            &book.title,
+                        ))
+                        .into(),
+                        cover,
+                        unread: book.unread.min(i32::MAX as u32) as i32,
+                        downloaded: false,
+                        in_library: book.in_library,
+                        progress: 0.0,
+                        selected: self.migration.selected_id == book.id,
+                    }
+                }),
+        ));
+    }
+
+    pub(super) fn migration_cover_book(&self, id: &str) -> Option<Book> {
+        if self.modal_context != "migration" {
+            return None;
+        }
+        self.migration
+            .candidates
+            .iter()
+            .find(|book| book.id == id)
+            .cloned()
+    }
+}
+
+fn valid_candidate(book: &Book, source_id: &str, origin_book_id: &str) -> bool {
+    !book.id.is_empty()
+        && !book.remote_id.is_empty()
+        && !book.title.trim().is_empty()
+        && book.source_id == source_id
+        && book.id != origin_book_id
+}
+
+/// Compare title text only; this does not establish book or chapter identity.
+fn migration_title_hint(origin: &str, candidate: &str) -> &'static str {
+    let (Some(origin), Some(candidate)) = (
+        normalized_migration_title(origin),
+        normalized_migration_title(candidate),
+    ) else {
+        return "migration_title_check";
+    };
+    if origin == candidate {
+        return "migration_title_exact";
+    }
+    if origin.len().min(candidate.len()) < MIN_APPROXIMATE_TITLE_CHARS
+        || origin.len().abs_diff(candidate.len()) > 1
+    {
+        return "migration_title_check";
+    }
+    let (shorter, longer) = if origin.len() <= candidate.len() {
+        (&origin, &candidate)
+    } else {
+        (&candidate, &origin)
+    };
+    let prefix = shorter
+        .iter()
+        .zip(longer)
+        .take_while(|(left, right)| left == right)
+        .count();
+    // At most one scalar edit is accepted, without a quadratic distance table.
+    let near = if prefix == shorter.len() {
+        longer.len() == shorter.len() + 1
+    } else if shorter.len() == longer.len() {
+        shorter[prefix + 1..] == longer[prefix + 1..]
+    } else {
+        shorter[prefix..] == longer[prefix + 1..]
+    };
+    if near {
+        "migration_title_near"
+    } else {
+        "migration_title_check"
+    }
+}
+
+fn normalized_migration_title(title: &str) -> Option<Vec<char>> {
+    let mut normalized = Vec::new();
+    let mut has_text = false;
+    for character in title
+        .chars()
+        .filter(|character| !character.is_whitespace() && !title_punctuation(*character))
+        .flat_map(char::to_lowercase)
+    {
+        if normalized.len() == MAX_TITLE_HINT_CHARS {
+            return None;
+        }
+        has_text |= character.is_alphanumeric();
+        normalized.push(character);
+    }
+    has_text.then_some(normalized)
+}
+
+fn title_punctuation(character: char) -> bool {
+    // Keep unrecognized symbols and combining marks rather than erasing meaning.
+    character.is_ascii_punctuation()
+        || matches!(
+            character,
+            '\u{00a1}' | '\u{00ab}' | '\u{00b7}' | '\u{00bb}' | '\u{00bf}'
+                | '\u{2010}'..='\u{2027}' | '\u{2030}'..='\u{2043}'
+                | '\u{3001}'..='\u{3003}' | '\u{3008}'..='\u{3011}'
+                | '\u{3014}'..='\u{301f}' | '\u{30fb}'
+                | '\u{ff01}'..='\u{ff0f}' | '\u{ff1a}'..='\u{ff20}'
+                | '\u{ff3b}'..='\u{ff40}' | '\u{ff5b}'..='\u{ff65}'
+        )
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn title_hints_normalize_case_whitespace_and_punctuation() {
+        assert_eq!(
+            migration_title_hint("  Blue\u{2014}LOCK: (01)\t", "blue lock 01"),
+            "migration_title_exact"
+        );
+        assert_eq!(migration_title_hint("A", "a"), "migration_title_exact");
+    }
+
+    #[test]
+    fn title_hints_preserve_unicode_text_during_normalization() {
+        assert_eq!(
+            migration_title_hint(
+                "\u{300c}B\u{00dc}CHER\u{300d} \u{4e00}\u{3001}\u{4e8c}",
+                "b\u{00fc}cher\u{4e00}\u{4e8c}",
+            ),
+            "migration_title_exact"
+        );
+        assert_eq!(
+            migration_title_hint("\u{30ab}\u{3099}", "\u{30ab}"),
+            "migration_title_check"
+        );
+    }
+
+    #[test]
+    fn title_hints_accept_only_one_edit_in_long_titles() {
+        for (origin, candidate) in [
+            ("series-000", "series-001"),
+            ("series-000", "series-000x"),
+            ("series-000x", "series-000"),
+            ("Journey to \u{661f}\u{6d77}", "Journey to \u{661f}\u{7a7a}"),
+        ] {
+            assert_eq!(
+                migration_title_hint(origin, candidate),
+                "migration_title_near"
+            );
+        }
+    }
+
+    #[test]
+    fn title_hints_require_review_for_short_or_different_titles() {
+        for (origin, candidate) in [
+            ("Cat", "Car"),
+            ("One Piece", "Demon Slayer"),
+            ("series-000", "series-999"),
+            ("series-000", "series-000 extended"),
+        ] {
+            assert_eq!(
+                migration_title_hint(origin, candidate),
+                "migration_title_check"
+            );
+        }
+    }
+
+    #[test]
+    fn title_hints_do_not_match_empty_or_symbol_only_metadata() {
+        for (origin, candidate) in [
+            ("", ""),
+            ("\u{3000}---?", "()"),
+            ("\u{1f4a7}", "\u{1f4a7}"),
+            ("Known title", ""),
+            ("", "Known title"),
+        ] {
+            assert_eq!(
+                migration_title_hint(origin, candidate),
+                "migration_title_check"
+            );
+        }
+    }
+
+    #[test]
+    fn title_hints_do_not_match_truncated_overlong_titles() {
+        let origin = "a".repeat(MAX_TITLE_HINT_CHARS + 1);
+        let candidate = format!("{}b", "a".repeat(MAX_TITLE_HINT_CHARS));
+        assert_eq!(
+            migration_title_hint(&origin, &origin),
+            "migration_title_check"
+        );
+        assert_eq!(
+            migration_title_hint(&origin, &candidate),
+            "migration_title_check"
+        );
+    }
+}

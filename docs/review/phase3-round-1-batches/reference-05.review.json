@@ -1,0 +1,138 @@
+{
+  "batch_id": "reference-05",
+  "reviewer": "/root/phase3_round1_review/reference_05",
+  "run_id": "a1baf3fe3dc2",
+  "review_type": "Fresh independent visual review of the four supplied reference pairs",
+  "binary_sha256": "94d7f3bbcab475ad8833a2f3c486138f7b49bead231851c2d8eab2f0c3d2ac51",
+  "source_sha256": "aef9db4e111165016a10a2a95e111f3155860b8510c7f6207ec9c79fbec5082c",
+  "reference_bundle_sha256_supplied_by_coordinator": "e7b49b456255432d74cfe41346f9d44c1a9c55bf67c5d55483e4ae3029547d18",
+  "identity_method": "Get-FileHash SHA256 of each original PNG byte stream; candidate hashes matched case_metadata.evidence_hashes.screenshot.sha256 and reference hashes matched case_metadata.reference_sha256. Each case metadata record matched the supplied run, binary, and source identities.",
+  "comparison_scale": "Candidate 618 x 824 native logical pixels; reference 1236 x 1648 physical pixels at scale 2. Geometry was compared at the same logical scale through direct visual inspection.",
+  "reviewed_case_ids": [
+    "pw-history--default",
+    "pw-history--clear-confirm",
+    "pw-history--incognito",
+    "pw-history--updates"
+  ],
+  "reviewed_cases": [
+    {
+      "case_id": "pw-history--default",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/pw-history--default.png",
+      "candidate_sha256": "0087039ea5509836348045062f722f8ef66e6ac68f2a0689ca997badcf322e68",
+      "reference_png": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/screens/pw-history.png",
+      "reference_sha256": "8de847f1a262247e8b18ca1396b568d3bce7ec4023da3a585db741372d68219b",
+      "viewed_candidate": true,
+      "viewed_reference": true,
+      "outcome": "visual-pass-with-intentional-data-differences",
+      "observations": [
+        "The display heading, selected reading-history tab, three date groups, narrow portrait covers, progress bars, secondary completion/time text, per-entry remove controls, folio, next action, and selected bottom history navigation are all present.",
+        "The current cover left edges align with the date-group label column at approximately x=22 logical pixels, while the text column starts at approximately x=84. The cover-to-text gap is comfortable and the old cover offset is not visible.",
+        "Rows within each date group preserve approximately 76 logical-pixel spacing. Bold titles, regular chapter text, and gray progress/time text retain the reference hierarchy. No title, control, progress text, or footer clipping is visible.",
+        "The white background, thin gray separators, black selected indicators, and outlined incognito control match the reference treatment. No added surface shadow or stippled overlay is visible."
+      ],
+      "intentional_differences": [
+        "The recent-reading summary is 8 chapters in the candidate and 12 in the reference; this is a permitted real count difference.",
+        "The candidate folio is 1/5 rather than the reference 1/4. The sidecar records a real independent 20-entry history snapshot and a five-page range; pagination capacity differences are permitted."
+      ]
+    },
+    {
+      "case_id": "pw-history--clear-confirm",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/pw-history--clear-confirm.png",
+      "candidate_sha256": "941294380ede10adaec34bd1aa74f801d56c50425637d568b3037e3f494f9e02",
+      "reference_png": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/screens/states/pw-history--clear-confirm.png",
+      "reference_sha256": "7143f661a910932a841feefe24be00372d9d14444087fb7551b9fe1572147539",
+      "viewed_candidate": true,
+      "viewed_reference": true,
+      "outcome": "visual-pass-with-intentional-data-differences",
+      "observations": [
+        "The confirmation is a wide white outlined panel positioned across the upper history rows at the same logical location as the reference. Its bold question is fully visible.",
+        "Cancel and clear occupy equal side-by-side action areas, with an outlined white cancel action and a solid black clear action. Their labels and edges are visible without clipping.",
+        "The surrounding history remains visible at its normal contrast, consistent with a transparent outside overlay. There is no dimming, shadow, or stippled surface treatment.",
+        "The unoccluded cover and date columns remain aligned, and the footer and bottom navigation retain their positions."
+      ],
+      "intentional_differences": [
+        "The underlying recent-reading count and folio differ for the permitted real 20-entry history snapshot, as in the default case."
+      ]
+    },
+    {
+      "case_id": "pw-history--incognito",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/pw-history--incognito.png",
+      "candidate_sha256": "0514974bd4784b0cec3252a393c8bf1efd77992b4f82affb7063911357c95326",
+      "reference_png": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/screens/states/pw-history--incognito.png",
+      "reference_sha256": "0c31c58650b054b6316b24eadae1575386a4ea1d407e83c859ca769e8b4bb999",
+      "viewed_candidate": true,
+      "viewed_reference": true,
+      "outcome": "changes-requested",
+      "observations": [
+        "The incognito control is correctly pressed as a black button with white content, and the application status bar is inverted to black with white time and device indicators.",
+        "The center of the candidate status bar is blank. The reference includes a centered white incognito policy message stating that history is not recorded. This missing persistent message is recorded as P3R1-REF05-1.",
+        "The history rows, cover/date-column alignment, typography hierarchy, gray progress text, remove controls, folio, and bottom navigation remain consistent with the default layout. No additional content clipping is visible.",
+        "The supplied sidecar records incognito=true and retains the independent 20-entry initial history snapshot; this still capture does not establish whether subsequent reads are excluded from history."
+      ],
+      "intentional_differences": [
+        "The underlying recent-reading count and folio reflect the permitted real snapshot differences. They do not explain the missing status-bar policy text."
+      ]
+    },
+    {
+      "case_id": "pw-history--updates",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/pw-history--updates.png",
+      "candidate_sha256": "b28d50dbcfee5de00a5b3d5bf570fa14d352069bf15de42ad899015164f0488a",
+      "reference_png": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/screens/states/pw-history--updates.png",
+      "reference_sha256": "d5caf92928154bbf5c3ac5c57212b773eda70a0cb775203d940651bb3f726836",
+      "viewed_candidate": true,
+      "viewed_reference": true,
+      "outcome": "visual-pass-with-intentional-data-differences",
+      "observations": [
+        "The heading changes to updates, the chapter-updates tab is selected, and the black bulk-download action is visible beside the outlined incognito action. The 1/2 folio, next action, and bottom history navigation remain visible.",
+        "The five visible records preserve approximately 76 logical-pixel row spacing, portrait cover geometry, a shared text column, thin row rules, gray secondary text, and separate outlined download actions. No row, title, download control, or footer clipping is visible.",
+        "The candidate cover left edges and date-group label align at approximately x=22 logical pixels and the text starts at approximately x=84, so the prior cover offset is not reproduced.",
+        "Every visible record has the same date in the supplied metadata, and the candidate presents one corresponding date group. This snapshot does not contain a queued record: all visible download states are available and the download queue is empty. The queued clock treatment in the reference is therefore not exercised here.",
+        "The page uses flat white surfaces and black/gray controls without an added shadow or stippled overlay."
+      ],
+      "intentional_differences": [
+        "Visible titles, covers, chapter labels, and progress text differ with the real update data. Two covers use text fallback artwork, which is treated as a permitted cover-content difference.",
+        "The reference spreads five records over three dates, while all five candidate records are dated today in the sidecar. The resulting single date group and larger whitespace below the list follow the real time data rather than a geometry exemption.",
+        "The candidate shows unread progress and available download actions, while the reference includes check-time, size, and queued-status examples. Real progress, capacity, and time values are permitted to differ; queued-state appearance remains outside this snapshot's coverage."
+      ]
+    }
+  ],
+  "suggestions": [
+    {
+      "id": "P3R1-REF05-1",
+      "case_id": "pw-history--incognito",
+      "priority": "P2",
+      "description": "Restore the persistent incognito policy message in the inverted application status bar.",
+      "evidence": "Direct inspection of the original candidate PNG shows a black 28-logical-pixel status bar with white time and device indicators but an empty center. At the same logical scale, the reference has a centered white message identifying incognito mode and stating that history is not recorded. The sidecar has incognito=true, so this is not an inactive-state or real-content difference.",
+      "recommendation": "Render the reference-equivalent centered white incognito policy message whenever incognito mode is active, preserving the existing time and right-side device indicators without overlap.",
+      "status": "open",
+      "introduced_round": 1
+    }
+  ],
+  "prior_finding_rechecks": [
+    {
+      "finding_id": "P3D-001",
+      "case_ids": [
+        "pw-history--default",
+        "pw-history--clear-confirm",
+        "pw-history--incognito",
+        "pw-history--updates"
+      ],
+      "outcome": "not-reproduced-in-reviewed-captures",
+      "observation": "Fresh inspection shows that visible cover left edges align with their date-group label column at approximately x=22 logical pixels; the text column starts at approximately x=84 with a comfortable gap. The default and incognito pages show this across three groups, the updates page across all five rows, and the unoccluded portions of the confirmation page retain the same alignment. No conclusion was carried forward solely from the earlier reported fix."
+    }
+  ],
+  "limitations": [
+    "This review covers only the four listed pairs and eight original images. It does not establish that the full round or other batches are clean.",
+    "Only the supplied PNG and JSON evidence was read and original PNG SHA256 identities were calculated. No application, build, tests, validation suite, smoke check, or runtime probe was run locally.",
+    "Static captures establish visible geometry and state presentation only. Clear execution, remove actions, pagination interactions, download execution, and the actual incognito recording policy were not independently exercised.",
+    "The updates snapshot contains no queued download, so its queued-state clock, border treatment, and state transition are not visually verified by this batch.",
+    "The candidate is a native 1x capture and the reference is a physical 2x capture. This review compares logical geometry and visible hierarchy rather than asserting exact raster or antialiasing equivalence.",
+    "The reference bundle digest was supplied by the coordinator. Individual reference PNG hashes were independently checked against each case metadata record; the complete reference bundle was not rehashed."
+  ],
+  "summary": {
+    "reviewed_pairs": 4,
+    "viewed_images": 8,
+    "open_suggestions": 1,
+    "prior_findings_reproduced": 0
+  }
+}

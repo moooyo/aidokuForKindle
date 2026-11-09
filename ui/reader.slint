@@ -1,0 +1,811 @@
+import { State, Commands } from "state.slint";
+import { Theme } from "theme.slint";
+import { Strings } from "strings.slint";
+import { BodyText, Caption, Icon } from "widgets.slint";
+
+export global ReaderMetrics {
+    out property <length> header-height: State.large-screen ? 78px : 89.5px;
+    out property <length> controls-height: State.large-screen ? 133px : 119px;
+    out property <length> toolbar-height: State.large-screen ? 77px : 69px;
+    out property <length> bottom-height: State.large-screen ? 210px : 188px;
+    out property <length> content-inset: State.large-screen ? (State.landscape ? 120px : 48px) : 20px;
+    out property <length> tools-inset: State.large-screen ? (State.landscape ? 120px : 24px) : 0px;
+    out property <length> range-top: State.large-screen ? 45px : 39px;
+    out property <length> range-height: State.large-screen ? 40px : 36px;
+    out property <length> chapter-top: State.large-screen ? 87px : 77px;
+    out property <length> chapter-height: State.large-screen ? 44px : 40px;
+}
+
+component ReaderGlyph inherits Path {
+    in property <string> kind;
+    in property <color> color: Theme.ink;
+    in property <bool> active: false;
+    in property <bool> marked: false;
+    width: 24px;
+    height: self.width;
+    viewbox-width: 24;
+    viewbox-height: 24;
+    fill: root.kind == "more" || root.kind == "toc" || (root.kind == "bookmark" && root.marked) ? root.color : transparent;
+    stroke: root.kind == "more" || root.kind == "toc" ? transparent : root.color;
+    stroke-width: root.kind == "back" ? (State.large-screen ? 1.8px : 1.9px) :
+        root.kind == "bookmark" ? (State.large-screen ? 1.7px : 1.8px) :
+        root.kind == "toc" ? (root.active ? (State.large-screen ? 2.3px : 2.4px) : (State.large-screen ? 1.7px : 1.8px)) :
+        root.kind == "chevron-left" || root.kind == "chevron-right" ? 2.2px :
+        root.kind == "lock" || root.kind == "unlock" ? 2px :
+        root.kind == "more" ? 3px : root.active ? (State.large-screen ? 2.1px : 2.2px) : (State.large-screen ? 1.6px : 1.7px);
+    stroke-line-cap: round;
+    stroke-line-join: round;
+    commands: root.kind == "mode" ? "M4 5h7v14H4zM13 5h7v14h-7z" :
+        root.kind == "layout" ? "M3 5h18v14H3zM12 5v14" :
+        root.kind == "picture" ? "M12 3a9 9 0 1 0 0 18a9 9 0 1 0 0-18zM12 3v18M12 8h5M12 12h7M12 16h5" :
+        root.kind == "brightness" ? "M12 7.5a4.5 4.5 0 1 0 0 9a4.5 4.5 0 1 0 0-9zM12 1.5v2.5M12 20v2.5M1.5 12H4M20 12h2.5M4.6 4.6l1.8 1.8M17.6 17.6l1.8 1.8M4.6 19.4l1.8-1.8M17.6 6.4l1.8-1.8" :
+        root.kind == "orientation" ? (State.large-screen ? "M20 12a8 8 0 1 1-2.4-5.7L20 8.5M20 3.5v5h-5" : "M20 11a8 8 0 0 0-14-4.5L4 9M4 4v5h5M4 13a8 8 0 0 0 14 4.5l2-2.5M20 20v-5h-5") :
+        root.kind == "back" ? "M20 12H5M11 6l-6 6 6 6" :
+        root.kind == "bookmark" ? "M6 3h12v18l-6-4.5L6 21z" :
+        root.kind == "toc" ? (root.active ?
+            "M9 4.8h12a1.2 1.2 0 0 1 0 2.4H9a1.2 1.2 0 0 1 0-2.4zM9 10.8h12a1.2 1.2 0 0 1 0 2.4H9a1.2 1.2 0 0 1 0-2.4zM9 16.8h12a1.2 1.2 0 0 1 0 2.4H9a1.2 1.2 0 0 1 0-2.4zM4.2 6a1.2 1.2 0 1 1-2.4 0a1.2 1.2 0 1 1 2.4 0zM4.2 12a1.2 1.2 0 1 1-2.4 0a1.2 1.2 0 1 1 2.4 0zM4.2 18a1.2 1.2 0 1 1-2.4 0a1.2 1.2 0 1 1 2.4 0z" :
+            "M9 5.1h12a.9 .9 0 0 1 0 1.8H9a.9 .9 0 0 1 0-1.8zM9 11.1h12a.9 .9 0 0 1 0 1.8H9a.9 .9 0 0 1 0-1.8zM9 17.1h12a.9 .9 0 0 1 0 1.8H9a.9 .9 0 0 1 0-1.8zM3.9 6a.9 .9 0 1 1-1.8 0a.9 .9 0 1 1 1.8 0zM3.9 12a.9 .9 0 1 1-1.8 0a.9 .9 0 1 1 1.8 0zM3.9 18a.9 .9 0 1 1-1.8 0a.9 .9 0 1 1 1.8 0z") :
+        root.kind == "lock" ? "M7 10V7a5 5 0 0 1 10 0v3M5 10h14v11H5z" :
+        root.kind == "unlock" ? "M7 10V7a5 5 0 0 1 9.5-2M5 10h14v11H5z" :
+        root.kind == "chevron-left" ? "M15 18l-6-6 6-6" :
+        root.kind == "chevron-right" ? "M9 18l6-6-6-6" :
+        "M6.5 12a1.5 1.5 0 1 1-3 0a1.5 1.5 0 1 1 3 0zM13.5 12a1.5 1.5 0 1 1-3 0a1.5 1.5 0 1 1 3 0zM20.5 12a1.5 1.5 0 1 1-3 0a1.5 1.5 0 1 1 3 0z";
+}
+
+component ReaderTool inherits Rectangle {
+    in property <string> action;
+    in property <string> text;
+    in property <bool> active;
+    background: touch.pressed ? Theme.ink : Theme.paper;
+    accessible-role: button;
+    accessible-label: root.text;
+    accessible-checkable: true;
+    accessible-checked: root.active;
+    if root.active: Rectangle {
+        x: parent.width * (State.large-screen ? 0.30 : 0.26);
+        y: 0px;
+        width: parent.width * (State.large-screen ? 0.40 : 0.48);
+        height: 4px;
+        background: touch.pressed ? Theme.paper : Theme.ink;
+    }
+    ReaderGlyph {
+        x: (parent.width - self.width) / 2;
+        y: (parent.height - (State.large-screen ? 53px : 46.5px)) / 2;
+        width: State.large-screen ? 26px : 23px;
+        height: self.width;
+        kind: root.action;
+        color: touch.pressed ? Theme.paper : root.active ? Theme.ink : Theme.secondary;
+        active: root.active;
+    }
+    BodyText {
+        x: 0px;
+        y: (parent.height - (State.large-screen ? 53px : 46.5px)) / 2 + (State.large-screen ? 31px : 27px);
+        width: parent.width;
+        height: State.large-screen ? 22px : 19.5px;
+        text: root.text;
+        font-size: State.large-screen ? 15px : 13px;
+        font-weight: root.active ? 700 : 400;
+        letter-spacing: State.large-screen ? 2px : 1px;
+        color: touch.pressed ? Theme.paper : root.active ? Theme.ink : Theme.secondary;
+        horizontal-alignment: center;
+    }
+    touch := TouchArea {
+        pointer-event(event) => {
+            if event.kind == PointerEventKind.down { Commands.refresh("fast"); }
+            else if event.kind == PointerEventKind.up || event.kind == PointerEventKind.cancel { Commands.refresh("ui"); }
+        }
+        clicked => { Commands.action("reader", root.action, ""); }
+    }
+}
+
+component ReaderHeaderAction inherits Rectangle {
+    in property <string> action;
+    in property <string> label;
+    in property <bool> marked;
+    in property <bool> active;
+    width: State.large-screen ? 56px : 48px;
+    height: self.width;
+    background: touch.pressed ? Theme.ink : Theme.paper;
+    accessible-role: button;
+    accessible-label: root.label;
+    accessible-checkable: root.action == "bookmark" || root.action == "toc";
+    accessible-checked: root.marked || root.active;
+    ReaderGlyph {
+        x: (parent.width - self.width) / 2;
+        y: (parent.height - self.height) / 2;
+        width: root.action == "back" ? (State.large-screen ? 28px : 24px) : (State.large-screen ? 25px : 22px);
+        height: self.width;
+        kind: root.action;
+        color: touch.pressed ? Theme.paper : Theme.ink;
+        marked: root.marked;
+        active: root.active;
+    }
+    if root.active: Rectangle {
+        x: State.large-screen ? 14px : 12px;
+        y: parent.height - (State.large-screen ? 6px : 5px);
+        width: parent.width - self.x * 2;
+        height: 3px;
+        background: touch.pressed ? Theme.paper : Theme.ink;
+    }
+    touch := TouchArea {
+        pointer-event(event) => {
+            if event.kind == PointerEventKind.down { Commands.refresh("fast"); }
+            else if event.kind == PointerEventKind.up || event.kind == PointerEventKind.cancel { Commands.refresh("ui"); }
+        }
+        clicked => { Commands.action("reader", root.action, ""); }
+    }
+}
+
+component ReaderChapterAction inherits Rectangle {
+    in property <string> text;
+    in property <string> action;
+    in property <bool> trailing;
+    in property <bool> enabled: true;
+    width: State.large-screen ? 180px : 150px;
+    height: ReaderMetrics.chapter-height;
+    background: touch.pressed && root.enabled ? Theme.ink : Theme.paper;
+    accessible-role: button;
+    accessible-label: root.text;
+    accessible-enabled: root.enabled;
+    ReaderGlyph {
+        x: root.trailing ? parent.width - (State.large-screen ? 28px : 24px) : (State.large-screen ? 10px : 8px);
+        y: (parent.height - self.height) / 2;
+        width: State.large-screen ? 18px : 16px;
+        height: self.width;
+        kind: root.trailing ? "chevron-right" : "chevron-left";
+        color: !root.enabled ? Theme.disabled : touch.pressed ? Theme.paper : Theme.ink;
+        active: true;
+    }
+    BodyText {
+        x: root.trailing ? (State.large-screen ? 10px : 8px) : (State.large-screen ? 32px : 26px);
+        width: parent.width - (State.large-screen ? 42px : 34px);
+        height: parent.height;
+        text: root.text;
+        font-size: State.large-screen ? 16px : 14px;
+        color: !root.enabled ? Theme.disabled : touch.pressed ? Theme.paper : Theme.ink;
+        horizontal-alignment: root.trailing ? right : left;
+    }
+    touch := TouchArea {
+        enabled: root.enabled;
+        pointer-event(event) => {
+            if event.kind == PointerEventKind.down { Commands.refresh("fast"); }
+            else if event.kind == PointerEventKind.up || event.kind == PointerEventKind.cancel { Commands.refresh("ui"); }
+        }
+        clicked => { Commands.action("reader", root.action, ""); }
+    }
+}
+
+component ReaderZoneLabel inherits Rectangle {
+    in property <string> text;
+    in property <bool> next;
+    width: caption.preferred-width + 36px;
+    height: State.large-screen ? 54px : 48px;
+    border-width: root.next ? 0px : 1.5px;
+    border-color: Theme.ink;
+    background: root.next ? Theme.ink : Theme.paper;
+    caption := BodyText {
+        width: parent.width;
+        height: parent.height;
+        text: root.text;
+        font-size: State.large-screen ? 20px : 18px;
+        font-weight: 700;
+        color: root.next ? Theme.paper : Theme.ink;
+        horizontal-alignment: center;
+    }
+}
+
+export component ReaderPage inherits Rectangle {
+    background: Theme.paper;
+    clip: true;
+    property <bool> wide: State.large-screen && State.landscape;
+    property <bool> vertical: State.reading-direction == "vertical" || State.reading-direction == "vertical-pages";
+    property <int> frame-first-page: root.frame-page(State.reader-page);
+    property <bool> dual: root.frame-dual(root.frame-first-page);
+    property <length> top-height: ReaderMetrics.header-height;
+    property <length> toolbar-height: ReaderMetrics.toolbar-height;
+    property <length> controls-height: ReaderMetrics.controls-height;
+    property <length> bottom-height: ReaderMetrics.bottom-height;
+    property <length> track-inset: ReaderMetrics.content-inset;
+    property <length> track-width: root.width - root.track-inset * 2;
+    property <float> side-fraction: root.dual ? 0.30 : 1.0 / 3.0;
+    property <bool> reverse-taps: State.reverse-taps || State.tap-layout == "reversed" || State.tap-layout == "reverse";
+    property <bool> next-on-left: (State.reading-direction == "rtl") != root.reverse-taps;
+    property <length> gesture-start-x;
+    property <length> gesture-start-y;
+    property <bool> gesture-expired: false;
+    property <bool> gesture-consumed: false;
+    property <bool> suppress-click: false;
+    property <int> input-epoch: State.reader-input-epoch;
+    property <int> gesture-input-epoch: 0;
+    property <int> pending-input-epoch: 0;
+    property <int> seek-input-epoch: 0;
+    property <bool> seeking: false;
+    property <int> preview-page: 1;
+    property <string> pending-action;
+    property <[string]> tool-actions: root.wide ?
+        (State.has-frontlight ? ["mode", "layout", "picture", "brightness", "more"] : ["mode", "layout", "picture", "more"]) :
+        (State.has-frontlight ? ["mode", "picture", "brightness", "orientation", "more"] : ["mode", "picture", "orientation", "more"]);
+    property <int> shown-page: root.seeking ? root.preview-page : State.reader-page;
+    property <int> shown-frame-first: root.frame-page(root.shown-page);
+    property <float> progress: State.reader-total <= 0 ? 0 : root.shown-page / State.reader-total;
+    property <string> page-label: root.frame-dual(root.shown-frame-first) ?
+        root.shown-frame-first + "–" + min(root.shown-frame-first + 1, State.reader-total) : "" + root.shown-frame-first;
+
+    function reset-input-state() {
+        hold.running = false;
+        swipe-limit.running = false;
+        tap-delay.running = false;
+        root.pending-action = "";
+        root.seeking = false;
+        root.preview-page = State.reader-page;
+        root.gesture-start-x = 0px;
+        root.gesture-start-y = 0px;
+        root.gesture-expired = true;
+        root.gesture-consumed = true;
+        root.suppress-click = true;
+    }
+
+    // Reset retained timers and drag previews before a suspended input sequence
+    // can resume. Timer handlers also check the epoch in case this callback has
+    // not yet been evaluated when the event loop handles an expired timer.
+    changed input-epoch => { root.reset-input-state(); }
+
+    function frame-page(page: int) -> int {
+        if State.cover-alone && State.spread && !root.vertical && page > 1 { return floor(page / 2) * 2; }
+        return page;
+    }
+
+    function frame-dual(page: int) -> bool {
+        return State.spread && !root.vertical && !(State.cover-alone && page == 1) && page < State.reader-total;
+    }
+
+    function page-at(position: length) -> int {
+        return root.frame-page(clamp(round((State.reading-direction == "rtl" ? 1 - position / max(1px, root.track-width) : position / max(1px, root.track-width)) * max(1, State.reader-total)), 1, max(1, State.reader-total)));
+    }
+
+    function tap-action(x: length, y: length) -> string {
+        if State.reader-menu { return "menu"; }
+        if root.vertical {
+            if y >= root.height / 3 && y <= root.height * 2 / 3 { return "menu"; }
+            if State.tap-layout == "swipe-only" { return ""; }
+            return (y > root.height * 2 / 3) != root.reverse-taps ? "next" : "previous";
+        }
+        if State.tap-layout == "l-shaped" && y > root.height * 2 / 3 { return root.reverse-taps ? "previous" : "next"; }
+        if x >= root.width * root.side-fraction && x <= root.width * (1 - root.side-fraction) { return "menu"; }
+        if State.tap-layout == "swipe-only" { return ""; }
+        return ((x < root.width / 2) == (State.reading-direction == "rtl")) != root.reverse-taps ? "next" : "previous";
+    }
+
+    // Once loaded, closed-menu rendering contains only the comic images. Each
+    // slot uses the entire runtime viewport and contain fitting; there is no
+    // reserved chrome, bookmark corner, footer hit area, border, or spread gutter.
+    Image {
+        x: root.dual ? (State.reading-direction == "rtl" ? root.width / 2 : 0px) : 0px;
+        y: 0px;
+        width: root.dual ? root.width / 2 : root.width;
+        height: root.height;
+        source: State.reader-image;
+        image-fit: contain;
+    }
+    if root.dual: Image {
+        x: State.reading-direction == "rtl" ? 0px : root.width / 2;
+        y: 0px;
+        width: root.width / 2;
+        height: root.height;
+        source: State.reader-image-next;
+        image-fit: contain;
+    }
+
+    if !State.reader-image-ready && State.busy && !State.reader-menu: BodyText {
+        x: 0px;
+        y: (root.height - 44px) / 2;
+        width: root.width;
+        height: 44px;
+        text: Strings.loading;
+        color: Theme.secondary;
+        horizontal-alignment: center;
+    }
+
+    page-touch := TouchArea {
+        width: root.width;
+        height: root.height;
+        moved => {
+            if self.pressed && root.gesture-input-epoch == State.reader-input-epoch && (abs(self.mouse-x - root.gesture-start-x) >= 33px || abs(self.mouse-y - root.gesture-start-y) >= 33px) {
+                root.suppress-click = true;
+                hold.running = false;
+                tap-delay.running = false;
+                root.pending-action = "";
+            }
+        }
+        pointer-event(event) => {
+            if event.kind == PointerEventKind.down {
+                root.gesture-input-epoch = State.reader-input-epoch;
+                root.gesture-start-x = self.mouse-x;
+                root.gesture-start-y = self.mouse-y;
+                root.suppress-click = false;
+                root.gesture-expired = false;
+                root.gesture-consumed = false;
+                hold.running = !State.reader-menu;
+                swipe-limit.running = true;
+            } else if event.kind == PointerEventKind.cancel {
+                root.reset-input-state();
+            } else if event.kind == PointerEventKind.up {
+                hold.running = false;
+                swipe-limit.running = false;
+                if root.gesture-input-epoch == State.reader-input-epoch && !root.gesture-consumed && !root.gesture-expired && !State.reader-menu {
+                    if root.gesture-start-y <= 47px && self.mouse-y - root.gesture-start-y >= 33px {
+                        root.suppress-click = true;
+                        Commands.action("reader", "menu", "");
+                    } else if abs(self.mouse-x - root.gesture-start-x) >= 33px && abs(self.mouse-x - root.gesture-start-x) > abs(self.mouse-y - root.gesture-start-y) {
+                        root.suppress-click = true;
+                        if !root.vertical {
+                            Commands.action("reader", ((self.mouse-x > root.gesture-start-x) == (State.reading-direction == "rtl")) != root.reverse-taps ? "next" : "previous", "");
+                        }
+                    } else if abs(self.mouse-y - root.gesture-start-y) >= 33px {
+                        root.suppress-click = true;
+                        if root.vertical {
+                            Commands.action("reader", (self.mouse-y < root.gesture-start-y) != root.reverse-taps ? "next" : "previous", "");
+                        }
+                    }
+                }
+            }
+        }
+        clicked => {
+            if root.gesture-input-epoch == State.reader-input-epoch && !root.suppress-click && abs(self.mouse-x - root.gesture-start-x) < 33px && abs(self.mouse-y - root.gesture-start-y) < 33px {
+                if !State.double-tap-zoom || State.reader-menu {
+                    if root.tap-action(self.mouse-x, self.mouse-y) != "" { Commands.action("reader", root.tap-action(self.mouse-x, self.mouse-y), ""); }
+                } else if tap-delay.running && root.pending-input-epoch == State.reader-input-epoch {
+                    tap-delay.running = false;
+                    root.pending-action = "";
+                    Commands.action("reader", "zoom", "");
+                } else {
+                    tap-delay.running = false;
+                    root.pending-action = root.tap-action(self.mouse-x, self.mouse-y);
+                    root.pending-input-epoch = State.reader-input-epoch;
+                    tap-delay.running = true;
+                }
+            }
+        }
+    }
+    hold := Timer {
+        interval: 500ms;
+        running: false;
+        triggered => {
+            self.running = false;
+            if root.gesture-input-epoch == State.reader-input-epoch && !root.gesture-consumed && abs(page-touch.mouse-x - root.gesture-start-x) < 12px && abs(page-touch.mouse-y - root.gesture-start-y) < 12px {
+                root.suppress-click = true;
+                root.gesture-consumed = true;
+                Commands.action("reader", "page-actions", "");
+            }
+        }
+    }
+    swipe-limit := Timer { interval: 900ms; running: false; triggered => { self.running = false; root.gesture-expired = true; } }
+    tap-delay := Timer { interval: 300ms; running: false; triggered => { self.running = false; if root.pending-input-epoch == State.reader-input-epoch && root.pending-action != "" { Commands.action("reader", root.pending-action, ""); } root.pending-action = ""; } }
+
+    // Tap-zone guidance is an explicit menu aid. Closed-menu frames retain only
+    // the contained artwork, including the complete lower-right page-turn area.
+    if State.show-tap-zones && State.reader-menu && State.reader-panel == "": Rectangle {
+        width: root.width;
+        height: root.height;
+        background: transparent;
+        if !root.vertical: Rectangle {
+            width: parent.width;
+            height: parent.height;
+            for boundary in [root.side-fraction, 1 - root.side-fraction]: Rectangle {
+                x: root.width * boundary - 1px;
+                width: 2px;
+                height: State.tap-layout == "l-shaped" ? root.height * 2 / 3 : root.height;
+                clip: true;
+                for dash in ceil((State.tap-layout == "l-shaped" ? root.height * 2 / 3 : root.height) / 12px): Rectangle {
+                    y: dash * 12px;
+                    width: 2px;
+                    height: 6px;
+                    background: Theme.ink;
+                }
+            }
+            if State.tap-layout == "l-shaped": Rectangle {
+                y: root.height * 2 / 3 - 1px;
+                width: root.width;
+                height: 2px;
+                for dash in ceil(root.width / 12px): Rectangle {
+                    x: dash * 12px;
+                    width: 6px;
+                    height: 2px;
+                    background: Theme.ink;
+                }
+            }
+            ReaderZoneLabel {
+                x: root.width * root.side-fraction / 2 - self.width / 2;
+                y: (root.top-height + min(root.height - root.bottom-height, State.tap-layout == "l-shaped" ? root.height * 2 / 3 : root.height) - self.height) / 2;
+                text: State.tap-layout == "swipe-only" ? Strings.swipe-only : root.next-on-left ? Strings.next : Strings.previous;
+                next: State.tap-layout != "swipe-only" && root.next-on-left;
+            }
+            ReaderZoneLabel {
+                x: (root.width - self.width) / 2;
+                y: (root.top-height + min(root.height - root.bottom-height, State.tap-layout == "l-shaped" ? root.height * 2 / 3 : root.height) - self.height) / 2;
+                text: Strings.menu;
+            }
+            ReaderZoneLabel {
+                x: root.width * (1 - root.side-fraction / 2) - self.width / 2;
+                y: (root.top-height + min(root.height - root.bottom-height, State.tap-layout == "l-shaped" ? root.height * 2 / 3 : root.height) - self.height) / 2;
+                text: State.tap-layout == "swipe-only" ? Strings.swipe-only : root.next-on-left ? Strings.previous : Strings.next;
+                next: State.tap-layout != "swipe-only" && !root.next-on-left;
+            }
+            if State.tap-layout == "l-shaped" && root.height - root.bottom-height - root.height * 2 / 3 >= (State.large-screen ? 62px : 56px): ReaderZoneLabel {
+                x: (root.width - self.width) / 2;
+                y: (root.height * 2 / 3 + root.height - root.bottom-height - self.height) / 2;
+                text: root.reverse-taps ? Strings.previous : Strings.next;
+                next: !root.reverse-taps;
+            }
+        }
+        if root.vertical: Rectangle {
+            width: parent.width;
+            height: parent.height;
+            for boundary in [1.0 / 3.0, 2.0 / 3.0]: Rectangle {
+                y: root.height * boundary - 1px;
+                width: root.width;
+                height: 2px;
+                for dash in ceil(root.width / 12px): Rectangle {
+                    x: dash * 12px;
+                    width: 6px;
+                    height: 2px;
+                    background: Theme.ink;
+                }
+            }
+            ReaderZoneLabel {
+                x: (root.width - self.width) / 2;
+                y: (root.top-height + max(root.top-height, root.height / 3) - self.height) / 2;
+                text: State.tap-layout == "swipe-only" ? Strings.swipe-only : root.reverse-taps ? (State.reading-direction == "vertical" ? Strings.next-screen : Strings.next) : (State.reading-direction == "vertical" ? Strings.previous-screen : Strings.previous);
+                next: State.tap-layout != "swipe-only" && root.reverse-taps;
+            }
+            ReaderZoneLabel {
+                x: (root.width - self.width) / 2;
+                y: (max(root.top-height, root.height / 3) + min(root.height - root.bottom-height, root.height * 2 / 3) - self.height) / 2;
+                text: Strings.menu;
+            }
+            ReaderZoneLabel {
+                x: (root.width - self.width) / 2;
+                y: (min(root.height - root.bottom-height, root.height * 2 / 3) + root.height - root.bottom-height - self.height) / 2;
+                text: State.tap-layout == "swipe-only" ? Strings.swipe-only : root.reverse-taps ? (State.reading-direction == "vertical" ? Strings.previous-screen : Strings.previous) : (State.reading-direction == "vertical" ? Strings.next-screen + " · " + Strings.webtoon-step : Strings.next);
+                next: State.tap-layout != "swipe-only" && !root.reverse-taps;
+            }
+        }
+    }
+
+    if State.reader-menu: Rectangle {
+        x: 0px;
+        y: 0px;
+        width: root.width;
+        height: root.top-height;
+        background: Theme.paper;
+        if !State.large-screen: Rectangle {
+            x: 0px;
+            y: 0px;
+            width: parent.width;
+            height: 26px;
+            background: State.incognito ? Theme.ink : Theme.paper;
+            property <color> foreground: State.incognito ? Theme.paper : Theme.ink;
+            Text {
+                x: 20px;
+                y: 0px;
+                width: 90px;
+                height: parent.height;
+                text: State.time;
+                font-family: Theme.numbers;
+                font-size: 13px;
+                font-weight: 600;
+                color: parent.foreground;
+                vertical-alignment: center;
+            }
+            Icon {
+                x: reader-battery.x - 24px;
+                y: (parent.height - 16px) / 2;
+                width: 16px;
+                height: 16px;
+                kind: "wifi";
+                enabled: State.wifi;
+                inverted: State.incognito;
+            }
+            reader-battery := Text {
+                x: parent.width - 51px - self.preferred-width;
+                y: 0px;
+                width: self.preferred-width;
+                height: parent.height;
+                text: State.battery + "%";
+                font-family: Theme.numbers;
+                font-size: 13px;
+                font-weight: 600;
+                color: parent.foreground;
+                vertical-alignment: center;
+            }
+            Rectangle {
+                x: parent.width - 43px;
+                y: (parent.height - 12px) / 2;
+                width: 23px;
+                height: 12px;
+                background: transparent;
+                Rectangle {
+                    x: parent.width / 26;
+                    y: parent.height / 14;
+                    width: parent.width / 26 * 21;
+                    height: parent.height / 14 * 12;
+                    background: transparent;
+                    border-width: 1.5px;
+                    border-color: State.incognito ? Theme.paper : Theme.ink;
+                    border-radius: 3px;
+                }
+                Rectangle {
+                    x: parent.width / 26 * 3.5;
+                    y: parent.height / 14 * 3.5;
+                    width: parent.width / 26 * 16.5 * clamp(State.battery / 100.0, 0, 1);
+                    height: parent.height / 14 * 7;
+                    background: State.incognito ? Theme.paper : Theme.ink;
+                    border-radius: 1px;
+                }
+                Rectangle {
+                    x: parent.width / 26 * 23.2;
+                    y: parent.height / 14 * 4.5;
+                    width: parent.width / 26 * 2;
+                    height: parent.height / 14 * 5;
+                    background: State.incognito ? Theme.paper : Theme.ink;
+                    border-radius: 1px;
+                }
+            }
+        }
+        ReaderHeaderAction {
+            x: State.large-screen ? 14px : 6px;
+            y: State.large-screen ? 11px : 31px;
+            action: "back";
+            label: Strings.back;
+        }
+        Caption {
+            x: State.large-screen ? 82px : 60px;
+            y: State.large-screen ? 14px : 33.5px;
+            width: max(0px, (root.wide ? rotation.x : bookmark.x) - self.x - (State.large-screen ? 6px : 2px));
+            height: State.large-screen ? 18px : 17px;
+            text: State.current-book.title;
+            font-size: State.large-screen ? 13px : 12px;
+            letter-spacing: State.large-screen ? 4px : 3px;
+        }
+        Text {
+            x: State.large-screen ? 82px : 60px;
+            y: State.large-screen ? 32px : 50.5px;
+            width: max(0px, (root.wide ? rotation.x : bookmark.x) - self.x - (State.large-screen ? 6px : 2px));
+            height: State.large-screen ? 32px : 26px;
+            text: Strings.chapter-prefix + State.current-chapter-number + Strings.chapter-suffix + (State.large-screen ? "　" : "  ") + State.current-chapter;
+            font-family: Theme.serif;
+            font-size: State.large-screen ? 23px : 19px;
+            font-weight: 900;
+            letter-spacing: State.large-screen ? 2px : 1px;
+            color: Theme.ink;
+            vertical-alignment: center;
+            overflow: elide;
+        }
+        rotation := Rectangle {
+            x: bookmark.x - self.width - 6px;
+            y: 15px;
+            width: max(124px, rotation-caption.preferred-width + 56px);
+            height: 48px;
+            visible: root.wide;
+            background: rotation-touch.pressed ? Theme.ink : Theme.paper;
+            border-width: 1.5px;
+            border-color: Theme.ink;
+            border-radius: Theme.control-radius;
+            accessible-role: button;
+            accessible-label: Strings.manual-rotation;
+            ReaderGlyph {
+                x: 12px;
+                y: 14px;
+                width: 20px;
+                height: 20px;
+                kind: "lock";
+                color: rotation-touch.pressed ? Theme.paper : Theme.ink;
+            }
+            rotation-caption := BodyText {
+                x: 40px;
+                width: parent.width - 56px;
+                height: parent.height;
+                text: Strings.manual-rotation;
+                font-size: 16px;
+                font-weight: 700;
+                color: rotation-touch.pressed ? Theme.paper : Theme.ink;
+            }
+            // This action opens supported manual orientations without implying
+            // that an automatic sensor subscription or lock toggle exists.
+            rotation-touch := TouchArea {
+                pointer-event(event) => {
+                    if event.kind == PointerEventKind.down { Commands.refresh("fast"); }
+                    else if event.kind == PointerEventKind.up || event.kind == PointerEventKind.cancel { Commands.refresh("ui"); }
+                }
+                clicked => { Commands.action("reader", "orientation", ""); }
+            }
+        }
+        bookmark := ReaderHeaderAction {
+            x: toc.x - (State.large-screen ? 62px : 50px);
+            y: State.large-screen ? 11px : 31px;
+            action: "bookmark";
+            label: Strings.bookmark;
+            marked: State.reader-bookmarked;
+        }
+        toc := ReaderHeaderAction {
+            x: State.large-screen ? reader-status.x - 85px : parent.width - 56px;
+            y: State.large-screen ? 11px : 31px;
+            action: "toc";
+            label: Strings.table-of-contents;
+            active: State.reader-panel == "toc";
+        }
+        Rectangle {
+            x: reader-status.x - 17px;
+            y: 22px;
+            width: 1px;
+            height: 34px;
+            visible: State.large-screen;
+            background: Theme.dotted;
+        }
+        reader-status := Text {
+            x: parent.width - 24px - self.preferred-width;
+            y: 22px;
+            width: self.preferred-width;
+            height: 34px;
+            visible: State.large-screen;
+            text: State.time + " · " + State.battery + "%";
+            font-family: Theme.numbers;
+            font-size: 16px;
+            font-weight: 600;
+            color: Theme.ink;
+            vertical-alignment: center;
+        }
+        Rectangle {
+            x: 0px;
+            y: parent.height - 1.5px;
+            width: parent.width;
+            height: 1.5px;
+            background: Theme.ink;
+        }
+    }
+
+    if State.reader-menu: Rectangle {
+        x: 0px;
+        y: root.height - root.bottom-height;
+        width: root.width;
+        height: root.bottom-height;
+        background: Theme.paper;
+        Rectangle {
+            x: 0px;
+            y: 0px;
+            width: parent.width;
+            height: State.reader-panel == "" ? 1.5px : 1px;
+            background: State.reader-panel == "" ? Theme.ink : Theme.line;
+        }
+        Caption {
+            x: root.track-inset;
+            y: State.large-screen ? 15.5px : 13.5px;
+            width: max(0px, page-number.x - self.x - 12px);
+            height: State.large-screen ? 27.5px : 23.5px;
+            text: Strings.chapter-remaining + " " + max(0, State.reader-total - root.shown-page) + " " + Strings.pages-unit + (State.next-downloaded ? " · " + Strings.next-chapter-downloaded : "");
+            font-size: State.large-screen ? 15px : 13px;
+        }
+        page-number := Text {
+            x: page-total.x - self.preferred-width;
+            y: State.large-screen ? 15.5px : 13.5px;
+            width: self.preferred-width;
+            height: State.large-screen ? 27.5px : 23.5px;
+            text: root.page-label;
+            font-family: Theme.numbers;
+            font-size: State.large-screen ? 20px : 17px;
+            font-weight: 700;
+            color: Theme.ink;
+            vertical-alignment: center;
+        }
+        page-total := Text {
+            x: parent.width - root.track-inset - self.preferred-width;
+            y: State.large-screen ? 19.5px : 16.5px;
+            width: self.preferred-width;
+            height: State.large-screen ? 23.5px : 20.5px;
+            text: " / " + State.reader-total;
+            font-family: Theme.numbers;
+            font-size: State.large-screen ? 16px : 14px;
+            color: Theme.secondary;
+            vertical-alignment: center;
+        }
+        Rectangle {
+            x: root.track-inset;
+            y: ReaderMetrics.range-top + (State.large-screen ? 18px : 16px);
+            width: root.track-width;
+            height: 4px;
+            background: Theme.line;
+            border-radius: 2px;
+            Rectangle {
+                x: State.reading-direction == "rtl" ? parent.width * (1 - root.progress) : 0px;
+                width: parent.width * root.progress;
+                height: parent.height;
+                background: Theme.ink;
+                border-radius: 2px;
+            }
+            Rectangle {
+                x: parent.width * (State.reading-direction == "rtl" ? 1 - root.progress : root.progress) - self.width / 2;
+                y: State.large-screen ? -11.5px : -10.5px;
+                width: State.large-screen ? 27px : 25px;
+                height: self.width;
+                border-width: 1.5px;
+                border-color: Theme.ink;
+                border-radius: 4.5px;
+                background: Theme.paper;
+                Rectangle {
+                    x: 4.5px;
+                    y: 4.5px;
+                    width: parent.width - 9px;
+                    height: parent.height - 9px;
+                    background: Theme.ink;
+                }
+            }
+        }
+        seek-touch := TouchArea {
+            x: root.track-inset;
+            y: ReaderMetrics.range-top;
+            width: root.track-width;
+            height: ReaderMetrics.range-height;
+            accessible-role: slider;
+            accessible-label: Strings.footer-pages + " " + root.shown-page + " / " + State.reader-total;
+            moved => {
+                if self.pressed && root.seeking && root.seek-input-epoch == State.reader-input-epoch {
+                    root.preview-page = root.page-at(self.mouse-x);
+                    Commands.refresh("fast");
+                }
+            }
+            pointer-event(event) => {
+                if event.kind == PointerEventKind.down {
+                    root.seek-input-epoch = State.reader-input-epoch;
+                    root.preview-page = root.page-at(self.mouse-x);
+                    root.seeking = true;
+                    Commands.refresh("fast");
+                } else if event.kind == PointerEventKind.up {
+                    if root.seeking && root.seek-input-epoch == State.reader-input-epoch {
+                        root.preview-page = root.page-at(self.mouse-x);
+                        root.seeking = false;
+                        Commands.action("reader", "seek", "" + root.preview-page);
+                    }
+                    root.seeking = false;
+                } else if event.kind == PointerEventKind.cancel {
+                    root.seeking = false;
+                    Commands.refresh("ui");
+                }
+            }
+        }
+        ReaderChapterAction {
+            x: root.track-inset - (State.large-screen ? 10px : 8px);
+            y: ReaderMetrics.chapter-top;
+            action: State.reading-direction == "rtl" ? "next-chapter" : "previous-chapter";
+            text: State.reading-direction == "rtl" ?
+                (State.reader-has-next-chapter ? Strings.chapter-prefix + State.reader-next-chapter-number + Strings.chapter-suffix : Strings.next-chapter) :
+                (State.reader-has-previous-chapter ? Strings.chapter-prefix + State.reader-previous-chapter-number + Strings.chapter-suffix : Strings.previous-chapter);
+            enabled: State.reading-direction == "rtl" ? State.reader-has-next-chapter : State.reader-has-previous-chapter;
+        }
+        ReaderChapterAction {
+            x: parent.width - root.track-inset + (State.large-screen ? 10px : 8px) - self.width;
+            y: ReaderMetrics.chapter-top;
+            trailing: true;
+            action: State.reading-direction == "rtl" ? "previous-chapter" : "next-chapter";
+            text: State.reading-direction == "rtl" ?
+                (State.reader-has-previous-chapter ? Strings.chapter-prefix + State.reader-previous-chapter-number + Strings.chapter-suffix : Strings.previous-chapter) :
+                (State.reader-has-next-chapter ? Strings.chapter-prefix + State.reader-next-chapter-number + Strings.chapter-suffix : Strings.next-chapter);
+            enabled: State.reading-direction == "rtl" ? State.reader-has-previous-chapter : State.reader-has-next-chapter;
+        }
+        Rectangle {
+            x: 0px;
+            y: root.controls-height;
+            width: parent.width;
+            height: 1px;
+            background: Theme.ink;
+        }
+        for action[index] in root.tool-actions: ReaderTool {
+            x: ReaderMetrics.tools-inset + index * (root.width - ReaderMetrics.tools-inset * 2) / root.tool-actions.length;
+            y: root.controls-height + 1px;
+            width: (root.width - ReaderMetrics.tools-inset * 2) / root.tool-actions.length;
+            height: root.toolbar-height - 1px;
+            action: action;
+            text: action == "mode" ? Strings.reader-mode : action == "picture" ? Strings.picture : action == "brightness" ? Strings.brightness : action == "orientation" ? Strings.orientation : action == "layout" ? Strings.layout : Strings.more;
+            active: State.reader-panel == action;
+        }
+    }
+}

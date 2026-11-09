@@ -1,0 +1,303 @@
+{
+  "schema_version": 1,
+  "round": 2,
+  "status": "changes_required",
+  "review_kind": "manual_static_screenshot_comparison",
+  "review_complete": true,
+  "scope_note": "All twelve reference screens were reviewed at their actual requested logical canvas size. Remote interaction checks are separate from this manual visual review.",
+  "new_suggestion_count": 5,
+  "known_unresolved_count": 6,
+  "qualifies_as_clean_round": false,
+  "consecutive_clean_rounds": 0,
+  "coordinate_system": {
+    "units": "logical design pixels",
+    "paperwhite": [
+      618,
+      824
+    ],
+    "scribe_portrait": [
+      930,
+      1240
+    ],
+    "scribe_landscape": [
+      1240,
+      930
+    ],
+    "reference_png_scale": 2
+  },
+  "screens": [
+    {
+      "id": "pw5-library",
+      "actual": "artifacts/ui-round-2/pw5-library.png",
+      "reference": "tmp/design/reference-01.png",
+      "reviewed": true
+    },
+    {
+      "id": "pw5-detail",
+      "actual": "artifacts/ui-round-2/pw5-detail.png",
+      "reference": "tmp/design/reference-02.png",
+      "reviewed": true
+    },
+    {
+      "id": "pw5-reader",
+      "actual": "artifacts/ui-round-2/pw5-reader.png",
+      "reference": "tmp/design/reference-03.png",
+      "reviewed": true
+    },
+    {
+      "id": "pw5-sources",
+      "actual": "artifacts/ui-round-2/pw5-sources.png",
+      "reference": "tmp/design/reference-04.png",
+      "reviewed": true
+    },
+    {
+      "id": "pw5-catalog",
+      "actual": "artifacts/ui-round-2/pw5-catalog.png",
+      "reference": "tmp/design/reference-05.png",
+      "reviewed": true
+    },
+    {
+      "id": "pw5-search",
+      "actual": "artifacts/ui-round-2/pw5-search.png",
+      "reference": "tmp/design/reference-06.png",
+      "reviewed": true
+    },
+    {
+      "id": "pw5-history",
+      "actual": "artifacts/ui-round-2/pw5-history.png",
+      "reference": "tmp/design/reference-07.png",
+      "reviewed": true
+    },
+    {
+      "id": "pw5-settings",
+      "actual": "artifacts/ui-round-2/pw5-settings.png",
+      "reference": "tmp/design/reference-08.png",
+      "reviewed": true
+    },
+    {
+      "id": "scribe-library",
+      "actual": "artifacts/ui-round-2/scribe-library.png",
+      "reference": "tmp/design/reference-09.png",
+      "reviewed": true
+    },
+    {
+      "id": "scribe-detail",
+      "actual": "artifacts/ui-round-2/scribe-detail.png",
+      "reference": "tmp/design/reference-10.png",
+      "reviewed": true
+    },
+    {
+      "id": "scribe-sources",
+      "actual": "artifacts/ui-round-2/scribe-sources.png",
+      "reference": "tmp/design/reference-11.png",
+      "reviewed": true
+    },
+    {
+      "id": "scribe-landscape-reader",
+      "actual": "artifacts/ui-round-2/scribe-landscape-reader.png",
+      "reference": "tmp/design/reference-12.png",
+      "reviewed": true
+    }
+  ],
+  "resolved_previous_findings": [
+    "R1-D001",
+    "R1-D002",
+    "R1-D003",
+    "R1-D004",
+    "R1-D005",
+    "R1-D006",
+    "R1-D007",
+    "R1-D008",
+    "R1-D009",
+    "R1-D010",
+    "R1-D013",
+    "R1-D014",
+    "R1-D015",
+    "R1-D019",
+    "R1-D020",
+    "R1-D021",
+    "R1-D023"
+  ],
+  "known_previous_findings": [
+    {
+      "id": "R1-D011",
+      "status": "known_pending_frozen_asset_version",
+      "observed": "Catalog/history still show the old context artwork in this frozen capture. The newly extracted context covers and projection helpers were completed after its asset snapshot."
+    },
+    {
+      "id": "R1-D012",
+      "status": "partially_resolved",
+      "observed": "The Incognito text and separate trash action are restored, but the remaining icon is still a lock instead of a crossed eye."
+    },
+    {
+      "id": "R1-D016",
+      "status": "partially_resolved",
+      "observed": "Sleep and storage icons are corrected; the screen-refresh and tap-region symbols still differ from the page and crosshair reference symbols."
+    },
+    {
+      "id": "R1-D017",
+      "status": "known_pending_true_update_seed",
+      "observed": "Update counters still reuse seven in this frozen version. Six genuine dated chapters and the separate chapter-update state are ready for the next snapshot."
+    },
+    {
+      "id": "R1-D018",
+      "status": "known_pending_weekly_projection",
+      "observed": "The frozen version still shows the current page count. The projection is being replaced with a complete persisted-history calculation."
+    },
+    {
+      "id": "R1-D022",
+      "status": "known_pending_safe_aspect_assets",
+      "observed": "Paperwhite library title variants are pending projection in this binary. The same crop problem also clips the Nocturne title in the search card."
+    }
+  ],
+  "new_findings": [
+    {
+      "id": "R2-D001",
+      "priority": "P2",
+      "screens": [
+        "scribe-detail"
+      ],
+      "bounds_design_px": [
+        380,
+        192,
+        908,
+        195
+      ],
+      "title": "Chapter rows obscure the Scribe directory rule",
+      "observed": "The directory's bottom rule is visible only as short segments at its ends because the first chapter row begins before the header has finished.",
+      "recommendation": "Move chapter content below the complete header rule, preserving the intended row spacing.",
+      "owner": "ui_primary",
+      "status": "implemented_awaiting_recapture",
+      "evidence": [
+        "artifacts/ui-round-2/scribe-detail.png"
+      ]
+    },
+    {
+      "id": "R2-D002",
+      "priority": "P2",
+      "screens": [
+        "scribe-detail"
+      ],
+      "bounds_design_px": [
+        40,
+        866,
+        356,
+        964
+      ],
+      "title": "Synopsis body inherits the only available serif weight",
+      "observed": "The complete sidebar synopsis is rendered at the heavy serif weight used for titles, unlike the regular body in the reference.",
+      "recommendation": "Use the bundled 400-weight body face for the synopsis, or explicitly provide a regular serif face if choosing that appearance.",
+      "owner": "ui_primary",
+      "status": "implemented_awaiting_recapture",
+      "evidence": [
+        "artifacts/ui-round-2/scribe-detail.png"
+      ]
+    },
+    {
+      "id": "R2-D003",
+      "priority": "P2",
+      "screens": [
+        "scribe-library"
+      ],
+      "bounds_design_px": [
+        594,
+        194,
+        882,
+        282
+      ],
+      "title": "Update-preview dotted rules leave large blank gaps",
+      "observed": "The title occupies its intrinsic width, but the dotted rule starts at a fixed 55 percent position, leaving roughly ninety design pixels after short book names.",
+      "recommendation": "Lay out intrinsic-width titles, a stretchable dotted rule, and a fixed-width chapter label in one row.",
+      "owner": "ui_primary",
+      "status": "implemented_awaiting_recapture",
+      "evidence": [
+        "artifacts/ui-round-2/scribe-library.png"
+      ]
+    },
+    {
+      "id": "R2-D004",
+      "priority": "P2",
+      "screens": [
+        "scribe-sources"
+      ],
+      "bounds_design_px": [
+        36,
+        74,
+        906,
+        340
+      ],
+      "title": "Combined Scribe browse header omits source context and action text",
+      "observed": "The header shows only list and plus icons, while the reference has labeled Source List and Add Source controls. Its search placeholder is generic and its subtitle omits the available-update state.",
+      "recommendation": "Use complete labeled controls on the wide layout, a source-specific search placeholder, and an update indicator derived from the current source metadata.",
+      "owner": "ui_aux",
+      "status": "identified",
+      "evidence": [
+        "artifacts/ui-round-2/scribe-sources.png"
+      ]
+    },
+    {
+      "id": "R2-D005",
+      "priority": "P2",
+      "screens": [
+        "pw5-catalog"
+      ],
+      "bounds_design_px": [
+        104,
+        272,
+        596,
+        615
+      ],
+      "title": "Catalog rows omit their source update ages",
+      "observed": "The Fog Port, Northern Expedition, and Midnight Radio status rows omit the supplied two-days-ago, today, and five-days-ago values.",
+      "recommendation": "Preserve the demo catalog update age as a projected timestamp, use zero for unmarked entries, and append the localized relative date in the catalog status row.",
+      "owner": "design_research_and_ui_primary",
+      "status": "implemented_awaiting_recapture",
+      "evidence": [
+        "artifacts/ui-round-2/pw5-catalog.png"
+      ]
+    }
+  ],
+  "extensions_to_existing_findings": [
+    {
+      "id": "R1-D022",
+      "screen": "pw5-search",
+      "bounds_design_px": [
+        144,
+        228,
+        248,
+        350
+      ],
+      "observed": "The narrow 376x514 Nocturne asset is center-cropped into a 104x122 card, removing the lower part of its printed title.",
+      "implemented_followup": "Three exact 312x366 art-only crops from PDF page 6 now match the source-card aspect ratio and await the next binary capture.",
+      "new_suggestion": false
+    }
+  ],
+  "source_art_variations": [
+    {
+      "status": "reported_for_final_design_difference_record",
+      "screens": [
+        "pw5-reader",
+        "scribe-landscape-reader"
+      ],
+      "description": "The source presents different speech-balloon positions for the same nominal chapter/page: upper-left in the Paperwhite city panel and upper-right in the Scribe city panel. The page artwork remains consistent across devices, while its main panel boundaries now match both reference projections. This illustration variation is recorded separately from reader-control defects."
+    }
+  ],
+  "accepted_data_policy": [
+    "Retain the complete 86-chapter catalog and its true six-item pagination of fifteen pages.",
+    "Do not fabricate a fifth searchable source response to match a mock count.",
+    "After genuine chapter-update seeding, book totals may advance beyond the older catalog totals in the source artwork; retain the true stored data.",
+    "Seven-day reading statistics must come from persisted records, even when their count differs from the mock's unsupported summary."
+  ],
+  "reported_remote_verification": {
+    "reported_by": "pairing_service",
+    "ui_cases": {
+      "passed": 53,
+      "total": 53
+    },
+    "online_http_paging_checks": {
+      "passed": 4,
+      "total": 4
+    }
+  },
+  "verification_note": "Only static screenshots, metadata, source text, and reference images were read by this reviewer. No local application, build, test suite, or runtime probe was executed. Newly implemented changes still require a fresh remote capture."
+}

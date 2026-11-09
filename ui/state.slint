@@ -1,0 +1,317 @@
+export struct BookItem {
+    id: string,
+    title: string,
+    display-title: string,
+    author: string,
+    subtitle: string,
+    status: string,
+    cover: image,
+    unread: int,
+    downloaded: bool,
+    in-library: bool,
+    progress: float,
+    selected: bool,
+}
+
+export struct ChapterItem {
+    id: string,
+    number: string,
+    title: string,
+    date: string,
+    read: bool,
+    downloaded: bool,
+    download-state: string,
+    download-progress: float,
+    current: bool,
+    progress: string,
+    selected: bool,
+}
+
+export struct SourceItem {
+    id: string,
+    name: string,
+    display-name: string,
+    subtitle: string,
+    compact-status: string,
+    update-subtitle: string,
+    initial: string,
+    available: bool,
+    installed: bool,
+    update: bool,
+    builtin: bool,
+}
+
+export struct HistoryItem {
+    id: string,
+    chapter-id: string,
+    title: string,
+    subtitle: string,
+    progress: string,
+    date: string,
+    date-label: string,
+    date-value: string,
+    cover: image,
+    fraction: float,
+    completed: bool,
+    group-start: bool,
+    column: int,
+    row-index: int,
+    group-row-count: int,
+    group-offset: int,
+    download-state: string,
+    download-progress: float,
+}
+
+export struct SearchGroup {
+    id: string,
+    title: string,
+    status: string,
+    error: bool,
+    pending: bool,
+    error-detail: string,
+    count: int,
+    books: [BookItem],
+}
+
+export struct SettingItem {
+    id: string,
+    title: string,
+    value: string,
+    group: string,
+    enabled: bool,
+}
+
+export struct DownloadItem {
+    id: string,
+    book-id: string,
+    title: string,
+    chapter: string,
+    cover: image,
+    progress: float,
+    state: string,
+    status: string,
+    completed: int,
+    total: int,
+}
+
+export struct FilterOption {
+    id: string,
+    title: string,
+    state: int,
+}
+
+export struct SourcePreferenceGroup {
+    id: string,
+    title: string,
+    kind: string,
+    value: string,
+    options: [SettingItem],
+    enabled: bool,
+}
+
+export global Commands {
+    callback action(string, string, string);
+    callback refresh(string);
+    callback job-ready();
+}
+
+export global State {
+    in-out property <bool> large-screen: false;
+    in-out property <bool> landscape: false;
+    in-out property <bool> reverse-landscape: false;
+    in-out property <string> route: "library";
+    in-out property <int> active-tab: 0;
+    in-out property <string> modal;
+    in-out property <string> modal-title;
+    in-out property <string> modal-context;
+    in-out property <string> settings-section: "";
+    in-out property <string> message;
+    in-out property <bool> busy: false;
+    in-out property <bool> demo: false;
+    in-out property <string> time: "18:44";
+    in-out property <int> battery: 87;
+    in-out property <bool> wifi: false;
+    in-out property <bool> has-frontlight: true;
+    in-out property <bool> has-warmth: true;
+    in-out property <bool> has-orientation: false;
+    in-out property <string> device-name;
+    in-out property <string> device-description;
+    in-out property <string> free-space;
+    in-out property <string> version: "0.1.0";
+    in-out property <int> page: 1;
+    in-out property <int> page-count: 1;
+    in-out property <bool> page-jump-open: false;
+    in-out property <string> page-jump-context: "page";
+    in-out property <[BookItem]> books;
+    in-out property <[BookItem]> catalog;
+    in-out property <[BookItem]> updates;
+    in-out property <[ChapterItem]> chapters;
+    in-out property <[SourceItem]> sources;
+    in-out property <[SourceItem]> available-sources;
+    in-out property <[SourceItem]> picker-sources;
+    in-out property <[SourceItem]> installed-sources;
+    in-out property <int> installed-source-page: 1;
+    in-out property <int> installed-source-page-count: 1;
+    in-out property <[HistoryItem]> history;
+    in-out property <[SearchGroup]> search-groups;
+    in-out property <[SourceItem]> search-sources;
+    in-out property <[BookItem]> search-local-matches;
+    in-out property <[SettingItem]> settings;
+    in-out property <[SettingItem]> settings-details;
+    in-out property <string> settings-status;
+    in-out property <bool> storage-ready: false;
+    in-out property <bool> storage-loading: false;
+    in-out property <string> storage-status-code: "unknown";
+    in-out property <string> storage-status;
+    in-out property <bool> storage-scale-known: false;
+    in-out property <bool> storage-downloaded-known: false;
+    in-out property <string> storage-downloaded-text: "—";
+    in-out property <float> storage-downloaded-fraction: 0;
+    in-out property <bool> storage-image-cache-known: false;
+    in-out property <string> storage-image-cache-text: "—";
+    in-out property <float> storage-image-cache-fraction: 0;
+    in-out property <bool> storage-covers-known: false;
+    in-out property <string> storage-covers-text: "—";
+    in-out property <float> storage-covers-fraction: 0;
+    in-out property <bool> storage-free-known: false;
+    in-out property <string> storage-free-text: "—";
+    in-out property <float> storage-free-fraction: 0;
+    in-out property <[SettingItem]> storage-books;
+    in-out property <int> storage-book-count: 0;
+    in-out property <string> storage-books-status;
+    in-out property <int> settings-details-page: 1;
+    in-out property <int> settings-details-page-count: 1;
+    in-out property <[DownloadItem]> download-queue;
+    in-out property <int> download-queue-count: 0;
+    in-out property <bool> downloads-paused: false;
+    in-out property <bool> download-queue-can-pause: false;
+    in-out property <bool> download-queue-can-resume: false;
+    in-out property <int> library-count: 0;
+    in-out property <string> library-download-size;
+    in-out property <int> reading-count: 0;
+    in-out property <int> planned-count: 0;
+    in-out property <int> completed-count: 0;
+    in-out property <int> updated-count: 0;
+    in-out property <int> chapter-update-count: 0;
+    in-out property <int> weekly-read-count: 0;
+    in-out property <int> installed-count: 0;
+    in-out property <int> builtin-source-count: 0;
+    in-out property <int> extension-source-count: 0;
+    in-out property <int> picker-builtin-count: 0;
+    in-out property <int> available-count: 0;
+    in-out property <int> source-update-count: 0;
+    in-out property <int> library-filter: 0;
+    in-out property <int> source-filter: 0;
+    in-out property <string> source-language: "all";
+    in-out property <int> source-language-index: 0;
+    in-out property <int> catalog-filter: 0;
+    in-out property <[string]> catalog-tabs;
+    in-out property <bool> catalog-has-more: false;
+    in-out property <[SettingItem]> catalog-sort-options;
+    in-out property <[SettingItem]> catalog-status-options;
+    in-out property <[FilterOption]> catalog-tag-options;
+    in-out property <int> catalog-filter-result-count: 0;
+    in-out property <int> catalog-result-count: 0;
+    in-out property <int> catalog-active-filter-count: 0;
+    in-out property <int> history-filter: 0;
+    in-out property <bool> selection-mode: false;
+    in-out property <string> library-sort: "recent-read";
+    in-out property <bool> library-ascending: false;
+    in-out property <[int]> library-filters: [0, 0, 0, 0];
+    in-out property <[string]> selected-books;
+    in-out property <BookItem> current-book;
+    in-out property <string> book-description;
+    in-out property <string> book-tags;
+    in-out property <[string]> book-tag-items;
+    in-out property <string> book-metadata;
+    in-out property <[SettingItem]> book-details;
+    in-out property <int> chapter-count: 0;
+    in-out property <int> unread-count: 0;
+    in-out property <int> downloaded-count: 0;
+    in-out property <bool> newest-first: true;
+    in-out property <bool> chapter-selection-mode: false;
+    in-out property <int> selected-chapter-count: 0;
+    in-out property <[BookItem]> migration-candidates;
+    in-out property <string> migration-selected-id;
+    in-out property <bool> migration-available: false;
+    in-out property <bool> migration-loading: false;
+    in-out property <bool> migration-committing: false;
+    in-out property <bool> migration-preserve-read: true;
+    in-out property <bool> migration-preserve-category: true;
+    in-out property <bool> migration-remove-downloads: false;
+    in-out property <bool> migration-can-start: false;
+    in-out property <string> migration-status;
+    in-out property <string> current-chapter;
+    in-out property <string> current-chapter-id;
+    in-out property <string> current-chapter-number;
+    in-out property <string> reader-next-chapter-number;
+    in-out property <string> reader-previous-chapter-number;
+    in-out property <bool> reader-has-next-chapter: false;
+    in-out property <bool> reader-has-previous-chapter: false;
+    in-out property <int> reader-page: 12;
+    in-out property <int> reader-total: 40;
+    in-out property <bool> reader-menu: true;
+    in-out property <int> reader-input-epoch: 0;
+    in-out property <bool> reader-image-ready: false;
+    in-out property <image> reader-image;
+    in-out property <image> reader-image-next;
+    in-out property <bool> reader-bookmarked: false;
+    in-out property <bool> next-downloaded: false;
+    in-out property <string> reader-footer;
+    in-out property <string> reader-panel;
+    in-out property <string> orientation-mode: "manual";
+    in-out property <bool> orientation-locked: true;
+    in-out property <string> reader-toc-tab: "chapters";
+    in-out property <bool> show-tap-zones: false;
+    in-out property <string> reading-direction: "rtl";
+    in-out property <string> global-reading-direction: "rtl";
+    in-out property <string> reader-default-direction: "rtl";
+    in-out property <string> tap-layout: "thirds";
+    in-out property <bool> double-tap-zoom: false;
+    in-out property <bool> spread: true;
+    in-out property <bool> reader-landscape-spread: false;
+    in-out property <bool> cover-alone: false;
+    in-out property <bool> reverse-taps: false;
+    in-out property <string> page-layout-mode: "automatic";
+    in-out property <bool> remember-book-direction: true;
+    in-out property <bool> incognito: false;
+    in-out property <bool> night-mode: false;
+    in-out property <bool> flash-on-close: true;
+    in-out property <bool> crop-borders: true;
+    in-out property <bool> dither: true;
+    in-out property <int> contrast: 0;
+    in-out property <bool> keep-awake: true;
+    in-out property <int> brightness: 12;
+    in-out property <int> warmth: 8;
+    in-out property <int> refresh-every: 6;
+    in-out property <string> source-id: "mangadex";
+    in-out property <string> source-title: "MangaDex";
+    in-out property <string> source-subtitle;
+    in-out property <[SourcePreferenceGroup]> source-preference-groups;
+    in-out property <string> source-initial;
+    in-out property <bool> source-available: true;
+    in-out property <bool> source-builtin: false;
+    in-out property <bool> source-needs-setup: false;
+    in-out property <string> source-server-address;
+    in-out property <string> source-server-credential;
+    in-out property <string> source-connection-status;
+    in-out property <string> search-scope: "all";
+    in-out property <int> search-source-count: 0;
+    in-out property <string> query;
+    in-out property <string> search-status;
+    in-out property <string> keyboard-text;
+    in-out property <string> keyboard-target: "search";
+    in-out property <string> keyboard-mode: "pinyin";
+    in-out property <string> keyboard-composition;
+    in-out property <[string]> keyboard-candidates;
+    in-out property <int> keyboard-candidate-page: 1;
+    in-out property <int> keyboard-candidate-page-count: 1;
+    in-out property <image> pairing-code;
+    in-out property <string> pairing-url;
+    in-out property <string> pairing-token;
+    in-out property <[SettingItem]> modal-items;
+    in-out property <string> panel-text;
+    in-out property <bool> summary-is-book: false;
+    in-out property <int> panel-page: 1;
+    in-out property <int> panel-page-count: 1;
+}

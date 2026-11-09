@@ -1,0 +1,67 @@
+{
+  "schema_version": 1,
+  "phase": "Phase3-C15",
+  "status": "Static source-bound preparation complete; only Root runtime resource GO is pending",
+  "runtime_executed": false,
+  "ssh_syntax_app_probe_cargo_or_vm_executed": false,
+  "local_work_scope": "Read-only source inspection, small artifact input copies and file-byte SHA metadata only; no code or App verification",
+  "local_sourceinputs": "D:/Code/aidokuForKindle/artifacts/phase3/candidate15/gui-lease/sourceinputs",
+  "remote_sourceinputs_planned": "/root/aidoku-phase3/evidence/candidate15/gui-lease/sourceinputs",
+  "inventory": "D:/Code/aidokuForKindle/artifacts/phase3/candidate15/gui-lease/sourceinputs/input-inventory.json",
+  "source": {
+    "root": "/root/aidoku-phase3/candidate15-repair-root-01/source-snapshot",
+    "file_count": 229,
+    "sha256": "c48c94852772b28294738a93b8590529c9e1e289441f1f5db361d8e84ee0196b",
+    "official_manifest": "/root/aidoku-phase3/evidence/candidate15/build-repair-root-01/source-after-gate-01.json",
+    "official_manifest_file_sha256": "28519ddbcacbab0d575434c7f9ddb4693b93dbf9fcb7979fbd1d0a96ef9999e3",
+    "policy": "Only the actual repair-root-01 immutable production tree may be linked or fingerprinted; no bare candidate15, old candidate14 or earlier source identity is substituted."
+  },
+  "desktop": {"path": "/root/aidoku-phase3/candidate15-repair-root-01/desktop/aidoku", "bytes": 263008640, "sha256": "87f9a786155c1f5a00e50e43ec63b9a29d0c5df514f6d4c473e6369392f6e910"},
+  "frozen_entry_roles": {
+    "lease_driver": {"path": "scripts/verify-live-reader-lease.py", "bytes": 31523, "sha256": "7ad4d50909f0f2fd3d9398a36c3d4dc1d80e8cc2cf7b7676735dd465bdfd4dd7"},
+    "pressure_driver": {"path": "scripts/verify-app-pressure-cover.py", "bytes": 12485, "sha256": "84f63650abaad45cafb685f0265c646f99edd4b427b4b3fecb4c2c256b98abff"},
+    "pressure_guard": {"path": "scripts/verify-handoff-tags.py", "bytes": 33913, "sha256": "7cd32588578edff343a33dc2a70b99cb6f838f6063de175c4e269935c53eb0b6"},
+    "actual_imported_base": {"path": "scripts/verify-handoff-ui.py", "sha256": "1f2379bffd9ce9594f307fa150f56c345fe508fca47aac3be31e8ce29a72fa44"},
+    "actual_base_plan": {"path": "docs/review/phase3-handoff-capture-plan.json", "sha256": "d07810abea322f7d2f86261f80e29007b3bd2f194eb2e9a3d4a53d8edcf70687"},
+    "reference_scope": {"path": "docs/review/phase3-reference-scope.json", "sha256": "c910bed9f02ed17b2ca0a54aca1beeeeb6caabc5a17a91afe764ddd3e7b0d33c"},
+    "c15_full_entry_context_only": {"path": "context/verify-handoff-ui-c15.py", "sha256": "0af445022cc4be732406ca843123e25102f0d979c26489b8b9895d2aea09c40c"},
+    "c15_full_plan_context_only": {"path": "context/phase3-handoff-capture-plan-c15.json", "sha256": "d9af9a8430d42bb58c673c52ca3e1a26f75ab88d007ef47f386bdf5136833942"},
+    "role_policy": "The versioned full C15 wrapper imports the frozen base; it is recorded separately and never renamed to the base or credited as executed by the lease or pressure producer."
+  },
+  "dependency_closure": {
+    "common_ten": ["verify-handoff-ui.py", "verify-ui.py", "verify-fullscreen.py", "handoff_c4_business.py", "handoff_c5_ui.py", "handoff_c5_reader.py", "handoff_c10_search.py", "handoff_c9_search.py", "handoff_c13_scope.py", "handoff_c12_scope.py"],
+    "lease_additions": ["verify-live-reader-lease.py", "verify-cache-ui.py"],
+    "pressure_additions": ["verify-app-pressure-cover.py", "verify-handoff-tags.py"],
+    "lease_imported_python_count": 12,
+    "pressure_imported_python_count": 12,
+    "stored_union_python_count": 14,
+    "edges": ["lease -> base, cache-ui", "pressure -> tags-guard -> base", "base -> native-ui, fullscreen, c4, c5-ui, c5-reader, c10-search, c13-scope", "c10-search -> c9-search", "c13-scope -> c12-scope -> c9-search"],
+    "artifact_freeze": "All fourteen copied Python files, base plan, scope and C15 context adjuncts have per-file byte/SHA records. Check the complete independent artifact freeze before and after each authorized run.",
+    "producer_subset": "The lease producer's original eight-file self-check remains an eight-file subset; the independent full closure record supplies the missing dependencies without changing its original conditions.",
+    "imports": "Use the isolated scripts directory for plain imports through PYTHONPATH/sys.path; no mutable UI-owner or old-harness fallback."
+  },
+  "reference_and_locale_binding": {
+    "reference_root": "/root/aidoku-phase3/reference",
+    "reference_metadata": "binding/reference-files.json",
+    "reference_records": 110,
+    "reference_images_copied_or_opened": false,
+    "locale_path": "/root/aidoku-phase3/candidate15-repair-root-01/source-snapshot/assets/i18n/zh-CN.json",
+    "locale_sha256": "ae4c43c45f6b8ccaaf2fd210c7cdbd1451f1bca958ee16ba0fd728f9ca14a513",
+    "before_after_policy": "Use the already frozen supplied references and explicit scope/plan identities. Verify reference, locale, tool, source and binary fingerprints in the authorized runtime window, then retain original bytes and results."
+  },
+  "gui_lease": {
+    "argv": ["/usr/bin/env", "PATH=/usr/bin:/bin", "PYTHONDONTWRITEBYTECODE=1", "PYTHONPATH=/root/aidoku-phase3/evidence/candidate15/gui-lease/sourceinputs/scripts", "/usr/bin/xvfb-run", "-a", "-s", "-screen 0 930x1240x24", "/usr/bin/python3", "/root/aidoku-phase3/evidence/candidate15/gui-lease/sourceinputs/scripts/verify-live-reader-lease.py", "--binary", "/root/aidoku-phase3/candidate15-repair-root-01/desktop/aidoku", "--expected-sha256", "87f9a786155c1f5a00e50e43ec63b9a29d0c5df514f6d4c473e6369392f6e910", "--source-root", "/root/aidoku-phase3/candidate15-repair-root-01/source-snapshot", "--expected-source-sha256", "c48c94852772b28294738a93b8590529c9e1e289441f1f5db361d8e84ee0196b", "--expected-source-file-count", "229", "--output", "/root/aidoku-phase3/evidence/candidate15/gui-lease/run-01", "--timeout", "90"],
+    "strict_contract": ["Fresh real provider/App actions create one completed six-page download, raw pages, pins, progress and Reader leases; only source configuration is direct fixture input", "Before 15 s: owned exact X11 Reader pixels plus fresh accepted page-2-of-6 production progress", "Before 20 s: real book-removal actor removes jobs and durable pins with six raw records intact", "Same App clear preserves two genuinely leased raw/processed files while all five unshown raw siblings are reclaimed", "After actual Reader process exit, a fresh settings process clears both former protected files"],
+    "scope": "One live Reader App with same-process DownloadWorker/SourceManager/CacheManager registry sharing; actual exit followed by later forced reclamation, not a same-process reader/back claim."
+  },
+  "app_pressure": {
+    "argv": ["/usr/bin/env", "PATH=/usr/bin:/bin", "PYTHONDONTWRITEBYTECODE=1", "PYTHONPATH=/root/aidoku-phase3/evidence/candidate15/gui-lease/sourceinputs/scripts", "/usr/bin/python3", "/root/aidoku-phase3/evidence/candidate15/gui-lease/sourceinputs/scripts/verify-app-pressure-cover.py", "--round", "1", "--pressure-device", "pw5", "--pressure-device", "scribe", "--output", "/root/aidoku-phase3/evidence/candidate15/app-pressure-cover/run-01", "--binary", "/root/aidoku-phase3/candidate15-repair-root-01/desktop/aidoku", "--source-root", "/root/aidoku-phase3/candidate15-repair-root-01/source-snapshot", "--reference-root", "/root/aidoku-phase3/reference", "--scope", "/root/aidoku-phase3/evidence/candidate15/gui-lease/sourceinputs/docs/review/phase3-reference-scope.json", "--plan", "/root/aidoku-phase3/evidence/candidate15/gui-lease/sourceinputs/docs/review/phase3-handoff-capture-plan.json", "--expected-sha256", "87f9a786155c1f5a00e50e43ec63b9a29d0c5df514f6d4c473e6369392f6e910", "--expected-source-sha256", "c48c94852772b28294738a93b8590529c9e1e289441f1f5db361d8e84ee0196b", "--timeout", "90", "--settled-reader-tail-ms", "5000"],
+    "cache_seeder_required": false,
+    "process_plan": "Existing Suite.capture gives each owned App an isolated xvfb-run display. Four sequential App stages per fixed profile, eight total for pw5+scribe; no second live Reader is added to the lease contract.",
+    "source_gate": "Existing guard requires source/binary SHA256 and Suite checks canonical source plus App identities. The independent preflight also binds exactly 229 source members; do not add the unsupported lease file-count option to this CLI.",
+    "existing_conditions": ["Twenty real HTTP library records are actually favorited", "Twenty-four ordinary enqueue intents coalesce to six unique jobs", "Reader menu is reached while actual queued/downloading jobs and delayed image GET requests remain active", "Three library page round trips reuse previously fetched real cover URLs and show 8 PW5 or 18 Scribe covers", "All six jobs reach completed state and actual chapter downloaded flags agree"],
+    "cleanup": "The existing completed_process owns a new process session; timeout sends group SIGTERM and then SIGKILL only if needed after three seconds. Fixture shutdown/server_close/thread.join remains unchanged; retain raw outputs and owner evidence."
+  },
+  "remaining_action": "Wait only for Root's explicit per-runtime resource GO. In that window materialize the frozen input package, link production exclusively to the repair snapshot, check full before identities, run the original producer, release owned Apps before copying, and record the full after/raw/copy fingerprints.",
+  "limits": "No C15 GUI or pressure run, native execution or formal performance result follows from this preparation. Existing unit/exact-lease cases and old-source reports cannot substitute for actual GUI. No new counter, endpoint, concurrent-GUI or physical-display claim; clean/full/visual-round credit is zero."
+}

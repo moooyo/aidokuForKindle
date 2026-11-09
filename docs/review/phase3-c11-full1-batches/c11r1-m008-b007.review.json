@@ -1,0 +1,134 @@
+{
+  "batch_id": "c11r1-m008-b007",
+  "reviewer": "/root/final_validation_delivery/c4_full_review_coordinator/c11r1_m008_b007",
+  "round": 1,
+  "run_id": "55c498296d35",
+  "module_id": "008-sc-sources-search-content",
+  "module_snapshot": {
+    "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate11/ui-round-1/snapshots/ui-round-1-snapshot-008-sc-sources-search-content/inventory.json",
+    "sha256": "43b3e09182a62b4dd91a956d5324d42f412a2914500544ae878d344fb3ec4186",
+    "archive_sha256": "1a867411f03f74930c4f0f8044e993e8124f64c90f9a8d619729d60e35e08b59",
+    "transfer_accounting_sha256": "26d6a7ae1662131c810758b2f13306d812d514e136a889c961e2263d3c2e1879",
+    "owner_file_count": 528
+  },
+  "freeze_tuple": {
+    "source_sha256": "33a2d049307c398da8bfbf196d1bf8e086412c117c194b592f4a93b5bfaedb3f",
+    "binary_sha256": "1e60db345cbd6fbe580258a4a309bf42361781061dc2033f78a8a5eb4446ad72",
+    "other_identity_fields_ref": "D:/Code/aidokuForKindle/docs/review/phase3-c11-full1-batches/c11r1-m008-b007.input.json#freeze_tuple"
+  },
+  "identity_binding": {
+    "immutable_input_path": "D:/Code/aidokuForKindle/docs/review/phase3-c11-full1-batches/c11r1-m008-b007.input.json",
+    "source_manifest_sha256": "e332086df1f552ae7d7c7d434491f6886a167095a86789d6e0ec93ca47975e9e",
+    "reference_manifest_sha256": "caad04a243ecbaac22c790d7918f50c8678985b9e58a9f963694fe7d69e2775a",
+    "declaration": "All SHA values are owner declarations. The module inventory frozen identity and the three case identities were read statically and agree with this input. No local rehash was performed.",
+    "unresolved_ancillary_declarations": "Input SHA and unrelated tag-flow source-rule manifest SHA remain pending owner declaration as recorded in the input; this report is bound to the declared immutable module inventory SHA."
+  },
+  "native_capture_dimensions": [
+    930,
+    1240
+  ],
+  "reviewed_case_ids": [
+    "scribe--http-search-success--view-all",
+    "scribe--http-search-success--server-connect",
+    "scribe--http-search-success--cached-unverified"
+  ],
+  "actual_original_image_opens": 4,
+  "references": [
+    {
+      "reference_id": "sc-browse--default",
+      "path": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/screens/sc-browse.png",
+      "sha256": "7c411218fec402c436953ffae701611203207719241797caeaac154e114d7fae",
+      "original_dimensions": [
+        1860,
+        2480
+      ],
+      "reference_physical_scale": 2,
+      "actual_image_opened": true,
+      "opening_ordinal": 1,
+      "comparison_kind": "Related logical screen/state contract only; no independent exact-state reference exists for these assigned supplemental cases.",
+      "tool_display_resize": [
+        1368,
+        1824
+      ],
+      "observation": "The original browse reference provides the related source header, tabs/search/filter, five-column card grid, folio and navigation allocation. It supplies no independent exact view-all, post-connect or unverified-cache state."
+    }
+  ],
+  "cases": [
+    {
+      "case_id": "scribe--http-search-success--view-all",
+      "png_sha256": "627a14eb7a31f8e8f55a4f177b9f7c401cfcb5ab4383990a88d666ffb5c8bf6e",
+      "case_json_sha256": "139bb0de5d7be096174805473bda6b454a42b0ca2b9159b9341c4f6d547b6ed1",
+      "state_sha256": "389da511c908a4f7262304432d657ff13326e5f78ccba194fb4523c4bf6b8c99",
+      "metadata_sha256": "8bf20460b02edfd2b408b98a796cb86e151cc64176c4f55e31752418234bf21c",
+      "actions_sha256": "aeea72c83cf70307cbc14083b6c911b3f1108a34b72b069ec48e78fc21dc8b5a",
+      "log_sha256": "7e68a4176710a866675a6b95bcf7bed2d96c58a8fd7996a4d48f3679514483a9",
+      "reference_sha256": null,
+      "comparison_reference_ids": [
+        "sc-browse--default"
+      ],
+      "comparison_status": "related-logical-contract-only-no-exact-state-reference",
+      "exact_case_paths_and_supplemental_identity_ref": "immutable_input_path#cases[0]",
+      "actual_image_opened": true,
+      "opening_ordinal": 2,
+      "observation": "The captured catalog shows ten settled cover cards in two rows, a readable 3/3 folio and previous-page control, with the next-page control absent at the end. The source heading, switch/settings controls, tabs, search/filter bounds, cover rules and footer allocation remain consistent with the related browse contract. Card labels end in a deliberate ellipsis within their slots; no title/status overlap is visible.",
+      "static_evidence": "The existing query('fixture') -> all('komga') -> page turn('999') actions lead to route=catalog, page=3/3. Owner state identifies Local komga fixture (komga), 40 catalog records and visible series-030 through series-039, each with 8 chapters. Assigned owner fixture declares 40 series and 8 chapters per series. The existing provider record retains the fixture query on list requests for pages 0 and 1 and thumbnail requests for the visible final-page IDs; this is a static evidence read, not a new HTTP operation.",
+      "intentional_and_capability_check": "Real provider titles, artwork and source tabs differ from the sample. These content differences preserve the native five-column card and footer allocation. The visible subtitle is configured and the owner state records verified connection without a contradictory visible setup gate.",
+      "static_verdict": "Related-contract comparison only: no new actionable issue observed in this captured catalog end state; no exact-state reference acceptance."
+    },
+    {
+      "case_id": "scribe--http-search-success--server-connect",
+      "png_sha256": "02f36150f6370b722e344f1eaf3381b53e0acb8d257b9d79855b92fdf3636f07",
+      "case_json_sha256": "86b49bfb198dee624f5943386ad5d15d5546b387e88fe5f851cad47b4ddf1401",
+      "state_sha256": "6a2b8ca79a71dabad94310f492842a8d42bdae093a33ad2dd47b1c560b07cfba",
+      "metadata_sha256": "e891b5b368b46f72450a6447a376291681e5da640f566c36080040cf35f215dc",
+      "actions_sha256": "e266dfdb2a32b37ea1148a99a1706f7a6e083355b0c6b42047314ed3fa149eee",
+      "log_sha256": "7e68a4176710a866675a6b95bcf7bed2d96c58a8fd7996a4d48f3679514483a9",
+      "reference_sha256": null,
+      "comparison_reference_ids": [
+        "sc-browse--default"
+      ],
+      "comparison_status": "related-logical-contract-only-no-exact-state-reference",
+      "exact_case_paths_and_supplemental_identity_ref": "immutable_input_path#cases[1]",
+      "actual_image_opened": true,
+      "opening_ordinal": 3,
+      "observation": "The result image is the catalog, showing fifteen settled covers in three rows, a readable 1/3 folio and next-page control. Local komga fixture, its configured subtitle and the surrounding controls remain clear. There is no visible configuration sheet, loading overlay, false setup warning, card overlap or border bleed.",
+      "static_evidence": "Existing actions are sources open('komga') -> catalog settings -> sources test-connect('komga'). Owner state records route=catalog, modal='', source_needs_setup=false and Connected status; modal_context='server-configuration' remains contextual data and is not treated as an open sheet. The loaded catalog_count is 20 with more remote content available; fifteen visible IDs are series-000 through series-014 and the fixture total is 40. The supplied cumulative provider record includes authorized, non-failure page-0 catalog requests attributed by the owner to connection testing; no independent request was performed.",
+      "intentional_and_capability_check": "The actual action-result catalog, rather than the initial sources screen or residual modal context, governs the visual comparison. The closed sheet and configured catalog agree with the existing action/state/provider evidence. Physical input, hidden hit regions and live external service behavior are outside this static review.",
+      "static_verdict": "Related-contract comparison only: no new actionable issue observed in the captured post-connect catalog; no exact configuration-sheet comparison or exact-state reference acceptance."
+    },
+    {
+      "case_id": "scribe--http-search-success--cached-unverified",
+      "png_sha256": "4d12fab6874a66ec5e06bf80d143e42cd5f543fc1e8cf0be1f1ced91bb59ddf6",
+      "case_json_sha256": "3d47d173ebd3354581f43065451ad7f4cf4c3fe6041f1248d3e66c87cd585def",
+      "state_sha256": "65317dc5ac5b0b2b1fd736a584a46f62c89a7a3130d2725aa73750bdf2a686c8",
+      "metadata_sha256": "aa8ef28e6d0dce8958c1e5792fec89e005c74ee6cb4ba3d831b0cd991a2821bc",
+      "actions_sha256": "c6fb7b0697c3604a5dcbb75d946c8ff524a15273551635570517d69154457829",
+      "log_sha256": "24b6c95632cb3e6fec9fa259d4703d9d167caccaf58acb30ca523dc254678579",
+      "reference_sha256": null,
+      "comparison_reference_ids": [
+        "sc-browse--default"
+      ],
+      "comparison_status": "related-logical-contract-only-no-exact-state-reference",
+      "exact_case_paths_and_supplemental_identity_ref": "immutable_input_path#cases[2]",
+      "actual_image_opened": true,
+      "opening_ordinal": 4,
+      "observation": "The catalog visibly labels the connection as unverified while retaining the configured source and fifteen cached cards. Each unavailable cover keeps a bordered native placeholder with a readable full series number; the card caption below is ellipsized cleanly. The five-column grid, status labels, 1/3 folio, next-page control and footer remain unobstructed.",
+      "static_evidence": "The existing address-edit keyboard sequence commits the '/unverified-cache' suffix and reopens komga. Owner state records offline=true, source_needs_setup=true, unverified connection and visible series-000 through series-014 from 40 cached records. The owner case records verification=false and zero new HTTP requests; no separate raw request sidecar is assigned to this case, so these remain attributed owner evidence. The assigned log lists unavailable offline-cache covers for the fifteen visible IDs, matching their visible placeholders.",
+      "intentional_and_capability_check": "The declared cover failure/backoff difference is retained truthfully. The image does not fabricate a Connected label or successful cover art. Cached content visibility is distinct from a fresh successful provider connection, and no new connection or Store operation is claimed.",
+      "static_verdict": "Related-contract comparison only: no new actionable issue observed in the captured unverified cached catalog; no exact-state reference acceptance."
+    }
+  ],
+  "new_actionable": [],
+  "pending": [],
+  "historical_findings": [],
+  "regression_closures": [],
+  "historical_scope": "No historical disposition was assigned or imported. Observed current source/cache behavior is recorded above as fresh bounded evidence, not as a claim that an unspecified historical issue is closed.",
+  "limitations": [
+    "All three cases have a related browse comparison only. A missing independent exact-state reference is not marked passed.",
+    "Candidate originals were viewed at native 930x1240 dimensions. Only the original reference was resized by the view tool; no source image was copied, cropped or processed.",
+    "Normal card captions visibly truncate the shared fixture title prefix. Numeric identity for loaded-cover cards is supported by owner state/provider records, not claimed readable from the tiny source-art caption.",
+    "Existing action, state, case, fixture and request evidence supports only its recorded operations. No application, test, build, probe, validator, SQL, SSH, hash or fresh provider execution occurred.",
+    "Screenshots do not qualify hidden hit regions, physical input, hardware lifecycle, e-ink behavior, performance or a live reader lease.",
+    "This is a three-case module contribution. No full-round acceptance, clean-round claim or record-review operation is made."
+  ]
+}

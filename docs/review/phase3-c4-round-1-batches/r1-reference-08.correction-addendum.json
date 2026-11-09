@@ -1,0 +1,125 @@
+{
+  "schema_version": 1,
+  "kind": "c4-visual-review-correction-identity-addendum",
+  "batch_id": "r1-reference-08-correction-addendum",
+  "reviewer": "/root/final_validation_delivery/c4_full_review_coordinator/visual_08",
+  "round": 1,
+  "run_id": "0c9ecf3777c9",
+  "module_snapshot_sha256": "95e8df5d3904a0e7fdccae75dec565fdc33c475afaf53c9d67bb5b9bb80089ff",
+  "source_sha256": "dc0cd6227768a5125ecf702982ce639789bc8bca390de82bab83329927ea6353",
+  "binary_sha256": "7c2f685ecafc7207446f0e75877b74d14cbc6e41a43f5accee8ae992256e3183",
+  "status": "withdrawn-false-positive-owner-identity-confirmed",
+  "corrected_source": {
+    "first_pass_report": "D:/Code/aidokuForKindle/docs/review/phase3-c4-round-1-batches/r1-reference-08.review.json",
+    "source_container": "suggestions",
+    "source_suggestion_id": "V08-04",
+    "source_suggestion_title": "Keep the SC incognito clock readable on the inverted status bar",
+    "case_id": "sc-history--incognito",
+    "independent_correction": "D:/Code/aidokuForKindle/docs/review/phase3-c4-round-1-batches/r1-reference-08.correction.json",
+    "related_regression_report": "D:/Code/aidokuForKindle/docs/review/phase3-c4-round-1-batches/r1-reference-08.regression.json",
+    "related_root_map_id_as_reported_by_coordinator": "G01",
+    "prior_reports_preserved_unchanged": true
+  },
+  "disposition": "V08-04 withdrawn false-positive",
+  "classification": "Reviewer first-pass visual misread; no current product defect is supported for the alleged missing SC incognito clock.",
+  "identity_boundary_update": "The earlier correction kept original identity accounting pending. The coordinator has now explicitly relayed owner confirmation that remote and local original PNG SHA-256 values agree and that the original before/after identity is unchanged. This addendum closes that pending identity boundary using owner evidence and an actually viewed authorized readable derivative, without a reviewer rehash.",
+  "provenance": {
+    "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate4/ui-round-1/readable-crops/r1-01/provenance.json",
+    "sha256": "022f2e1a5c8a81cb868bbbc9059a68d7564c49f6105fa264162fca907bd335fd",
+    "sha256_source": "Full provenance-file identity supplied by coordinator/owner; no local rehash",
+    "statically_read_before_image_view": true,
+    "kind": "authorized-frozen-original-readable-derivatives",
+    "owner": "/root/phase3_ui_harness",
+    "generated_utc": "2026-11-06T11:48:01.863209+00:00",
+    "record_id": "incognito-clock-candidate",
+    "record_purpose": "Resolve the original clock-reading ambiguity without altering any original report or PNG.",
+    "authorization": "Explicit FVD request for an additional legal clock ROI after original remote/local SHA agreement.",
+    "originals_modified": false,
+    "original_reports_modified": false,
+    "not_design_acceptance": true,
+    "generation_request": {
+      "owner_remote_path": "/tmp/aidoku-phase3-c4-readable-crop-requests-r1.json",
+      "sha256": "66e114ab3f45f248adf0d526008ada4503067087bc020f772aec0b00ff038773"
+    },
+    "generator": {
+      "owner_remote_path": "/tmp/aidoku-phase3-c4-generate-readable-crops-r1.py",
+      "sha256": "b5ef0a663a89d92ac378b2282e6beb938b15db8624f88c5f78934fb5d2e06c6f",
+      "executed_by_this_reviewer": false
+    }
+  },
+  "input_output_chain": {
+    "original_input": {
+      "local_path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate4/ui-round-1/sc-history--incognito.png",
+      "owner_remote_path": "/tmp/aidoku-phase3-c4-ui-round-1/sc-history--incognito.png",
+      "input_sha256": "603f857014ec50e2aca99769fb562f2eb71f26422414be080575ebc00c42f1ac",
+      "source_sha256_after": "603f857014ec50e2aca99769fb562f2eb71f26422414be080575ebc00c42f1ac",
+      "dimensions": [930, 1240]
+    },
+    "roi": {
+      "coordinate_space": "Original native candidate pixels",
+      "x_y_width_height": [0, 0, 200, 40]
+    },
+    "unscaled_crop_output": {
+      "owner_remote_path": "/tmp/aidoku-phase3-c4-readable-crops-r1-01/incognito-clock-candidate.crop.png",
+      "sha256": "29140d0618515856aa683cfd0f0f82db4d41c8f6e19765fcf06dad25d3192b01",
+      "dimensions": [200, 40],
+      "separately_opened_by_this_reviewer": false
+    },
+    "readable_display_output": {
+      "local_path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate4/ui-round-1/readable-crops/r1-01/incognito-clock-candidate.nearest-4x.png",
+      "owner_remote_path": "/tmp/aidoku-phase3-c4-readable-crops-r1-01/incognito-clock-candidate.nearest-4x.png",
+      "output_sha256": "4ac7b4ef4ff1008869fc573a93179f3cc1e25f1e273dde0af7aa041389bd915a",
+      "dimensions": [800, 160],
+      "display_scale": 4,
+      "interpolation": "nearest-neighbor",
+      "actually_viewed": true,
+      "view_method": "tools.view_image opened the existing authorized local output after provenance was read."
+    },
+    "hash_provenance": "Every input/output SHA is supplied in the owner provenance or coordinator identity confirmation. No local or remote hash was calculated by this reviewer."
+  },
+  "actual_visual_observation": {
+    "viewed": true,
+    "visible_clock_text": "18:50",
+    "foreground": "White",
+    "background": "Black incognito status strip",
+    "observation": "The authorized nearest-neighbor 4x derivative clearly shows the white 18:50 clock on the black status-strip background. Every digit and the colon are readable. The clock is present in the unchanged original ROI; the earlier missing-clock claim is a false-positive caused by the first-pass visual reading.",
+    "agreement_with_prior_direct_reviews": "This crop agrees with both direct full-original opens in the reviewer's historical second pass and with the coordinator's separately reported full-original confirmation.",
+    "roi_scope_limit": "The authorized ROI isolates the left clock. It does not by itself review the centered policy or right-hand indicators; those were separately viewed in the full original during the second pass."
+  },
+  "owner_identity_confirmation": {
+    "status": "owner-identity-confirmed",
+    "confirmation_source": "Explicit coordinator message relaying owner normal static accounting",
+    "remote_original_sha256": "603f857014ec50e2aca99769fb562f2eb71f26422414be080575ebc00c42f1ac",
+    "local_original_sha256": "603f857014ec50e2aca99769fb562f2eb71f26422414be080575ebc00c42f1ac",
+    "provenance_source_before_sha256": "603f857014ec50e2aca99769fb562f2eb71f26422414be080575ebc00c42f1ac",
+    "provenance_source_after_sha256": "603f857014ec50e2aca99769fb562f2eb71f26422414be080575ebc00c42f1ac",
+    "remote_local_agreement_confirmed_by_owner": true,
+    "original_before_after_unchanged_confirmed_by_owner": true,
+    "reviewer_local_rehash_performed": false,
+    "reviewer_remote_rehash_performed": false
+  },
+  "related_original_state_and_reference": {
+    "state_sha256": "4a70cba821e2f2d8c9349f906675163baa5ad184ba7587f27543ead3e1ac7867",
+    "actions_sha256": "e4d149f7ab5d6e186462bd819731eeec86fdc1166c50480989bb980ac46a1bec",
+    "reference_original_sha256": "204bd725431fba2485dc74848e7b19da924466a715bb798c414185a2d96850b7",
+    "identity_source": "Owner-frozen first-pass inventory retained in the original correction",
+    "captured_state": "history/incognito action at 650 ms with preferences.incognito=true and reader_effective.incognito=true"
+  },
+  "root_disposition": {
+    "as_reported_by_coordinator": "Root explicitly withdrew the G01 source repair after owner identity confirmation.",
+    "current_actionability": "V08-04 must remain excluded from current product defects and repair requirements.",
+    "production_fix_required_for_V08_04": false,
+    "reviewer_did_not_edit_root_map": true
+  },
+  "historical_separation": {
+    "historical_id": "P3R1-G05",
+    "detail": "The original G05 requirement concerns the centered incognito/no-history policy notice. Its current-case observations and outside-batch evidence limits remain in the regression report. The false-positive clock allegation is explicitly withdrawn independently of G05's historical acceptance."
+  },
+  "limitations": [
+    "The first-pass report and original correction remain unchanged as the audit trail. This addendum supplies the later owner identity confirmation and authorized crop observation, and explicitly classifies V08-04 as withdrawn false-positive.",
+    "Only the already-authorized clock derivative was opened. No image was copied, cropped, resized, generated or otherwise processed by this reviewer.",
+    "No application/test/build/probe execution, SSH, local or remote rehash, production edit, original-evidence edit or Root-map edit was performed by this reviewer.",
+    "The provenance, input and output hashes are owner-supplied evidence. Owner identity confirmation is attributed to the owner rather than presented as a local reviewer hash result.",
+    "The authorized readable derivative resolves this one visual-reading ambiguity. It is not full-round design acceptance, historical group closure or qualification of physical input, performance, evdev or lease behavior."
+  ]
+}

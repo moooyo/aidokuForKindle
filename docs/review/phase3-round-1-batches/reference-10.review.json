@@ -1,0 +1,53 @@
+{
+  "batch_id": "reference-10",
+  "reviewer": "/root/phase3_round1_review/reference_10",
+  "run_id": "a1baf3fe3dc2",
+  "reviewed_case_ids": [
+    "pw-reader--toc"
+  ],
+  "identity_verification": {
+    "case_metadata": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/cases/pw-reader--toc.json",
+    "run_id_matches": true,
+    "binary_sha256": "94d7f3bbcab475ad8833a2f3c486138f7b49bead231851c2d8eab2f0c3d2ac51",
+    "binary_sha256_matches": true,
+    "source_sha256": "aef9db4e111165016a10a2a95e111f3155860b8510c7f6207ec9c79fbec5082c",
+    "source_sha256_matches": true,
+    "reference_package_sha256_supplied_by_parent": "e7b49b456255432d74cfe41346f9d44c1a9c55bf67c5d55483e4ae3029547d18",
+    "candidate_png_hash_matches_case_evidence": true,
+    "reference_png_hash_matches_case_metadata": true,
+    "hash_method": "PowerShell Get-FileHash -Algorithm SHA256 on the original, unmodified PNG files"
+  },
+  "reviewed_cases": [
+    {
+      "case_id": "pw-reader--toc",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/pw-reader--toc.png",
+      "candidate_sha256": "027c8f5d5d3a3a8ac5ea81761a669b7547ca3a74145486463be4901a1a9ab436",
+      "reference_png": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/screens/states/pw-reader--toc.png",
+      "reference_sha256": "f66825556e844eff175f196cbd33179b0cd8d0e401129667d575f198f3d2e543",
+      "viewed_candidate": true,
+      "viewed_reference": true,
+      "outcome": "no_actionable_issue",
+      "observations": [
+        "Both original PNGs were individually opened with tools.view_image. Comparison used the candidate 618 by 824 logical viewport and the reference 1236 by 1648 physical viewport at a 2:1 reference scale.",
+        "The menu-open reader header preserves the approximately 26-logical-pixel status area and 58-logical-pixel content row. The back, bookmark, and table-of-contents controls remain visible, and the five lower tools fit within the approximately 68-logical-pixel tool strip.",
+        "The chapter and bookmark tabs are visible with a clear active underline. Five chapter rows follow the expected approximately 46-logical-pixel rhythm; titles, dotted leaders, dividers, and the pagination area do not overlap or clip.",
+        "The candidate sidecar identifies chapters 86 through 82 on panel page 1 of 18, while the current chapter is 34 and completed downloads are chapters 27 through 35. The absence of a current-chapter dot, current-row progress, and read/download labels in these five visible rows is consistent with the recorded state.",
+        "The lower reader area visibly retains 12 / 40 progress, 28 remaining pages, the next-chapter download indication, a clear progress thumb, and previous/next chapter controls. These controls are not obscured by the table-of-contents panel.",
+        "The displayed Chinese text has no visible missing-glyph boxes or truncation. Black text, secondary gray text, dotted leaders, and the progress track remain visually distinguishable. No definite font, grayscale, or clipping defect was found in this assigned pair."
+      ],
+      "intentional_differences": [
+        "The candidate uses its recorded 86-chapter data and newest-first first page, while the reference illustrates chapters 36 through 32 with chapter 34 visible. Different chapter titles, per-row states, and the absence of the off-page current marker are accepted data-dependent differences.",
+        "The candidate includes a 1 / 18 pagination row. Its table-of-contents panel therefore begins approximately 52 logical pixels higher while preserving five chapter rows and the lower reader controls. Panel height is content-dependent and is not judged against a fixed reference height.",
+        "Reader artwork and its processing may differ from the illustrative reference artwork. The visible candidate artwork margins and differing line-art details are not treated as proof of a reader viewport inset defect."
+      ]
+    }
+  ],
+  "suggestions": [],
+  "limitations": [
+    "This review covers only the single assigned case and two PNGs. It does not establish that the complete round is clean.",
+    "This was a static evidence review. No local application, build, tests, validation suite, runtime probe, Git operation, or product modification was performed.",
+    "The current-chapter marker and per-row read/download styling cannot be directly assessed in the candidate screenshot because the relevant chapters are on another table-of-contents page. Interactive reachability was not exercised.",
+    "The supplied reference-package identity was recorded as context; individual PNG hashes were independently computed and matched to the case evidence. No package-wide hash recomputation was performed.",
+    "The artwork is not guaranteed to be the same source image. Its whitespace cannot independently prove a viewport geometry defect without a same-image rendering oracle."
+  ]
+}

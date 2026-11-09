@@ -1,0 +1,35 @@
+{
+  "schema_version": 1,
+  "kind": "phase3-c13-recoverable-archive-storage-audit-correction",
+  "owner": "/root/final_validation_delivery/c13_storage_archive_audit",
+  "original_audit": {
+    "path": "D:/Code/aidokuForKindle/docs/review/phase3-c13-recoverable-archive-storage-audit.json",
+    "immutable_sha256": "aa9a5a5543d866a4ef09d8e3400f5eced76c304552ebe449d7abb20f90219b97",
+    "modified": false
+  },
+  "correction": {
+    "field": "reported_trigger_context.c13_all_targets_exit_code",
+    "original_value": 85,
+    "corrected_cargo_exit_code": 101,
+    "reason": "85 is the failed test count, not the Cargo process exit code.",
+    "actualCargoExit": 101,
+    "failed_tests": 85,
+    "passed_tests": 386,
+    "ignored_tests": 2,
+    "whole_gate_result": "FAIL",
+    "new_helper_result": "PASS",
+    "helper_result_effect": "The new helper PASS does not change the whole gate FAIL.",
+    "source": "Correction supplied by /root/final_validation_delivery; no test or process was rerun for this addendum."
+  },
+  "preservation": {
+    "original_audit_and_raw_evidence_unchanged": true,
+    "all_eight_archive_eligibility_size_sha256_and_member_counts_unchanged": true
+  },
+  "operations_performed": {
+    "new_correction_document_only": true,
+    "tests": 0,
+    "root_or_remote_commands": 0,
+    "new_hashes": 0,
+    "deletions": 0
+  }
+}

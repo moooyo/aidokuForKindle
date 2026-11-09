@@ -1,0 +1,198 @@
+{
+  "batch_id": "supplemental-33",
+  "reviewer": "/root/phase3_round1_review/supplemental_33",
+  "run_id": "a1baf3fe3dc2",
+  "round": 1,
+  "binary_sha256": "94d7f3bbcab475ad8833a2f3c486138f7b49bead231851c2d8eab2f0c3d2ac51",
+  "source_sha256": "aef9db4e111165016a10a2a95e111f3155860b8510c7f6207ec9c79fbec5082c",
+  "review_method": {
+    "candidate_images_viewed": 8,
+    "reference_images_viewed": 0,
+    "image_tool": "functions tools.view_image",
+    "scope": "Independent visual inspection of only the eight candidate PNGs listed in supplemental-33.input.json, with read-only case metadata and reference text inspection.",
+    "identity": "Every current PNG SHA-256 matches both the input's expected_png_sha256 and its case metadata evidence_hashes.screenshot.sha256. All eight case records declare round 1, the specified run, binary and source identities, the Scribe portrait profile, and a 930 x 1240 native logical capture.",
+    "reference_text": [
+      "docs/review/phase3-reference-scope.json: sharedContract, capabilityBounds, sc-library and sc-sources entries",
+      "docs/DESIGN_HANDOFF.md: Library and Sources sections",
+      "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/HANDOFF.md: lines 91-92, 129, 166, 231-232, 254-255",
+      "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/prototype/sc-library.dc.html: lines 184-194",
+      "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/prototype/sc-sources.dc.html: lines 49-52, 84-115, 211-225"
+    ]
+  },
+  "reviewed_case_ids": [
+    "scribe--sort-latest-chapter",
+    "scribe--sort-recent-open",
+    "scribe--sort-recent-read",
+    "scribe--sort-recent-update",
+    "scribe--sort-title",
+    "scribe--sort-unread-count",
+    "scribe--source-language-all",
+    "scribe--source-language-en"
+  ],
+  "reviewed_cases": [
+    {
+      "case_id": "scribe--sort-latest-chapter",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/scribe--sort-latest-chapter.png",
+      "candidate_sha256": "e7681c5b626d216e9a61b5fb0d17878a7aab0d6e64a1e91be8a1c7430dcd5798",
+      "viewed_candidate": true,
+      "outcome": "no_actionable_visual_issue_found_within_scope",
+      "observations": [
+        "The library sort float contains all eight readable choices in two columns. Latest chapter is the sole inverted sort choice, in the third row of the right column; the old-to-new direction is separately inverted.",
+        "All four filter controls are visible in their neutral white state. The full-width Done action fits beneath them without clipping, and the float grows to include direction and filters beyond the abbreviated prototype screenshot content.",
+        "The float begins at the declared top/right anchor and uses a white surface, black outline and small corners. There is no overlay shadow, dimmed backdrop or stippled capture mask; stippling belongs to visible book artwork.",
+        "The exposed library retains six-column book allocation, title-adjacent state markers, a readable 1/3 folio and next-page action above the dock. The metadata identifies library-sort:latest-chapter, ascending=true and neutral filters; the PNG does not establish SQL order correctness."
+      ],
+      "intentional_differences": []
+    },
+    {
+      "case_id": "scribe--sort-recent-open",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/scribe--sort-recent-open.png",
+      "candidate_sha256": "3058378f16a5595bc00d7dd0143084c5c2334ffe9db172c1f07c5a49ae0e488e",
+      "viewed_candidate": true,
+      "outcome": "no_actionable_visual_issue_found_within_scope",
+      "observations": [
+        "Recent open is the only inverted sort choice, at the left of the second row. The old-to-new direction is inverted, while all four filters remain neutral and readable.",
+        "The eight choices, two direction controls, filter row and Done action occupy the outlined white float without internal truncation or overlap. Background content remains undimmed.",
+        "A different visible book sequence is present behind the float, with the continuation card retained above the library. Title-row badges and download marks remain outside cover artwork, and the 1/3 folio and next-page action remain legible.",
+        "The visible selection agrees with metadata library_sort=recent-open and ascending=true. Open timestamps are not displayed, so the picture alone cannot qualify chronological query results."
+      ],
+      "intentional_differences": []
+    },
+    {
+      "case_id": "scribe--sort-recent-read",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/scribe--sort-recent-read.png",
+      "candidate_sha256": "3b9cd6fd07d8eecdd86e2ed9c7872d7feacfff5abf87bd0dc3424caea763aa3d",
+      "viewed_candidate": true,
+      "outcome": "no_actionable_visual_issue_found_within_scope",
+      "observations": [
+        "Recent read is the sole inverted sort choice at the top right. The separate old-to-new direction control is inverted; the remaining sort choices and neutral filters are distinguishable.",
+        "The white float retains the same top/right anchoring and content-sized height as the other sort captures. Its title, controls and Done action are fully readable, with no shadow or background mask.",
+        "The exposed grid contains numerous white title-only cover fallbacks with readable book labels rather than broken-image symbols. These data-level cover differences are not treated as geometry defects.",
+        "The library folio reads 1/3 with a visible next-page action. Metadata records recent-read, ascending=true and neutral filters; no read timestamps are visible for independently checking the SQL ordering."
+      ],
+      "intentional_differences": []
+    },
+    {
+      "case_id": "scribe--sort-recent-update",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/scribe--sort-recent-update.png",
+      "candidate_sha256": "c22f424619cc64306889d9acf1abd0dd191289e45180d82e2058249af01e757b",
+      "viewed_candidate": true,
+      "outcome": "no_actionable_visual_issue_found_within_scope",
+      "observations": [
+        "Recent update is the only inverted sort choice, at the right of the second row. Old-to-new is the selected direction and the four filters remain visibly neutral.",
+        "Every sort label, direction label, filter and the Done action fits within the white outlined float. No dimming, offset shadow or stippled overlay is visible.",
+        "The exposed title-only covers, lower grid labels and 1/3 folio remain readable. Similarity to the recent-read background is not sufficient evidence of a sorting fault because update and read keys are absent from this PNG.",
+        "The selected presentation agrees with metadata library_sort=recent-update, ascending=true and the single active sort indicator. The metadata's persisted-state check is distinguished from independent SQL ordering verification."
+      ],
+      "intentional_differences": []
+    },
+    {
+      "case_id": "scribe--sort-title",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/scribe--sort-title.png",
+      "candidate_sha256": "ba6005535ee8ec74f327fc3c01ae95ff29c43f4f5e9fd64c34fb8b777c7e1c52",
+      "viewed_candidate": true,
+      "outcome": "no_actionable_visual_issue_found_within_scope",
+      "observations": [
+        "The title criterion at the upper left is the sole inverted sort choice. The direction row uses descending/ascending wording, with ascending inverted on the right, clearly separating criterion and direction.",
+        "The other seven choices, four neutral filter controls and Done action remain legible in the content-sized outlined float; no control text is clipped.",
+        "The visible library sequence differs from the temporal captures, and title-adjacent unread/download markers remain below their covers. The page indicator remains 1/3 above the dock with next-page navigation at the right.",
+        "Metadata records library_sort=title and ascending=true, matching the visible controls. The screenshot does not reveal the database collation or the complete paginated sequence, so no complete title-order correctness claim is made."
+      ],
+      "intentional_differences": []
+    },
+    {
+      "case_id": "scribe--sort-unread-count",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/scribe--sort-unread-count.png",
+      "candidate_sha256": "c78e9493437c4cb57f841c8f6b4bb9daf0e13b77e6211585694e4bbf6eff6540",
+      "viewed_candidate": true,
+      "outcome": "no_confirmed_product_issue_optional_design_observation",
+      "observations": [
+        "Unread chapter count is the sole inverted sort choice, at the lower left of the eight-choice grid. Old-to-new is separately inverted; the direction controls follow the handoff's generic temporal wording.",
+        "The four neutral filters and full-width Done action are readable. The float is white and outlined without a shadow, dimming or stippled capture layer, and its content fits without clipping.",
+        "The exposed grid has title-adjacent badges and download marks, a readable 1/3 folio and a next-page action above the dock. Demo badges are not assumed to be the SQL unread-count keys and are not used to reject the visible order.",
+        "Metadata records unread-count, ascending=true and a single active sort indicator. The selected state is visible, while actual unread counts and the query's full result order are not independently established by this capture."
+      ],
+      "intentional_differences": []
+    },
+    {
+      "case_id": "scribe--source-language-all",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/scribe--source-language-all.png",
+      "candidate_sha256": "fef0ed0b1f8f3d91e3c93a63092f0b4ce0ad082c20673a0b92d274aeaa19d78e",
+      "viewed_candidate": true,
+      "outcome": "no_actionable_visual_issue_found_within_scope",
+      "observations": [
+        "This is visibly the two-column source manager with the Available tab active. All five language controls are present, and All is inverted; the language selection is established from the PNG rather than metadata alone.",
+        "The installed column ends at x=400 and retains four built-in entries plus three extension entries. The right column visibly presents ten rows: two update actions followed by eight install actions, with readable source names and secondary language/version text.",
+        "The header and Available tab show 124 available records, while the right-column folio reads 1/13 and exposes next-page navigation. The installed column is not paginated with the right column in this frame.",
+        "White outlined tiles and actions, the available-tab underline and inverted All control are clear. The unavailable installed extension has a warning treatment and uninstall action rather than an enabled catalog action; network operations are not inferred from the static picture.",
+        "Metadata source_language=all, available_count=124 and page_count=13 agree with the visible state. The case provides actual language-control and filtered-list coverage, so no Installed-tab capture gap is recorded."
+      ],
+      "intentional_differences": []
+    },
+    {
+      "case_id": "scribe--source-language-en",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/scribe--source-language-en.png",
+      "candidate_sha256": "d859304bf334c9dfd3373125a3256259cbff917b5f0c76166dd9256617eec608",
+      "viewed_candidate": true,
+      "outcome": "no_actionable_visual_issue_found_within_scope",
+      "observations": [
+        "The Available tab is visibly active and English is the sole inverted language control. All, Simplified Chinese, Traditional Chinese and Japanese remain white and distinguishable.",
+        "The right column contains exactly one visible result, MangaDex, labeled multilingual with version 13 and an Update action. The header and tab both report one available record, and the right-column folio reads 1/1 without a next-page action.",
+        "The fixed installed column retains the same seven entries and grouping as the All-language capture, while the right list and its folio contract to the English result. This directly displays a filtered outcome rather than only a language value in metadata.",
+        "Source names, action text, language controls and the lone result are readable without overlap. The larger empty area follows the short result set; the bottom folio and dock retain their allocations.",
+        "Metadata source_language=en, available_count=1 and page_count=1 agree with the visible state. MangaDex's multilingual label is not treated as evidence that its English membership is incorrect."
+      ],
+      "intentional_differences": []
+    }
+  ],
+  "suggestions": [],
+  "optional_observations": [
+    {
+      "id": "P3R1-SUP33-OPTIONAL-1",
+      "case_id": "scribe--sort-unread-count",
+      "priority": "P3",
+      "classification": "inference",
+      "description": "The unread-count criterion uses temporal new-to-old / old-to-new direction wording. A reader may find generic ascending/descending or few-to-many/many-to-few wording clearer for a quantity.",
+      "evidence": "The inspected unread-count PNG has the count criterion inverted and the old-to-new direction inverted. HANDOFF.md line 166 explicitly supplies the temporal pair for the sort sheet, so this is not an implementation deviation or evidence of an incorrect SQL query.",
+      "recommendation": "Consider quantity-specific direction wording only in a future design revision. No product correction is requested by this batch review.",
+      "introduced_round": 1
+    }
+  ],
+  "coverage_gaps": [
+    {
+      "case_ids": [
+        "scribe--sort-latest-chapter",
+        "scribe--sort-recent-open",
+        "scribe--sort-recent-read",
+        "scribe--sort-recent-update",
+        "scribe--sort-title",
+        "scribe--sort-unread-count"
+      ],
+      "description": "These six PNGs show selected criteria and ascending direction but do not expose all sort keys or the full result set. They do not independently prove SQL order, tie handling, collation, persisted-state reload behavior or descending order. Demo badge values are not substituted for actual unread counts."
+    },
+    {
+      "case_ids": [
+        "scribe--sort-latest-chapter",
+        "scribe--sort-recent-open",
+        "scribe--sort-recent-read",
+        "scribe--sort-recent-update",
+        "scribe--sort-title",
+        "scribe--sort-unread-count"
+      ],
+      "description": "Neutral filters, Done and background pagination are visible, but these still images do not demonstrate include/exclude transitions, direction changes, press feedback, dismissal, pointer behavior or page navigation."
+    },
+    {
+      "case_ids": [
+        "scribe--source-language-all",
+        "scribe--source-language-en"
+      ],
+      "description": "Both requested language selections and their visible result counts are covered. These static demo captures do not establish completeness of remote source metadata, other language outcomes, later-page results, actual installation/update/uninstall completion or source connection behavior."
+    }
+  ],
+  "limitations": [
+    "Only the eight input-listed candidate PNGs were loaded. No independent reference PNG was supplied or viewed; geometry was assessed against scope, handoff and prototype text, not an exact pixel comparison.",
+    "Existing metadata and mechanical-check records were read for identity and declared state. Their success flags were not used as substitutes for viewing the PNGs, and no new tests, builds, smoke checks, runtime probes or application execution were performed.",
+    "The native captures are desktop-backend images at 930 x 1240 logical pixels. This batch does not qualify physical e-ink behavior, touch interaction, waveforms, sleep/wake, hardware capabilities or the 512 MiB memory target.",
+    "This limited batch does not establish that the full round or application is clean. No reader case is included, so artwork-only closed-reader behavior and invisible input targets are outside this batch's visible evidence."
+  ]
+}

@@ -1,0 +1,1201 @@
+{
+  "schema_version": 1,
+  "phase": 3,
+  "review_date": "2026-11-06",
+  "review_kind": "read_only_manual_reference_preparation",
+  "status": "reference_inventory_complete_not_implementation_acceptance",
+  "handoff_root": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff",
+  "handoff_version": "1793901158-6c09",
+  "reviewers": {
+    "paperwhite": "phase2_fidelity_review/expanded_ui_readonly",
+    "scribe": "phase2_fidelity_review/expanded_ui_readonly/phase3_scribe_references"
+  },
+  "package_inventory": {
+    "all_pngs": 110,
+    "default_product_screens": 17,
+    "component_and_specification_screens": 7,
+    "interaction_states": 84,
+    "reader_states_excluded_here": 23,
+    "non_reader_states_reviewed_here": 61,
+    "overviews": 2,
+    "prototype_html_files": 24,
+    "paperwhite_states_directly_viewed_by_primary": 24,
+    "scribe_states_directly_viewed_by_named_supporting_reviewer": 37,
+    "dimension_source": "screens/INDEX.md; no local image processing or dimension probe was performed"
+  },
+  "method": {
+    "viewing_tool": "view_image",
+    "existing_reference_images_only": true,
+    "all_non_reader_states_manually_viewed_by_named_reviewers": true,
+    "primary_reviewer_personally_viewed_all_61": false,
+    "documentation_read_in_full": [
+      "README.md",
+      "HANDOFF.md",
+      "CLAUDE.md",
+      "tokens/tokens.json",
+      "screens/INDEX.md",
+      "prototype/README.md"
+    ],
+    "prototype_text_read_for_shared_contracts": [
+      "prototype/nav-pw.dc.html",
+      "prototype/dock-sc.dc.html",
+      "prototype/pager.dc.html",
+      "prototype/Main.dc.html state and renderVals",
+      "prototype/pw-manga.dc.html description sheet and state/renderVals",
+      "prototype/pw-settings.dc.html root/subpage and summary-state sections"
+    ],
+    "scribe_static_contract_support": "docs/review/phase3-scribe-reference-support.json",
+    "prototype_executed": false,
+    "application_executed": false,
+    "tests_or_runtime_probes_run": false,
+    "screenshots_captured": false,
+    "pixel_processing_performed": false,
+    "ssh_used": false,
+    "source_package_modified": false,
+    "production_modified": false,
+    "implementation_acceptance_status": "not_assessed",
+    "previous_clean_review_credit_reused": false,
+    "clean_round_credit": 0,
+    "evidence_boundary": "The observations describe supplied static reference PNGs and intended source behavior only. They are not screenshots of a newly implemented candidate, do not prove any action succeeds, and do not establish a clean review round."
+  },
+  "authoritative_overrides": [
+    {
+      "id": "human_confirmed_image_only_reader",
+      "precedence": "The user's explicit confirmation relayed by Root overrides conflicting handoff Reader decoration and corner gestures.",
+      "requirements": [
+        "Keep closed-menu reading image-only over the complete viewport.",
+        "Do not restore a permanent bookmark ribbon, footer, page label, status bar, incognito banner, or success notification over comic pixels.",
+        "Do not reserve the bottom-right corner for a footer toggle; it follows the normal reading tap layout.",
+        "Implement explicitly opened Reader menus and all other pages against the new handoff.",
+        "Non-Reader pagers, cover-caption badges, selection checkboxes and incognito indicators do not permit permanent Reader chrome."
+      ],
+      "reader_png_review_owner": "phase2_fidelity_review"
+    },
+    {
+      "id": "wake_restores_original_context",
+      "clarified_requirement": "Wake returns directly to the existing app view and original reading image/page/offset without reopening the app.",
+      "requirements": [
+        "Optional stock, cover or progress screensavers during sleep are not prohibited by this requirement.",
+        "Preserve the original ReaderSession and navigation state independently of the sleep presentation choice.",
+        "Make optional screensaver settings real, capability-aware, and able to fall back.",
+        "Keep sleep-presentation checks separate from same-app exact-position wake evidence."
+      ]
+    }
+  ],
+  "shared_acceptance": {
+    "visual": [
+      "Use native drawing, the two distinct PW and Scribe layout profiles, and the declared physical-resolution references.",
+      "Use the eight specified grayscale values and the packaged Noto Serif SC, Noto Sans SC and Literata roles.",
+      "Keep surfaces white, borders sharp, controls rectangular, and panel backgrounds undimmed, with no shadows or animation.",
+      "Use token-based spacing, line widths and touch areas; make active and disabled states distinguishable.",
+      "Keep cover unread/download metadata beside captions in ordinary library states and selection checkboxes on covers only in selection mode.",
+      "Keep all lists paginated and preserve the intended column counts instead of adding scrolling."
+    ],
+    "behavior_to_verify_after_candidate_freeze": [
+      "Close menus and panels with their explicit controls and outside taps where specified, without activating underlying content.",
+      "Route keyboard, touch and list-swipe navigation to the visible modal or page context.",
+      "Use real data for counts, progress, capacities, source versions, connection status, tracking and authorization.",
+      "Verify settings persistence, real file/network outcomes, and recoverable failures independently of visual matching.",
+      "Verify the specified refresh regions, coalescing and hardware waveforms remotely after implementation; PNGs cannot prove them.",
+      "Run the new scope through two fresh complete clean rounds; previous-phase clean reviews do not count."
+    ]
+  },
+  "prototype_state_contracts": {
+    "navigation": {
+      "sources": [
+        "prototype/nav-pw.dc.html",
+        "prototype/dock-sc.dc.html",
+        "HANDOFF.md section 6"
+      ],
+      "structure": "An active route prop selects one of library, browse, search, history and settings; the components derive current-page semantics, active rule, icon stroke, color and weight.",
+      "routes": "PW Browse is source management followed by a separate source homepage. Scribe Browse directly displays the current source, with separate source management. Detail, source homepage and Reader are secondary contexts with named back destinations.",
+      "acceptance": "Keep the five primary destinations stable, preserve the correct return context, and hide or replace the dock in the specified secondary, selection and keyboard states."
+    },
+    "pager": {
+      "source": "prototype/pager.dc.html",
+      "state": "open=false and local=null; hosted page callbacks own application navigation, while local is only a standalone prototype fallback.",
+      "bounds": "Total is at least one, current page is clamped from one through total, and turn closes the jump panel before calling the appropriate host callback.",
+      "variant": "Only folio is the adopted design. Numbers and button-group branches remain reference alternatives.",
+      "jump_grid": "Balanced columns equal ceil(total / ceil(total / max_columns)), with max_columns seven for PW and ten for Scribe; the current cell is black.",
+      "acceptance": [
+        "Keep the center current/total label borderless when closed and inverted while its jump panel is open.",
+        "Hide boundary prev/next actions while retaining their space, and prevent opening a jump panel for one page.",
+        "Choose a target page once, close the panel and merge list/pager refresh; outside dismissal preserves the page."
+      ]
+    },
+    "library": {
+      "source": "prototype/Main.dc.html",
+      "state": [
+        "cat",
+        "page",
+        "sheet",
+        "sort",
+        "asc",
+        "flt[4]",
+        "select",
+        "picked",
+        "toast",
+        "paused"
+      ],
+      "structure": "Exclusive sheet states select more, sort or queue. Category changes reset page one; sorting is exclusive, filters cycle through three states, selected books form a separate set, and selection completion clears that set.",
+      "acceptance": "Use persistent book identities and real queue state in the product; prototype sample titles, progress and local-only handlers are reference fixtures."
+    },
+    "manga_description_and_summary": {
+      "source": "prototype/pw-manga.dc.html",
+      "state": "page, desc (chapter-order boolean), inLib, sheet, dl, tracking status, progress and score. The desc order boolean is distinct from sheet='desc', the description panel.",
+      "sheet_states": [
+        "more",
+        "desc",
+        "dl",
+        "track",
+        null
+      ],
+      "description": "The description sheet shows the full synopsis, tags, source/language, latest update and local storage use; it must not leak its tags into unrelated summaries.",
+      "chapter_paging": "The sample first page has six rows; subsequent pages have twelve rows and collapse the information block into a centered book-title header.",
+      "acceptance": "Keep panel context and chapter ordering separate, derive true page totals from actual data, and verify tracking/download operations rather than copying prototype close-only behavior."
+    },
+    "settings": {
+      "source": "prototype/pw-settings.dc.html",
+      "structure": "Root settings have their own two-page list; view selects root or a named subpage. Summary values derive from the setting state rather than from the manga summary context.",
+      "acceptance": "Keep root pagination, subpage back navigation, setting persistence and optional screensaver policy independent of ReaderSession preservation."
+    }
+  },
+  "inventory": {
+    "Main": [
+      "screens/states/Main--download-queue.png",
+      "screens/states/Main--jump-pages.png",
+      "screens/states/Main--more.png",
+      "screens/states/Main--select.png",
+      "screens/states/Main--sort.png"
+    ],
+    "pw-manga": [
+      "screens/states/pw-manga--batch-download.png",
+      "screens/states/pw-manga--chapters-p2.png",
+      "screens/states/pw-manga--description.png",
+      "screens/states/pw-manga--more.png",
+      "screens/states/pw-manga--tracking.png"
+    ],
+    "pw-browse": [
+      "screens/states/pw-browse--add-source.png",
+      "screens/states/pw-browse--available.png",
+      "screens/states/pw-browse--source-lists.png",
+      "screens/states/pw-browse--updates.png"
+    ],
+    "pw-source": [
+      "screens/states/pw-source--filter.png",
+      "screens/states/pw-source--source-settings.png"
+    ],
+    "pw-history": [
+      "screens/states/pw-history--clear-confirm.png",
+      "screens/states/pw-history--incognito.png",
+      "screens/states/pw-history--updates.png"
+    ],
+    "pw-search": [
+      "screens/states/pw-search--numbers.png",
+      "screens/states/pw-search--results.png"
+    ],
+    "pw-settings": [
+      "screens/states/pw-settings--display.png",
+      "screens/states/pw-settings--page2.png",
+      "screens/states/pw-settings--power.png"
+    ],
+    "sc-library": [
+      "screens/states/sc-library--download-queue.png",
+      "screens/states/sc-library--jump-pages.png",
+      "screens/states/sc-library--more.png",
+      "screens/states/sc-library--select.png",
+      "screens/states/sc-library--sort.png"
+    ],
+    "sc-manga": [
+      "screens/states/sc-manga--migrate.png",
+      "screens/states/sc-manga--more.png",
+      "screens/states/sc-manga--tracking.png"
+    ],
+    "sc-browse": [
+      "screens/states/sc-browse--blocked-source.png",
+      "screens/states/sc-browse--filter.png",
+      "screens/states/sc-browse--server-setup.png",
+      "screens/states/sc-browse--source-picker.png",
+      "screens/states/sc-browse--source-settings.png"
+    ],
+    "sc-history": [
+      "screens/states/sc-history--clear-confirm.png",
+      "screens/states/sc-history--incognito.png",
+      "screens/states/sc-history--updates.png"
+    ],
+    "sc-sources": [
+      "screens/states/sc-sources--add-source.png",
+      "screens/states/sc-sources--source-lists.png",
+      "screens/states/sc-sources--updates.png"
+    ],
+    "sc-search": [
+      "screens/states/sc-search--results.png"
+    ],
+    "sc-settings": [
+      "screens/states/sc-settings--about.png",
+      "screens/states/sc-settings--auto-update.png",
+      "screens/states/sc-settings--backup.png",
+      "screens/states/sc-settings--categories.png",
+      "screens/states/sc-settings--download.png",
+      "screens/states/sc-settings--image.png",
+      "screens/states/sc-settings--language.png",
+      "screens/states/sc-settings--light.png",
+      "screens/states/sc-settings--logs.png",
+      "screens/states/sc-settings--pen.png",
+      "screens/states/sc-settings--power.png",
+      "screens/states/sc-settings--reading.png",
+      "screens/states/sc-settings--source-lists.png",
+      "screens/states/sc-settings--spread.png",
+      "screens/states/sc-settings--storage.png",
+      "screens/states/sc-settings--tap-zones.png",
+      "screens/states/sc-settings--tracking-login.png"
+    ]
+  },
+  "category_acceptance_checklists": {
+    "Main": [
+      "Preserve the four-by-two grid and distinct normal, more, sort, queue, selection and jump states.",
+      "Provide eight sorting choices, direction and three-state filters, plus real queue controls.",
+      "Update selection counts and limit select-this-page to visible entries; replace the dock with four real batch actions.",
+      "Keep jump-grid selection and normal list paging synchronized without scrolling."
+    ],
+    "pw-manga": [
+      "Preserve the first-page information block, six chapter rows and secondary-page header with twelve rows.",
+      "Keep description, batch, tracking and more contexts separate, with outside dismissal and the correct return page.",
+      "Bind chapter read/download state to actual chapter identities and progress.",
+      "Make batch estimates, cleanup, service tracking and optional screensaver actions reflect real supported outcomes."
+    ],
+    "pw-browse": [
+      "Keep installed, available and source-version-update tabs distinct, with real counts and language filtering.",
+      "Provide functional install, update, update-all, source-list add/remove and local connection flows.",
+      "Replace sample QR codes, addresses and versions with actual state; keep source secrets out of public errors.",
+      "Keep native input or mobile entry available without WebView dependencies."
+    ],
+    "pw-source": [
+      "Preserve the source header, listing tabs, five-row catalog, secondary-page back destination and absence of the dock.",
+      "Apply exclusive ordering, multiple publication states, three-state tags, reset and filter submission.",
+      "Render and persist the real source's declared settings, including multiselect language choices.",
+      "Keep filtered results and pagination consistent with submitted criteria."
+    ],
+    "pw-history": [
+      "Preserve date groups, history progress, per-item deletion and separate chapter-update state.",
+      "Require explicit confirmation to clear history; cancel and outside dismissal preserve records.",
+      "Make per-item and all-update downloads reflect actual queue state.",
+      "Show the reference incognito indicator on non-Reader pages while suppressing history recording; closed-menu Reader remains image-only."
+    ],
+    "pw-search": [
+      "Keep query, source scopes, clear, cancel and IME state independent.",
+      "Preserve candidate input across relevant keyboard-mode changes and provide functional numeric/symbol keys.",
+      "Submit real per-source searches, show partial successes, no-result and timeout states independently, and retry only the failed source.",
+      "Hide the keyboard and restore the primary navigation in the results state."
+    ],
+    "pw-settings": [
+      "Preserve two-page root grouping and named subpage navigation with current value summaries.",
+      "Use actual refresh/quality/toggle settings and device capabilities; do not fake unsupported hardware behavior.",
+      "Verify bounded values, persistence, grayscale rendering, cleanup and supported exit behavior after implementation.",
+      "Optional screensaver choices must preserve the open app and exact wake position independently of their sleep image."
+    ],
+    "sc-library": [
+      "Maintain the paired resume and new-chapters cards above five category tabs and a six-column, three-row cover grid.",
+      "Keep the update action in the heading, the three-item more menu, and the separate eight-option sorting popup.",
+      "Support queue pause/resume, per-book selection, selection counts, page-wide selection, and the four batch actions.",
+      "Place the jump grid above the pager and preserve the normal library dock below it."
+    ],
+    "sc-manga": [
+      "Preserve the large left information column and the right chapter directory, with no bottom dock.",
+      "Support the five-item more menu, service-specific tracking, and source migration with a single selected target and three independent retention options.",
+      "Keep chapter order and page navigation independent of the information column.",
+      "Verify any optional screensaver feature independently from exact ReaderSession restoration on wake."
+    ],
+    "sc-browse": [
+      "Preserve the source title switcher, current-source metadata, search/filter row, five-column grid, pager, and Browse dock selection.",
+      "Support built-in and extension groups, current-source indication, source management entry points, and page reset on source changes.",
+      "Support single-choice ordering, multi-choice publication states, three-state tags, reset, and filter application.",
+      "Support declared source settings, real self-hosted server setup, and an unavailable-source state without adding WebView verification."
+    ],
+    "sc-history": [
+      "Preserve the two-column date-grouped records, per-record removal, completion or progress metadata, and pagers.",
+      "Keep the incognito state explicit in its button and non-Reader status bar while actually suppressing history recording.",
+      "Require a clear confirmation for removing all history; cancel and outside dismissal must preserve records.",
+      "Keep chapter updates, per-item download state, and the all-download action separate from reading history."
+    ],
+    "sc-sources": [
+      "Preserve the installed-source left column and installable/update right column with separate headings and counts.",
+      "Support per-source and bulk updates and update the status and counts after real completion.",
+      "Provide the add-source connection panel and source-list management panel with outside dismissal.",
+      "Replace decorative QR samples with functional connection data and implement real install, remove, update, and URL-entry behavior."
+    ],
+    "sc-search": [
+      "Keep the search field, clear action, cancel action, and source scope controls above the results.",
+      "Render each source independently, with up to six preview covers, a total, and a view-all action.",
+      "Distinguish successful results, no results, timeout, and retry states; one failed source must not block other sources.",
+      "Hide the keyboard on submit, restore the dock in the results state, and reopen the keyboard on input focus."
+    ],
+    "sc-settings": [
+      "Preserve the fixed two-column layout, grouped left navigation, black current selection, and right-side content replacement without scrolling.",
+      "Use the shown segmented controls, row toggles, sliders, language checkmark, and tap-zone cards consistently.",
+      "Make each setting affect the relevant runtime or hardware behavior and persist according to the product contract.",
+      "Keep source management, storage operations, backup/restore, logs, and authorization backed by real outcomes, with valid failure and fallback behavior.",
+      "Remove the simulated mobile-authorization button and all prototype-only toasts from the product.",
+      "Keep optional screensaver choices separate from preserving the open app, original image/page/offset, and ReaderSession through sleep and wake."
+    ]
+  },
+  "direct_observations": [
+    {
+      "file": "screens/states/Main--more.png",
+      "directly_viewed": true,
+      "visual": [
+        "A white black-outlined menu is anchored under the upper-right more button over an undimmed library.",
+        "Its four rows are library refresh, download queue with count three, multi-select and category management."
+      ],
+      "behavior_acceptance": [
+        "Each row reaches its real flow; outside taps close the menu without activating the library beneath."
+      ],
+      "inspected_by": "phase2_fidelity_review/expanded_ui_readonly"
+    },
+    {
+      "file": "screens/states/Main--sort.png",
+      "directly_viewed": true,
+      "visual": [
+        "A full-width bottom sheet shows eight ordering buttons in two columns, recent reading selected, a descending/ascending row, four filter tags and black completion.",
+        "The underlying library remains undimmed and the sheet has a sharp top rule."
+      ],
+      "behavior_acceptance": [
+        "Keep ordering exclusive, direction independent and each filter three-state; finish and outside dismissal preserve the intended chosen state."
+      ],
+      "inspected_by": "phase2_fidelity_review/expanded_ui_readonly"
+    },
+    {
+      "file": "screens/states/Main--download-queue.png",
+      "directly_viewed": true,
+      "visual": [
+        "A bottom queue sheet has pause-all and close actions plus three cover rows.",
+        "The first row has 18 / 40 pages and a partly filled bar; two rows are waiting."
+      ],
+      "behavior_acceptance": [
+        "Use real progress and waiting state; pause/resume and dismissal must not lose partial work."
+      ],
+      "inspected_by": "phase2_fidelity_review/expanded_ui_readonly"
+    },
+    {
+      "file": "screens/states/Main--select.png",
+      "directly_viewed": true,
+      "visual": [
+        "The heading is zero selected books with select-this-page and completion controls.",
+        "Eight covers have square top-left checkboxes; a four-action batch bar replaces the dock."
+      ],
+      "behavior_acceptance": [
+        "Individual and visible-page selection update the true selected set; completion exits and batch actions operate on that set."
+      ],
+      "inspected_by": "phase2_fidelity_review/expanded_ui_readonly"
+    },
+    {
+      "file": "screens/states/Main--jump-pages.png",
+      "directly_viewed": true,
+      "visual": [
+        "The bottom jump sheet contains pages one through six in one balanced row.",
+        "Page one and the center 1 / 6 control are black; the next action and library dock retain their positions."
+      ],
+      "behavior_acceptance": [
+        "Selecting a cell navigates once and closes; outside dismissal preserves page one and boundary actions keep their reserved space."
+      ],
+      "inspected_by": "phase2_fidelity_review/expanded_ui_readonly"
+    },
+    {
+      "file": "screens/states/pw-manga--more.png",
+      "directly_viewed": true,
+      "visual": [
+        "A four-row upper-right popup overlays detail content without a scrim.",
+        "Actions are refresh, migrate, edit categories and use as screensaver cover."
+      ],
+      "behavior_acceptance": [
+        "Route each action to a real supported operation; a screensaver choice must preserve the exact ReaderSession restored on wake."
+      ],
+      "inspected_by": "phase2_fidelity_review/expanded_ui_readonly"
+    },
+    {
+      "file": "screens/states/pw-manga--description.png",
+      "directly_viewed": true,
+      "visual": [
+        "A bottom description sheet has a black close action, a complete indented serif synopsis, four outlined tags and source/update/local-use metadata.",
+        "Sample local use is nine chapters and 196 MB."
+      ],
+      "behavior_acceptance": [
+        "Render the real complete synopsis and metadata, keep tags limited to book-summary context, and return to the same detail page on dismissal."
+      ],
+      "inspected_by": "phase2_fidelity_review/expanded_ui_readonly"
+    },
+    {
+      "file": "screens/states/pw-manga--batch-download.png",
+      "directly_viewed": true,
+      "visual": [
+        "A bottom sheet presents next five, all unread, custom range and delete-read-downloads actions.",
+        "Size estimates and free space are right-aligned or placed below the rows, with a separate cancel control."
+      ],
+      "behavior_acceptance": [
+        "Use actual selections, estimates and available storage; implement custom range and cleanup rather than prototype close-only handlers."
+      ],
+      "inspected_by": "phase2_fidelity_review/expanded_ui_readonly"
+    },
+    {
+      "file": "screens/states/pw-manga--tracking.png",
+      "directly_viewed": true,
+      "visual": [
+        "The sheet shows linked AniList reading status, a 33 / 86 progress stepper and unset score.",
+        "A dashed MyAnimeList card offers login; completion is at the sheet's upper right."
+      ],
+      "behavior_acceptance": [
+        "Persist and synchronize real linked-service changes and route unlinked login to tracking settings; do not invent authorization."
+      ],
+      "inspected_by": "phase2_fidelity_review/expanded_ui_readonly"
+    },
+    {
+      "file": "screens/states/pw-manga--chapters-p2.png",
+      "directly_viewed": true,
+      "visual": [
+        "The information block collapses into a centered book-title header on page 2 / 8.",
+        "Twelve chapter rows, 80 through 69, use aligned numbers, leaders, dates and separate download buttons; both pager directions appear."
+      ],
+      "behavior_acceptance": [
+        "Derive true row windows and page totals, preserve order and current chapter state, and keep row opening separate from download actions."
+      ],
+      "inspected_by": "phase2_fidelity_review/expanded_ui_readonly"
+    },
+    {
+      "file": "screens/states/pw-browse--available.png",
+      "directly_viewed": true,
+      "visual": [
+        "The available tab is active above five language controls and six source rows, each with a separate install button.",
+        "Source-list and add controls remain in the heading, with the Browse dock below."
+      ],
+      "behavior_acceptance": [
+        "Apply real language filtering and source installation; update counts and row state after actual completion."
+      ],
+      "inspected_by": "phase2_fidelity_review/expanded_ui_readonly"
+    },
+    {
+      "file": "screens/states/pw-browse--updates.png",
+      "directly_viewed": true,
+      "visual": [
+        "The updates tab contains two old-to-new version rows and a full-width black update-all action.",
+        "No unrelated source catalog or chapter-update list is shown."
+      ],
+      "behavior_acceptance": [
+        "Install actual source updates, report failures accurately and distinguish source versions from manga chapter updates."
+      ],
+      "inspected_by": "phase2_fidelity_review/expanded_ui_readonly"
+    },
+    {
+      "file": "screens/states/pw-browse--add-source.png",
+      "directly_viewed": true,
+      "visual": [
+        "A bottom connection sheet contains a decorative QR sample, LAN address, waiting state and close action.",
+        "A divided lower section contains a source-list URL field and keyboard-entry button."
+      ],
+      "behavior_acceptance": [
+        "Replace samples with a functional local connection and native input; close and outside taps dismiss without losing established configuration."
+      ],
+      "inspected_by": "phase2_fidelity_review/expanded_ui_readonly"
+    },
+    {
+      "file": "screens/states/pw-browse--source-lists.png",
+      "directly_viewed": true,
+      "visual": [
+        "A bottom sheet has one outlined list card with name, URL and removal action, followed by a dashed add-list button.",
+        "Completion is a separate black heading action."
+      ],
+      "behavior_acceptance": [
+        "Add/remove real persistent lists and update dependent source data; completion or outside taps close the sheet."
+      ],
+      "inspected_by": "phase2_fidelity_review/expanded_ui_readonly"
+    },
+    {
+      "file": "screens/states/pw-source--filter.png",
+      "directly_viewed": true,
+      "visual": [
+        "A bottom filter sheet has four ordering choices, four publication states, twelve tag chips, reset and an approximate-result action.",
+        "Relevance is selected in black; the source page remains undimmed behind the sheet."
+      ],
+      "behavior_acceptance": [
+        "Keep order exclusive, statuses multiselect and tags three-state; reset clears criteria and apply submits once then resets result pagination."
+      ],
+      "inspected_by": "phase2_fidelity_review/expanded_ui_readonly"
+    },
+    {
+      "file": "screens/states/pw-source--source-settings.png",
+      "directly_viewed": true,
+      "visual": [
+        "A bottom MangaDex settings sheet has simplified/traditional Chinese selected in black and English/Japanese unselected.",
+        "A separate image-quality summary and black completion control remain visible."
+      ],
+      "behavior_acceptance": [
+        "Use the source's declared setting schema and persist independent multiselect language and image-quality values."
+      ],
+      "inspected_by": "phase2_fidelity_review/expanded_ui_readonly"
+    },
+    {
+      "file": "screens/states/pw-history--updates.png",
+      "directly_viewed": true,
+      "visual": [
+        "The title is updates with an active chapter-update tab and black download-all action.",
+        "Date groups contain five visible update rows with sizes or check time, and one queued row uses a dashed clock button; pager is 1 / 2."
+      ],
+      "behavior_acceptance": [
+        "Drive individual/all downloads and queued state from real records; retain independent history/update tabs and true pagination."
+      ],
+      "inspected_by": "phase2_fidelity_review/expanded_ui_readonly"
+    },
+    {
+      "file": "screens/states/pw-history--clear-confirm.png",
+      "directly_viewed": true,
+      "visual": [
+        "A centered white black-outlined dialog asks to clear all reading history over the undimmed list.",
+        "Equal-width outlined cancel and black clear buttons form the final row."
+      ],
+      "behavior_acceptance": [
+        "Clear only after explicit confirmation; cancel and outside dismissal preserve all records and the visible context."
+      ],
+      "inspected_by": "phase2_fidelity_review/expanded_ui_readonly"
+    },
+    {
+      "file": "screens/states/pw-history--incognito.png",
+      "directly_viewed": true,
+      "visual": [
+        "The entire non-Reader status strip is black with white time, connection, battery and incognito status text.",
+        "The incognito button is black while the ordinary history list remains visible."
+      ],
+      "behavior_acceptance": [
+        "Suppress new history while enabled and allow disabling it; never copy this status strip into closed-menu image-only reading."
+      ],
+      "inspected_by": "phase2_fidelity_review/expanded_ui_readonly"
+    },
+    {
+      "file": "screens/states/pw-search--numbers.png",
+      "directly_viewed": true,
+      "visual": [
+        "The query and source scopes remain above a numeric/symbol keyboard with candidate row, erase, alphabet/language toggles, space and black search.",
+        "The keyboard occupies the dock area; no primary navigation is visible."
+      ],
+      "behavior_acceptance": [
+        "Implement native text/candidate input and mode transitions without losing the intended query; search commits the correct text."
+      ],
+      "inspected_by": "phase2_fidelity_review/expanded_ui_readonly"
+    },
+    {
+      "file": "screens/states/pw-search--results.png",
+      "directly_viewed": true,
+      "visual": [
+        "Submitted results show three MangaDex covers, one Komga cover, a local no-result row and a failed-source retry row.",
+        "Counts and view-all controls sit beside source headings; the keyboard is closed and the Search dock restored."
+      ],
+      "behavior_acceptance": [
+        "Show independent partial results, retry only the failed source and preserve the submitted query and source scope across navigation."
+      ],
+      "inspected_by": "phase2_fidelity_review/expanded_ui_readonly"
+    },
+    {
+      "file": "screens/states/pw-settings--page2.png",
+      "directly_viewed": true,
+      "visual": [
+        "Root settings page 2 / 2 contains grouped library, source/data and general rows with right-side value summaries.",
+        "The previous action is visible, the next boundary is empty and the Settings dock remains selected."
+      ],
+      "behavior_acceptance": [
+        "Keep root paging and named subpage navigation separate and replace placeholder values with actual persisted state."
+      ],
+      "inspected_by": "phase2_fidelity_review/expanded_ui_readonly"
+    },
+    {
+      "file": "screens/states/pw-settings--display.png",
+      "directly_viewed": true,
+      "visual": [
+        "The display subpage has five refresh interval choices, three quality cards, three ruled toggles and a sixteen-step grayscale test strip.",
+        "The sample selects interval six and balanced quality, with chapter refresh on and menu/night options off."
+      ],
+      "behavior_acceptance": [
+        "Apply actual supported refresh policy and bounded settings, persist choices and preserve the named return destination."
+      ],
+      "inspected_by": "phase2_fidelity_review/expanded_ui_readonly"
+    },
+    {
+      "file": "screens/states/pw-settings--power.png",
+      "directly_viewed": true,
+      "visual": [
+        "Download keep-awake and charging updates are on, reading Wi-Fi-off is off.",
+        "Three screensaver thumbnails show current cover selected, reading progress and system default, followed by a bordered Kindle-home exit row."
+      ],
+      "behavior_acceptance": [
+        "Use real supported power and exit behavior; test optional screensaver fallback separately while preserving exact app/page/offset restoration on wake."
+      ],
+      "inspected_by": "phase2_fidelity_review/expanded_ui_readonly"
+    },
+    {
+      "file": "screens/states/sc-library--download-queue.png",
+      "directly_viewed": true,
+      "visual": [
+        "A large centered outlined white queue panel overlays the intact library grid without dimming it.",
+        "The heading has pause-all and close buttons; three cover rows show one active progress bar at 18 / 40 pages and two waiting rows."
+      ],
+      "behavior_acceptance": [
+        "Pause-all changes to resume-all and controls the actual queue.",
+        "Close and outside taps dismiss the panel without losing queue progress."
+      ],
+      "inspected_by": "phase2_fidelity_review/expanded_ui_readonly/phase3_scribe_references"
+    },
+    {
+      "file": "screens/states/sc-library--jump-pages.png",
+      "directly_viewed": true,
+      "visual": [
+        "A full-width white jump panel with a black top rule covers the lower library rows above the pager.",
+        "The balanced grid contains pages 1, 2, and 3, with page 1 and the central 1 / 3 pager control black; the normal dock remains below."
+      ],
+      "behavior_acceptance": [
+        "Selecting a page navigates and closes the panel; outside taps close it.",
+        "Respect boundary arrows and the noninteractive single-page case."
+      ],
+      "inspected_by": "phase2_fidelity_review/expanded_ui_readonly/phase3_scribe_references"
+    },
+    {
+      "file": "screens/states/sc-library--more.png",
+      "directly_viewed": true,
+      "visual": [
+        "A compact outlined popup is anchored below the upper-right more action.",
+        "Its three rows are download queue with a three-chapter count, multi-select, and category management; the update icon remains in the heading."
+      ],
+      "behavior_acceptance": [
+        "Each row opens the corresponding queue, selection, or category flow.",
+        "Outside taps close the menu and restore the same library context."
+      ],
+      "inspected_by": "phase2_fidelity_review/expanded_ui_readonly/phase3_scribe_references"
+    },
+    {
+      "file": "screens/states/sc-library--select.png",
+      "directly_viewed": true,
+      "visual": [
+        "The heading reports zero selected books with select-this-page and completion controls.",
+        "All eighteen covers have upper-left square checkboxes; ordinary unread/download caption badges are absent in this state.",
+        "The dock is replaced by mark-read, download-unread, move-category, and remove-from-library batch actions."
+      ],
+      "behavior_acceptance": [
+        "Individual toggles and page-wide selection update the heading count.",
+        "Completion exits selection and clears the transient selection; batch actions operate on the selected set."
+      ],
+      "inspected_by": "phase2_fidelity_review/expanded_ui_readonly/phase3_scribe_references"
+    },
+    {
+      "file": "screens/states/sc-library--sort.png",
+      "directly_viewed": true,
+      "visual": [
+        "An upper-right outlined sorting popup shows eight options in two columns and four rows.",
+        "Recent reading is selected in black; a full-width black completion button finishes the panel.",
+        "This exported state contains no visible sort-direction control or filter tags."
+      ],
+      "behavior_acceptance": [
+        "Only one ordering option is selected and completion or outside taps close the panel.",
+        "Treat handoff requirements for direction and library filters as additional behavior scope, not as visually proven by this PNG."
+      ],
+      "inspected_by": "phase2_fidelity_review/expanded_ui_readonly/phase3_scribe_references"
+    },
+    {
+      "file": "screens/states/sc-manga--migrate.png",
+      "directly_viewed": true,
+      "visual": [
+        "A large centered outlined migration panel sits over the two-column manga detail page without a scrim.",
+        "Komga, source A, and local files appear as three single-choice rows with small covers and match metadata; Komga is selected.",
+        "Read-state and category/tracking retention are on, deletion of old downloads is off, and cancel/start buttons share the bottom row."
+      ],
+      "behavior_acceptance": [
+        "Keep candidate selection exclusive and retention options independent.",
+        "Cancel and outside dismissal must not migrate; starting migration must perform and report a real migration outcome."
+      ],
+      "inspected_by": "phase2_fidelity_review/expanded_ui_readonly/phase3_scribe_references"
+    },
+    {
+      "file": "screens/states/sc-manga--more.png",
+      "directly_viewed": true,
+      "visual": [
+        "A five-row outlined popup overlays the upper-right chapter directory while the large cover and detail column stay visible.",
+        "Rows provide refresh, migration, category edit, use-as-screensaver-cover, and delete-all-downloads actions."
+      ],
+      "behavior_acceptance": [
+        "Wire each action to its real flow and allow outside dismissal.",
+        "A screensaver cover must not replace or reset the ReaderSession that must resume on wake."
+      ],
+      "related_gate": "resume_preservation_requirement",
+      "inspected_by": "phase2_fidelity_review/expanded_ui_readonly/phase3_scribe_references"
+    },
+    {
+      "file": "screens/states/sc-manga--tracking.png",
+      "directly_viewed": true,
+      "visual": [
+        "An outlined tracking panel contains a linked AniList card and a dashed unlinked MyAnimeList card.",
+        "The AniList card shows reading status, a 33 / 86 progress stepper, and an unset score; MyAnimeList has a black settings-login action.",
+        "A completion button is aligned at the panel's upper right."
+      ],
+      "behavior_acceptance": [
+        "Status, bounded chapter progress, and rating changes must synchronize with the associated service.",
+        "The unlinked service opens tracking settings; completion and outside taps close the panel."
+      ],
+      "inspected_by": "phase2_fidelity_review/expanded_ui_readonly/phase3_scribe_references"
+    },
+    {
+      "file": "screens/states/sc-browse--blocked-source.png",
+      "directly_viewed": true,
+      "visual": [
+        "The source-B title uses a dashed unavailable icon and unavailable metadata.",
+        "A large centered warning emblem, unavailable status heading, black migration action, and outlined uninstall action replace the normal source grid.",
+        "The Browse dock remains visible and selected."
+      ],
+      "behavior_acceptance": [
+        "Keep the source explicitly unavailable rather than opening a WebView verification flow.",
+        "Migration and uninstall must reach functional outcomes, with uninstall returning to a usable source context."
+      ],
+      "inspected_by": "phase2_fidelity_review/expanded_ui_readonly/phase3_scribe_references"
+    },
+    {
+      "file": "screens/states/sc-browse--filter.png",
+      "directly_viewed": true,
+      "visual": [
+        "An outlined floating filter panel overlays the five-column source grid with its filter trigger selected in black.",
+        "Relevance ordering, ongoing publication status, and an included fantasy tag are black; other ordering, state, and tag controls are white.",
+        "The reset link is upper right and the bottom action shows an approximate result count of 97."
+      ],
+      "behavior_acceptance": [
+        "Ordering is exclusive, publication states allow multiple choices, and tags cycle through neutral, included, and excluded.",
+        "Reset clears criteria; apply commits criteria and closes; outside taps dismiss."
+      ],
+      "inspected_by": "phase2_fidelity_review/expanded_ui_readonly/phase3_scribe_references"
+    },
+    {
+      "file": "screens/states/sc-browse--server-setup.png",
+      "directly_viewed": true,
+      "visual": [
+        "The title is Kavita with an unconnected-server status instead of source content.",
+        "The main area has a wide server-address field, a second API-key or credentials field, and paired mobile-entry and black test/connect actions.",
+        "Large blank space and the Browse dock remain below the setup form."
+      ],
+      "behavior_acceptance": [
+        "Implement real field entry and mobile-assisted setup rather than sample values.",
+        "Test/connect validates connectivity, reports failures, and changes to a usable library at its first page only after success."
+      ],
+      "inspected_by": "phase2_fidelity_review/expanded_ui_readonly/phase3_scribe_references"
+    },
+    {
+      "file": "screens/states/sc-browse--source-picker.png",
+      "directly_viewed": true,
+      "visual": [
+        "The source switch trigger is black and points upward while a wide left-aligned popup is open beneath the title.",
+        "Four built-in rows and three extension rows are separated into groups; MangaDex is bold with a checkmark, and source B is muted and unavailable.",
+        "The footer has add-source, source-lists, and manage-sources actions, the last with a count of two."
+      ],
+      "behavior_acceptance": [
+        "Selecting a source closes the popup, updates title/content, and resets pagination.",
+        "Management actions navigate to the corresponding source-management context; outside taps close the picker."
+      ],
+      "inspected_by": "phase2_fidelity_review/expanded_ui_readonly/phase3_scribe_references"
+    },
+    {
+      "file": "screens/states/sc-browse--source-settings.png",
+      "directly_viewed": true,
+      "visual": [
+        "An upper-right outlined MangaDex settings popup leaves the source grid and dock visible.",
+        "Simplified and traditional Chinese language options are both black, while English and Japanese are white.",
+        "The three image-quality options have the e-ink-adapted option black; completion is at upper right."
+      ],
+      "behavior_acceptance": [
+        "Language choices allow multiple selections and image quality is exclusive.",
+        "Render real source-declared settings and preserve them when completing or dismissing the panel."
+      ],
+      "inspected_by": "phase2_fidelity_review/expanded_ui_readonly/phase3_scribe_references"
+    },
+    {
+      "file": "screens/states/sc-history--clear-confirm.png",
+      "directly_viewed": true,
+      "visual": [
+        "An outlined white confirmation dialog is centered over the two-column date-grouped history list without dimming it.",
+        "The dialog has a prominent clear-all-history question and equal-width outlined cancel and black clear buttons."
+      ],
+      "behavior_acceptance": [
+        "Cancel and outside taps close the dialog and preserve all records.",
+        "Confirmed clearing removes history and returns history pagination to the first page."
+      ],
+      "inspected_by": "phase2_fidelity_review/expanded_ui_readonly/phase3_scribe_references"
+    },
+    {
+      "file": "screens/states/sc-history--incognito.png",
+      "directly_viewed": true,
+      "visual": [
+        "The entire top status strip is black with white time, connection, battery, and centered incognito-state text.",
+        "The incognito button is black; the regular two-column reading history and History dock stay visible."
+      ],
+      "behavior_acceptance": [
+        "Toggling incognito actually suppresses recording and can be turned off.",
+        "Any global incognito indicator must respect the separate image-only fullscreen Reader requirement."
+      ],
+      "limitation": "This non-Reader PNG cannot prove incognito behavior or fullscreen Reader presentation.",
+      "inspected_by": "phase2_fidelity_review/expanded_ui_readonly/phase3_scribe_references"
+    },
+    {
+      "file": "screens/states/sc-history--updates.png",
+      "directly_viewed": true,
+      "visual": [
+        "The heading changes to updates, the chapter-updates tab is underlined with a count of seven, and a black download-all button replaces the clear action.",
+        "Two-column update entries are grouped by day, with cover, chapter, size/check metadata, and separate download buttons.",
+        "A queued entry has a dashed clock button; pagination reads 1 / 2."
+      ],
+      "behavior_acceptance": [
+        "Individual and all-download actions update real download states and support the intended cancellation behavior.",
+        "Changing history/update tabs resets pagination without confusing chapter updates with source-version updates."
+      ],
+      "inspected_by": "phase2_fidelity_review/expanded_ui_readonly/phase3_scribe_references"
+    },
+    {
+      "file": "screens/states/sc-sources--add-source.png",
+      "directly_viewed": true,
+      "visual": [
+        "A large outlined add-source popup overlays the split source-management page without a scrim.",
+        "A decorative QR sample sits beside a LAN address and waiting state; a close control is upper right.",
+        "A lower divider separates a source-list URL field from its black keyboard-entry action."
+      ],
+      "behavior_acceptance": [
+        "Provide a real QR/LAN connection flow and live connection state.",
+        "Support source-list URL entry, close, and outside dismissal; sample address and QR artwork are not functional evidence."
+      ],
+      "inspected_by": "phase2_fidelity_review/expanded_ui_readonly/phase3_scribe_references"
+    },
+    {
+      "file": "screens/states/sc-sources--source-lists.png",
+      "directly_viewed": true,
+      "visual": [
+        "A wide outlined source-lists popup contains a list card with name, URL, 124-source count, and remove button.",
+        "A dashed full-width add-list action sits below, with black completion in the panel heading."
+      ],
+      "behavior_acceptance": [
+        "Removal updates the actual list store and available-source data.",
+        "Adding opens the input/connection flow; completion and outside taps dismiss the popup."
+      ],
+      "inspected_by": "phase2_fidelity_review/expanded_ui_readonly/phase3_scribe_references"
+    },
+    {
+      "file": "screens/states/sc-sources--updates.png",
+      "directly_viewed": true,
+      "visual": [
+        "The installed-source left column remains visible with four built-ins and three extensions.",
+        "The right update tab is underlined and shows MangaDex v12 to v13 and source A v8 to v9, each with an update button.",
+        "A broad black update-all action sits below the two rows; no multi-page pager is shown for this short update list."
+      ],
+      "behavior_acceptance": [
+        "Individual and bulk update actions must install actual source versions and update counts/status after completion.",
+        "Keep installed and available/update contexts distinct and show appropriate failures without falsifying completion."
+      ],
+      "inspected_by": "phase2_fidelity_review/expanded_ui_readonly/phase3_scribe_references"
+    },
+    {
+      "file": "screens/states/sc-search--results.png",
+      "directly_viewed": true,
+      "visual": [
+        "The top search field contains a submitted query, clear icon, and cancel action, followed by five scope controls.",
+        "MangaDex has six preview covers and an 18-result total; Komga has one cover; local files have a no-result row and source A has a timeout row with retry.",
+        "The keyboard is closed and the Search dock is visible and selected."
+      ],
+      "behavior_acceptance": [
+        "Submit and IME candidate handling must yield the intended query and hide the keyboard.",
+        "Show per-source partial outcomes independently; retry only the failed source and expose real retry status.",
+        "Result, view-all, focus, clear, cancel, and scope actions must navigate or update state correctly."
+      ],
+      "inspected_by": "phase2_fidelity_review/expanded_ui_readonly/phase3_scribe_references"
+    },
+    {
+      "file": "screens/states/sc-settings--about.png",
+      "directly_viewed": true,
+      "visual": [
+        "About is selected at the bottom of the grouped left navigation.",
+        "The right panel has four ruled rows for version, device/firmware, open-source licenses with a view button, and project home."
+      ],
+      "behavior_acceptance": [
+        "Replace placeholder version, firmware, and address values with actual information.",
+        "Make license viewing and the supported project-home action functional."
+      ],
+      "inspected_by": "phase2_fidelity_review/expanded_ui_readonly/phase3_scribe_references"
+    },
+    {
+      "file": "screens/states/sc-settings--auto-update.png",
+      "directly_viewed": true,
+      "visual": [
+        "The right panel contains a three-choice frequency row with daily selected in black.",
+        "Wi-Fi-only and skip-completed toggles are on; charging-only is off."
+      ],
+      "behavior_acceptance": [
+        "Frequency is exclusive, and each condition affects actual scheduling.",
+        "Persist the selected values and coordinate them with power/network policies without treating this PNG as scheduler proof."
+      ],
+      "inspected_by": "phase2_fidelity_review/expanded_ui_readonly/phase3_scribe_references"
+    },
+    {
+      "file": "screens/states/sc-settings--backup.png",
+      "directly_viewed": true,
+      "visual": [
+        "The panel begins with black immediate-backup and outlined restore actions.",
+        "Two recent automatic backups appear in ruled rows with dates and 1.2 MB / 1.1 MB sizes."
+      ],
+      "behavior_acceptance": [
+        "Create and restore real backups, report actual status, and update the recent-backup list.",
+        "Support the handoff's Aidoku backup import expectations and surface skipped incompatible settings."
+      ],
+      "inspected_by": "phase2_fidelity_review/expanded_ui_readonly/phase3_scribe_references"
+    },
+    {
+      "file": "screens/states/sc-settings--categories.png",
+      "directly_viewed": true,
+      "visual": [
+        "Four category rows display counts of 12, 9, 25, and 0.",
+        "Only the first three rows have rename buttons; uncategorized has none, and a dashed new-category action is below."
+      ],
+      "behavior_acceptance": [
+        "Rename and create categories through real input and persistence.",
+        "Keep uncategorized non-renamable and synchronize library category labels/counts."
+      ],
+      "inspected_by": "phase2_fidelity_review/expanded_ui_readonly/phase3_scribe_references"
+    },
+    {
+      "file": "screens/states/sc-settings--download.png",
+      "directly_viewed": true,
+      "visual": [
+        "Four predownload choices are shown with two chapters selected in black.",
+        "Screen-size scaling and grayscale saving toggles are on; a ruled save-location row shows documents/aidoku."
+      ],
+      "behavior_acceptance": [
+        "Predownload amount is exclusive and affects the actual download policy.",
+        "Scaling, grayscale storage, and the supported save path must have real effects and persist."
+      ],
+      "inspected_by": "phase2_fidelity_review/expanded_ui_readonly/phase3_scribe_references"
+    },
+    {
+      "file": "screens/states/sc-settings--image.png",
+      "directly_viewed": true,
+      "visual": [
+        "A five-choice contrast row runs from -2 through standard to +2, with standard black.",
+        "Crop-white-borders, grayscale dithering, and split-large-spreads toggles are all on."
+      ],
+      "behavior_acceptance": [
+        "Contrast is exclusive and affects rendered images.",
+        "Each image-processing option must apply to the correct page pipeline and preserve the Reader's page/session identity."
+      ],
+      "inspected_by": "phase2_fidelity_review/expanded_ui_readonly/phase3_scribe_references"
+    },
+    {
+      "file": "screens/states/sc-settings--language.png",
+      "directly_viewed": true,
+      "visual": [
+        "The right panel has four ruled language rows: simplified Chinese, traditional Chinese, English, and Japanese.",
+        "The current simplified-Chinese row is bold with a right-side checkmark rather than a black filled row."
+      ],
+      "behavior_acceptance": [
+        "Language selection is exclusive, applies actual localization, and persists.",
+        "Keep labels and typography usable in every supported language without clipping."
+      ],
+      "inspected_by": "phase2_fidelity_review/expanded_ui_readonly/phase3_scribe_references"
+    },
+    {
+      "file": "screens/states/sc-settings--light.png",
+      "directly_viewed": true,
+      "visual": [
+        "Separate brightness and warmth rows show values 14 and 6 above horizontal tracks, each bounded by minus and plus buttons.",
+        "The thumbs are square outlined controls and automatic brightness is on."
+      ],
+      "behavior_acceptance": [
+        "Buttons and dragging must apply bounded 0 through 24 hardware values and keep the shown value in sync.",
+        "Automatic brightness must use the actual supported capability; hide unsupported controls rather than displaying inactive substitutes."
+      ],
+      "inspected_by": "phase2_fidelity_review/expanded_ui_readonly/phase3_scribe_references"
+    },
+    {
+      "file": "screens/states/sc-settings--logs.png",
+      "directly_viewed": true,
+      "visual": [
+        "A single write-log-files row has its toggle on.",
+        "Two outlined export-log and clear-log actions sit beneath its rule, with the rest of the panel empty."
+      ],
+      "behavior_acceptance": [
+        "The toggle controls actual logging and persists.",
+        "Export and clear operate on real logs and accurately report success or failure."
+      ],
+      "inspected_by": "phase2_fidelity_review/expanded_ui_readonly/phase3_scribe_references"
+    },
+    {
+      "file": "screens/states/sc-settings--pen.png",
+      "directly_viewed": true,
+      "visual": [
+        "The pen category is black in the left navigation.",
+        "The right panel contains only use-pen-for-taps and ignore-palm-while-using-pen rows, both on."
+      ],
+      "behavior_acceptance": [
+        "Treat the pen as touch input and apply palm rejection through supported device input behavior.",
+        "Do not infer handwriting or annotation functionality from these controls."
+      ],
+      "inspected_by": "phase2_fidelity_review/expanded_ui_readonly/phase3_scribe_references"
+    },
+    {
+      "file": "screens/states/sc-settings--power.png",
+      "directly_viewed": true,
+      "visual": [
+        "The power panel shows keep-awake-during-downloads and update-while-charging on, and disable-Wi-Fi-while-reading off.",
+        "Three screensaver thumbnails show current cover, reading progress, and system default; current cover has the thick selected outline.",
+        "A final ruled row provides an outlined exit action to the Kindle home screen."
+      ],
+      "behavior_acceptance": [
+        "Make wake locks, charging updates, Wi-Fi policy, and exit interact correctly with the Kindle lifecycle.",
+        "Optional screensaver modes require actual hardware support and fallback; they must preserve the open ReaderSession and exact image/page/offset on wake without reopening the app."
+      ],
+      "related_gate": "resume_preservation_requirement",
+      "inspected_by": "phase2_fidelity_review/expanded_ui_readonly/phase3_scribe_references"
+    },
+    {
+      "file": "screens/states/sc-settings--reading.png",
+      "directly_viewed": true,
+      "visual": [
+        "Four equal direction controls show right-to-left, left-to-right, vertical paging, and webtoon scrolling, with right-to-left black.",
+        "Remember-direction-per-manga is on in a separate ruled row."
+      ],
+      "behavior_acceptance": [
+        "Default direction is exclusive and changes the correct tap/swipe semantics.",
+        "Per-manga direction memory must restore the intended setting when opening the same work."
+      ],
+      "inspected_by": "phase2_fidelity_review/expanded_ui_readonly/phase3_scribe_references"
+    },
+    {
+      "file": "screens/states/sc-settings--source-lists.png",
+      "directly_viewed": true,
+      "visual": [
+        "A ruled list row shows a placeholder list name and index.min.json URL with a remove button.",
+        "A dashed add-source-list action and an outlined open-source-management action sit side by side beneath it."
+      ],
+      "behavior_acceptance": [
+        "Add and remove source lists in the real persistent store and update dependent source data.",
+        "Open source management with the correct navigation context."
+      ],
+      "inspected_by": "phase2_fidelity_review/expanded_ui_readonly/phase3_scribe_references"
+    },
+    {
+      "file": "screens/states/sc-settings--spread.png",
+      "directly_viewed": true,
+      "visual": [
+        "Automatic double-page is black in a three-choice landscape row; always-double and keep-single are white.",
+        "Whole-spread display is black in a second two-choice row, and cover-as-single-page is on."
+      ],
+      "behavior_acceptance": [
+        "Each row is an independent exclusive choice and applies to actual landscape pagination.",
+        "Spread and cover handling must preserve logical page identity across orientation and sleep/wake changes."
+      ],
+      "inspected_by": "phase2_fidelity_review/expanded_ui_readonly/phase3_scribe_references"
+    },
+    {
+      "file": "screens/states/sc-settings--storage.png",
+      "directly_viewed": true,
+      "visual": [
+        "A segmented usage bar and grayscale legend distinguish downloaded chapters, image cache, covers, and free space.",
+        "Three high-usage works have chapter/size metadata and manage buttons.",
+        "Outlined clean-image-cache and delete-read-downloads actions are below the usage rows."
+      ],
+      "behavior_acceptance": [
+        "Compute actual storage values and update the bar, legend, and per-work sizes after operations.",
+        "Manage and cleanup operations must preserve unrelated data and report their real outcomes."
+      ],
+      "inspected_by": "phase2_fidelity_review/expanded_ui_readonly/phase3_scribe_references"
+    },
+    {
+      "file": "screens/states/sc-settings--tap-zones.png",
+      "directly_viewed": true,
+      "visual": [
+        "Three tall cards pair square selection indicators with small zone diagrams; thirds is the black selected card.",
+        "L-shape and swipe-only cards remain white; reverse-left/right and show-tap-zones toggles are both off."
+      ],
+      "behavior_acceptance": [
+        "Keep zone choice exclusive and make hit testing match the chosen diagram and reading direction.",
+        "Reverse and diagnostic-zone display are independent options; diagnostic overlays must not become persistent default Reader chrome."
+      ],
+      "inspected_by": "phase2_fidelity_review/expanded_ui_readonly/phase3_scribe_references"
+    },
+    {
+      "file": "screens/states/sc-settings--tracking-login.png",
+      "directly_viewed": true,
+      "visual": [
+        "The upper AniList card is logged in with a placeholder username, tracked-work count, and logout action.",
+        "The MyAnimeList card is waiting for mobile authorization, with a QR sample, device code KX4F-92QD, remaining time 4:58, and cancel.",
+        "A simulated-mobile-authorized button is visibly part of the prototype export; auto-sync and offline-local-queue toggles below are on."
+      ],
+      "behavior_acceptance": [
+        "Use real device-code authorization, QR content, expiry, cancellation, polling, error handling, and service logout.",
+        "Remove the simulated authorization control from product UI; apply synchronization and offline-queue settings to real tracking work."
+      ],
+      "related_gate": "prototype_only_authorization_control",
+      "inspected_by": "phase2_fidelity_review/expanded_ui_readonly/phase3_scribe_references"
+    }
+  ],
+  "reference_limits": [
+    "Sample counts, dates, capacities, addresses, QR artwork, versions, device codes and placeholder names are reference data, not production truth.",
+    "Prototype local state changes, close-only handlers and simulated authorization controls cannot substitute for implemented behavior; demo-only controls and prototype-only success toasts must be excluded.",
+    "The Scribe sort PNG depicts eight ordering options and completion but does not show all direction/filter requirements described in the handoff.",
+    "The handoff leaves some empty, offline and unconfigured states incomplete; these require actual implementation review, not invented reference evidence.",
+    "No reference screenshot proves cache fairness, download throughput, file integrity, WASM compatibility, tracking synchronization, backup correctness, hardware settings, e-ink refresh behavior or sleep/wake restoration."
+  ],
+  "hard_conflicts_in_reviewed_non_reader_images": [],
+  "conclusion": {
+    "non_reader_reference_preparation_complete": true,
+    "manual_reference_count": 61,
+    "implementation_verified": false,
+    "qualifies_as_clean_round": false,
+    "next_gate": "A newly frozen product candidate and explicit remote verification go-ahead from Root."
+  },
+  "scribe_reference_findings": [
+    {
+      "id": "resume_preservation_requirement",
+      "classification": "independent_lifecycle_gate",
+      "references": [
+        "screens/states/sc-settings--power.png",
+        "screens/states/sc-manga--more.png",
+        "prototype/sc-settings.dc.html:235",
+        "prototype/sc-settings.dc.html:301",
+        "prototype/sc-manga.dc.html:241",
+        "HANDOFF.md sections 5.2, 5.7, and 9"
+      ],
+      "observed_reference": "The reference offers current-cover, reading-progress, and system screensavers, defaults its sample state to the cover, and offers a manga-level use-as-screensaver-cover action.",
+      "authoritative_requirement": "The parent reviewer clarified that the user's requirement concerns wake returning to the original app view, reading image/page/offset without reopening the app. It does not prohibit a stock or optional cover screensaver during sleep.",
+      "assessment": "The screensaver options are not a hard conflict under that clarified requirement. They require a separate hardware and lifecycle gate and cannot substitute for resume evidence.",
+      "acceptance": [
+        "Preserve the original ReaderSession, logical page or image, offset, and app context through sleep/wake.",
+        "Show the original reading position on wake without requiring app reopening.",
+        "Make optional screensaver settings real and provide a supported fallback.",
+        "Verify sleep presentation separately from wake restoration."
+      ]
+    },
+    {
+      "id": "prototype_only_authorization_control",
+      "classification": "demo_content_exclusion",
+      "references": [
+        "screens/states/sc-settings--tracking-login.png",
+        "prototype/README.md",
+        "HANDOFF.md section 5.7"
+      ],
+      "assessment": "The exported PNG visibly includes a simulated mobile-authorization button. The handoff explicitly excludes simulated controls and prototype-only toasts from implementation; the visual reference must be interpreted with that exclusion."
+    },
+    {
+      "id": "library_sort_visual_coverage",
+      "classification": "reference_coverage_limit",
+      "references": [
+        "screens/states/sc-library--sort.png",
+        "HANDOFF.md section 5.1"
+      ],
+      "assessment": "The directly viewed sorting PNG depicts eight ordering choices and completion only. It does not depict the direction control or the library's three-state filter tags described in the handoff; those remain additional acceptance requirements."
+    },
+    {
+      "id": "reader_fullscreen_scope_boundary",
+      "classification": "separate_reader_gate",
+      "assessment": "These 37 non-Reader states do not prove or disprove image-only fullscreen reading, absence of permanent page badges, or Reader gesture behavior. Incognito indicators, setting previews, library badges, and list pagers must not be used as evidence permitting permanent Reader overlays."
+    },
+    {
+      "id": "static_reference_is_not_runtime_evidence",
+      "classification": "evidence_limit",
+      "assessment": "Prototype handlers often demonstrate local state changes or toasts. Reference PNGs cannot prove source connectivity, WASM compatibility, downloads, migration, service authorization, backup integrity, actual hardware settings, e-ink refresh behavior, or sleep/wake restoration."
+    }
+  ]
+}

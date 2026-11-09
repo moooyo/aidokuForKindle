@@ -1,0 +1,195 @@
+{
+  "batch_id": "supplemental-21",
+  "reviewer": "/root/phase3_round1_review/supplemental_21",
+  "run_id": "a1baf3fe3dc2",
+  "review_basis": {
+    "method": "Fresh manual inspection of each of the eight input-listed candidate PNGs with tools.view_image. No other PNGs were opened.",
+    "independent_reference_png": false,
+    "text_sources": [
+      "D:/Code/aidokuForKindle/docs/review/phase3-reference-scope.json",
+      "D:/Code/aidokuForKindle/docs/DESIGN_HANDOFF.md",
+      "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/HANDOFF.md",
+      "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/prototype/sc-library.dc.html",
+      "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/prototype/sc-manga.dc.html"
+    ]
+  },
+  "evidence_identity": {
+    "binary_sha256": "94d7f3bbcab475ad8833a2f3c486138f7b49bead231851c2d8eab2f0c3d2ac51",
+    "source_sha256": "aef9db4e111165016a10a2a95e111f3155860b8510c7f6207ec9c79fbec5082c",
+    "profile": "scribe",
+    "backend": "desktop",
+    "native_capture_size": [930, 1240],
+    "current_png_hashes_match_input_and_case_evidence": true,
+    "case_metadata_run_binary_and_source_match": true,
+    "note": "Existing case checks and salient state were read for identity and interpretation. Their mechanical pass flags do not determine the visual outcomes below."
+  },
+  "reviewed_case_ids": [
+    "sc-library--download-queue--completed-job-menu",
+    "sc-library--download-queue--completed-real-job",
+    "sc-library--download-queue--completed-remove-apply",
+    "sc-library--download-queue--completed-remove-cancel",
+    "sc-library--download-queue--completed-remove-confirm",
+    "sc-library--download-queue--page-two",
+    "sc-library--download-queue--pause-all",
+    "sc-library--download-queue--resume-all"
+  ],
+  "reviewed_cases": [
+    {
+      "case_id": "sc-library--download-queue--completed-job-menu",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/sc-library--download-queue--completed-job-menu.png",
+      "candidate_sha256": "9f11e8b9f82f5f17110c9f37c5a52d63e305fa6831f4d162e20415cca35ab217",
+      "viewed_candidate": true,
+      "outcome": "pass",
+      "observations": [
+        "The settings-backed completed-job action panel has a complete white outline, a clear Download management heading, and readable Continue reading, Remove offline chapter, and Cancel rows.",
+        "The selected job is chapter 1 with completed=6, total=6 and state=completed in the case metadata. The visible actions suit a completed job and do not present pause or retry as the available operation.",
+        "The content-sized panel and its Done control are contained within the viewport. The underlying settings remain undimmed, with no panel shadow or decorative stipple."
+      ],
+      "intentional_differences": [],
+      "issue_ids": []
+    },
+    {
+      "case_id": "sc-library--download-queue--completed-real-job",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/sc-library--download-queue--completed-real-job.png",
+      "candidate_sha256": "154ff6d8f4354201a4158443ff155f2c74a82e00bdf66e9c0c39db95c3841d8b",
+      "viewed_candidate": true,
+      "outcome": "fail",
+      "observations": [
+        "The queue floats over the real detail route at the expected centered 640-design-pixel width and approximately y=300. It shows three covers and distinguishable chapter 1, 2 and 3 title prefixes, each with a full progress bar and 6/6-page counter matching the completed metadata.",
+        "Pause all is visibly disabled, consistent with the metadata reporting no pausable or resumable jobs. Close remains prominent and readable.",
+        "The side borders stop around y=729 while the 1/2 folio and Next page control sit around y=764. The bottom border is absent, leaving navigation outside the outlined container.",
+        "In the exposed lower-left detail area, the Adventure and Long metadata captions extend beyond their small outlined tag boxes. The rendered tag row loses the intended label padding and clear separation."
+      ],
+      "intentional_differences": [],
+      "issue_ids": ["P3R1-SUP21-1", "P3R1-SUP21-2"]
+    },
+    {
+      "case_id": "sc-library--download-queue--completed-remove-apply",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/sc-library--download-queue--completed-remove-apply.png",
+      "candidate_sha256": "4e61d6a0a3d32a1877607a31089949c9b28e7cb6a3ce4570fbc3ea6dcefeea3a",
+      "viewed_candidate": true,
+      "outcome": "fail",
+      "observations": [
+        "After removal, the queue visibly starts with chapters 2, 3 and 4 rather than chapter 1. Each retains its cover, full bar and 6/6-page counter; the metadata confirms the selected chapter was removed and the total queue count is now four.",
+        "Pause all remains visibly disabled, matching the lack of remaining active jobs. The panel retains the expected white fill, undimmed background and clear Close control.",
+        "The 1/2 pager is below the ends of the side borders and no bottom outline encloses it. The changed membership is represented, but the queue container is visibly incomplete."
+      ],
+      "intentional_differences": [],
+      "issue_ids": ["P3R1-SUP21-1"]
+    },
+    {
+      "case_id": "sc-library--download-queue--completed-remove-cancel",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/sc-library--download-queue--completed-remove-cancel.png",
+      "candidate_sha256": "ac983c201f085bcbe6b065fa2caf86b6a85340c7d54125011b38711f3c2e45e1",
+      "viewed_candidate": true,
+      "outcome": "pass",
+      "observations": [
+        "The removal dialog is closed and the settings page is fully restored, with no residual popup border, dimming or stale confirmation text.",
+        "The metadata reports an empty modal and retains the completed chapter 1 job within a five-job queue, consistent with cancellation preserving the download.",
+        "The refresh-quality choices visibly report temporary unavailability and remain disabled; the screenshot does not imply that the desktop capture qualifies hardware waveform quality."
+      ],
+      "intentional_differences": [],
+      "issue_ids": []
+    },
+    {
+      "case_id": "sc-library--download-queue--completed-remove-confirm",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/sc-library--download-queue--completed-remove-confirm.png",
+      "candidate_sha256": "98895b5d315c30931a9dace79032bfef88b3e5e92971c7dff3eed03d1396302a",
+      "viewed_candidate": true,
+      "outcome": "pass",
+      "observations": [
+        "The centered white confirmation dialog has all four border edges and no shadow or dimmed backdrop. Its two-line title fits and explains that shared content and imported files are retained.",
+        "Cancel and Remove appear as equal-width adjacent buttons, with Remove presented as the black primary action. Neither label nor the preservation message is clipped.",
+        "The case state still contains the original five jobs and identifies chapter 1 as the removal context, consistent with a pending confirmation rather than an already completed deletion."
+      ],
+      "intentional_differences": [],
+      "issue_ids": []
+    },
+    {
+      "case_id": "sc-library--download-queue--page-two",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/sc-library--download-queue--page-two.png",
+      "candidate_sha256": "f39b7294a7bd9976bc4758bcad1423c12e29985055d867f7bdbb223520253862",
+      "viewed_candidate": true,
+      "outcome": "fail",
+      "observations": [
+        "Page 2 displays only the two actual remaining jobs, chapters 4 and 5, with covers, distinct chapter prefixes, Waiting to download labels and empty bars matching their queued 0/6 state.",
+        "The 2/2 folio keeps Previous page at the left and suppresses Next page on the last page. Pause all is visibly available, matching the queue capability metadata.",
+        "The panel shortens for the two-row content, but its side borders stop around y=622 while the pager is around y=656. The bottom outline again fails to enclose the pager."
+      ],
+      "intentional_differences": [],
+      "issue_ids": ["P3R1-SUP21-1"]
+    },
+    {
+      "case_id": "sc-library--download-queue--pause-all",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/sc-library--download-queue--pause-all.png",
+      "candidate_sha256": "58bd139352fca15bfc9dd1e0f28c91ba2f41e80bef7511bb51786e022dd6e862",
+      "viewed_candidate": true,
+      "outcome": "fail",
+      "observations": [
+        "The header changes to the enabled Resume all action and retains Close. This matches downloads_paused=true, can_pause=false and can_resume=true in the metadata.",
+        "The visible first-page jobs remain completed chapters 1 through 3 with covers, full progress bars and 6/6 counters. The paused chapter 4 and 5 jobs are off this page, so their paused row presentation is not visually established by this capture.",
+        "The 1/2 pager and Next page control appear below the side borders, with the bottom border missing from the white queue container."
+      ],
+      "intentional_differences": [],
+      "issue_ids": ["P3R1-SUP21-1"]
+    },
+    {
+      "case_id": "sc-library--download-queue--resume-all",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/sc-library--download-queue--resume-all.png",
+      "candidate_sha256": "9c2ba0c44946b18e7570032d1357b991f0c809c37417c1cac6238228e71ffd52",
+      "viewed_candidate": true,
+      "outcome": "fail",
+      "observations": [
+        "The header returns to the enabled Pause all action, matching downloads_paused=false, can_pause=true and can_resume=false in the metadata. Close remains separately available.",
+        "The three visible completed jobs preserve their chapter identities and 6/6 full-bar presentation. The resumed downloading chapter 4 and queued chapter 5 exist on the other page, so this PNG does not itself display their changing progress.",
+        "The queue repeats the incomplete bottom outline: its 1/2 folio and Next page control are outside the ends of the side borders."
+      ],
+      "intentional_differences": [],
+      "issue_ids": ["P3R1-SUP21-1"]
+    }
+  ],
+  "suggestions": [
+    {
+      "id": "P3R1-SUP21-1",
+      "case_id": "sc-library--download-queue--completed-real-job",
+      "affected_case_ids": [
+        "sc-library--download-queue--completed-real-job",
+        "sc-library--download-queue--completed-remove-apply",
+        "sc-library--download-queue--page-two",
+        "sc-library--download-queue--pause-all",
+        "sc-library--download-queue--resume-all"
+      ],
+      "priority": "P2",
+      "description": "The queue pager is painted below the outlined white panel, leaving the bottom border missing and the footer outside the container.",
+      "evidence": [
+        "In the four three-row views, the centered panel begins around x=145, y=300 and its side borders end around y=729; the 1/2 folio and Next page control are lower, around y=764, without a surrounding bottom edge.",
+        "The two-row page-two view repeats the defect at its reduced height: side borders end around y=622 and the 2/2 folio and Previous page control appear around y=656 outside the outline.",
+        "HANDOFF.md sections 3.4 and 4.6 require bounded outlined popups. The sc-library prototype section at lines 160-176 uses a white bordered content-sized container. Real job counts do not waive containment or clipping requirements."
+      ],
+      "recommendation": "Include the pager and its bottom padding in the queue dialog's measured content height. Keep header, actual rows and folio within one complete four-sided white outline for both three-row first pages and two-row last pages. Recheck the detail and settings backgrounds, including removal, pause and resume variants.",
+      "status": "open",
+      "introduced_round": 1
+    },
+    {
+      "id": "P3R1-SUP21-2",
+      "case_id": "sc-library--download-queue--completed-real-job",
+      "priority": "P2",
+      "description": "The exposed detail metadata tag captions outgrow their outlined boxes and lose the required internal padding.",
+      "evidence": [
+        "Near the lower-left of the completed-real-job PNG, around y=1065-1102, Adventure extends left of its tag outline and Long metadata extends beyond its narrow box. Adjacent tag captions are visually crowded across the gaps between outlines.",
+        "The case metadata identifies actual tag strings including Adventure, Local, Long metadata and Mystery; the defect is label containment rather than a difference in sample content.",
+        "The sc-manga prototype lines 64-69 sizes tags from their text, applies 16-design-pixel horizontal padding and wraps them with 8-pixel gaps. The scope explicitly retains geometry and clipping requirements for real long content."
+      ],
+      "recommendation": "Size each tag box from the rendered label width plus horizontal padding, and wrap the row within the information column. Preserve readable spacing and keep every visible caption inside its own outline when using the real metadata strings.",
+      "status": "open",
+      "introduced_round": 1
+    }
+  ],
+  "limitations": [
+    "Only the eight input-listed candidate PNGs were visually inspected. These supplemental states have no independent per-state reference PNG; judgment uses the supplied scope, HANDOFF and prototype text plus explicit UX requirements.",
+    "State and checks are existing frozen case evidence. Reading them does not independently execute or verify cancel, remove, pause, resume, persistence, outside dismissal or hit-target behavior.",
+    "Pause-all and resume-all capture page 1 containing completed jobs; the affected active or paused jobs are off-page. Their row appearance is not established by these screenshots.",
+    "Static desktop PNGs do not qualify physical sleep/wake, e-ink waveforms, timing, memory ceilings such as 512 MiB, hardware capabilities or sustained queue behavior.",
+    "Closed-reader artwork and absent-hardware variants are outside this batch. This review does not establish a complete clean round or a clean-round streak. No local application, build, test, smoke check or runtime probe was run."
+  ]
+}

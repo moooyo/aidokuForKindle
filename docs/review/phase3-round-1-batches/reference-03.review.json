@@ -1,0 +1,124 @@
+{
+  "batch_id": "reference-03",
+  "reviewer": "/root/phase3_round1_review/reference_03",
+  "run_id": "a1baf3fe3dc2",
+  "round": 1,
+  "review_method": "Fresh independent visual inspection of all eight assigned original PNGs using view_image, plus read-only inspection of the batch input, four case metadata JSON files, the relevant design handoff constraints, and the static Paperwhite browse prototype declarations.",
+  "identity_method": "Candidate and reference SHA-256 values were recomputed from the original PNG file bytes using Get-FileHash. The candidate byte hash is the pixel identity used by this review.",
+  "capture_identity": {
+    "binary_sha256": "94d7f3bbcab475ad8833a2f3c486138f7b49bead231851c2d8eab2f0c3d2ac51",
+    "source_sha256": "aef9db4e111165016a10a2a95e111f3155860b8510c7f6207ec9c79fbec5082c",
+    "provided_reference_bundle_sha256": "e7b49b456255432d74cfe41346f9d44c1a9c55bf67c5d55483e4ae3029547d18",
+    "all_case_run_ids_match": true,
+    "all_case_binary_hashes_match": true,
+    "all_case_source_hashes_match": true,
+    "all_candidate_png_hashes_match_case_evidence": true,
+    "all_reference_png_hashes_match_case_metadata": true
+  },
+  "comparison_scale": {
+    "candidate_native_size": [618, 824],
+    "reference_physical_size": [1236, 1648],
+    "reference_physical_scale": 2,
+    "coordinate_basis": "All comparison coordinates and dimensions below are approximate logical 1x pixels; reference physical coordinates were divided by two."
+  },
+  "constraint_basis": [
+    "D:/Code/aidokuForKindle/docs/DESIGN_HANDOFF.md:279-280 states that sheets do not declare fixed heights and follow content.",
+    "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/prototype/pw-browse.dc.html:132-153 declares an intrinsic add-source sheet, a fixed 168 by 168 QR region, and a URL span with padding but no fixed width or height.",
+    "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/prototype/pw-browse.dc.html:160-169 declares an intrinsic source-list sheet, 18/22/26 outer padding, a 44-pixel done action, and a 50-pixel add action."
+  ],
+  "reviewed_case_ids": [
+    "pw-browse--default",
+    "pw-browse--add-source",
+    "pw-browse--available",
+    "pw-browse--source-lists"
+  ],
+  "reviewed_cases": [
+    {
+      "case_id": "pw-browse--default",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/pw-browse--default.png",
+      "candidate_sha256": "a8d03a743e4e882add4dc50ea1ee547b573e6fc003b16b918fbef42063be1df7",
+      "reference_png": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/screens/pw-browse.png",
+      "reference_sha256": "e3a7cc6f08e4f5c65f8ce8f9a15524cca930fefffa13a446948873a9d9983c21",
+      "viewed_candidate": true,
+      "viewed_reference": true,
+      "outcome": "pass",
+      "observations": [
+        "The top header, in-place installed/available/update tabs, and separator at approximately y=152 follow the reference hierarchy and geometry.",
+        "Built-in source icons are approximately 44 by 44 at x=22, source text begins near x=80, and the four built-in rows retain the reference spacing. The extension group and dashed add-source tile also align with the reference.",
+        "The unavailable extension is visibly gray with a warning symbol, an explicit web-verification limitation, and a reachable uninstall action; the screenshot does not suggest successful web authorization.",
+        "The dock begins near y=752 and retains the selected browse treatment. Serif display text, sans-serif row text, thin gray separators, and black primary controls retain the intended hierarchy.",
+        "No visible clipping, overlapping controls, tinted gray, surface shadow, or stipple pattern was observed."
+      ],
+      "intentional_differences": [
+        "The top summary and unavailable-source explanation use different wording while preserving their meaning."
+      ]
+    },
+    {
+      "case_id": "pw-browse--add-source",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/pw-browse--add-source.png",
+      "candidate_sha256": "07a298c3efa426f55bf5dfab66501463c8f96ca51f9d097753a2e2b8a3d22079",
+      "reference_png": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/screens/states/pw-browse--add-source.png",
+      "reference_sha256": "1614884e6bde2f184bc5d2b119603e7d4715a3e4427659a5793136ee36cc5889",
+      "viewed_candidate": true,
+      "viewed_reference": true,
+      "outcome": "pass",
+      "observations": [
+        "The full-width white bottom sheet begins at approximately y=442, matching the reference shell. The close button, 168 by 168 QR container, divider, direct-URL entry, and keyboard-entry button remain visible and reachable.",
+        "The URL frame is approximately x=210..596 and y=567..629, compared with reference x=210..394 and y=589..629. The candidate expands the URL frame from approximately 184 by 40 to 386 by 62 logical pixels, and its caption starts roughly 27 pixels above the reference caption.",
+        "The entire right-hand information group remains approximately centered beside the QR after including its additional pairing-code line. The prototype declares an intrinsic URL span rather than fixed URL-box dimensions; the real URL and additional pairing data make the observed extent difference insufficient to establish an actionable fixed-geometry violation.",
+        "The capture metadata declares pairing_endpoint_running=true, and the image shows a concrete URL, a QR, a pairing code, and a waiting state. The visible state does not claim a completed connection.",
+        "The white sheet has no visible shadow or stipple, and no panel content is visibly clipped."
+      ],
+      "intentional_differences": [
+        "The concrete endpoint, generated QR pattern, pairing code, and waiting-state content are actual endpoint-dependent data rather than the reference placeholders. Their intrinsic information-block extents differ from the illustrative sample; no actionable fixed URL-box violation was established."
+      ]
+    },
+    {
+      "case_id": "pw-browse--available",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/pw-browse--available.png",
+      "candidate_sha256": "7ad3cf647ae8f0cb31702ee904c72d047bcce87ddca2d9f384fa34618794af28",
+      "reference_png": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/screens/states/pw-browse--available.png",
+      "reference_sha256": "47b5cd032c0297e403fef863faac894ea76b63919ed1310a41e24c39f4dd1a5f",
+      "viewed_candidate": true,
+      "viewed_reference": true,
+      "outcome": "pass",
+      "observations": [
+        "The available tab is selected in place and the five language-filter chips remain directly below the tab bar, with a black selected all-languages chip and outlined alternatives.",
+        "The first source icon begins near x=22, y=223 and keeps the reference 44 by 44 geometry. Source rows retain approximately 64-pixel spacing, x=80 text alignment, thin gray separators, and outlined action buttons near x=518..602.",
+        "The candidate displays update actions for installed sources and install actions for remaining records. Its seventh visible row and 1/18 folio fit above the dock without overlap or clipping.",
+        "The row typography and grayscale hierarchy are legible, the dock remains at approximately y=752, and there are no visible surface shadows or stipple patterns."
+      ],
+      "intentional_differences": [
+        "Actual source titles, language/version subtitles, update-versus-install actions, visible record count, and pagination differ from the illustrative reference records. Existing row geometry remains consistent."
+      ]
+    },
+    {
+      "case_id": "pw-browse--source-lists",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/pw-browse--source-lists.png",
+      "candidate_sha256": "3a6393598d140e7934ac2b7e7931d4c701e6f536d9c8de41edb4db904b6dfb88",
+      "reference_png": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/screens/states/pw-browse--source-lists.png",
+      "reference_sha256": "66dd26813d66d49c230f3310291d8546802c79e31796d082a40daf85b0ebc63e",
+      "viewed_candidate": true,
+      "viewed_reference": true,
+      "outcome": "pass",
+      "observations": [
+        "The candidate correctly shows an unconfigured empty state instead of inventing a saved repository row or a remove action.",
+        "The bottom sheet top border is approximately y=602 rather than reference y=585, moving the title and done button approximately 16 to 17 logical pixels down in absolute screen coordinates. The header retains approximately 18-pixel inset from its own top rule, the done action remains approximately 44 pixels high, and the add action remains aligned near y=748..798 with the declared bottom inset. The handoff and prototype define content-driven sheet height, so the shorter empty-state sheet is not an actionable shell-height defect.",
+        "The done and add-source-list controls are fully visible. The empty-state label is legible and does not overlap them.",
+        "The sheet remains full-width with a clean white surface, a dark top rule, a black primary done button, and a dashed add action. No visible shadow, stipple, or text clipping was observed."
+      ],
+      "intentional_differences": [
+        "Repository names and counts are actual saved records; an empty record set legitimately replaces the reference sample repository row with an unconfigured state. Because sheet height follows content, the resulting top-edge shift is accepted while its declared header and action metrics remain intact."
+      ]
+    }
+  ],
+  "suggestions": [],
+  "limitations": [
+    "This review covers only the four assigned reference pairs and does not establish that the entire round is clean.",
+    "Only existing assigned PNGs, JSON metadata, and the relevant static handoff/prototype declarations were read. No application, build, tests, validation suite, smoke test, runtime probe, Git operation, or product-code modification was performed.",
+    "Geometry coordinates are visual estimates normalized to logical 1x scale; no derived image, crop, or additional screenshot was loaded.",
+    "PNG byte hashes were independently recomputed. Binary and source identities were matched against the supplied run values in all four case metadata files; the executable, source bundle, and reference bundle were not independently rehashed.",
+    "The QR payload, endpoint connectivity, install/update actions, language filtering, and add/remove persistence were not exercised. Endpoint availability is supported here by the existing capture capability declaration and visible waiting state, not independent network verification.",
+    "The source-list empty state provides no populated record with which to visually assess a remove action."
+  ]
+}

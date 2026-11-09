@@ -1,0 +1,160 @@
+{
+  "schema_version": 1,
+  "batch_id": "c11r1-m012-b001",
+  "round": 1,
+  "reviewer": "c11r1_tail_m012_b001",
+  "run_id": "55c498296d35",
+  "module_id": "012-c4-c5-reader-controls",
+  "input_path": "D:/Code/aidokuForKindle/docs/review/phase3-c11-full1-batches/c11r1-m012-b001.input.json",
+  "source_sha256": "33a2d049307c398da8bfbf196d1bf8e086412c117c194b592f4a93b5bfaedb3f",
+  "binary_sha256": "1e60db345cbd6fbe580258a4a309bf42361781061dc2033f78a8a5eb4446ad72",
+  "module_inventory": {
+    "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate11/ui-round-1/snapshots/ui-round-1-snapshot-012-c4-c5-reader-controls/inventory.json",
+    "sha256": "2709353f3d330bb2ff599c5f0e3cb62e718d0b33a8516ba45a0d737edae9ebad"
+  },
+  "evidence_inventory_sha256": {
+    "source_manifest": "e332086df1f552ae7d7c7d434491f6886a167095a86789d6e0ec93ca47975e9e",
+    "reference_manifest": "caad04a243ecbaac22c790d7918f50c8678985b9e58a9f963694fe7d69e2775a",
+    "final_capture_manifest": "ff5fad60889a430ef0ae78e0f5c52a08e6a8d57a5785f306b303e56857a1079d",
+    "final_capture_inventory": "6cd76cd5c6638159f226b38b38d1f9f49c5e9c778528e2f5939136f3bf63fd51"
+  },
+  "identity_basis": "All SHA values are copied owner declarations from the assigned immutable input. The four case JSON records identify the same run/source/binary; no local rehash or new execution was performed.",
+  "reviewed_case_ids": [
+    "pw5--c4-reader--l-shaped-forward",
+    "pw5--c4-reader--l-shaped-reverse",
+    "pw5--c4-reader--swipe-only-tap",
+    "pw5--c4-reader--swipe-only-forward"
+  ],
+  "actual_opens": {
+    "candidate_cases": 4,
+    "candidate_original_images": 4,
+    "reference_original_images": 1,
+    "related_reference_pairs": 4,
+    "processed_source_images": 0,
+    "oracle_images": 0,
+    "total_images": 5
+  },
+  "references": [
+    {
+      "reference_id": "pw-reader--fullscreen",
+      "path": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/screens/states/pw-reader--fullscreen.png",
+      "sha256": "70fa45f447c4f52e2e737f7634a1838d73071e32cf22c40e6e8235e07582cee4",
+      "dimensions": [1236, 1648],
+      "actual_view": true,
+      "actual_image_opens": 1,
+      "comparison_kind": "related logical closed-Reader contract only",
+      "exact_state_reference": "unavailable for all four assigned cases",
+      "observation": "The original reference contains full-height monochrome panel artwork and a black ribbon-shaped element at the upper-right corner. The current user contract requires artwork only and does not require that corner element. This reference was not resized or treated as an exact-state geometry or content match."
+    }
+  ],
+  "cases": [
+    {
+      "case_id": "pw5--c4-reader--l-shaped-forward",
+      "png_path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate11/ui-round-1/snapshots/ui-round-1-snapshot-012-c4-c5-reader-controls/files/output/pw5--c4-reader--l-shaped-forward.png",
+      "png_sha256": "6b4703a4d4b2bdccf43e91f43cfba716e3cfca4ddb2cc0abd1b6a7f041c02852",
+      "case_json_sha256": "55068edbd521d60603f9e544c605c45a700c9a5da62909315e182761fc266a08",
+      "state_sha256": "79540bca1cd125695bcfdcd84dbc6d4b6fd10621215f8792a24150b27c9e8ef4",
+      "metadata_sha256": "db7f33455858aa4ff2a71b3fa1ee5f7f9b77030b42cbac3aa3d807b584ab093a",
+      "actions_sha256": "5384c8fd57001065bfb3e16ce505350e7d324ecbcfc09bb1486a764a87005cc1",
+      "log_sha256": "dc121ceea011a63c29b404d6c6b75bbe2db32b326923b8fa99759f457bfd709f",
+      "actual_view": true,
+      "actual_image_opens": 1,
+      "native_dimensions": [618, 824],
+      "reference_ids": ["pw-reader--fullscreen"],
+      "related_reference_pair_compared": true,
+      "observation": "The visible artwork has a tall radiating-line panel on the left, dotted and dense textured panels at upper right, and a wide striped panel at the bottom. Bar glyphs remain inside artwork balloons. No application corner ribbon, page/status label, footer, download notice, or tap-zone overlay is visible.",
+      "existing_state_action_support": "The existing actions set single page mode, l-shaped taps, and reverse-taps=false, then record a tap at (556.2,741.6). The case records three pointer events; current, visible, committed, and displayed pages are 13 of 40. Route=reader, menu=false, modal and reader_panel are empty. These are existing capture records, not a newly executed gesture check.",
+      "render_source_identity": {
+        "binding": "The input binds retained first_path to this case's displayed_reader.first_path.",
+        "declared_processed_sha256": "9c897c0b6e44f26afc7edd6ef3dfe0b89f0284d2131142be67027cb83833c199"
+      },
+      "actual_render_source_images_opened": [],
+      "static_verdict": "No new actionable visual defect in the assigned final frame.",
+      "limits": "The screenshot does not independently establish tap routing or invisible hit regions; exact-state reference comparison is unavailable."
+    },
+    {
+      "case_id": "pw5--c4-reader--l-shaped-reverse",
+      "png_path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate11/ui-round-1/snapshots/ui-round-1-snapshot-012-c4-c5-reader-controls/files/output/pw5--c4-reader--l-shaped-reverse.png",
+      "png_sha256": "6b4703a4d4b2bdccf43e91f43cfba716e3cfca4ddb2cc0abd1b6a7f041c02852",
+      "case_json_sha256": "f2c183d2e36b7517a2fd99c6ee15c9997641c2bc9caf7cd6560977491fd6d4ea",
+      "state_sha256": "52c17bafbef2d7e6010404bf8fb1575a1f45353361920d55e243992a0e92ca21",
+      "metadata_sha256": "df1694a9dfbe18f32d9fe390a2a77caf18fa14796b65b4ac3958baee0512dbed",
+      "actions_sha256": "434f75ac52c5d4d479245d11138af8a5737b833149bd4566dbb890468ef5811e",
+      "log_sha256": "dc121ceea011a63c29b404d6c6b75bbe2db32b326923b8fa99759f457bfd709f",
+      "actual_view": true,
+      "actual_image_opens": 1,
+      "native_dimensions": [618, 824],
+      "reference_ids": ["pw-reader--fullscreen"],
+      "related_reference_pair_compared": true,
+      "observation": "This separately opened original shows the same radiating, dotted, and striped artwork composition as the forward frame. Artwork continues to the top and bottom edges; the corners and lower edge contain no application ribbon, page counter, footer, or control overlay.",
+      "existing_state_action_support": "The existing actions set single page mode, l-shaped taps, and reverse-taps=true, then record the same (556.2,741.6) tap. The case records three pointer events; current, visible, committed, and displayed pages are 11 of 40. The Reader menu, modal, and panel are closed. Identical fixture appearance does not establish page identity; the captured page result is supported by the existing state record.",
+      "render_source_identity": {
+        "binding": "The input binds retained first_path to this case's displayed_reader.first_path.",
+        "declared_processed_sha256": "d92e7cd58215e0e711e927581fae3008d50b956531a6e581e96e4af83b0615db"
+      },
+      "actual_render_source_images_opened": [],
+      "static_verdict": "No new actionable visual defect in the assigned final frame.",
+      "limits": "The final artwork frame alone does not prove reversal behavior or unseen tap zones; exact-state reference comparison is unavailable."
+    },
+    {
+      "case_id": "pw5--c4-reader--swipe-only-tap",
+      "png_path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate11/ui-round-1/snapshots/ui-round-1-snapshot-012-c4-c5-reader-controls/files/output/pw5--c4-reader--swipe-only-tap.png",
+      "png_sha256": "99e72fc0524cab6742a606d8fd257bc1fd762c534457451aacba487d8ee9c394",
+      "case_json_sha256": "88c409ef521d31dc9e62d4a95fc2438fc3432293f911055cb1f9056dd371b4b9",
+      "state_sha256": "d70070f7886cd7f955f579b733c155e1d477bd042f2c3302f74598075fd0f644",
+      "metadata_sha256": "b7ab4f993c9d1608f54db438c895bd7238a00d1f57c83c6b369d7f95af340c0d",
+      "actions_sha256": "1e3dbfbe222d382e8881c5ff3e7c4a2a955274f22d22062a936f1221ad354fdc",
+      "log_sha256": "dc121ceea011a63c29b404d6c6b75bbe2db32b326923b8fa99759f457bfd709f",
+      "actual_view": true,
+      "actual_image_opens": 1,
+      "native_dimensions": [618, 824],
+      "reference_ids": ["pw-reader--fullscreen"],
+      "related_reference_pair_compared": true,
+      "observation": "The page shows a horizontal-line skyline panel above a dotted panel at lower left, a radiating panel below it, and a tall crosshatched panel on the right. The white strips follow the artwork panel outlines. No application footer, page label, ribbon, menu, or tap-zone overlay appears.",
+      "existing_state_action_support": "Existing actions select single page mode and swipe-only taps, then record a stationary tap at (61.8,412), with three pointer events. Current, visible, committed, and displayed pages remain 12 of 40; overlays are closed. Effective tap_layout is swipe-only while retained displayed framebuffer preferences say thirds. This tap-only preference difference does not by itself require a different closed artwork frame and is not recorded as a rendering defect.",
+      "render_source_identity": {
+        "binding": "The input binds retained first_path to this case's displayed_reader.first_path.",
+        "declared_processed_sha256": "26446e091a8303e74a35e2139c4171c13dd8061885ff4aaf40d1b9da65dca0e3"
+      },
+      "actual_render_source_images_opened": [],
+      "static_verdict": "No new actionable visual defect in the assigned final frame.",
+      "limits": "The image cannot independently prove the stationary tap was ignored; that result rests on existing action/state records. Exact-state reference comparison is unavailable."
+    },
+    {
+      "case_id": "pw5--c4-reader--swipe-only-forward",
+      "png_path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate11/ui-round-1/snapshots/ui-round-1-snapshot-012-c4-c5-reader-controls/files/output/pw5--c4-reader--swipe-only-forward.png",
+      "png_sha256": "6b4703a4d4b2bdccf43e91f43cfba716e3cfca4ddb2cc0abd1b6a7f041c02852",
+      "case_json_sha256": "a91a7efbc3d9c8c51fcc800b58b412af6e0ecc6412b789ea090d0a53b82b196c",
+      "state_sha256": "08a007023c8d13180951d82945b040d01bcd53d7dd9b4acc73faa2c1ebf2da3c",
+      "metadata_sha256": "b15623d00849828f7a268015be0fbba52dc9be9aa0c96d762f8bf810ff9634c0",
+      "actions_sha256": "7a9256a88b90f737fd49313e01d5e71c46290e28c42430fd501c3f62b07baaaa",
+      "log_sha256": "dc121ceea011a63c29b404d6c6b75bbe2db32b326923b8fa99759f457bfd709f",
+      "actual_view": true,
+      "actual_image_opens": 1,
+      "native_dimensions": [618, 824],
+      "reference_ids": ["pw-reader--fullscreen"],
+      "related_reference_pair_compared": true,
+      "observation": "The separately opened swipe-result original shows the tall radiating panel, two textured right panels, and broad bottom striped panel. No transient gesture graphic, footer, counter, corner ribbon, or application overlay interrupts the artwork.",
+      "existing_state_action_support": "Existing actions select single page mode and swipe-only taps, then record a rightward pointer gesture from (154.5,412) through (309,412) to (463.5,412), with five pointer events. Current, visible, committed, and displayed pages are 13 of 40; effective and displayed tap layouts are swipe-only. The final Reader menu, modal, and panel are closed. This is static support from actual C11 capture records, not a newly executed swipe test.",
+      "render_source_identity": {
+        "binding": "The input binds retained first_path to this case's displayed_reader.first_path.",
+        "declared_processed_sha256": "23fe69043dac80bd96f208a03e669c7ade7ba20242b712e707dc302ae6fdd16c"
+      },
+      "actual_render_source_images_opened": [],
+      "static_verdict": "No new actionable visual defect in the assigned final frame.",
+      "limits": "The image does not establish swipe timing, sensitivity, or physical input behavior; exact-state reference comparison is unavailable."
+    }
+  ],
+  "source_artwork_attribution_basis": "Visible panel outlines, edge continuation, textured fills, white margins, and balloon bar glyphs are consistent with the declared retained render-source binding. No processed or raw source image was opened, and no owner oracle metric was adopted as the visual verdict. These artwork details were not classified as application gutters or chrome.",
+  "suggestions": [],
+  "new_actionable": [],
+  "pending": [],
+  "historical_findings": [],
+  "regression_closures": [],
+  "limitations": [
+    "All four comparisons use the assigned related logical reference; no independent exact-state reference exists, so no exact reference match is asserted or marked passed.",
+    "Only the four assigned native originals and one original reference were opened. Processed source and oracle identities remain owner provenance declarations.",
+    "Final screenshots and existing state/action records do not qualify hidden footer hit regions, unrecorded interaction paths, hardware input, native lifecycle, e-ink effects, or performance.",
+    "No tests, builds, probes, SSH, hash execution, image processing, or validator execution occurred. This report gives no module-wide or full-round acceptance or clean-round credit."
+  ]
+}

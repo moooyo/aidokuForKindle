@@ -1,0 +1,156 @@
+{
+  "batch_id": "supplemental-02",
+  "reviewer": "/root/phase3_round1_review/supplemental_02",
+  "run_id": "a1baf3fe3dc2",
+  "round": 1,
+  "binary_sha256": "94d7f3bbcab475ad8833a2f3c486138f7b49bead231851c2d8eab2f0c3d2ac51",
+  "source_sha256": "aef9db4e111165016a10a2a95e111f3155860b8510c7f6207ec9c79fbec5082c",
+  "reviewed_case_ids": [
+    "Main--download-queue--resume-all",
+    "pw5--anchored-menu-outside-dismiss",
+    "pw5--catalog-filter-apply",
+    "pw5--catalog-filter-reset",
+    "pw5--catalog-first-boundary",
+    "pw5--catalog-last-page",
+    "pw5--catalog-tag-1",
+    "pw5--catalog-tag-2"
+  ],
+  "reviewed_cases": [
+    {
+      "case_id": "Main--download-queue--resume-all",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/Main--download-queue--resume-all.png",
+      "candidate_sha256": "04caf7683f87a716b3b476e59c37344cb910dbe7ad5ca7febccc3996f317f730",
+      "viewed_candidate": true,
+      "outcome": "pass",
+      "observations": [
+        "The full-width white download sheet has a black top rule, a readable title, Pause all and Close actions, three cover rows, full progress bars, and a 1/2 folio with a forward action. There is no shadow, dimmed backdrop, or stippled overlay surface.",
+        "The three visible rows show chapters 1, 2, and 3 of Local fixture series 000 with 6/6 page counters. Each long fixture title ends in a deliberate ellipsis before the right-aligned counter, with no overlapping text or clipped control.",
+        "The sidecar identifies the settings route with the downloads modal, demo=false, downloads_paused=false, five real jobs, and a resumable-job count of zero. Its resume-all check records three completed jobs, one downloading job, and one queued job; the enabled Pause all action is consistent with those remaining off-page jobs. The still image alone does not establish that transition.",
+        "The sheet follows its content and retains its pagination area; no fixed reference height is assumed. The settings content visible above it states the absence of an orientation sensor, consistent with the capability declaration."
+      ],
+      "intentional_differences": []
+    },
+    {
+      "case_id": "pw5--anchored-menu-outside-dismiss",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/pw5--anchored-menu-outside-dismiss.png",
+      "candidate_sha256": "fc37f360ba9d0c7ac18d345fbe63e55257fbb687c23114c8add630ad6d6b2603",
+      "viewed_candidate": true,
+      "outcome": "pass",
+      "observations": [
+        "The library is fully exposed after the dismissal case, with no remaining menu outline, capture mask, gray veil, or shadow. The sidecar agrees: route=library, menu=null, and both modal fields are empty.",
+        "The white outlined continuation card, four category tabs, four-by-two cover grid, title-adjacent unread/download indicators, 1/6 folio, and bottom navigation remain readable and separated. Cover stippling is artwork rather than an overlay treatment.",
+        "The first-page previous allocation remains empty while the next action stays at the right edge. This screenshot confirms the dismissed end state; it does not independently prove the outside target's hit area or event handling."
+      ],
+      "intentional_differences": []
+    },
+    {
+      "case_id": "pw5--catalog-filter-apply",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/pw5--catalog-filter-apply.png",
+      "candidate_sha256": "175c6b23677175795816ae7eb0367dde90f0ad65d747bdc94b870a3ea659a0a8",
+      "viewed_candidate": true,
+      "outcome": "pass",
+      "observations": [
+        "The catalog is shown without a sheet or dock. Search, filter, and source settings remain separate header controls; the filter is inverted with a legible 2 badge.",
+        "Five evenly spaced rows preserve the cover, heavy title, optional in-library badge, author/tags, and publication-status hierarchy. The rows show ongoing records, led by Northern Brigade, consistent with the sidecar's ongoing status and latest ordering selections.",
+        "The displayed 1/20 folio agrees with 97 filtered records at five rows per page. The sidecar reports two active criteria, an empty modal, and the same visible record order. The first-page previous control is absent and the next action retains its edge allocation.",
+        "No row text overlaps the membership badge or separator, and the white surfaces have no shadow or screen-tone mask."
+      ],
+      "intentional_differences": []
+    },
+    {
+      "case_id": "pw5--catalog-filter-reset",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/pw5--catalog-filter-reset.png",
+      "candidate_sha256": "73a74e5f168b326146a6b2ed3de80e4c7b67f98ecf26bd82b5902b3b9b000bc7",
+      "viewed_candidate": true,
+      "outcome": "pass",
+      "observations": [
+        "The bottom filter sheet has a black top rule, white surface, a readable Reset action, and a fully visible apply-results button. Its two tag rows fit above the button without clipping, and the background remains undimmed.",
+        "Relevance is fully inverted, all publication statuses are unselected, and all nine available source tags are neutral outlined controls. Follows and Rating are visibly muted, consistent with their enabled=false declarations rather than a fabricated supported ordering.",
+        "The apply action displays 128 loaded records and the header has no numeric filter badge. The sidecar reports zero active criteria, 128 results, default relevance sorting, and all tag states equal to zero.",
+        "The actual source's nine tags and resulting content-driven sheet height are accepted as data-dependent layout; the static prototype's twelve sample tags do not establish a fixed panel height."
+      ],
+      "intentional_differences": []
+    },
+    {
+      "case_id": "pw5--catalog-first-boundary",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/pw5--catalog-first-boundary.png",
+      "candidate_sha256": "9982eafb3a4c363c2d57dcc72e042e16912421235462dcbc0ea9282a7bcb6a2f",
+      "viewed_candidate": true,
+      "outcome": "pass",
+      "observations": [
+        "The catalog first folio is 1/26, with no previous-page label, a centered current/total label, and a right-aligned next action. The sidecar remains at page=1 and page_count=26 after the boundary case.",
+        "Five complete rows are visible with consistent cover alignment, approximately 108-pixel row spacing, title-adjacent in-library badges, and readable secondary lines. The final row and bottom folio do not collide.",
+        "The filter is unselected, the popular tab is underlined, and the source-specific catalog correctly has no main dock. No overlay residue, shadow, or gray card surface is visible."
+      ],
+      "intentional_differences": []
+    },
+    {
+      "case_id": "pw5--catalog-last-page",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/pw5--catalog-last-page.png",
+      "candidate_sha256": "3313bb14c60166d4bcf132c4087038b108980ff51ba35ebec39513fe48711c01",
+      "viewed_candidate": true,
+      "outcome": "pass",
+      "observations": [
+        "The final catalog folio displays 26/26, retaining the previous action at the left edge and omitting the next action at the right. The sidecar's final-boundary check also records page=26 and page_count=26.",
+        "Exactly three remaining records are shown for a 128-record catalog with five records per page. Their covers and title/author/tags/status lines retain the same top-aligned row spacing instead of stretching into the unused white area.",
+        "The folio stays at the bottom of the viewport, with no fabricated extra rows or misleading empty-state message. All three titles and their volume numbers are legible, with no crop or overlap."
+      ],
+      "intentional_differences": []
+    },
+    {
+      "case_id": "pw5--catalog-tag-1",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/pw5--catalog-tag-1.png",
+      "candidate_sha256": "8fdbccceeba04c870344f82743d391321f3f560be2d836d9661e180bae8c95fb",
+      "viewed_candidate": true,
+      "outcome": "needs_changes",
+      "observations": [
+        "The Adventure tag is fully inverted while the other tags remain neutral; the header badge shows 1 and the results action shows 63. These values agree with the sidecar's Adventure state=1, active criterion count=1, and filtered result count=63.",
+        "The included tag visibly uses a plus prefix. HANDOFF.md:129 and prototype/pw-source.dc.html:191 explicitly specify a checkmark prefix for inclusion. This is the inclusion half of P3R1-SUP02-1.",
+        "The sheet's title, sort/status sections, wrapped second tag row, and full-width results action remain inside the viewport. The white background has no dimming, shadow, or stippled capture mask."
+      ],
+      "intentional_differences": []
+    },
+    {
+      "case_id": "pw5--catalog-tag-2",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/pw5--catalog-tag-2.png",
+      "candidate_sha256": "bdcee8168296460bd006f08553a33db61847d62d234ab69e42b6e5c80133a059",
+      "viewed_candidate": true,
+      "outcome": "needs_changes",
+      "observations": [
+        "The Adventure tag is distinguished from neutral controls by a dashed outline and struck-through label. The header badge remains 1 and the results action shows 65, consistent with the sidecar's Adventure state=-1 and result count=65.",
+        "The excluded tag uses a minus prefix rather than the cross required by HANDOFF.md:129 and prototype/pw-source.dc.html:191. This is the exclusion half of P3R1-SUP02-1; the dashed border and strike-through are already present.",
+        "The result set visible above the sheet differs from the included-tag state and agrees with the sidecar's non-Adventure records. The sheet controls and bottom results action are fully visible without shadow, dimming, or text overlap."
+      ],
+      "intentional_differences": []
+    }
+  ],
+  "suggestions": [
+    {
+      "id": "P3R1-SUP02-1",
+      "case_id": "pw5--catalog-tag-1",
+      "affected_case_ids": [
+        "pw5--catalog-tag-1",
+        "pw5--catalog-tag-2"
+      ],
+      "priority": "P3",
+      "description": "Catalog tri-state tags use plus/minus prefixes instead of the specified check/cross symbols.",
+      "evidence": [
+        "In pw5--catalog-tag-1.png, the included Adventure chip has a white plus prefix on black.",
+        "In pw5--catalog-tag-2.png, the excluded Adventure chip has a minus prefix within its dashed, struck-through control.",
+        "HANDOFF.md:129 prescribes a checkmark for inclusion and a cross for exclusion. The authoritative static expression at prototype/pw-source.dc.html:191 uses those same marks. Both case metadata files declare no intentional differences."
+      ],
+      "recommendation": "Render the required checkmark for include and cross for exclude in the catalog tag controls, retaining the existing inverse include fill and dashed, struck-through exclude treatment. Keep the 0/1/-1 state and real result counts unchanged.",
+      "status": "open",
+      "introduced_round": 1
+    }
+  ],
+  "limitations": [
+    "All eight listed candidate PNGs were individually opened with view_image. No other PNG or independent per-state reference image was opened. This supplemental review does not claim pixel matching or exact screenshot equivalence.",
+    "Get-FileHash confirmed that every current candidate SHA-256 matches both the input's expected hash and its case sidecar's screenshot evidence hash. All sidecars identify run a1baf3fe3dc2 and the binary/source hashes recorded above.",
+    "The review used static requirements from docs/DESIGN_HANDOFF.md, docs/review/phase3-reference-scope.json, docs/review/phase3-prototype-reference-support.json, and the supplied HANDOFF.md and relevant prototype text. The prototype was not executed.",
+    "Existing sidecar checks support case identity and state interpretation; they were not rerun and do not replace the visual observations. A still image cannot establish outside-dismiss event routing, full-control press feedback, or the complete pause/resume and filter interaction sequences.",
+    "No application, build, test, smoke check, or runtime probe was run locally or remotely for this review. No physical wake behavior, e-ink waveform behavior, or 512 MiB memory qualification is inferred from these PNGs.",
+    "This batch contains no closed-reader, authentication, or image-quality settings capture. It therefore makes no visual finding about the artwork-only reader override, unavailable authorization flows, or hardware controls outside the visible settings fragment.",
+    "The findings apply only to these eight supplemental cases and do not establish that the full round is clean."
+  ]
+}

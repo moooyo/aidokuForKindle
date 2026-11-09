@@ -1,0 +1,218 @@
+{
+  "batch_id": "supplemental-13",
+  "reviewer": "independent-visual-reviewer-supplemental-13",
+  "run_id": "a1baf3fe3dc2",
+  "binary_sha256": "94d7f3bbcab475ad8833a2f3c486138f7b49bead231851c2d8eab2f0c3d2ac51",
+  "source_sha256": "aef9db4e111165016a10a2a95e111f3155860b8510c7f6207ec9c79fbec5082c",
+  "review_scope": "Fresh manual inspection of the eight candidate PNGs listed in supplemental-13.input.json, without independent reference PNGs. Settings requirements were checked against DESIGN_HANDOFF.md, phase3-reference-scope.json, phase3-prototype-reference-support.json, and the original handoff and relevant static prototype text.",
+  "provenance": {
+    "candidate_identity": "All eight case metadata records identify this run, binary, source, pw5 profile, settings route, and desktop capture backend.",
+    "png_hashes": "Get-FileHash SHA256 values for all eight current candidate PNGs match both the input expected_png_sha256 values and the case metadata evidence_hashes.screenshot.sha256 values.",
+    "mechanical_checks": "The recorded case checks have no failed entries. These records establish capture identity and declared state, and were not used as a substitute for manual visual inspection.",
+    "capability_declaration": {
+      "frontlight_control_exposed": true,
+      "warmth_control_exposed": true,
+      "software_dither": true,
+      "hardware_dither_qualified": false,
+      "orientation_profile_declared": false,
+      "pen_input_implemented": false,
+      "physical_hardware_qualified": false,
+      "tracking_authorization_implemented": false,
+      "pairing_endpoint_running": false
+    }
+  },
+  "reviewed_case_ids": [
+    "pw5--settings-downloads",
+    "pw5--settings-first-boundary",
+    "pw5--settings-frontlight-warmth",
+    "pw5--settings-image-processing",
+    "pw5--settings-language",
+    "pw5--settings-last-page",
+    "pw5--settings-logs",
+    "pw5--settings-source-lists"
+  ],
+  "reviewed_cases": [
+    {
+      "case_id": "pw5--settings-downloads",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/pw5--settings-downloads.png",
+      "candidate_sha256": "44556a1cf06fc954e02244b65d28b298149533ebaf2d93ec7f495abd1f734697",
+      "viewed_candidate": true,
+      "outcome": "needs_changes",
+      "observations": [
+        "The dedicated Downloads page has a labeled Settings back action, a large serif title, the active Settings dock, and no root-list pager.",
+        "All four read-ahead choices and both persistence switches are visibly disabled. The read-ahead group explicitly identifies its unavailable state instead of claiming an active feature.",
+        "The Save location row is populated from the actual case data directory, and the Download management action remains fully visible.",
+        "The destination value ends in an ellipsis before the case-specific directory and final demo component. The read-only row has no visible expansion or full-path action, so this page does not let the user identify the full destination."
+      ],
+      "intentional_differences": [
+        "Unavailable download integration is accepted as the declared application state.",
+        "The real capture data directory may differ from the prototype example destination; that data difference does not excuse truncating the usable destination."
+      ]
+    },
+    {
+      "case_id": "pw5--settings-first-boundary",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/pw5--settings-first-boundary.png",
+      "candidate_sha256": "ff0f411bba260954e607142dfacadf4f1084aeb15b8379f9a6e04ceeadeb43ef",
+      "viewed_candidate": true,
+      "outcome": "no_actionable_issue_observed",
+      "observations": [
+        "Page 1 contains the version caption, serif Settings title, white outlined Paperwhite 5 card, four device rows, and three reading rows.",
+        "The seven visible setting rows match the recorded visible_setting_ids. Their labels and trailing summaries fit without overlap, and the selected profile correctly describes warmth support and no gravity sensor.",
+        "The folio reads 1 / 2 with the previous action hidden, the center retained, and the next action at the right edge. The Settings dock remains flush at the bottom.",
+        "The card and list use white surfaces, thin separators, and readable grayscale hierarchy without a shadow or dimmed layer."
+      ],
+      "intentional_differences": []
+    },
+    {
+      "case_id": "pw5--settings-frontlight-warmth",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/pw5--settings-frontlight-warmth.png",
+      "candidate_sha256": "cf3f09520c02ff087d247c127cd0443a72aa58b6012a642d9d4788bf7b862251",
+      "viewed_candidate": true,
+      "outcome": "no_actionable_issue_observed",
+      "observations": [
+        "Brightness 12 and warmth 8 are clearly associated with separate horizontal tracks, square thumbs, and large minus/plus controls.",
+        "The brightness thumb is near the midpoint and warmth near one third of the track, consistent with the declared 0..24 control range and current preference values.",
+        "The runtime declaration exposes both frontlight and warmth, which supports displaying both controls. No unsupported automatic-brightness or orientation-sensor control appears.",
+        "The content has generous separation, remains above the dock, and retains the required labeled back action without a root pager."
+      ],
+      "intentional_differences": [
+        "Current brightness and warmth values come from the captured application preferences rather than prototype sample values.",
+        "The capture exposes implemented controls on a desktop backend and does not qualify physical light hardware."
+      ]
+    },
+    {
+      "case_id": "pw5--settings-image-processing",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/pw5--settings-image-processing.png",
+      "candidate_sha256": "50f8a834e3bc65ed455f63b55ccbcdf33ca5c9516c84c3593191f0b38e776309",
+      "viewed_candidate": true,
+      "outcome": "no_actionable_issue_observed",
+      "observations": [
+        "All five contrast choices fit in one row. Standard is distinctly selected with black fill and white text, matching contrast 0.",
+        "Crop borders and 16-level grayscale dither have active black tracks and right-aligned white knobs, matching the recorded crop_borders and dither preferences.",
+        "The dither label does not claim hardware dithering. This agrees with software_dither=true and hardware_dither_qualified=false.",
+        "Split spread is visibly disabled rather than shown as an active operation. All three rows and separators remain readable and within the page."
+      ],
+      "intentional_differences": [
+        "Unavailable image-processing integration may remain disabled as declared.",
+        "The enabled dither control represents the implemented software path rather than unsupported hardware dithering."
+      ]
+    },
+    {
+      "case_id": "pw5--settings-language",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/pw5--settings-language.png",
+      "candidate_sha256": "7dd84348deaf8fddc68b9ca619c3dba8a99c0385d96a3ca00c01f3501050a768",
+      "viewed_candidate": true,
+      "outcome": "no_actionable_issue_observed",
+      "observations": [
+        "Four language rows are evenly separated and fully visible.",
+        "Simplified Chinese is bold and has a trailing checkmark at the far right, preserving the required current-language indication.",
+        "Traditional Chinese, English, and Japanese are visibly muted, so the screenshot does not suggest those unavailable translations are selected or enabled.",
+        "The language list retains the labeled Settings back action and active dock without an unnecessary list pager or clipped row."
+      ],
+      "intentional_differences": [
+        "Unavailable translations are accepted as the application's actual state; the screenshot does not simulate a successful language change."
+      ]
+    },
+    {
+      "case_id": "pw5--settings-last-page",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/pw5--settings-last-page.png",
+      "candidate_sha256": "238438f7b7de5411f1e6e2f92f746bc969b4d11cf71099b30f5591ca660d5a46",
+      "viewed_candidate": true,
+      "outcome": "no_actionable_issue_observed",
+      "observations": [
+        "The second root page omits the first-page device card and fits all nine settings rows in Library, Sources and data, and General groups.",
+        "The visible rows match categories, auto-update, source-lists, downloads, tracking, backup, language, logs, and about in the captured state.",
+        "The folio reads 2 / 2, shows the previous action at the left, preserves the centered page count, and hides the next action at the final boundary.",
+        "Unavailable summaries for automatic updates, backup, and logs, the unconfigured tracking summary, and the selected language remain readable without colliding with chevrons."
+      ],
+      "intentional_differences": []
+    },
+    {
+      "case_id": "pw5--settings-logs",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/pw5--settings-logs.png",
+      "candidate_sha256": "1d69ddb7582bc2e36a91a2088c6aa1850a475383ca70f9b87d2aaddba1957089",
+      "viewed_candidate": true,
+      "outcome": "needs_changes",
+      "observations": [
+        "The page contains the required logfile switch and separate Export logs and Clear logs buttons, all visibly disabled.",
+        "No success, log file, or cleanup result is fabricated in the captured state.",
+        "The metadata records a nonempty unavailable settings_status, but the page renders no availability message or explanation near the disabled controls.",
+        "The disabled controls occupy a small area below the title, leaving enough clear space for a concise status message without clipping or changing the dock."
+      ],
+      "intentional_differences": [
+        "Unavailable logging integration is accepted as real application state.",
+        "That intentional capability difference does not explain why the recorded unavailable status is omitted from the visible secondary page."
+      ]
+    },
+    {
+      "case_id": "pw5--settings-source-lists",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/pw5--settings-source-lists.png",
+      "candidate_sha256": "ba3c6a30301827e237fc7be69da97566bd84b091df39cb326b6e550194cf7b73",
+      "viewed_candidate": true,
+      "outcome": "needs_changes",
+      "observations": [
+        "The empty list is represented by a dash rather than a fabricated sample source list or URL, consistent with the zero-list state.",
+        "Add source list and Open source management are fully visible side by side, with the labeled back action and active Settings dock retained.",
+        "Both actions use the same solid black outline. The Add source list action therefore loses the dashed creation-action treatment explicitly declared by the handoff and source-list prototype.",
+        "No shadow, gray backdrop, inaccessible bottom content, or unnecessary root pager is visible."
+      ],
+      "intentional_differences": [
+        "Zero stored source lists legitimately replaces the prototype sample list card.",
+        "The empty-data difference does not account for the Add source list border-style mismatch."
+      ]
+    }
+  ],
+  "suggestions": [
+    {
+      "id": "P3R1-SUP13-1",
+      "case_id": "pw5--settings-downloads",
+      "priority": "P2",
+      "description": "The actual download destination is truncated before its identifying directory components, with no visible way to reveal the complete path.",
+      "evidence": [
+        "In the candidate PNG, the Save location value is a single line ending in an ellipsis after the shared run-directory prefix.",
+        "case_metadata.state.settings_details contains the complete destination /tmp/aidoku-phase3-ui-round-1/data/a1baf3fe3dc2/pw5--settings-downloads/demo, with enabled=false and no action id.",
+        "DESIGN_HANDOFF.md Settings and original HANDOFF.md section 5.7 require a download destination; phase3-reference-scope.json capabilityBounds.data explicitly keeps clipping in scope despite real data differences."
+      ],
+      "recommendation": "Wrap the actual destination onto a dedicated multiline value area, or provide a visible full-path detail action that exposes the complete destination on Paperwhite.",
+      "status": "open",
+      "introduced_round": 1
+    },
+    {
+      "id": "P3R1-SUP13-2",
+      "case_id": "pw5--settings-logs",
+      "priority": "P2",
+      "description": "The logging secondary page offers only disabled controls and does not display its recorded unavailable status or explain the current limitation.",
+      "evidence": [
+        "The candidate shows a disabled logfile switch and disabled Export logs and Clear logs buttons, with no inline status text anywhere below the title.",
+        "case_metadata.state.settings_status contains a nonempty unavailable message.",
+        "phase3-reference-scope.json precedence.real-state and sharedContract.behavior require truthful operation states; the status is available in the evidence but absent from the user-visible page."
+      ],
+      "recommendation": "Render the actual unavailable status beside or above the disabled logging actions and include a concise reason where known, so users can understand the current feature state.",
+      "status": "open",
+      "introduced_round": 1
+    },
+    {
+      "id": "P3R1-SUP13-3",
+      "case_id": "pw5--settings-source-lists",
+      "priority": "P3",
+      "description": "Add source list uses a solid border instead of the handoff's dashed creation-action border.",
+      "evidence": [
+        "The candidate renders Add source list and Open source management with matching solid black outlines.",
+        "Original HANDOFF.md section 4.5 specifies a 1.5-pixel dashed outline for creation actions, including Add source list.",
+        "prototype/sc-settings.dc.html:271 maps the dashed argument to a dashed line; line 341 sets that argument to true for Add source list and leaves Open source management solid."
+      ],
+      "recommendation": "Use the declared white dashed-outline creation-button treatment for Add source list while keeping the management action's solid outline.",
+      "status": "open",
+      "introduced_round": 1
+    }
+  ],
+  "limitations": [
+    "Only the eight input-listed candidate PNGs were opened with view_image. No independent reference PNGs or other candidate images were loaded.",
+    "The relevant handoff, scope, prototype support map, and original prototype were read as static text only. The prototype was not executed.",
+    "These are 618x824 native desktop captures using the pw5 design profile. Their declared physical reference scale does not qualify an actual Paperwhite panel, frontlight, warmth, sensor, hardware dithering, or pen.",
+    "Static screenshots show current values and disabled appearance but do not establish control activation, the 0 and 24 endpoint behavior, persistence, route execution, source-list operations, filesystem effects, or cleanup feedback.",
+    "No application, build, tests, validation suite, smoke test, or runtime probe was launched locally or remotely by this reviewer. Existing JSON/text/PNG evidence and allowed SHA256 file reads were used.",
+    "No conclusion about physical sleep/wake, retained artwork, 512 MiB operation, performance timing, or the complete phase-three review matrix is possible from this batch.",
+    "This batch result does not establish a complete clean round."
+  ]
+}

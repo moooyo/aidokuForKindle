@@ -1,0 +1,169 @@
+{
+  "batch_id": "supplemental-44",
+  "reviewer": "/root/phase3_round1_review/supplemental_44",
+  "run_id": "a1baf3fe3dc2",
+  "binary_sha256": "94d7f3bbcab475ad8833a2f3c486138f7b49bead231851c2d8eab2f0c3d2ac51",
+  "source_sha256": "aef9db4e111165016a10a2a95e111f3155860b8510c7f6207ec9c79fbec5082c",
+  "review_method": "Fresh manual inspection of all eight listed candidate PNGs with tools.view_image, supplemented by read-only case metadata, SHA256 hashes, reference scope, HANDOFF.md, and relevant prototype source declarations. No other PNG was opened.",
+  "evidence_integrity": {
+    "method": "Get-FileHash -Algorithm SHA256 on each current candidate PNG",
+    "all_candidate_hashes_match_input": true,
+    "all_candidate_hashes_match_case_screenshot_evidence": true,
+    "all_case_run_binary_and_source_ids_match": true,
+    "metadata_checks": "All checks recorded in the eight case metadata files report passed. These capture checks were read as existing evidence and were not rerun."
+  },
+  "reviewed_case_ids": [
+    "scribe-landscape--toc-page-jump",
+    "scribe-landscape--vertical-bottom-right",
+    "scribe-landscape--webtoon-import",
+    "scribe-landscape--webtoon-step",
+    "scribe-landscape--zones-closed-pure",
+    "scribe3--stretch-catalog",
+    "scribe3--stretch-detail",
+    "scribe3--stretch-history"
+  ],
+  "reviewed_cases": [
+    {
+      "case_id": "scribe-landscape--toc-page-jump",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/scribe-landscape--toc-page-jump.png",
+      "candidate_sha256": "9383ef9f60c1a6c0dd289e5edadfc4804ec15da748e3fd209202a2a19aec1f37",
+      "viewed_candidate": true,
+      "outcome": "issues_found",
+      "observations": [
+        "The 1240 by 930 landscape reader shows its integrated header, a panel-context jump overlay, the inverse 1/15 panel folio, spread progress 12-13/40, chapter navigation, and five reader tools. The identity agrees with menu=true, modal=choices, modal_context=reader-toc, page_jump_open=true, and page_jump_context=panel in the case metadata.",
+        "All fifteen page choices are visible as a balanced eight-plus-seven grid, with page 1 inverted and the first-page previous allocation left empty. Labels and the bottom reader controls are not clipped.",
+        "A full-width black horizontal rule at approximately y=545 crosses the first row of page cells, whose visible bounds are approximately y=508 through y=564. The jump heading is above it at approximately y=468. This violates the required top-rule placement above the heading and grid; see P3R1-SUP44-1.",
+        "The overlay remains white without a dimmed backdrop or shadow. The current PNG SHA256 matches both the input manifest and case screenshot evidence."
+      ],
+      "intentional_differences": []
+    },
+    {
+      "case_id": "scribe-landscape--vertical-bottom-right",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/scribe-landscape--vertical-bottom-right.png",
+      "candidate_sha256": "4d8f38a646e708fd826a816c8ddb0c4b03583ab6812210a787d17816f659f6dd",
+      "viewed_candidate": true,
+      "outcome": "no_visible_issue_found",
+      "observations": [
+        "The 1240 by 930 landscape viewport contains a magnified vertical-reading artwork segment: dotted panels on the upper left, a radial panel below, and a crosshatched panel on the right. Cropping at the image edges is consistent with the displayed vertical segment rather than clipped application controls.",
+        "No menu, status bar, bookmark ribbon, footer text, notification, or visible lower-right control overlays the artwork. The case records menu=false, no modal, vertical direction, page 12/40, offset 1581, image height 3488, and viewport height 1860.",
+        "The recorded exact-artwork check is supporting capture evidence only; manual inspection independently found no visible application decoration. A PNG does not prove which bottom-right hit target handled the preceding action.",
+        "The current PNG SHA256 matches both the input manifest and case screenshot evidence."
+      ],
+      "intentional_differences": []
+    },
+    {
+      "case_id": "scribe-landscape--webtoon-import",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/scribe-landscape--webtoon-import.png",
+      "candidate_sha256": "8294615069b6007700ad730df8779ea1532208395f7e098b8ae4b9e9f11a0b37",
+      "viewed_candidate": true,
+      "outcome": "no_visible_issue_found",
+      "observations": [
+        "The imported local item appears on a 930 by 1240 portrait library page, matching the library route and the non-reader portrait rule despite the landscape case prefix. Metadata records demo=false and library_count=1.",
+        "The continuation card shows Chapter 1, its chapter label, a complete 1/1 progress display, and an inverse arrow action. The library grid contains the same tall cover with title-adjacent unread and download markers.",
+        "The parallel update card, category tabs, single-page 1/1 folio, and five-item dock fit within the page. A centered white outlined saved toast is above the folio; it is on the library page, not over a closed reader.",
+        "The large unused grid area follows the actual one-item dataset. Actual title, count, cover, and size values are accepted data differences. The current PNG SHA256 matches both the input manifest and case screenshot evidence."
+      ],
+      "intentional_differences": []
+    },
+    {
+      "case_id": "scribe-landscape--webtoon-step",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/scribe-landscape--webtoon-step.png",
+      "candidate_sha256": "f2dbe21b2673b8628a9b67e5b06ffc84a08d3c8e793f044a8729ea62ddc38ec3",
+      "viewed_candidate": true,
+      "outcome": "no_visible_issue_found",
+      "observations": [
+        "The 1240 by 930 landscape image shows a tall imported artwork segment with an upper gray panel, the artwork label VERTICAL PANEL 2, white spacing, and a lower black panel. The label is embedded artwork rather than reader chrome.",
+        "No header, bookmark ribbon, footer, toast, status bar, or tap-zone tint covers the artwork. Metadata agrees with a closed vertical reader for the single-page local item, offset 1581, scaled image height 15134, and viewport height 1860.",
+        "The existing capture check records 1581 as the 85-percent step of the 1860-pixel viewport. This is consistent with the handoff contract, while this single still image alone cannot demonstrate the transition or retained overlap.",
+        "Artwork side borders and white spacing are accepted as source-image content and are not reported as an application viewport inset. The current PNG SHA256 matches both the input manifest and case screenshot evidence."
+      ],
+      "intentional_differences": []
+    },
+    {
+      "case_id": "scribe-landscape--zones-closed-pure",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/scribe-landscape--zones-closed-pure.png",
+      "candidate_sha256": "91ceb9e8a9b560e178d234248902dc249c94f21c6c7da60c0057ce780d16ea37",
+      "viewed_candidate": true,
+      "outcome": "no_visible_issue_found",
+      "observations": [
+        "The closed 1240 by 930 landscape reader presents two actual artwork page allocations. The radial, stippled, striped, and crosshatched regions belong to the artwork; there is no decorative application divider added over them.",
+        "Although the case records show_tap_zones=true, the viewed image has no tap-zone labels, shaded zones, status bar, bookmark ribbon, footer text, or notification. This agrees with the user's artwork-only closed-reader rule.",
+        "The narrow white space above and below the artwork is accepted as aspect-fit/source-image whitespace. It is not evidence of a restored app bar or a viewport-inset defect.",
+        "The state records menu=false, no modal, page 12/40, and spread=true. The current PNG SHA256 matches both the input manifest and case screenshot evidence. The absence of an invisible footer-cycle hit region cannot be established from pixels."
+      ],
+      "intentional_differences": []
+    },
+    {
+      "case_id": "scribe3--stretch-catalog",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/scribe3--stretch-catalog.png",
+      "candidate_sha256": "7b52dc5696ca68c2ce13706a1d43ae06324530f986846b99da8ecf1af0d42a6d",
+      "viewed_candidate": true,
+      "outcome": "no_visible_issue_found",
+      "observations": [
+        "The native 990 by 1320 Scribe 3 portrait catalog has a source identity/header, source switch, settings action, catalog tabs, search field, and filter action. The viewed identity agrees with profile=scribe3 and route=catalog.",
+        "Fifteen records occupy five columns by three rows, as required by HANDOFF.md section 5.5 and prototype/sc-browse.dc.html. The six-column rule applies to the library grid and is not a catalog requirement.",
+        "Covers and title plates remain inside their columns. Titles, status/chapter metadata, and title-adjacent library bookmark markers remain readable without colliding with adjacent records. The bottom row clears the folio and dock.",
+        "The 1/9 folio keeps the previous-action allocation empty and shows the next action on the right. The browse dock item is visibly selected. The native canvas was not resized for comparison with Scribe 1/2, and the current PNG SHA256 matches both the input manifest and case screenshot evidence."
+      ],
+      "intentional_differences": [
+        "A distinct native viewport is captured at this profile's actual size; it is not resized to impersonate an exact handoff canvas."
+      ]
+    },
+    {
+      "case_id": "scribe3--stretch-detail",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/scribe3--stretch-detail.png",
+      "candidate_sha256": "19f9008d8b27fc82f8123ddeef4cceb6ea4d5aa0ee289104be5848ced5331bff",
+      "viewed_candidate": true,
+      "outcome": "no_visible_issue_found",
+      "observations": [
+        "The 990 by 1320 Scribe 3 detail page preserves the narrower 384-design-pixel information allocation instead of equal halves. Its cover, title, author, source/status metadata, continuation action, three secondary actions, full description, and tags fit inside the information area.",
+        "The directory uses the remaining width and shows sixteen complete rows, numbered 86 through 71, with dotted leaders, dates, and separate download controls. The metadata also lists sixteen visible chapter rows and 86 chapters.",
+        "The directory count, sort control, and five-chapter download action remain legible above the list. The 1/6 folio stays at the bottom of the directory, and no main dock is present. No chapter row, tag, or bottom control visibly clips the canvas.",
+        "This is the native Scribe 3 layout, not a rescaled Scribe 1/2 pixel match. Actual story text, chapter dates, counts, and progress are accepted data differences. The current PNG SHA256 matches both the input manifest and case screenshot evidence."
+      ],
+      "intentional_differences": [
+        "A distinct native viewport is captured at this profile's actual size; it is not resized to impersonate an exact handoff canvas."
+      ]
+    },
+    {
+      "case_id": "scribe3--stretch-history",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/scribe3--stretch-history.png",
+      "candidate_sha256": "57ac5bcb696529dd851f0fc83ded869b36cc46cf26095be065feabf01513a6e2",
+      "viewed_candidate": true,
+      "outcome": "no_visible_issue_found",
+      "observations": [
+        "The 990 by 1320 Scribe 3 history page shows its summary, title, incognito action, clear action, and history/update tabs. The viewed route and selected history tab agree with the case metadata.",
+        "Records use two equal columns separated by a clear gap. Today and yesterday each contain two records; later date groups contain one left-column record. Date headings span the group and preserve the displayed chronological order rather than filling empty right slots with a later date.",
+        "Seven visible records have small covers, readable title/chapter text, real progress or completed metadata, and distinct remove controls. Progress tracks and times fit inside their columns without overlap or truncation.",
+        "The last group clears the 1/4 folio and selected history dock. The native Scribe 3 canvas is retained, and the current PNG SHA256 matches both the input manifest and case screenshot evidence."
+      ],
+      "intentional_differences": [
+        "A distinct native viewport is captured at this profile's actual size; it is not resized to impersonate an exact handoff canvas."
+      ]
+    }
+  ],
+  "suggestions": [
+    {
+      "id": "P3R1-SUP44-1",
+      "case_id": "scribe-landscape--toc-page-jump",
+      "priority": "P2",
+      "description": "A full-width black rule crosses the first row of the reader ToC jump grid instead of remaining above the jump heading and page cells.",
+      "evidence": "In the manually viewed 1240 by 930 candidate, the rule runs at approximately y=545 while the first row of buttons spans approximately y=508-564 and the jump heading sits around y=468. The line remains visible between the page buttons and across the empty right side of the panel. HANDOFF.md section 4.2 and prototype/pager.dc.html declare a white jump panel with its 2-pixel rule on the top edge above the content. The candidate SHA256 is 9383ef9f60c1a6c0dd289e5edadfc4804ec15da748e3fd209202a2a19aec1f37.",
+      "recommendation": "Anchor the jump panel's top rule to its actual content-sized top edge above the heading, and ensure the opaque white panel covers any underlying ToC separator. Preserve the balanced eight-plus-seven page grid and clear space above the panel folio.",
+      "status": "open",
+      "introduced_round": 1
+    }
+  ],
+  "coverage_gaps": [
+    "The input supplies eight candidate PNGs and no independent exact-state reference PNGs. This review uses the authoritative scope, handoff, prototype text, metadata, and visible layout rather than claiming exact screenshot equality.",
+    "Scribe 3 has no independent exact reference canvas. Its 990 by 1320 native captures were assessed for the retained layout contract, typography, clipping, and folio boundaries without resizing them to Scribe 1/2.",
+    "The ToC jump overlay obscures the underlying ToC records. Their non-overlay layout and actual page selection or outside-dismiss behavior are not demonstrated by this still image.",
+    "A single vertical-reader image cannot independently demonstrate the preceding tap, animation-free step transition, retained overlap, or absence of an invisible footer-cycle target."
+  ],
+  "limitations": [
+    "Only the eight input-listed candidate images were visually inspected. Existing metadata checks and the zero-error artwork oracle supplement, but do not replace, manual review.",
+    "No application, build, test suite, local runtime probe, Git operation, or product modification was performed. The sole authored artifact is this review report.",
+    "Static PNGs do not qualify physical sleep/wake, hardware rotation, e-ink refresh behavior, frontlight control, 512 MiB operation, accessibility semantics, or actual transparent touch-target bounds.",
+    "The seven cases without a newly identified visible issue are limited to these captures. This batch contains an open issue and does not establish a clean full review round."
+  ]
+}

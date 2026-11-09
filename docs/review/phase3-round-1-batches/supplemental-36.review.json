@@ -1,0 +1,149 @@
+{
+  "batch_id": "supplemental-36",
+  "reviewer": "/root/phase3_round1_review/supplemental_36",
+  "run_id": "a1baf3fe3dc2",
+  "binary_sha256": "94d7f3bbcab475ad8833a2f3c486138f7b49bead231851c2d8eab2f0c3d2ac51",
+  "source_sha256": "aef9db4e111165016a10a2a95e111f3155860b8510c7f6207ec9c79fbec5082c",
+  "review_scope": "Fresh manual review of the eight candidate PNGs listed in supplemental-36.input.json. No other PNG or independent reference image was opened.",
+  "review_basis": [
+    "The artwork-only closed-reader override and the Scribe portrait reader requirements in docs/review/phase3-reference-scope.json and docs/DESIGN_HANDOFF.md.",
+    "Read-only excerpts of the authoritative HANDOFF.md section 5.3 and prototype/sc-reader-portrait.dc.html, including the 78-pixel menu header, 48-pixel content inset, progress controls, and 76-pixel tool row.",
+    "Each supplied case JSON was read for capture identity, salient reader state, checks, intentional differences, and screenshot evidence hash. Supplied checks were not rerun.",
+    "Every candidate was individually opened with tools.view_image. Get-FileHash SHA256 matched both the input expected hash and the corresponding case screenshot evidence hash for all eight files. All eight case records match the assigned run, binary, and source identities."
+  ],
+  "reviewed_case_ids": [
+    "scribe-portrait--image-setting-invalidation",
+    "scribe-portrait--last-page",
+    "scribe-portrait--legacy-footer-1-pure",
+    "scribe-portrait--legacy-footer-2-pure",
+    "scribe-portrait--legacy-footer-3-pure",
+    "scribe-portrait--ltr-page-input",
+    "scribe-portrait--menu-suppresses-page-turn",
+    "scribe-portrait--next-chapter"
+  ],
+  "reviewed_cases": [
+    {
+      "case_id": "scribe-portrait--image-setting-invalidation",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/scribe-portrait--image-setting-invalidation.png",
+      "candidate_sha256": "5eb3f6b78434881e989f9e489c1618ecdf9da4ff359bc87a4eaa508ddc38ddea",
+      "viewed_candidate": true,
+      "outcome": "no_visible_issue",
+      "observations": [
+        "The closed portrait frame displays the skyline, dot-tone panel, radial burst, crosshatching, and speech bubbles without a header, footer label, bookmark ribbon, status bar, toast, or loading placeholder.",
+        "The high-contrast lines remain legible across the visible page. No unexpected blank band, application gutter, or overlay-driven crop is apparent. The narrow outer white margins agree with the supplied 1764 by 2480 artwork fit at x=24..906 in the 930 by 1240 viewport.",
+        "The case identifies chapter 034, page 12 of 40, contrast 10, a ready settled image, and a changed processed-image cache identity. This final PNG supports the visible settled result; it does not independently prove the cache invalidation transition."
+      ],
+      "intentional_differences": []
+    },
+    {
+      "case_id": "scribe-portrait--last-page",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/scribe-portrait--last-page.png",
+      "candidate_sha256": "f019cd0ad046560f83be742a1cfe87e3ea9108a62a28975242909dfaaac8f9f5",
+      "viewed_candidate": true,
+      "outcome": "no_visible_issue",
+      "observations": [
+        "The last-page capture remains an artwork-only frame. The skyline at the top and the radial and crosshatched panels at the bottom are visible without an end-of-chapter banner, page counter, ribbon, or menu remnant.",
+        "The artwork extends to the top and bottom of the viewport, with no error blank or inserted bottom control strip. Its side whitespace is consistent with the supplied aspect-ratio fit.",
+        "The case and displayed-session metadata both identify chapter 034, page 40 of 40, menu closed, and a ready settled image. The terminal page number is metadata evidence because this intentionally pure frame does not display a page label."
+      ],
+      "intentional_differences": []
+    },
+    {
+      "case_id": "scribe-portrait--legacy-footer-1-pure",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/scribe-portrait--legacy-footer-1-pure.png",
+      "candidate_sha256": "f019cd0ad046560f83be742a1cfe87e3ea9108a62a28975242909dfaaac8f9f5",
+      "viewed_candidate": true,
+      "outcome": "no_visible_issue",
+      "observations": [
+        "Individually viewed this file despite its shared hash with other captures. The skyline, dotted left panel, crosshatched right panel, and lower radial panel remain unobscured by application controls.",
+        "No page-number footer, remaining-page label, clock, notification, status bar, or bookmark ribbon appears at the bottom or upper corners. The bottom artwork is not displaced by a reserved footer strip.",
+        "The supplied state retains footer_mode=1 and identifies chapter 034, page 12 of 40 with the menu closed. The visible result satisfies the decoration-removal part of the legacy preference contract; an invisible footer-cycle target cannot be assessed from pixels."
+      ],
+      "intentional_differences": [
+        "A stored legacy footer preference never restores closed-reader labels or a footer-cycle hit region."
+      ]
+    },
+    {
+      "case_id": "scribe-portrait--legacy-footer-2-pure",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/scribe-portrait--legacy-footer-2-pure.png",
+      "candidate_sha256": "f019cd0ad046560f83be742a1cfe87e3ea9108a62a28975242909dfaaac8f9f5",
+      "viewed_candidate": true,
+      "outcome": "no_visible_issue",
+      "observations": [
+        "Individually viewed the complete candidate. The top speech bubble and skyline, the left dotted panel, and the long right-hand silhouette are intact in the visible frame.",
+        "The lower edge carries artwork alone, without a remaining-pages footer, chapter caption, time, ribbon, toast, or toolbar. No unexplained blank region or visible UI residue is present.",
+        "The supplied state retains footer_mode=2 while the final reader is closed at chapter 034, page 12 of 40. The equal screenshot hash corroborates the identical visible result but was not used instead of opening the image. Hidden input-region removal remains outside this PNG review."
+      ],
+      "intentional_differences": [
+        "A stored legacy footer preference never restores closed-reader labels or a footer-cycle hit region."
+      ]
+    },
+    {
+      "case_id": "scribe-portrait--legacy-footer-3-pure",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/scribe-portrait--legacy-footer-3-pure.png",
+      "candidate_sha256": "f019cd0ad046560f83be742a1cfe87e3ea9108a62a28975242909dfaaac8f9f5",
+      "viewed_candidate": true,
+      "outcome": "no_visible_issue",
+      "observations": [
+        "Individually viewed this third legacy preference capture. The radial lower-left panel and the crosshatched lower-right panel continue to the bottom of the visible artwork.",
+        "No clock footer, page counter, chapter strip, status bar, notification, or upper-right bookmark ribbon is visible. The tonal patterns belong to the artwork rather than an application scrim.",
+        "The case retains footer_mode=3 and a settled chapter 034, page 12 of 40 session with the menu closed. The visible preference fallback is correct for the artwork-only override; the PNG cannot establish whether an invisible cycle target exists."
+      ],
+      "intentional_differences": [
+        "A stored legacy footer preference never restores closed-reader labels or a footer-cycle hit region."
+      ]
+    },
+    {
+      "case_id": "scribe-portrait--ltr-page-input",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/scribe-portrait--ltr-page-input.png",
+      "candidate_sha256": "6c77b3b52c54b347e072eded1bbf4585202ab448efeb90b1e5a95657267d5ccd",
+      "viewed_candidate": true,
+      "outcome": "no_visible_issue",
+      "observations": [
+        "The final frame shows the alternate artwork layout: a tall radial panel on the left, dotted and dark-tone panels on the right, and a broad vertical-line panel below. It contains no menu, footer, ribbon, toast, status bar, or error placeholder.",
+        "The image remains legible at the top and bottom edges. The page's internal whitespace and narrow fitted outer margins are compatible with the supplied artwork geometry and are not treated as an application viewport inset.",
+        "State and displayed-session evidence identify LTR direction and chapter 034, page 13 of 40 with the menu closed. The PNG establishes the visible result after input, but cannot independently establish the tap direction or input sequence."
+      ],
+      "intentional_differences": []
+    },
+    {
+      "case_id": "scribe-portrait--menu-suppresses-page-turn",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/scribe-portrait--menu-suppresses-page-turn.png",
+      "candidate_sha256": "1a24006c0713596d49b40ad927db738c51a612247e2697f47156d6127a0cf421",
+      "viewed_candidate": true,
+      "outcome": "no_visible_issue",
+      "observations": [
+        "The menu is visibly open. Its white integrated header contains back, book/chapter text, a filled bookmark action, contents action, and time/battery; all fit without clipping or overlap. The filled bookmark agrees with reader_bookmarked=true and bookmark_count=1 in the case.",
+        "The bottom section displays 12 / 40 and 28 remaining pages, consistent with the supplied page 12 of 40 state. The seek thumb and chapter controls are readable, with next chapter 35 on the left and previous chapter 33 on the right for the recorded RTL direction.",
+        "The five tools occupy the bottom row with distinct icons and labels. The white edge-attached menu and clean rules follow the textual menu structure, without a shadow, dimmed backdrop, stippled scrim, unexplained blank panel, or extra open sheet.",
+        "The supplied check records reader_page=12 and menu=true. This image confirms the resulting open-menu state and displayed page label; suppression of page-turn input itself requires the supplied action/state evidence rather than the PNG alone."
+      ],
+      "intentional_differences": []
+    },
+    {
+      "case_id": "scribe-portrait--next-chapter",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/scribe-portrait--next-chapter.png",
+      "candidate_sha256": "6c77b3b52c54b347e072eded1bbf4585202ab448efeb90b1e5a95657267d5ccd",
+      "viewed_candidate": true,
+      "outcome": "no_visible_issue",
+      "observations": [
+        "Individually viewed the next-chapter candidate. Its alternate radial, dotted, dark-tone, and vertical-line composition renders as a settled artwork-only page without a stale menu, chapter-change banner, progress footer, ribbon, or loading blank.",
+        "No additional application gutter or unexplained overlay crop is visible. The artwork's own white regions and the supplied aspect-ratio fitting margins are allowed source-content geometry.",
+        "The case identifies a changed actual chapter ID ending in chapter-035 and page 1 of 40; its displayed session agrees. The image is identical to the LTR case's selected demo artwork, so the chapter identity and transition are established by the supplied state/check evidence rather than visual uniqueness."
+      ],
+      "intentional_differences": []
+    }
+  ],
+  "suggestions": [],
+  "coverage_gaps": [
+    "No independent reference PNG was supplied or viewed for this supplemental batch. This review checks the candidate frames against the supplied textual design contract and case identity, and does not claim an exact visual comparison with a reference image.",
+    "The eight final frames do not independently demonstrate temporal input behavior, LTR tap mapping, page-turn suppression while the menu is open, next-chapter transition ordering, or the absence of an invisible footer-cycle hit region.",
+    "Only one unexpanded reader menu is in this batch. Expanded sheets, their content-driven heights, and capability-dependent unavailable or hidden controls are not covered by these PNGs."
+  ],
+  "limitations": [
+    "The supplied zero-changed-pixel artwork oracle is supporting metadata only. Each assigned PNG was also visually inspected; oracle success was not substituted for manual review.",
+    "Existing JSON, text, and candidate PNGs were read, candidate file hashes were computed, and this report was written. No application, build, test suite, smoke check, or runtime probe was launched.",
+    "Static desktop captures do not qualify physical Kindle wake, e-ink waveforms, sensor or pen behavior, hardware capability success, or a 512 MiB memory target.",
+    "No visible issue was found within these eight assigned frames. This is a batch-scoped result and does not establish that the complete round is clean."
+  ]
+}

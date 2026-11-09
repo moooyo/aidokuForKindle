@@ -1,0 +1,86 @@
+{
+  "batch_id": "reference-30",
+  "reviewer": "/root/phase3_round1_review/reference_30",
+  "run_id": "a1baf3fe3dc2",
+  "round": 1,
+  "binary_sha256": "94d7f3bbcab475ad8833a2f3c486138f7b49bead231851c2d8eab2f0c3d2ac51",
+  "source_sha256": "aef9db4e111165016a10a2a95e111f3155860b8510c7f6207ec9c79fbec5082c",
+  "supplied_reference_bundle_sha256": "e7b49b456255432d74cfe41346f9d44c1a9c55bf67c5d55483e4ae3029547d18",
+  "identity_verification": {
+    "case_metadata_matches_expected_run_binary_source_and_round": true,
+    "candidate_hashes_match_case_evidence": true,
+    "reference_hashes_match_case_evidence": true,
+    "hash_method": "PowerShell Get-FileHash -Algorithm SHA256 on the unmodified PNG file bytes",
+    "comparison_scale": "Candidate 930 x 1240 at logical 1x; reference 1860 x 2480 at physical 2x, interpreted at half size for the same logical viewport.",
+    "reference_bundle_digest_scope": "The bundle digest is supplied review identity. Only the assigned per-case reference PNG hashes were independently checked in this batch."
+  },
+  "reviewed_case_ids": [
+    "sc-settings--tap-zones",
+    "sc-settings--tracking-login"
+  ],
+  "reviewed_cases": [
+    {
+      "case_id": "sc-settings--tap-zones",
+      "case_metadata": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/cases/sc-settings--tap-zones.json",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/sc-settings--tap-zones.png",
+      "candidate_sha256": "f7c3af14b3d046d2c6aad48e979d2975f8baf107d8c75012248d18c9380c4366",
+      "reference_png": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/screens/states/sc-settings--tap-zones.png",
+      "reference_sha256": "741d63a6f68a0e1fafec6fd4aa68d8ab0a20c2aa4de697b849b6335c655627fa",
+      "viewed_candidate": true,
+      "viewed_reference": true,
+      "outcome": "issues_found",
+      "observations": [
+        "The candidate metadata identifies round 1, the requested run, binary, source, Scribe profile, portrait settings route, and tap-regions section. Both PNG hashes match the metadata evidence.",
+        "The 320 logical-pixel navigation column, approximately 46-pixel current row, right content origin near x=356, and 80-pixel dock visually match the shared settings geometry at equal logical scale. No list pager is visible.",
+        "All three diagram radio cards, left-right inversion preference, and tap-zone display preference are visible above the dock without clipping. The selected thirds card uses the expected black surface and white foreground.",
+        "The two unselected layout cards use light-gray labels, radio outlines, and diagrams, whereas the reference keeps these elements black. This changes their apparent availability and is recorded as P3R1-REF30-1.",
+        "The heading retains a serif treatment, labels remain legible, and the white surfaces have no visible shadow or stippled fill. The preference rows and switches remain unobstructed."
+      ],
+      "intentional_differences": [
+        "Live version, time, device descriptor, and capability wording differ from the reference placeholders or captured values.",
+        "The navigation omits the stylus entry, consistent with the metadata declaring pen_input_implemented=false; the remaining entries remain visible."
+      ]
+    },
+    {
+      "case_id": "sc-settings--tracking-login",
+      "case_metadata": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/cases/sc-settings--tracking-login.json",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/sc-settings--tracking-login.png",
+      "candidate_sha256": "9d872a164d8a02ee583f135a254ace90054e1eec1228ce68725bc48c65edf97f",
+      "reference_png": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/screens/states/sc-settings--tracking-login.png",
+      "reference_sha256": "ad5197af65d070199ef1b7b3e019f5a4b4ca7d29bc7417d2040a90a83cd339ed",
+      "viewed_candidate": true,
+      "viewed_reference": true,
+      "outcome": "pass_with_intentional_differences",
+      "observations": [
+        "The candidate metadata identifies round 1, the requested run, binary, source, Scribe profile, portrait settings route, and tracking section. Both PNG hashes match the metadata evidence.",
+        "The navigation column and active row, right content margins, heading origin, and 80-pixel dock follow the same logical settings geometry. The compact cards retain the reference content width and clear white bordered surfaces.",
+        "AniList and MyAnimeList both show an unconfigured state with visibly disabled login buttons. Automatic sync and offline local-storage controls are also visibly disabled, consistent with tracking_authorization_implemented=false.",
+        "No logged-in account, tracking count, pending device code, countdown, QR code, or authorization-success claim is shown. The reference's simulated account and authorization content is not reproduced.",
+        "The shorter account cards and higher following preference rows are consistent with their smaller amount of actual state content. All displayed text and controls remain unclipped and visibly separated, with no shadow or stipple."
+      ],
+      "intentional_differences": [
+        "The case explicitly captures actual tracking unavailability or external-configuration state because authorization is not implemented. Disabled controls and absent simulated authorization content are accepted capability-bound differences.",
+        "Card heights and subsequent row positions follow actual unconfigured content rather than the reference's expanded pending-authorization card.",
+        "Live version, time, device descriptor, and capability wording differ from reference placeholders or captured values; the stylus navigation entry is omitted consistently with pen_input_implemented=false."
+      ]
+    }
+  ],
+  "suggestions": [
+    {
+      "id": "P3R1-REF30-1",
+      "case_id": "sc-settings--tap-zones",
+      "priority": "P2",
+      "description": "The unselected tap-layout cards have disabled-looking foreground contrast instead of the normal black treatment shown by the reference.",
+      "evidence": "At approximately logical y=298-426, the L-shaped and swipe-only cards have light-gray labels, radio outlines, and diagrams. At the same logical positions, the reference uses black labels and strokes for both unselected cards. This case has no declared capability bound or intentional difference for these alternatives.",
+      "recommendation": "Render selectable unselected tap-layout cards with the reference's normal black foreground and diagram strokes. If either alternative is genuinely unavailable, explicitly document that capability bound and its unavailable state rather than leaving the contrast difference unexplained.",
+      "status": "open",
+      "introduced_round": 1
+    }
+  ],
+  "limitations": [
+    "This independent review covers only the two assigned screenshot pairs and does not establish that the full round is clean.",
+    "All four original PNG files were actually viewed through tools.view_image. No application, build, test, smoke test, runtime probe, Git operation, or product modification was performed.",
+    "Static screenshots establish appearance only. They do not prove hit-target behavior, persistence, real authorization functionality, or physical-device behavior. In particular, disabled-looking tap-layout cards are a visual finding, not a claim that interaction was tested.",
+    "Coordinates and dimensions in visual observations are approximate logical estimates. Source PNG bytes were not resized, edited, or otherwise modified; the image viewer resized the physical reference for display."
+  ]
+}

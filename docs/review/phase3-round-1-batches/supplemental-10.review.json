@@ -1,0 +1,171 @@
+{
+  "batch_id": "supplemental-10",
+  "reviewer": "/root/phase3_round1_review/supplemental_10",
+  "run_id": "a1baf3fe3dc2",
+  "round": 1,
+  "binary_sha256": "94d7f3bbcab475ad8833a2f3c486138f7b49bead231851c2d8eab2f0c3d2ac51",
+  "source_sha256": "aef9db4e111165016a10a2a95e111f3155860b8510c7f6207ec9c79fbec5082c",
+  "comparison_basis": [
+    "The eight candidate PNGs listed in supplemental-10.input.json were individually opened with tools.view_image. No other PNG was opened and no independent reference PNG was supplied for this batch.",
+    "Read the applicable text in docs/review/phase3-reference-scope.json, docs/review/phase3-prototype-reference-support.json, docs/DESIGN_HANDOFF.md, authoritative HANDOFF.md section 5.1, and prototype/Main.dc.html category/toast declarations.",
+    "Used targeted static source reads to distinguish the injected PW filter-4 case from the four public PW tabs and to establish the refresh toast's demo-only operation. No application, build, test, or runtime probe was executed."
+  ],
+  "identity_checks": {
+    "all_case_names_profiles_routes_and_round_identity_match": true,
+    "all_current_png_hashes_match_input_expected_hashes": true,
+    "all_current_png_hashes_match_case_screenshot_evidence_hashes": true,
+    "candidate_native_dimensions": [618, 824],
+    "metadata_intentional_differences": "All eight case sidecars contain an empty intentional_differences list."
+  },
+  "reviewed_case_ids": [
+    "pw5--library-tab-0",
+    "pw5--library-tab-1",
+    "pw5--library-tab-2",
+    "pw5--library-tab-3",
+    "pw5--library-tab-4",
+    "pw5--library-update-toast",
+    "pw5--migration-cancel",
+    "pw5--migration-options"
+  ],
+  "reviewed_cases": [
+    {
+      "case_id": "pw5--library-tab-0",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/pw5--library-tab-0.png",
+      "candidate_sha256": "fc37f360ba9d0c7ac18d345fbe63e55257fbb687c23114c8add630ad6d6b2603",
+      "viewed_candidate": true,
+      "outcome": "no_actionable_issue_observed",
+      "observations": [
+        "The All tab is bold with a dark underline; Reading, Planned, and Completed remain visibly inactive. The displayed counts are 46, 12, 9, and 25, agreeing with the corresponding state values.",
+        "Eight books occupy a four-by-two grid with aligned cover bounds and title rows. Unread badges for demo-00, demo-02, demo-03, demo-05, and demo-07 and downloaded icons for demo-00, demo-03, and demo-04 agree with visible_books rather than being placed over artwork.",
+        "The outlined continuation card shows chapter 34 and 12/40 progress. The folio reads 1/6, the previous-page allocation is empty, the next action stays at the right edge, and the five-item dock remains visible.",
+        "White UI surfaces have clear outlines without offset shadows or a screen-tone overlay. The stippled patterns are confined to fixture cover artwork."
+      ],
+      "intentional_differences": []
+    },
+    {
+      "case_id": "pw5--library-tab-1",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/pw5--library-tab-1.png",
+      "candidate_sha256": "a00962642bb348409039cbfb73ad535d1c1b4bc0619857f6beaa5f2601785bc0",
+      "viewed_candidate": true,
+      "outcome": "no_actionable_issue_observed",
+      "observations": [
+        "Reading is the sole bold underlined category, matching library_filter=1. The All underline from the default case is absent.",
+        "The page contains demo-00 through demo-07, exactly the visible_books set recorded for this Reading capture. Its similarity to the first All page is supported by the sidecar membership rather than treated as proof of a broken filter.",
+        "The grid retains four columns and two rows with title-adjacent unread/download state. The folio changes to 1/2 for the twelve-record category while continuation and dock geometry remain stable."
+      ],
+      "intentional_differences": []
+    },
+    {
+      "case_id": "pw5--library-tab-2",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/pw5--library-tab-2.png",
+      "candidate_sha256": "447c39910f1820d1841d37e62de016c74ef389a6e42e39506a3f79994afa73ee",
+      "viewed_candidate": true,
+      "outcome": "no_actionable_issue_observed",
+      "observations": [
+        "Planned is bold and underlined, matching library_filter=2 and the count of nine. The folio is 1/2.",
+        "The eight visible titles belong to demo-12 through demo-19 as recorded in visible_books. Unread counts 9, 1, and 2 appear on the corresponding title rows; the two downloaded indicators also agree with the sidecar.",
+        "The last two first-page covers use readable outlined title plates. These are valid missing-cover presentations, not empty interface cards; their labels remain visible beneath the cover area.",
+        "The grid and continuation remain aligned with the other category captures, with no text collision or overlay on the dock."
+      ],
+      "intentional_differences": []
+    },
+    {
+      "case_id": "pw5--library-tab-3",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/pw5--library-tab-3.png",
+      "candidate_sha256": "386c2a82da19237cf853653bfda82f00ce39e653e84700f25163ef1072ccc836",
+      "viewed_candidate": true,
+      "outcome": "no_actionable_issue_observed",
+      "observations": [
+        "Completed is the sole bold underlined tab, matching library_filter=3 and completed_count=25. The first page correctly displays 1/4 at an eight-card capacity.",
+        "The eight cards correspond to demo-21 through demo-28. All use outlined readable title plates, and no unread or downloaded marker is fabricated where visible_books records zero/false.",
+        "Both grid rows keep consistent cover bounds and title baselines despite the change from illustrated fixture covers to missing-cover title plates. The continuation card and five-item dock retain their positions."
+      ],
+      "intentional_differences": []
+    },
+    {
+      "case_id": "pw5--library-tab-4",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/pw5--library-tab-4.png",
+      "candidate_sha256": "3dc19b153d7241d3ab4abc605f7f8b21231b3a636cf03e3963bf7cf6129c23a1",
+      "viewed_candidate": true,
+      "outcome": "limited_injected_state",
+      "observations": [
+        "The injected library_filter=4 state has no visible selected category. It displays a centered no-results state, a prominent All recovery action, and a 1/1 folio without previous/next actions; visible_books is empty.",
+        "Static source establishes that filter 4 means Uncategorized. Authoritative HANDOFF section 5.1 and prototype/Main.dc.html specify four PW tabs and add Uncategorized only on Scribe. ui/library.slint likewise guards this fifth tab with State.large-screen.",
+        "scripts/verify-handoff-ui.py injects range(5) for every profile, so this PW screenshot does not establish a missing public fifth-tab requirement. The absent selected label is recorded as a limitation of this injected case rather than an actionable PW tab defect.",
+        "The empty-state message and All recovery control fit the content area without clipping the continuation card, folio, or dock."
+      ],
+      "intentional_differences": []
+    },
+    {
+      "case_id": "pw5--library-update-toast",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/pw5--library-update-toast.png",
+      "candidate_sha256": "a0663d92a870fec594b24069e07ea599b52eb9d5a5d740c21de6167a28e9df2d",
+      "viewed_candidate": true,
+      "outcome": "actionable_issue",
+      "observations": [
+        "A compact white toast with a black outline is horizontally centered at the lower content area, approximately 140 logical pixels above the viewport bottom. It has no shadow, dimmed backdrop, or top-wide black notice.",
+        "The visible message translates to Saved. The capture action is library/refresh, while the case state is demo=true, offline=true, busy=false, and message=Saved.",
+        "Static source confirms that the demo branch of refresh_library only emits the generic saved message and returns. This feedback neither identifies the requested update check nor honestly explains that this demo/offline action performed no check; see P3R1-SUP10-1.",
+        "The underlying All tab, eight-book grid, continuation progress, 1/6 folio, and dock remain legible and otherwise match this case's state."
+      ],
+      "intentional_differences": []
+    },
+    {
+      "case_id": "pw5--migration-cancel",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/pw5--migration-cancel.png",
+      "candidate_sha256": "c82dab94dd83aff1aa8a20bffe4a0058bf48a276b6475bfdf356f66c31300fe1",
+      "viewed_candidate": true,
+      "outcome": "no_actionable_issue_observed",
+      "observations": [
+        "The result is the normal first detail page: back action, cover and title, three-line synopsis, continuation at chapter 34 and 12/40, membership/tracking actions, directory header, and six chapter rows numbered 86 through 81.",
+        "The migration sheet and any completion toast are absent. This agrees with modal='', empty migration_candidates, empty migration_selected_id, and empty migration_status after cancellation; the screenshot does not falsely announce a completed migration.",
+        "The chapter rows retain uniform spacing, readable number/title/date columns, and separate outlined download controls. The 1/8 folio is consistent with the six-then-twelve PW detail pagination contract.",
+        "Cancellation returns to a clear white detail scene without a residual mask or shadow. Persistent storage effects cannot be established from this single image."
+      ],
+      "intentional_differences": []
+    },
+    {
+      "case_id": "pw5--migration-options",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/pw5--migration-options.png",
+      "candidate_sha256": "6cba589ba1733e7f08f0f0ce0014a5a2f50622116ef0b5551684bdfa6f1b3239",
+      "viewed_candidate": true,
+      "outcome": "no_actionable_issue_observed",
+      "observations": [
+        "The PW migration panel is a white bottom-attached sheet with a black top rule. The exposed cover/information above it remains undimmed, and there is no offset shadow or stippled input-capture mask.",
+        "The candidate area explicitly reports no migration match in the offline cache and offers Find match. No fabricated destination or selected candidate appears, agreeing with empty migration_candidates and migration_selected_id.",
+        "The first two switches are visibly off and the remove-original-downloads switch is on. These match migration_preserve_read=false, migration_preserve_category=false, and migration_remove_downloads=true, respectively.",
+        "Cancel remains an outlined action, while Start migration is visibly unavailable. This is consistent with migration_can_start=false and prevents a no-candidate scene from presenting a false successful migration path.",
+        "The panel contains title, empty result feedback, three switch rows, and its bottom actions without clipping. There is no independent PW migration reference from which to assert an exact fixed panel height. Category retention is the only retention claim on the second switch; this image is not evidence that tracking associations can be migrated."
+      ],
+      "intentional_differences": []
+    }
+  ],
+  "suggestions": [
+    {
+      "id": "P3R1-SUP10-1",
+      "case_id": "pw5--library-update-toast",
+      "priority": "P2",
+      "description": "The captured demo/offline library refresh reports Saved even though the action performs neither an update check nor a save, leaving the requested operation's result unclear.",
+      "evidence": [
+        "The candidate PNG shows only a Saved toast after the library refresh action.",
+        "The case sidecar records demo=true, offline=true, busy=false, and message=Saved; scripts/verify-handoff-ui.py:988-991 triggers library/refresh for this capture.",
+        "src/app/actions.rs:2028-2033 short-circuits demo refresh_library with notify(tr(saved)) and returns before an update worker or the offline error path.",
+        "HANDOFF.md section 5.1 calls for update-check feedback, while the retained real-state contract requires honest unavailable/operation state and excludes simulated successful operations."
+      ],
+      "recommendation": "Use explicit demo/offline feedback stating that updates were not checked. For real update requests, show a truthful checking state and the actual completion/error result. Preserve the existing compact outlined lower-toast geometry.",
+      "status": "open",
+      "introduced_round": 1
+    }
+  ],
+  "limitations": [
+    "This is an independent review of exactly eight listed candidate PNGs. No independent reference image was provided or opened; geometry conclusions are limited to the applicable textual contract and visible consistency.",
+    "All eight images were individually viewed and their current SHA-256 values matched both the batch manifest and case screenshot evidence. Existing mechanical checks were consulted for identity and recorded state, not substituted for visual review.",
+    "PW filter 4 is injected by the capture harness even though the public PW category bar is defined with four tabs. This case does not prove a required fifth PW entry, its discoverability, or a public tab-selection defect.",
+    "The update-feedback finding is demonstrated in the captured demo/offline branch. No conclusion about a live online update request or its eventual worker result is drawn from this batch.",
+    "The cancellation image proves the visible closed-panel state only. The migration-options image covers an empty offline candidate list and toggled options, not real target selection, committed migration, read/category persistence, tracking transfer, or original-download deletion.",
+    "One static empty migration panel cannot establish how sheet height responds to other candidate counts or longer content. No exact PW migration-panel screenshot exists in the declared reference matrix.",
+    "Static PNGs cannot establish interaction hit targets, outside dismissal, toast duration, refresh timing, network work, physical hardware capabilities, wake restoration, or operation within 512 MiB. No local or remote runtime verification was performed by this reviewer.",
+    "Actual record titles, counts, progress, timestamps, and fixture or missing-cover artwork are permitted data variations. Closed-reader artwork-only behavior, hardware-absence variants, quality settings, and authorization states are outside these eight images.",
+    "This batch contains one actionable suggestion and does not establish a complete clean review round or contribute a complete-matrix clean-round claim."
+  ]
+}

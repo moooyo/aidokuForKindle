@@ -1,0 +1,175 @@
+{
+  "schema_version": 2,
+  "round": 4,
+  "reviewer": "final_fidelity_review",
+  "status": "changes_required",
+  "review_kind": "independent_static_visual_and_source_review",
+  "review_complete": true,
+  "qualifies_as_clean_round": false,
+  "new_suggestion_count": 5,
+  "followup_finding_count": 1,
+  "shared_new_suggestion_count": 3,
+  "baseline_screens_reviewed": 12,
+  "scope_note": "All twelve fresh baseline screens and the available Paperwhite chapter-selection, download-management, batch-download, and cache states were reviewed. Eleven baseline images were inspected in ui-round-4 and reused unchanged by the consolidated ui-round-4-final set; the replacement settled Scribe landscape reader and all expanded states were inspected in ui-round-4-final. Conditional source findings are distinguished from visible defects. Scribe chapter selection has static source coverage only in this fixture set.",
+  "frozen_candidate_sha256": "ec69abefc3f31de1061c5ba497434455bceb12d4c915cd8ba230da2abb14d4da",
+  "source_snapshot_note": "Source excerpts were inspected before subsequent repair edits. This report describes the frozen round-4 candidate; a later source fix does not establish a visually clean replacement capture.",
+  "coordinate_system": {
+    "unit": "logical design pixel",
+    "paperwhite": [618, 824],
+    "scribe_portrait": [930, 1240],
+    "scribe_landscape": [1240, 930],
+    "reference_image_scale": 2
+  },
+  "independent_findings": [
+    {
+      "id": "R4-I001",
+      "priority": "P2",
+      "screen": "cache-usage",
+      "location": "Lower caption inside the cache usage summary panel",
+      "confirmation": "conditional_source_confirmed",
+      "evidence": ["ui/panels.slint:155", "ui/panels.slint:158", "src/app/actions.rs:1671", "src/app/actions.rs:1687", "src/app/view.rs:255", "artifacts/ui-round-4-final/storage-cache-info.png", "artifacts/ui-round-4-final/storage-cache-info.state.json"],
+      "observed": "Cache usage opens the shared summary panel with modal_context cache-info. That panel unconditionally renders State.book-tags, while the current book and its tags remain projected on the Settings route. The existing cache screenshot uses an imported book with no tags and therefore does not display the leak; a tagged current book meets the source condition.",
+      "why": "Unrelated genre tags under storage information make the new cache state appear to describe the last opened comic rather than application storage.",
+      "fix": "Project a dedicated summary caption or summary kind and render book tags only for the book synopsis. Cache usage should contain only cache-related information."
+    },
+    {
+      "id": "R4-I002",
+      "canonical_shared_id": "R4-D002",
+      "priority": "P2",
+      "screen": "download-manager",
+      "location": "Completed download rows, job action menu, and global queue actions",
+      "confirmation": "screenshot_and_source_confirmed",
+      "evidence": ["src/app/actions.rs:998", "src/app/actions.rs:1207", "src/app/actions.rs:1227", "src/app/actions.rs:1607", "src/app/actions.rs:1613", "src/downloads.rs:494", "artifacts/ui-round-4-final/downloads-pause-all.png", "artifacts/ui-round-4-final/downloads-pause-all.state.json", "artifacts/ui-round-4/pw5-library.state.json"],
+      "observed": "All download rows and queue controls are enabled. Selecting a completed job offers Pause, Resume, and Cancel, although change_state returns immediately for a completed job. The fresh fixture has nine completed jobs, so its all-completed queue also exposes three actions with no eligible target.",
+      "why": "Controls advertise work that cannot occur and return the user to the same queue without a meaningful state change.",
+      "fix": "Derive job and global action availability from the actual job states. Hide or disable inapplicable operations, retain clear completed status, and keep disabled semantics and styling consistent with the shared controls."
+    },
+    {
+      "id": "R4-I003",
+      "classification": "followup_to_existing_finding",
+      "existing_finding_id": "R3-D001",
+      "count_as_new": false,
+      "priority": "P2",
+      "screen": "catalog-and-library-tabs",
+      "location": "Selected underline relative to the full-width tab divider",
+      "confirmation": "screenshot_and_source_confirmed",
+      "evidence": ["artifacts/ui-round-4/pw5-catalog.png", "tmp/design/reference-05.png", "artifacts/ui-round-4/scribe-sources.png", "tmp/design/reference-11.png", "ui/sources.slint:224", "ui/sources.slint:329", "ui/sources.slint:355", "ui/widgets.slint:134", "ui/library.slint:123"],
+      "observed": "The continuous divider is now restored, but the selected underline sits below it: approximately four design pixels on Paperwhite catalog and eight on Scribe browse. CatalogTabs uses 44/48-pixel visual bars while Tab remains 48/56 pixels tall. Library also has a smaller 46/52-pixel bar around the shared 48/56-pixel Tab.",
+      "why": "The restored full-width rule and detached selected rule create two unrelated baselines. The reference places the selected marker on the shared rule.",
+      "fix": "Align each selected underline to the visual tab bar divider while preserving the full 48/56-pixel hit area. Review the shared tab instances together so the fix remains consistent across library, catalog, and browse."
+    },
+    {
+      "id": "R4-I004",
+      "priority": "P3",
+      "screen": "library-and-paperwhite-catalog",
+      "location": "Library filter icon and catalog source preferences icon in the top-right action groups",
+      "confirmation": "screenshot_and_source_confirmed",
+      "evidence": ["artifacts/ui-round-4/pw5-library.png", "tmp/design/reference-01.png", "artifacts/ui-round-4/scribe-library.png", "tmp/design/reference-09.png", "artifacts/ui-round-4/pw5-catalog.png", "tmp/design/reference-05.png", "ui/library.slint:88", "ui/sources.slint:348"],
+      "observed": "The reference uses the same two horizontal sliders symbol for library filtering and source preferences. The implementation uses a funnel in the library and a gear for catalog preferences.",
+      "why": "These visible action glyphs are still different from the default reference treatment, although their functions are available.",
+      "fix": "Add a separate sliders glyph and map only these two actions to it. Keep the existing funnel for catalog filtering and the gear for the Settings navigation destination."
+    },
+    {
+      "id": "R4-I005",
+      "priority": "P2",
+      "screen": "sources-and-reader",
+      "location": "Source-specific search/filter actions and direct reader footer, orientation, and seek hit regions",
+      "confirmation": "source_confirmed_with_visible_control_context",
+      "evidence": ["artifacts/ui-round-4/scribe-sources.png", "artifacts/ui-round-4-final/scribe-landscape-reader.png", "artifacts/ui-round-4-final/reader-footer-priority.png", "tmp/design/design-text.txt", "ui/sources.slint:321", "ui/sources.slint:328", "ui/reader.slint:217", "ui/reader.slint:272", "ui/reader.slint:375"],
+      "observed": "In the frozen candidate the Scribe source search and filter controls are 54 pixels high and the filter is 54 pixels wide. Reader footer and landscape orientation hit regions remain 48 pixels high on Scribe, while the progress-seek TouchArea is 44 pixels high on both device classes. These direct regions do not inherit an expanded shared-button target.",
+      "why": "The supplied spec requires minimum 48-pixel Paperwhite and 56-pixel Scribe touch dimensions. Fixed direct hit areas bypass the otherwise correct shared touch token.",
+      "fix": "Use the device touch token for the effective hit regions, preserving current visual glyph sizes. Keep adjacent seek, chapter, and toolbar actions non-overlapping when expanding the hit regions."
+    },
+    {
+      "id": "R4-I006",
+      "priority": "P2",
+      "screen": "chapter-download-and-storage-feedback",
+      "location": "Bottom persistent message bar over the page controls",
+      "confirmation": "screenshot_and_source_confirmed",
+      "evidence": ["artifacts/ui-round-4-final/detail-chapter-download-selected.png", "artifacts/ui-round-4-final/batch-all.png", "artifacts/ui-round-4-final/batch-unread.png", "artifacts/ui-round-4-final/storage-clear-cache.png", "ui/app.slint:53", "ui/app.slint:54", "ui/app.slint:58"],
+      "observed": "The queued-download message occupies approximately y=762..816 on the Paperwhite detail screen and covers its page controls at approximately y=776..824. The saved message after clearing cache similarly covers the Settings page controls at approximately y=698..746. The message remains until explicitly dismissed.",
+      "why": "Routine download or cache feedback conceals the next navigation action and page count. The user must close an unrelated message before seeing those controls again.",
+      "fix": "Reserve space or use inline feedback so a message does not cover the page controls, last content row, reader footer, or modal actions. Account for each route's fixed controls instead of moving the overlay onto another interactive row."
+    }
+  ],
+  "shared_findings_confirmed": [
+    {
+      "id": "R4-D001",
+      "reported_by": "design_research",
+      "screen": "paperwhite-chapter-selection",
+      "location": "Bottom six pixels of the selection actions and the first chapter row",
+      "evidence": ["artifacts/ui-round-4-final/detail-chapter-hold-600.png", "artifacts/ui-round-4-final/detail-chapter-select-two.png", "artifacts/ui-round-4-final/detail-chapter-select-all.png"],
+      "observed": "Selection action buttons extend to approximately y=434, but the first selected row and its touch area start at approximately y=428.",
+      "why": "The later chapter row covers the bottom of the action buttons and can receive taps intended for the actions.",
+      "fix": "Start chapter content after the complete selection action area while retaining six rows that meet the Paperwhite touch minimum."
+    },
+    {
+      "id": "R4-D003",
+      "reported_by": "design_research",
+      "screen": "download-manager-pagination",
+      "location": "Download panel and pager between full pages and the last page",
+      "evidence": ["artifacts/ui-round-4-final/downloads-lazy-pagination-01.png", "artifacts/ui-round-4-final/downloads-lazy-pagination-02.png", "artifacts/ui-round-4-final/downloads-lazy-pagination-11.png", "artifacts/ui-round-4-final/downloads-lazy-pagination-12.png"],
+      "observed": "The pager is at approximately y=634..682 on full pages but jumps to y=451..499 on the one-row last page because the centered panel shrinks to the current item count.",
+      "why": "A repeated next/previous action changes physical position between pages, increasing mistaken taps on a touch-only device.",
+      "fix": "Keep the panel frame and pager stable for the whole download result set, using empty row space on short pages."
+    },
+    {
+      "id": "R4-D004",
+      "reported_by": "design_research",
+      "screen": "batch-download-state",
+      "location": "Ordinary All and Unread batch enqueue behavior",
+      "evidence": ["artifacts/ui-round-4-final/batch-all.state.json", "artifacts/ui-round-4-final/batch-unread.state.json", "artifacts/ui-round-4-final/batch-next-five.state.json", "artifacts/ui-round-4-final/downloads-lazy-pagination-01.png"],
+      "observed": "Batch All changes all 86 jobs to queued, including nine completed 40/40 jobs. Batch Unread leaves seven completed jobs and requeues the other two completed local chapters. The queue consequently displays waiting 40/40 items.",
+      "why": "Ordinary batch download should preserve usable local completed chapters rather than recreating work and presenting a contradictory waiting/completed progress pair.",
+      "fix": "Skip valid completed chapters for ordinary batch operations. Use a separate explicit redownload or repair path when refreshing completed content is intended."
+    }
+  ],
+  "coverage_matrix": [
+    {"screen": "pw5-library", "actual": "artifacts/ui-round-4/pw5-library.png", "reference": "tmp/design/reference-01.png", "visual_reviewed": true, "result": "New tab geometry and action glyph findings only; cover grid, title, spacing, grayscale, continuation progress, pagination, and navigation reviewed."},
+    {"screen": "pw5-detail", "actual": "artifacts/ui-round-4/pw5-detail.png", "reference": "tmp/design/reference-02.png", "visual_reviewed": true, "result": "No new baseline finding; typography, synopsis, continue and favorite controls, directory dots, independent download targets, and true fifteen-page count reviewed."},
+    {"screen": "pw5-reader", "actual": "artifacts/ui-round-4/pw5-reader.png", "reference": "tmp/design/reference-03.png", "visual_reviewed": true, "result": "No new baseline finding; title, panel boundaries, full-width toolbar rules, progress, chapter controls, and picture/orientation glyphs reviewed."},
+    {"screen": "pw5-sources", "actual": "artifacts/ui-round-4/pw5-sources.png", "reference": "tmp/design/reference-04.png", "visual_reviewed": true, "result": "No new baseline finding; installed and unavailable source treatments, uninstall action, and pairing card reviewed."},
+    {"screen": "pw5-catalog", "actual": "artifacts/ui-round-4/pw5-catalog.png", "reference": "tmp/design/reference-05.png", "visual_reviewed": true, "result": "New tab geometry and action glyph findings; context artwork, metadata, update ages, dividers, pagination, and action placement reviewed."},
+    {"screen": "pw5-search", "actual": "artifacts/ui-round-4/pw5-search.png", "reference": "tmp/design/reference-06.png", "visual_reviewed": true, "result": "No new baseline finding; complete inner cover titles, consistent true source counts, result grouping, completion/volume metadata, retry action, and navigation reviewed."},
+    {"screen": "pw5-history", "actual": "artifacts/ui-round-4/pw5-history.png", "reference": "tmp/design/reference-07.png", "visual_reviewed": true, "result": "No new baseline finding; crossed-eye privacy icon, separate trash control, date typography, true summary, chapter updates, progress fills, context artwork, row delete targets, and pagination reviewed."},
+    {"screen": "pw5-settings", "actual": "artifacts/ui-round-4/pw5-settings.png", "reference": "tmp/design/reference-08.png", "visual_reviewed": true, "result": "No new baseline finding; corrected screen/tap/storage/sleep glyphs, device card, labels, gray values, rows, pagination, and navigation reviewed."},
+    {"screen": "scribe-library", "actual": "artifacts/ui-round-4/scribe-library.png", "reference": "tmp/design/reference-09.png", "visual_reviewed": true, "result": "New tab geometry and action glyph findings only; six-by-three grid, continuation card, intrinsic update-preview dots, true update count, captions, and pagination reviewed."},
+    {"screen": "scribe-detail", "actual": "artifacts/ui-round-4/scribe-detail.png", "reference": "tmp/design/reference-10.png", "visual_reviewed": true, "result": "No new baseline finding; two-column proportions, complete directory rule, readable regular synopsis, tags, sixteen directory rows, actions, and pagination reviewed."},
+    {"screen": "scribe-sources", "actual": "artifacts/ui-round-4/scribe-sources.png", "reference": "tmp/design/reference-11.png", "visual_reviewed": true, "result": "New tab geometry and minimum target findings; labeled top actions, source cards, update context, source search text, five-by-two covers, tags, and pagination reviewed."},
+    {"screen": "scribe-landscape-reader", "actual": "artifacts/ui-round-4-final/scribe-landscape-reader.png", "reference": "tmp/design/reference-12.png", "visual_reviewed": true, "result": "Settled capture has busy=false, reader_inflight=false, and committed_reader_page=12. Panel boundaries, spread order, toolbar boundaries, progress, and truthful locked-direction label reviewed; direct hit regions are recorded separately in R4-I005."},
+    {"screen": "chapter-selection-paperwhite", "actual": ["artifacts/ui-round-4-final/detail-chapter-hold-600.png", "artifacts/ui-round-4-final/detail-chapter-select-two.png", "artifacts/ui-round-4-final/detail-chapter-select-all.png", "artifacts/ui-round-4-final/detail-chapter-cancel.png", "artifacts/ui-round-4-final/detail-chapter-download-selected.png"], "visual_reviewed": true, "source_reviewed": true, "result": "Selection counts, selected rows, checkboxes, select all, cancel, exit after download, and paging reviewed. R4-D001 records the overlap and R4-I006 records covered page controls after enqueue."},
+    {"screen": "chapter-selection-scribe", "visual_reviewed": false, "source_reviewed": true, "result": "Static geometry retains 56-pixel actions and the two-column detail layout. This fixture set has no Scribe selection screenshot; request that capture with the next candidate."},
+    {"screen": "download-manager", "actual": ["artifacts/ui-round-4-final/downloads-lazy-pagination-01.png", "artifacts/ui-round-4-final/downloads-lazy-pagination-02.png", "artifacts/ui-round-4-final/downloads-lazy-pagination-11.png", "artifacts/ui-round-4-final/downloads-lazy-pagination-12.png", "artifacts/ui-round-4-final/downloads-pause-all.png", "artifacts/ui-round-4-final/downloads-resume-all.png", "artifacts/ui-round-4-final/downloads-cancel-all.png"], "visual_reviewed": true, "source_reviewed": true, "result": "Queue state labels, progress, first/middle/last pagination, global actions, stipple, hard shadow, typography, and row hit heights reviewed. R4-D002 and R4-D003 remain actionable."},
+    {"screen": "batch-download", "actual": ["artifacts/ui-round-4-final/batch-all.png", "artifacts/ui-round-4-final/batch-unread.png"], "state_sidecars_reviewed": ["batch-all", "batch-unread", "batch-next-five", "batch-next-ten"], "visual_reviewed": true, "result": "R4-D004 records repeated completed work; R4-I006 records feedback hiding the directory pager."},
+    {"screen": "cache-usage-and-clear", "actual": ["artifacts/ui-round-4-final/storage-cache-info.png", "artifacts/ui-round-4-final/storage-clear-cache.png"], "visual_reviewed": true, "source_reviewed": true, "result": "Usage, protected-cache explanation, cache bounds, clear completion, and retained imported files in the existing remote report reviewed. The empty-tag imported fixture does not exercise R4-I001. R4-I006 records the clear-completion message covering the pager."},
+    {"screen": "reader-page-actions", "actual": "artifacts/raw-round-4/raw-reader-hold-600.png", "visual_reviewed": true, "result": "No new finding; page-action labels, 52-pixel rows, stipple, hard shadow, and close target reviewed."},
+    {"screen": "scribe3-no-frontlight", "actual": ["artifacts/ui-round-4-final/scribe3-nofrontlight-reader.png", "artifacts/ui-round-4-final/scribe3-nofrontlight-settings.png"], "visual_reviewed": true, "result": "No new visual finding; unavailable brightness/warmth actions are hidden and remaining reader tools occupy the full width."}
+  ],
+  "resolved_previous_findings_observed": ["R1-D012", "R1-D016", "R2-D001", "R2-D002", "R2-D003", "R2-D004", "R2-D005"],
+  "existing_finding_followup": "R3-D001 has its continuous divider restored, but the selected-underline geometry remains open as R4-I003.",
+  "accepted_variations": [
+    "The 86-chapter book requires fifteen Paperwhite pages at six rows per page despite the mock's eight-page footer.",
+    "Counts, dates, completed progress, and page totals follow persisted fixtures rather than fabricated values.",
+    "One canonical comic page remains shared between Paperwhite and Scribe despite different mock speech-balloon positions.",
+    "Manual rotation uses a truthful locked-direction label instead of claiming automatic sensor support.",
+    "Documented platform gaps are not new visual findings unless their UI claims unsupported success."
+  ],
+  "cross_cutting_review": {
+    "fonts": "The fresh baseline preserves heavy serif titles, regular body text, and numeric page labels without newly observed clipping.",
+    "grayscale": "The shared theme uses the supplied discrete grayscale palette; panels use stipple and a solid offset shadow.",
+    "pagination": "Static UI source uses page controls and direct state replacement. No ScrollView, Flickable, animation, or transition declaration was found in the UI files.",
+    "touch": "Shared ActionButton, IconButton, PageBar, and modal rows meet their 48/56-pixel minimum. R4-I005 records direct regions that bypass the token, while R4-D001 records the chapter-selection overlap that reduces an otherwise valid target.",
+    "state_truthfulness": "R4-I001, R4-D002, and R4-D004 require correction before the expanded state review can be clean."
+  },
+  "reported_remote_verification": {
+    "consolidated_ui_report": "artifacts/ui-round-4-final/report.json",
+    "ui_passed": 95,
+    "ui_failed": 0,
+    "raw_mouse_report": "artifacts/raw-round-4/report.md",
+    "raw_mouse_passed": 6,
+    "raw_mouse_failed": 0,
+    "qualification": "These existing reports establish their listed checks only. They do not replace the manual visual findings in this document."
+  },
+  "next_candidate_coverage": ["Fresh screenshots after all product changes", "Scribe chapter selection", "Cache usage while a book with non-empty tags is current", "Stable short-last-page download pager", "State-disabled completed job and global actions", "No toast overlap with fixed page controls"],
+  "verification_note": "Only reference images, fresh remote screenshots and sidecars, source files, and existing reports were read. This reviewer ran no local application, build, test suite, runtime probe, or independent remote verification. The supplied remote reports pass, but the frozen candidate is not a clean design round."
+}

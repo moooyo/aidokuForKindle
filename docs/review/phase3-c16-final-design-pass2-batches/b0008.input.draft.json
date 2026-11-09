@@ -1,0 +1,906 @@
+{
+  "schema_version": 1,
+  "kind": "Actual C16 final-design-pass2 bounded fresh input draft",
+  "scope": "FINAL_DESIGN_REFERENCE_PASS2",
+  "coordinator": "/root/c15_visual_coordinator",
+  "batch_id": "b0008",
+  "pass": 2,
+  "run_id": "c205f1b52500",
+  "draft_only": true,
+  "formal_input": false,
+  "assigned_owner": null,
+  "actual_worker_parent": null,
+  "proxy_lane": null,
+  "slot_id": null,
+  "task_name": null,
+  "status": "queued",
+  "assignment_status": "Sole coordinator registration and actual dispatch are pending; proposal fields do not create primary ownership.",
+  "proposed_registration": {
+    "proxy_lane": "FVD",
+    "slot_id": "FVD-C16-R2-04",
+    "required_parent": "/root/final_validation_delivery",
+    "task_name": "c16fd2_fvd_b0008",
+    "proposed_owner": "/root/final_validation_delivery/c16fd2_fvd_b0008",
+    "fork_turns": "none",
+    "registrar": "/root/c15_visual_coordinator",
+    "actual_registered": false,
+    "slot_registration_rule": "Register only after the actual prior worker naturally releases this slot; sole coordinator registration is required."
+  },
+  "primary_ownership_audit": {
+    "ledger_path": "D:/Code/aidokuForKindle/docs/review/phase3-c16-final-design-pass2-ledger.json",
+    "ledger_sha256_owner_declared": null,
+    "ledger_actual_run_id": "c205f1b52500",
+    "ledger_pass": 2,
+    "matching_primary_owner_count": 0,
+    "scope": "Exact selected case IDs checked by static reading of the new pass2 ledger immediately before this draft; no ledger mutation."
+  },
+  "freeze": {
+    "source_file_count": 229,
+    "source_sha256": "1fe46f49f4b60ad455b9e870e376a571adf203aebdf50b7d8616e376801c5626",
+    "desktop_sha256": "8aa3e37550e48fc195adf3c1511158b2dc8dd65099a7e250b32b198ca6bfd6b9",
+    "desktop_bytes": 265909992,
+    "core_manifest_sha256": "cf91ea316b335fbcbb09528c51205a49a01bd1452cc3695edc15b297e477ecb0",
+    "shared_preparation_sha256": null,
+    "input_binding_sha256": "d363238f693e495659570cb2592355a9b977a19a4ee668a1b7ca39adbf3c92f3"
+  },
+  "module": {
+    "id": "pw-reader",
+    "snapshot_path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate16/final-design-pass-2-modules/pw-reader/snapshot.json",
+    "snapshot_sha256": "482a52a9c056f79ea24560f86f0bb43e183fedad4deb5aab25a2f6258058ca5e",
+    "snapshot_sha256_owner_record_path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate16/final-design-pass-2-modules/PW-modules-local-return-verification-01.json",
+    "snapshot_sha256_owner_record_json_pointer": "/modules/1/snapshot_sha256",
+    "inventory_field": "members",
+    "originals_modified": false,
+    "actual_manual_ids": [
+      "pw-reader--default",
+      "pw-reader--fullscreen-footer",
+      "pw-reader--fullscreen",
+      "pw-reader--image",
+      "pw-reader--light",
+      "pw-reader--mode",
+      "pw-reader--more",
+      "pw-reader--rotate",
+      "pw-reader--toc"
+    ],
+    "actual_prerequisite_ids": [],
+    "independent_directory_binding": "D:/Code/aidokuForKindle/artifacts/phase3/candidate16/final-design-pass-2-modules/pw-reader",
+    "path_binding_rule": "Join only actual snapshot.members.path to this independent pass2 module directory. Do not use historical outputs or observations."
+  },
+  "modules_local_return_receipt_binding": {
+    "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate16/final-design-pass-2-modules/PW-modules-local-return-verification-01.json",
+    "sha256_owner_declared": "c4a22137e2c1c6f8bce8506cd5cfa407c523738777e452dc03612103e4dd3aca",
+    "run_id_owner_declared": "c205f1b52500",
+    "round_owner_declared": 2,
+    "matched_members_owner_declared": 258,
+    "matched_bytes_owner_declared": 8671875,
+    "module_count_owner_declared": 7,
+    "viewer_count_owner_declared": 0,
+    "hash_source": "Sole coordinator owner declaration for this actual pass2 receipt; snapshot identities are copied from its module entries. No local hash computation."
+  },
+  "stable_module_index_binding": null,
+  "global_final_manifest": null,
+  "global_final_inventory": null,
+  "global_final_reconciliation": null,
+  "global_status": "New shared preparation, stable index and global final declarations remain pending; their hashes are null. This draft carries no global closure credit.",
+  "case_ids": [
+    "pw-reader--fullscreen-footer",
+    "pw-reader--fullscreen"
+  ],
+  "manual_case_count": 2,
+  "cases": [
+    {
+      "case_id": "pw-reader--fullscreen-footer",
+      "module_id": "pw-reader",
+      "run_id": "c205f1b52500",
+      "round": 2,
+      "source_sha256_owner_declared": "1fe46f49f4b60ad455b9e870e376a571adf203aebdf50b7d8616e376801c5626",
+      "binary_sha256_owner_declared": "8aa3e37550e48fc195adf3c1511158b2dc8dd65099a7e250b32b198ca6bfd6b9",
+      "manual_review_required": true,
+      "prerequisite": false,
+      "native_capture_size": [
+        618,
+        824
+      ],
+      "actual_route": "reader",
+      "reader_panel_owner_declared": "",
+      "capability_declaration": {
+        "backend": "desktop",
+        "frontlight_control_exposed": true,
+        "hardware_dither_qualified": false,
+        "orientation_profile_declared": false,
+        "pairing_endpoint_running": false,
+        "pen_input_implemented": false,
+        "physical_hardware_qualified": false,
+        "profile": "pw5",
+        "scope": "selected design profile and implemented application controls",
+        "server_configuration_implemented": true,
+        "software_dither": true,
+        "tracking_authorization_implemented": false,
+        "warmth_control_exposed": true
+      },
+      "artifacts": {
+        "case_json": {
+          "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate16/final-design-pass-2-modules/pw-reader/files/output/cases/pw-reader--fullscreen-footer.json",
+          "sha256": "054ecdb880eb810fcc4c8be9191e31f45e459ac111f76ec0532ca8cdbde86f69",
+          "bytes": 31253,
+          "module_relative_path": "files/output/cases/pw-reader--fullscreen-footer.json",
+          "original_path": "/root/aidoku-phase3/evidence/candidate16/final-design-pass-2/cases/pw-reader--fullscreen-footer.json",
+          "owner_inventory_json_pointer": "/members/2"
+        },
+        "screenshot": {
+          "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate16/final-design-pass-2-modules/pw-reader/files/output/pw-reader--fullscreen-footer.png",
+          "sha256": "99e72fc0524cab6742a606d8fd257bc1fd762c534457451aacba487d8ee9c394",
+          "bytes": 378599,
+          "module_relative_path": "files/output/pw-reader--fullscreen-footer.png",
+          "original_path": "/root/aidoku-phase3/evidence/candidate16/final-design-pass-2/pw-reader--fullscreen-footer.png",
+          "owner_inventory_json_pointer": "/members/16"
+        },
+        "state": {
+          "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate16/final-design-pass-2-modules/pw-reader/files/output/pw-reader--fullscreen-footer.state.json",
+          "sha256": "72d098c088d6c4e23e05efe049f141c5afb36f5898a68574f4065f72ade42ae7",
+          "bytes": 14260,
+          "module_relative_path": "files/output/pw-reader--fullscreen-footer.state.json",
+          "original_path": "/root/aidoku-phase3/evidence/candidate16/final-design-pass-2/pw-reader--fullscreen-footer.state.json",
+          "owner_inventory_json_pointer": "/members/17"
+        },
+        "metadata": {
+          "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate16/final-design-pass-2-modules/pw-reader/files/output/pw-reader--fullscreen-footer.metadata.json",
+          "sha256": "08cb2a29c041137087758d42f49f66888eb944772aae7c6f3f698bae1b10f6a6",
+          "bytes": 674,
+          "module_relative_path": "files/output/pw-reader--fullscreen-footer.metadata.json",
+          "original_path": "/root/aidoku-phase3/evidence/candidate16/final-design-pass-2/pw-reader--fullscreen-footer.metadata.json",
+          "owner_inventory_json_pointer": "/members/18"
+        },
+        "actions": {
+          "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate16/final-design-pass-2-modules/pw-reader/files/output/actions/pw-reader--fullscreen-footer.json",
+          "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+          "bytes": 3,
+          "module_relative_path": "files/output/actions/pw-reader--fullscreen-footer.json",
+          "original_path": "/root/aidoku-phase3/evidence/candidate16/final-design-pass-2/actions/pw-reader--fullscreen-footer.json",
+          "owner_inventory_json_pointer": "/members/19"
+        },
+        "log": {
+          "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate16/final-design-pass-2-modules/pw-reader/files/output/pw-reader--fullscreen-footer.log",
+          "sha256": "dc121ceea011a63c29b404d6c6b75bbe2db32b326923b8fa99759f457bfd709f",
+          "bytes": 68,
+          "module_relative_path": "files/output/pw-reader--fullscreen-footer.log",
+          "original_path": "/root/aidoku-phase3/evidence/candidate16/final-design-pass-2/pw-reader--fullscreen-footer.log",
+          "owner_inventory_json_pointer": "/members/20"
+        }
+      },
+      "reference": {
+        "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate16/final-design-pass-2-modules/pw-reader/files/references/fb9d1ace61b8656559417e388dbd0087dfa3d8c96526f8efe913e4bce80076e4-pw-reader--fullscreen-footer.png",
+        "sha256": "fb9d1ace61b8656559417e388dbd0087dfa3d8c96526f8efe913e4bce80076e4",
+        "bytes": 43275,
+        "module_relative_path": "files/references/fb9d1ace61b8656559417e388dbd0087dfa3d8c96526f8efe913e4bce80076e4-pw-reader--fullscreen-footer.png",
+        "original_path": "/root/aidoku-phase3/evidence/candidate16/final-design-preparation-01/references/screens/states/pw-reader--fullscreen-footer.png",
+        "owner_inventory_json_pointer": "/members/24",
+        "kind": "related-published-design-reference",
+        "binding_type": "related",
+        "reference_role_owner_declared": "reference-only alias of the user-overridden artwork-only scene",
+        "applicability": "user-overridden-reference-only",
+        "case_declared_sha256": "fb9d1ace61b8656559417e388dbd0087dfa3d8c96526f8efe913e4bce80076e4",
+        "case_reference_id_owner_declared": "pw-reader--fullscreen-footer",
+        "applicability_rule": "Retain the actual case applicability and capability declaration, including null or unavailable controls. Do not add unobserved operation or hardware acceptance."
+      },
+      "reference_expected": "Reference inspected; requested footer/ribbon behavior is intentionally overridden.",
+      "intentional_differences": [
+        "The user overrides the reference footer and ribbon: every closed-reader pixel remains artwork only."
+      ],
+      "visible_ui_requirements": null,
+      "native_visible_regions": null,
+      "extra_required_originals": [
+        {
+          "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate16/final-design-pass-2-modules/pw-reader/files/output/processed/pw-reader--fullscreen-footer/first_path.png",
+          "sha256": "f2c156f9946604083d71a434a9351355e6f0ad49d607c2ea23af0b4ba8ec5e7a",
+          "bytes": 130148,
+          "module_relative_path": "files/output/processed/pw-reader--fullscreen-footer/first_path.png",
+          "original_path": "/root/aidoku-phase3/evidence/candidate16/final-design-pass-2/processed/pw-reader--fullscreen-footer/first_path.png",
+          "owner_inventory_json_pointer": "/members/23",
+          "role": "own-processed-source-original",
+          "field_owner_declared": "first_path",
+          "application_path_owner_declared": "/root/aidoku-phase3/evidence/candidate16/final-design-pass-2/data/c205f1b52500/pw-reader--fullscreen-footer/demo/cache/shared-v1/processed/91/91b779db31cbdfe2e67e7266aa7c612b58ba27ff79c0811f2108dc432c979dbe.png",
+          "case_declared_sha256": "f2c156f9946604083d71a434a9351355e6f0ad49d607c2ea23af0b4ba8ec5e7a",
+          "geometry_owner_declared": {
+            "source_size": [
+              1172,
+              1648
+            ],
+            "slot": [
+              0,
+              0,
+              618,
+              824
+            ],
+            "destination": [
+              16,
+              0,
+              602,
+              824
+            ],
+            "dx8": 512,
+            "dy8": 512,
+            "sample_origin": [
+              0,
+              0
+            ],
+            "sample_center_offset": 0
+          },
+          "owner_case_json_pointer": "/pure_reader_oracle/processed_inputs/0",
+          "mandatory": true
+        },
+        {
+          "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate16/final-design-pass-2-modules/pw-reader/files/output/oracle/pw-reader--fullscreen-footer.expected.png",
+          "sha256": "453566ca4cac5f749d97dcad597a8070f16e64741cb95d22f2f4e8450731b012",
+          "bytes": 36216,
+          "module_relative_path": "files/output/oracle/pw-reader--fullscreen-footer.expected.png",
+          "original_path": "/root/aidoku-phase3/evidence/candidate16/final-design-pass-2/oracle/pw-reader--fullscreen-footer.expected.png",
+          "owner_inventory_json_pointer": "/members/21",
+          "role": "own-expected-source-composition-original",
+          "owner_case_json_pointer": "/pure_reader_oracle/expected",
+          "mandatory": true
+        }
+      ],
+      "own_source_composition_reading_required": true,
+      "artwork_content_contract": "Committed source identity and strict whole-viewport pixel composition; legitimate bright or white source pages need no dark-ink quota.",
+      "pure_reader_oracle": {
+        "sampler_contract": "slint-software-1.17.1-shared-rgb8-fixed8-v1",
+        "metrics": {
+          "exact_match": true,
+          "changed_pixels": 0,
+          "maximum_channel_difference": 0,
+          "rgb_mae_diagnostic_only": 0.0,
+          "difference_bbox": null,
+          "regions_diagnostic_only": {
+            "top_96": {
+              "rectangle": [
+                0,
+                0,
+                618,
+                96
+              ],
+              "changed_pixels": 0
+            },
+            "bottom_96": {
+              "rectangle": [
+                0,
+                728,
+                618,
+                824
+              ],
+              "changed_pixels": 0
+            },
+            "left_32": {
+              "rectangle": [
+                0,
+                0,
+                32,
+                824
+              ],
+              "changed_pixels": 0
+            },
+            "right_32": {
+              "rectangle": [
+                586,
+                0,
+                618,
+                824
+              ],
+              "changed_pixels": 0
+            },
+            "center_seam_8": {
+              "rectangle": [
+                305,
+                0,
+                313,
+                824
+              ],
+              "changed_pixels": 0
+            }
+          },
+          "pixel_error_tolerance": 0,
+          "ignored_pixels": 0
+        },
+        "processed_inputs": [
+          {
+            "field": "first_path",
+            "application_path": "/root/aidoku-phase3/evidence/candidate16/final-design-pass-2/data/c205f1b52500/pw-reader--fullscreen-footer/demo/cache/shared-v1/processed/91/91b779db31cbdfe2e67e7266aa7c612b58ba27ff79c0811f2108dc432c979dbe.png",
+            "retained_path": "/root/aidoku-phase3/evidence/candidate16/final-design-pass-2/processed/pw-reader--fullscreen-footer/first_path.png",
+            "sha256": "f2c156f9946604083d71a434a9351355e6f0ad49d607c2ea23af0b4ba8ec5e7a",
+            "geometry": {
+              "source_size": [
+                1172,
+                1648
+              ],
+              "slot": [
+                0,
+                0,
+                618,
+                824
+              ],
+              "destination": [
+                16,
+                0,
+                602,
+                824
+              ],
+              "dx8": 512,
+              "dy8": 512,
+              "sample_origin": [
+                0,
+                0
+              ],
+              "sample_center_offset": 0
+            }
+          }
+        ],
+        "expected": "/root/aidoku-phase3/evidence/candidate16/final-design-pass-2/oracle/pw-reader--fullscreen-footer.expected.png",
+        "difference": "/root/aidoku-phase3/evidence/candidate16/final-design-pass-2/oracle/pw-reader--fullscreen-footer.diff.png",
+        "original_capture_unchanged": true
+      },
+      "pure_oracle": null,
+      "own_closed_source_chain_required": null,
+      "same_case_closed_prerequisite": null,
+      "same_case_dependencies": null,
+      "acceptance_scope_limit": "Review captured artwork content against this case own retained processed source and expected composition. Closing operations and post-close setting effects still require their own actual evidence.",
+      "closed_or_post_close_effect_acceptance": null,
+      "owner_json_pointers": {
+        "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate16/final-design-pass-2-modules/pw-reader/files/output/cases/pw-reader--fullscreen-footer.json",
+        "sha256": "054ecdb880eb810fcc4c8be9191e31f45e459ac111f76ec0532ca8cdbde86f69",
+        "state": "/state",
+        "metadata": "/metadata",
+        "actions": "/actions",
+        "checks": "/checks",
+        "command": "/command",
+        "capability_declaration": "/state/capability_declaration",
+        "reference_applicability": "/reference_applicability",
+        "pure_reader_oracle": "/pure_reader_oracle",
+        "pure_oracle": "/pure_oracle",
+        "own_closed_source_chain_required": "/own_closed_source_chain_required",
+        "same_case_closed_prerequisite": "/same_case_closed_prerequisite",
+        "same_case_dependencies": "/same_case_dependencies",
+        "closed_or_post_close_effect_acceptance": "/closed_or_post_close_effect_acceptance"
+      }
+    },
+    {
+      "case_id": "pw-reader--fullscreen",
+      "module_id": "pw-reader",
+      "run_id": "c205f1b52500",
+      "round": 2,
+      "source_sha256_owner_declared": "1fe46f49f4b60ad455b9e870e376a571adf203aebdf50b7d8616e376801c5626",
+      "binary_sha256_owner_declared": "8aa3e37550e48fc195adf3c1511158b2dc8dd65099a7e250b32b198ca6bfd6b9",
+      "manual_review_required": true,
+      "prerequisite": false,
+      "native_capture_size": [
+        618,
+        824
+      ],
+      "actual_route": "reader",
+      "reader_panel_owner_declared": "",
+      "capability_declaration": {
+        "backend": "desktop",
+        "frontlight_control_exposed": true,
+        "hardware_dither_qualified": false,
+        "orientation_profile_declared": false,
+        "pairing_endpoint_running": false,
+        "pen_input_implemented": false,
+        "physical_hardware_qualified": false,
+        "profile": "pw5",
+        "scope": "selected design profile and implemented application controls",
+        "server_configuration_implemented": true,
+        "software_dither": true,
+        "tracking_authorization_implemented": false,
+        "warmth_control_exposed": true
+      },
+      "artifacts": {
+        "case_json": {
+          "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate16/final-design-pass-2-modules/pw-reader/files/output/cases/pw-reader--fullscreen.json",
+          "sha256": "50a937aa7bdc567d9849a67ce8f0f87bf22177dc4b061c75625780603eacd38d",
+          "bytes": 30999,
+          "module_relative_path": "files/output/cases/pw-reader--fullscreen.json",
+          "original_path": "/root/aidoku-phase3/evidence/candidate16/final-design-pass-2/cases/pw-reader--fullscreen.json",
+          "owner_inventory_json_pointer": "/members/3"
+        },
+        "screenshot": {
+          "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate16/final-design-pass-2-modules/pw-reader/files/output/pw-reader--fullscreen.png",
+          "sha256": "99e72fc0524cab6742a606d8fd257bc1fd762c534457451aacba487d8ee9c394",
+          "bytes": 378599,
+          "module_relative_path": "files/output/pw-reader--fullscreen.png",
+          "original_path": "/root/aidoku-phase3/evidence/candidate16/final-design-pass-2/pw-reader--fullscreen.png",
+          "owner_inventory_json_pointer": "/members/25"
+        },
+        "state": {
+          "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate16/final-design-pass-2-modules/pw-reader/files/output/pw-reader--fullscreen.state.json",
+          "sha256": "aab276d07677142cc487fa77c3a1b9a770a0289c26b219563ef38792359de39f",
+          "bytes": 14239,
+          "module_relative_path": "files/output/pw-reader--fullscreen.state.json",
+          "original_path": "/root/aidoku-phase3/evidence/candidate16/final-design-pass-2/pw-reader--fullscreen.state.json",
+          "owner_inventory_json_pointer": "/members/26"
+        },
+        "metadata": {
+          "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate16/final-design-pass-2-modules/pw-reader/files/output/pw-reader--fullscreen.metadata.json",
+          "sha256": "5a2de1a3fd93c05d91893c2a9388575e937e533021f13abd07cc768d8d3b06c4",
+          "bytes": 674,
+          "module_relative_path": "files/output/pw-reader--fullscreen.metadata.json",
+          "original_path": "/root/aidoku-phase3/evidence/candidate16/final-design-pass-2/pw-reader--fullscreen.metadata.json",
+          "owner_inventory_json_pointer": "/members/27"
+        },
+        "actions": {
+          "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate16/final-design-pass-2-modules/pw-reader/files/output/actions/pw-reader--fullscreen.json",
+          "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+          "bytes": 3,
+          "module_relative_path": "files/output/actions/pw-reader--fullscreen.json",
+          "original_path": "/root/aidoku-phase3/evidence/candidate16/final-design-pass-2/actions/pw-reader--fullscreen.json",
+          "owner_inventory_json_pointer": "/members/28"
+        },
+        "log": {
+          "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate16/final-design-pass-2-modules/pw-reader/files/output/pw-reader--fullscreen.log",
+          "sha256": "dc121ceea011a63c29b404d6c6b75bbe2db32b326923b8fa99759f457bfd709f",
+          "bytes": 68,
+          "module_relative_path": "files/output/pw-reader--fullscreen.log",
+          "original_path": "/root/aidoku-phase3/evidence/candidate16/final-design-pass-2/pw-reader--fullscreen.log",
+          "owner_inventory_json_pointer": "/members/29"
+        }
+      },
+      "reference": {
+        "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate16/final-design-pass-2-modules/pw-reader/files/references/70fa45f447c4f52e2e737f7634a1838d73071e32cf22c40e6e8235e07582cee4-pw-reader--fullscreen.png",
+        "sha256": "70fa45f447c4f52e2e737f7634a1838d73071e32cf22c40e6e8235e07582cee4",
+        "bytes": 40033,
+        "module_relative_path": "files/references/70fa45f447c4f52e2e737f7634a1838d73071e32cf22c40e6e8235e07582cee4-pw-reader--fullscreen.png",
+        "original_path": "/root/aidoku-phase3/evidence/candidate16/final-design-preparation-01/references/screens/states/pw-reader--fullscreen.png",
+        "owner_inventory_json_pointer": "/members/33",
+        "kind": "exact-published-design-reference",
+        "binding_type": "exact",
+        "reference_role_owner_declared": null,
+        "applicability": "applicable-subject-to-evidence-based-capability-bounds",
+        "case_declared_sha256": "70fa45f447c4f52e2e737f7634a1838d73071e32cf22c40e6e8235e07582cee4",
+        "case_reference_id_owner_declared": "pw-reader--fullscreen",
+        "applicability_rule": "Retain the actual case applicability and capability declaration, including null or unavailable controls. Do not add unobserved operation or hardware acceptance."
+      },
+      "reference_expected": "Artwork-only reader under the user override; no app decoration or footer-cycle region.",
+      "intentional_differences": [
+        "Persistent reference bookmark ribbon is absent under the user override."
+      ],
+      "visible_ui_requirements": null,
+      "native_visible_regions": null,
+      "extra_required_originals": [
+        {
+          "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate16/final-design-pass-2-modules/pw-reader/files/output/processed/pw-reader--fullscreen/first_path.png",
+          "sha256": "bbcaf9602bcdd5564b3b8a3d3bfda33802e1460baeade76146467d65d0c7291d",
+          "bytes": 130148,
+          "module_relative_path": "files/output/processed/pw-reader--fullscreen/first_path.png",
+          "original_path": "/root/aidoku-phase3/evidence/candidate16/final-design-pass-2/processed/pw-reader--fullscreen/first_path.png",
+          "owner_inventory_json_pointer": "/members/32",
+          "role": "own-processed-source-original",
+          "field_owner_declared": "first_path",
+          "application_path_owner_declared": "/root/aidoku-phase3/evidence/candidate16/final-design-pass-2/data/c205f1b52500/pw-reader--fullscreen/demo/cache/shared-v1/processed/c8/c81c845cbedf1937d7779d4e3e5d86565cf5d20099b98e9b90f736d34f0578d4.png",
+          "case_declared_sha256": "bbcaf9602bcdd5564b3b8a3d3bfda33802e1460baeade76146467d65d0c7291d",
+          "geometry_owner_declared": {
+            "source_size": [
+              1172,
+              1648
+            ],
+            "slot": [
+              0,
+              0,
+              618,
+              824
+            ],
+            "destination": [
+              16,
+              0,
+              602,
+              824
+            ],
+            "dx8": 512,
+            "dy8": 512,
+            "sample_origin": [
+              0,
+              0
+            ],
+            "sample_center_offset": 0
+          },
+          "owner_case_json_pointer": "/pure_reader_oracle/processed_inputs/0",
+          "mandatory": true
+        },
+        {
+          "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate16/final-design-pass-2-modules/pw-reader/files/output/oracle/pw-reader--fullscreen.expected.png",
+          "sha256": "453566ca4cac5f749d97dcad597a8070f16e64741cb95d22f2f4e8450731b012",
+          "bytes": 36216,
+          "module_relative_path": "files/output/oracle/pw-reader--fullscreen.expected.png",
+          "original_path": "/root/aidoku-phase3/evidence/candidate16/final-design-pass-2/oracle/pw-reader--fullscreen.expected.png",
+          "owner_inventory_json_pointer": "/members/30",
+          "role": "own-expected-source-composition-original",
+          "owner_case_json_pointer": "/pure_reader_oracle/expected",
+          "mandatory": true
+        }
+      ],
+      "own_source_composition_reading_required": true,
+      "artwork_content_contract": "Committed source identity and strict whole-viewport pixel composition; legitimate bright or white source pages need no dark-ink quota.",
+      "pure_reader_oracle": {
+        "sampler_contract": "slint-software-1.17.1-shared-rgb8-fixed8-v1",
+        "metrics": {
+          "exact_match": true,
+          "changed_pixels": 0,
+          "maximum_channel_difference": 0,
+          "rgb_mae_diagnostic_only": 0.0,
+          "difference_bbox": null,
+          "regions_diagnostic_only": {
+            "top_96": {
+              "rectangle": [
+                0,
+                0,
+                618,
+                96
+              ],
+              "changed_pixels": 0
+            },
+            "bottom_96": {
+              "rectangle": [
+                0,
+                728,
+                618,
+                824
+              ],
+              "changed_pixels": 0
+            },
+            "left_32": {
+              "rectangle": [
+                0,
+                0,
+                32,
+                824
+              ],
+              "changed_pixels": 0
+            },
+            "right_32": {
+              "rectangle": [
+                586,
+                0,
+                618,
+                824
+              ],
+              "changed_pixels": 0
+            },
+            "center_seam_8": {
+              "rectangle": [
+                305,
+                0,
+                313,
+                824
+              ],
+              "changed_pixels": 0
+            }
+          },
+          "pixel_error_tolerance": 0,
+          "ignored_pixels": 0
+        },
+        "processed_inputs": [
+          {
+            "field": "first_path",
+            "application_path": "/root/aidoku-phase3/evidence/candidate16/final-design-pass-2/data/c205f1b52500/pw-reader--fullscreen/demo/cache/shared-v1/processed/c8/c81c845cbedf1937d7779d4e3e5d86565cf5d20099b98e9b90f736d34f0578d4.png",
+            "retained_path": "/root/aidoku-phase3/evidence/candidate16/final-design-pass-2/processed/pw-reader--fullscreen/first_path.png",
+            "sha256": "bbcaf9602bcdd5564b3b8a3d3bfda33802e1460baeade76146467d65d0c7291d",
+            "geometry": {
+              "source_size": [
+                1172,
+                1648
+              ],
+              "slot": [
+                0,
+                0,
+                618,
+                824
+              ],
+              "destination": [
+                16,
+                0,
+                602,
+                824
+              ],
+              "dx8": 512,
+              "dy8": 512,
+              "sample_origin": [
+                0,
+                0
+              ],
+              "sample_center_offset": 0
+            }
+          }
+        ],
+        "expected": "/root/aidoku-phase3/evidence/candidate16/final-design-pass-2/oracle/pw-reader--fullscreen.expected.png",
+        "difference": "/root/aidoku-phase3/evidence/candidate16/final-design-pass-2/oracle/pw-reader--fullscreen.diff.png",
+        "original_capture_unchanged": true
+      },
+      "pure_oracle": null,
+      "own_closed_source_chain_required": null,
+      "same_case_closed_prerequisite": null,
+      "same_case_dependencies": null,
+      "acceptance_scope_limit": "Review captured artwork content against this case own retained processed source and expected composition. Closing operations and post-close setting effects still require their own actual evidence.",
+      "closed_or_post_close_effect_acceptance": null,
+      "owner_json_pointers": {
+        "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate16/final-design-pass-2-modules/pw-reader/files/output/cases/pw-reader--fullscreen.json",
+        "sha256": "50a937aa7bdc567d9849a67ce8f0f87bf22177dc4b061c75625780603eacd38d",
+        "state": "/state",
+        "metadata": "/metadata",
+        "actions": "/actions",
+        "checks": "/checks",
+        "command": "/command",
+        "capability_declaration": "/state/capability_declaration",
+        "reference_applicability": "/reference_applicability",
+        "pure_reader_oracle": "/pure_reader_oracle",
+        "pure_oracle": "/pure_oracle",
+        "own_closed_source_chain_required": "/own_closed_source_chain_required",
+        "same_case_closed_prerequisite": "/same_case_closed_prerequisite",
+        "same_case_dependencies": "/same_case_dependencies",
+        "closed_or_post_close_effect_acceptance": "/closed_or_post_close_effect_acceptance"
+      }
+    }
+  ],
+  "image_open_plan": [
+    {
+      "case_id": "pw-reader--fullscreen-footer",
+      "role": "actual-current-native-original",
+      "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate16/final-design-pass-2-modules/pw-reader/files/output/pw-reader--fullscreen-footer.png",
+      "sha256": "99e72fc0524cab6742a606d8fd257bc1fd762c534457451aacba487d8ee9c394",
+      "mandatory": true,
+      "covered_case_ids": [
+        "pw-reader--fullscreen-footer"
+      ]
+    },
+    {
+      "case_id": "pw-reader--fullscreen-footer",
+      "role": "related-published-design-reference",
+      "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate16/final-design-pass-2-modules/pw-reader/files/references/fb9d1ace61b8656559417e388dbd0087dfa3d8c96526f8efe913e4bce80076e4-pw-reader--fullscreen-footer.png",
+      "sha256": "fb9d1ace61b8656559417e388dbd0087dfa3d8c96526f8efe913e4bce80076e4",
+      "mandatory": true,
+      "covered_case_ids": [
+        "pw-reader--fullscreen-footer"
+      ]
+    },
+    {
+      "case_id": "pw-reader--fullscreen-footer",
+      "role": "own-processed-source-original",
+      "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate16/final-design-pass-2-modules/pw-reader/files/output/processed/pw-reader--fullscreen-footer/first_path.png",
+      "sha256": "f2c156f9946604083d71a434a9351355e6f0ad49d607c2ea23af0b4ba8ec5e7a",
+      "mandatory": true,
+      "covered_case_ids": [
+        "pw-reader--fullscreen-footer"
+      ]
+    },
+    {
+      "case_id": "pw-reader--fullscreen-footer",
+      "role": "own-expected-source-composition-original",
+      "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate16/final-design-pass-2-modules/pw-reader/files/output/oracle/pw-reader--fullscreen-footer.expected.png",
+      "sha256": "453566ca4cac5f749d97dcad597a8070f16e64741cb95d22f2f4e8450731b012",
+      "mandatory": true,
+      "covered_case_ids": [
+        "pw-reader--fullscreen-footer"
+      ]
+    },
+    {
+      "case_id": "pw-reader--fullscreen",
+      "role": "actual-current-native-original",
+      "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate16/final-design-pass-2-modules/pw-reader/files/output/pw-reader--fullscreen.png",
+      "sha256": "99e72fc0524cab6742a606d8fd257bc1fd762c534457451aacba487d8ee9c394",
+      "mandatory": true,
+      "covered_case_ids": [
+        "pw-reader--fullscreen"
+      ]
+    },
+    {
+      "case_id": "pw-reader--fullscreen",
+      "role": "exact-published-design-reference",
+      "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate16/final-design-pass-2-modules/pw-reader/files/references/70fa45f447c4f52e2e737f7634a1838d73071e32cf22c40e6e8235e07582cee4-pw-reader--fullscreen.png",
+      "sha256": "70fa45f447c4f52e2e737f7634a1838d73071e32cf22c40e6e8235e07582cee4",
+      "mandatory": true,
+      "covered_case_ids": [
+        "pw-reader--fullscreen"
+      ]
+    },
+    {
+      "case_id": "pw-reader--fullscreen",
+      "role": "own-processed-source-original",
+      "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate16/final-design-pass-2-modules/pw-reader/files/output/processed/pw-reader--fullscreen/first_path.png",
+      "sha256": "bbcaf9602bcdd5564b3b8a3d3bfda33802e1460baeade76146467d65d0c7291d",
+      "mandatory": true,
+      "covered_case_ids": [
+        "pw-reader--fullscreen"
+      ]
+    },
+    {
+      "case_id": "pw-reader--fullscreen",
+      "role": "own-expected-source-composition-original",
+      "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate16/final-design-pass-2-modules/pw-reader/files/output/oracle/pw-reader--fullscreen.expected.png",
+      "sha256": "453566ca4cac5f749d97dcad597a8070f16e64741cb95d22f2f4e8450731b012",
+      "mandatory": true,
+      "covered_case_ids": [
+        "pw-reader--fullscreen"
+      ]
+    }
+  ],
+  "source_composition_comparison_pairs": [
+    {
+      "case_id": "pw-reader--fullscreen-footer",
+      "role": "own-source-composition-comparison",
+      "processed_originals": [
+        {
+          "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate16/final-design-pass-2-modules/pw-reader/files/output/processed/pw-reader--fullscreen-footer/first_path.png",
+          "sha256": "f2c156f9946604083d71a434a9351355e6f0ad49d607c2ea23af0b4ba8ec5e7a",
+          "bytes": 130148,
+          "module_relative_path": "files/output/processed/pw-reader--fullscreen-footer/first_path.png",
+          "original_path": "/root/aidoku-phase3/evidence/candidate16/final-design-pass-2/processed/pw-reader--fullscreen-footer/first_path.png",
+          "owner_inventory_json_pointer": "/members/23",
+          "role": "own-processed-source-original",
+          "field_owner_declared": "first_path",
+          "application_path_owner_declared": "/root/aidoku-phase3/evidence/candidate16/final-design-pass-2/data/c205f1b52500/pw-reader--fullscreen-footer/demo/cache/shared-v1/processed/91/91b779db31cbdfe2e67e7266aa7c612b58ba27ff79c0811f2108dc432c979dbe.png",
+          "case_declared_sha256": "f2c156f9946604083d71a434a9351355e6f0ad49d607c2ea23af0b4ba8ec5e7a",
+          "geometry_owner_declared": {
+            "source_size": [
+              1172,
+              1648
+            ],
+            "slot": [
+              0,
+              0,
+              618,
+              824
+            ],
+            "destination": [
+              16,
+              0,
+              602,
+              824
+            ],
+            "dx8": 512,
+            "dy8": 512,
+            "sample_origin": [
+              0,
+              0
+            ],
+            "sample_center_offset": 0
+          },
+          "owner_case_json_pointer": "/pure_reader_oracle/processed_inputs/0",
+          "mandatory": true
+        }
+      ],
+      "expected_original": {
+        "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate16/final-design-pass-2-modules/pw-reader/files/output/oracle/pw-reader--fullscreen-footer.expected.png",
+        "sha256": "453566ca4cac5f749d97dcad597a8070f16e64741cb95d22f2f4e8450731b012",
+        "bytes": 36216,
+        "module_relative_path": "files/output/oracle/pw-reader--fullscreen-footer.expected.png",
+        "original_path": "/root/aidoku-phase3/evidence/candidate16/final-design-pass-2/oracle/pw-reader--fullscreen-footer.expected.png",
+        "owner_inventory_json_pointer": "/members/21",
+        "role": "own-expected-source-composition-original",
+        "owner_case_json_pointer": "/pure_reader_oracle/expected",
+        "mandatory": true
+      },
+      "current_native_original": {
+        "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate16/final-design-pass-2-modules/pw-reader/files/output/pw-reader--fullscreen-footer.png",
+        "sha256": "99e72fc0524cab6742a606d8fd257bc1fd762c534457451aacba487d8ee9c394",
+        "bytes": 378599,
+        "module_relative_path": "files/output/pw-reader--fullscreen-footer.png",
+        "original_path": "/root/aidoku-phase3/evidence/candidate16/final-design-pass-2/pw-reader--fullscreen-footer.png",
+        "owner_inventory_json_pointer": "/members/16"
+      },
+      "owner_case_json_path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate16/final-design-pass-2-modules/pw-reader/files/output/cases/pw-reader--fullscreen-footer.json",
+      "owner_case_json_pointer": "/pure_reader_oracle",
+      "declared_processed_input_count": 1,
+      "counted_source_oracle_pairs": 1,
+      "required_reading_rule": "Read every own retained processed PNG and own expected composition, then inspect the actual current native original against this source chain. Equal SHA across distinct paths cannot replace openings. Oracle metrics are identity/support declarations only and do not supply manual purity acceptance.",
+      "expected_role_limit": "Own expected is a source composition and never a published design reference."
+    },
+    {
+      "case_id": "pw-reader--fullscreen",
+      "role": "own-source-composition-comparison",
+      "processed_originals": [
+        {
+          "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate16/final-design-pass-2-modules/pw-reader/files/output/processed/pw-reader--fullscreen/first_path.png",
+          "sha256": "bbcaf9602bcdd5564b3b8a3d3bfda33802e1460baeade76146467d65d0c7291d",
+          "bytes": 130148,
+          "module_relative_path": "files/output/processed/pw-reader--fullscreen/first_path.png",
+          "original_path": "/root/aidoku-phase3/evidence/candidate16/final-design-pass-2/processed/pw-reader--fullscreen/first_path.png",
+          "owner_inventory_json_pointer": "/members/32",
+          "role": "own-processed-source-original",
+          "field_owner_declared": "first_path",
+          "application_path_owner_declared": "/root/aidoku-phase3/evidence/candidate16/final-design-pass-2/data/c205f1b52500/pw-reader--fullscreen/demo/cache/shared-v1/processed/c8/c81c845cbedf1937d7779d4e3e5d86565cf5d20099b98e9b90f736d34f0578d4.png",
+          "case_declared_sha256": "bbcaf9602bcdd5564b3b8a3d3bfda33802e1460baeade76146467d65d0c7291d",
+          "geometry_owner_declared": {
+            "source_size": [
+              1172,
+              1648
+            ],
+            "slot": [
+              0,
+              0,
+              618,
+              824
+            ],
+            "destination": [
+              16,
+              0,
+              602,
+              824
+            ],
+            "dx8": 512,
+            "dy8": 512,
+            "sample_origin": [
+              0,
+              0
+            ],
+            "sample_center_offset": 0
+          },
+          "owner_case_json_pointer": "/pure_reader_oracle/processed_inputs/0",
+          "mandatory": true
+        }
+      ],
+      "expected_original": {
+        "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate16/final-design-pass-2-modules/pw-reader/files/output/oracle/pw-reader--fullscreen.expected.png",
+        "sha256": "453566ca4cac5f749d97dcad597a8070f16e64741cb95d22f2f4e8450731b012",
+        "bytes": 36216,
+        "module_relative_path": "files/output/oracle/pw-reader--fullscreen.expected.png",
+        "original_path": "/root/aidoku-phase3/evidence/candidate16/final-design-pass-2/oracle/pw-reader--fullscreen.expected.png",
+        "owner_inventory_json_pointer": "/members/30",
+        "role": "own-expected-source-composition-original",
+        "owner_case_json_pointer": "/pure_reader_oracle/expected",
+        "mandatory": true
+      },
+      "current_native_original": {
+        "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate16/final-design-pass-2-modules/pw-reader/files/output/pw-reader--fullscreen.png",
+        "sha256": "99e72fc0524cab6742a606d8fd257bc1fd762c534457451aacba487d8ee9c394",
+        "bytes": 378599,
+        "module_relative_path": "files/output/pw-reader--fullscreen.png",
+        "original_path": "/root/aidoku-phase3/evidence/candidate16/final-design-pass-2/pw-reader--fullscreen.png",
+        "owner_inventory_json_pointer": "/members/25"
+      },
+      "owner_case_json_path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate16/final-design-pass-2-modules/pw-reader/files/output/cases/pw-reader--fullscreen.json",
+      "owner_case_json_pointer": "/pure_reader_oracle",
+      "declared_processed_input_count": 1,
+      "counted_source_oracle_pairs": 1,
+      "required_reading_rule": "Read every own retained processed PNG and own expected composition, then inspect the actual current native original against this source chain. Equal SHA across distinct paths cannot replace openings. Oracle metrics are identity/support declarations only and do not supply manual purity acceptance.",
+      "expected_role_limit": "Own expected is a source composition and never a published design reference."
+    }
+  ],
+  "reference_pair_count": 2,
+  "source_oracle_pair_count": 2,
+  "comparison_pair_count": 4,
+  "planned_minimum_image_opens": 8,
+  "own_processed_original_open_count": 2,
+  "own_expected_original_open_count": 2,
+  "diagnostic_difference_image_opens": 0,
+  "image_open_count_policy": "Open every mandatory actual unique path independently. A legitimately shared exact path has one actual opening with covered-case bindings; equal SHA across different paths gives no reuse credit.",
+  "maximum_manual_cases": 4,
+  "maximum_reference_pairs": 4,
+  "maximum_comparison_pairs": 4,
+  "maximum_image_opens": 8,
+  "fork_turns": "none",
+  "model_selection": "Intentional inheritance because current tool metadata does not distinguish model capabilities.",
+  "worker_contract": "D:/Code/aidokuForKindle/docs/review/phase3-full-fresh-worker-contract.md",
+  "skill_path": "C:/Users/moooyo/.codex/skills/ui-ux-pro-max/SKILL.md",
+  "requirements": [
+    "Actually open every mandatory current, reference and own processed/expected unique path in image_open_plan. Retain explicit covered-case bindings for lawful same-path sharing; matching SHA alone supplies no opening credit.",
+    "Count own source-oracle composition pairs together with design-reference pairs within four total pairs and eight required opens. Own expected is a source composition, never a design reference. Do not open diagnostic difference images.",
+    "Read required actual glyph hierarchy, clipping, icons, visible feedback, pure reader content and supported normal use from the new originals. Required issues block closure; extra non-required optimizations remain deferred.",
+    "Preserve actual raw reference applicability and capability declarations, including null, empty and unavailable controls. A captured desktop control does not prove hardware operation.",
+    "An open panel supports captured UI only. Preserve raw closed/source acceptance fields and do not infer closing operations, post-close effects or unobserved functional proof.",
+    "Old pass1 images or observations, Source parameters and automatic PASS cannot replace new glyph, purity or closing-operation observations.",
+    "Required unread text or uncertain extent needs a precise own-source ROI request and reading_pending. Do not generate or process the ROI in this worker.",
+    "Typeface and numeric weights such as 500 or 700 remain unmeasured limitations unless actual new evidence exists. Static parameters do not replace visible glyph and extent observations.",
+    "The assigned worker may read static local text and use tools.view_image for the required originals only. No SSH, hashing, tests, builds, validation, probes, App/capture, Python/PIL, cropping, resizing, image processing, extra images, child agents, Source edits, old report edits or registry edits.",
+    "Write a new compact English report at report_path and use Chinese team messages. Record actual actor, parent, proxy and slot; path-role-SHA openings; reference/source/total pair counts; bounded findings; new_required, reading_pending, identity and deferred.",
+    "A reference-only case under an actual user override is required reading as related context. Preserve the override and do not restore its overridden app footer, cycle target or ribbon.",
+    "Each case with an actual source oracle requires its own complete retained processed and expected original chain. Mechanical oracle metrics do not substitute for new manual purity observations.",
+    "No hidden, hardware, unobserved operation, lease, performance, full-stress, package or global clean credit."
+  ],
+  "required_member_pending": [],
+  "report_path": "D:/Code/aidokuForKindle/docs/review/phase3-c16-final-design-pass2-batches/b0008.review.json",
+  "credit": {
+    "full_stress": 0,
+    "clean": 0,
+    "package": 0,
+    "pass1": 0,
+    "pass2": 0
+  },
+  "static_draft_helper_image_opens": 0,
+  "declared_hash_basis": "Actual independent pass2 snapshot.members, actual pass2 local-return receipt module SHA declarations and sole coordinator receipt SHA declaration only; no local or Source hashing."
+}

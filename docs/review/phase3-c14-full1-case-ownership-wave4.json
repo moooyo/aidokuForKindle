@@ -1,0 +1,2176 @@
+{
+  "schema_version": 1,
+  "kind": "c14-full-round-one-current-case-ownership",
+  "owner": "/root/final_validation_delivery/c4_full_review_coordinator",
+  "identity": {
+    "round": 1,
+    "run_id": "1e2765959467",
+    "source_sha256": "4737c2c1b8dcdf3c5c97400e2036502c6efdf932ff25322b8ddd51fc62d7c99f",
+    "binary_sha256": "01ec3051c62598d100f2203694ed7840d4706052bdbea260f5176b7d255b5a37",
+    "main_harness_sha256": "1f2379bffd9ce9594f307fa150f56c345fe508fca47aac3be31e8ce29a72fa44",
+    "capture_plan_sha256": "d07810abea322f7d2f86261f80e29007b3bd2f194eb2e9a3d4a53d8edcf70687"
+  },
+  "modules": [
+    {
+      "module": "001",
+      "module_name": "001-pw-library-and-real-queue",
+      "inventory": "D:/Code/aidokuForKindle/artifacts/phase3/candidate14/ui-round-1-module-snapshots/001-pw-library-and-real-queue/inventory.json",
+      "inventory_sha256": "90b5ff7dda8fa0adda101db1440f19fa41753fd7778091f30fc536184429c870",
+      "manual_review_ids": [
+        "Main--default",
+        "Main--download-queue",
+        "Main--download-queue--page-two",
+        "Main--download-queue--pause-all",
+        "Main--download-queue--resume-all",
+        "Main--download-queue--cancel-all",
+        "Main--download-queue--completed-real-job",
+        "Main--download-queue--completed-job-menu",
+        "Main--download-queue--completed-remove-confirm",
+        "Main--download-queue--completed-remove-cancel",
+        "Main--download-queue--completed-remove-apply",
+        "Main--jump-pages",
+        "Main--more",
+        "Main--select",
+        "Main--sort"
+      ],
+      "prerequisite_ids": [
+        "Main--download-queue--fixture-seed"
+      ],
+      "captured_count": 16
+    },
+    {
+      "module": "002",
+      "module_name": "002-pw-detail",
+      "inventory": "D:/Code/aidokuForKindle/artifacts/phase3/candidate14/ui-round-1-module-snapshots/002-pw-detail/inventory.json",
+      "inventory_sha256": "7ea5e3ab883d75987017dd1db2849947a47efc38db34c30bd046659e595d935d",
+      "manual_review_ids": [
+        "pw-manga--default",
+        "pw-manga--batch-download",
+        "pw-manga--chapters-p2",
+        "pw-manga--description",
+        "pw-manga--more",
+        "pw-manga--tracking"
+      ],
+      "prerequisite_ids": [],
+      "captured_count": 6
+    },
+    {
+      "module": "003",
+      "module_name": "003-pw-reader",
+      "inventory": "D:/Code/aidokuForKindle/artifacts/phase3/candidate14/ui-round-1-module-snapshots/003-pw-reader/inventory.json",
+      "inventory_sha256": "871b72099146257d5f4fd618cf0ff6d2b35229de32abead74e79c814e2681dfc",
+      "manual_review_ids": [
+        "pw-reader--default",
+        "pw-reader--fullscreen-footer",
+        "pw-reader--fullscreen",
+        "pw-reader--image",
+        "pw-reader--light",
+        "pw-reader--mode",
+        "pw-reader--more",
+        "pw-reader--rotate",
+        "pw-reader--toc"
+      ],
+      "prerequisite_ids": [],
+      "captured_count": 9
+    },
+    {
+      "module": "004",
+      "module_name": "004-pw-sources-search-history-settings",
+      "inventory": "D:/Code/aidokuForKindle/artifacts/phase3/candidate14/ui-round-1-module-snapshots/004-pw-sources-search-history-settings/inventory.json",
+      "inventory_sha256": "d7b7d0d50150b7e2c6a5661ad9303fbb2a733405720a9854f55dfddfcbb285b7",
+      "manual_review_ids": [
+        "pw-browse--default",
+        "pw-browse--add-source",
+        "pw-browse--available",
+        "pw-browse--source-lists",
+        "pw-browse--updates",
+        "pw-source--default",
+        "pw-source--filter",
+        "pw-source--source-settings",
+        "pw-search--default",
+        "pw-search--numbers",
+        "pw-search--results",
+        "pw-history--default",
+        "pw-history--clear-confirm",
+        "pw-history--incognito",
+        "pw-history--updates",
+        "pw-settings--default",
+        "pw-settings--display",
+        "pw-settings--page2",
+        "pw-settings--power"
+      ],
+      "prerequisite_ids": [],
+      "captured_count": 19
+    },
+    {
+      "module": "005",
+      "module_name": "005-sc-library-detail-sources",
+      "inventory": "D:/Code/aidokuForKindle/artifacts/phase3/candidate14/ui-round-1-module-snapshots/005-sc-library-detail-sources/inventory.json",
+      "inventory_sha256": "97b3fcf1f352206a517a93de6784e888edae796693b56cc71dcbe82fbed49292",
+      "manual_review_ids": [
+        "sc-library--default",
+        "sc-library--download-queue",
+        "sc-library--download-queue--page-two",
+        "sc-library--download-queue--pause-all",
+        "sc-library--download-queue--resume-all",
+        "sc-library--download-queue--cancel-all",
+        "sc-library--download-queue--completed-real-job",
+        "sc-library--download-queue--completed-job-menu",
+        "sc-library--download-queue--completed-remove-confirm",
+        "sc-library--download-queue--completed-remove-cancel",
+        "sc-library--download-queue--completed-remove-apply",
+        "sc-library--jump-pages",
+        "sc-library--more",
+        "sc-library--select",
+        "sc-library--sort",
+        "sc-manga--default",
+        "sc-manga--migrate",
+        "sc-manga--more",
+        "sc-manga--tracking",
+        "sc-browse--default",
+        "sc-browse--blocked-source",
+        "sc-browse--filter",
+        "sc-browse--server-setup",
+        "sc-browse--source-picker",
+        "sc-browse--source-settings"
+      ],
+      "prerequisite_ids": [
+        "sc-library--download-queue--fixture-seed"
+      ],
+      "captured_count": 26
+    },
+    {
+      "module": "006",
+      "module_name": "006-sc-reader-portrait",
+      "inventory": "D:/Code/aidokuForKindle/artifacts/phase3/candidate14/ui-round-1-module-snapshots/006-sc-reader-portrait/inventory.json",
+      "inventory_sha256": "c9eb2e84ed749b0e19077b275809ffe89db19619df79aa7b040bb596ff93ffcd",
+      "manual_review_ids": [
+        "sc-reader-portrait--default",
+        "sc-reader-portrait--fullscreen-footer",
+        "sc-reader-portrait--fullscreen",
+        "sc-reader-portrait--image",
+        "sc-reader-portrait--light",
+        "sc-reader-portrait--mode",
+        "sc-reader-portrait--more",
+        "sc-reader-portrait--orientation",
+        "sc-reader-portrait--toc"
+      ],
+      "prerequisite_ids": [],
+      "captured_count": 9
+    },
+    {
+      "module": "007",
+      "module_name": "007-sc-reader-landscape",
+      "inventory": "D:/Code/aidokuForKindle/artifacts/phase3/candidate14/ui-round-1-module-snapshots/007-sc-reader-landscape/inventory.json",
+      "inventory_sha256": "bf58f1655324f2f9c556190ea4b448519d3e27b2fcc9eca1ee6759d41d9147c6",
+      "manual_review_ids": [
+        "sc-reader--default",
+        "sc-reader--fullscreen",
+        "sc-reader--image",
+        "sc-reader--layout",
+        "sc-reader--light",
+        "sc-reader--mode",
+        "sc-reader--more",
+        "sc-reader--toc"
+      ],
+      "prerequisite_ids": [],
+      "captured_count": 8
+    },
+    {
+      "module": "008",
+      "module_name": "008-sc-sources-search-history-settings",
+      "inventory": "D:/Code/aidokuForKindle/artifacts/phase3/candidate14/ui-round-1-module-snapshots/008-sc-sources-search-history-settings/inventory.json",
+      "inventory_sha256": "84da28fc8987e31e73a5e349b7823ddde1a0a1420146cf3036e805d41c3ad988",
+      "manual_review_ids": [
+        "sc-sources--default",
+        "sc-sources--add-source",
+        "sc-sources--source-lists",
+        "sc-sources--updates",
+        "sc-search--default",
+        "sc-search--results",
+        "sc-history--default",
+        "sc-history--clear-confirm",
+        "sc-history--incognito",
+        "sc-history--updates",
+        "sc-settings--default",
+        "sc-settings--about",
+        "sc-settings--auto-update",
+        "sc-settings--backup",
+        "sc-settings--categories",
+        "sc-settings--download",
+        "sc-settings--image",
+        "sc-settings--language",
+        "sc-settings--light",
+        "sc-settings--logs",
+        "sc-settings--pen",
+        "sc-settings--power",
+        "sc-settings--reading",
+        "sc-settings--source-lists",
+        "sc-settings--spread",
+        "sc-settings--storage",
+        "sc-settings--tap-zones",
+        "sc-settings--tracking-login"
+      ],
+      "prerequisite_ids": [],
+      "captured_count": 28
+    },
+    {
+      "module": "009",
+      "module_name": "009-pw-settings-license-history-entry",
+      "inventory": "D:/Code/aidokuForKindle/artifacts/phase3/candidate14/ui-round-1-module-snapshots/009-pw-settings-license-history-entry/inventory.json",
+      "inventory_sha256": "bbd0cefe272037a66981a3bf45255d4581414bd95bf9432521742cf3b2bbe536",
+      "manual_review_ids": [
+        "pw5--settings-frontlight-warmth",
+        "pw5--settings-storage",
+        "pw5--settings-default-direction",
+        "pw5--settings-tap-regions",
+        "pw5--settings-image-processing",
+        "pw5--settings-spread",
+        "pw5--settings-categories",
+        "pw5--settings-auto-update",
+        "pw5--settings-source-lists",
+        "pw5--settings-downloads",
+        "pw5--settings-tracking",
+        "pw5--settings-backup",
+        "pw5--settings-language",
+        "pw5--settings-logs",
+        "pw5--settings-about",
+        "pw5--c5-about-license-entry",
+        "pw5--c5-license-first",
+        "pw5--c5-license-last",
+        "pw5--c5-empty-history-body",
+        "pw5--c5-empty-history-library"
+      ],
+      "prerequisite_ids": [],
+      "captured_count": 20
+    },
+    {
+      "module": "010",
+      "module_name": "010-pw-library-keyboard-paging",
+      "inventory": "D:/Code/aidokuForKindle/artifacts/phase3/candidate14/ui-round-1-module-snapshots/010-pw-library-keyboard-paging/inventory.json",
+      "inventory_sha256": "c18dc2b81fafb6601d0a9dd99da37621ab6a8b0a962e4d0beca8440a7ceba0eb",
+      "manual_review_ids": [
+        "pw5--sort-title",
+        "pw5--sort-recent-read",
+        "pw5--sort-recent-open",
+        "pw5--sort-recent-update",
+        "pw5--sort-added-at",
+        "pw5--sort-latest-chapter",
+        "pw5--sort-unread-count",
+        "pw5--sort-chapter-count",
+        "pw5--sort-descending",
+        "pw5--sort-cold-persistence",
+        "pw5--filter-downloaded-1",
+        "pw5--filter-downloaded-2",
+        "pw5--filter-downloaded-3",
+        "pw5--filter-unread-1",
+        "pw5--filter-unread-2",
+        "pw5--filter-unread-3",
+        "pw5--filter-tracked-1",
+        "pw5--filter-tracked-2",
+        "pw5--filter-tracked-3",
+        "pw5--filter-completed-1",
+        "pw5--filter-completed-2",
+        "pw5--filter-completed-3",
+        "pw5--library-tab-0",
+        "pw5--library-tab-1",
+        "pw5--library-tab-2",
+        "pw5--library-tab-3",
+        "pw5--library-tab-4",
+        "pw5--selection-all-page",
+        "pw5--selection-category",
+        "pw5--selection-cancel",
+        "pw5--selection-mark-read",
+        "pw5--selection-remove",
+        "pw5--library-update-toast",
+        "pw5--keyboard-pinyin",
+        "pw5--keyboard-candidate-page-2",
+        "pw5--keyboard-candidate-commit",
+        "pw5--keyboard-english",
+        "pw5--keyboard-numbers",
+        "pw5--keyboard-shift-space-backspace",
+        "pw5--keyboard-clear",
+        "pw5--keyboard-cancel",
+        "pw5--search-source-scope",
+        "pw5--library-last-page",
+        "pw5--library-first-boundary",
+        "pw5--catalog-last-page",
+        "pw5--catalog-first-boundary",
+        "pw5--detail-last-page",
+        "pw5--detail-first-boundary",
+        "pw5--history-last-page",
+        "pw5--history-first-boundary",
+        "pw5--settings-last-page",
+        "pw5--settings-first-boundary",
+        "pw5--sources-last-page",
+        "pw5--sources-first-boundary",
+        "pw5--detail-page-two",
+        "pw5--folio-outside-dismiss",
+        "pw5--anchored-menu-outside-dismiss",
+        "pw5--empty-library",
+        "pw5--empty-history"
+      ],
+      "prerequisite_ids": [],
+      "captured_count": 59
+    },
+    {
+      "module": "011",
+      "module_name": "011-pw-tags-history-migration-http-search",
+      "inventory": "D:/Code/aidokuForKindle/artifacts/phase3/candidate14/ui-round-1-module-snapshots/011-pw-tags-history-migration-http-search/inventory.json",
+      "inventory_sha256": "bcaab92957ba6b220f3f402ced8f3dc68b27355de8b3df72d215b9708e82bbb8",
+      "manual_review_ids": [
+        "pw5--catalog-tags-seed",
+        "pw5--catalog-tag-1",
+        "pw5--catalog-tag-2",
+        "pw5--catalog-tag-3",
+        "pw5--catalog-filter-apply",
+        "pw5--catalog-filter-reset",
+        "pw5--source-language-all",
+        "pw5--source-language-zh-Hans",
+        "pw5--source-language-zh-Hant",
+        "pw5--source-language-en",
+        "pw5--source-language-ja",
+        "pw5--history-delete-entry",
+        "pw5--history-clear-apply",
+        "pw5--incognito-enable",
+        "pw5--incognito-history-policy",
+        "pw5--incognito-persistence",
+        "pw5--history-clear-cancel",
+        "pw5--server-address-keyboard",
+        "pw5--server-secret-keyboard",
+        "pw5--migration-options",
+        "pw5--migration-cancel",
+        "pw5--real-migration--origin-empty",
+        "pw5--real-migration--origin-selector-last",
+        "pw5--real-migration--origin-selector-cancel",
+        "pw5--real-migration--candidates",
+        "pw5--real-migration--selected",
+        "pw5--real-migration--committed",
+        "pw5--source-list-operation--added",
+        "pw5--source-list-operation--removed",
+        "pw5--http-search-success",
+        "pw5--http-search-success--view-all",
+        "pw5--http-search-success--view-all-pointer-open",
+        "pw5--http-search-success--server-connect",
+        "pw5--http-search-success--cached-unverified",
+        "pw5--http-search-empty",
+        "pw5--http-search-failure",
+        "pw5--http-search-retry",
+        "pw5--http-search-retrying",
+        "pw5--http-search-timeout",
+        "pw5--independent-search--early-result",
+        "pw5--independent-search--all-complete",
+        "pw5--independent-search--more-picker",
+        "pw5--independent-search--more-fourth-source"
+      ],
+      "prerequisite_ids": [
+        "pw5--history-operation-seed",
+        "pw5--real-migration--fixture-seed",
+        "pw5--real-migration--origin-library",
+        "pw5--source-list-operation--fixture-seed",
+        "pw5--http-search-success--fixture-seed",
+        "pw5--http-search-empty--fixture-seed",
+        "pw5--http-search-failure--fixture-seed",
+        "pw5--http-search-retry--fixture-seed",
+        "pw5--http-search-retrying--fixture-seed",
+        "pw5--http-search-timeout--fixture-seed",
+        "pw5--independent-search--fixture-seed"
+      ],
+      "captured_count": 54
+    },
+    {
+      "module": "012",
+      "module_name": "012-pw-content-stress",
+      "inventory": "D:/Code/aidokuForKindle/artifacts/phase3/candidate14/ui-round-1-module-snapshots/012-pw-content-stress/inventory.json",
+      "inventory_sha256": "3c3a3e86793446f3ddeef44a451c95c9def3aaf81314eb4e83262cca3dd96f04",
+      "manual_review_ids": [
+        "pw5--content-stress--dense-sources",
+        "pw5--content-stress--dense-installed-last",
+        "pw5--content-stress--scope-typing",
+        "pw5--content-stress--scope-picker-last",
+        "pw5--content-stress--scope-cancel",
+        "pw5--content-stress--scope-select-last",
+        "pw5--content-stress--long-chapters",
+        "pw5--content-stress--filter-tags-first",
+        "pw5--content-stress--filter-tag-page-1",
+        "pw5--content-stress--filter-tag-page-2",
+        "pw5--content-stress--filter-tag-page-3",
+        "pw5--content-stress--filter-tag-page-4",
+        "pw5--content-stress--filter-tag-page-5",
+        "pw5--content-stress--filter-tag-page-6",
+        "pw5--content-stress--description-and-tags",
+        "pw5--content-stress--description-last-page",
+        "pw5--content-stress--category-capability"
+      ],
+      "prerequisite_ids": [
+        "pw5--content-stress--fixture-seed",
+        "pw5--content-stress--filter-tag-page-2-observe",
+        "pw5--content-stress--filter-tag-page-3-observe",
+        "pw5--content-stress--filter-tag-page-4-observe",
+        "pw5--content-stress--filter-tag-page-5-observe",
+        "pw5--content-stress--filter-tag-page-6-observe"
+      ],
+      "captured_count": 23
+    },
+    {
+      "module": "013",
+      "module_name": "013-sc-book-storage-cleanup",
+      "inventory": "D:/Code/aidokuForKindle/artifacts/phase3/candidate14/ui-round-1-module-snapshots/013-sc-book-storage-cleanup/inventory.json",
+      "inventory_sha256": "b34cd298b363e6a50f4976bf97bfba43a16fb80903fa8912fa2793d98b258833",
+      "manual_review_ids": [
+        "scribe--c4-book-storage--delete-all-local-protected",
+        "scribe--c4-book-storage--storage-initial-loading",
+        "scribe--c4-book-storage--storage-ready-four-classes",
+        "scribe--c4-book-storage--storage-book-management",
+        "scribe--c4-book-storage--delete-all-more",
+        "scribe--c4-book-storage--delete-all-confirm",
+        "scribe--c4-book-storage--delete-all-cancel",
+        "scribe--c4-book-storage--delete-all-active-confirm",
+        "scribe--c4-book-storage--delete-all-applied",
+        "scribe--c4-book-storage--delete-all-empty-disabled",
+        "scribe--c4-book-storage--storage-after-cleanup"
+      ],
+      "prerequisite_ids": [
+        "scribe--c4-book-storage--fixture-seed",
+        "scribe--c4-book-storage--six-real-downloads",
+        "scribe--c4-book-storage--real-reader-cache",
+        "scribe--c4-book-storage--real-local-import"
+      ],
+      "captured_count": 15
+    },
+    {
+      "module": "014",
+      "module_name": "014-sc-license-history-entry",
+      "inventory": "D:/Code/aidokuForKindle/artifacts/phase3/candidate14/ui-round-1-module-snapshots/014-sc-license-history-entry/inventory.json",
+      "inventory_sha256": "ca4a6c645dfec5f3317474550034906a1396740baee6a21dd367d1b21d4c6823",
+      "manual_review_ids": [
+        "scribe--c5-about-license-entry",
+        "scribe--c5-license-first",
+        "scribe--c5-license-last",
+        "scribe--c5-license-return",
+        "scribe--c5-empty-history-body",
+        "scribe--c5-empty-history-browse"
+      ],
+      "prerequisite_ids": [],
+      "captured_count": 6
+    },
+    {
+      "module": "015",
+      "module_name": "015-sc-library-keyboard-paging",
+      "inventory": "D:/Code/aidokuForKindle/artifacts/phase3/candidate14/ui-round-1-module-snapshots/015-sc-library-keyboard-paging/inventory.json",
+      "inventory_sha256": "2d6d9fbdd9d9cfd78276bf7a81f553560789f1a7ca0a8b951ddc598291f31b89",
+      "manual_review_ids": [
+        "scribe--sort-title",
+        "scribe--sort-recent-read",
+        "scribe--sort-recent-open",
+        "scribe--sort-recent-update",
+        "scribe--sort-added-at",
+        "scribe--sort-latest-chapter",
+        "scribe--sort-unread-count",
+        "scribe--sort-chapter-count",
+        "scribe--sort-descending",
+        "scribe--sort-cold-persistence",
+        "scribe--filter-downloaded-1",
+        "scribe--filter-downloaded-2",
+        "scribe--filter-downloaded-3",
+        "scribe--filter-unread-1",
+        "scribe--filter-unread-2",
+        "scribe--filter-unread-3",
+        "scribe--filter-tracked-1",
+        "scribe--filter-tracked-2",
+        "scribe--filter-tracked-3",
+        "scribe--filter-completed-1",
+        "scribe--filter-completed-2",
+        "scribe--filter-completed-3",
+        "scribe--library-tab-0",
+        "scribe--library-tab-1",
+        "scribe--library-tab-2",
+        "scribe--library-tab-3",
+        "scribe--library-tab-4",
+        "scribe--selection-all-page",
+        "scribe--selection-category",
+        "scribe--selection-cancel",
+        "scribe--selection-mark-read",
+        "scribe--selection-remove",
+        "scribe--library-update-toast",
+        "scribe--keyboard-pinyin",
+        "scribe--keyboard-candidate-page-2",
+        "scribe--keyboard-candidate-commit",
+        "scribe--keyboard-english",
+        "scribe--keyboard-numbers",
+        "scribe--keyboard-shift-space-backspace",
+        "scribe--keyboard-clear",
+        "scribe--keyboard-cancel",
+        "scribe--search-source-scope",
+        "scribe--library-last-page",
+        "scribe--library-first-boundary",
+        "scribe--catalog-last-page",
+        "scribe--catalog-first-boundary",
+        "scribe--detail-last-page",
+        "scribe--detail-first-boundary",
+        "scribe--history-last-page",
+        "scribe--history-first-boundary",
+        "scribe--settings-last-page",
+        "scribe--settings-first-boundary",
+        "scribe--sources-last-page",
+        "scribe--sources-first-boundary",
+        "scribe--detail-page-two",
+        "scribe--folio-outside-dismiss",
+        "scribe--anchored-menu-outside-dismiss",
+        "scribe--empty-library",
+        "scribe--empty-history"
+      ],
+      "prerequisite_ids": [],
+      "captured_count": 59
+    }
+  ],
+  "batches": [
+    {
+      "batch_id": "c14r1-m001-b001",
+      "lane": "a",
+      "module": "001",
+      "module_name": "001-pw-library-and-real-queue",
+      "module_inventory": "D:/Code/aidokuForKindle/artifacts/phase3/candidate14/ui-round-1-module-snapshots/001-pw-library-and-real-queue/inventory.json",
+      "module_inventory_sha256": "90b5ff7dda8fa0adda101db1440f19fa41753fd7778091f30fc536184429c870",
+      "case_ids": [
+        "Main--default",
+        "Main--download-queue",
+        "Main--download-queue--page-two"
+      ],
+      "input": "D:/Code/aidokuForKindle/docs/review/phase3-c14-full1-batches/c14r1-m001-b001.input.json",
+      "report": "D:/Code/aidokuForKindle/docs/review/phase3-c14-full1-batches/c14r1-m001-b001.review.json",
+      "maximum_actual_image_opens": 8,
+      "maximum_reference_pairs": 4
+    },
+    {
+      "batch_id": "c14r1-m001-b002",
+      "lane": "b",
+      "module": "001",
+      "module_name": "001-pw-library-and-real-queue",
+      "module_inventory": "D:/Code/aidokuForKindle/artifacts/phase3/candidate14/ui-round-1-module-snapshots/001-pw-library-and-real-queue/inventory.json",
+      "module_inventory_sha256": "90b5ff7dda8fa0adda101db1440f19fa41753fd7778091f30fc536184429c870",
+      "case_ids": [
+        "Main--download-queue--pause-all",
+        "Main--download-queue--resume-all",
+        "Main--download-queue--cancel-all"
+      ],
+      "input": "D:/Code/aidokuForKindle/docs/review/phase3-c14-full1-batches/c14r1-m001-b002.input.json",
+      "report": "D:/Code/aidokuForKindle/docs/review/phase3-c14-full1-batches/c14r1-m001-b002.review.json",
+      "maximum_actual_image_opens": 8,
+      "maximum_reference_pairs": 4
+    },
+    {
+      "batch_id": "c14r1-m001-b003",
+      "lane": "a",
+      "module": "001",
+      "module_name": "001-pw-library-and-real-queue",
+      "module_inventory": "D:/Code/aidokuForKindle/artifacts/phase3/candidate14/ui-round-1-module-snapshots/001-pw-library-and-real-queue/inventory.json",
+      "module_inventory_sha256": "90b5ff7dda8fa0adda101db1440f19fa41753fd7778091f30fc536184429c870",
+      "case_ids": [
+        "Main--download-queue--completed-real-job",
+        "Main--download-queue--completed-job-menu",
+        "Main--download-queue--completed-remove-confirm"
+      ],
+      "input": "D:/Code/aidokuForKindle/docs/review/phase3-c14-full1-batches/c14r1-m001-b003.input.json",
+      "report": "D:/Code/aidokuForKindle/docs/review/phase3-c14-full1-batches/c14r1-m001-b003.review.json",
+      "maximum_actual_image_opens": 8,
+      "maximum_reference_pairs": 4
+    },
+    {
+      "batch_id": "c14r1-m001-b004",
+      "lane": "b",
+      "module": "001",
+      "module_name": "001-pw-library-and-real-queue",
+      "module_inventory": "D:/Code/aidokuForKindle/artifacts/phase3/candidate14/ui-round-1-module-snapshots/001-pw-library-and-real-queue/inventory.json",
+      "module_inventory_sha256": "90b5ff7dda8fa0adda101db1440f19fa41753fd7778091f30fc536184429c870",
+      "case_ids": [
+        "Main--download-queue--completed-remove-cancel",
+        "Main--download-queue--completed-remove-apply",
+        "Main--jump-pages"
+      ],
+      "input": "D:/Code/aidokuForKindle/docs/review/phase3-c14-full1-batches/c14r1-m001-b004.input.json",
+      "report": "D:/Code/aidokuForKindle/docs/review/phase3-c14-full1-batches/c14r1-m001-b004.review.json",
+      "maximum_actual_image_opens": 8,
+      "maximum_reference_pairs": 4
+    },
+    {
+      "batch_id": "c14r1-m001-b005",
+      "lane": "a",
+      "module": "001",
+      "module_name": "001-pw-library-and-real-queue",
+      "module_inventory": "D:/Code/aidokuForKindle/artifacts/phase3/candidate14/ui-round-1-module-snapshots/001-pw-library-and-real-queue/inventory.json",
+      "module_inventory_sha256": "90b5ff7dda8fa0adda101db1440f19fa41753fd7778091f30fc536184429c870",
+      "case_ids": [
+        "Main--more",
+        "Main--select",
+        "Main--sort"
+      ],
+      "input": "D:/Code/aidokuForKindle/docs/review/phase3-c14-full1-batches/c14r1-m001-b005.input.json",
+      "report": "D:/Code/aidokuForKindle/docs/review/phase3-c14-full1-batches/c14r1-m001-b005.review.json",
+      "maximum_actual_image_opens": 8,
+      "maximum_reference_pairs": 4
+    },
+    {
+      "batch_id": "c14r1-m002-b001",
+      "lane": "b",
+      "module": "002",
+      "module_name": "002-pw-detail",
+      "module_inventory": "D:/Code/aidokuForKindle/artifacts/phase3/candidate14/ui-round-1-module-snapshots/002-pw-detail/inventory.json",
+      "module_inventory_sha256": "7ea5e3ab883d75987017dd1db2849947a47efc38db34c30bd046659e595d935d",
+      "case_ids": [
+        "pw-manga--default",
+        "pw-manga--batch-download"
+      ],
+      "input": "D:/Code/aidokuForKindle/docs/review/phase3-c14-full1-batches/c14r1-m002-b001.input.json",
+      "report": "D:/Code/aidokuForKindle/docs/review/phase3-c14-full1-batches/c14r1-m002-b001.review.json",
+      "maximum_actual_image_opens": 8,
+      "maximum_reference_pairs": 4
+    },
+    {
+      "batch_id": "c14r1-m002-b002",
+      "lane": "a",
+      "module": "002",
+      "module_name": "002-pw-detail",
+      "module_inventory": "D:/Code/aidokuForKindle/artifacts/phase3/candidate14/ui-round-1-module-snapshots/002-pw-detail/inventory.json",
+      "module_inventory_sha256": "7ea5e3ab883d75987017dd1db2849947a47efc38db34c30bd046659e595d935d",
+      "case_ids": [
+        "pw-manga--chapters-p2",
+        "pw-manga--description"
+      ],
+      "input": "D:/Code/aidokuForKindle/docs/review/phase3-c14-full1-batches/c14r1-m002-b002.input.json",
+      "report": "D:/Code/aidokuForKindle/docs/review/phase3-c14-full1-batches/c14r1-m002-b002.review.json",
+      "maximum_actual_image_opens": 8,
+      "maximum_reference_pairs": 4
+    },
+    {
+      "batch_id": "c14r1-m002-b003",
+      "lane": "b",
+      "module": "002",
+      "module_name": "002-pw-detail",
+      "module_inventory": "D:/Code/aidokuForKindle/artifacts/phase3/candidate14/ui-round-1-module-snapshots/002-pw-detail/inventory.json",
+      "module_inventory_sha256": "7ea5e3ab883d75987017dd1db2849947a47efc38db34c30bd046659e595d935d",
+      "case_ids": [
+        "pw-manga--more",
+        "pw-manga--tracking"
+      ],
+      "input": "D:/Code/aidokuForKindle/docs/review/phase3-c14-full1-batches/c14r1-m002-b003.input.json",
+      "report": "D:/Code/aidokuForKindle/docs/review/phase3-c14-full1-batches/c14r1-m002-b003.review.json",
+      "maximum_actual_image_opens": 8,
+      "maximum_reference_pairs": 4
+    },
+    {
+      "batch_id": "c14r1-m003-b001",
+      "lane": "a",
+      "module": "003",
+      "module_name": "003-pw-reader",
+      "module_inventory": "D:/Code/aidokuForKindle/artifacts/phase3/candidate14/ui-round-1-module-snapshots/003-pw-reader/inventory.json",
+      "module_inventory_sha256": "871b72099146257d5f4fd618cf0ff6d2b35229de32abead74e79c814e2681dfc",
+      "case_ids": [
+        "pw-reader--default",
+        "pw-reader--fullscreen-footer",
+        "pw-reader--fullscreen"
+      ],
+      "input": "D:/Code/aidokuForKindle/docs/review/phase3-c14-full1-batches/c14r1-m003-b001.input.json",
+      "report": "D:/Code/aidokuForKindle/docs/review/phase3-c14-full1-batches/c14r1-m003-b001.review.json",
+      "maximum_actual_image_opens": 8,
+      "maximum_reference_pairs": 4
+    },
+    {
+      "batch_id": "c14r1-m003-b002",
+      "lane": "b",
+      "module": "003",
+      "module_name": "003-pw-reader",
+      "module_inventory": "D:/Code/aidokuForKindle/artifacts/phase3/candidate14/ui-round-1-module-snapshots/003-pw-reader/inventory.json",
+      "module_inventory_sha256": "871b72099146257d5f4fd618cf0ff6d2b35229de32abead74e79c814e2681dfc",
+      "case_ids": [
+        "pw-reader--image",
+        "pw-reader--light",
+        "pw-reader--mode"
+      ],
+      "input": "D:/Code/aidokuForKindle/docs/review/phase3-c14-full1-batches/c14r1-m003-b002.input.json",
+      "report": "D:/Code/aidokuForKindle/docs/review/phase3-c14-full1-batches/c14r1-m003-b002.review.json",
+      "maximum_actual_image_opens": 8,
+      "maximum_reference_pairs": 4
+    },
+    {
+      "batch_id": "c14r1-m003-b003",
+      "lane": "a",
+      "module": "003",
+      "module_name": "003-pw-reader",
+      "module_inventory": "D:/Code/aidokuForKindle/artifacts/phase3/candidate14/ui-round-1-module-snapshots/003-pw-reader/inventory.json",
+      "module_inventory_sha256": "871b72099146257d5f4fd618cf0ff6d2b35229de32abead74e79c814e2681dfc",
+      "case_ids": [
+        "pw-reader--more",
+        "pw-reader--rotate",
+        "pw-reader--toc"
+      ],
+      "input": "D:/Code/aidokuForKindle/docs/review/phase3-c14-full1-batches/c14r1-m003-b003.input.json",
+      "report": "D:/Code/aidokuForKindle/docs/review/phase3-c14-full1-batches/c14r1-m003-b003.review.json",
+      "maximum_actual_image_opens": 8,
+      "maximum_reference_pairs": 4
+    },
+    {
+      "batch_id": "c14r1-m004-b001",
+      "lane": "b",
+      "module": "004",
+      "module_name": "004-pw-sources-search-history-settings",
+      "module_inventory": "D:/Code/aidokuForKindle/artifacts/phase3/candidate14/ui-round-1-module-snapshots/004-pw-sources-search-history-settings/inventory.json",
+      "module_inventory_sha256": "d7b7d0d50150b7e2c6a5661ad9303fbb2a733405720a9854f55dfddfcbb285b7",
+      "case_ids": [
+        "pw-browse--default",
+        "pw-browse--add-source",
+        "pw-browse--available",
+        "pw-browse--source-lists"
+      ],
+      "input": "D:/Code/aidokuForKindle/docs/review/phase3-c14-full1-batches/c14r1-m004-b001.input.json",
+      "report": "D:/Code/aidokuForKindle/docs/review/phase3-c14-full1-batches/c14r1-m004-b001.review.json",
+      "maximum_actual_image_opens": 8,
+      "maximum_reference_pairs": 4
+    },
+    {
+      "batch_id": "c14r1-m004-b002",
+      "lane": "a",
+      "module": "004",
+      "module_name": "004-pw-sources-search-history-settings",
+      "module_inventory": "D:/Code/aidokuForKindle/artifacts/phase3/candidate14/ui-round-1-module-snapshots/004-pw-sources-search-history-settings/inventory.json",
+      "module_inventory_sha256": "d7b7d0d50150b7e2c6a5661ad9303fbb2a733405720a9854f55dfddfcbb285b7",
+      "case_ids": [
+        "pw-browse--updates",
+        "pw-source--default",
+        "pw-source--filter",
+        "pw-source--source-settings"
+      ],
+      "input": "D:/Code/aidokuForKindle/docs/review/phase3-c14-full1-batches/c14r1-m004-b002.input.json",
+      "report": "D:/Code/aidokuForKindle/docs/review/phase3-c14-full1-batches/c14r1-m004-b002.review.json",
+      "maximum_actual_image_opens": 8,
+      "maximum_reference_pairs": 4
+    },
+    {
+      "batch_id": "c14r1-m004-b003",
+      "lane": "b",
+      "module": "004",
+      "module_name": "004-pw-sources-search-history-settings",
+      "module_inventory": "D:/Code/aidokuForKindle/artifacts/phase3/candidate14/ui-round-1-module-snapshots/004-pw-sources-search-history-settings/inventory.json",
+      "module_inventory_sha256": "d7b7d0d50150b7e2c6a5661ad9303fbb2a733405720a9854f55dfddfcbb285b7",
+      "case_ids": [
+        "pw-search--default",
+        "pw-search--numbers",
+        "pw-search--results",
+        "pw-history--default"
+      ],
+      "input": "D:/Code/aidokuForKindle/docs/review/phase3-c14-full1-batches/c14r1-m004-b003.input.json",
+      "report": "D:/Code/aidokuForKindle/docs/review/phase3-c14-full1-batches/c14r1-m004-b003.review.json",
+      "maximum_actual_image_opens": 8,
+      "maximum_reference_pairs": 4
+    },
+    {
+      "batch_id": "c14r1-m004-b004",
+      "lane": "a",
+      "module": "004",
+      "module_name": "004-pw-sources-search-history-settings",
+      "module_inventory": "D:/Code/aidokuForKindle/artifacts/phase3/candidate14/ui-round-1-module-snapshots/004-pw-sources-search-history-settings/inventory.json",
+      "module_inventory_sha256": "d7b7d0d50150b7e2c6a5661ad9303fbb2a733405720a9854f55dfddfcbb285b7",
+      "case_ids": [
+        "pw-history--clear-confirm",
+        "pw-history--incognito",
+        "pw-history--updates",
+        "pw-settings--default"
+      ],
+      "input": "D:/Code/aidokuForKindle/docs/review/phase3-c14-full1-batches/c14r1-m004-b004.input.json",
+      "report": "D:/Code/aidokuForKindle/docs/review/phase3-c14-full1-batches/c14r1-m004-b004.review.json",
+      "maximum_actual_image_opens": 8,
+      "maximum_reference_pairs": 4
+    },
+    {
+      "batch_id": "c14r1-m004-b005",
+      "lane": "b",
+      "module": "004",
+      "module_name": "004-pw-sources-search-history-settings",
+      "module_inventory": "D:/Code/aidokuForKindle/artifacts/phase3/candidate14/ui-round-1-module-snapshots/004-pw-sources-search-history-settings/inventory.json",
+      "module_inventory_sha256": "d7b7d0d50150b7e2c6a5661ad9303fbb2a733405720a9854f55dfddfcbb285b7",
+      "case_ids": [
+        "pw-settings--display",
+        "pw-settings--page2",
+        "pw-settings--power"
+      ],
+      "input": "D:/Code/aidokuForKindle/docs/review/phase3-c14-full1-batches/c14r1-m004-b005.input.json",
+      "report": "D:/Code/aidokuForKindle/docs/review/phase3-c14-full1-batches/c14r1-m004-b005.review.json",
+      "maximum_actual_image_opens": 8,
+      "maximum_reference_pairs": 4
+    },
+    {
+      "batch_id": "c14r1-m005-b001",
+      "lane": "a",
+      "module": "005",
+      "module_name": "005-sc-library-detail-sources",
+      "module_inventory": "D:/Code/aidokuForKindle/artifacts/phase3/candidate14/ui-round-1-module-snapshots/005-sc-library-detail-sources/inventory.json",
+      "module_inventory_sha256": "97b3fcf1f352206a517a93de6784e888edae796693b56cc71dcbe82fbed49292",
+      "case_ids": [
+        "sc-library--default",
+        "sc-library--download-queue",
+        "sc-library--download-queue--page-two"
+      ],
+      "input": "D:/Code/aidokuForKindle/docs/review/phase3-c14-full1-batches/c14r1-m005-b001.input.json",
+      "report": "D:/Code/aidokuForKindle/docs/review/phase3-c14-full1-batches/c14r1-m005-b001.review.json",
+      "maximum_actual_image_opens": 8,
+      "maximum_reference_pairs": 4
+    },
+    {
+      "batch_id": "c14r1-m005-b002",
+      "lane": "b",
+      "module": "005",
+      "module_name": "005-sc-library-detail-sources",
+      "module_inventory": "D:/Code/aidokuForKindle/artifacts/phase3/candidate14/ui-round-1-module-snapshots/005-sc-library-detail-sources/inventory.json",
+      "module_inventory_sha256": "97b3fcf1f352206a517a93de6784e888edae796693b56cc71dcbe82fbed49292",
+      "case_ids": [
+        "sc-library--download-queue--pause-all",
+        "sc-library--download-queue--resume-all",
+        "sc-library--download-queue--cancel-all"
+      ],
+      "input": "D:/Code/aidokuForKindle/docs/review/phase3-c14-full1-batches/c14r1-m005-b002.input.json",
+      "report": "D:/Code/aidokuForKindle/docs/review/phase3-c14-full1-batches/c14r1-m005-b002.review.json",
+      "maximum_actual_image_opens": 8,
+      "maximum_reference_pairs": 4
+    },
+    {
+      "batch_id": "c14r1-m005-b003",
+      "lane": "a",
+      "module": "005",
+      "module_name": "005-sc-library-detail-sources",
+      "module_inventory": "D:/Code/aidokuForKindle/artifacts/phase3/candidate14/ui-round-1-module-snapshots/005-sc-library-detail-sources/inventory.json",
+      "module_inventory_sha256": "97b3fcf1f352206a517a93de6784e888edae796693b56cc71dcbe82fbed49292",
+      "case_ids": [
+        "sc-library--download-queue--completed-real-job",
+        "sc-library--download-queue--completed-job-menu",
+        "sc-library--download-queue--completed-remove-confirm"
+      ],
+      "input": "D:/Code/aidokuForKindle/docs/review/phase3-c14-full1-batches/c14r1-m005-b003.input.json",
+      "report": "D:/Code/aidokuForKindle/docs/review/phase3-c14-full1-batches/c14r1-m005-b003.review.json",
+      "maximum_actual_image_opens": 8,
+      "maximum_reference_pairs": 4
+    },
+    {
+      "batch_id": "c14r1-m005-b004",
+      "lane": "b",
+      "module": "005",
+      "module_name": "005-sc-library-detail-sources",
+      "module_inventory": "D:/Code/aidokuForKindle/artifacts/phase3/candidate14/ui-round-1-module-snapshots/005-sc-library-detail-sources/inventory.json",
+      "module_inventory_sha256": "97b3fcf1f352206a517a93de6784e888edae796693b56cc71dcbe82fbed49292",
+      "case_ids": [
+        "sc-library--download-queue--completed-remove-cancel",
+        "sc-library--download-queue--completed-remove-apply",
+        "sc-library--jump-pages"
+      ],
+      "input": "D:/Code/aidokuForKindle/docs/review/phase3-c14-full1-batches/c14r1-m005-b004.input.json",
+      "report": "D:/Code/aidokuForKindle/docs/review/phase3-c14-full1-batches/c14r1-m005-b004.review.json",
+      "maximum_actual_image_opens": 8,
+      "maximum_reference_pairs": 4
+    },
+    {
+      "batch_id": "c14r1-m005-b005",
+      "lane": "a",
+      "module": "005",
+      "module_name": "005-sc-library-detail-sources",
+      "module_inventory": "D:/Code/aidokuForKindle/artifacts/phase3/candidate14/ui-round-1-module-snapshots/005-sc-library-detail-sources/inventory.json",
+      "module_inventory_sha256": "97b3fcf1f352206a517a93de6784e888edae796693b56cc71dcbe82fbed49292",
+      "case_ids": [
+        "sc-library--more",
+        "sc-library--select",
+        "sc-library--sort"
+      ],
+      "input": "D:/Code/aidokuForKindle/docs/review/phase3-c14-full1-batches/c14r1-m005-b005.input.json",
+      "report": "D:/Code/aidokuForKindle/docs/review/phase3-c14-full1-batches/c14r1-m005-b005.review.json",
+      "maximum_actual_image_opens": 8,
+      "maximum_reference_pairs": 4
+    },
+    {
+      "batch_id": "c14r1-m005-b006",
+      "lane": "b",
+      "module": "005",
+      "module_name": "005-sc-library-detail-sources",
+      "module_inventory": "D:/Code/aidokuForKindle/artifacts/phase3/candidate14/ui-round-1-module-snapshots/005-sc-library-detail-sources/inventory.json",
+      "module_inventory_sha256": "97b3fcf1f352206a517a93de6784e888edae796693b56cc71dcbe82fbed49292",
+      "case_ids": [
+        "sc-manga--default",
+        "sc-manga--migrate",
+        "sc-manga--more",
+        "sc-manga--tracking"
+      ],
+      "input": "D:/Code/aidokuForKindle/docs/review/phase3-c14-full1-batches/c14r1-m005-b006.input.json",
+      "report": "D:/Code/aidokuForKindle/docs/review/phase3-c14-full1-batches/c14r1-m005-b006.review.json",
+      "maximum_actual_image_opens": 8,
+      "maximum_reference_pairs": 4
+    },
+    {
+      "batch_id": "c14r1-m005-b007",
+      "lane": "a",
+      "module": "005",
+      "module_name": "005-sc-library-detail-sources",
+      "module_inventory": "D:/Code/aidokuForKindle/artifacts/phase3/candidate14/ui-round-1-module-snapshots/005-sc-library-detail-sources/inventory.json",
+      "module_inventory_sha256": "97b3fcf1f352206a517a93de6784e888edae796693b56cc71dcbe82fbed49292",
+      "case_ids": [
+        "sc-browse--default",
+        "sc-browse--blocked-source",
+        "sc-browse--filter",
+        "sc-browse--server-setup"
+      ],
+      "input": "D:/Code/aidokuForKindle/docs/review/phase3-c14-full1-batches/c14r1-m005-b007.input.json",
+      "report": "D:/Code/aidokuForKindle/docs/review/phase3-c14-full1-batches/c14r1-m005-b007.review.json",
+      "maximum_actual_image_opens": 8,
+      "maximum_reference_pairs": 4
+    },
+    {
+      "batch_id": "c14r1-m005-b008",
+      "lane": "b",
+      "module": "005",
+      "module_name": "005-sc-library-detail-sources",
+      "module_inventory": "D:/Code/aidokuForKindle/artifacts/phase3/candidate14/ui-round-1-module-snapshots/005-sc-library-detail-sources/inventory.json",
+      "module_inventory_sha256": "97b3fcf1f352206a517a93de6784e888edae796693b56cc71dcbe82fbed49292",
+      "case_ids": [
+        "sc-browse--source-picker",
+        "sc-browse--source-settings"
+      ],
+      "input": "D:/Code/aidokuForKindle/docs/review/phase3-c14-full1-batches/c14r1-m005-b008.input.json",
+      "report": "D:/Code/aidokuForKindle/docs/review/phase3-c14-full1-batches/c14r1-m005-b008.review.json",
+      "maximum_actual_image_opens": 8,
+      "maximum_reference_pairs": 4
+    },
+    {
+      "batch_id": "c14r1-m006-b001",
+      "lane": "a",
+      "module": "006",
+      "module_name": "006-sc-reader-portrait",
+      "module_inventory": "D:/Code/aidokuForKindle/artifacts/phase3/candidate14/ui-round-1-module-snapshots/006-sc-reader-portrait/inventory.json",
+      "module_inventory_sha256": "c9eb2e84ed749b0e19077b275809ffe89db19619df79aa7b040bb596ff93ffcd",
+      "case_ids": [
+        "sc-reader-portrait--default",
+        "sc-reader-portrait--fullscreen-footer",
+        "sc-reader-portrait--fullscreen"
+      ],
+      "input": "D:/Code/aidokuForKindle/docs/review/phase3-c14-full1-batches/c14r1-m006-b001.input.json",
+      "report": "D:/Code/aidokuForKindle/docs/review/phase3-c14-full1-batches/c14r1-m006-b001.review.json",
+      "maximum_actual_image_opens": 8,
+      "maximum_reference_pairs": 4
+    },
+    {
+      "batch_id": "c14r1-m006-b002",
+      "lane": "b",
+      "module": "006",
+      "module_name": "006-sc-reader-portrait",
+      "module_inventory": "D:/Code/aidokuForKindle/artifacts/phase3/candidate14/ui-round-1-module-snapshots/006-sc-reader-portrait/inventory.json",
+      "module_inventory_sha256": "c9eb2e84ed749b0e19077b275809ffe89db19619df79aa7b040bb596ff93ffcd",
+      "case_ids": [
+        "sc-reader-portrait--image",
+        "sc-reader-portrait--light",
+        "sc-reader-portrait--mode"
+      ],
+      "input": "D:/Code/aidokuForKindle/docs/review/phase3-c14-full1-batches/c14r1-m006-b002.input.json",
+      "report": "D:/Code/aidokuForKindle/docs/review/phase3-c14-full1-batches/c14r1-m006-b002.review.json",
+      "maximum_actual_image_opens": 8,
+      "maximum_reference_pairs": 4
+    },
+    {
+      "batch_id": "c14r1-m006-b003",
+      "lane": "a",
+      "module": "006",
+      "module_name": "006-sc-reader-portrait",
+      "module_inventory": "D:/Code/aidokuForKindle/artifacts/phase3/candidate14/ui-round-1-module-snapshots/006-sc-reader-portrait/inventory.json",
+      "module_inventory_sha256": "c9eb2e84ed749b0e19077b275809ffe89db19619df79aa7b040bb596ff93ffcd",
+      "case_ids": [
+        "sc-reader-portrait--more",
+        "sc-reader-portrait--orientation",
+        "sc-reader-portrait--toc"
+      ],
+      "input": "D:/Code/aidokuForKindle/docs/review/phase3-c14-full1-batches/c14r1-m006-b003.input.json",
+      "report": "D:/Code/aidokuForKindle/docs/review/phase3-c14-full1-batches/c14r1-m006-b003.review.json",
+      "maximum_actual_image_opens": 8,
+      "maximum_reference_pairs": 4
+    },
+    {
+      "batch_id": "c14r1-m007-b001",
+      "lane": "b",
+      "module": "007",
+      "module_name": "007-sc-reader-landscape",
+      "module_inventory": "D:/Code/aidokuForKindle/artifacts/phase3/candidate14/ui-round-1-module-snapshots/007-sc-reader-landscape/inventory.json",
+      "module_inventory_sha256": "bf58f1655324f2f9c556190ea4b448519d3e27b2fcc9eca1ee6759d41d9147c6",
+      "case_ids": [
+        "sc-reader--default",
+        "sc-reader--fullscreen",
+        "sc-reader--image"
+      ],
+      "input": "D:/Code/aidokuForKindle/docs/review/phase3-c14-full1-batches/c14r1-m007-b001.input.json",
+      "report": "D:/Code/aidokuForKindle/docs/review/phase3-c14-full1-batches/c14r1-m007-b001.review.json",
+      "maximum_actual_image_opens": 8,
+      "maximum_reference_pairs": 4
+    },
+    {
+      "batch_id": "c14r1-m007-b002",
+      "lane": "a",
+      "module": "007",
+      "module_name": "007-sc-reader-landscape",
+      "module_inventory": "D:/Code/aidokuForKindle/artifacts/phase3/candidate14/ui-round-1-module-snapshots/007-sc-reader-landscape/inventory.json",
+      "module_inventory_sha256": "bf58f1655324f2f9c556190ea4b448519d3e27b2fcc9eca1ee6759d41d9147c6",
+      "case_ids": [
+        "sc-reader--layout",
+        "sc-reader--light",
+        "sc-reader--mode"
+      ],
+      "input": "D:/Code/aidokuForKindle/docs/review/phase3-c14-full1-batches/c14r1-m007-b002.input.json",
+      "report": "D:/Code/aidokuForKindle/docs/review/phase3-c14-full1-batches/c14r1-m007-b002.review.json",
+      "maximum_actual_image_opens": 8,
+      "maximum_reference_pairs": 4
+    },
+    {
+      "batch_id": "c14r1-m007-b003",
+      "lane": "b",
+      "module": "007",
+      "module_name": "007-sc-reader-landscape",
+      "module_inventory": "D:/Code/aidokuForKindle/artifacts/phase3/candidate14/ui-round-1-module-snapshots/007-sc-reader-landscape/inventory.json",
+      "module_inventory_sha256": "bf58f1655324f2f9c556190ea4b448519d3e27b2fcc9eca1ee6759d41d9147c6",
+      "case_ids": [
+        "sc-reader--more",
+        "sc-reader--toc"
+      ],
+      "input": "D:/Code/aidokuForKindle/docs/review/phase3-c14-full1-batches/c14r1-m007-b003.input.json",
+      "report": "D:/Code/aidokuForKindle/docs/review/phase3-c14-full1-batches/c14r1-m007-b003.review.json",
+      "maximum_actual_image_opens": 8,
+      "maximum_reference_pairs": 4
+    },
+    {
+      "batch_id": "c14r1-m008-b001",
+      "lane": "a",
+      "module": "008",
+      "module_name": "008-sc-sources-search-history-settings",
+      "module_inventory": "D:/Code/aidokuForKindle/artifacts/phase3/candidate14/ui-round-1-module-snapshots/008-sc-sources-search-history-settings/inventory.json",
+      "module_inventory_sha256": "84da28fc8987e31e73a5e349b7823ddde1a0a1420146cf3036e805d41c3ad988",
+      "case_ids": [
+        "sc-sources--default",
+        "sc-sources--add-source",
+        "sc-sources--source-lists",
+        "sc-sources--updates"
+      ],
+      "input": "D:/Code/aidokuForKindle/docs/review/phase3-c14-full1-batches/c14r1-m008-b001.input.json",
+      "report": "D:/Code/aidokuForKindle/docs/review/phase3-c14-full1-batches/c14r1-m008-b001.review.json",
+      "maximum_actual_image_opens": 8,
+      "maximum_reference_pairs": 4
+    },
+    {
+      "batch_id": "c14r1-m008-b002",
+      "lane": "b",
+      "module": "008",
+      "module_name": "008-sc-sources-search-history-settings",
+      "module_inventory": "D:/Code/aidokuForKindle/artifacts/phase3/candidate14/ui-round-1-module-snapshots/008-sc-sources-search-history-settings/inventory.json",
+      "module_inventory_sha256": "84da28fc8987e31e73a5e349b7823ddde1a0a1420146cf3036e805d41c3ad988",
+      "case_ids": [
+        "sc-search--default",
+        "sc-search--results",
+        "sc-history--default",
+        "sc-history--clear-confirm"
+      ],
+      "input": "D:/Code/aidokuForKindle/docs/review/phase3-c14-full1-batches/c14r1-m008-b002.input.json",
+      "report": "D:/Code/aidokuForKindle/docs/review/phase3-c14-full1-batches/c14r1-m008-b002.review.json",
+      "maximum_actual_image_opens": 8,
+      "maximum_reference_pairs": 4
+    },
+    {
+      "batch_id": "c14r1-m008-b003",
+      "lane": "a",
+      "module": "008",
+      "module_name": "008-sc-sources-search-history-settings",
+      "module_inventory": "D:/Code/aidokuForKindle/artifacts/phase3/candidate14/ui-round-1-module-snapshots/008-sc-sources-search-history-settings/inventory.json",
+      "module_inventory_sha256": "84da28fc8987e31e73a5e349b7823ddde1a0a1420146cf3036e805d41c3ad988",
+      "case_ids": [
+        "sc-history--incognito",
+        "sc-history--updates",
+        "sc-settings--default",
+        "sc-settings--about"
+      ],
+      "input": "D:/Code/aidokuForKindle/docs/review/phase3-c14-full1-batches/c14r1-m008-b003.input.json",
+      "report": "D:/Code/aidokuForKindle/docs/review/phase3-c14-full1-batches/c14r1-m008-b003.review.json",
+      "maximum_actual_image_opens": 8,
+      "maximum_reference_pairs": 4
+    },
+    {
+      "batch_id": "c14r1-m008-b004",
+      "lane": "b",
+      "module": "008",
+      "module_name": "008-sc-sources-search-history-settings",
+      "module_inventory": "D:/Code/aidokuForKindle/artifacts/phase3/candidate14/ui-round-1-module-snapshots/008-sc-sources-search-history-settings/inventory.json",
+      "module_inventory_sha256": "84da28fc8987e31e73a5e349b7823ddde1a0a1420146cf3036e805d41c3ad988",
+      "case_ids": [
+        "sc-settings--auto-update",
+        "sc-settings--backup",
+        "sc-settings--categories",
+        "sc-settings--download"
+      ],
+      "input": "D:/Code/aidokuForKindle/docs/review/phase3-c14-full1-batches/c14r1-m008-b004.input.json",
+      "report": "D:/Code/aidokuForKindle/docs/review/phase3-c14-full1-batches/c14r1-m008-b004.review.json",
+      "maximum_actual_image_opens": 8,
+      "maximum_reference_pairs": 4
+    },
+    {
+      "batch_id": "c14r1-m008-b005",
+      "lane": "a",
+      "module": "008",
+      "module_name": "008-sc-sources-search-history-settings",
+      "module_inventory": "D:/Code/aidokuForKindle/artifacts/phase3/candidate14/ui-round-1-module-snapshots/008-sc-sources-search-history-settings/inventory.json",
+      "module_inventory_sha256": "84da28fc8987e31e73a5e349b7823ddde1a0a1420146cf3036e805d41c3ad988",
+      "case_ids": [
+        "sc-settings--image",
+        "sc-settings--language",
+        "sc-settings--light",
+        "sc-settings--logs"
+      ],
+      "input": "D:/Code/aidokuForKindle/docs/review/phase3-c14-full1-batches/c14r1-m008-b005.input.json",
+      "report": "D:/Code/aidokuForKindle/docs/review/phase3-c14-full1-batches/c14r1-m008-b005.review.json",
+      "maximum_actual_image_opens": 8,
+      "maximum_reference_pairs": 4
+    },
+    {
+      "batch_id": "c14r1-m008-b006",
+      "lane": "b",
+      "module": "008",
+      "module_name": "008-sc-sources-search-history-settings",
+      "module_inventory": "D:/Code/aidokuForKindle/artifacts/phase3/candidate14/ui-round-1-module-snapshots/008-sc-sources-search-history-settings/inventory.json",
+      "module_inventory_sha256": "84da28fc8987e31e73a5e349b7823ddde1a0a1420146cf3036e805d41c3ad988",
+      "case_ids": [
+        "sc-settings--pen",
+        "sc-settings--power",
+        "sc-settings--reading",
+        "sc-settings--source-lists"
+      ],
+      "input": "D:/Code/aidokuForKindle/docs/review/phase3-c14-full1-batches/c14r1-m008-b006.input.json",
+      "report": "D:/Code/aidokuForKindle/docs/review/phase3-c14-full1-batches/c14r1-m008-b006.review.json",
+      "maximum_actual_image_opens": 8,
+      "maximum_reference_pairs": 4
+    },
+    {
+      "batch_id": "c14r1-m008-b007",
+      "lane": "a",
+      "module": "008",
+      "module_name": "008-sc-sources-search-history-settings",
+      "module_inventory": "D:/Code/aidokuForKindle/artifacts/phase3/candidate14/ui-round-1-module-snapshots/008-sc-sources-search-history-settings/inventory.json",
+      "module_inventory_sha256": "84da28fc8987e31e73a5e349b7823ddde1a0a1420146cf3036e805d41c3ad988",
+      "case_ids": [
+        "sc-settings--spread",
+        "sc-settings--storage",
+        "sc-settings--tap-zones",
+        "sc-settings--tracking-login"
+      ],
+      "input": "D:/Code/aidokuForKindle/docs/review/phase3-c14-full1-batches/c14r1-m008-b007.input.json",
+      "report": "D:/Code/aidokuForKindle/docs/review/phase3-c14-full1-batches/c14r1-m008-b007.review.json",
+      "maximum_actual_image_opens": 8,
+      "maximum_reference_pairs": 4
+    },
+    {
+      "batch_id": "c14r1-m009-b001",
+      "lane": "b",
+      "module": "009",
+      "module_name": "009-pw-settings-license-history-entry",
+      "module_inventory": "D:/Code/aidokuForKindle/artifacts/phase3/candidate14/ui-round-1-module-snapshots/009-pw-settings-license-history-entry/inventory.json",
+      "module_inventory_sha256": "bbd0cefe272037a66981a3bf45255d4581414bd95bf9432521742cf3b2bbe536",
+      "case_ids": [
+        "pw5--settings-frontlight-warmth",
+        "pw5--settings-storage",
+        "pw5--settings-default-direction",
+        "pw5--settings-tap-regions"
+      ],
+      "input": "D:/Code/aidokuForKindle/docs/review/phase3-c14-full1-batches/c14r1-m009-b001.input.json",
+      "report": "D:/Code/aidokuForKindle/docs/review/phase3-c14-full1-batches/c14r1-m009-b001.review.json",
+      "maximum_actual_image_opens": 8,
+      "maximum_reference_pairs": 4
+    },
+    {
+      "batch_id": "c14r1-m009-b002",
+      "lane": "a",
+      "module": "009",
+      "module_name": "009-pw-settings-license-history-entry",
+      "module_inventory": "D:/Code/aidokuForKindle/artifacts/phase3/candidate14/ui-round-1-module-snapshots/009-pw-settings-license-history-entry/inventory.json",
+      "module_inventory_sha256": "bbd0cefe272037a66981a3bf45255d4581414bd95bf9432521742cf3b2bbe536",
+      "case_ids": [
+        "pw5--settings-image-processing",
+        "pw5--settings-spread",
+        "pw5--settings-categories",
+        "pw5--settings-auto-update"
+      ],
+      "input": "D:/Code/aidokuForKindle/docs/review/phase3-c14-full1-batches/c14r1-m009-b002.input.json",
+      "report": "D:/Code/aidokuForKindle/docs/review/phase3-c14-full1-batches/c14r1-m009-b002.review.json",
+      "maximum_actual_image_opens": 8,
+      "maximum_reference_pairs": 4
+    },
+    {
+      "batch_id": "c14r1-m009-b003",
+      "lane": "b",
+      "module": "009",
+      "module_name": "009-pw-settings-license-history-entry",
+      "module_inventory": "D:/Code/aidokuForKindle/artifacts/phase3/candidate14/ui-round-1-module-snapshots/009-pw-settings-license-history-entry/inventory.json",
+      "module_inventory_sha256": "bbd0cefe272037a66981a3bf45255d4581414bd95bf9432521742cf3b2bbe536",
+      "case_ids": [
+        "pw5--settings-source-lists",
+        "pw5--settings-downloads",
+        "pw5--settings-tracking",
+        "pw5--settings-backup"
+      ],
+      "input": "D:/Code/aidokuForKindle/docs/review/phase3-c14-full1-batches/c14r1-m009-b003.input.json",
+      "report": "D:/Code/aidokuForKindle/docs/review/phase3-c14-full1-batches/c14r1-m009-b003.review.json",
+      "maximum_actual_image_opens": 8,
+      "maximum_reference_pairs": 4
+    },
+    {
+      "batch_id": "c14r1-m009-b004",
+      "lane": "a",
+      "module": "009",
+      "module_name": "009-pw-settings-license-history-entry",
+      "module_inventory": "D:/Code/aidokuForKindle/artifacts/phase3/candidate14/ui-round-1-module-snapshots/009-pw-settings-license-history-entry/inventory.json",
+      "module_inventory_sha256": "bbd0cefe272037a66981a3bf45255d4581414bd95bf9432521742cf3b2bbe536",
+      "case_ids": [
+        "pw5--settings-language",
+        "pw5--settings-logs",
+        "pw5--settings-about",
+        "pw5--c5-about-license-entry"
+      ],
+      "input": "D:/Code/aidokuForKindle/docs/review/phase3-c14-full1-batches/c14r1-m009-b004.input.json",
+      "report": "D:/Code/aidokuForKindle/docs/review/phase3-c14-full1-batches/c14r1-m009-b004.review.json",
+      "maximum_actual_image_opens": 8,
+      "maximum_reference_pairs": 4
+    },
+    {
+      "batch_id": "c14r1-m009-b005",
+      "lane": "b",
+      "module": "009",
+      "module_name": "009-pw-settings-license-history-entry",
+      "module_inventory": "D:/Code/aidokuForKindle/artifacts/phase3/candidate14/ui-round-1-module-snapshots/009-pw-settings-license-history-entry/inventory.json",
+      "module_inventory_sha256": "bbd0cefe272037a66981a3bf45255d4581414bd95bf9432521742cf3b2bbe536",
+      "case_ids": [
+        "pw5--c5-license-first",
+        "pw5--c5-license-last",
+        "pw5--c5-empty-history-body",
+        "pw5--c5-empty-history-library"
+      ],
+      "input": "D:/Code/aidokuForKindle/docs/review/phase3-c14-full1-batches/c14r1-m009-b005.input.json",
+      "report": "D:/Code/aidokuForKindle/docs/review/phase3-c14-full1-batches/c14r1-m009-b005.review.json",
+      "maximum_actual_image_opens": 8,
+      "maximum_reference_pairs": 4
+    },
+    {
+      "batch_id": "c14r1-m010-b001",
+      "lane": "a",
+      "module": "010",
+      "module_name": "010-pw-library-keyboard-paging",
+      "module_inventory": "D:/Code/aidokuForKindle/artifacts/phase3/candidate14/ui-round-1-module-snapshots/010-pw-library-keyboard-paging/inventory.json",
+      "module_inventory_sha256": "c18dc2b81fafb6601d0a9dd99da37621ab6a8b0a962e4d0beca8440a7ceba0eb",
+      "case_ids": [
+        "pw5--sort-title",
+        "pw5--sort-recent-read",
+        "pw5--sort-recent-open",
+        "pw5--sort-recent-update"
+      ],
+      "input": "D:/Code/aidokuForKindle/docs/review/phase3-c14-full1-batches/c14r1-m010-b001.input.json",
+      "report": "D:/Code/aidokuForKindle/docs/review/phase3-c14-full1-batches/c14r1-m010-b001.review.json",
+      "maximum_actual_image_opens": 8,
+      "maximum_reference_pairs": 4
+    },
+    {
+      "batch_id": "c14r1-m010-b002",
+      "lane": "b",
+      "module": "010",
+      "module_name": "010-pw-library-keyboard-paging",
+      "module_inventory": "D:/Code/aidokuForKindle/artifacts/phase3/candidate14/ui-round-1-module-snapshots/010-pw-library-keyboard-paging/inventory.json",
+      "module_inventory_sha256": "c18dc2b81fafb6601d0a9dd99da37621ab6a8b0a962e4d0beca8440a7ceba0eb",
+      "case_ids": [
+        "pw5--sort-added-at",
+        "pw5--sort-latest-chapter",
+        "pw5--sort-unread-count",
+        "pw5--sort-chapter-count"
+      ],
+      "input": "D:/Code/aidokuForKindle/docs/review/phase3-c14-full1-batches/c14r1-m010-b002.input.json",
+      "report": "D:/Code/aidokuForKindle/docs/review/phase3-c14-full1-batches/c14r1-m010-b002.review.json",
+      "maximum_actual_image_opens": 8,
+      "maximum_reference_pairs": 4
+    },
+    {
+      "batch_id": "c14r1-m010-b003",
+      "lane": "a",
+      "module": "010",
+      "module_name": "010-pw-library-keyboard-paging",
+      "module_inventory": "D:/Code/aidokuForKindle/artifacts/phase3/candidate14/ui-round-1-module-snapshots/010-pw-library-keyboard-paging/inventory.json",
+      "module_inventory_sha256": "c18dc2b81fafb6601d0a9dd99da37621ab6a8b0a962e4d0beca8440a7ceba0eb",
+      "case_ids": [
+        "pw5--sort-descending",
+        "pw5--sort-cold-persistence",
+        "pw5--filter-downloaded-1",
+        "pw5--filter-downloaded-2"
+      ],
+      "input": "D:/Code/aidokuForKindle/docs/review/phase3-c14-full1-batches/c14r1-m010-b003.input.json",
+      "report": "D:/Code/aidokuForKindle/docs/review/phase3-c14-full1-batches/c14r1-m010-b003.review.json",
+      "maximum_actual_image_opens": 8,
+      "maximum_reference_pairs": 4
+    },
+    {
+      "batch_id": "c14r1-m010-b004",
+      "lane": "b",
+      "module": "010",
+      "module_name": "010-pw-library-keyboard-paging",
+      "module_inventory": "D:/Code/aidokuForKindle/artifacts/phase3/candidate14/ui-round-1-module-snapshots/010-pw-library-keyboard-paging/inventory.json",
+      "module_inventory_sha256": "c18dc2b81fafb6601d0a9dd99da37621ab6a8b0a962e4d0beca8440a7ceba0eb",
+      "case_ids": [
+        "pw5--filter-downloaded-3",
+        "pw5--filter-unread-1",
+        "pw5--filter-unread-2",
+        "pw5--filter-unread-3"
+      ],
+      "input": "D:/Code/aidokuForKindle/docs/review/phase3-c14-full1-batches/c14r1-m010-b004.input.json",
+      "report": "D:/Code/aidokuForKindle/docs/review/phase3-c14-full1-batches/c14r1-m010-b004.review.json",
+      "maximum_actual_image_opens": 8,
+      "maximum_reference_pairs": 4
+    },
+    {
+      "batch_id": "c14r1-m010-b005",
+      "lane": "a",
+      "module": "010",
+      "module_name": "010-pw-library-keyboard-paging",
+      "module_inventory": "D:/Code/aidokuForKindle/artifacts/phase3/candidate14/ui-round-1-module-snapshots/010-pw-library-keyboard-paging/inventory.json",
+      "module_inventory_sha256": "c18dc2b81fafb6601d0a9dd99da37621ab6a8b0a962e4d0beca8440a7ceba0eb",
+      "case_ids": [
+        "pw5--filter-tracked-1",
+        "pw5--filter-tracked-2",
+        "pw5--filter-tracked-3",
+        "pw5--filter-completed-1"
+      ],
+      "input": "D:/Code/aidokuForKindle/docs/review/phase3-c14-full1-batches/c14r1-m010-b005.input.json",
+      "report": "D:/Code/aidokuForKindle/docs/review/phase3-c14-full1-batches/c14r1-m010-b005.review.json",
+      "maximum_actual_image_opens": 8,
+      "maximum_reference_pairs": 4
+    },
+    {
+      "batch_id": "c14r1-m010-b006",
+      "lane": "b",
+      "module": "010",
+      "module_name": "010-pw-library-keyboard-paging",
+      "module_inventory": "D:/Code/aidokuForKindle/artifacts/phase3/candidate14/ui-round-1-module-snapshots/010-pw-library-keyboard-paging/inventory.json",
+      "module_inventory_sha256": "c18dc2b81fafb6601d0a9dd99da37621ab6a8b0a962e4d0beca8440a7ceba0eb",
+      "case_ids": [
+        "pw5--filter-completed-2",
+        "pw5--filter-completed-3",
+        "pw5--library-tab-0",
+        "pw5--library-tab-1"
+      ],
+      "input": "D:/Code/aidokuForKindle/docs/review/phase3-c14-full1-batches/c14r1-m010-b006.input.json",
+      "report": "D:/Code/aidokuForKindle/docs/review/phase3-c14-full1-batches/c14r1-m010-b006.review.json",
+      "maximum_actual_image_opens": 8,
+      "maximum_reference_pairs": 4
+    },
+    {
+      "batch_id": "c14r1-m010-b007",
+      "lane": "a",
+      "module": "010",
+      "module_name": "010-pw-library-keyboard-paging",
+      "module_inventory": "D:/Code/aidokuForKindle/artifacts/phase3/candidate14/ui-round-1-module-snapshots/010-pw-library-keyboard-paging/inventory.json",
+      "module_inventory_sha256": "c18dc2b81fafb6601d0a9dd99da37621ab6a8b0a962e4d0beca8440a7ceba0eb",
+      "case_ids": [
+        "pw5--library-tab-2",
+        "pw5--library-tab-3",
+        "pw5--library-tab-4",
+        "pw5--selection-all-page"
+      ],
+      "input": "D:/Code/aidokuForKindle/docs/review/phase3-c14-full1-batches/c14r1-m010-b007.input.json",
+      "report": "D:/Code/aidokuForKindle/docs/review/phase3-c14-full1-batches/c14r1-m010-b007.review.json",
+      "maximum_actual_image_opens": 8,
+      "maximum_reference_pairs": 4
+    },
+    {
+      "batch_id": "c14r1-m010-b008",
+      "lane": "b",
+      "module": "010",
+      "module_name": "010-pw-library-keyboard-paging",
+      "module_inventory": "D:/Code/aidokuForKindle/artifacts/phase3/candidate14/ui-round-1-module-snapshots/010-pw-library-keyboard-paging/inventory.json",
+      "module_inventory_sha256": "c18dc2b81fafb6601d0a9dd99da37621ab6a8b0a962e4d0beca8440a7ceba0eb",
+      "case_ids": [
+        "pw5--selection-category",
+        "pw5--selection-cancel",
+        "pw5--selection-mark-read",
+        "pw5--selection-remove"
+      ],
+      "input": "D:/Code/aidokuForKindle/docs/review/phase3-c14-full1-batches/c14r1-m010-b008.input.json",
+      "report": "D:/Code/aidokuForKindle/docs/review/phase3-c14-full1-batches/c14r1-m010-b008.review.json",
+      "maximum_actual_image_opens": 8,
+      "maximum_reference_pairs": 4
+    },
+    {
+      "batch_id": "c14r1-m010-b009",
+      "lane": "a",
+      "module": "010",
+      "module_name": "010-pw-library-keyboard-paging",
+      "module_inventory": "D:/Code/aidokuForKindle/artifacts/phase3/candidate14/ui-round-1-module-snapshots/010-pw-library-keyboard-paging/inventory.json",
+      "module_inventory_sha256": "c18dc2b81fafb6601d0a9dd99da37621ab6a8b0a962e4d0beca8440a7ceba0eb",
+      "case_ids": [
+        "pw5--library-update-toast",
+        "pw5--keyboard-pinyin",
+        "pw5--keyboard-candidate-page-2",
+        "pw5--keyboard-candidate-commit"
+      ],
+      "input": "D:/Code/aidokuForKindle/docs/review/phase3-c14-full1-batches/c14r1-m010-b009.input.json",
+      "report": "D:/Code/aidokuForKindle/docs/review/phase3-c14-full1-batches/c14r1-m010-b009.review.json",
+      "maximum_actual_image_opens": 8,
+      "maximum_reference_pairs": 4
+    },
+    {
+      "batch_id": "c14r1-m010-b010",
+      "lane": "b",
+      "module": "010",
+      "module_name": "010-pw-library-keyboard-paging",
+      "module_inventory": "D:/Code/aidokuForKindle/artifacts/phase3/candidate14/ui-round-1-module-snapshots/010-pw-library-keyboard-paging/inventory.json",
+      "module_inventory_sha256": "c18dc2b81fafb6601d0a9dd99da37621ab6a8b0a962e4d0beca8440a7ceba0eb",
+      "case_ids": [
+        "pw5--keyboard-english",
+        "pw5--keyboard-numbers",
+        "pw5--keyboard-shift-space-backspace",
+        "pw5--keyboard-clear"
+      ],
+      "input": "D:/Code/aidokuForKindle/docs/review/phase3-c14-full1-batches/c14r1-m010-b010.input.json",
+      "report": "D:/Code/aidokuForKindle/docs/review/phase3-c14-full1-batches/c14r1-m010-b010.review.json",
+      "maximum_actual_image_opens": 8,
+      "maximum_reference_pairs": 4
+    },
+    {
+      "batch_id": "c14r1-m010-b011",
+      "lane": "a",
+      "module": "010",
+      "module_name": "010-pw-library-keyboard-paging",
+      "module_inventory": "D:/Code/aidokuForKindle/artifacts/phase3/candidate14/ui-round-1-module-snapshots/010-pw-library-keyboard-paging/inventory.json",
+      "module_inventory_sha256": "c18dc2b81fafb6601d0a9dd99da37621ab6a8b0a962e4d0beca8440a7ceba0eb",
+      "case_ids": [
+        "pw5--keyboard-cancel",
+        "pw5--search-source-scope",
+        "pw5--library-last-page",
+        "pw5--library-first-boundary"
+      ],
+      "input": "D:/Code/aidokuForKindle/docs/review/phase3-c14-full1-batches/c14r1-m010-b011.input.json",
+      "report": "D:/Code/aidokuForKindle/docs/review/phase3-c14-full1-batches/c14r1-m010-b011.review.json",
+      "maximum_actual_image_opens": 8,
+      "maximum_reference_pairs": 4
+    },
+    {
+      "batch_id": "c14r1-m010-b012",
+      "lane": "b",
+      "module": "010",
+      "module_name": "010-pw-library-keyboard-paging",
+      "module_inventory": "D:/Code/aidokuForKindle/artifacts/phase3/candidate14/ui-round-1-module-snapshots/010-pw-library-keyboard-paging/inventory.json",
+      "module_inventory_sha256": "c18dc2b81fafb6601d0a9dd99da37621ab6a8b0a962e4d0beca8440a7ceba0eb",
+      "case_ids": [
+        "pw5--catalog-last-page",
+        "pw5--catalog-first-boundary",
+        "pw5--detail-last-page",
+        "pw5--detail-first-boundary"
+      ],
+      "input": "D:/Code/aidokuForKindle/docs/review/phase3-c14-full1-batches/c14r1-m010-b012.input.json",
+      "report": "D:/Code/aidokuForKindle/docs/review/phase3-c14-full1-batches/c14r1-m010-b012.review.json",
+      "maximum_actual_image_opens": 8,
+      "maximum_reference_pairs": 4
+    },
+    {
+      "batch_id": "c14r1-m010-b013",
+      "lane": "a",
+      "module": "010",
+      "module_name": "010-pw-library-keyboard-paging",
+      "module_inventory": "D:/Code/aidokuForKindle/artifacts/phase3/candidate14/ui-round-1-module-snapshots/010-pw-library-keyboard-paging/inventory.json",
+      "module_inventory_sha256": "c18dc2b81fafb6601d0a9dd99da37621ab6a8b0a962e4d0beca8440a7ceba0eb",
+      "case_ids": [
+        "pw5--history-last-page",
+        "pw5--history-first-boundary",
+        "pw5--settings-last-page",
+        "pw5--settings-first-boundary"
+      ],
+      "input": "D:/Code/aidokuForKindle/docs/review/phase3-c14-full1-batches/c14r1-m010-b013.input.json",
+      "report": "D:/Code/aidokuForKindle/docs/review/phase3-c14-full1-batches/c14r1-m010-b013.review.json",
+      "maximum_actual_image_opens": 8,
+      "maximum_reference_pairs": 4
+    },
+    {
+      "batch_id": "c14r1-m010-b014",
+      "lane": "b",
+      "module": "010",
+      "module_name": "010-pw-library-keyboard-paging",
+      "module_inventory": "D:/Code/aidokuForKindle/artifacts/phase3/candidate14/ui-round-1-module-snapshots/010-pw-library-keyboard-paging/inventory.json",
+      "module_inventory_sha256": "c18dc2b81fafb6601d0a9dd99da37621ab6a8b0a962e4d0beca8440a7ceba0eb",
+      "case_ids": [
+        "pw5--sources-last-page",
+        "pw5--sources-first-boundary",
+        "pw5--detail-page-two",
+        "pw5--folio-outside-dismiss"
+      ],
+      "input": "D:/Code/aidokuForKindle/docs/review/phase3-c14-full1-batches/c14r1-m010-b014.input.json",
+      "report": "D:/Code/aidokuForKindle/docs/review/phase3-c14-full1-batches/c14r1-m010-b014.review.json",
+      "maximum_actual_image_opens": 8,
+      "maximum_reference_pairs": 4
+    },
+    {
+      "batch_id": "c14r1-m010-b015",
+      "lane": "a",
+      "module": "010",
+      "module_name": "010-pw-library-keyboard-paging",
+      "module_inventory": "D:/Code/aidokuForKindle/artifacts/phase3/candidate14/ui-round-1-module-snapshots/010-pw-library-keyboard-paging/inventory.json",
+      "module_inventory_sha256": "c18dc2b81fafb6601d0a9dd99da37621ab6a8b0a962e4d0beca8440a7ceba0eb",
+      "case_ids": [
+        "pw5--anchored-menu-outside-dismiss",
+        "pw5--empty-library",
+        "pw5--empty-history"
+      ],
+      "input": "D:/Code/aidokuForKindle/docs/review/phase3-c14-full1-batches/c14r1-m010-b015.input.json",
+      "report": "D:/Code/aidokuForKindle/docs/review/phase3-c14-full1-batches/c14r1-m010-b015.review.json",
+      "maximum_actual_image_opens": 8,
+      "maximum_reference_pairs": 4
+    },
+    {
+      "batch_id": "c14r1-m011-b001",
+      "lane": "b",
+      "module": "011",
+      "module_name": "011-pw-tags-history-migration-http-search",
+      "module_inventory": "D:/Code/aidokuForKindle/artifacts/phase3/candidate14/ui-round-1-module-snapshots/011-pw-tags-history-migration-http-search/inventory.json",
+      "module_inventory_sha256": "bcaab92957ba6b220f3f402ced8f3dc68b27355de8b3df72d215b9708e82bbb8",
+      "case_ids": [
+        "pw5--catalog-tags-seed",
+        "pw5--catalog-tag-1",
+        "pw5--catalog-tag-2",
+        "pw5--catalog-tag-3"
+      ],
+      "input": "D:/Code/aidokuForKindle/docs/review/phase3-c14-full1-batches/c14r1-m011-b001.input.json",
+      "report": "D:/Code/aidokuForKindle/docs/review/phase3-c14-full1-batches/c14r1-m011-b001.review.json",
+      "maximum_actual_image_opens": 8,
+      "maximum_reference_pairs": 4
+    },
+    {
+      "batch_id": "c14r1-m011-b002",
+      "lane": "a",
+      "module": "011",
+      "module_name": "011-pw-tags-history-migration-http-search",
+      "module_inventory": "D:/Code/aidokuForKindle/artifacts/phase3/candidate14/ui-round-1-module-snapshots/011-pw-tags-history-migration-http-search/inventory.json",
+      "module_inventory_sha256": "bcaab92957ba6b220f3f402ced8f3dc68b27355de8b3df72d215b9708e82bbb8",
+      "case_ids": [
+        "pw5--catalog-filter-apply",
+        "pw5--catalog-filter-reset",
+        "pw5--source-language-all",
+        "pw5--source-language-zh-Hans"
+      ],
+      "input": "D:/Code/aidokuForKindle/docs/review/phase3-c14-full1-batches/c14r1-m011-b002.input.json",
+      "report": "D:/Code/aidokuForKindle/docs/review/phase3-c14-full1-batches/c14r1-m011-b002.review.json",
+      "maximum_actual_image_opens": 8,
+      "maximum_reference_pairs": 4
+    },
+    {
+      "batch_id": "c14r1-m011-b003",
+      "lane": "b",
+      "module": "011",
+      "module_name": "011-pw-tags-history-migration-http-search",
+      "module_inventory": "D:/Code/aidokuForKindle/artifacts/phase3/candidate14/ui-round-1-module-snapshots/011-pw-tags-history-migration-http-search/inventory.json",
+      "module_inventory_sha256": "bcaab92957ba6b220f3f402ced8f3dc68b27355de8b3df72d215b9708e82bbb8",
+      "case_ids": [
+        "pw5--source-language-zh-Hant",
+        "pw5--source-language-en",
+        "pw5--source-language-ja",
+        "pw5--history-delete-entry"
+      ],
+      "input": "D:/Code/aidokuForKindle/docs/review/phase3-c14-full1-batches/c14r1-m011-b003.input.json",
+      "report": "D:/Code/aidokuForKindle/docs/review/phase3-c14-full1-batches/c14r1-m011-b003.review.json",
+      "maximum_actual_image_opens": 8,
+      "maximum_reference_pairs": 4
+    },
+    {
+      "batch_id": "c14r1-m011-b004",
+      "lane": "a",
+      "module": "011",
+      "module_name": "011-pw-tags-history-migration-http-search",
+      "module_inventory": "D:/Code/aidokuForKindle/artifacts/phase3/candidate14/ui-round-1-module-snapshots/011-pw-tags-history-migration-http-search/inventory.json",
+      "module_inventory_sha256": "bcaab92957ba6b220f3f402ced8f3dc68b27355de8b3df72d215b9708e82bbb8",
+      "case_ids": [
+        "pw5--history-clear-apply",
+        "pw5--incognito-enable",
+        "pw5--incognito-history-policy",
+        "pw5--incognito-persistence"
+      ],
+      "input": "D:/Code/aidokuForKindle/docs/review/phase3-c14-full1-batches/c14r1-m011-b004.input.json",
+      "report": "D:/Code/aidokuForKindle/docs/review/phase3-c14-full1-batches/c14r1-m011-b004.review.json",
+      "maximum_actual_image_opens": 8,
+      "maximum_reference_pairs": 4
+    },
+    {
+      "batch_id": "c14r1-m011-b005",
+      "lane": "b",
+      "module": "011",
+      "module_name": "011-pw-tags-history-migration-http-search",
+      "module_inventory": "D:/Code/aidokuForKindle/artifacts/phase3/candidate14/ui-round-1-module-snapshots/011-pw-tags-history-migration-http-search/inventory.json",
+      "module_inventory_sha256": "bcaab92957ba6b220f3f402ced8f3dc68b27355de8b3df72d215b9708e82bbb8",
+      "case_ids": [
+        "pw5--history-clear-cancel",
+        "pw5--server-address-keyboard",
+        "pw5--server-secret-keyboard",
+        "pw5--migration-options"
+      ],
+      "input": "D:/Code/aidokuForKindle/docs/review/phase3-c14-full1-batches/c14r1-m011-b005.input.json",
+      "report": "D:/Code/aidokuForKindle/docs/review/phase3-c14-full1-batches/c14r1-m011-b005.review.json",
+      "maximum_actual_image_opens": 8,
+      "maximum_reference_pairs": 4
+    },
+    {
+      "batch_id": "c14r1-m011-b006",
+      "lane": "a",
+      "module": "011",
+      "module_name": "011-pw-tags-history-migration-http-search",
+      "module_inventory": "D:/Code/aidokuForKindle/artifacts/phase3/candidate14/ui-round-1-module-snapshots/011-pw-tags-history-migration-http-search/inventory.json",
+      "module_inventory_sha256": "bcaab92957ba6b220f3f402ced8f3dc68b27355de8b3df72d215b9708e82bbb8",
+      "case_ids": [
+        "pw5--migration-cancel",
+        "pw5--real-migration--origin-empty",
+        "pw5--real-migration--origin-selector-last",
+        "pw5--real-migration--origin-selector-cancel"
+      ],
+      "input": "D:/Code/aidokuForKindle/docs/review/phase3-c14-full1-batches/c14r1-m011-b006.input.json",
+      "report": "D:/Code/aidokuForKindle/docs/review/phase3-c14-full1-batches/c14r1-m011-b006.review.json",
+      "maximum_actual_image_opens": 8,
+      "maximum_reference_pairs": 4
+    },
+    {
+      "batch_id": "c14r1-m011-b007",
+      "lane": "b",
+      "module": "011",
+      "module_name": "011-pw-tags-history-migration-http-search",
+      "module_inventory": "D:/Code/aidokuForKindle/artifacts/phase3/candidate14/ui-round-1-module-snapshots/011-pw-tags-history-migration-http-search/inventory.json",
+      "module_inventory_sha256": "bcaab92957ba6b220f3f402ced8f3dc68b27355de8b3df72d215b9708e82bbb8",
+      "case_ids": [
+        "pw5--real-migration--candidates",
+        "pw5--real-migration--selected",
+        "pw5--real-migration--committed",
+        "pw5--source-list-operation--added"
+      ],
+      "input": "D:/Code/aidokuForKindle/docs/review/phase3-c14-full1-batches/c14r1-m011-b007.input.json",
+      "report": "D:/Code/aidokuForKindle/docs/review/phase3-c14-full1-batches/c14r1-m011-b007.review.json",
+      "maximum_actual_image_opens": 8,
+      "maximum_reference_pairs": 4
+    },
+    {
+      "batch_id": "c14r1-m011-b008",
+      "lane": "a",
+      "module": "011",
+      "module_name": "011-pw-tags-history-migration-http-search",
+      "module_inventory": "D:/Code/aidokuForKindle/artifacts/phase3/candidate14/ui-round-1-module-snapshots/011-pw-tags-history-migration-http-search/inventory.json",
+      "module_inventory_sha256": "bcaab92957ba6b220f3f402ced8f3dc68b27355de8b3df72d215b9708e82bbb8",
+      "case_ids": [
+        "pw5--source-list-operation--removed",
+        "pw5--http-search-success",
+        "pw5--http-search-success--view-all",
+        "pw5--http-search-success--view-all-pointer-open"
+      ],
+      "input": "D:/Code/aidokuForKindle/docs/review/phase3-c14-full1-batches/c14r1-m011-b008.input.json",
+      "report": "D:/Code/aidokuForKindle/docs/review/phase3-c14-full1-batches/c14r1-m011-b008.review.json",
+      "maximum_actual_image_opens": 8,
+      "maximum_reference_pairs": 4
+    },
+    {
+      "batch_id": "c14r1-m011-b009",
+      "lane": "b",
+      "module": "011",
+      "module_name": "011-pw-tags-history-migration-http-search",
+      "module_inventory": "D:/Code/aidokuForKindle/artifacts/phase3/candidate14/ui-round-1-module-snapshots/011-pw-tags-history-migration-http-search/inventory.json",
+      "module_inventory_sha256": "bcaab92957ba6b220f3f402ced8f3dc68b27355de8b3df72d215b9708e82bbb8",
+      "case_ids": [
+        "pw5--http-search-success--server-connect",
+        "pw5--http-search-success--cached-unverified",
+        "pw5--http-search-empty",
+        "pw5--http-search-failure"
+      ],
+      "input": "D:/Code/aidokuForKindle/docs/review/phase3-c14-full1-batches/c14r1-m011-b009.input.json",
+      "report": "D:/Code/aidokuForKindle/docs/review/phase3-c14-full1-batches/c14r1-m011-b009.review.json",
+      "maximum_actual_image_opens": 8,
+      "maximum_reference_pairs": 4
+    },
+    {
+      "batch_id": "c14r1-m011-b010",
+      "lane": "a",
+      "module": "011",
+      "module_name": "011-pw-tags-history-migration-http-search",
+      "module_inventory": "D:/Code/aidokuForKindle/artifacts/phase3/candidate14/ui-round-1-module-snapshots/011-pw-tags-history-migration-http-search/inventory.json",
+      "module_inventory_sha256": "bcaab92957ba6b220f3f402ced8f3dc68b27355de8b3df72d215b9708e82bbb8",
+      "case_ids": [
+        "pw5--http-search-retry",
+        "pw5--http-search-retrying",
+        "pw5--http-search-timeout",
+        "pw5--independent-search--early-result"
+      ],
+      "input": "D:/Code/aidokuForKindle/docs/review/phase3-c14-full1-batches/c14r1-m011-b010.input.json",
+      "report": "D:/Code/aidokuForKindle/docs/review/phase3-c14-full1-batches/c14r1-m011-b010.review.json",
+      "maximum_actual_image_opens": 8,
+      "maximum_reference_pairs": 4
+    },
+    {
+      "batch_id": "c14r1-m011-b011",
+      "lane": "b",
+      "module": "011",
+      "module_name": "011-pw-tags-history-migration-http-search",
+      "module_inventory": "D:/Code/aidokuForKindle/artifacts/phase3/candidate14/ui-round-1-module-snapshots/011-pw-tags-history-migration-http-search/inventory.json",
+      "module_inventory_sha256": "bcaab92957ba6b220f3f402ced8f3dc68b27355de8b3df72d215b9708e82bbb8",
+      "case_ids": [
+        "pw5--independent-search--all-complete",
+        "pw5--independent-search--more-picker",
+        "pw5--independent-search--more-fourth-source"
+      ],
+      "input": "D:/Code/aidokuForKindle/docs/review/phase3-c14-full1-batches/c14r1-m011-b011.input.json",
+      "report": "D:/Code/aidokuForKindle/docs/review/phase3-c14-full1-batches/c14r1-m011-b011.review.json",
+      "maximum_actual_image_opens": 8,
+      "maximum_reference_pairs": 4
+    },
+    {
+      "batch_id": "c14r1-m012-b001",
+      "lane": "a",
+      "module": "012",
+      "module_name": "012-pw-content-stress",
+      "module_inventory": "D:/Code/aidokuForKindle/artifacts/phase3/candidate14/ui-round-1-module-snapshots/012-pw-content-stress/inventory.json",
+      "module_inventory_sha256": "3c3a3e86793446f3ddeef44a451c95c9def3aaf81314eb4e83262cca3dd96f04",
+      "case_ids": [
+        "pw5--content-stress--dense-sources",
+        "pw5--content-stress--dense-installed-last",
+        "pw5--content-stress--scope-typing",
+        "pw5--content-stress--scope-picker-last"
+      ],
+      "input": "D:/Code/aidokuForKindle/docs/review/phase3-c14-full1-batches/c14r1-m012-b001.input.json",
+      "report": "D:/Code/aidokuForKindle/docs/review/phase3-c14-full1-batches/c14r1-m012-b001.review.json",
+      "maximum_actual_image_opens": 8,
+      "maximum_reference_pairs": 4
+    },
+    {
+      "batch_id": "c14r1-m012-b002",
+      "lane": "b",
+      "module": "012",
+      "module_name": "012-pw-content-stress",
+      "module_inventory": "D:/Code/aidokuForKindle/artifacts/phase3/candidate14/ui-round-1-module-snapshots/012-pw-content-stress/inventory.json",
+      "module_inventory_sha256": "3c3a3e86793446f3ddeef44a451c95c9def3aaf81314eb4e83262cca3dd96f04",
+      "case_ids": [
+        "pw5--content-stress--scope-cancel",
+        "pw5--content-stress--scope-select-last",
+        "pw5--content-stress--long-chapters",
+        "pw5--content-stress--filter-tags-first"
+      ],
+      "input": "D:/Code/aidokuForKindle/docs/review/phase3-c14-full1-batches/c14r1-m012-b002.input.json",
+      "report": "D:/Code/aidokuForKindle/docs/review/phase3-c14-full1-batches/c14r1-m012-b002.review.json",
+      "maximum_actual_image_opens": 8,
+      "maximum_reference_pairs": 4
+    },
+    {
+      "batch_id": "c14r1-m012-b003",
+      "lane": "a",
+      "module": "012",
+      "module_name": "012-pw-content-stress",
+      "module_inventory": "D:/Code/aidokuForKindle/artifacts/phase3/candidate14/ui-round-1-module-snapshots/012-pw-content-stress/inventory.json",
+      "module_inventory_sha256": "3c3a3e86793446f3ddeef44a451c95c9def3aaf81314eb4e83262cca3dd96f04",
+      "case_ids": [
+        "pw5--content-stress--filter-tag-page-1",
+        "pw5--content-stress--filter-tag-page-2",
+        "pw5--content-stress--filter-tag-page-3",
+        "pw5--content-stress--filter-tag-page-4"
+      ],
+      "input": "D:/Code/aidokuForKindle/docs/review/phase3-c14-full1-batches/c14r1-m012-b003.input.json",
+      "report": "D:/Code/aidokuForKindle/docs/review/phase3-c14-full1-batches/c14r1-m012-b003.review.json",
+      "maximum_actual_image_opens": 8,
+      "maximum_reference_pairs": 4
+    },
+    {
+      "batch_id": "c14r1-m012-b004",
+      "lane": "b",
+      "module": "012",
+      "module_name": "012-pw-content-stress",
+      "module_inventory": "D:/Code/aidokuForKindle/artifacts/phase3/candidate14/ui-round-1-module-snapshots/012-pw-content-stress/inventory.json",
+      "module_inventory_sha256": "3c3a3e86793446f3ddeef44a451c95c9def3aaf81314eb4e83262cca3dd96f04",
+      "case_ids": [
+        "pw5--content-stress--filter-tag-page-5",
+        "pw5--content-stress--filter-tag-page-6",
+        "pw5--content-stress--description-and-tags",
+        "pw5--content-stress--description-last-page"
+      ],
+      "input": "D:/Code/aidokuForKindle/docs/review/phase3-c14-full1-batches/c14r1-m012-b004.input.json",
+      "report": "D:/Code/aidokuForKindle/docs/review/phase3-c14-full1-batches/c14r1-m012-b004.review.json",
+      "maximum_actual_image_opens": 8,
+      "maximum_reference_pairs": 4
+    },
+    {
+      "batch_id": "c14r1-m012-b005",
+      "lane": "a",
+      "module": "012",
+      "module_name": "012-pw-content-stress",
+      "module_inventory": "D:/Code/aidokuForKindle/artifacts/phase3/candidate14/ui-round-1-module-snapshots/012-pw-content-stress/inventory.json",
+      "module_inventory_sha256": "3c3a3e86793446f3ddeef44a451c95c9def3aaf81314eb4e83262cca3dd96f04",
+      "case_ids": [
+        "pw5--content-stress--category-capability"
+      ],
+      "input": "D:/Code/aidokuForKindle/docs/review/phase3-c14-full1-batches/c14r1-m012-b005.input.json",
+      "report": "D:/Code/aidokuForKindle/docs/review/phase3-c14-full1-batches/c14r1-m012-b005.review.json",
+      "maximum_actual_image_opens": 8,
+      "maximum_reference_pairs": 4
+    },
+    {
+      "batch_id": "c14r1-m013-b001",
+      "lane": "b",
+      "module": "013",
+      "module_name": "013-sc-book-storage-cleanup",
+      "module_inventory": "D:/Code/aidokuForKindle/artifacts/phase3/candidate14/ui-round-1-module-snapshots/013-sc-book-storage-cleanup/inventory.json",
+      "module_inventory_sha256": "b34cd298b363e6a50f4976bf97bfba43a16fb80903fa8912fa2793d98b258833",
+      "case_ids": [
+        "scribe--c4-book-storage--delete-all-local-protected",
+        "scribe--c4-book-storage--storage-initial-loading",
+        "scribe--c4-book-storage--storage-ready-four-classes",
+        "scribe--c4-book-storage--storage-book-management"
+      ],
+      "input": "D:/Code/aidokuForKindle/docs/review/phase3-c14-full1-batches/c14r1-m013-b001.input.json",
+      "report": "D:/Code/aidokuForKindle/docs/review/phase3-c14-full1-batches/c14r1-m013-b001.review.json",
+      "maximum_actual_image_opens": 8,
+      "maximum_reference_pairs": 4
+    },
+    {
+      "batch_id": "c14r1-m013-b002",
+      "lane": "a",
+      "module": "013",
+      "module_name": "013-sc-book-storage-cleanup",
+      "module_inventory": "D:/Code/aidokuForKindle/artifacts/phase3/candidate14/ui-round-1-module-snapshots/013-sc-book-storage-cleanup/inventory.json",
+      "module_inventory_sha256": "b34cd298b363e6a50f4976bf97bfba43a16fb80903fa8912fa2793d98b258833",
+      "case_ids": [
+        "scribe--c4-book-storage--delete-all-more",
+        "scribe--c4-book-storage--delete-all-confirm",
+        "scribe--c4-book-storage--delete-all-cancel",
+        "scribe--c4-book-storage--delete-all-active-confirm"
+      ],
+      "input": "D:/Code/aidokuForKindle/docs/review/phase3-c14-full1-batches/c14r1-m013-b002.input.json",
+      "report": "D:/Code/aidokuForKindle/docs/review/phase3-c14-full1-batches/c14r1-m013-b002.review.json",
+      "maximum_actual_image_opens": 8,
+      "maximum_reference_pairs": 4
+    },
+    {
+      "batch_id": "c14r1-m013-b003",
+      "lane": "b",
+      "module": "013",
+      "module_name": "013-sc-book-storage-cleanup",
+      "module_inventory": "D:/Code/aidokuForKindle/artifacts/phase3/candidate14/ui-round-1-module-snapshots/013-sc-book-storage-cleanup/inventory.json",
+      "module_inventory_sha256": "b34cd298b363e6a50f4976bf97bfba43a16fb80903fa8912fa2793d98b258833",
+      "case_ids": [
+        "scribe--c4-book-storage--delete-all-applied",
+        "scribe--c4-book-storage--delete-all-empty-disabled",
+        "scribe--c4-book-storage--storage-after-cleanup"
+      ],
+      "input": "D:/Code/aidokuForKindle/docs/review/phase3-c14-full1-batches/c14r1-m013-b003.input.json",
+      "report": "D:/Code/aidokuForKindle/docs/review/phase3-c14-full1-batches/c14r1-m013-b003.review.json",
+      "maximum_actual_image_opens": 8,
+      "maximum_reference_pairs": 4
+    },
+    {
+      "batch_id": "c14r1-m014-b001",
+      "lane": "a",
+      "module": "014",
+      "module_name": "014-sc-license-history-entry",
+      "module_inventory": "D:/Code/aidokuForKindle/artifacts/phase3/candidate14/ui-round-1-module-snapshots/014-sc-license-history-entry/inventory.json",
+      "module_inventory_sha256": "ca4a6c645dfec5f3317474550034906a1396740baee6a21dd367d1b21d4c6823",
+      "case_ids": [
+        "scribe--c5-about-license-entry",
+        "scribe--c5-license-first",
+        "scribe--c5-license-last",
+        "scribe--c5-license-return"
+      ],
+      "input": "D:/Code/aidokuForKindle/docs/review/phase3-c14-full1-batches/c14r1-m014-b001.input.json",
+      "report": "D:/Code/aidokuForKindle/docs/review/phase3-c14-full1-batches/c14r1-m014-b001.review.json",
+      "maximum_actual_image_opens": 8,
+      "maximum_reference_pairs": 4
+    },
+    {
+      "batch_id": "c14r1-m014-b002",
+      "lane": "b",
+      "module": "014",
+      "module_name": "014-sc-license-history-entry",
+      "module_inventory": "D:/Code/aidokuForKindle/artifacts/phase3/candidate14/ui-round-1-module-snapshots/014-sc-license-history-entry/inventory.json",
+      "module_inventory_sha256": "ca4a6c645dfec5f3317474550034906a1396740baee6a21dd367d1b21d4c6823",
+      "case_ids": [
+        "scribe--c5-empty-history-body",
+        "scribe--c5-empty-history-browse"
+      ],
+      "input": "D:/Code/aidokuForKindle/docs/review/phase3-c14-full1-batches/c14r1-m014-b002.input.json",
+      "report": "D:/Code/aidokuForKindle/docs/review/phase3-c14-full1-batches/c14r1-m014-b002.review.json",
+      "maximum_actual_image_opens": 8,
+      "maximum_reference_pairs": 4
+    },
+    {
+      "batch_id": "c14r1-m015-b001",
+      "lane": "a",
+      "module": "015",
+      "module_name": "015-sc-library-keyboard-paging",
+      "module_inventory": "D:/Code/aidokuForKindle/artifacts/phase3/candidate14/ui-round-1-module-snapshots/015-sc-library-keyboard-paging/inventory.json",
+      "module_inventory_sha256": "2d6d9fbdd9d9cfd78276bf7a81f553560789f1a7ca0a8b951ddc598291f31b89",
+      "case_ids": [
+        "scribe--sort-title",
+        "scribe--sort-recent-read",
+        "scribe--sort-recent-open",
+        "scribe--sort-recent-update"
+      ],
+      "input": "D:/Code/aidokuForKindle/docs/review/phase3-c14-full1-batches/c14r1-m015-b001.input.json",
+      "report": "D:/Code/aidokuForKindle/docs/review/phase3-c14-full1-batches/c14r1-m015-b001.review.json",
+      "maximum_actual_image_opens": 8,
+      "maximum_reference_pairs": 4
+    },
+    {
+      "batch_id": "c14r1-m015-b002",
+      "lane": "b",
+      "module": "015",
+      "module_name": "015-sc-library-keyboard-paging",
+      "module_inventory": "D:/Code/aidokuForKindle/artifacts/phase3/candidate14/ui-round-1-module-snapshots/015-sc-library-keyboard-paging/inventory.json",
+      "module_inventory_sha256": "2d6d9fbdd9d9cfd78276bf7a81f553560789f1a7ca0a8b951ddc598291f31b89",
+      "case_ids": [
+        "scribe--sort-added-at",
+        "scribe--sort-latest-chapter",
+        "scribe--sort-unread-count",
+        "scribe--sort-chapter-count"
+      ],
+      "input": "D:/Code/aidokuForKindle/docs/review/phase3-c14-full1-batches/c14r1-m015-b002.input.json",
+      "report": "D:/Code/aidokuForKindle/docs/review/phase3-c14-full1-batches/c14r1-m015-b002.review.json",
+      "maximum_actual_image_opens": 8,
+      "maximum_reference_pairs": 4
+    },
+    {
+      "batch_id": "c14r1-m015-b003",
+      "lane": "a",
+      "module": "015",
+      "module_name": "015-sc-library-keyboard-paging",
+      "module_inventory": "D:/Code/aidokuForKindle/artifacts/phase3/candidate14/ui-round-1-module-snapshots/015-sc-library-keyboard-paging/inventory.json",
+      "module_inventory_sha256": "2d6d9fbdd9d9cfd78276bf7a81f553560789f1a7ca0a8b951ddc598291f31b89",
+      "case_ids": [
+        "scribe--sort-descending",
+        "scribe--sort-cold-persistence",
+        "scribe--filter-downloaded-1",
+        "scribe--filter-downloaded-2"
+      ],
+      "input": "D:/Code/aidokuForKindle/docs/review/phase3-c14-full1-batches/c14r1-m015-b003.input.json",
+      "report": "D:/Code/aidokuForKindle/docs/review/phase3-c14-full1-batches/c14r1-m015-b003.review.json",
+      "maximum_actual_image_opens": 8,
+      "maximum_reference_pairs": 4
+    },
+    {
+      "batch_id": "c14r1-m015-b004",
+      "lane": "b",
+      "module": "015",
+      "module_name": "015-sc-library-keyboard-paging",
+      "module_inventory": "D:/Code/aidokuForKindle/artifacts/phase3/candidate14/ui-round-1-module-snapshots/015-sc-library-keyboard-paging/inventory.json",
+      "module_inventory_sha256": "2d6d9fbdd9d9cfd78276bf7a81f553560789f1a7ca0a8b951ddc598291f31b89",
+      "case_ids": [
+        "scribe--filter-downloaded-3",
+        "scribe--filter-unread-1",
+        "scribe--filter-unread-2",
+        "scribe--filter-unread-3"
+      ],
+      "input": "D:/Code/aidokuForKindle/docs/review/phase3-c14-full1-batches/c14r1-m015-b004.input.json",
+      "report": "D:/Code/aidokuForKindle/docs/review/phase3-c14-full1-batches/c14r1-m015-b004.review.json",
+      "maximum_actual_image_opens": 8,
+      "maximum_reference_pairs": 4
+    },
+    {
+      "batch_id": "c14r1-m015-b005",
+      "lane": "a",
+      "module": "015",
+      "module_name": "015-sc-library-keyboard-paging",
+      "module_inventory": "D:/Code/aidokuForKindle/artifacts/phase3/candidate14/ui-round-1-module-snapshots/015-sc-library-keyboard-paging/inventory.json",
+      "module_inventory_sha256": "2d6d9fbdd9d9cfd78276bf7a81f553560789f1a7ca0a8b951ddc598291f31b89",
+      "case_ids": [
+        "scribe--filter-tracked-1",
+        "scribe--filter-tracked-2",
+        "scribe--filter-tracked-3",
+        "scribe--filter-completed-1"
+      ],
+      "input": "D:/Code/aidokuForKindle/docs/review/phase3-c14-full1-batches/c14r1-m015-b005.input.json",
+      "report": "D:/Code/aidokuForKindle/docs/review/phase3-c14-full1-batches/c14r1-m015-b005.review.json",
+      "maximum_actual_image_opens": 8,
+      "maximum_reference_pairs": 4
+    },
+    {
+      "batch_id": "c14r1-m015-b006",
+      "lane": "b",
+      "module": "015",
+      "module_name": "015-sc-library-keyboard-paging",
+      "module_inventory": "D:/Code/aidokuForKindle/artifacts/phase3/candidate14/ui-round-1-module-snapshots/015-sc-library-keyboard-paging/inventory.json",
+      "module_inventory_sha256": "2d6d9fbdd9d9cfd78276bf7a81f553560789f1a7ca0a8b951ddc598291f31b89",
+      "case_ids": [
+        "scribe--filter-completed-2",
+        "scribe--filter-completed-3",
+        "scribe--library-tab-0",
+        "scribe--library-tab-1"
+      ],
+      "input": "D:/Code/aidokuForKindle/docs/review/phase3-c14-full1-batches/c14r1-m015-b006.input.json",
+      "report": "D:/Code/aidokuForKindle/docs/review/phase3-c14-full1-batches/c14r1-m015-b006.review.json",
+      "maximum_actual_image_opens": 8,
+      "maximum_reference_pairs": 4
+    },
+    {
+      "batch_id": "c14r1-m015-b007",
+      "lane": "a",
+      "module": "015",
+      "module_name": "015-sc-library-keyboard-paging",
+      "module_inventory": "D:/Code/aidokuForKindle/artifacts/phase3/candidate14/ui-round-1-module-snapshots/015-sc-library-keyboard-paging/inventory.json",
+      "module_inventory_sha256": "2d6d9fbdd9d9cfd78276bf7a81f553560789f1a7ca0a8b951ddc598291f31b89",
+      "case_ids": [
+        "scribe--library-tab-2",
+        "scribe--library-tab-3",
+        "scribe--library-tab-4",
+        "scribe--selection-all-page"
+      ],
+      "input": "D:/Code/aidokuForKindle/docs/review/phase3-c14-full1-batches/c14r1-m015-b007.input.json",
+      "report": "D:/Code/aidokuForKindle/docs/review/phase3-c14-full1-batches/c14r1-m015-b007.review.json",
+      "maximum_actual_image_opens": 8,
+      "maximum_reference_pairs": 4
+    },
+    {
+      "batch_id": "c14r1-m015-b008",
+      "lane": "b",
+      "module": "015",
+      "module_name": "015-sc-library-keyboard-paging",
+      "module_inventory": "D:/Code/aidokuForKindle/artifacts/phase3/candidate14/ui-round-1-module-snapshots/015-sc-library-keyboard-paging/inventory.json",
+      "module_inventory_sha256": "2d6d9fbdd9d9cfd78276bf7a81f553560789f1a7ca0a8b951ddc598291f31b89",
+      "case_ids": [
+        "scribe--selection-category",
+        "scribe--selection-cancel",
+        "scribe--selection-mark-read",
+        "scribe--selection-remove"
+      ],
+      "input": "D:/Code/aidokuForKindle/docs/review/phase3-c14-full1-batches/c14r1-m015-b008.input.json",
+      "report": "D:/Code/aidokuForKindle/docs/review/phase3-c14-full1-batches/c14r1-m015-b008.review.json",
+      "maximum_actual_image_opens": 8,
+      "maximum_reference_pairs": 4
+    },
+    {
+      "batch_id": "c14r1-m015-b009",
+      "lane": "a",
+      "module": "015",
+      "module_name": "015-sc-library-keyboard-paging",
+      "module_inventory": "D:/Code/aidokuForKindle/artifacts/phase3/candidate14/ui-round-1-module-snapshots/015-sc-library-keyboard-paging/inventory.json",
+      "module_inventory_sha256": "2d6d9fbdd9d9cfd78276bf7a81f553560789f1a7ca0a8b951ddc598291f31b89",
+      "case_ids": [
+        "scribe--library-update-toast",
+        "scribe--keyboard-pinyin",
+        "scribe--keyboard-candidate-page-2",
+        "scribe--keyboard-candidate-commit"
+      ],
+      "input": "D:/Code/aidokuForKindle/docs/review/phase3-c14-full1-batches/c14r1-m015-b009.input.json",
+      "report": "D:/Code/aidokuForKindle/docs/review/phase3-c14-full1-batches/c14r1-m015-b009.review.json",
+      "maximum_actual_image_opens": 8,
+      "maximum_reference_pairs": 4
+    },
+    {
+      "batch_id": "c14r1-m015-b010",
+      "lane": "b",
+      "module": "015",
+      "module_name": "015-sc-library-keyboard-paging",
+      "module_inventory": "D:/Code/aidokuForKindle/artifacts/phase3/candidate14/ui-round-1-module-snapshots/015-sc-library-keyboard-paging/inventory.json",
+      "module_inventory_sha256": "2d6d9fbdd9d9cfd78276bf7a81f553560789f1a7ca0a8b951ddc598291f31b89",
+      "case_ids": [
+        "scribe--keyboard-english",
+        "scribe--keyboard-numbers",
+        "scribe--keyboard-shift-space-backspace",
+        "scribe--keyboard-clear"
+      ],
+      "input": "D:/Code/aidokuForKindle/docs/review/phase3-c14-full1-batches/c14r1-m015-b010.input.json",
+      "report": "D:/Code/aidokuForKindle/docs/review/phase3-c14-full1-batches/c14r1-m015-b010.review.json",
+      "maximum_actual_image_opens": 8,
+      "maximum_reference_pairs": 4
+    },
+    {
+      "batch_id": "c14r1-m015-b011",
+      "lane": "a",
+      "module": "015",
+      "module_name": "015-sc-library-keyboard-paging",
+      "module_inventory": "D:/Code/aidokuForKindle/artifacts/phase3/candidate14/ui-round-1-module-snapshots/015-sc-library-keyboard-paging/inventory.json",
+      "module_inventory_sha256": "2d6d9fbdd9d9cfd78276bf7a81f553560789f1a7ca0a8b951ddc598291f31b89",
+      "case_ids": [
+        "scribe--keyboard-cancel",
+        "scribe--search-source-scope",
+        "scribe--library-last-page",
+        "scribe--library-first-boundary"
+      ],
+      "input": "D:/Code/aidokuForKindle/docs/review/phase3-c14-full1-batches/c14r1-m015-b011.input.json",
+      "report": "D:/Code/aidokuForKindle/docs/review/phase3-c14-full1-batches/c14r1-m015-b011.review.json",
+      "maximum_actual_image_opens": 8,
+      "maximum_reference_pairs": 4
+    },
+    {
+      "batch_id": "c14r1-m015-b012",
+      "lane": "b",
+      "module": "015",
+      "module_name": "015-sc-library-keyboard-paging",
+      "module_inventory": "D:/Code/aidokuForKindle/artifacts/phase3/candidate14/ui-round-1-module-snapshots/015-sc-library-keyboard-paging/inventory.json",
+      "module_inventory_sha256": "2d6d9fbdd9d9cfd78276bf7a81f553560789f1a7ca0a8b951ddc598291f31b89",
+      "case_ids": [
+        "scribe--catalog-last-page",
+        "scribe--catalog-first-boundary",
+        "scribe--detail-last-page",
+        "scribe--detail-first-boundary"
+      ],
+      "input": "D:/Code/aidokuForKindle/docs/review/phase3-c14-full1-batches/c14r1-m015-b012.input.json",
+      "report": "D:/Code/aidokuForKindle/docs/review/phase3-c14-full1-batches/c14r1-m015-b012.review.json",
+      "maximum_actual_image_opens": 8,
+      "maximum_reference_pairs": 4
+    },
+    {
+      "batch_id": "c14r1-m015-b013",
+      "lane": "a",
+      "module": "015",
+      "module_name": "015-sc-library-keyboard-paging",
+      "module_inventory": "D:/Code/aidokuForKindle/artifacts/phase3/candidate14/ui-round-1-module-snapshots/015-sc-library-keyboard-paging/inventory.json",
+      "module_inventory_sha256": "2d6d9fbdd9d9cfd78276bf7a81f553560789f1a7ca0a8b951ddc598291f31b89",
+      "case_ids": [
+        "scribe--history-last-page",
+        "scribe--history-first-boundary",
+        "scribe--settings-last-page",
+        "scribe--settings-first-boundary"
+      ],
+      "input": "D:/Code/aidokuForKindle/docs/review/phase3-c14-full1-batches/c14r1-m015-b013.input.json",
+      "report": "D:/Code/aidokuForKindle/docs/review/phase3-c14-full1-batches/c14r1-m015-b013.review.json",
+      "maximum_actual_image_opens": 8,
+      "maximum_reference_pairs": 4
+    },
+    {
+      "batch_id": "c14r1-m015-b014",
+      "lane": "b",
+      "module": "015",
+      "module_name": "015-sc-library-keyboard-paging",
+      "module_inventory": "D:/Code/aidokuForKindle/artifacts/phase3/candidate14/ui-round-1-module-snapshots/015-sc-library-keyboard-paging/inventory.json",
+      "module_inventory_sha256": "2d6d9fbdd9d9cfd78276bf7a81f553560789f1a7ca0a8b951ddc598291f31b89",
+      "case_ids": [
+        "scribe--sources-last-page",
+        "scribe--sources-first-boundary",
+        "scribe--detail-page-two",
+        "scribe--folio-outside-dismiss"
+      ],
+      "input": "D:/Code/aidokuForKindle/docs/review/phase3-c14-full1-batches/c14r1-m015-b014.input.json",
+      "report": "D:/Code/aidokuForKindle/docs/review/phase3-c14-full1-batches/c14r1-m015-b014.review.json",
+      "maximum_actual_image_opens": 8,
+      "maximum_reference_pairs": 4
+    },
+    {
+      "batch_id": "c14r1-m015-b015",
+      "lane": "a",
+      "module": "015",
+      "module_name": "015-sc-library-keyboard-paging",
+      "module_inventory": "D:/Code/aidokuForKindle/artifacts/phase3/candidate14/ui-round-1-module-snapshots/015-sc-library-keyboard-paging/inventory.json",
+      "module_inventory_sha256": "2d6d9fbdd9d9cfd78276bf7a81f553560789f1a7ca0a8b951ddc598291f31b89",
+      "case_ids": [
+        "scribe--anchored-menu-outside-dismiss",
+        "scribe--empty-library",
+        "scribe--empty-history"
+      ],
+      "input": "D:/Code/aidokuForKindle/docs/review/phase3-c14-full1-batches/c14r1-m015-b015.input.json",
+      "report": "D:/Code/aidokuForKindle/docs/review/phase3-c14-full1-batches/c14r1-m015-b015.review.json",
+      "maximum_actual_image_opens": 8,
+      "maximum_reference_pairs": 4
+    }
+  ],
+  "accounting": {
+    "stable_captured": 357,
+    "stable_manual_required": 334,
+    "assigned_unique_manual": 334,
+    "batches": 93,
+    "missing_or_duplicate_static_assignments": 0
+  },
+  "actual_viewing_basis": "Assignment is not viewing. Actual flags and current case SHA are aggregated from sealed fresh reports, and every incremental declaration must reconcile with the final manifest.",
+  "final_manifest_received": false,
+  "full_round_credit": 0,
+  "clean_round_credit": 0
+}

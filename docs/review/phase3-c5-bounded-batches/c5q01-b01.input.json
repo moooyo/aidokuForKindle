@@ -1,0 +1,399 @@
+{
+  "schema_version": 1,
+  "kind": "fresh-C5-bounded-independent-visual-batch",
+  "batch_id": "c5q01-b01",
+  "lane": "Reference controls, metadata and catalog typography",
+  "record_date": "2026-11-07",
+  "round": 3,
+  "run_id": "43d2545cb872",
+  "capture_manifest": {
+    "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate5/ui-qualification-01/manifest.json",
+    "sha256": "1731e4306df0596e80edd7df2d3e5e57c34fc64feae44572011eba61c2bfc7c5"
+  },
+  "final_inventory": {
+    "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate5/ui-qualification-01/qualification-final-inventory.json",
+    "sha256": "d65f77a634219f545fa9adfdfbd4bbcb2838ca77efa04a5cb7254ad3e6434c7d"
+  },
+  "transfer_accounting": {
+    "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate5/ui-qualification-01-transfer-accounting.json",
+    "sha256": "7bdd0e209d11d95f60bc921405af8f360cf20332b6cacb1d784954341ab3721b",
+    "owner_reported_matches": "285/285",
+    "owner_reported_changed_existing_files": []
+  },
+  "freeze_tuple": {
+    "source_file_count": 227,
+    "source_sha256": "892f0ac73a807e4fd61a235d9ad4fe00c4f03c1e4e6881f28b2dd8bee2b7ddf1",
+    "binary_sha256": "9bd66a1f89473218e67558f763a4a7d4da7c642f9960ae5430ceb74ac365129b",
+    "harness_sha256": "94ccc78d3c11b97791618527350ce59dacf458bfc57f8f04aabec045dd544a74",
+    "capture_plan_sha256": "b3adabbf4f2d33789f381dc2ac55474d89fcd210d58ce9e5083c0d818d547eec",
+    "reference_scope_sha256": "c910bed9f02ed17b2ca0a54aca1beeeeb6caabc5a17a91afe764ddd3e7b0d33c",
+    "reference_sha256": "e7b49b456255432d74cfe41346f9d44c1a9c55bf67c5d55483e4ae3029547d18",
+    "capture_helper_sha256": {
+      "verify-ui.py": "470872e6fd22a78b474c0f862164875ad9c7237bd2f3f164512864580ac1e90d",
+      "verify-fullscreen.py": "4a6c48cef771e66e9b3058edd888dcf2d4bce02e2720b5cc00c7a5b987bc9670",
+      "handoff_c4_business.py": "6197f375b247962e3ce9acdd3779468073f11e0002ac3c7ce876a7b1a0d0d9be",
+      "handoff_c5_ui.py": "fa30ef2bf8ab512e9705f43933ff6acaf32993e5aa1dbc62be330d4c97b481f2",
+      "handoff_c5_reader.py": "5b88a0c1b8e1151a3f96decef1a3a06f98a0d9de99908709bafbfb02cea490d5"
+    }
+  },
+  "actual_status": {
+    "captured": 38,
+    "manual": 34,
+    "prerequisites": 4,
+    "mechanical_case_failures": 0,
+    "reference_capture_coverage": "6/101",
+    "partial": true,
+    "full_capture_suite_completed": false,
+    "clean_round": false,
+    "record_review_authorized": false
+  },
+  "image_budget": {
+    "exact_reference_pairs_max": 4,
+    "total_image_opens_max": 8,
+    "declared_exact_pairs": 4,
+    "new_candidate_images": 4,
+    "assigned_original_reference_images": 4,
+    "total_planned_image_opens": 8,
+    "rule": "Each job is a fresh fork_turns=none worker. No followup image queues. If a necessary readable crop would exceed this budget, keep that check pending and ask the coordinator for a separate fresh crop job."
+  },
+  "frozen_scope_path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate5/ui-qualification-01/execution-inputs/docs/review/phase3-reference-scope.json",
+  "frozen_plan_path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate5/ui-qualification-01/execution-inputs/docs/review/phase3-handoff-capture-plan.json",
+  "root_contracts": [
+    {
+      "id": "C4-C5-G03",
+      "title": "Show the actual loaded Paperwhite catalog count",
+      "requirement": "Display a truthful already-loaded or filtered result count from the actual current catalog state. The observed 128 is fixture evidence, not a value to hardcode or a claim about a remote grand total.",
+      "limit": null
+    },
+    {
+      "id": "C4-C5-G04",
+      "title": "Keep filter chips at intrinsic content width",
+      "requirement": "Use intrinsic chip widths with the declared padding and wrapping. Do not flex-grow the last partial row. Preserve actual tags, tri-state semantics, readability and pagination.",
+      "limit": null
+    },
+    {
+      "id": "C4-C5-G05",
+      "title": "Use the Paperwhite category-management list glyph",
+      "requirement": "Restore the Paperwhite list glyph for Category Management. Keep the Scribe folder glyph; Root explicitly distinguished the two profile references.",
+      "limit": null
+    },
+    {
+      "id": "C4-C5-G08",
+      "title": "Keep a neutral filter trigger neutral when opened",
+      "requirement": "Base the settled trigger's applied-state appearance on actual applied filters rather than merely opening the sheet. Preserve ordinary inverse press feedback during an actual press.",
+      "limit": null
+    },
+    {
+      "id": "C4-C5-G15",
+      "title": "Use interface sans-serif for Scribe catalog captions",
+      "requirement": "Render cover-external Scribe catalog captions with the declared interface sans-serif treatment. Do not recolor or reinterpret lettering inside cover artwork, and do not change Library serif titles.",
+      "limit": "Only the rendered appearance and declared style are asserted, not a measured runtime font file or numeric actual weight."
+    },
+    {
+      "id": "C4-ACCEPT-04",
+      "title": "P06 truthful unavailable controls and fixed-on policies",
+      "requirement": "Accept truthful unavailable presentation and actual fixed-on policy behavior. Do not invent quality, sensor or user-switching features merely to imitate sample enabled states. Keep actual unsupported/omitted control state explicit and do not treat these screenshots as physical hardware qualification.",
+      "limit": null
+    }
+  ],
+  "cases": [
+    {
+      "case_id": "Main--more",
+      "profile": "pw5",
+      "actual_route": "library",
+      "actual_landscape": false,
+      "actual_modal": "choices",
+      "actual_modal_context": "library-more",
+      "actual_reader_panel": "",
+      "actual_settings_section": "",
+      "native_capture_size": [
+        618,
+        824
+      ],
+      "physical_reference_scale": 2,
+      "owner_mechanical_passed": true,
+      "intentional_differences": [],
+      "external_evidence_required": [],
+      "case_json": {
+        "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate5/ui-qualification-01/cases/Main--more.json",
+        "remote_path": "/root/aidoku-phase3/evidence/candidate5/ui-qualification-01/cases/Main--more.json",
+        "sha256": "085cf173ab4096c74b8adb007c6e96a858e38beaacac9f7bf12169dc49fbfa24",
+        "bytes": 27984,
+        "identity_source": "owner immutable C5 inventory and transfer accounting; no local rehash"
+      },
+      "png": {
+        "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate5/ui-qualification-01/Main--more.png",
+        "remote_path": "/root/aidoku-phase3/evidence/candidate5/ui-qualification-01/Main--more.png",
+        "sha256": "e9d13c91a94dff17844d2e9f50384a1c3612a3740e42f45a3d89ce7fedb2ab2a",
+        "bytes": 248946,
+        "identity_source": "owner immutable C5 inventory and transfer accounting; no local rehash"
+      },
+      "state": {
+        "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate5/ui-qualification-01/Main--more.state.json",
+        "remote_path": "/root/aidoku-phase3/evidence/candidate5/ui-qualification-01/Main--more.state.json",
+        "sha256": "9531f856a1e9cf2899818726d2acb9f8d7d743ecb0b89f24fe325b5b5d497a18",
+        "bytes": 16321,
+        "identity_source": "owner immutable C5 inventory and transfer accounting; no local rehash"
+      },
+      "metadata": {
+        "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate5/ui-qualification-01/Main--more.metadata.json",
+        "remote_path": "/root/aidoku-phase3/evidence/candidate5/ui-qualification-01/Main--more.metadata.json",
+        "sha256": "69cffe4704905332bebee23cfdde34f235409f55e00f365a369107e668d52e29",
+        "bytes": 672,
+        "identity_source": "owner immutable C5 inventory and transfer accounting; no local rehash"
+      },
+      "actions": {
+        "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate5/ui-qualification-01/actions/Main--more.json",
+        "remote_path": "/root/aidoku-phase3/evidence/candidate5/ui-qualification-01/actions/Main--more.json",
+        "sha256": "f6b6922a2a51d4d57dce2ccbcdea844e66849db4a16a2a6cb351a78a7b7d378f",
+        "bytes": 94,
+        "identity_source": "owner immutable C5 inventory and transfer accounting; no local rehash"
+      },
+      "log": {
+        "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate5/ui-qualification-01/Main--more.log",
+        "remote_path": "/root/aidoku-phase3/evidence/candidate5/ui-qualification-01/Main--more.log",
+        "sha256": "dc121ceea011a63c29b404d6c6b75bbe2db32b326923b8fa99759f457bfd709f",
+        "bytes": 68,
+        "identity_source": "owner immutable C5 inventory and transfer accounting; no local rehash"
+      }
+    },
+    {
+      "case_id": "pw-source--filter",
+      "profile": "pw5",
+      "actual_route": "catalog",
+      "actual_landscape": false,
+      "actual_modal": "choices",
+      "actual_modal_context": "catalog-filter",
+      "actual_reader_panel": "",
+      "actual_settings_section": "",
+      "native_capture_size": [
+        618,
+        824
+      ],
+      "physical_reference_scale": 2,
+      "owner_mechanical_passed": true,
+      "intentional_differences": [],
+      "external_evidence_required": [],
+      "case_json": {
+        "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate5/ui-qualification-01/cases/pw-source--filter.json",
+        "remote_path": "/root/aidoku-phase3/evidence/candidate5/ui-qualification-01/cases/pw-source--filter.json",
+        "sha256": "c6dde956799add045dad86a9524f21a05b4c3635f6430dbfafc3fba30777ced9",
+        "bytes": 39574,
+        "identity_source": "owner immutable C5 inventory and transfer accounting; no local rehash"
+      },
+      "png": {
+        "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate5/ui-qualification-01/pw-source--filter.png",
+        "remote_path": "/root/aidoku-phase3/evidence/candidate5/ui-qualification-01/pw-source--filter.png",
+        "sha256": "1fe0434b9fba487a439a7b936011af08984a17fb34a5d4216617b33a949625b7",
+        "bytes": 102766,
+        "identity_source": "owner immutable C5 inventory and transfer accounting; no local rehash"
+      },
+      "state": {
+        "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate5/ui-qualification-01/pw-source--filter.state.json",
+        "remote_path": "/root/aidoku-phase3/evidence/candidate5/ui-qualification-01/pw-source--filter.state.json",
+        "sha256": "7a700bb902a72f9cfab234e34a094427843943992228ed903abf07bc1adacd09",
+        "bytes": 23407,
+        "identity_source": "owner immutable C5 inventory and transfer accounting; no local rehash"
+      },
+      "metadata": {
+        "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate5/ui-qualification-01/pw-source--filter.metadata.json",
+        "remote_path": "/root/aidoku-phase3/evidence/candidate5/ui-qualification-01/pw-source--filter.metadata.json",
+        "sha256": "cf7f177db43621004f59d1dfffc7c24fdf3ad96b471a39069a715cd9ca9f28ac",
+        "bytes": 672,
+        "identity_source": "owner immutable C5 inventory and transfer accounting; no local rehash"
+      },
+      "actions": {
+        "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate5/ui-qualification-01/actions/pw-source--filter.json",
+        "remote_path": "/root/aidoku-phase3/evidence/candidate5/ui-qualification-01/actions/pw-source--filter.json",
+        "sha256": "97498c0a800999be91f169be14fc8b046abbbe6d353122c462bc1e06a5f0adfc",
+        "bytes": 101,
+        "identity_source": "owner immutable C5 inventory and transfer accounting; no local rehash"
+      },
+      "log": {
+        "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate5/ui-qualification-01/pw-source--filter.log",
+        "remote_path": "/root/aidoku-phase3/evidence/candidate5/ui-qualification-01/pw-source--filter.log",
+        "sha256": "dc121ceea011a63c29b404d6c6b75bbe2db32b326923b8fa99759f457bfd709f",
+        "bytes": 68,
+        "identity_source": "owner immutable C5 inventory and transfer accounting; no local rehash"
+      }
+    },
+    {
+      "case_id": "pw-settings--display",
+      "profile": "pw5",
+      "actual_route": "settings",
+      "actual_landscape": false,
+      "actual_modal": "",
+      "actual_modal_context": "",
+      "actual_reader_panel": "",
+      "actual_settings_section": "screen-refresh",
+      "native_capture_size": [
+        618,
+        824
+      ],
+      "physical_reference_scale": 2,
+      "owner_mechanical_passed": true,
+      "intentional_differences": [],
+      "external_evidence_required": [],
+      "case_json": {
+        "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate5/ui-qualification-01/cases/pw-settings--display.json",
+        "remote_path": "/root/aidoku-phase3/evidence/candidate5/ui-qualification-01/cases/pw-settings--display.json",
+        "sha256": "77997746409e73f92abc881120d360061febd300138d29963984595654dacbcc",
+        "bytes": 23810,
+        "identity_source": "owner immutable C5 inventory and transfer accounting; no local rehash"
+      },
+      "png": {
+        "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate5/ui-qualification-01/pw-settings--display.png",
+        "remote_path": "/root/aidoku-phase3/evidence/candidate5/ui-qualification-01/pw-settings--display.png",
+        "sha256": "fae9b0781108068aa88e2e99192688579b4df458f632378ce1073dc7fa9392d7",
+        "bytes": 65719,
+        "identity_source": "owner immutable C5 inventory and transfer accounting; no local rehash"
+      },
+      "state": {
+        "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate5/ui-qualification-01/pw-settings--display.state.json",
+        "remote_path": "/root/aidoku-phase3/evidence/candidate5/ui-qualification-01/pw-settings--display.state.json",
+        "sha256": "02fec128cd819efbf661c97b51bae9b3fb5f337e246c6ad27e509ca0abf05e01",
+        "bytes": 11887,
+        "identity_source": "owner immutable C5 inventory and transfer accounting; no local rehash"
+      },
+      "metadata": {
+        "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate5/ui-qualification-01/pw-settings--display.metadata.json",
+        "remote_path": "/root/aidoku-phase3/evidence/candidate5/ui-qualification-01/pw-settings--display.metadata.json",
+        "sha256": "51e33440393ebffa79cd2773d982e3f5d56dc9ac9ed8f71cf55201ed42cf57fb",
+        "bytes": 673,
+        "identity_source": "owner immutable C5 inventory and transfer accounting; no local rehash"
+      },
+      "actions": {
+        "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate5/ui-qualification-01/actions/pw-settings--display.json",
+        "remote_path": "/root/aidoku-phase3/evidence/candidate5/ui-qualification-01/actions/pw-settings--display.json",
+        "sha256": "da8663beb77f72a5ae34d4e0a659334975f0f48c576e0a82f7293b316137920a",
+        "bytes": 109,
+        "identity_source": "owner immutable C5 inventory and transfer accounting; no local rehash"
+      },
+      "log": {
+        "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate5/ui-qualification-01/pw-settings--display.log",
+        "remote_path": "/root/aidoku-phase3/evidence/candidate5/ui-qualification-01/pw-settings--display.log",
+        "sha256": "dc121ceea011a63c29b404d6c6b75bbe2db32b326923b8fa99759f457bfd709f",
+        "bytes": 68,
+        "identity_source": "owner immutable C5 inventory and transfer accounting; no local rehash"
+      }
+    },
+    {
+      "case_id": "sc-browse--default",
+      "profile": "scribe",
+      "actual_route": "catalog",
+      "actual_landscape": false,
+      "actual_modal": "",
+      "actual_modal_context": "",
+      "actual_reader_panel": "",
+      "actual_settings_section": "screen-refresh",
+      "native_capture_size": [
+        930,
+        1240
+      ],
+      "physical_reference_scale": 2,
+      "owner_mechanical_passed": true,
+      "intentional_differences": [],
+      "external_evidence_required": [],
+      "case_json": {
+        "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate5/ui-qualification-01/cases/sc-browse--default.json",
+        "remote_path": "/root/aidoku-phase3/evidence/candidate5/ui-qualification-01/cases/sc-browse--default.json",
+        "sha256": "df6bfb9a25c0943f4bc80af7ccd93f034f1a9ea33d0e17945ace5bd022814b50",
+        "bytes": 40536,
+        "identity_source": "owner immutable C5 inventory and transfer accounting; no local rehash"
+      },
+      "png": {
+        "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate5/ui-qualification-01/sc-browse--default.png",
+        "remote_path": "/root/aidoku-phase3/evidence/candidate5/ui-qualification-01/sc-browse--default.png",
+        "sha256": "ff02079108c6c36c80c602039a82d0bf23cc50b1fd4f805d8d1d72fd23797d23",
+        "bytes": 508674,
+        "identity_source": "owner immutable C5 inventory and transfer accounting; no local rehash"
+      },
+      "state": {
+        "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate5/ui-qualification-01/sc-browse--default.state.json",
+        "remote_path": "/root/aidoku-phase3/evidence/candidate5/ui-qualification-01/sc-browse--default.state.json",
+        "sha256": "3c40f83de16a350783d79093c0e80338f396803589982afa6d2ec9146e257f37",
+        "bytes": 26029,
+        "identity_source": "owner immutable C5 inventory and transfer accounting; no local rehash"
+      },
+      "metadata": {
+        "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate5/ui-qualification-01/sc-browse--default.metadata.json",
+        "remote_path": "/root/aidoku-phase3/evidence/candidate5/ui-qualification-01/sc-browse--default.metadata.json",
+        "sha256": "5fadd203d12a448f60b0cb4805edc08e4169ab16f73ae8e322a4337199b67ce7",
+        "bytes": 679,
+        "identity_source": "owner immutable C5 inventory and transfer accounting; no local rehash"
+      },
+      "actions": {
+        "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate5/ui-qualification-01/actions/sc-browse--default.json",
+        "remote_path": "/root/aidoku-phase3/evidence/candidate5/ui-qualification-01/actions/sc-browse--default.json",
+        "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+        "bytes": 3,
+        "identity_source": "owner immutable C5 inventory and transfer accounting; no local rehash"
+      },
+      "log": {
+        "path": "D:/Code/aidokuForKindle/artifacts/phase3/candidate5/ui-qualification-01/sc-browse--default.log",
+        "remote_path": "/root/aidoku-phase3/evidence/candidate5/ui-qualification-01/sc-browse--default.log",
+        "sha256": "7e68a4176710a866675a6b95bcf7bed2d96c58a8fd7996a4d48f3679514483a9",
+        "bytes": 72,
+        "identity_source": "owner immutable C5 inventory and transfer accounting; no local rehash"
+      }
+    }
+  ],
+  "original_references": [
+    {
+      "reference_id": "Main--more",
+      "path": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/screens/states/Main--more.png",
+      "relative_path": "screens/states/Main--more.png",
+      "sha256": "cc740c4be85a90bba48238897d459e0819245937ae0e878f6a8d28cb9107a2d0",
+      "dimensions": [
+        1236,
+        1648
+      ],
+      "comparison_basis": "Use only where state/profile applies. Supplemental states are related/global-contract comparisons, not invented exact exported states."
+    },
+    {
+      "reference_id": "pw-source--filter",
+      "path": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/screens/states/pw-source--filter.png",
+      "relative_path": "screens/states/pw-source--filter.png",
+      "sha256": "1339b77a8346218b73343211b67163fbba6efe5b875fff5b2b37239dfcfd2c23",
+      "dimensions": [
+        1236,
+        1648
+      ],
+      "comparison_basis": "Use only where state/profile applies. Supplemental states are related/global-contract comparisons, not invented exact exported states."
+    },
+    {
+      "reference_id": "pw-settings--display",
+      "path": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/screens/states/pw-settings--display.png",
+      "relative_path": "screens/states/pw-settings--display.png",
+      "sha256": "51b3dfe82ec164b5e2effb36b3fe1a9cb6ca5a333b10daa9eee34565402c2653",
+      "dimensions": [
+        1236,
+        1648
+      ],
+      "comparison_basis": "Use only where state/profile applies. Supplemental states are related/global-contract comparisons, not invented exact exported states."
+    },
+    {
+      "reference_id": "sc-browse--default",
+      "path": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/screens/sc-browse.png",
+      "relative_path": "screens/sc-browse.png",
+      "sha256": "7c411218fec402c436953ffae701611203207719241797caeaac154e114d7fae",
+      "dimensions": [
+        1860,
+        2480
+      ],
+      "comparison_basis": "Use only where state/profile applies. Supplemental states are related/global-contract comparisons, not invented exact exported states."
+    }
+  ],
+  "instructions": [
+    "Actually open each listed new C5 original candidate and each assigned necessary original reference with tools.view_image. Do not use old C4 candidates or old pixel verdicts in place of new viewing.",
+    "Read only compact relevant case/state/metadata/action/log fields; do not dump full manifests, full model arrays, complete oracle payloads or base64 into context/reports.",
+    "Use the declared actual state/data and applicable Root contract. Do not demand sample titles/counts or fabricate exact references for new license/editor/empty states.",
+    "Closed Reader contains artwork only: no app footer/bookmark/page/status/download/debug chrome. Genuine source-art borders or captions with existing source/oracle identity are not app chrome.",
+    "Truthful unavailable/fixed-on controls and absent sensor integration are accepted bounds. Manual270 may replace unsupported sensor-follow without claiming physical qualification. Do not add feature wishes.",
+    "Separate directly visible design/state issues from existing captured action/fixture/oracle support. No screenshots prove physical touch, e-ink effects, native mapping, timing or the independent live-reader lease.",
+    "Only local static reads and original-image viewing. No application, test, build, probe, local validation/hash/SQL, SSH, copy, crop/image processing, current production/harness/plan edits or new agents.",
+    "Write compact English JSON only to the assigned report. Per case include all original evidence SHA, actual viewing, concrete observations, capability/intentional checks and behavior limits. Do not duplicate entire input/state/oracle data.",
+    "Immediately report any concrete new actionable, identity mismatch or unreadable detail with exact trigger/current PNG/reference SHA to the coordinator. Keep uncertain observations pending. No full/clean claim."
+  ],
+  "output_report_path": "D:/Code/aidokuForKindle/docs/review/phase3-c5-bounded-batches/c5q01-b01.review.json"
+}

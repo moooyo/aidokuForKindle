@@ -1,0 +1,171 @@
+{
+  "batch_id": "reference-20",
+  "reviewer": "/root/phase3_round1_review/reference_20",
+  "run_id": "a1baf3fe3dc2",
+  "round": 1,
+  "review_type": "Fresh independent visual review of four reference pairs",
+  "identity_checks": {
+    "candidate": "candidate3",
+    "expected_binary_sha256": "94d7f3bbcab475ad8833a2f3c486138f7b49bead231851c2d8eab2f0c3d2ac51",
+    "expected_source_sha256": "aef9db4e111165016a10a2a95e111f3155860b8510c7f6207ec9c79fbec5082c",
+    "supplied_reference_corpus_sha256": "e7b49b456255432d74cfe41346f9d44c1a9c55bf67c5d55483e4ae3029547d18",
+    "case_metadata_identity": "All four case sidecars identify round 1, run a1baf3fe3dc2, and the expected binary and source digests.",
+    "png_hash_basis": "Get-FileHash -Algorithm SHA256 over the unmodified on-disk PNG bytes.",
+    "png_hash_matches": "All four candidate hashes match evidence_hashes.screenshot.sha256, and all four reference hashes match reference_sha256 in their corresponding case sidecars.",
+    "reference_corpus_scope": "The supplied corpus digest is recorded as provenance; this bounded review verifies the four individual reference PNG digests and does not recompute the aggregate corpus digest.",
+    "comparison_scale": "Candidate PNGs are 1240 by 930 logical pixels at scale 1. Reference PNGs are 2480 by 1860 physical pixels at scale 2. Visual geometry was compared in the same 1240 by 930 logical coordinate space."
+  },
+  "reviewed_case_ids": [
+    "sc-reader--default",
+    "sc-reader--fullscreen",
+    "sc-reader--image",
+    "sc-reader--layout"
+  ],
+  "reviewed_cases": [
+    {
+      "case_id": "sc-reader--default",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/sc-reader--default.png",
+      "candidate_sha256": "51d17444f10f121e64d13d2b833439bdf7869b3692c52a729395a907a2cb3708",
+      "reference_png": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/screens/sc-reader.png",
+      "reference_sha256": "2940ed50f4c8bb2a5b452315b0c71bab32a5fe5ceb605c9c4358f23baf8f65ee",
+      "case_metadata": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/cases/sc-reader--default.json",
+      "viewed_candidate": true,
+      "viewed_reference": true,
+      "outcome": "no_actionable_issue_observed",
+      "observations": [
+        "The candidate visibly opens the reader menu; the sidecar also records menu=true and no modal. This matches the default reference state.",
+        "The integrated header occupies approximately 78 logical pixels and contains the back action, two-level book/chapter title, orientation control, bookmark, contents action, and time/battery. Text and icons remain fully visible.",
+        "The reader uses two equal horizontal page allocations. Differences within the comic artwork and its white margins are not sufficient evidence of a viewport inset defect.",
+        "The progress and chapter-navigation region uses approximately 120 logical pixels of horizontal inset, shows the 12-13 of 40 range, and retains both chapter actions without stray rules through the text.",
+        "The five-tool strip is approximately 76 logical pixels tall. The More icon is a compact three-dot ellipsis, and the header, muted gray labels, divider lines, selected range handle, and tool labels show no material font, grayscale, or clipping regression at logical scale.",
+        "The screenshot shows the contents action but does not open its table-of-contents sheet."
+      ],
+      "intentional_differences": [
+        "The orientation action is manual and locked rather than claiming the reference's automatic sensor rotation, consistent with the capability boundary.",
+        "The captured comic assets differ in internal composition and cropping from the reference; this was not treated as application chrome or an inset failure."
+      ]
+    },
+    {
+      "case_id": "sc-reader--fullscreen",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/sc-reader--fullscreen.png",
+      "candidate_sha256": "91ceb9e8a9b560e178d234248902dc249c94f21c6c7da60c0057ce780d16ea37",
+      "reference_png": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/screens/states/sc-reader--fullscreen.png",
+      "reference_sha256": "d3a53afd5b446e5e7a2028097666a158406d4eadbbac048e32773a88bf733107",
+      "case_metadata": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/cases/sc-reader--fullscreen.json",
+      "viewed_candidate": true,
+      "viewed_reference": true,
+      "outcome": "no_actionable_issue_observed",
+      "observations": [
+        "The candidate is artwork-only: there is no visible header, bookmark ribbon, footer, progress display, tool strip, or notification. The sidecar records menu=false with no modal or reader panel.",
+        "Two page allocations occupy the landscape reader. Comic panel arrangement and image-internal white areas differ from the reference and were not used to infer an application viewport inset.",
+        "No visible interface element overlaps or clips the artwork. This still image cannot establish the absence of an invisible footer-cycle hit region."
+      ],
+      "intentional_differences": [
+        "The persistent bookmark ribbon visible at the reference's upper-right edge is absent, as explicitly required by the user override.",
+        "Underlying comic imagery and its internal whitespace differ from the reference."
+      ]
+    },
+    {
+      "case_id": "sc-reader--image",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/sc-reader--image.png",
+      "candidate_sha256": "cedc6417c7105da363e201f74d1e29ccf327695b0628faa878cf5bdaa92397f4",
+      "reference_png": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/screens/states/sc-reader--image.png",
+      "reference_sha256": "e3d8204f61f4b24516ea56a3350516c84c31efff2bb8f14a407c45866015a708",
+      "case_metadata": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/cases/sc-reader--image.json",
+      "viewed_candidate": true,
+      "viewed_reference": true,
+      "outcome": "no_actionable_issue_observed",
+      "observations": [
+        "The picture sheet appears above the retained range/navigation and tool regions, with the picture tool selected. Its title, preview, contrast area, refresh choices, dither row, and night row are fully visible.",
+        "The preview contains actual comic artwork. Five contrast positions appear between minus and plus controls; the standard state fills the first three segments.",
+        "The full-refresh choices show Every, 3, 6, 10, and Chapter, with 6 visibly selected. The right column shows software 16-level grayscale dithering enabled and night mode disabled.",
+        "The picture sheet begins at approximately logical y468, with content aligned to the reference's approximately 120-pixel horizontal inset. The retained header and bottom regions match the reference's proportions.",
+        "The title weight, muted labels, thin separators, outlined controls, and filled selection states remain legible without visible clipping or blocked controls."
+      ],
+      "intentional_differences": [
+        "The reference's hardware-dither status is replaced by the implemented software 16-level grayscale dither control. The capability declaration records software_dither=true and hardware_dither_qualified=false, so the candidate does not claim unsupported hardware dithering.",
+        "The orientation control truthfully offers manual orientation, and the preview uses the captured comic assets rather than identical reference artwork."
+      ]
+    },
+    {
+      "case_id": "sc-reader--layout",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/sc-reader--layout.png",
+      "candidate_sha256": "f60c165b71ead3e316c0eddf160d89e96a598f9db3e5c10e48aac4a345d23105",
+      "reference_png": "C:/Users/moooyo/Downloads/aidoku-kindle-handoff/aidoku-kindle-handoff/screens/states/sc-reader--layout.png",
+      "reference_sha256": "b1b897b31bf421080f4669a36a2d903271d31dbf98245a5d3cf3ab244ac9d055",
+      "case_metadata": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/cases/sc-reader--layout.json",
+      "viewed_candidate": true,
+      "viewed_reference": true,
+      "outcome": "actionable_issue_observed",
+      "observations": [
+        "The layout sheet retains the expected header, progress/navigation region, and selected layout tool. Its sheet boundary begins at approximately logical y542, matching the normalized reference.",
+        "Single, Double, and Automatic cards appear with Automatic selected. Their icons, labels, borders, and black/white selected state are legible and unclipped.",
+        "The entire right-hand settings column is blank. The reference has a Separate cover page toggle above a Spread image row with Whole page and Split into two choices in this space. Neither control group is visible in the candidate.",
+        "The sidecar's reader-layout modal_items contain only layout:single, layout:double, and layout:automatic, consistent with the visible omission.",
+        "The omitted settings are application layout controls; no sensor, pen, or hardware-dither capability boundary explains their absence."
+      ],
+      "intentional_differences": [
+        "Manual orientation and differing underlying comic imagery are accepted capability/content differences.",
+        "The missing cover and spread-treatment settings are not accepted as intentional differences."
+      ]
+    }
+  ],
+  "suggestions": [
+    {
+      "id": "P3R1-REF20-1",
+      "case_id": "sc-reader--layout",
+      "priority": "P2",
+      "description": "The landscape Layout sheet omits the Separate cover page toggle and the Whole page / Split into two spread-image controls.",
+      "evidence": "At the same 1240 by 930 logical scale, the candidate's right column around x697-1120 and y596-705 is blank. The reference places the separate-cover toggle and spread-image treatment choices there. The candidate sidecar exposes only the Single, Double, and Automatic layout items. The missing controls are not excluded by the supplied capability boundaries.",
+      "recommendation": "Restore the separate-cover toggle and the whole/split spread-image choices in the landscape Layout sheet, showing their current state and keeping both groups fully accessible alongside the three page-layout cards.",
+      "status": "open",
+      "introduced_round": 1
+    }
+  ],
+  "prior_finding_rechecks": [
+    {
+      "id": "P3D004",
+      "status": "no_visual_recurrence_in_reviewed_cases",
+      "case_ids": [
+        "sc-reader--default",
+        "sc-reader--image",
+        "sc-reader--layout"
+      ],
+      "observed_evidence": "Each of the three menu-open candidates displays a small three-dot More ellipsis with no visible enclosing artifact or stray rule."
+    },
+    {
+      "id": "P3D005",
+      "status": "no_visual_recurrence_in_reviewed_cases",
+      "case_ids": [
+        "sc-reader--default",
+        "sc-reader--image",
+        "sc-reader--layout"
+      ],
+      "observed_evidence": "In the three menu-open candidates, the chapter-navigation row between the two chapter actions has no extra short rules. The expected full-width boundary above the tool strip remains."
+    },
+    {
+      "id": "P3R001",
+      "status": "no_visual_recurrence_in_reviewed_cases",
+      "case_ids": [
+        "sc-reader--default",
+        "sc-reader--fullscreen",
+        "sc-reader--image",
+        "sc-reader--layout"
+      ],
+      "observed_evidence": "The upper-right contents action in the default, picture, and layout candidates visibly uses a bullet-list icon approximately 20 logical pixels wide. Its three bullets and accompanying rules remain distinct; it has not regressed to the earlier approximately 11-pixel set of short rules. The fullscreen case intentionally has no header action."
+    }
+  ],
+  "limitations": [
+    "This verdict covers only the four assigned cases and eight directly viewed PNGs; it is not an all-case or all-round clean declaration.",
+    "Only existing PNGs and JSON sidecars were read, and PNG byte hashes were collected. No local application, build, tests, runtime probes, git commands, or product modifications were performed.",
+    "Visible controls can be checked for appearance, clipping, and visual accessibility. Their interaction, persistence, invisible hit regions, and the fullscreen footer-cycle prohibition require separate behavioral evidence.",
+    "The static captures and declared capabilities do not qualify physical pen input, orientation sensors, hardware dithering, or physical e-ink rendering.",
+    "Physical reference scale was normalized conceptually during visual comparison. Source artwork differences and content-internal white space were not classified as application viewport defects."
+  ],
+  "summary": {
+    "reviewed_pairs": 4,
+    "viewed_images": 8,
+    "open_findings": 1,
+    "prior_findings_visually_rechecked": 3
+  }
+}

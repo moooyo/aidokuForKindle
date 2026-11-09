@@ -1,0 +1,202 @@
+{
+  "batch_id": "supplemental-28",
+  "reviewer": "/root/phase3_round1_review/supplemental_28",
+  "run_id": "a1baf3fe3dc2",
+  "round": 1,
+  "candidate_identity": {
+    "binary_sha256": "94d7f3bbcab475ad8833a2f3c486138f7b49bead231851c2d8eab2f0c3d2ac51",
+    "source_sha256": "aef9db4e111165016a10a2a95e111f3155860b8510c7f6207ec9c79fbec5082c",
+    "profile": "scribe",
+    "native_capture_size": [930, 1240],
+    "backend": "desktop",
+    "capture_method": "native Slint application --capture; unmodified original PNG",
+    "identity_observation": "All eight case sidecars identify the frozen run, binary, and source above. Get-FileHash SHA256 for every current candidate PNG matched both its input expected_png_sha256 and its sidecar evidence_hashes.screenshot.sha256. All supplied mechanical checks passed; those results were read as existing evidence and were not rerun."
+  },
+  "review_basis": [
+    "docs/review/phase3-reference-scope.json: precedence, sharedContract, capabilityBounds, and additionalRequiredCases",
+    "docs/DESIGN_HANDOFF.md: Search and keyboard, History, Forms and overlays, and explicit user differences",
+    "User handoff HANDOFF.md sections 4.7, 5.5, and 5.6, read as static text",
+    "User handoff prototype/sc-history.dc.html lines 19-45 and prototype/sc-search.dc.html lines 19-49 and 125-159, read as static text",
+    "docs/review/phase3-prototype-reference-support.json: sc-search and sc-history board maps"
+  ],
+  "reviewed_case_ids": [
+    "scribe--incognito-enable",
+    "scribe--incognito-history-policy",
+    "scribe--incognito-persistence",
+    "scribe--independent-search--all-complete",
+    "scribe--independent-search--early-result",
+    "scribe--keyboard-cancel",
+    "scribe--keyboard-candidate-commit",
+    "scribe--keyboard-candidate-page-2"
+  ],
+  "reviewed_cases": [
+    {
+      "case_id": "scribe--incognito-enable",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/scribe--incognito-enable.png",
+      "candidate_sha256": "5fd1207b0bf187a05516c3565db47177366b3c5e81a6b6ac50b55fefdfa3a335",
+      "viewed_candidate": true,
+      "outcome": "actionable_issue_found",
+      "observations": [
+        "The history route and incognito=true preference match the sidecar. The header Incognito action is black with white content, and the 36-pixel system strip is inverted.",
+        "The inverted strip contains only time, Wi-Fi, battery percentage, and battery icon. Its large center region is empty instead of displaying the required explicit incognito/no-history policy; see P3R1-SUP28-1.",
+        "Six visible history records are grouped into Today, Yesterday, Sunday, and Saturday across two columns. Book, chapter, progress or completion time, individual removal controls, a 1/5 folio, and the selected History dock item remain legible.",
+        "The page uses white surfaces and thin separators without a UI shadow or dimmed overlay. Patterned cover artwork is fixture content and is not treated as an interface stipple defect."
+      ],
+      "intentional_differences": []
+    },
+    {
+      "case_id": "scribe--incognito-history-policy",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/scribe--incognito-history-policy.png",
+      "candidate_sha256": "8ca978bcd16954f87be2fee2c7d80abb47b4f2a8f0da48b38f219ff4e2fd07b9",
+      "viewed_candidate": true,
+      "outcome": "actionable_issue_found",
+      "observations": [
+        "Although the case starts from a reader scenario, its captured state.route is detail. The image correctly shows the book detail page after private reading, with a fixed left information column, 16 directory rows, and a 1/6 folio; it is not misclassified as a closed-reader image.",
+        "The continuation control shows the session at page 20/40. Existing sidecar checks report incognito persisted as true and durable history unchanged at 20 rows before and after the scenario. This is supplied behavioral evidence, not a conclusion derived from the PNG alone.",
+        "The inverted status strip persists on the detail route, but the explicit incognito/no-history message is absent. This page has no history header Incognito action, making the missing persistent label especially consequential; see P3R1-SUP28-1.",
+        "Chapter dates and outlined download controls remain readable. The book information, action buttons, description, tags, and directory do not overlap, and there is no main dock on this secondary route."
+      ],
+      "intentional_differences": []
+    },
+    {
+      "case_id": "scribe--incognito-persistence",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/scribe--incognito-persistence.png",
+      "candidate_sha256": "5fd1207b0bf187a05516c3565db47177366b3c5e81a6b6ac50b55fefdfa3a335",
+      "viewed_candidate": true,
+      "outcome": "actionable_issue_found",
+      "observations": [
+        "The captured history route restores the black Incognito action and inverted status strip. The sidecar includes a passed persisted-incognito=true check.",
+        "This PNG is byte-identical to incognito-enable, consistent with the restored visible history layout, six records, 1/5 folio, and selected History dock item. It was still opened and inspected separately.",
+        "The persistent status strip again omits the explicit incognito/no-history policy text. Persistence of the black color treatment does not fulfill the label requirement; see P3R1-SUP28-1.",
+        "Visible progress, completed-entry labels, dates, and individual remove controls remain separated and readable after restoration."
+      ],
+      "intentional_differences": []
+    },
+    {
+      "case_id": "scribe--independent-search--all-complete",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/scribe--independent-search--all-complete.png",
+      "candidate_sha256": "891f02db5d3939156f84662876e8dc3618eff60d7adad03c3d145ca519cd4b2d",
+      "viewed_candidate": true,
+      "outcome": "actionable_issue_found",
+      "observations": [
+        "The committed query is fixture, the keyboard is closed, and the Search dock is restored. The summary reports four completed source attempts and two sources with results.",
+        "The empty source has an explicit no-results row; the failing source has an incomplete-operation label and Retry action. Fast and slow sources each show a count of 20, a View all action, and six visible cover cards. This agrees with four non-pending group states and 40 total results in the sidecar.",
+        "The scope bar offers All sources, Library, Actual empty fixture, Actual error fixture, and Actual fast fixture. It omits Actual slow fixture and provides no visible overflow or source-picker affordance despite displaying results for that fourth source; see P3R1-SUP28-2.",
+        "The result groups, count labels, retry control, and two six-card rows do not overlap. Long fixture titles truncate within their cells rather than crossing cover boundaries. White outlined input and scopes have no offset shadow or gray card fill."
+      ],
+      "intentional_differences": []
+    },
+    {
+      "case_id": "scribe--independent-search--early-result",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/scribe--independent-search--early-result.png",
+      "candidate_sha256": "593b57c8f6b1234bb2e9313ca999d905270a458aba5272a6e71d94cd6aa1613c",
+      "viewed_candidate": true,
+      "outcome": "actionable_issue_found",
+      "observations": [
+        "Six fast-source result cards and their View all action are already visible while the slow source has its own searching label. The summary correctly shows three completed source attempts and one source with results.",
+        "The empty and failing sources retain separate no-results and incomplete-operation rows, with Retry available only for the failure. The slow group has no fabricated cards. The lower outlined loading notice leaves the completed fast results unobscured.",
+        "The sidecar identifies fast as count=20 and pending=false, slow as pending=true with no book IDs, empty as a successful empty result, and error as a separate failure. The PNG is consistent with those supplied states, while request timing itself is outside static-image proof.",
+        "The fourth source again has no scope chip or visible overflow selection control, although its pending result group is present; see P3R1-SUP28-2.",
+        "The keyboard is absent and the Search dock remains visible. The loading notice is white with a black outline and has no shadow, scrim, or stippled backdrop."
+      ],
+      "intentional_differences": [
+        "Fast, empty, failing and delayed sources are independent real loopback requests; completed results remain visible while a slower source is pending."
+      ]
+    },
+    {
+      "case_id": "scribe--keyboard-cancel",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/scribe--keyboard-cancel.png",
+      "candidate_sha256": "9f2181e808b0da26c8d12625c0db69294143515e47cbc8cb875fdd5f9eb30c64",
+      "viewed_candidate": true,
+      "outcome": "no_actionable_visual_issue_found",
+      "observations": [
+        "The search input has returned to its empty placeholder with no committed character or composition text. The sidecar confirms empty query, keyboard_text, composition, and candidates, with modal cleared.",
+        "The keyboard and candidate strip are absent, and the full five-item dock is restored with Search selected. No abandoned composition or result group remains on the page.",
+        "The empty search prompt and centered Search action are clearly separated from the header and dock. The input and source scopes remain white and outlined, with no clipping, modal mask, or shadow."
+      ],
+      "intentional_differences": []
+    },
+    {
+      "case_id": "scribe--keyboard-candidate-commit",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/scribe--keyboard-candidate-commit.png",
+      "candidate_sha256": "50767132065aa05d15bc2f071076725fcb443791df9a09c86966b254e64d3072",
+      "viewed_candidate": true,
+      "outcome": "no_actionable_visual_issue_found",
+      "observations": [
+        "One committed Chinese character appears in the search field with its clear control. The sidecar distinguishes keyboard_text containing that character from the still-unsubmitted query and confirms an empty composition and candidate list.",
+        "The candidate row has returned to the Pinyin mode hint, so the former composition and candidates are visibly cleared after commit.",
+        "The local-library area shows an honest no-match state while editing. The full QWERTY keyboard, shift, backspace, number toggle, language toggle, space, and Search key are visible without label collisions.",
+        "The keyboard replaces the dock, as required for editing, and remains bounded by a simple black top rule without a dimmed background or shadow."
+      ],
+      "intentional_differences": []
+    },
+    {
+      "case_id": "scribe--keyboard-candidate-page-2",
+      "candidate_png": "D:/Code/aidokuForKindle/artifacts/phase3/candidate3/ui-round-1/scribe--keyboard-candidate-page-2.png",
+      "candidate_sha256": "b0c270d1d3836318eda74f87f8ff9240ae1c865835331a6c3d6df847a3afd1f1",
+      "viewed_candidate": true,
+      "outcome": "no_actionable_visual_issue_found",
+      "observations": [
+        "The underlined composition s remains distinct from eight readable candidate terms. Both previous and next chevrons are visible to the right of the candidate row, with no overlap into the QWERTY row.",
+        "The sidecar records candidate page 2 of 4 and the same eight visible dictionary candidates, and includes a passed existing check that navigation changes the actual candidate page. The screenshot supports the visible page contents, not a newly executed input test.",
+        "No candidate has been committed into the main input: the placeholder remains, while the clear control is available for the active composition. The no-local-match message remains separate from the keyboard.",
+        "All keyboard rows and the black Search action fit inside the viewport. The dock is hidden during editing, and there is no scrim, shadow, or decorative stipple on the keyboard surface."
+      ],
+      "intentional_differences": []
+    }
+  ],
+  "suggestions": [
+    {
+      "id": "P3R1-SUP28-1",
+      "case_id": "scribe--incognito-enable",
+      "affected_case_ids": [
+        "scribe--incognito-enable",
+        "scribe--incognito-history-policy",
+        "scribe--incognito-persistence"
+      ],
+      "priority": "P2",
+      "description": "The persistent inverted status strip omits the explicit incognito and no-history policy label.",
+      "evidence": [
+        "All three viewed PNGs have an inverted black 36-pixel status strip with time and device indicators, but its center is empty.",
+        "All three sidecars record preferences.incognito=true. The history-policy case is on the detail route, where no Incognito header action exists to compensate for the missing persistent mode label.",
+        "HANDOFF.md section 5.6 requires the centered incognito/no-history message and recommends keeping this status treatment on normal pages until the mode is disabled. prototype/sc-history.dc.html lines 21-24 explicitly render that text in the inverted strip.",
+        "This concerns normal history and detail routes. The user's artwork-only closed-reader exception remains applicable and does not require adding a status strip over closed-reader artwork."
+      ],
+      "recommendation": "Render a centered, readable white incognito/no-history policy label whenever the normal application status strip is inverted for incognito. Preserve it after navigation and restart, while keeping the closed reader artwork-only.",
+      "status": "open",
+      "introduced_round": 1
+    },
+    {
+      "id": "P3R1-SUP28-2",
+      "case_id": "scribe--independent-search--all-complete",
+      "affected_case_ids": [
+        "scribe--independent-search--all-complete",
+        "scribe--independent-search--early-result"
+      ],
+      "priority": "P2",
+      "description": "The fourth searched source has no visible source-scope selection entry or overflow affordance.",
+      "evidence": [
+        "Both PNGs show All sources with a count of 4 and only three named source controls: Actual empty fixture, Actual error fixture, and Actual fast fixture. There is no Actual slow fixture chip, More control, scope pager, or source-picker affordance in the visible bar.",
+        "Both sidecars contain four search_group_states, including id=slow, while state.search_sources exposes only empty, error, and fast. The slow group is visibly pending in early-result and populated in all-complete.",
+        "HANDOFF.md section 5.5 specifies a scope entry for each source name. The reference scope also requires source-scope coverage and readable dense-source states; accepting real source names and counts does not waive missing navigation."
+      ],
+      "recommendation": "Provide a visible scope selector for every searchable source, using a bounded source picker, explicit overflow control, or pagination when all named controls do not fit. Keep long source names readable and make the slow source selectable in both pending and completed states.",
+      "status": "open",
+      "introduced_round": 1
+    }
+  ],
+  "coverage_gaps": [
+    "This supplemental input supplies no independent reference PNGs. Only the eight listed candidate PNGs were opened; judgments use explicit handoff text, prototype declarations, scope rules, and the supplied case sidecars rather than a pixel-for-pixel reference comparison.",
+    "The two search images show pending and completed snapshots, but do not independently establish request overlap, the 300 ms refresh cadence, retry execution, or View all and source-scope behavior. Existing mechanical results are supporting evidence only.",
+    "The keyboard snapshots cover cancel, candidate commit, and candidate page two. They do not newly exercise clear, repeated input, all dictionary pages, language modes, hit targets, or feedback latency.",
+    "The private-reading scenario is captured after return to detail. No closed-reader PNG is in this batch, so artwork-only reader presentation, removal of footer-cycle hit regions, and physical sleep/wake behavior are not visually covered here.",
+    "These cases contain no absent-hardware settings or authorization panels. Hardware hiding and honest quality or authorization disabled states require their own applicable cases."
+  ],
+  "limitations": [
+    "This was a fresh, independent static review of supplemental-28 only. It does not assert that the full round or any clean-round streak is complete.",
+    "All eight candidates were actually opened individually with functions tools.view_image. No other PNG or reference image was loaded.",
+    "Activity was limited to reading existing PNG, JSON, and text evidence, calculating PNG SHA256 with Get-FileHash, and writing this review document. No local application, build, test, validation suite, runtime probe, Git operation, or product modification was performed.",
+    "Native captures are 930 by 1240 desktop-rendered Scribe design pixels. They do not qualify physical panel output, device waveforms, wake latency, sensor behavior, or a 512 MiB memory budget.",
+    "Real or fixture titles, cover artwork, counts, progress, timestamps, and source names were accepted as data differences. No network success, durable history policy, persistence, or physical capability was inferred solely from static pixels."
+  ]
+}
