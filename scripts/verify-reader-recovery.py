@@ -41,12 +41,16 @@ CASES = (
 
 
 class KomgaRecovery:
-    def __init__(self, *, slow_first: bool = False, slow_retry: bool = False, slow_eight: bool = False):
+    def __init__(self, *, slow_first: bool = False, slow_retry: bool = False, slow_eight: bool = False, hold_manifest_failure: bool = False):
         self.requests: list[dict[str, Any]] = []
         self.failed_second = False
         self.slow_first = slow_first
         self.slow_retry = slow_retry
         self.slow_eight = slow_eight
+        self.hold_manifest_failure = hold_manifest_failure
+        self.manifest_retry_allowed = threading.Event()
+        self.manifest_lock = threading.Lock()
+        self.manifest_release_request_count: int | None = None
         self.images: dict[str, bytes] = {}
         for chapter, level in (("c01", 85), ("c02", 170)):
             image = Image.new("L", (600, 800), level)
@@ -91,9 +95,16 @@ class KomgaRecovery:
                     return
                 for chapter in ("c01", "c02"):
                     if path == f"/api/v1/books/{chapter}/pages":
-                        failed = chapter == "c02" and not owner.failed_second
-                        owner.failed_second |= failed
-                        owner.requests.append({"path": path, "status": 500 if failed else 200})
+                        with owner.manifest_lock:
+                            gate_open = owner.manifest_retry_allowed.is_set()
+                            failed = chapter == "c02" and (
+                                not gate_open if owner.hold_manifest_failure else not owner.failed_second
+                            )
+                            owner.failed_second |= failed
+                            record = {"path": path, "status": 500 if failed else 200}
+                            if owner.hold_manifest_failure and chapter == "c02":
+                                record["retry_gate_open"] = gate_open
+                            owner.requests.append(record)
                         count = 10 if owner.slow_eight and chapter == "c01" else 1
                         self.reply(500 if failed else 200, {} if failed else [{"number": number, "mediaType": "image/png"} for number in range(1, count + 1)])
                         return
@@ -119,6 +130,11 @@ class KomgaRecovery:
         self.server.shutdown()
         self.server.server_close()
         self.thread.join(timeout=1)
+
+    def allow_manifest_retry(self) -> None:
+        with self.manifest_lock:
+            self.manifest_release_request_count = len(self.requests)
+            self.manifest_retry_allowed.set()
 
     @property
     def url(self) -> str:
@@ -309,7 +325,10 @@ def run_manifest_scenario(suite: Any, Replay: Any, name: str) -> None:
     slow = name.startswith("slow-first-")
     retrying = name == "manifest-retrying-visible"
     pending_menu = name == "pending-menu-displayed"
-    with KomgaRecovery(slow_first=slow, slow_retry=retrying, slow_eight=pending_menu) as provider:
+    held_manifest = getattr(suite.args, "performance_traces", False) and name in {
+        "manifest-failure-visible", "manifest-retry-target", "manifest-retrying-visible"
+    }
+    with KomgaRecovery(slow_first=slow, slow_retry=retrying, slow_eight=pending_menu, hold_manifest_failure=held_manifest) as provider:
         source = {"id": "komga", "name": "Komga recovery fixture", "kind": "komga", "base_url": provider.url, "username": "", "password": "", "token": "", "version": 1, "languages": ["en"], "enabled": True, "options": {}}
         with sqlite3.connect(database) as connection:
             connection.execute("DELETE FROM sources")
@@ -326,7 +345,43 @@ def run_manifest_scenario(suite: Any, Replay: Any, name: str) -> None:
             replay.intent("detail", "open-chapter", chapter_two, wait=1200)
             if name in ("manifest-retry-target", "manifest-retrying-visible"):
                 replay.intent("panel", "choose", "reader-retry", wait=1000 if retrying else 4500)
-        case = suite.run(name, "sources", demo=False, offline=False, data=Path(seed["data_dir"]), replay=replay, expected_route="reader", capture_delay=1600, allow_busy=slow or retrying or pending_menu)
+        observer_stop = threading.Event()
+        release_evidence: dict[str, Any] = {}
+        observer: threading.Thread | None = None
+        failure_log = suite.output / "processes" / name / "stderr.log"
+        failure_marker = f"aidoku: reader request {chapter_two} page 1:"
+        if held_manifest and name in {"manifest-retry-target", "manifest-retrying-visible"}:
+            def release_after_foreground_failure() -> None:
+                while not observer_stop.wait(0.02):
+                    try:
+                        if not failure_log.is_file() or failure_marker not in failure_log.read_text(encoding="utf-8", errors="replace"):
+                            continue
+                        with sqlite3.connect(f"file:{database}?mode=ro", uri=True, timeout=1) as connection:
+                            previous = connection.execute("SELECT page FROM progress WHERE chapter_id=?", (chapter_one,)).fetchone()
+                            target = connection.execute("SELECT page FROM progress WHERE chapter_id=?", (chapter_two,)).fetchone()
+                        if previous != (1,) or target is not None:
+                            continue
+                        release_evidence.update(observed_foreground_failure=True, previous_committed_page=1, target_progress_absent=True)
+                        provider.allow_manifest_retry()
+                        release_evidence["release_request_count"] = provider.manifest_release_request_count
+                        return
+                    except (OSError, sqlite3.Error) as error:
+                        release_evidence["last_observation_error"] = type(error).__name__
+
+            observer = threading.Thread(target=release_after_foreground_failure, daemon=True)
+            observer.start()
+        try:
+            case = suite.run(name, "sources", demo=False, offline=False, data=Path(seed["data_dir"]), replay=replay, expected_route="reader", capture_delay=1600, allow_busy=slow or retrying or pending_menu)
+        finally:
+            observer_stop.set()
+            if observer is not None:
+                observer.join(timeout=2)
+        if held_manifest:
+            foreground_error = failure_log.is_file() and failure_marker in failure_log.read_text(encoding="utf-8", errors="replace")
+            case["manifest_failure_control"] = {"held_against_prefetch": True, "foreground_error_observed": foreground_error, "retry_gate_open": provider.manifest_retry_allowed.is_set(), "release_evidence": release_evidence}
+            suite.check(case, "A real foreground chapter failure occurred after any background prefetch failures", foreground_error, case["manifest_failure_control"])
+            if name in {"manifest-retry-target", "manifest-retrying-visible"}:
+                suite.check(case, "Only an observed foreground failure with preserved old progress releases the retry response", release_evidence.get("observed_foreground_failure") is True and release_evidence.get("target_progress_absent") is True and provider.manifest_retry_allowed.is_set(), release_evidence)
         if pending_menu:
             suite.expect(case, "menu", True)
             suite.expect(case, "visible_reader_page", 7)
@@ -365,7 +420,10 @@ def run_manifest_scenario(suite: Any, Replay: Any, name: str) -> None:
             suite.expect(case, "modal", "")
             suite.expect(case, "menu", False)
             second_requests = [request for request in provider.requests if request["path"] == "/api/v1/books/c02/pages"]
-            suite.check(case, "Retry refetches exactly the failed chapter manifest", [request["status"] for request in second_requests] == [500, 200], provider.requests)
+            if held_manifest:
+                suite.check(case, "The held manifest stays failed before the foreground-controlled retry and then succeeds", bool(second_requests) and any(request["status"] == 500 for request in second_requests) and any(request["status"] == 200 for request in second_requests) and all(request["status"] == (200 if request["retry_gate_open"] else 500) for request in second_requests), provider.requests)
+            else:
+                suite.check(case, "Retry refetches exactly the failed chapter manifest", [request["status"] for request in second_requests] == [500, 200], provider.requests)
         request_path = suite.output / (name + ".http.json")
         request_path.write_text(json.dumps(provider.requests, indent=2) + "\n")
         case["http_requests"] = str(request_path)

@@ -43,14 +43,22 @@ impl App {
         if self.suspended && section != "lifecycle" && !(section == "app" && action == "exit") {
             return Ok(());
         }
+        let reader_entry = matches!(
+            (section, action),
+            ("detail", "open-chapter" | "continue") | ("library", "continue") | ("history", "open")
+        );
         let _timing_action = if crate::reader_timing::enabled()
-            && (matches!(section, "reader" | "lifecycle" | "navigation" | "panel")
+            && (reader_entry
+                || matches!(section, "reader" | "lifecycle" | "navigation" | "panel")
                 || section == "settings" && self.route == "reader"
                 || section == "app"
                     && self.route == "reader"
                     && matches!(action, "left" | "right" | "back"))
         {
             let kind = match (section, action) {
+                ("detail", "open-chapter" | "continue")
+                | ("library", "continue")
+                | ("history", "open") => "open",
                 ("reader", "next") => "next",
                 ("reader", "previous") => "previous",
                 ("reader", "seek") => "seek",
@@ -68,10 +76,17 @@ impl App {
                     }
                 }
                 ("reader", "zoom") => "zoom",
+                ("panel", "choose")
+                    if value.starts_with("chapter:")
+                        || value == "reader-retry" && self.modal_context == "reader-recovery" =>
+                {
+                    "open"
+                }
+                ("panel", "choose") if value.starts_with("bookmark:") => "seek",
                 ("reader", "menu") | ("panel", _) => "menu",
                 ("lifecycle", "suspend") => "suspend",
                 ("lifecycle", "resume") => "resume",
-                ("navigation", _) => "open",
+                ("navigation", _) => "other",
                 ("settings", _) => "settings",
                 ("app", "left" | "right") if self.modal.is_empty() => {
                     let direction = self.effective_reader_preferences().reading_direction;
@@ -1299,6 +1314,7 @@ impl App {
     pub(super) fn load_reader_target(&mut self, target: ReaderTarget) -> Result<()> {
         let result = self.begin_reader_target(&target);
         if let Err(error) = result {
+            crate::reader_timing::action_failed();
             self.recover_reader_failure(target, error);
         }
         Ok(())
@@ -4436,6 +4452,171 @@ mod offline_listing_tests {
         );
         config.kind = "komga".into();
         assert_eq!(remembered_listings(&config, false)[2].0, "title");
+    }
+}
+
+#[cfg(test)]
+mod reader_timing_entry_tests {
+    use super::*;
+    use crate::{app::tests::DemoRouteFixture, platform::DeviceProfile};
+
+    fn entry_fixture(route: &str, with_manifest: bool) -> (DemoRouteFixture, Chapter) {
+        let fixture = DemoRouteFixture::new(route, DeviceProfile::Pw6, false);
+        let book = Book {
+            id: "timing-entry-book".into(),
+            source_id: "local".into(),
+            remote_id: "timing-entry-book".into(),
+            title: "Timing entry fixture".into(),
+            in_library: true,
+            ..Book::default()
+        };
+        let chapter = Chapter {
+            id: "timing-entry-chapter".into(),
+            book_id: book.id.clone(),
+            source_id: "local".into(),
+            remote_id: "timing-entry-chapter".into(),
+            number: 1.0,
+            title: "Timing entry chapter".into(),
+            ..Chapter::default()
+        };
+        fixture.app.store.upsert_book(&book).unwrap();
+        fixture
+            .app
+            .store
+            .save_chapters(&book.id, &[chapter.clone()])
+            .unwrap();
+        if with_manifest {
+            publish_manifest(&fixture.app, &chapter);
+        }
+        (fixture, chapter)
+    }
+
+    fn publish_manifest(app: &App, chapter: &Chapter) {
+        let path = app.data_dir.join("timing-entry-page.png");
+        image::GrayImage::from_pixel(8, 12, image::Luma([64]))
+            .save(&path)
+            .unwrap();
+        app.store
+            .save_pages(
+                &chapter.id,
+                &[Page {
+                    local_path: Some(path),
+                    ..Page::default()
+                }],
+            )
+            .unwrap();
+    }
+
+    #[test]
+    fn actual_reader_entry_commands_bind_open_actions_to_image_requests() {
+        for (route, section, action, panel) in [
+            ("detail", "detail", "open-chapter", false),
+            ("detail", "detail", "continue", false),
+            ("library", "library", "continue", false),
+            ("history", "history", "open", false),
+            ("settings", "panel", "choose", true),
+        ] {
+            let (mut fixture, chapter) = entry_fixture(route, true);
+            fixture.app.current_book_id = Some(chapter.book_id.clone());
+            let value = if panel {
+                format!("chapter:{}", chapter.id)
+            } else if action == "continue" {
+                String::new()
+            } else {
+                chapter.id.clone()
+            };
+            let (result, events) = crate::reader_timing::capture_test_events(|| {
+                fixture.app.dispatch(section, action, &value)
+            });
+            result.unwrap();
+            assert_eq!(fixture.app.route, "reader", "{section}/{action}");
+            let events = events.as_array().unwrap();
+            let received = events
+                .iter()
+                .find(|event| event["name"] == "action_received")
+                .unwrap();
+            assert_eq!(received["action_kind"], "open", "{section}/{action}");
+            assert_eq!(received["boundary"], "app_intent_received");
+            let request = events
+                .iter()
+                .find(|event| event["name"] == "request_created")
+                .unwrap();
+            assert_eq!(
+                request["action_id"], received["action_id"],
+                "{section}/{action}"
+            );
+        }
+    }
+
+    #[test]
+    fn actual_manifest_failure_and_retry_keep_distinct_open_actions() {
+        let (mut fixture, chapter) = entry_fixture("detail", false);
+        fixture.app.current_book_id = Some(chapter.book_id.clone());
+        let (_, events) = crate::reader_timing::capture_test_events(|| {
+            fixture
+                .app
+                .dispatch("detail", "open-chapter", &chapter.id)
+                .unwrap();
+            assert!(fixture.app.reader_recovery.is_some());
+            assert_eq!(fixture.app.modal_context, "reader-recovery");
+            publish_manifest(&fixture.app, &chapter);
+            fixture
+                .app
+                .dispatch("panel", "choose", "reader-retry")
+                .unwrap();
+        });
+        let events = events.as_array().unwrap();
+        let received: Vec<_> = events
+            .iter()
+            .filter(|event| event["name"] == "action_received")
+            .collect();
+        assert_eq!(received.len(), 2);
+        assert!(received.iter().all(|event| event["action_kind"] == "open"));
+        let failed = events
+            .iter()
+            .find(|event| event["name"] == "action_failed")
+            .unwrap();
+        assert_eq!(failed["action_id"], received[0]["action_id"]);
+        let request = events
+            .iter()
+            .find(|event| event["name"] == "request_created")
+            .unwrap();
+        assert_eq!(request["action_id"], received[1]["action_id"]);
+        assert_ne!(request["action_id"], failed["action_id"]);
+    }
+
+    #[test]
+    fn leaving_an_actual_pending_manifest_records_the_cancelled_open_action() {
+        let (mut fixture, chapter) = entry_fixture("detail", false);
+        fixture.app.current_book_id = Some(chapter.book_id.clone());
+        fixture.app.options.offline = false;
+        let (_, events) = crate::reader_timing::capture_test_events(|| {
+            fixture
+                .app
+                .dispatch("detail", "open-chapter", &chapter.id)
+                .unwrap();
+            assert!(fixture.app.chapter_inflight.is_some());
+            fixture.app.dispatch("navigation", "open", "0").unwrap();
+        });
+        assert_eq!(fixture.app.route, "library");
+        assert!(fixture.app.chapter_inflight.is_none());
+        let events = events.as_array().unwrap();
+        let opening = events
+            .iter()
+            .find(|event| event["name"] == "action_received" && event["action_kind"] == "open")
+            .unwrap();
+        let cancelled = events
+            .iter()
+            .find(|event| event["name"] == "action_cancelled")
+            .unwrap();
+        assert_eq!(cancelled["action_id"], opening["action_id"]);
+        assert_eq!(cancelled["reason"], "superseded");
+        let navigation = events
+            .iter()
+            .rev()
+            .find(|event| event["name"] == "action_received")
+            .unwrap();
+        assert_eq!(navigation["action_kind"], "other");
     }
 }
 

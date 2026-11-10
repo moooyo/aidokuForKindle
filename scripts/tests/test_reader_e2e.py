@@ -95,6 +95,38 @@ class TraceCausalityTests(unittest.TestCase):
         self.assertEqual(report["samples"]["action_to_ui_ms"],[0.100])
         self.assertEqual(report["samples"]["request_to_ui_ms"],[0.060,0.060])
 
+    def test_unassociated_first_image_after_reader_open_is_not_startup(self) -> None:
+        trace = document()
+        trace["events"].insert(1,event("action_received",50,action_id=1,action_kind="open",boundary="app_intent_received",input_origin="scripted_intent"))
+        trace["events"].insert(2,event("action_cancelled",80,action_id=1,reason="restored"))
+        self.rejected(trace,expectation(allowed_action_outcomes=["action_cancelled"]))
+
+    def test_reader_open_is_eligible_and_uses_its_own_action_boundary(self) -> None:
+        trace = document()
+        for value in trace["events"]:
+            if "request_id" in value:
+                value["action_id"] = 1
+        trace["events"].insert(1,event("action_received",50,action_id=1,action_kind="open",boundary="app_intent_received",input_origin="scripted_intent"))
+        report = HARNESS.validate_trace(trace,expectation(require_startup=False))
+        self.assertEqual(report["eligible_action_count"],1)
+        self.assertEqual(report["successful_actions"],{"open":1})
+        self.assertEqual(report["samples"]["action_open_to_ui_ms"],[0.110])
+        self.assertNotIn("rust_main_to_first_ui_ms",report["samples"])
+
+    def test_ordinary_navigation_other_does_not_spoil_startup(self) -> None:
+        trace = document()
+        trace["events"].insert(1,event("action_received",50,action_id=1,action_kind="other",boundary="app_intent_received",input_origin="scripted_intent"))
+        report = HARNESS.validate_trace(trace,expectation())
+        self.assertEqual(report["eligible_action_count"],0)
+        self.assertEqual(report["samples"]["rust_main_to_first_ui_ms"],[0.160])
+
+    def test_same_timestamp_open_after_first_ui_does_not_rewrite_its_origin(self) -> None:
+        trace = document()
+        trace["events"].insert(-1,event("action_received",160,action_id=1,action_kind="open",boundary="app_intent_received",input_origin="scripted_intent"))
+        trace["events"].insert(-1,event("action_cancelled",170,action_id=1,reason="restored"))
+        report = HARNESS.validate_trace(trace,expectation(allowed_action_outcomes=["action_cancelled"]))
+        self.assertEqual(report["samples"]["rust_main_to_first_ui_ms"],[0.160])
+
     def test_lost_flush_and_dropped_events_are_rejected(self) -> None:
         for field,value in (("finished",False),("dropped_events",1),("clock","wall_clock"),("event_limit",2)):
             with self.subTest(field=field):

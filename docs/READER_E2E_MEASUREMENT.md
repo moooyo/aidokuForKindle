@@ -128,6 +128,15 @@ execute a native trial. The generic runner does not connect to a Kindle.
 That operator retains exact executable identities, prepared-state identities,
 bounded process outcomes, trace hashes, restoration and lease-release receipts.
 
+Prepare and build all inputs before acquiring the lease. Acquire it only when
+the next actual device command is ready, and hold it only for the continuous
+device-operation batch and necessary bounded restoration. Release immediately
+after those operations with owner/token checks. Host analysis, report writing,
+tool debugging and waits for other tasks run outside the lease. If an idle
+manual step is not ready, end the owned session and release before waiting.
+Later batches use fresh lease identities and tokens. The lease is not a
+reservation for a future build, measurement or response.
+
 `scripts/benchmark-reader-e2e.py analyze --manifest <runs.json> --output <analysis.json>`
 qualifies already collected JSON files. A manifest contains `schema_version: 1`,
 `expected_pairs` (an integer or per-workload map), the `control` source paths
@@ -155,6 +164,13 @@ allowed failure/cancellation; it cannot silently disappear from the sample.
 `eligible_action_kinds`, `allowed_action_outcomes` and
 `required_action_outcomes` describe intentional action-level regression paths.
 Menu/settings operations are not page turns unless explicitly selected.
+The fixed `open` kind is reserved for an actual Reader entry and is eligible by
+default; ordinary non-Reader navigation uses `other`. A first accepted UI image
+cannot qualify as startup merely because its request omitted `action_id`: if a
+Reader `open` action precedes it in the event sequence, the missing association
+is rejected. Qualified scripted Reader entries instead require the correct
+action association with `require_startup: false`. Event order resolves equal
+microsecond timestamps without reclassifying an earlier completed startup.
 
 The analyzer rejects truncated/unflushed/lossy traces, backward clocks, missing
 work or terminal boundaries, stale request/generation/frame associations,

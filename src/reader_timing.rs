@@ -22,6 +22,11 @@ thread_local! {
     static INPUT_ORIGIN: Cell<&'static str> = const { Cell::new("app_dispatch") };
 }
 
+#[cfg(test)]
+thread_local! {
+    static TEST_TRACE: std::cell::RefCell<Option<TraceState>> = const { std::cell::RefCell::new(None) };
+}
+
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub(crate) struct RequestToken {
     pub(crate) request_id: u64,
@@ -139,6 +144,14 @@ impl TraceState {
     }
 
     fn action(&mut self, kind: &'static str, origin: &'static str, at_us: u64) -> u64 {
+        if let Some(action_id) = self.pending_action.take()
+            && self.deferred_action == Some(action_id)
+        {
+            let mut cancelled = Event::new("action_cancelled", None);
+            cancelled.action_id = Some(action_id);
+            cancelled.reason = Some("superseded");
+            self.record(cancelled, at_us);
+        }
         self.next_action = self.next_action.wrapping_add(1).max(1);
         self.pending_action = Some(self.next_action);
         self.deferred_action = None;
@@ -296,6 +309,15 @@ fn micros(value: std::time::Duration) -> u64 {
 }
 
 fn update<R>(apply: impl FnOnce(&mut TraceState, u64) -> R) -> Option<R> {
+    #[cfg(test)]
+    if TEST_TRACE.with(|trace| trace.borrow().is_some()) {
+        return TEST_TRACE.with(|trace| {
+            let mut trace = trace.borrow_mut();
+            let state = trace.as_mut().expect("The test trace is active");
+            let at_us = state.last_at_us.saturating_add(1);
+            Some(apply(state, at_us))
+        });
+    }
     let recorder = TRACE.get()?;
     let mut state = recorder
         .state
@@ -306,7 +328,29 @@ fn update<R>(apply: impl FnOnce(&mut TraceState, u64) -> R) -> Option<R> {
 }
 
 pub fn enabled() -> bool {
+    #[cfg(test)]
+    if TEST_TRACE.with(|trace| trace.borrow().is_some()) {
+        return true;
+    }
     TRACE.get().is_some()
+}
+
+#[cfg(test)]
+pub(crate) fn capture_test_events<R>(apply: impl FnOnce() -> R) -> (R, serde_json::Value) {
+    struct ResetTrace;
+    impl Drop for ResetTrace {
+        fn drop(&mut self) {
+            TEST_TRACE.with(|trace| *trace.borrow_mut() = None);
+        }
+    }
+    TEST_TRACE.with(|trace| {
+        assert!(trace.borrow().is_none(), "Test traces cannot be nested");
+        *trace.borrow_mut() = Some(TraceState::new(EVENT_LIMIT));
+    });
+    let _reset = ResetTrace;
+    let result = apply();
+    let trace = TEST_TRACE.with(|trace| trace.borrow_mut().take().unwrap());
+    (result, serde_json::to_value(trace.events).unwrap())
 }
 
 /// Enable in-memory timing. No output file is opened until `finish`.

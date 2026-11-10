@@ -38,7 +38,7 @@ ACTION_KINDS = {
     "zoom", "menu", "suspend", "resume", "open", "settings", "other",
 }
 ACTION_TERMINALS = {"action_failed", "action_cancelled"}
-DEFAULT_ELIGIBLE_ACTIONS = {"next","previous","seek","next_chapter","previous_chapter","tap","zoom"}
+DEFAULT_ELIGIBLE_ACTIONS = {"next","previous","seek","next_chapter","previous_chapter","tap","zoom","open"}
 INPUT_ORIGINS = {"scripted_intent", "scripted_pointer", "app_dispatch"}
 ABORT_EVENTS = {"request_cancelled", "request_failed", "request_invalidated"}
 STAGE_EVENTS = {"source_manager_finished", "fetch_finished", "render_finished", "prepare_finished"}
@@ -338,6 +338,8 @@ def validate_trace(document: Any, expectation: dict[str, Any]) -> dict[str, Any]
         first_ui = min(ui_events, key=lambda event:event["at_us"])
         first_request = requests[first_ui["request_id"]]
         require(first_request["action_id"] is None, "The first image was action-triggered, not a startup Reader frame")
+        first_ui_ordinal = next(ordinal for ordinal,event in enumerate(events) if event is first_ui)
+        require(not any(event.get("name") == "action_received" and event.get("action_kind") == "open" for event in events[:first_ui_ordinal]), "A Reader open action preceded an unassociated first image; it cannot qualify as startup")
         add("rust_main_to_first_ui_ms", first_ui["at_us"])
         if expectation["scope"] == "native":
             require("send_accepted" in first_request["events"], "The startup UI image never reached native SEND acceptance")
