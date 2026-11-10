@@ -12,6 +12,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
+import importlib.util
 import io
 import json
 import os
@@ -227,6 +228,8 @@ class Suite:
         self.cases: list[dict[str, Any]] = []
         self.reference_cases: dict[str, dict[str, Any]] = {}
         self.started = time.monotonic()
+        self.process_cleanup_failed = False
+        self.timing_process_runner = None
 
     def fresh(self, name: str) -> Path:
         directory = self.data_root / name
@@ -265,6 +268,8 @@ class Suite:
         capture_delay: int = 650,
         allow_busy: bool = False,
     ) -> dict[str, Any]:
+        if self.process_cleanup_failed:
+            raise RuntimeError("An owned process group was not stopped; abort subsequent UI scenarios")
         if (self.binary.stat().st_size, self.binary.stat().st_mtime_ns) != self.binary_stat:
             raise RuntimeError("The binary changed during verification; rerun against an immutable build.")
         data = data or self.fresh(name)
@@ -293,6 +298,10 @@ class Suite:
             command.append("--landscape")
         if import_path is not None:
             command.extend(["--import", str(import_path)])
+        performance_trace = None
+        if getattr(self.args, "performance_traces", False):
+            performance_trace = self.output / f"{name}.performance.json"
+            command.extend(["--performance-trace", str(performance_trace)])
         environment = os.environ.copy()
         environment.update({
             "SLINT_SCALE_FACTOR": "1", "SLINT_BACKEND": "winit-software",
@@ -308,16 +317,36 @@ class Suite:
             "intentional_inflight_capture": allow_busy,
             "state": {}, "metadata": {},
         }
+        if performance_trace is not None:
+            case["performance_trace"] = str(performance_trace)
         self.cases.append(case)
         started = time.monotonic()
         print(f"RUN {name}", flush=True)
         try:
             # Keep diagnostics visible while the process runs. Recovery harnesses
             # synchronize isolated file restoration with actual failure events.
-            with (self.output / f"{name}.log").open("wb") as log:
-                result = subprocess.run(command, env=environment, stdout=log, stderr=subprocess.STDOUT, timeout=self.args.timeout, check=False)
-            case["exit_code"] = result.returncode
-            self.check(case, "Application exited successfully", result.returncode == 0, result.returncode)
+            if performance_trace is None:
+                with (self.output / f"{name}.log").open("wb") as log:
+                    result = subprocess.run(command, env=environment, stdout=log, stderr=subprocess.STDOUT, timeout=self.args.timeout, check=False)
+                exit_code = result.returncode
+            else:
+                if self.timing_process_runner is None:
+                    path = Path(__file__).with_name("benchmark-reader-e2e.py")
+                    specification = importlib.util.spec_from_file_location("reader_e2e_ui_process", path)
+                    if specification is None or specification.loader is None:
+                        raise RuntimeError("The adjacent bounded process runner could not be loaded")
+                    self.timing_process_runner = importlib.util.module_from_spec(specification)
+                    specification.loader.exec_module(self.timing_process_runner)
+                try:
+                    process = self.timing_process_runner.run_process(command, self.output / "processes" / name, self.args.timeout, self.output, environment)
+                except self.timing_process_runner.ProcessGroupCleanupError:
+                    self.process_cleanup_failed = True
+                    raise
+                case["process"] = process
+                exit_code = process.get("exit_code")
+                self.check(case, "The bounded application process and its owned group completed successfully", process.get("succeeded") is True, process)
+            case["exit_code"] = exit_code
+            self.check(case, "Application exited successfully", exit_code == 0, exit_code)
             for kind in ("metadata", "state"):
                 path = screenshot.with_suffix(f".{kind}.json")
                 self.check(case, f"Application generated {kind} sidecar", path.is_file(), str(path))
@@ -1224,6 +1253,7 @@ def main() -> int:
     parser.add_argument("--binary", type=Path, required=True, help="Immutable desktop aidoku binary on the remote worker")
     parser.add_argument("--output-dir", "--outputdir", dest="output_dir", type=Path, required=True, help="Retain captures, replay actions, logs, state sidecars and the final report here")
     parser.add_argument("--timeout", type=int, default=60, help="Per-process timeout in seconds")
+    parser.add_argument("--performance-traces", action="store_true", help="Retain opt-in Reader producer traces for qualification; capture trials are excluded from timing comparisons")
     parser.add_argument("--quick", "--screenshots-only", dest="quick", action="store_true", help="Capture all device/design states without the extended interaction suite")
     parser.add_argument("--network-only", action="store_true", help="Run only the isolated loopback Komga browse/search pagination E2E cases")
     parser.add_argument("--interaction-only", action="store_true", help="Run only child-started list gestures and Scribe simulated source installation")

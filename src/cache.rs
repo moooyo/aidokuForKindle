@@ -1039,21 +1039,41 @@ impl CacheManager {
                 "The cached image is missing or its checksum changed"
             );
         }
-        let fingerprint = metadata_fingerprint(&fs::metadata(&canonical)?);
+        let metadata = fs::metadata(&canonical)?;
+        ensure!(
+            metadata.is_file()
+                && metadata.len() > 0
+                && metadata.len() <= crate::imaging::MAX_PAGE_BYTES,
+            "The compressed page is empty or exceeds 32 MiB"
+        );
+        let fingerprint = metadata_fingerprint(&metadata);
+        // Files outside the private cache root remain mutable even when their
+        // timestamps and identity collide. Only matching bytes can retain a
+        // previous codec validation proof.
+        let source_checksum = if canonical.starts_with(&self.inner.root) {
+            None
+        } else {
+            Some(self.fingerprint(&canonical)?)
+        };
         {
             let state = self.lock()?;
-            if state
-                .external
-                .get(&canonical)
-                .is_some_and(|value| value.fingerprint == fingerprint && value.image_validated)
-            {
+            if state.external.get(&canonical).is_some_and(|value| {
+                value.fingerprint == fingerprint
+                    && value.image_validated
+                    && source_checksum
+                        .as_ref()
+                        .is_none_or(|checksum| value.checksum == *checksum)
+            }) {
                 return Ok(());
             }
         }
         crate::imaging::validate_file(&canonical).context("Validate a local comic image")?;
         let (checksum, size) = checksum_file(&canonical)?;
         ensure!(
-            metadata_fingerprint(&fs::metadata(&canonical)?) == fingerprint,
+            metadata_fingerprint(&fs::metadata(&canonical)?) == fingerprint
+                && source_checksum
+                    .as_ref()
+                    .is_none_or(|before| *before == checksum),
             "The local image changed during validation"
         );
         let mut state = self.lock()?;
@@ -1081,13 +1101,18 @@ impl CacheManager {
         }
         let canonical = fs::canonicalize(path).context("Resolve a source fingerprint")?;
         let fingerprint = metadata_fingerprint(&fs::metadata(&canonical)?);
-        if let Some(value) = self
-            .lock()?
-            .external
-            .get(&canonical)
-            .filter(|value| value.fingerprint == fingerprint)
-        {
-            return Ok(value.checksum.clone());
+        // Managed artifacts and private staging files are published atomically.
+        // External sources have no immutability contract: metadata is only a
+        // change detector around the checksum read, never a content identity.
+        if canonical.starts_with(&self.inner.root) {
+            if let Some(value) = self
+                .lock()?
+                .external
+                .get(&canonical)
+                .filter(|value| value.fingerprint == fingerprint)
+            {
+                return Ok(value.checksum.clone());
+            }
         }
         let (checksum, size) = checksum_file(&canonical)?;
         ensure!(
@@ -1096,12 +1121,16 @@ impl CacheManager {
         );
         let mut state = self.lock()?;
         state.stats.checksum_bytes = state.stats.checksum_bytes.saturating_add(size);
+        let image_validated = state
+            .external
+            .get(&canonical)
+            .is_some_and(|value| value.checksum == checksum && value.image_validated);
         state.remember_external(
             canonical,
             Validation {
                 fingerprint,
                 checksum: checksum.clone(),
-                image_validated: false,
+                image_validated,
             },
         );
         Ok(checksum)
@@ -2562,6 +2591,30 @@ mod tests {
         bytes
     }
 
+    fn overwrite_with_colliding_metadata(cache: &CacheManager, path: &Path, bytes: &[u8]) {
+        let metadata = fs::metadata(path).unwrap();
+        assert_eq!(metadata.len(), bytes.len() as u64);
+        let modified = metadata.modified().unwrap();
+        fs::write(path, bytes).unwrap();
+        OpenOptions::new()
+            .write(true)
+            .open(path)
+            .unwrap()
+            .set_times(fs::FileTimes::new().set_modified(modified))
+            .unwrap();
+        let canonical = fs::canonicalize(path).unwrap();
+        // Model a metadata collision without depending on the filesystem's
+        // timestamp precision. The memo still contains the previous checksum.
+        let fingerprint = metadata_fingerprint(&fs::metadata(&canonical).unwrap());
+        cache
+            .lock()
+            .unwrap()
+            .external
+            .get_mut(&canonical)
+            .unwrap()
+            .fingerprint = fingerprint;
+    }
+
     fn assert_totals_match_index(cache: &CacheManager) {
         let stats = cache.stats();
         let expected = cache.lock().unwrap().database.query_row(
@@ -3139,6 +3192,13 @@ mod tests {
         fs::write(write.temp_path(), &image).unwrap();
         cache.validate_path(write.temp_path()).unwrap();
         let validated = cache.stats();
+        let checksum = cache.fingerprint(write.temp_path()).unwrap();
+        cache.validate_path(write.temp_path()).unwrap();
+        assert_eq!(cache.stats().checksum_bytes, validated.checksum_bytes);
+        assert_eq!(
+            cache.stats().external_validations,
+            validated.external_validations
+        );
         let canonical = write.commit().unwrap();
         let committed = cache.stats();
         assert_eq!(
@@ -3149,6 +3209,7 @@ mod tests {
             committed.checksum_bytes,
             validated.checksum_bytes + image.len() as u64
         );
+        assert_eq!(cache.fingerprint(&canonical).unwrap(), checksum);
         cache.validate_path(&canonical).unwrap();
         let repeated = cache.stats();
         assert_eq!(
@@ -3156,6 +3217,114 @@ mod tests {
             committed.external_validations
         );
         assert_eq!(repeated.checksum_bytes, committed.checksum_bytes);
+    }
+
+    #[test]
+    fn external_fingerprints_rehash_bytes_when_metadata_collides() {
+        let directory = tempfile::tempdir().unwrap();
+        let cache = manager(&directory, 4096);
+        let path = directory.path().join("external.png");
+        let first = image_bytes("first");
+        let second = image_bytes("other");
+        fs::write(&path, &first).unwrap();
+        cache.validate_path(&path).unwrap();
+        let original = cache.fingerprint(&path).unwrap();
+        overwrite_with_colliding_metadata(&cache, &path, &second);
+        let before = cache.stats();
+        let checksum = cache.fingerprint(&path).unwrap();
+        assert_ne!(checksum, original);
+        assert_eq!(checksum, format!("{:x}", Sha256::digest(&second)));
+        assert_eq!(
+            cache.stats().checksum_bytes,
+            before.checksum_bytes + second.len() as u64
+        );
+        let canonical = fs::canonicalize(&path).unwrap();
+        assert!(!cache.lock().unwrap().external[&canonical].image_validated);
+        cache.validate_path(&path).unwrap();
+        assert!(cache.lock().unwrap().external[&canonical].image_validated);
+        assert_eq!(
+            cache.stats().external_validations,
+            before.external_validations + 1
+        );
+    }
+
+    #[test]
+    fn external_validation_rechecks_changed_bytes_when_metadata_collides() {
+        let directory = tempfile::tempdir().unwrap();
+        let cache = manager(&directory, 4096);
+        let path = directory.path().join("external.png");
+        let first = image_bytes("first");
+        let second = image_bytes("other");
+        fs::write(&path, &first).unwrap();
+        cache.validate_path(&path).unwrap();
+        overwrite_with_colliding_metadata(&cache, &path, &second);
+        let before = cache.stats();
+        cache.validate_path(&path).unwrap();
+        let canonical = fs::canonicalize(&path).unwrap();
+        let memo = cache.lock().unwrap().external[&canonical].clone();
+        assert!(memo.image_validated);
+        assert_eq!(memo.checksum, format!("{:x}", Sha256::digest(&second)));
+        assert_eq!(
+            cache.stats().external_validations,
+            before.external_validations + 1
+        );
+    }
+
+    #[test]
+    fn external_validation_rejects_bad_bytes_when_metadata_collides() {
+        let directory = tempfile::tempdir().unwrap();
+        let cache = manager(&directory, 4096);
+        let path = directory.path().join("external.png");
+        let image = image_bytes("valid");
+        fs::write(&path, &image).unwrap();
+        cache.validate_path(&path).unwrap();
+        let bad = vec![0; image.len()];
+        overwrite_with_colliding_metadata(&cache, &path, &bad);
+        let before = cache.stats();
+        assert!(cache.validate_path(&path).is_err());
+        let canonical = fs::canonicalize(&path).unwrap();
+        let memo = cache.lock().unwrap().external[&canonical].clone();
+        assert!(!memo.image_validated);
+        assert_eq!(memo.checksum, format!("{:x}", Sha256::digest(&bad)));
+        assert_eq!(
+            cache.stats().external_validations,
+            before.external_validations
+        );
+        assert_eq!(
+            cache.stats().checksum_bytes,
+            before.checksum_bytes + bad.len() as u64
+        );
+    }
+
+    #[test]
+    fn unchanged_external_bytes_keep_codec_proofs_while_rehashing() {
+        let directory = tempfile::tempdir().unwrap();
+        let cache = manager(&directory, 4096);
+        let path = directory.path().join("external.png");
+        let image = image_bytes("unchanged");
+        fs::write(&path, &image).unwrap();
+        cache.validate_path(&path).unwrap();
+        let canonical = fs::canonicalize(&path).unwrap();
+        let checksum = cache.lock().unwrap().external[&canonical].checksum.clone();
+        let before = cache.stats();
+        assert_eq!(cache.fingerprint(&path).unwrap(), checksum);
+        cache.validate_path(&path).unwrap();
+        let modified = fs::metadata(&path).unwrap().modified().unwrap() + Duration::from_secs(3);
+        OpenOptions::new()
+            .write(true)
+            .open(&path)
+            .unwrap()
+            .set_times(fs::FileTimes::new().set_modified(modified))
+            .unwrap();
+        assert_eq!(cache.fingerprint(&path).unwrap(), checksum);
+        cache.validate_path(&path).unwrap();
+        let repeated = cache.stats();
+        assert!(cache.lock().unwrap().external[&canonical].image_validated);
+        assert_eq!(repeated.external_validations, before.external_validations);
+        assert_eq!(
+            repeated.checksum_bytes,
+            before.checksum_bytes + 4 * image.len() as u64
+        );
     }
 
     #[test]

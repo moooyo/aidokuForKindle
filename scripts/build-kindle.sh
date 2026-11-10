@@ -6,7 +6,7 @@ SCRIPT_DIR=$(CDPATH= cd "$(dirname "$0")" && pwd)
 REPO_ROOT=$(CDPATH= cd "$SCRIPT_DIR/.." && pwd)
 TARGET=armv7-unknown-linux-musleabihf
 CARGO_TARGET_DIR=${CARGO_TARGET_DIR:-$REPO_ROOT/target}
-CARGO_BUILD_JOBS=${CARGO_BUILD_JOBS:-12}
+CARGO_BUILD_JOBS=${CARGO_BUILD_JOBS:-6}
 STAGING_ROOT=$REPO_ROOT/dist/kindle
 
 if [ -n "${ZIG_BIN_DIR:-}" ]; then

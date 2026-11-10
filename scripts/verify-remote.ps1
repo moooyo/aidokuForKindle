@@ -9,7 +9,7 @@ param(
     [switch]$Kindle,
     [switch]$Firmware,
     [ValidateRange(1, 2147483647)]
-    [int]$CargoBuildJobs = 12
+    [int]$CargoBuildJobs = 6
 )
 
 $ErrorActionPreference = 'Stop'

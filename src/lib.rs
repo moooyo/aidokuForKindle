@@ -14,6 +14,7 @@ pub mod native_presentation;
 pub mod pairing;
 pub mod platform;
 pub mod reader;
+pub mod reader_timing;
 pub mod render_cache;
 pub mod sources;
 pub mod store;

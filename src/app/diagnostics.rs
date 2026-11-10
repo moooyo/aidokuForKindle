@@ -94,6 +94,7 @@ impl App {
                 .is_some_and(|setting| setting.kind == "secure-text");
         snapshot["diagnostics_available"] = json!(true);
         snapshot["diagnostics_schema_version"] = json!(1);
+        snapshot["performance_timing_enabled"] = json!(crate::reader_timing::enabled());
         snapshot["interface_language"] = json!(
             ui.global::<crate::ui::Strings>()
                 .get_locale_code()

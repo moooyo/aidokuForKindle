@@ -645,6 +645,16 @@ impl App {
                     Ok(result) => {
                         if let Err(error) = self.complete_job(result, &message.context) {
                             if matches!(message.context.kind, JobKind::Reader | JobKind::Chapter) {
+                                if matches!(message.context.kind, JobKind::Chapter)
+                                    && self.job_context_is_current(&message.context)
+                                {
+                                    crate::reader_timing::action_failed();
+                                }
+                                crate::reader_timing::failed(crate::reader_timing::token(
+                                    message.context.reader_generation,
+                                    message.context.lifecycle_generation,
+                                ));
+                                self.platform.cancel_reader_frame();
                                 self.reader_job_failed(&message.context, error);
                             } else if matches!(message.context.kind, JobKind::Search) {
                                 self.fail_search_group(&message.context, &error.to_string());
@@ -680,6 +690,16 @@ impl App {
                             self.fail_search_group(&message.context, &error.to_string());
                         } else if matches!(message.context.kind, JobKind::Reader | JobKind::Chapter)
                         {
+                            if matches!(message.context.kind, JobKind::Chapter)
+                                && self.job_context_is_current(&message.context)
+                            {
+                                crate::reader_timing::action_failed();
+                            }
+                            crate::reader_timing::failed(crate::reader_timing::token(
+                                message.context.reader_generation,
+                                message.context.lifecycle_generation,
+                            ));
+                            self.platform.cancel_reader_frame();
                             self.reader_job_failed(&message.context, error);
                         } else if self.job_context_is_current(&message.context) {
                             self.show_error(error);
@@ -843,8 +863,16 @@ impl App {
             self.download_ui_dirty = false;
         }
         if changed || background_due && self.background_ui_dirty {
-            if let Err(error) = self.sync_view() {
-                eprintln!("aidoku: update view: {error:#}");
+            match self.sync_view() {
+                Ok(()) => self.publish_reader_timing(),
+                Err(error) => {
+                    crate::reader_timing::failed(crate::reader_timing::token(
+                        self.reader_generation,
+                        self.lifecycle_generation,
+                    ));
+                    self.platform.cancel_reader_frame();
+                    eprintln!("aidoku: update view: {error:#}");
+                }
             }
             self.platform
                 .refresh(self.frame_refresh.take().unwrap_or(RefreshKind::Ui));
@@ -894,7 +922,14 @@ impl App {
 
     fn retry_superseded_job(&mut self, context: &JobContext) {
         match &context.kind {
-            JobKind::Reader if self.route == "reader" => self.reader_dirty = true,
+            JobKind::Reader if self.route == "reader" => {
+                crate::reader_timing::retry(
+                    context.reader_generation,
+                    context.lifecycle_generation,
+                );
+                self.platform.cancel_reader_frame();
+                self.reader_dirty = true;
+            }
             JobKind::Chapter if self.route == "reader" && self.job_context_is_current(context) => {
                 if let Some(target) = self
                     .reader_target()
@@ -1156,6 +1191,10 @@ impl App {
                         self.reader_refresh = RefreshRequest::None;
                         self.save_reader_progress()?;
                         self.queue_displayed_tracking_progress()?;
+                        crate::reader_timing::prepare_publication(crate::reader_timing::token(
+                            context.reader_generation,
+                            context.lifecycle_generation,
+                        ));
                         if !self.replay_pending_wide_navigation()? {
                             self.prefetch_dirty = true;
                             if let Err(error) = self.start_reader_prefetch() {
@@ -1339,6 +1378,8 @@ impl App {
     }
 
     pub(crate) fn invalidate_reader_work(&mut self) {
+        crate::reader_timing::invalidate("invalidated");
+        self.platform.cancel_reader_frame();
         self.cancel_reader_prefetch();
         self.reader_generation = self.reader_generation.wrapping_add(1);
         self.reader_dirty = false;
@@ -1352,6 +1393,30 @@ impl App {
             self.pending.remove(&id);
         }
         self.busy = !self.pending.is_empty();
+    }
+
+    fn publish_reader_timing(&self) {
+        if !crate::reader_timing::enabled() {
+            return;
+        }
+        let visible = self.route == "reader"
+            && !self.suspended
+            && !self.resume_frame_pending
+            && self.modal.is_empty()
+            && self.reader.as_ref().is_some_and(|reader| !reader.menu_open)
+            && self.displayed_reader.is_some();
+        if !visible {
+            crate::reader_timing::cancel_native("not_visible");
+            self.platform.cancel_reader_frame();
+            return;
+        }
+        if let Some(token) = crate::reader_timing::publish(
+            self.reader_generation,
+            self.lifecycle_generation,
+            self.platform.is_kindle(),
+        ) {
+            self.platform.arm_reader_frame(token);
+        }
     }
 
     pub(crate) fn invalidate_search_work(&mut self) {
@@ -1521,6 +1586,9 @@ impl App {
         if self.shutting_down {
             return;
         }
+        crate::reader_timing::cancel_action("shutdown");
+        crate::reader_timing::invalidate("shutdown");
+        self.platform.cancel_reader_frame();
         self.shutting_down = true;
         self.platform.restore_device_policies();
         self.cancel_reader_prefetch();

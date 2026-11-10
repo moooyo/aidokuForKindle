@@ -1,4 +1,6 @@
 mod decode_scheduler;
+mod grayscale;
+mod row_resize;
 
 pub use decode_scheduler::{
     DecodeCancellation, check_decode_cancelled, is_decode_cancelled, with_background_decode,
@@ -13,7 +15,7 @@ use std::{
 
 use anyhow::{Context, Result, bail, ensure};
 use image::{
-    GenericImageView, GrayImage, ImageReader, Limits, Luma, Pixel,
+    GrayImage, ImageReader, Limits, Luma,
     imageops::{self, FilterType},
 };
 
@@ -108,7 +110,7 @@ pub fn decode_page(bytes: &[u8], options: &ImageOptions) -> Result<GrayImage> {
     }
     let (width, height) =
         fit_dimensions(gray.width(), gray.height(), options.width, options.height);
-    let mut output = imageops::resize(&gray, width, height, FilterType::Lanczos3);
+    let mut output = row_resize::resize_gray(&gray, width, height)?;
     apply_contrast(&mut output, options.contrast);
     quantize(&mut output, options.dither);
     Ok(output)
@@ -159,7 +161,7 @@ pub fn render_vertical_window_with_geometry(
         .min(f64::from(gray.height())) as u32;
     let source_height = source_bottom.saturating_sub(source_top).max(1);
     let strip = imageops::crop_imm(&gray, 0, source_top, gray.width(), source_height).to_image();
-    let mut output = imageops::resize(&strip, options.width, output_height, FilterType::Lanczos3);
+    let mut output = row_resize::resize_gray(&strip, options.width, output_height)?;
     apply_contrast(&mut output, options.contrast);
     quantize(&mut output, options.dither);
     Ok(VerticalWindow {
@@ -682,14 +684,7 @@ fn decode_grayscale(bytes: &[u8]) -> Result<GrayImage> {
         current.bitmap_decodes += 1;
         work.set(current);
     });
-    let mut output = GrayImage::new(width, height);
-    for (x, y, pixel) in image.pixels() {
-        let alpha = u32::from(pixel[3]);
-        let value = u32::from(pixel.to_luma()[0]);
-        let paper_value = (value * alpha + 255 * (255 - alpha) + 127) / 255;
-        output.put_pixel(x, y, Luma([paper_value as u8]));
-    }
-    Ok(output)
+    Ok(grayscale::into_grayscale(image))
 }
 
 fn crop_white_borders(image: GrayImage) -> GrayImage {

@@ -56,6 +56,32 @@ The application adapter maps UI and reading partial requests to AUTO, press feed
 - `src/framebuffer/ffi.rs`: reviewed DU/A2 and monochrome constants.
 - `Cargo.toml`: omit the unavailable example workspace and align font dependencies with Slint 1.17.1's actual resolved versions and dlopen requirements.
 
+## Evaluated neutral scanout target and update markers
+
+The 2026-11-10 evaluation adds a retained Gray8 scene through Slint 1.17.1's
+public `TargetPixel` API. Only an actually mapped one-byte framebuffer may use
+it. Neutral input preserves the original per-channel integer compositing;
+observed non-neutral input discards that attempt and rebuilds the entire scene
+in RGB before scanout. RGB remains selected for every subsequent frame and for
+other framebuffer formats. Restoring Slint's public repaint policy can make the
+next requested frame conservatively redraw in full before ordinary dirty
+regions resume. Input image buffers still use Slint's public RGB8/RGBA8 formats.
+
+`src/gray_target.rs` owns that representation and fallback. `src/platform.rs`
+selects it from actual framebuffer properties, while `src/render_control.rs`
+applies the same inversion and threshold transforms to either canonical input.
+Rotation, retained wake, dirty-region resolution and scanout ownership keep
+their existing ordering. Host offscreen pixel oracles and allocation/timing
+measurements are recorded in the application's evaluation report; they are
+not physical-device refresh measurements.
+
+`src/framebuffer/markers.rs` allocates a nonzero identity for each logical
+submission. All ABI probes for that submission share its identity, and only a
+successful SEND changes the completion-wait target. This prevents a repeated
+marker from selecting an older pending frame. It does not turn a driver ioctl
+acknowledgement into proof of physical waveform completion. This evaluation
+does not enable additional MTK flag or MDP-wait ioctls.
+
 ## Application-local clipboard
 
 The native platform implements [Slint 1.17.1's public platform trait](https://github.com/slint-ui/slint/blob/v1.17.1/internal/core/platform.rs): `Platform::set_clipboard_text(&self, text: &str, clipboard: Clipboard)` and `Platform::clipboard_text(&self, clipboard: Clipboard) -> Option<String>`. `DefaultClipboard` and `SelectionClipboard` use separate owned text slots. Unknown future clipboard kinds are ignored or return `None`.
@@ -157,3 +183,24 @@ their own exact application and launcher identities.
 Controlled submission regressions and firmware evidence for this refinement
 must be recorded with the new application identity. Earlier Aidoku/C5 evidence
 above establishes the earlier implementation only.
+
+## Aidoku opt-in Reader output observations
+
+- `src/frame_observer.rs` owns an optional callback and one-shot opaque Reader
+  token. Revision checks invalidate superseded or cancelled active attempts,
+  including cancellation during a callback. No document identity is exposed.
+- `src/lib.rs` exposes observer registration and token arm/cancel operations
+  while retaining the same shared state through backend typestate changes.
+- `src/platform.rs` consumes a token for one output attempt, reports a real
+  write before its matching successful SEND, and distinguishes unavailable
+  output from completion. Startup scene allocation is valid first-image output;
+  subsequent rotation, output-mode and ownership rewrites are excluded.
+- `src/framebuffer/mod.rs` exposes the last successful marker read-only. An
+  observation sequence is distinct from a driver marker. The instrumented
+  historical baseline retains its original constant marker and RGB algorithms.
+
+Observation is optional and does not change refresh planning, driver settings,
+submission ordering, wait targets or input ownership. Successful SEND means
+driver acceptance, not optical panel completion. Application timing and its
+controlled baseline procedure are documented in
+[Reader end-to-end measurement](../../docs/READER_E2E_MEASUREMENT.md).

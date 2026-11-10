@@ -50,3 +50,37 @@ submission errors propagate through the event loop, and a failed full update
 cannot advance the resume counter. This confirms submission acceptance only,
 not physical waveform completion. Upstream licenses and earlier attribution are
 unchanged.
+
+## Evaluated grayscale target and submission identities
+
+The next Aidoku refinement uses the public Slint target-pixel extension to
+retain one neutral channel for actual 8-bpp framebuffer mappings. An observed
+colored input forces a complete RGB rebuild and permanent RGB fallback before
+any candidate pixels reach scanout. Other framebuffer formats keep RGB. The
+canonical scene remains independent of output inversion, partial updates,
+render rotation and retained wake; input Image buffers remain RGB8/RGBA8.
+
+Framebuffer update submissions now use distinct nonzero markers within their
+owned session. ABI fallback shares the same logical marker, failed SENDs do
+not replace the last accepted target, and interrupted waits retry that target.
+No additional driver-parameter or MDP completion operation is enabled.
+`PATCHES.md` records the affected modules and the host oracle scope. The separate
+[Aidoku evaluation](../../docs/KOREADER_OPTIMIZATION_EVALUATION.md) records the
+final integration checks and bounded physical Scribe smoke with its exact
+executable identity; it does not claim panel timing or new MTK-flag qualification.
+
+## Opt-in Reader frame observations
+
+The subsequent observation extension adds a one-shot application token and an
+optional public frame observer. It reports actual framebuffer writes and
+successful SEND calls separately, with phase duration, frame-write sequence and
+the submitted driver marker. Superseded, cancelled, unwritten and rejected
+attempts cannot become successful observations. Callbacks run without retaining
+the observer's mutable borrow and may cancel the current attempt safely.
+
+The first full scene can establish startup image output. Later ownership,
+rotation and output-mode rewrites remain separate from page-turn observations.
+No additional repaint, wait, driver flag or MDP operation is requested. The
+application's observer is installed only for opt-in timing; physical e-ink
+completion still requires a separate observation. See the
+[measurement contract](../../docs/READER_E2E_MEASUREMENT.md).

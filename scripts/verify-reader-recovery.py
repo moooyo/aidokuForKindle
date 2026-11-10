@@ -219,7 +219,11 @@ def run_scenario(suite: Any, Replay: Any, name: str) -> None:
             # Synchronize with an actual product failure and its committed public
             # progress, not the host/App startup clocks. A slow startup therefore
             # cannot restore the source before the failing request has occurred.
-            log_path = suite.output / f"{name}.log"
+            log_path = (
+                suite.output / "processes" / name / "stderr.log"
+                if getattr(suite.args, "performance_traces", False)
+                else suite.output / f"{name}.log"
+            )
             marker = f"aidoku: reader request {chapter_id} page {target}:"
             database = imported["state"]["database"]
 
@@ -374,18 +378,21 @@ def main() -> int:
     parser.add_argument("--output-dir", type=Path, required=True)
     parser.add_argument("--case", action="append", choices=CASES, dest="selected_cases")
     parser.add_argument("--timeout", type=int, default=60)
+    parser.add_argument("--performance-traces", action="store_true", help="Retain producer traces for recovery qualification, not latency comparisons")
     options = parser.parse_args()
     if os.name == "nt" or platform.system() != "Linux":
         parser.error("Run this recovery verification only on the designated remote Linux worker.")
     harness = load_harness()
     if harness.sha256(options.binary.resolve()) != options.expected_sha256:
         parser.error("The reader recovery binary does not match the frozen SHA-256.")
-    suite = harness.Suite(SimpleNamespace(binary=options.binary, output_dir=options.output_dir, timeout=options.timeout, selected_cases=options.selected_cases))
+    suite = harness.Suite(SimpleNamespace(binary=options.binary, output_dir=options.output_dir, timeout=options.timeout, selected_cases=options.selected_cases, performance_traces=options.performance_traces))
     for name in options.selected_cases or CASES:
         try:
             run_scenario(suite, harness.Replay, name)
         except Exception as error:
             suite.cases.append({"name": name + "-harness", "passed": False, "checks": [{"description": "The recovery scenario completed", "passed": False, "actual": f"{type(error).__name__}: {error}"}]})
+        if suite.process_cleanup_failed:
+            break
     return suite.finish()
 
 

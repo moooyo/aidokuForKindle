@@ -5,6 +5,10 @@ use crate::domain::SearchSession;
 impl App {
     /// Stop new work and checkpoint navigation before the native process parks.
     pub fn prepare_suspend(&mut self) -> Result<()> {
+        crate::reader_timing::mark("suspend_requested");
+        crate::reader_timing::cancel_action("lifecycle");
+        crate::reader_timing::cancel_native("lifecycle");
+        self.platform.cancel_reader_frame();
         self.pending_wide_navigation = 0;
         self.cancel_pending_user_network();
         if self.suspended {
@@ -66,6 +70,7 @@ impl App {
         self.save_reader_progress()?;
         self.checkpoint_navigation(true)?;
         self.suspend_checkpoint_ready = true;
+        crate::reader_timing::mark("suspend_checkpoint_ready");
         Ok(())
     }
 
@@ -82,6 +87,7 @@ impl App {
         if !self.suspended {
             return Ok(());
         }
+        crate::reader_timing::mark("resume_requested");
         self.network_control.resume();
         self.downloads
             .resume_owned(self.options.offline || self.options.demo)?;
@@ -240,6 +246,7 @@ impl App {
         if self.suspended {
             return Ok(());
         }
+        crate::reader_timing::mark("retained_resume_frame_acknowledged");
         self.resume_frame_pending = false;
         if self.route == "reader" && !self.options.demo {
             if let Some(ui) = self.ui.upgrade() {
@@ -366,6 +373,7 @@ impl App {
     }
 
     pub(crate) fn restore_saved_session(&mut self) -> Result<()> {
+        crate::reader_timing::cancel_action("restored");
         let Some(saved) = self.store.session()? else {
             self.network_control.resume();
             self.downloads

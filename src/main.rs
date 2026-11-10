@@ -128,6 +128,10 @@ struct Arguments {
     #[arg(long)]
     capture: Option<PathBuf>,
 
+    /// Save bounded software timing after exit, relative to the first Rust main entry.
+    #[arg(long)]
+    performance_trace: Option<PathBuf>,
+
     /// Allow up to 15 seconds for visible cover publication before a capture.
     #[arg(long)]
     capture_settle_covers: bool,
@@ -175,7 +179,13 @@ struct CaptureMetadata {
 }
 
 fn main() -> std::process::ExitCode {
-    match run(Arguments::parse()) {
+    let process_entry = Instant::now();
+    let arguments = Arguments::parse();
+    let result =
+        aidoku_kindle::reader_timing::enable(arguments.performance_trace.as_deref(), process_entry)
+            .and_then(|()| run(arguments));
+    let trace_result = aidoku_kindle::reader_timing::finish(result.is_ok());
+    match result.and(trace_result) {
         Ok(()) => std::process::ExitCode::SUCCESS,
         Err(error) => {
             eprintln!("aidoku: {error:#}");
@@ -229,12 +239,14 @@ fn run(arguments: Arguments) -> Result<()> {
         .unwrap_or_else(|| default_data_dir(arguments.kindle))?;
     fs::create_dir_all(&data_dir).context("Create the application data directory")?;
     let platform = Rc::new(Platform::new(arguments.device, arguments.kindle)?);
+    aidoku_kindle::reader_timing::mark("platform_initialized");
     let fonts = BUNDLED_FONTS
         .iter()
         .map(|(family, weight, bytes)| {
             decompress_font(bytes).with_context(|| format!("Load bundled {family} weight {weight}"))
         })
         .collect::<Result<Vec<_>>>()?;
+    aidoku_kindle::reader_timing::mark("fonts_loaded");
     if STOP_REQUESTED.load(Ordering::Relaxed) {
         return Ok(());
     }
@@ -384,17 +396,25 @@ fn run(arguments: Arguments) -> Result<()> {
                     if Duration::from_millis(action.at_ms) > elapsed {
                         break;
                     }
-                    let result = if action.section == "pointer" {
-                        dispatch_pointer(
-                            ui.window(),
-                            &action.action,
-                            &action.value,
-                            &pointer_observer,
-                        )
-                    } else {
-                        app.borrow_mut()
-                            .dispatch(&action.section, &action.action, &action.value)
-                    };
+                    let result = aidoku_kindle::reader_timing::with_scripted_input(
+                        action.section == "pointer",
+                        || {
+                            if action.section == "pointer" {
+                                dispatch_pointer(
+                                    ui.window(),
+                                    &action.action,
+                                    &action.value,
+                                    &pointer_observer,
+                                )
+                            } else {
+                                app.borrow_mut().dispatch(
+                                    &action.section,
+                                    &action.action,
+                                    &action.value,
+                                )
+                            }
+                        },
+                    );
                     next_action.set(next_action.get() + 1);
                     if let Err(error) = result {
                         failures.borrow_mut().push(format!(
@@ -433,6 +453,7 @@ fn run(arguments: Arguments) -> Result<()> {
         );
     }
     ui.show().context("Show the application window")?;
+    aidoku_kindle::reader_timing::mark("window_shown");
     lifecycle.borrow().publish_initial(&app, &platform);
     eprintln!(
         "aidoku: {} window ready; profile={}, logical={}x{}, scale={}",
@@ -446,6 +467,7 @@ fn run(arguments: Arguments) -> Result<()> {
         ui.get_canvas_height(),
         ui.window().scale_factor()
     );
+    aidoku_kindle::reader_timing::mark("event_loop_started");
     let event_loop_result = slint::run_event_loop();
     poll_timer.stop();
     if event_loop_result.is_ok() && failures.borrow().is_empty() {

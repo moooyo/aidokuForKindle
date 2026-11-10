@@ -1045,6 +1045,18 @@ mod tests {
             fixture
         }
 
+        fn managed(image: GrayImage) -> Self {
+            let mut fixture = Self::empty();
+            let write = fixture.cache.begin_raw(&fixture.page, None, 0).unwrap();
+            image
+                .save_with_format(write.temp_path(), ImageFormat::Png)
+                .unwrap();
+            fixture.cache.validate_path(write.temp_path()).unwrap();
+            fixture.raw = write.commit().unwrap();
+            fixture.page.local_path = Some(fixture.raw.clone());
+            fixture
+        }
+
         fn empty() -> Self {
             let render_guard = TEST_RENDER_LOCK
                 .lock()
@@ -1197,7 +1209,7 @@ mod tests {
     }
 
     #[test]
-    fn warm_render_preserves_pixels_without_loading_or_hashing_the_original() {
+    fn warm_external_render_rehashes_the_source_without_loading_its_pixels() {
         let fixture = Fixture::new(artwork());
         let reads = Cell::new(0);
         let started = Instant::now();
@@ -1217,6 +1229,8 @@ mod tests {
         .unwrap();
         let cold_time = started.elapsed();
         let checksummed = fixture.cache.stats().checksum_bytes;
+        let source_bytes = fs::metadata(&fixture.raw).unwrap().len();
+        RENDER_WORK.with(|work| work.set(RenderWork::default()));
         let started = Instant::now();
         let warm = render_with_source(
             &fixture.cache,
@@ -1226,7 +1240,7 @@ mod tests {
             false,
             0,
             1.0,
-            |_| panic!("A processed hit must not read the original comic"),
+            |_| panic!("A processed hit must not load the original for decoding"),
         )
         .unwrap();
         let warm_time = started.elapsed();
@@ -1239,10 +1253,17 @@ mod tests {
         assert!(cold.cache_path.is_file());
         assert_eq!(fs::canonicalize(&cold.cache_path).unwrap(), cold.cache_path);
         assert_eq!(reads.get(), 1);
-        assert_eq!(fixture.cache.stats().checksum_bytes, checksummed);
+        assert_eq!(
+            fixture.cache.stats().checksum_bytes,
+            checksummed + source_bytes
+        );
+        assert_eq!(
+            RENDER_WORK.with(std::cell::Cell::get),
+            RenderWork::default()
+        );
         assert_eq!(fixture.cache.stats().commits, 1);
         eprintln!(
-            "Processed render cold={cold_time:?}, warm={warm_time:?}, original_reads={}",
+            "Processed render cold={cold_time:?}, warm={warm_time:?}, source_checksum_bytes={source_bytes}, original_pixel_reads={}",
             reads.get()
         );
 
@@ -1260,6 +1281,45 @@ mod tests {
                 .iter()
                 .any(|chunk| chunk.keyword == METADATA_KEY)
         );
+    }
+
+    #[test]
+    fn warm_managed_render_preserves_pixels_without_loading_or_hashing_the_original() {
+        let fixture = Fixture::managed(artwork());
+        let cold = render(
+            &fixture.cache,
+            &fixture.page,
+            &fixture.raw,
+            &options(),
+            false,
+            0,
+            1.0,
+        )
+        .unwrap();
+        let checksummed = fixture.cache.stats().checksum_bytes;
+        RENDER_WORK.with(|work| work.set(RenderWork::default()));
+        let warm = render_with_source(
+            &fixture.cache,
+            &fixture.page,
+            &fixture.raw,
+            &options(),
+            false,
+            0,
+            1.0,
+            |_| panic!("A managed processed hit must not load the original for decoding"),
+        )
+        .unwrap();
+        assert!(!cold.cache_hit);
+        assert!(warm.cache_hit && warm.memory_hit);
+        assert!(Arc::ptr_eq(&cold.image, &warm.image));
+        assert_eq!(cold.image, warm.image);
+        assert_eq!(cold.cache_path, warm.cache_path);
+        assert_eq!(fixture.cache.stats().checksum_bytes, checksummed);
+        assert_eq!(
+            RENDER_WORK.with(std::cell::Cell::get),
+            RenderWork::default()
+        );
+        assert_eq!(fixture.cache.stats().commits, 2);
     }
 
     #[test]
@@ -2242,7 +2302,7 @@ mod tests {
     }
 
     #[test]
-    fn warm_second_long_png_viewport_recovers_full_height_without_scanning_the_strip() {
+    fn warm_second_external_long_png_viewport_rehashes_source_without_decoding_the_strip() {
         let fixture = Fixture::empty();
         write_long_png(&fixture.raw);
         let options = ImageOptions {
@@ -2277,6 +2337,8 @@ mod tests {
         assert_eq!(first.scaled_height, second.scaled_height);
         assert_ne!(first.image, second.image);
         let checksummed = fixture.cache.stats().checksum_bytes;
+        let source_bytes = fs::metadata(&fixture.raw).unwrap().len();
+        RENDER_WORK.with(|work| work.set(RenderWork::default()));
         let started = Instant::now();
         let warm = render_with_source(
             &fixture.cache,
@@ -2286,16 +2348,23 @@ mod tests {
             true,
             435,
             1.0,
-            |_| panic!("A warm second viewport must not load or scan the original long PNG"),
+            |_| panic!("A warm second viewport must not decode the original long PNG"),
         )
         .unwrap();
         assert!(warm.cache_hit);
         assert_eq!(second.image, warm.image);
         assert_eq!(second.scaled_height, warm.scaled_height);
         assert_eq!(second.viewport_height, warm.viewport_height);
-        assert_eq!(fixture.cache.stats().checksum_bytes, checksummed);
+        assert_eq!(
+            fixture.cache.stats().checksum_bytes,
+            checksummed + source_bytes
+        );
+        assert_eq!(
+            RENDER_WORK.with(std::cell::Cell::get),
+            RenderWork::default()
+        );
         eprintln!(
-            "Warm second long-PNG viewport={:?}; complete_height={}, original_reads=0",
+            "Warm second long-PNG viewport={:?}; complete_height={}, source_checksum_bytes={source_bytes}, original_pixel_reads=0",
             started.elapsed(),
             warm.scaled_height
         );

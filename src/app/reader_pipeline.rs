@@ -42,6 +42,8 @@ impl App {
     ) -> Result<()> {
         self.cancel_reader_prefetch();
         self.reader_generation = self.reader_generation.wrapping_add(1);
+        crate::reader_timing::request(self.reader_generation, self.lifecycle_generation);
+        self.platform.cancel_reader_frame();
         self.reader_dirty = true;
         self.reader_refresh = merge_refresh(self.reader_refresh, refresh);
         if let Some(id) = self.reader_inflight {
@@ -49,6 +51,10 @@ impl App {
             // decoder threads. The newest frame starts after this one completes.
             self.pending.insert(id);
             self.busy = true;
+            crate::reader_timing::record(
+                "request_waiting_for_worker",
+                crate::reader_timing::token(self.reader_generation, self.lifecycle_generation),
+            );
             return Ok(());
         }
         self.start_reader_image_job()
@@ -64,6 +70,10 @@ impl App {
         }
         let target = self.reader_target();
         if let Err(error) = self.begin_reader_image_job() {
+            crate::reader_timing::failed(crate::reader_timing::token(
+                self.reader_generation,
+                self.lifecycle_generation,
+            ));
             if let Some(target) = target {
                 self.recover_reader_failure(target, error);
             } else {
@@ -75,6 +85,8 @@ impl App {
     }
 
     pub(super) fn begin_reader_image_job(&mut self) -> Result<()> {
+        let timing =
+            crate::reader_timing::request(self.reader_generation, self.lifecycle_generation);
         let reader = self.reader.as_ref().context("No chapter is open")?;
         let chapter_id = reader.current_chapter().id.clone();
         let source_id = reader.current_chapter().source_id.clone();
@@ -102,19 +114,21 @@ impl App {
                 .next()
                 .context("The requested page is outside this chapter")?;
             let mut paths = Vec::with_capacity(if spread { 2 } else { 1 });
-            let path = cached_page(
+            let fetch_timing = crate::reader_timing::Stage::new(timing, "fetch_finished");
+            let cached = cached_page(
                 &manager,
                 &request,
                 &source_id,
                 index,
                 offline,
                 FetchPriority::Interactive,
-                &mut paths,
             )?;
+            drop(fetch_timing);
+            let mut render_timing = crate::reader_timing::Stage::new(timing, "render_finished");
             let prepared = render_reader_page(
                 manager.cache(),
                 &request,
-                &path,
+                &cached.path,
                 &options,
                 &effective,
                 viewport,
@@ -124,6 +138,9 @@ impl App {
                 half,
                 None,
             )?;
+            render_timing.render_result(prepared.rendered.cache_hit, prepared.rendered.memory_hit);
+            drop(render_timing);
+            paths.push(cached);
             let wide = prepared.wide;
             let wide_half = prepared.half;
             let rendered = prepared.rendered;
@@ -135,19 +152,21 @@ impl App {
                 let request = pages
                     .next()
                     .context("The second spread page is outside this chapter")?;
-                let path = cached_page(
+                let fetch_timing = crate::reader_timing::Stage::new(timing, "fetch_finished");
+                let cached = cached_page(
                     &manager,
                     &request,
                     &source_id,
                     index + 1,
                     offline,
                     FetchPriority::Interactive,
-                    &mut paths,
                 )?;
+                drop(fetch_timing);
+                let mut render_timing = crate::reader_timing::Stage::new(timing, "render_finished");
                 let prepared = render_reader_page(
                     manager.cache(),
                     &request,
-                    &path,
+                    &cached.path,
                     &options,
                     &effective,
                     viewport,
@@ -157,19 +176,27 @@ impl App {
                     0,
                     None,
                 )?;
+                render_timing
+                    .render_result(prepared.rendered.cache_hit, prepared.rendered.memory_hit);
+                drop(render_timing);
+                paths.push(cached);
                 let rendered = prepared.rendered;
                 (Some(rendered.image), Some(rendered.cache_path))
             } else {
                 (None, None)
             };
+            let prepare_timing = crate::reader_timing::Stage::new(timing, "prepare_finished");
+            let first = super::prepared_pixels::prepare(first);
+            let second = second.map(super::prepared_pixels::prepare);
+            drop(prepare_timing);
             Ok(JobResult::ReaderImage {
                 chapter_id,
                 page,
                 offset,
                 wide,
                 wide_half,
-                first: super::prepared_pixels::prepare(first),
-                second: second.map(super::prepared_pixels::prepare),
+                first,
+                second,
                 scaled_height,
                 viewport_height,
                 preferences: effective,
@@ -537,15 +564,15 @@ fn prefetch_chapter_frames(
     cancellation: &imaging::DecodeCancellation,
 ) -> Result<PrefetchedChapter> {
     let mut paths = Vec::with_capacity(frames.len());
-    let mut fetched = HashMap::<usize, PathBuf>::new();
+    let mut fetched = HashMap::<usize, CachedPage>::new();
     let mut failed = HashSet::new();
     for frame in frames {
         cancellation.check()?;
         if failed.contains(&frame.index) {
             continue;
         }
-        let path = if let Some(path) = fetched.get(&frame.index) {
-            path.clone()
+        let cached = if let Some(cached) = fetched.get(&frame.index) {
+            cached.clone()
         } else {
             match cached_page(
                 manager,
@@ -554,11 +581,10 @@ fn prefetch_chapter_frames(
                 frame.index,
                 offline,
                 FetchPriority::Prefetch,
-                &mut paths,
             ) {
-                Ok(path) => {
-                    fetched.insert(frame.index, path.clone());
-                    path
+                Ok(cached) => {
+                    fetched.insert(frame.index, cached.clone());
+                    cached
                 }
                 Err(error) => {
                     cancellation.check()?;
@@ -572,7 +598,7 @@ fn prefetch_chapter_frames(
         match render_reader_page(
             manager.cache(),
             &frame.page,
-            &path,
+            &cached.path,
             &frame.options,
             preferences,
             viewport,
@@ -584,6 +610,12 @@ fn prefetch_chapter_frames(
         ) {
             Ok(prepared) => {
                 cancellation.check()?;
+                if !paths
+                    .iter()
+                    .any(|path: &CachedPage| path.index == cached.index)
+                {
+                    paths.push(cached);
+                }
                 let _ = super::prepared_pixels::prepare(prepared.rendered.image);
             }
             Err(error) => {
@@ -684,19 +716,11 @@ fn cached_page(
     index: usize,
     offline: bool,
     priority: FetchPriority,
-    paths: &mut Vec<CachedPage>,
-) -> Result<PathBuf> {
+) -> Result<CachedPage> {
     let identity = cached_page_identity(request, index);
-    if let Some(path) = request.local_path.as_ref().filter(|path| path.is_file()) {
-        manager.cache().validate_path(path)?;
-        paths.push(CachedPage {
-            index,
-            identity,
-            path: path.clone(),
-        });
-        return Ok(path.clone());
-    }
-    let path = if let Some(path) = manager.cache().lookup_raw(request)? {
+    let path = if let Some(path) = request.local_path.as_ref().filter(|path| path.is_file()) {
+        path.clone()
+    } else if let Some(path) = manager.cache().lookup_raw(request)? {
         path
     } else if request.url.is_empty() && request.local_path.is_some() {
         return Err(std::io::Error::from(std::io::ErrorKind::NotFound))
@@ -706,12 +730,20 @@ fn cached_page(
     } else {
         manager.fetch_page_for_source(source_id, request, priority, None)?
     };
-    paths.push(CachedPage {
+    let metadata = fs::metadata(&path).context("Read the reader source metadata")?;
+    anyhow::ensure!(
+        metadata.is_file() && metadata.len() > 0 && metadata.len() <= imaging::MAX_PAGE_BYTES,
+        "The reader source is empty or exceeds the compressed-image limit"
+    );
+    // This is a size-bounded candidate, not an image or checksum proof. The
+    // following render verifies source bytes and the complete rendering key;
+    // doing fingerprint or codec work here would duplicate that verification.
+    // Callers publish its manifest path only after the render succeeds.
+    Ok(CachedPage {
         index,
         identity,
-        path: path.clone(),
-    });
-    Ok(path)
+        path,
+    })
 }
 
 fn is_strip(preferences: &Preferences) -> bool {
@@ -954,6 +986,431 @@ mod tests {
             )
             .unwrap()
         }
+    }
+
+    #[derive(Debug, Clone, Copy)]
+    enum ReaderSourceKind {
+        Managed,
+        External,
+    }
+
+    struct CachedReaderFixture {
+        directory: tempfile::TempDir,
+        kind: ReaderSourceKind,
+        page: Page,
+        original: PathBuf,
+        processed: PathBuf,
+        pixels: Arc<GrayImage>,
+        preferences: Preferences,
+        viewport: (u32, u32),
+        options: ImageOptions,
+    }
+
+    impl CachedReaderFixture {
+        fn new(kind: ReaderSourceKind) -> Self {
+            let directory = tempfile::tempdir().unwrap();
+            let cache = crate::cache::CacheManager::open(directory.path()).unwrap();
+            let mut page = Page {
+                url: "https://example.test/reader-cache.png".into(),
+                ..Page::default()
+            };
+            page.headers
+                .insert("X-Reader-Identity".into(), "first".into());
+            let source =
+                GrayImage::from_fn(32, 48, |x, y| image::Luma([((x * 13 + y * 7) % 239) as u8]));
+            let original = match kind {
+                ReaderSourceKind::Managed => {
+                    let write = cache.begin_raw(&page, None, 4_096).unwrap();
+                    source
+                        .save_with_format(write.temp_path(), image::ImageFormat::Png)
+                        .unwrap();
+                    write.commit().unwrap()
+                }
+                ReaderSourceKind::External => {
+                    let path = directory.path().join("source.png");
+                    source
+                        .save_with_format(&path, image::ImageFormat::Png)
+                        .unwrap();
+                    path
+                }
+            };
+            page.local_path = Some(original.clone());
+            let preferences = Preferences {
+                crop_borders: false,
+                dither: false,
+                spread: false,
+                split_wide: false,
+                resize_downloads: false,
+                grayscale_downloads: false,
+                ..Preferences::default()
+            };
+            let viewport = (8, 12);
+            let options = reader_image_options(&preferences, viewport, 0, 1);
+            let rendered = render_reader_page(
+                &cache,
+                &page,
+                &original,
+                &options,
+                &preferences,
+                viewport,
+                false,
+                0,
+                1.0,
+                0,
+                None,
+            )
+            .unwrap();
+            let processed = rendered.rendered.cache_path;
+            let pixels = rendered.rendered.image;
+            crate::render_cache::clear_memory(&cache);
+            // No cache manager or lease survives setup. Reopening the fixture
+            // therefore starts with cold checksum and source-validation state.
+            drop(cache);
+            Self {
+                directory,
+                kind,
+                page,
+                original,
+                processed,
+                pixels,
+                preferences,
+                viewport,
+                options,
+            }
+        }
+
+        fn manager(&self) -> SourceManager {
+            SourceManager::new(self.directory.path(), &[]).unwrap()
+        }
+
+        fn render(
+            &self,
+            manager: &SourceManager,
+            page: &Page,
+        ) -> Result<(CachedPage, super::super::wide_pages::WidePage)> {
+            let cached = self.candidate(manager, page)?;
+            let rendered = self.render_candidate(manager, page, &cached)?;
+            Ok((cached, rendered))
+        }
+
+        fn candidate(&self, manager: &SourceManager, page: &Page) -> Result<CachedPage> {
+            cached_page(
+                manager,
+                page,
+                "reader-fixture",
+                0,
+                true,
+                FetchPriority::Interactive,
+            )
+        }
+
+        fn render_candidate(
+            &self,
+            manager: &SourceManager,
+            page: &Page,
+            cached: &CachedPage,
+        ) -> Result<super::super::wide_pages::WidePage> {
+            render_reader_page(
+                manager.cache(),
+                page,
+                &cached.path,
+                &self.options,
+                &self.preferences,
+                self.viewport,
+                false,
+                0,
+                1.0,
+                0,
+                None,
+            )
+        }
+
+        fn frame(&self, page: &Page) -> PrefetchFrame {
+            PrefetchFrame {
+                index: 0,
+                page: page.clone(),
+                options: self.options.clone(),
+                vertical: false,
+                offset: 0,
+                zoom: 1.0,
+                half: 0,
+            }
+        }
+
+        fn prefetch(
+            &self,
+            manager: &SourceManager,
+            frames: Vec<PrefetchFrame>,
+        ) -> PrefetchedChapter {
+            prefetch_chapter_frames(
+                manager,
+                Chapter {
+                    id: "reader-chapter".into(),
+                    book_id: "reader-book".into(),
+                    source_id: "reader-fixture".into(),
+                    remote_id: "reader-chapter".into(),
+                    page_count: 1,
+                    ..Chapter::default()
+                },
+                None,
+                frames,
+                true,
+                &self.preferences,
+                self.viewport,
+                &imaging::DecodeCancellation::new(),
+            )
+            .unwrap()
+        }
+
+        fn replace_source(&self, bytes: &[u8]) {
+            match self.kind {
+                ReaderSourceKind::Managed => {
+                    let cache = crate::cache::CacheManager::open(self.directory.path()).unwrap();
+                    let write = cache
+                        .begin_raw(&self.page, None, bytes.len() as u64)
+                        .unwrap();
+                    fs::write(write.temp_path(), bytes).unwrap();
+                    write.commit().unwrap();
+                }
+                ReaderSourceKind::External => fs::write(&self.original, bytes).unwrap(),
+            }
+        }
+
+        fn key(&self) -> crate::cache::RenderKey {
+            let checksum = format!("{:x}", Sha256::digest(fs::read(&self.original).unwrap()));
+            crate::cache::RenderKey {
+                source_key: format!(
+                    "{}:{checksum}",
+                    crate::cache::CacheManager::page_key(&self.page)
+                ),
+                width: self.options.width,
+                height: self.options.height,
+                crop_borders: self.options.crop_borders,
+                dither: self.options.dither,
+                contrast: self.options.contrast,
+                vertical: false,
+                offset: 0,
+                zoom_milli: 1_000,
+            }
+        }
+    }
+
+    #[test]
+    fn reader_cache_cold_png_hit_checks_source_hash_without_duplicate_codec_validation() {
+        for kind in [ReaderSourceKind::Managed, ReaderSourceKind::External] {
+            let fixture = CachedReaderFixture::new(kind);
+            let manager = fixture.manager();
+            let bytes = fs::read(&fixture.original).unwrap();
+            let checksum = format!("{:x}", Sha256::digest(&bytes));
+            let before = manager.cache().stats();
+            let cached = fixture.candidate(&manager, &fixture.page).unwrap();
+            assert_eq!(
+                manager.cache().stats().checksum_bytes,
+                before.checksum_bytes
+            );
+            let rendered = fixture
+                .render_candidate(&manager, &fixture.page, &cached)
+                .unwrap();
+            assert!(rendered.rendered.cache_hit && !rendered.rendered.memory_hit);
+            assert_eq!(rendered.rendered.cache_path, fixture.processed);
+            assert_eq!(rendered.rendered.image, fixture.pixels);
+            assert_eq!(cached.index, 0);
+            assert_eq!(cached.identity, cached_page_identity(&fixture.page, 0));
+            let after = manager.cache().stats();
+            assert_eq!(after.external_validations - before.external_validations, 0);
+            assert_eq!(
+                after.checksum_bytes - before.checksum_bytes,
+                bytes.len() as u64 + fs::metadata(&fixture.processed).unwrap().len(),
+                "Both canonical and processed files must be SHA-256 checked on a cold reopen: {kind:?}"
+            );
+            let warm = fixture
+                .render_candidate(&manager, &fixture.page, &cached)
+                .unwrap();
+            assert!(warm.rendered.cache_hit && warm.rendered.memory_hit);
+            let warm_hash_bytes = manager.cache().stats().checksum_bytes - after.checksum_bytes;
+            assert_eq!(
+                warm_hash_bytes,
+                if matches!(kind, ReaderSourceKind::External) {
+                    bytes.len() as u64
+                } else {
+                    0
+                },
+                "Mutable external source bytes must be checked even on a resident hit"
+            );
+            assert_eq!(
+                manager.cache().fingerprint(&fixture.original).unwrap(),
+                checksum
+            );
+        }
+    }
+
+    #[test]
+    fn reader_cache_external_source_replacement_changes_the_render_key() {
+        let fixture = CachedReaderFixture::new(ReaderSourceKind::External);
+        let original_identity = crate::cache::CacheManager::page_key(&fixture.page);
+        GrayImage::from_pixel(32, 48, image::Luma([0]))
+            .save_with_format(&fixture.original, image::ImageFormat::Png)
+            .unwrap();
+        assert_eq!(
+            crate::cache::CacheManager::page_key(&fixture.page),
+            original_identity
+        );
+        let manager = fixture.manager();
+        let (_, rendered) = fixture.render(&manager, &fixture.page).unwrap();
+        assert!(!rendered.rendered.cache_hit);
+        assert_ne!(rendered.rendered.cache_path, fixture.processed);
+        assert_ne!(rendered.rendered.image, fixture.pixels);
+        assert!(
+            rendered
+                .rendered
+                .image
+                .as_raw()
+                .iter()
+                .all(|pixel| *pixel == 0)
+        );
+    }
+
+    #[test]
+    fn reader_cache_invalid_originals_never_publish_prefetch_paths() {
+        for kind in [ReaderSourceKind::Managed, ReaderSourceKind::External] {
+            let fixture = CachedReaderFixture::new(kind);
+            fixture.replace_source(b"A checksummed artifact that is not an image");
+            let manager = fixture.manager();
+            let mut page = fixture.page.clone();
+            if matches!(kind, ReaderSourceKind::Managed) {
+                // This covers a raw cache hit without an existing manifest path.
+                page.local_path = None;
+            }
+            let candidate = fixture.candidate(&manager, &page).unwrap();
+            assert!(
+                fixture
+                    .render_candidate(&manager, &page, &candidate)
+                    .is_err()
+            );
+            let prefetched = fixture.prefetch(&manager, vec![fixture.frame(&page)]);
+            assert!(prefetched.paths.is_empty());
+            assert!(fixture.processed.is_file());
+        }
+    }
+
+    #[test]
+    fn reader_cache_corrupt_processed_pngs_rebuild_from_the_original() {
+        for matching_checksum in [false, true] {
+            let fixture = CachedReaderFixture::new(ReaderSourceKind::Managed);
+            if matching_checksum {
+                let cache = crate::cache::CacheManager::open(fixture.directory.path()).unwrap();
+                let write = cache.begin_processed(&fixture.key(), 64).unwrap();
+                fs::write(
+                    write.temp_path(),
+                    b"An indexed processed artifact with invalid PNG data",
+                )
+                .unwrap();
+                write.commit().unwrap();
+            } else {
+                fs::write(
+                    &fixture.processed,
+                    b"A processed file with a changed checksum",
+                )
+                .unwrap();
+            }
+            let manager = fixture.manager();
+            let candidate = fixture.candidate(&manager, &fixture.page).unwrap();
+            let rendered = fixture
+                .render_candidate(&manager, &fixture.page, &candidate)
+                .unwrap();
+            assert!(!rendered.rendered.cache_hit);
+            assert_eq!(rendered.rendered.image, fixture.pixels);
+            assert_eq!(rendered.rendered.cache_path, fixture.processed);
+            assert!(manager.cache().stats().corruptions > 0);
+        }
+    }
+
+    #[test]
+    fn reader_cache_managed_checksum_mismatch_cannot_reuse_old_pixels() {
+        let fixture = CachedReaderFixture::new(ReaderSourceKind::Managed);
+        fs::write(
+            &fixture.original,
+            b"A raw file changed outside the cache index",
+        )
+        .unwrap();
+        let manager = fixture.manager();
+        let candidate = fixture.candidate(&manager, &fixture.page).unwrap();
+        assert!(
+            fixture
+                .render_candidate(&manager, &fixture.page, &candidate)
+                .is_err()
+        );
+        let prefetched = fixture.prefetch(&manager, vec![fixture.frame(&fixture.page)]);
+        assert!(prefetched.paths.is_empty());
+        assert!(manager.cache().stats().corruptions > 0);
+        assert!(fixture.processed.is_file());
+    }
+
+    #[test]
+    fn reader_cache_missing_source_does_not_restore_its_processed_png() {
+        for kind in [ReaderSourceKind::Managed, ReaderSourceKind::External] {
+            let fixture = CachedReaderFixture::new(kind);
+            fs::remove_file(&fixture.original).unwrap();
+            let manager = fixture.manager();
+            assert!(fixture.candidate(&manager, &fixture.page).is_err());
+            let prefetched = fixture.prefetch(&manager, vec![fixture.frame(&fixture.page)]);
+            assert!(prefetched.paths.is_empty());
+            assert!(fixture.processed.is_file());
+        }
+    }
+
+    #[test]
+    fn reader_cache_preserves_page_identity_when_headers_change() {
+        let fixture = CachedReaderFixture::new(ReaderSourceKind::Managed);
+        let mut page = fixture.page.clone();
+        page.headers
+            .insert("X-Reader-Identity".into(), "second".into());
+        let manager = fixture.manager();
+        let (cached, rendered) = fixture.render(&manager, &page).unwrap();
+        assert_ne!(cached.identity, cached_page_identity(&fixture.page, 0));
+        assert_eq!(cached.identity, cached_page_identity(&page, 0));
+        assert_ne!(rendered.rendered.cache_path, fixture.processed);
+        assert_eq!(rendered.rendered.image, fixture.pixels);
+        assert!(!rendered.rendered.cache_hit);
+    }
+
+    #[test]
+    fn reader_cache_empty_and_oversized_sources_fail_before_hashing() {
+        for length in [0, imaging::MAX_PAGE_BYTES + 1] {
+            let fixture = CachedReaderFixture::new(ReaderSourceKind::External);
+            fs::OpenOptions::new()
+                .write(true)
+                .open(&fixture.original)
+                .unwrap()
+                .set_len(length)
+                .unwrap();
+            let manager = fixture.manager();
+            let before = manager.cache().stats().checksum_bytes;
+            assert!(fixture.candidate(&manager, &fixture.page).is_err());
+            assert_eq!(manager.cache().stats().checksum_bytes, before);
+            let prefetched = fixture.prefetch(&manager, vec![fixture.frame(&fixture.page)]);
+            assert!(prefetched.paths.is_empty());
+        }
+    }
+
+    #[test]
+    fn reader_cache_prefetch_only_publishes_successful_source_pages() {
+        let fixture = CachedReaderFixture::new(ReaderSourceKind::Managed);
+        let manager = fixture.manager();
+        let mut invalid = fixture.frame(&fixture.page);
+        invalid.options.width = 0;
+        let failed = fixture.prefetch(&manager, vec![invalid]);
+        assert!(failed.paths.is_empty());
+        let mut invalid = fixture.frame(&fixture.page);
+        invalid.options.width = 0;
+        let mixed = fixture.prefetch(&manager, vec![invalid, fixture.frame(&fixture.page)]);
+        assert_eq!(mixed.paths.len(), 1);
+        assert_eq!(mixed.paths[0].index, 0);
+        assert_eq!(
+            mixed.paths[0].identity,
+            cached_page_identity(&fixture.page, 0)
+        );
+        assert_eq!(mixed.paths[0].path, fixture.original);
     }
 
     fn preferences(direction: &str, spread: bool) -> Preferences {

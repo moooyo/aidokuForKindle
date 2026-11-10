@@ -83,13 +83,19 @@ not enabled by that condition for a monochrome Paperwhite 6.
 [enablement](https://github.com/koreader/koreader-base/blob/b153a4a252f6e4295af7a569bcfdd59ffa688fa6/ffi/framebuffer_mxcfb.lua#L1148-L1156),
 [ABI semantics](https://github.com/koreader/koreader-base/blob/b153a4a252f6e4295af7a569bcfdd59ffa688fa6/ffi-cdecl/include/mtk-kindle.h#L384-L389).
 
-Paperwhite 5/6 initialization enables the driver's MTK fast mode through
-`MXCFB_SET_UPDATE_FLAGS_MTK`; exit restores it. This controls driver waveform
+Paperwhite 5/6 and Scribe/Scribe3 initialization enable the driver's MTK fast mode through
+`MXCFB_SET_UPDATE_FLAGS_MTK`; exit disables it. This controls driver waveform
 promotion. It is a useful display-scheduling reference but does not accelerate
 comic decoding or scaling.
 [Device initialization](https://github.com/koreader/koreader/blob/01ccbd790d6269301ad523e75c45f62d022a6d7b/frontend/device/kindle/device.lua#L1768-L1802),
+[Scribe initialization](https://github.com/koreader/koreader/blob/01ccbd790d6269301ad523e75c45f62d022a6d7b/frontend/device/kindle/device.lua#L1858-L1859),
+[Scribe3 initialization](https://github.com/koreader/koreader/blob/01ccbd790d6269301ad523e75c45f62d022a6d7b/frontend/device/kindle/device.lua#L1920-L1921),
 [fast-mode ioctl](https://github.com/koreader/koreader-base/blob/b153a4a252f6e4295af7a569bcfdd59ffa688fa6/ffi/framebuffer_mxcfb.lua#L743-L750),
 [exit restoration](https://github.com/koreader/koreader/blob/01ccbd790d6269301ad523e75c45f62d022a6d7b/frontend/device/kindle/device.lua#L2048-L2052).
+The upstream exit call clears the fast-mode parameter; it does not snapshot and
+restore the prior parameter byte. See [the display evaluation](MTK_DISPLAY_EVALUATION.md)
+for the separate official-kernel review, synchronization correction and exact-device
+qualification requirements.
 
 ### Rotation and other platforms
 

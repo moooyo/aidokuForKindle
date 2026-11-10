@@ -544,6 +544,40 @@ impl Platform {
                             observed.framebuffer,
                         )?;
                 }
+                if crate::reader_timing::enabled() {
+                    backend.set_frame_observer(|observed| {
+                        use slint_backend_kindle::NativeFramePhase;
+                        let elapsed_us =
+                            u64::try_from(observed.elapsed.as_micros()).unwrap_or(u64::MAX);
+                        match observed.phase {
+                            NativeFramePhase::FramebufferWritten => {
+                                crate::reader_timing::native_frame_written(
+                                    observed.token,
+                                    observed.frame_sequence,
+                                    elapsed_us,
+                                    observed.full_frame,
+                                );
+                            }
+                            NativeFramePhase::SendAccepted => {
+                                if let Some(marker) = observed.marker {
+                                    crate::reader_timing::native_send_accepted(
+                                        observed.token,
+                                        observed.frame_sequence,
+                                        marker,
+                                        elapsed_us,
+                                        observed.full_frame,
+                                    );
+                                }
+                            }
+                            NativeFramePhase::Unavailable(reason) => {
+                                crate::reader_timing::native_frame_unavailable(
+                                    observed.token,
+                                    reason.as_str(),
+                                );
+                            }
+                        }
+                    });
+                }
                 self.native_presentation.replace(presentation);
                 *self.backend.borrow_mut() = Some(backend);
                 // Backend installation mutates its default-font environment.
@@ -618,6 +652,37 @@ impl Platform {
         self.configured_logical_size.set(Some(logical_size));
         self.display_rotation_degrees.set(degrees);
         Ok(())
+    }
+
+    /// Associate only the next native output with an accepted Reader image.
+    pub fn arm_reader_frame(&self, token: u64) {
+        if !crate::reader_timing::enabled() {
+            return;
+        }
+        #[cfg(all(feature = "kindle", target_os = "linux"))]
+        if self.kindle
+            && let Some(backend) = self.backend.borrow().as_ref()
+        {
+            if let Some(previous) = backend.arm_reader_frame(token) {
+                crate::reader_timing::native_frame_unavailable(previous, "superseded");
+            }
+        }
+        let _ = token;
+    }
+
+    /// Cancel a token before navigation, overlays or lifecycle changes replace it.
+    pub fn cancel_reader_frame(&self) {
+        if !crate::reader_timing::enabled() {
+            return;
+        }
+        #[cfg(all(feature = "kindle", target_os = "linux"))]
+        if self.kindle
+            && let Some(backend) = self.backend.borrow().as_ref()
+        {
+            if let Some(previous) = backend.cancel_reader_frame() {
+                crate::reader_timing::native_frame_unavailable(previous, "cancelled");
+            }
+        }
     }
 
     pub fn install_input_observer(

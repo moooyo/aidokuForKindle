@@ -8,14 +8,15 @@ use std::sync::atomic::{AtomicBool, AtomicU32, Ordering};
 use std::sync::{Arc, Mutex};
 use std::time::{Duration, Instant};
 
-use slint::Rgb8Pixel;
 use slint::platform::software_renderer::{
     MinimalSoftwareWindow, RenderingRotation, RepaintBufferType, SoftwareRenderer,
 };
 use slint::platform::{Clipboard, EventLoopProxy, Platform, PlatformError, WindowAdapter};
 
 use crate::clipboard::{ClipboardKind, ClipboardStore};
+use crate::frame_observer::{FrameObserverState, NativeFrameUnavailable, reader_output_eligible};
 use crate::framebuffer::Framebuffer;
+use crate::gray_target::RetainedScene;
 use crate::lifecycle::{LifecycleHandle, LifecycleState};
 use crate::portrait::{InputEpoch, NativePortraitBinding};
 use crate::portrait_runtime::LivePortrait;
@@ -64,6 +65,7 @@ pub(crate) struct KindlePlatform {
     pub(crate) on_wake: OnWakeCallback,
     input_observer: InputObserver,
     control_callback: ControlCallback,
+    frame_observer: Rc<FrameObserverState>,
     lifecycle: Arc<LifecycleState>,
     black_and_white: Arc<AtomicBool>,
     dark_mode: Arc<AtomicBool>,
@@ -208,6 +210,7 @@ impl KindlePlatform {
         rotation: Arc<AtomicU32>,
         input_observer: InputObserver,
         control_callback: ControlCallback,
+        frame_observer: Rc<FrameObserverState>,
     ) -> std::io::Result<Self> {
         let window = MinimalSoftwareWindow::new(RepaintBufferType::ReusedBuffer);
         let wakeup = wakeup::make_wakeup()?;
@@ -221,6 +224,7 @@ impl KindlePlatform {
             on_wake,
             input_observer,
             control_callback,
+            frame_observer,
             lifecycle: Arc::new(LifecycleState::default()),
             black_and_white,
             dark_mode: Arc::new(AtomicBool::new(false)),
@@ -477,7 +481,10 @@ impl Platform for KindlePlatform {
 
         let width = frame_buffer.width as usize;
         let (panel_width, panel_height) = (frame_buffer.width, frame_buffer.height);
-        let mut rgb_buffer = vec![Rgb8Pixel::default(); width * panel_height as usize];
+        let mut scene = RetainedScene::new(
+            width * panel_height as usize,
+            frame_buffer.supports_gray8_target(),
+        );
         let mut gray_renderer = GrayRenderer::new(width, initial_mode);
         // The old launch query remains only for callers without an authenticated
         // native calibration. A calibrated startup or resume never probes LIPC
@@ -752,6 +759,10 @@ impl Platform for KindlePlatform {
             if !pending.is_empty() || force_full {
                 self.window.request_redraw();
             }
+            // An armed image belongs to this single output attempt. Snapshot
+            // rendering and later menu/wake redraws cannot consume it again.
+            let mut observed_frame = self.frame_observer.begin();
+            let render_started = observed_frame.as_ref().map(|_| Instant::now());
             let mut dirty_region = None;
             self.window.draw_if_needed(|renderer| {
                 let _scanout_rotation = ScanoutRotation::new(
@@ -763,12 +774,12 @@ impl Platform for KindlePlatform {
                         _ => RenderingRotation::NoRotation,
                     },
                 );
-                // Rotation changes require a complete retained RGB scene; Slint
+                // Rotation changes require a complete retained scene; Slint
                 // does not invalidate its dirty cache for output rotation alone.
                 if rotation_changed {
                     renderer.set_repaint_buffer_type(RepaintBufferType::NewBuffer);
                 }
-                let dirty = renderer.render(&mut rgb_buffer, width);
+                let dirty = scene.render(renderer, width);
                 if rotation_changed {
                     renderer.set_repaint_buffer_type(RepaintBufferType::ReusedBuffer);
                 }
@@ -789,22 +800,49 @@ impl Platform for KindlePlatform {
                     height: panel_height,
                 });
             }
-            let written = gray_renderer.write_frame(
-                &rgb_buffer,
+            let render_elapsed = render_started.map_or(Duration::ZERO, |start| start.elapsed());
+            let write_started = observed_frame.as_ref().map(|_| Instant::now());
+            let written = gray_renderer.write_scene_frame(
+                scene.pixels(),
                 (panel_width, panel_height),
                 dirty_region,
                 output_mode,
                 |row, columns, pixels| frame_buffer.write_line(row, columns, pixels),
             );
-            if written.region.is_some() {
+            let write_elapsed = write_started.map_or(Duration::ZERO, |start| start.elapsed());
+            let frame_sequence = written.region.map(|_| {
                 self.lifecycle
                     .frame_write_count
-                    .fetch_add(1, Ordering::AcqRel);
+                    .fetch_add(1, Ordering::AcqRel)
+                    .wrapping_add(1)
+            });
+            if let Some(observed) = observed_frame.as_mut() {
+                if let Some(region) = written.region {
+                    let sequence = frame_sequence.expect("written output has a sequence");
+                    if reader_output_eligible(
+                        sequence,
+                        self.lifecycle.resume_frame_pending.load(Ordering::Acquire),
+                        rotation_changed || written.mode_changed || force_full,
+                    ) {
+                        let full = region.x == 0
+                            && region.y == 0
+                            && region.width == panel_width
+                            && region.height == panel_height;
+                        observed.written(sequence, region, full, write_elapsed, render_elapsed);
+                    } else {
+                        // Initial scene allocation is valid first-image output;
+                        // later rewrites and resumes are separate observations.
+                        observed.unavailable(NativeFrameUnavailable::Cancelled);
+                    }
+                } else {
+                    observed.unavailable(NativeFrameUnavailable::NoWrite);
+                }
             }
-            if rotation_changed || written.mode_changed || force_full {
-                frame_buffer.refresh_full().map_err(|error| {
+            let submission_started = observed_frame.as_ref().map(|_| Instant::now());
+            let submission = if rotation_changed || written.mode_changed || force_full {
+                Some(frame_buffer.refresh_full().map_err(|error| {
                     PlatformError::Other(format!("full framebuffer refresh was rejected: {error}"))
-                })?;
+                }))
             } else if let Some(refresh) = crate::refresh::resolve(
                 pending,
                 written.region,
@@ -812,9 +850,25 @@ impl Platform for KindlePlatform {
                 panel_height,
                 render_rotation,
             ) {
-                frame_buffer.refresh_planned(refresh).map_err(|error| {
+                Some(frame_buffer.refresh_planned(refresh).map_err(|error| {
                     PlatformError::Other(format!("framebuffer refresh was rejected: {error}"))
-                })?;
+                }))
+            } else {
+                None
+            };
+            let submission_elapsed =
+                submission_started.map_or(Duration::ZERO, |start| start.elapsed());
+            if let Some(observed) = observed_frame.as_mut() {
+                match &submission {
+                    Some(Ok(())) => {
+                        observed.accepted(frame_buffer.last_submitted_marker(), submission_elapsed)
+                    }
+                    Some(Err(_)) => observed.unavailable(NativeFrameUnavailable::SendRejected),
+                    None => observed.unavailable(NativeFrameUnavailable::NoWrite),
+                }
+            }
+            if let Some(submission) = submission {
+                submission?;
             }
             drawn_rotation = applied_rotation;
             drawn_render_rotation = render_rotation;

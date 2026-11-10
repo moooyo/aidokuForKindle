@@ -1,0 +1,29 @@
+[package]
+name = "reader-snapshot-evaluation"
+version = "0.1.0"
+edition = "2024"
+
+[features]
+host-zstd = []
+
+[[bin]]
+name = "reader-snapshot-evaluation"
+path = "reader-snapshot-benchmark.rs"
+
+[dependencies]
+anyhow = "1"
+flate2 = { version = "=1.1.10", features = ["zlib-rs"] }
+image = { version = "=0.25.10", default-features = false, features = ["png", "jpeg", "gif", "webp"] }
+libc = "0.2"
+png = "0.18"
+rusqlite = { version = "0.37", features = ["bundled"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+sha2 = "0.10"
+
+[dev-dependencies]
+tempfile = "3"
+
+[profile.release]
+lto = "thin"
+codegen-units = 1

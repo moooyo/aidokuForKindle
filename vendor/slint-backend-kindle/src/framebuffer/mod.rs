@@ -1,10 +1,13 @@
 mod ffi;
+mod markers;
 
 use crate::refresh::{RefreshWaveform, ResolvedRefresh};
 use std::cell::Cell;
 use std::io;
 use std::ops::Range;
 use std::os::fd::AsRawFd;
+
+use markers::UpdateMarkers;
 
 use ffi::{
     EPDC_FLAG_FORCE_MONOCHROME, FBIOGET_FSCREENINFO, FBIOGET_VSCREENINFO, FbFixScreeninfo,
@@ -228,12 +231,18 @@ pub(crate) struct Framebuffer {
     /// The update ioctl variant this kernel accepts, cached after the first
     /// successful refresh. `None` until then.
     update_variant: Cell<Option<UpdateVariant>>,
+    update_markers: UpdateMarkers,
 }
 
 // SAFETY: The mmap is process-wide and we only access it from the event loop thread.
 unsafe impl Send for Framebuffer {}
 
 impl Framebuffer {
+    /// Select a neutral target from the actual mapped format, never a profile.
+    pub(crate) fn supports_gray8_target(&self) -> bool {
+        self.bytes_per_pixel == 1
+    }
+
     /// Open the framebuffer device and query its geometry from the kernel.
     ///
     /// This works on any Kindle model - the resolution and stride are read at
@@ -327,6 +336,7 @@ impl Framebuffer {
             bytes_per_pixel,
             retained_layout,
             update_variant: Cell::new(None),
+            update_markers: UpdateMarkers::default(),
         })
     }
 
@@ -391,12 +401,14 @@ impl Framebuffer {
     /// cache it, so later frames issue exactly one ioctl instead of retrying a
     /// known-failing one every refresh.
     fn send_update(&self, region: UpdateRect, waveform: u32, mode: u32) -> io::Result<()> {
-        submit_update(&self.update_variant, |variant| {
-            if self.send_update_variant(variant, region, waveform, mode) {
-                Ok(())
-            } else {
-                Err(io::Error::last_os_error())
-            }
+        self.update_markers.submit(|marker| {
+            submit_update(&self.update_variant, |variant| {
+                if self.send_update_variant(variant, region, waveform, mode, marker) {
+                    Ok(())
+                } else {
+                    Err(io::Error::last_os_error())
+                }
+            })
         })
     }
 
@@ -407,12 +419,13 @@ impl Framebuffer {
         region: UpdateRect,
         waveform: u32,
         mode: u32,
+        marker: u32,
     ) -> bool {
         match variant {
-            UpdateVariant::Legacy => self.send_update_legacy(region, waveform, mode),
-            UpdateVariant::Rex => self.send_update_rex(region, waveform, mode),
-            UpdateVariant::Zelda => self.send_update_zelda(region, waveform, mode),
-            UpdateVariant::Mtk => self.send_update_mtk(region, waveform, mode),
+            UpdateVariant::Legacy => self.send_update_legacy(region, waveform, mode, marker),
+            UpdateVariant::Rex => self.send_update_rex(region, waveform, mode, marker),
+            UpdateVariant::Zelda => self.send_update_zelda(region, waveform, mode, marker),
+            UpdateVariant::Mtk => self.send_update_mtk(region, waveform, mode, marker),
             UpdateVariant::Unsupported => false,
         }
     }
@@ -426,12 +439,18 @@ impl Framebuffer {
 
     /// Issue the legacy `MXCFB_SEND_UPDATE` (72-byte struct). Returns whether the
     /// ioctl succeeded.
-    fn send_update_legacy(&self, region: UpdateRect, waveform: u32, mode: u32) -> bool {
+    fn send_update_legacy(
+        &self,
+        region: UpdateRect,
+        waveform: u32,
+        mode: u32,
+        marker: u32,
+    ) -> bool {
         let update = UpdateRequest {
             update_region: region,
             waveform_mode: waveform,
             update_mode: mode,
-            update_marker: 1,
+            update_marker: marker,
             temperature: TEMP_USE_AMBIENT,
             flags: if waveform == WAVEFORM_MODE_DU {
                 EPDC_FLAG_FORCE_MONOCHROME
@@ -445,12 +464,12 @@ impl Framebuffer {
 
     /// Issue the modern `MXCFB_SEND_UPDATE_REX` (80-byte struct). Returns whether
     /// the ioctl succeeded.
-    fn send_update_rex(&self, region: UpdateRect, waveform: u32, mode: u32) -> bool {
+    fn send_update_rex(&self, region: UpdateRect, waveform: u32, mode: u32, marker: u32) -> bool {
         let update = UpdateRequestRex {
             update_region: region,
             waveform_mode: waveform,
             update_mode: mode,
-            update_marker: 1,
+            update_marker: marker,
             temperature: TEMP_USE_AMBIENT,
             flags: if waveform == WAVEFORM_MODE_DU {
                 EPDC_FLAG_FORCE_MONOCHROME
@@ -464,12 +483,12 @@ impl Framebuffer {
 
     /// Issue `MXCFB_SEND_UPDATE_MTK` (96-byte struct, MediaTek devices).
     /// Returns whether the ioctl succeeded.
-    fn send_update_mtk(&self, region: UpdateRect, waveform: u32, mode: u32) -> bool {
+    fn send_update_mtk(&self, region: UpdateRect, waveform: u32, mode: u32, marker: u32) -> bool {
         let update = UpdateRequestMtk {
             update_region: region,
             waveform_mode: waveform,
             update_mode: mode,
-            update_marker: 1,
+            update_marker: marker,
             temperature: TEMP_USE_AMBIENT,
             flags: if waveform == WAVEFORM_MODE_DU {
                 EPDC_FLAG_FORCE_MONOCHROME
@@ -483,12 +502,12 @@ impl Framebuffer {
 
     /// Issue `MXCFB_SEND_UPDATE_ZELDA` (88-byte struct, KOA2/KOA3 — Oasis 2/3).
     /// Returns whether the ioctl succeeded.
-    fn send_update_zelda(&self, region: UpdateRect, waveform: u32, mode: u32) -> bool {
+    fn send_update_zelda(&self, region: UpdateRect, waveform: u32, mode: u32, marker: u32) -> bool {
         let update = UpdateRequestZelda {
             update_region: region,
             waveform_mode: waveform,
             update_mode: mode,
-            update_marker: 1,
+            update_marker: marker,
             temperature: TEMP_USE_AMBIENT,
             flags: if waveform == WAVEFORM_MODE_DU {
                 EPDC_FLAG_FORCE_MONOCHROME
@@ -539,7 +558,12 @@ impl Framebuffer {
         )
     }
 
-    /// Block until the EPDC has applied the last update (marker 1).
+    /// Observe the accepted SEND identity without issuing an ioctl or a wait.
+    pub(crate) fn last_submitted_marker(&self) -> Option<u32> {
+        self.update_markers.last_submitted()
+    }
+
+    /// Ask the driver to wait for the last successfully submitted update.
     ///
     /// Used before suspending to RAM so the panel doesn't latch mid-refresh.
     /// Best-effort: a failing ioctl is ignored, since this is purely defensive.
@@ -547,14 +571,16 @@ impl Framebuffer {
         let _ = self.wait_for_update_complete_checked();
     }
 
-    /// A full-frame input barrier requires an acknowledged EPDC update.
+    /// Use the accepted update's identity, without waiting on a rejected frame.
+    /// Some vendor kernels return success even when their internal wait times
+    /// out; this acknowledges the ioctl, not independent panel completion.
     pub(crate) fn wait_for_update_complete_checked(&self) -> io::Result<()> {
-        let mut marker = UpdateMarkerData {
-            update_marker: 1,
-            collision_test: 0,
-        };
-        loop {
-            // SAFETY: The complete marker ABI buffer stays live for every retry.
+        self.update_markers.wait_for_last_submitted(|target| {
+            let mut marker = UpdateMarkerData {
+                update_marker: target,
+                collision_test: 0,
+            };
+            // SAFETY: The complete marker ABI buffer stays live for this call.
             let result = unsafe {
                 libc::ioctl(
                     self.file.as_raw_fd(),
@@ -563,13 +589,11 @@ impl Framebuffer {
                 )
             };
             if result >= 0 {
-                return Ok(());
+                Ok(())
+            } else {
+                Err(io::Error::last_os_error())
             }
-            let error = io::Error::last_os_error();
-            if error.kind() != io::ErrorKind::Interrupted {
-                return Err(error);
-            }
-        }
+        })
     }
 
     /// Partial refresh of a dirty rectangle
@@ -774,6 +798,89 @@ mod tests {
         })
         .unwrap_err();
         assert_eq!(error.kind(), io::ErrorKind::Unsupported);
+    }
+
+    #[test]
+    fn marker_identity_survives_abi_probes_and_changes_for_cached_submissions() {
+        for accepted in UpdateVariant::PROBE_ORDER {
+            let selected = Cell::new(None);
+            let markers = UpdateMarkers::default();
+            let mut probes = Vec::new();
+            markers
+                .submit(|marker| {
+                    submit_update(&selected, |variant| {
+                        probes.push((variant, marker));
+                        if variant == accepted {
+                            Ok(())
+                        } else {
+                            Err(io::Error::from_raw_os_error(libc::ENOTTY))
+                        }
+                    })
+                })
+                .unwrap();
+            assert!(probes.iter().all(|(_, marker)| *marker == 1));
+            assert_eq!(probes.last(), Some(&(accepted, 1)));
+            assert_eq!(selected.get(), Some(accepted));
+            probes.clear();
+            markers
+                .submit(|marker| {
+                    submit_update(&selected, |variant| {
+                        probes.push((variant, marker));
+                        Ok(())
+                    })
+                })
+                .unwrap();
+            assert_eq!(probes, [(accepted, 2)]);
+            markers
+                .wait_for_last_submitted(|target| {
+                    assert_eq!(target, 2);
+                    Ok(())
+                })
+                .unwrap();
+
+            assert!(
+                markers
+                    .submit(|_| {
+                        submit_update(&selected, |_| Err(io::Error::from_raw_os_error(libc::EIO)))
+                    })
+                    .is_err()
+            );
+            markers
+                .wait_for_last_submitted(|target| {
+                    assert_eq!(target, 2, "A rejected update cannot replace the fence");
+                    Ok(())
+                })
+                .unwrap();
+        }
+    }
+
+    #[test]
+    fn a_rejected_probe_cannot_create_a_completion_target() {
+        let selected = Cell::new(None);
+        let markers = UpdateMarkers::default();
+        let mut probes = Vec::new();
+        assert!(
+            markers
+                .submit(|marker| {
+                    submit_update(&selected, |variant| {
+                        probes.push((variant, marker));
+                        Err(io::Error::from_raw_os_error(libc::ENOTTY))
+                    })
+                })
+                .is_err()
+        );
+        assert_eq!(
+            probes,
+            UpdateVariant::PROBE_ORDER.map(|variant| (variant, 1))
+        );
+        assert!(
+            markers
+                .submit(|_| { submit_update(&selected, |_| panic!("unsupported ABI was cached")) })
+                .is_err()
+        );
+        markers
+            .wait_for_last_submitted(|_| panic!("no ioctl accepted either update"))
+            .unwrap();
     }
 
     #[test]

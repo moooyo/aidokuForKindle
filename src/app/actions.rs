@@ -43,6 +43,55 @@ impl App {
         if self.suspended && section != "lifecycle" && !(section == "app" && action == "exit") {
             return Ok(());
         }
+        let _timing_action = if crate::reader_timing::enabled()
+            && (matches!(section, "reader" | "lifecycle" | "navigation" | "panel")
+                || section == "settings" && self.route == "reader"
+                || section == "app"
+                    && self.route == "reader"
+                    && matches!(action, "left" | "right" | "back"))
+        {
+            let kind = match (section, action) {
+                ("reader", "next") => "next",
+                ("reader", "previous") => "previous",
+                ("reader", "seek") => "seek",
+                ("reader", "next-chapter") => "next_chapter",
+                ("reader", "previous-chapter") => "previous_chapter",
+                ("reader", "tap") => {
+                    let delta = value.split_once(',').and_then(|(x, y)| {
+                        let (x, y) = (x.parse::<f32>().ok()?, y.parse::<f32>().ok()?);
+                        self.reader.as_ref()?.tap_page_delta(x, y)
+                    });
+                    match delta {
+                        Some(delta) if delta > 0 => "next",
+                        Some(_) => "previous",
+                        None => "menu",
+                    }
+                }
+                ("reader", "zoom") => "zoom",
+                ("reader", "menu") | ("panel", _) => "menu",
+                ("lifecycle", "suspend") => "suspend",
+                ("lifecycle", "resume") => "resume",
+                ("navigation", _) => "open",
+                ("settings", _) => "settings",
+                ("app", "left" | "right") if self.modal.is_empty() => {
+                    let direction = self.effective_reader_preferences().reading_direction;
+                    if action == "left" && direction == "rtl"
+                        || action == "right" && direction != "rtl"
+                    {
+                        "next"
+                    } else {
+                        "previous"
+                    }
+                }
+                _ => "other",
+            };
+            let timing = crate::reader_timing::action(kind);
+            crate::reader_timing::cancel_native("superseded");
+            self.platform.cancel_reader_frame();
+            timing
+        } else {
+            None
+        };
         if section != "lifecycle" {
             self.platform.note_user_activity();
         }
@@ -734,6 +783,7 @@ impl App {
         self.poll_device_policies();
         self.prepare_demo_catalog_route()?;
         self.sync_view()?;
+        self.publish_reader_timing();
         if !transient_picker_action {
             self.checkpoint_navigation(false)?;
         }
@@ -1448,6 +1498,7 @@ impl App {
             _ => None,
         };
         if delta.is_some_and(|delta| self.defer_wide_navigation(delta)) {
+            crate::reader_timing::defer_action();
             return Ok(());
         }
         let Some(reader) = self.reader.as_mut() else {

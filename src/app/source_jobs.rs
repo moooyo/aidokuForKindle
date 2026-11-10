@@ -110,6 +110,7 @@ impl App {
         target: ReaderTarget,
         operation: impl FnOnce(Arc<SourceManager>) -> Result<JobResult> + Send + 'static,
     ) -> Result<()> {
+        crate::reader_timing::defer_action();
         let id = self.spawn_targeted_job(true, JobKind::Chapter, Some(target), operation)?;
         self.chapter_inflight = Some(id);
         Ok(())
@@ -178,7 +179,12 @@ impl App {
         let revision = self.source_configuration_revision.clone();
         let network = self.network_control.clone();
         let data_dir = self.data_dir.clone();
+        let timing = matches!(kind, JobKind::Reader)
+            .then(|| crate::reader_timing::token(self.reader_generation, self.lifecycle_generation))
+            .flatten();
         self.spawn_worker(foreground, true, kind, reader_target, source, move || {
+            let manager_timing =
+                crate::reader_timing::Stage::new(timing, "source_manager_finished");
             let manager = pool.manager(
                 &data_dir,
                 &configurations,
@@ -187,6 +193,7 @@ impl App {
                 &network,
                 expected_epoch,
             )?;
+            drop(manager_timing);
             ensure_current(&revision, expected_revision, &network, expected_epoch)?;
             let result = operation(manager);
             ensure_current(&revision, expected_revision, &network, expected_epoch)?;
@@ -241,11 +248,19 @@ impl App {
         let ui = self.ui.clone();
         let ready_pending = self.foreground_ready_pending.clone();
         let ready_posts = self.foreground_ready_posts.clone();
+        let timing = matches!(context.kind, JobKind::Reader)
+            .then(|| {
+                crate::reader_timing::token(context.reader_generation, context.lifecycle_generation)
+            })
+            .flatten();
+        crate::reader_timing::record("request_queued", timing);
         let spawned = std::thread::Builder::new()
             .name("aidoku-source".into())
             .spawn(move || {
+                crate::reader_timing::record("worker_started", timing);
                 let result = std::panic::catch_unwind(std::panic::AssertUnwindSafe(operation))
                     .unwrap_or_else(|_| Err(anyhow::anyhow!("A source worker failed")));
+                crate::reader_timing::record("worker_finished", timing);
                 if tx
                     .send(JobMessage {
                         id,
@@ -269,6 +284,7 @@ impl App {
                 }
             });
         if let Err(error) = spawned {
+            crate::reader_timing::failed(timing);
             self.active_jobs.remove(&id);
             self.pending.remove(&id);
             self.busy = !self.pending.is_empty();

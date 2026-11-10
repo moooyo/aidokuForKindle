@@ -8,12 +8,30 @@ plugin and does not require the WeRead application.
 
 ## Current development follow-up
 
-The working tree adds chapter-boundary and vertical-image prefetch, prioritized
-background decoding, prepared RGB publication, wide-page halves, editable
+Commit `ffb3417`, merged and pushed to main, adds chapter-boundary and
+vertical-image prefetch, prioritized background decoding, prepared RGB
+publication, wide-page halves, editable
 categories, metadata backup/restore, bounded logs, optional download preparation,
 scheduled library updates, configured tracking accounts, and runtime languages.
 See [implementation and current verification](docs/READING_FOLLOWUP.md) and
 [the KOReader hardware review](docs/KOREADER_HARDWARE_RESEARCH.md).
+
+The current [KOReader optimization evaluation](docs/KOREADER_OPTIMIZATION_EVALUATION.md)
+adds compatible grayscale conversion, row-buffer scaling, existing-PNG reuse,
+an 8-bpp grayscale retained scene and distinct framebuffer update markers.
+Remote tests and the ARM release build passed. The candidate also completed
+an isolated native Reader smoke on a physical Scribe, including page changes,
+menu controls, normal exit and restored native controls; see the
+[physical report](artifacts/koreader-eval-physical-20261110-r1/reports/PHYSICAL_SMOKE.md).
+Host stage measurements do not establish physical page-turn latency, ghosting
+or battery improvements. Experimental MTK flags remain disabled.
+
+Optional `--performance-trace <new-file.json>` records bounded Reader timing
+from Rust main entry through image acceptance and, on Kindle, the matching
+framebuffer write and accepted driver submission. It writes once after runtime
+shutdown. See the [end-to-end measurement procedure](docs/READER_E2E_MEASUREMENT.md)
+for controlled fixtures, baseline observation code, trace qualification and
+the distinction between software output and optical panel completion.
 
 ## Frozen Candidate18 delivery
 
@@ -125,8 +143,8 @@ testing without explicit authorization for the current task.
 From PowerShell in this checkout:
 
 ```powershell
-.\scripts\verify-remote.ps1 -CargoBuildJobs 2
-.\scripts\verify-remote.ps1 -Kindle -CargoBuildJobs 2
+.\scripts\verify-remote.ps1 -CargoBuildJobs 6
+.\scripts\verify-remote.ps1 -Kindle -CargoBuildJobs 6
 ```
 
 The final Candidate18 recipe uses `CARGO_BUILD_JOBS=2`,

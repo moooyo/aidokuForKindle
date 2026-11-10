@@ -18,7 +18,9 @@
 //! ```
 
 mod clipboard;
+mod frame_observer;
 mod framebuffer;
+mod gray_target;
 mod lifecycle;
 mod platform;
 mod portrait;
@@ -32,6 +34,7 @@ mod splash;
 mod touch;
 mod wakeup;
 
+pub use frame_observer::{NativeFrameObservation, NativeFramePhase, NativeFrameUnavailable};
 pub use framebuffer::{NativeFramebufferObservation, probe_native_framebuffer};
 pub use lifecycle::{LifecycleError, LifecycleHandle, LifecycleStatus};
 pub use portrait::NativePortraitOrientation;
@@ -92,6 +95,7 @@ pub struct KindleBackend<State = NoSchedule> {
     on_wake: OnWakeCallback,
     input_observer: InputObserver,
     control_callback: ControlCallback,
+    frame_observer: Rc<frame_observer::FrameObserverState>,
     black_and_white: Arc<AtomicBool>,
     rotation: Arc<AtomicU32>,
     refresh_handle: RefreshHandle,
@@ -101,6 +105,25 @@ pub struct KindleBackend<State = NoSchedule> {
 }
 
 impl<State> KindleBackend<State> {
+    /// Observe one armed Reader output without changing rendering or refreshes.
+    /// The callback runs on the UI thread after a write or accepted SEND. It
+    /// must not mutate UI models or render recursively. No callback borrow or
+    /// mutex remains held during invocation; observation performs no file I/O.
+    pub fn set_frame_observer(&self, observer: impl Fn(NativeFrameObservation) + 'static) {
+        self.frame_observer.set_observer(observer);
+    }
+
+    /// Arm the next output for an accepted Reader image. Returns an unconsumed
+    /// replaced token. The application must cancel on navigation or overlays.
+    pub fn arm_reader_frame(&self, token: u64) -> Option<u64> {
+        self.frame_observer.arm(token)
+    }
+
+    /// Retire an unconsumed token and invalidate any active observation attempt.
+    pub fn cancel_reader_frame(&self) -> Option<u64> {
+        self.frame_observer.cancel()
+    }
+
     /// Receive signal-pipe/control notifications even while the normal UI is parked.
     pub fn set_control_callback(&self, callback: impl FnMut() + 'static) {
         *self.control_callback.borrow_mut() = Some(Box::new(callback));
@@ -174,6 +197,7 @@ impl<State> KindleBackend<State> {
             on_wake: self.on_wake,
             input_observer: self.input_observer,
             control_callback: self.control_callback,
+            frame_observer: self.frame_observer,
             black_and_white: self.black_and_white,
             rotation: self.rotation,
             refresh_handle: self.refresh_handle,
@@ -261,6 +285,7 @@ pub fn install(font_data: &[u8]) -> Result<KindleBackend, slint::PlatformError> 
     let on_wake: OnWakeCallback = Rc::new(RefCell::new(None));
     let input_observer: InputObserver = Rc::new(RefCell::new(None));
     let control_callback: ControlCallback = Rc::new(RefCell::new(None));
+    let frame_observer = Rc::new(frame_observer::FrameObserverState::default());
     let black_and_white = Arc::new(AtomicBool::new(false));
     let rotation = Arc::new(AtomicU32::new(0));
     let platform = KindlePlatform::new(
@@ -270,6 +295,7 @@ pub fn install(font_data: &[u8]) -> Result<KindleBackend, slint::PlatformError> 
         rotation.clone(),
         input_observer.clone(),
         control_callback.clone(),
+        frame_observer.clone(),
     )
     .map_err(|e| slint::PlatformError::Other(format!("failed to init Kindle platform: {e}")))?;
     let window = platform.window.clone();
@@ -284,6 +310,7 @@ pub fn install(font_data: &[u8]) -> Result<KindleBackend, slint::PlatformError> 
         on_wake,
         input_observer,
         control_callback,
+        frame_observer,
         black_and_white,
         rotation,
         refresh_handle,

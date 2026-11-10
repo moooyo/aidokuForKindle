@@ -8,6 +8,7 @@ use std::sync::atomic::{AtomicBool, Ordering};
 
 use slint::Rgb8Pixel;
 
+use crate::gray_target::ScenePixels;
 use crate::refresh::PhysicalRect;
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
@@ -78,8 +79,8 @@ pub(crate) struct FrameWrite {
     pub(crate) mode_changed: bool,
 }
 
-/// Keeps only a scanline of transformed output. Slint retains the original RGB
-/// frame, so partial redraws and repeated full updates cannot double-invert it.
+/// Keeps only a scanline of transformed output. Slint retains canonical scene
+/// pixels, so partial redraws and repeated full updates cannot double-invert it.
 pub(crate) struct GrayRenderer {
     applied_mode: GrayMode,
     line: Vec<u8>,
@@ -100,6 +101,17 @@ impl GrayRenderer {
     pub(crate) fn write_frame(
         &mut self,
         rgb: &[Rgb8Pixel],
+        panel: (u32, u32),
+        dirty: Option<PhysicalRect>,
+        mode: GrayMode,
+        write_line: impl FnMut(usize, Range<usize>, &[u8]),
+    ) -> FrameWrite {
+        self.write_scene_frame(ScenePixels::Rgb(rgb), panel, dirty, mode, write_line)
+    }
+
+    pub(crate) fn write_scene_frame(
+        &mut self,
+        scene: ScenePixels<'_>,
         panel: (u32, u32),
         dirty: Option<PhysicalRect>,
         mode: GrayMode,
@@ -124,10 +136,22 @@ impl GrayRenderer {
             self.line.resize(width, 0);
             for row in y..y + region.height as usize {
                 let start = row * width + x;
-                let source = &rgb[start..start + span];
                 let output = &mut self.line[..span];
-                for (destination, source) in output.iter_mut().zip(source) {
-                    *destination = mode.pixel(*source);
+                match scene {
+                    ScenePixels::Gray(gray) => {
+                        for (destination, source) in
+                            output.iter_mut().zip(&gray[start..start + span])
+                        {
+                            *destination = mode.grayscale(source.value());
+                        }
+                    }
+                    ScenePixels::Rgb(rgb) => {
+                        for (destination, source) in
+                            output.iter_mut().zip(&rgb[start..start + span])
+                        {
+                            *destination = mode.pixel(*source);
+                        }
+                    }
                 }
                 write_line(row, x..x + span, output);
             }
@@ -160,6 +184,8 @@ fn clip(rect: PhysicalRect, panel: (u32, u32)) -> Option<PhysicalRect> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::gray_target::Gray8Pixel;
+    use slint::platform::software_renderer::TargetPixel;
 
     fn gray(value: u8) -> Rgb8Pixel {
         Rgb8Pixel {
@@ -338,6 +364,75 @@ mod tests {
         assert_eq!(panel.visible(), [255, 255, 0, 0]);
         panel.draw(&mut renderer, &rgb, None, light);
         assert_eq!(panel.visible(), [0, 0, 255, 255]);
+    }
+
+    #[test]
+    fn gray_scene_and_rgb_wrapper_match_across_modes_and_clipped_dirty_regions() {
+        let width = 17;
+        let height = 19;
+        let rgb: Vec<_> = (0..width * height)
+            .map(|index| gray((index % 256) as u8))
+            .collect();
+        let gray: Vec<_> = rgb
+            .iter()
+            .map(|pixel| Gray8Pixel::from_rgb(pixel.r, pixel.g, pixel.b))
+            .collect();
+        let original_gray = gray.clone();
+        let mut reference_panel = Panel::new(width, height);
+        let mut candidate_panel = Panel::new(width, height);
+        let mut reference_renderer = GrayRenderer::new(width, GrayMode::default());
+        let mut candidate_renderer = GrayRenderer::new(width, GrayMode::default());
+
+        let regions = [
+            full(width as u32, height as u32),
+            None,
+            Some(PhysicalRect {
+                x: -3,
+                y: -2,
+                width: 9,
+                height: 7,
+            }),
+            Some(PhysicalRect {
+                x: 15,
+                y: 17,
+                width: 8,
+                height: 9,
+            }),
+            Some(PhysicalRect {
+                x: 40,
+                y: 40,
+                width: 4,
+                height: 4,
+            }),
+        ];
+        for black_and_white in [false, true, false] {
+            for dark_mode in [false, true, false] {
+                let mode = GrayMode {
+                    dark_mode,
+                    black_and_white,
+                };
+                for dirty in regions {
+                    let reference =
+                        reference_panel.draw(&mut reference_renderer, &rgb, dirty, mode);
+                    let candidate = candidate_renderer.write_scene_frame(
+                        ScenePixels::Gray(&gray),
+                        (width as u32, height as u32),
+                        dirty,
+                        mode,
+                        |row, columns, pixels| {
+                            let start = row * candidate_panel.stride + columns.start;
+                            candidate_panel.bytes[start..start + pixels.len()]
+                                .copy_from_slice(pixels);
+                        },
+                    );
+                    assert_eq!(reference.region, candidate.region);
+                    assert_eq!(reference.mode_changed, candidate.mode_changed);
+                    assert_eq!(reference_panel.bytes, candidate_panel.bytes);
+                }
+            }
+        }
+        assert_eq!(gray, original_gray);
+        candidate_panel.assert_padding_untouched();
     }
 
     #[test]

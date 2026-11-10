@@ -2,10 +2,40 @@
 
 Updated: 2026-11-10.
 
-## Current development follow-up
+## Current KOReader optimization evaluation
 
-The current working tree adds reader prefetch/decoder/pixel-publication work and
-the requested application feature follow-up. Its implementation and separate
+The current working tree evaluates the remaining KOReader techniques on top of
+the delivered `ffb3417`. It adopts output-compatible native-channel grayscale
+conversion, row-buffer Lanczos3 scaling, processed-PNG reuse with fresh external
+source integrity, a neutral Gray8 retained scene on actual 8-bpp mappings, and
+distinct successful-update markers. It corrects the earlier omission of Scribe
+fast-mode initialization in KOReader. Forced colored-JPEG Luma conversion,
+another persistent current-frame codec, and unqualified MTK operations remain
+disabled for the measured reasons in
+[the full evaluation](KOREADER_OPTIMIZATION_EVALUATION.md).
+
+Final remote checks passed 663 default library tests, 676 Kindle-feature library
+tests, 101 backend tests and thirteen primary desktop UI cases. Each application
+library configuration retained two ignored opt-in benchmarks. The default
+all-target run also passed three binary and 95 example tests. Formatting and the
+ARM release build passed. Cargo build concurrency remained six.
+
+The resulting 49,181,368-byte ARM executable, SHA-256
+`e0e8338763e7a386482f0cfd41c282e1ae52fa0c563277437770ada8dc0f6e6a`,
+ran on a physical Scribe with firmware 5.19.5 build 479432. It accepted Reader
+progress 12 -> 13 -> 12, exercised the menu and exited normally. All eleven
+bounded smoke checks passed, original lighting and native controls were restored,
+and the owned lease was released. See the
+[physical smoke report](../artifacts/koreader-eval-physical-20261110-r1/reports/PHYSICAL_SMOKE.md).
+These are actual native functional observations, not panel-latency, ghosting,
+battery, physical-input or comparative on-device performance measurements.
+Host stage timings must not be presented as complete Kindle page-turn gains.
+
+## Delivered reading and application follow-up
+
+Commit `ffb3417`, already merged and pushed to main, adds reader
+prefetch/decoder/pixel-publication work and the requested application feature
+follow-up. Its implementation and separate
 verification status are tracked in [reading follow-up](READING_FOLLOWUP.md).
 Final remote checks passed 636 host library tests, 649 Kindle-feature library
 tests, thirteen primary UI cases, two actual Reader-panel pointer cases and
@@ -68,10 +98,11 @@ after successful Store writes; typed SQLite contention retry is limited to its
 implemented dequeue/checkpoint/ownership/wake paths, not every database write.
 No unmeasured speedup or constant-cost SQLite claim is made.
 
-All verification ran on test-env. Independent work uses isolated outputs and
-local mutual exclusion for genuinely shared writable resources, without a
-whole-host lease. Only the Native owner controls the dedicated VM/QMP; this work
-did not acquire or change the shared physical-Kindle lock. Local operations were
+For the frozen Candidate18 records, verification ran on test-env. Independent
+work used isolated outputs and local mutual exclusion for genuinely shared
+writable resources, without a whole-host lease. Only the Native owner controlled
+the dedicated VM/QMP; that historical work did not acquire or change the shared
+physical-Kindle lock. Local operations were
 editing, ordinary copying/extraction and image reading, with no Windows tests,
 builds, hash validation, runtime probes or image processing.
 
