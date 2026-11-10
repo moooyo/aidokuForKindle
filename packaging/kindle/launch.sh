@@ -70,7 +70,7 @@ APP_GENERATION=0; APP_PHASE=starting; SLEEP_EPOCH=0; SLEEP_GENERATION=0
 NATIVE_READ_PID=''; NATIVE_READ_BIRTH=''; NATIVE_READ_SEQUENCE=0
 NATIVE_RESUME_ATTEMPTS=0
 SLEEP_APP_PID=0; SLEEP_PENDING=0; WAKE_PENDING=0
-DISPLAY_OWNED=0; PAUSED_WM_RECORDS=''; STATUSBAR_STOPPED=0; EXIT_REDRAW=1; EVENT_FD_OPEN=0
+DISPLAY_OWNED=0; PAUSED_WM_RECORDS=''; STATUSBAR_STOPPED=0; STOCK_REPAINT_PENDING=0; EXIT_REDRAW=1; EVENT_FD_OPEN=0
 
 native_read_is_owned() {
     [ -n "$NATIVE_READ_PID" ] && [ -n "$NATIVE_READ_BIRTH" ] || return 1
@@ -201,12 +201,8 @@ native_read_hex() {
 
 take_display() {
     [ "$DISPLAY_OWNED" -eq 0 ] || return 0
-    DISPLAY_OWNED=1; PAUSED_WM_RECORDS=''; STATUSBAR_STOPPED=0
-    if command -v status >/dev/null 2>&1 && command -v stop >/dev/null 2>&1 && command -v start >/dev/null 2>&1; then
-        case "$(status statusbar 2>/dev/null || :)" in
-            *start/running*) if stop statusbar >/dev/null 2>&1; then STATUSBAR_STOPPED=1; fi ;;
-        esac
-    fi
+    DISPLAY_OWNED=1; PAUSED_WM_RECORDS=''; STATUSBAR_STOPPED=0; STOCK_REPAINT_PENDING=1
+    # Freeze the WM before stopping statusbar can damage the stock X11 scene.
     if command -v pidof >/dev/null 2>&1; then
         for wm_pid in $(pidof awesome 2>/dev/null || :); do
             valid_pid "$wm_pid" || continue
@@ -215,6 +211,11 @@ take_display() {
             [ -n "$wm_birth" ] || continue
             if kill -STOP "$wm_pid" 2>/dev/null; then PAUSED_WM_RECORDS="$PAUSED_WM_RECORDS $wm_pid:$wm_birth"; fi
         done
+    fi
+    if command -v status >/dev/null 2>&1 && command -v stop >/dev/null 2>&1 && command -v start >/dev/null 2>&1; then
+        case "$(status statusbar 2>/dev/null || :)" in
+            *start/running*) if stop statusbar >/dev/null 2>&1; then STATUSBAR_STOPPED=1; fi ;;
+        esac
     fi
 }
 
@@ -231,16 +232,27 @@ redraw_stock() {
     stop_redraw
 }
 release_display() {
-    [ "$DISPLAY_OWNED" -eq 1 ] || return 0
-    for wm_record in $PAUSED_WM_RECORDS; do
-        wm_pid=${wm_record%%:*}; wm_birth=${wm_record#*:}
-        if [ "$(process_birth "$wm_pid")" = "$wm_birth" ]; then kill -CONT "$wm_pid" 2>/dev/null || :; fi
-    done
-    PAUSED_WM_RECORDS=''
-    if [ "$STATUSBAR_STOPPED" -eq 1 ]; then start statusbar >/dev/null 2>&1 || :; fi
-    STATUSBAR_STOPPED=0; DISPLAY_OWNED=0
-    # Framebuffer writes bypass X damage. Do not repaint over a USB takeover.
-    if [ "$1" -eq 1 ] && command -v xrefresh >/dev/null 2>&1; then redraw_stock; fi
+    if [ "$DISPLAY_OWNED" -eq 1 ]; then
+        for wm_record in $PAUSED_WM_RECORDS; do
+            wm_pid=${wm_record%%:*}; wm_birth=${wm_record#*:}
+            if [ "$(process_birth "$wm_pid")" = "$wm_birth" ]; then kill -CONT "$wm_pid" 2>/dev/null || :; fi
+        done
+        PAUSED_WM_RECORDS=''
+        if [ "$STATUSBAR_STOPPED" -eq 1 ]; then start statusbar >/dev/null 2>&1 || :; fi
+        STATUSBAR_STOPPED=0; DISPLAY_OWNED=0
+    fi
+    # Direct framebuffer writes bypass X damage. Preserve one final repaint
+    # across quiet power handoffs, including an exit while the App is parked.
+    # USB takeover keeps this request unconsumed and never repaints its view.
+    if [ "$1" -eq 1 ] && [ "$STOCK_REPAINT_PENDING" -eq 1 ]; then
+        STOCK_REPAINT_PENDING=0
+        if command -v xrefresh >/dev/null 2>&1; then redraw_stock; fi
+    fi
+}
+handoff_power_display() {
+    # Stock powerd paints its own screensaver transition. Forcing the X11 scene
+    # here can expose the native bookshelf before sleep or retained restoration.
+    release_display 0
 }
 
 # Background functions inherit $$ from the supervisor. This builtin reads the
@@ -453,10 +465,14 @@ resume_application() {
     stop_ack; stop_wake; WAKE_PENDING=0
     if [ "$APP_PHASE" = fallback ]; then SLEEP_PENDING=0; start_application 1; return 0; fi
     if [ -n "$APP_PID" ] && owned_pid "$APP_PID" "$RUNNER_PID"; then
+        # The current wake passed the native active-state gate. Freeze stock
+        # drawing before the bounded portrait authorization transaction.
+        take_display
         # This permission carries no direction or cached output mode. The
         # suspended App resolves fresh GETVAR against this generation's anchor
         # and obtains holding from its separate trusted sensor snapshot.
         if ! native_read_command "$APP_DIR/aidoku" --kindle --device "$PROFILE" --authorize-native-portrait-resume "$SLEEP_EPOCH"; then
+            handoff_power_display
             printf '%s\n' 'aidoku: Waiting for a current native portrait resume permission.' >&2
             WAKE_PENDING=1
             NATIVE_RESUME_ATTEMPTS=$((NATIVE_RESUME_ATTEMPTS + 1))
@@ -464,7 +480,6 @@ resume_application() {
             return 0
         fi
         [ "$(native_read_hex)" = 5055424c49534845440a ] || fail 'The native portrait resume publication is invalid.'
-        take_display
         send_resume
         SLEEP_PENDING=0; set_phase resuming; stop_resume
         run_resume_watch "$SLEEP_EPOCH" "$APP_GENERATION" "$APP_PID" & RESUME_PID=$!
@@ -515,7 +530,7 @@ while IFS= read -r event <&3; do
                 NATIVE_RESUME_ATTEMPTS=0
                 WAKE_PENDING=1; stop_ack
                 if [ "$APP_PHASE" = pausing ]; then set_phase wake-live; fi
-                if matches_record sleep-ready "$SLEEP_APP_PID $NONCE $SLEEP_EPOCH"; then release_display 1; fi
+                if matches_record sleep-ready "$SLEEP_APP_PID $NONCE $SLEEP_EPOCH"; then handoff_power_display; fi
                 start_wake_probe
             fi ;;
         usbConfigured*) EXIT_REDRAW=0; exit 143 ;;
@@ -543,9 +558,9 @@ while IFS= read -r event <&3; do
             [ "$#" -eq 5 ] && valid_sleep_message "$2" "$3" "$4" "$5" || continue
             [ "$SLEEP_PENDING" -eq 1 ] && matches_record sleep-ready "$SLEEP_APP_PID $NONCE $SLEEP_EPOCH" || continue
             if ordinary_exit "$SLEEP_APP_PID"; then exit 0; fi
-            if [ "$WAKE_PENDING" -eq 1 ]; then release_display 1; continue; fi
+            if [ "$WAKE_PENDING" -eq 1 ]; then handoff_power_display; continue; fi
             [ "$APP_PHASE" = pausing ] || continue
-            if signal_child "$APP_PID" "$RUNNER_PID" STOP; then set_phase parked; release_display 1; fi
+            if signal_child "$APP_PID" "$RUNNER_PID" STOP; then set_phase parked; handoff_power_display; fi
             stop_ack ;;
         'ack-timeout '*)
             set -- $event
@@ -558,7 +573,7 @@ while IFS= read -r event <&3; do
             set -- $event
             [ "$#" -eq 5 ] && valid_sleep_message "$2" "$3" "$4" "$5" || continue
             [ "$SLEEP_PENDING" -eq 1 ] && [ "$WAKE_PENDING" -eq 1 ] && matches_record sleep-ready "$SLEEP_APP_PID $NONCE $SLEEP_EPOCH" || continue
-            release_display 1 ;;
+            handoff_power_display ;;
         'wake-active '*)
             set -- $event
             [ "$#" -eq 5 ] && valid_sleep_message "$2" "$3" "$4" "$5" || continue

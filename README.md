@@ -31,6 +31,9 @@ menu controls, normal exit and restored native controls; see the
 [physical report](artifacts/koreader-eval-physical-20261110-r1/reports/PHYSICAL_SMOKE.md).
 That report has its own executable identity and does not qualify every later
 instrumented build.
+The later [sleep/wake continuity fix](docs/SLEEP_WAKE_CONTINUITY.md) passed 37
+remote launcher checks and a bounded physical Scribe visual recheck: the user
+confirmed that neither sleep entry nor wake exposed the stock bookshelf.
 Host stage measurements do not establish physical page-turn latency, ghosting
 or battery improvements. Experimental MTK flags remain disabled.
 

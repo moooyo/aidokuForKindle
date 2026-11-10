@@ -128,7 +128,31 @@ if "--capture-native-portrait" in sys.argv or "--authorize-native-portrait-resum
         valid = False
     if not valid:
         raise SystemExit(1)
-    sys.stdout.write("PUBLISHED\n")
+
+    def portrait_trace(event):
+        wm = os.environ["AIDOKU_FAKE_WM"]
+        status = Path(f"/proc/{wm}/status").read_text()
+        wm_state = next(line.split(":", 1)[1].strip() for line in status.splitlines() if line.startswith("State:"))
+        entry = {
+            "event": event, "pid": pid, "time": time.monotonic(),
+            "action": "startup" if epoch is None else "resume", "epoch": epoch,
+            "wm_state": wm_state, "statusbar": (root / "statusbar").read_text(),
+            "power_state": (root / "power-state").read_text(),
+        }
+        descriptor = os.open(root / "portrait-probe.jsonl", os.O_WRONLY | os.O_CREAT | os.O_APPEND, 0o600)
+        try:
+            os.write(descriptor, (json.dumps(entry) + "\n").encode())
+        finally:
+            os.close(descriptor)
+
+    portrait_trace("started")
+    rejected = root / ("reject-portrait-startup" if epoch is None else "reject-portrait-resume")
+    if rejected.exists():
+        portrait_trace("rejected")
+        raise SystemExit(1)
+    malformed = epoch is not None and (root / "malformed-portrait-resume").exists()
+    portrait_trace("malformed" if malformed else "published")
+    sys.stdout.write("INVALID\n" if malformed else "PUBLISHED\n")
     sys.stdout.flush()
     raise SystemExit(0)
 
@@ -349,7 +373,11 @@ class LauncherTests(unittest.TestCase):
         })
         self.shell(self.bin / "status", 'if [ "$(cat "$AIDOKU_TEST_ROOT/statusbar")" = running ]; then printf "%s\\n" "statusbar start/running, process 123"; else printf "%s\\n" "statusbar stop/waiting"; fi')
         self.shell(self.bin / "start", 'printf "%s\\n" "start:$1" >>"$AIDOKU_TEST_ROOT/operations"; printf running >"$AIDOKU_TEST_ROOT/statusbar"')
-        self.shell(self.bin / "stop", 'printf "%s\\n" "stop:$1" >>"$AIDOKU_TEST_ROOT/operations"; printf stopped >"$AIDOKU_TEST_ROOT/statusbar"')
+        self.shell(self.bin / "stop", r'''
+wm_state=$(sed -n 's/^State:[[:space:]]*//p' "/proc/$AIDOKU_FAKE_WM/status")
+printf '%s\n' "wm-before-stop:$wm_state" "stop:$1" >>"$AIDOKU_TEST_ROOT/operations"
+printf stopped >"$AIDOKU_TEST_ROOT/statusbar"
+''')
         self.shell(self.bin / "pidof", '[ "$1" = awesome ] && printf "%s\\n" "$AIDOKU_FAKE_WM"')
         self.shell(self.bin / "xrefresh", 'printf "%s\\n" "xrefresh:$*" >>"$AIDOKU_TEST_ROOT/operations"; if [ "${AIDOKU_FAKE_REDRAW_HANG:-0}" = 1 ]; then exec sleep 120; fi')
         self.shell(self.bin / "lipc-get-prop", 'if [ "${AIDOKU_FAKE_LIPC_HANG:-0}" = 1 ] && [ ! -f "$AIDOKU_TEST_ROOT/release-power-query" ]; then exec sleep 120; fi; cat "$AIDOKU_TEST_ROOT/power-state"')
@@ -385,6 +413,10 @@ class LauncherTests(unittest.TestCase):
 
     def power_queries(self, event: str | None = None) -> list[dict]:
         return self.traces(event, file_name="power-probe.jsonl")
+
+    def portrait_queries(self, event: str | None = None, *, action: str | None = None) -> list[dict]:
+        values = self.traces(event, file_name="portrait-probe.jsonl")
+        return [value for value in values if action is None or value["action"] == action]
 
     def phase(self) -> str:
         try:
@@ -455,6 +487,27 @@ class LauncherTests(unittest.TestCase):
         self.assertEqual(self.complete(), 7)
         self.assert_recovered()
 
+    def test_startup_portrait_failure_does_not_repaint_untaken_display(self) -> None:
+        (self.root / "reject-portrait-startup").touch()
+        self.spawn_launcher()
+        self.assertEqual(self.complete(), 1)
+        self.assertFalse(self.lock.exists())
+        self.assertEqual(self.traces(), [])
+        self.assertFalse(self.process_state(self.wm.pid).startswith(("T", "t")))
+        self.assertEqual(self.statusbar.read_text(), "running")
+        self.assertEqual(self.operations.read_text(), "")
+
+    def test_window_manager_is_paused_before_statusbar_is_stopped(self) -> None:
+        pid = self.start_launcher()
+        self.park(pid)
+        self.wake()
+        observed = [line.partition(":")[2] for line in self.operations.read_text().splitlines() if line.startswith("wm-before-stop:")]
+        self.assertEqual(len(observed), 2)
+        self.assertTrue(all(state.startswith(("T", "t")) for state in observed), observed)
+        self.assertNotIn("xrefresh:", self.operations.read_text())
+        self.stop_launcher()
+        self.assert_recovered()
+
     def test_preexisting_stopped_resources_are_not_started(self) -> None:
         self.statusbar.write_text("stopped")
         os.kill(self.wm.pid, signal.SIGSTOP)
@@ -465,6 +518,26 @@ class LauncherTests(unittest.TestCase):
         self.assertTrue(self.process_state(self.wm.pid).startswith("T"))
         self.assertEqual(self.statusbar.read_text(), "stopped")
         self.assertNotIn("start:statusbar", self.operations.read_text())
+        self.assertFalse(self.lock.exists())
+
+    def test_preexisting_stopped_resources_are_preserved_across_sleep_and_wake(self) -> None:
+        self.statusbar.write_text("stopped")
+        os.kill(self.wm.pid, signal.SIGSTOP)
+        wait_for(lambda: self.process_state(self.wm.pid).startswith("T"))
+        pid = self.start_launcher()
+        self.event("goingToScreenSaver", state="screenSaver")
+        wait_for(lambda: self.phase() == "parked" and self.process_state(pid).startswith("T"))
+        self.assertTrue(self.process_state(self.wm.pid).startswith("T"))
+        self.assertEqual(self.statusbar.read_text(), "stopped")
+        self.wake()
+        self.assertTrue(self.process_state(self.wm.pid).startswith("T"))
+        self.assertEqual(self.statusbar.read_text(), "stopped")
+        self.assertEqual(self.operations.read_text(), "")
+        self.stop_launcher()
+        self.assertTrue(self.process_state(self.wm.pid).startswith("T"))
+        self.assertEqual(self.statusbar.read_text(), "stopped")
+        self.assertNotIn("start:statusbar", self.operations.read_text())
+        self.assertEqual(self.operations.read_text().count("xrefresh:"), 1)
         self.assertFalse(self.lock.exists())
 
     def test_signal_preserves_the_five_second_grace_period(self) -> None:
@@ -478,11 +551,78 @@ class LauncherTests(unittest.TestCase):
         pid = self.start_launcher()
         self.park(pid)
         self.assertEqual(len(self.traces("started")), 1)
+        self.assertNotIn("xrefresh:", self.operations.read_text())
         self.wake()
         resumed = self.traces("resumed")[-1]
         self.assertEqual(resumed["pid"], pid)
         self.assertEqual(resumed["state"], MEMORY_STATE)
         self.assertEqual(len(self.traces("started")), 1)
+        self.assertNotIn("xrefresh:", self.operations.read_text())
+        self.stop_launcher()
+        self.assert_recovered()
+        self.assertEqual(self.operations.read_text().count("xrefresh:"), 1)
+
+    def test_wake_freezes_stock_before_portrait_authorization(self) -> None:
+        pid = self.start_launcher()
+        self.park(pid)
+        self.wake()
+        observed = self.portrait_queries(action="resume")
+        self.assertEqual([row["event"] for row in observed], ["started", "published"])
+        self.assertTrue(all(row["wm_state"].startswith(("T", "t")) for row in observed), observed)
+        self.assertTrue(all(row["statusbar"] == "stopped" and row["power_state"] == "active" for row in observed), observed)
+        self.assertNotIn("xrefresh:", self.operations.read_text())
+        self.stop_launcher()
+        self.assert_recovered()
+
+    def test_failed_portrait_authorization_restores_stock_before_retry(self) -> None:
+        rejection = self.root / "reject-portrait-resume"
+        rejection.touch()
+        pid = self.start_launcher()
+        self.park(pid)
+        self.event("outOfScreenSaver", state="active")
+        wait_for(lambda: len(self.portrait_queries("rejected", action="resume")) == 3
+                 and self.statusbar.read_text() == "running"
+                 and not self.process_state(self.wm.pid).startswith(("T", "t")),
+                 seconds=14, description="stock restoration after bounded portrait authorization retries")
+        self.assertTrue(self.process_state(pid).startswith("T"))
+        self.assertEqual(self.traces("resumed"), [])
+        self.assertEqual(len(self.traces("started")), 1)
+        self.assertNotIn("xrefresh:", self.operations.read_text())
+        rejected = self.portrait_queries("rejected", action="resume")
+        self.assertTrue(all(row["wm_state"].startswith(("T", "t")) and row["statusbar"] == "stopped" for row in rejected), rejected)
+        rejection.unlink()
+        self.wake()
+        self.assertEqual(self.traces("resumed")[-1]["pid"], pid)
+        self.assertNotIn("xrefresh:", self.operations.read_text())
+        self.stop_launcher()
+        self.assert_recovered()
+
+    def test_malformed_portrait_publication_restores_and_repaints_stock(self) -> None:
+        (self.root / "malformed-portrait-resume").touch()
+        pid = self.start_launcher()
+        self.park(pid)
+        self.event("outOfScreenSaver", state="active")
+        self.assertEqual(self.complete(), 1)
+        self.assertEqual(len(self.portrait_queries("malformed", action="resume")), 1)
+        self.assertEqual(self.traces("resumed"), [])
+        self.assertEqual(len(self.traces("started")), 1)
+        self.assert_recovered()
+        self.assertEqual(self.operations.read_text().count("xrefresh:"), 1)
+
+    def test_duplicate_sleep_and_wake_events_do_not_repaint_or_repeat_takeover(self) -> None:
+        pid = self.start_launcher()
+        self.park(pid)
+        self.event("goingToScreenSaver")
+        self.wake()
+        self.event("outOfScreenSaver")
+        self.event("exitingScreenSaver")
+        time.sleep(0.2)
+        self.assertEqual((self.lock / "epoch").read_text().strip(), "1")
+        self.assertEqual(len(self.traces("resumed")), 1)
+        self.assertEqual(len(self.traces("started")), 1)
+        self.assertEqual(self.operations.read_text().splitlines().count("stop:statusbar"), 2)
+        self.assertEqual(self.operations.read_text().splitlines().count("start:statusbar"), 1)
+        self.assertNotIn("xrefresh:", self.operations.read_text())
         self.stop_launcher()
         self.assert_recovered()
 
@@ -498,6 +638,7 @@ class LauncherTests(unittest.TestCase):
         self.assertFalse(self.process_state(pid).startswith("T"))
         self.assertEqual(len(self.traces("started")), 1)
         self.assertEqual(self.traces("resumed")[-1]["pid"], pid)
+        self.assertNotIn("xrefresh:", self.operations.read_text())
         self.stop_launcher()
         self.assert_recovered()
 
@@ -508,6 +649,9 @@ class LauncherTests(unittest.TestCase):
         time.sleep(1.3)
         self.assertEqual(self.traces("resumed"), [])
         self.assertTrue(self.process_state(pid).startswith("T"))
+        self.assertEqual(self.portrait_queries(action="resume"), [])
+        self.assertFalse(self.process_state(self.wm.pid).startswith(("T", "t")))
+        self.assertEqual(self.statusbar.read_text(), "running")
         self.wake()
         self.assertEqual(self.traces("resumed")[-1]["pid"], pid)
         self.stop_launcher()
@@ -639,6 +783,7 @@ class LauncherTests(unittest.TestCase):
         wait_for(lambda: any(row.get("record", "").endswith(" 2") for row in self.traces("late-ack")), seconds=6)
         self.assertFalse(self.process_state(pid).startswith("T"))
         self.assertEqual(len(self.traces("started")), 1)
+        self.assertNotIn("xrefresh:", self.operations.read_text())
         self.stop_launcher()
 
     def test_ack_timeout_restarts_only_after_valid_wake(self) -> None:
@@ -648,6 +793,7 @@ class LauncherTests(unittest.TestCase):
         wait_for(lambda: self.phase() == "fallback", seconds=14, description="bounded ACK fallback")
         self.assertEqual(len(self.traces("started")), 1)
         self.assertTrue(self.traces("terminated")[-1]["fallback"])
+        self.assertEqual(self.operations.read_text().count("xrefresh:"), 1)
         self.event("outOfScreenSaver", state="active")
         self.event("exitingScreenSaver")
         wait_for(lambda: len(self.traces("started")) == 2 and self.phase() == "active", description="checkpoint restart")
@@ -716,10 +862,25 @@ class LauncherTests(unittest.TestCase):
     def test_term_while_parked_continues_child_before_exit(self) -> None:
         pid = self.start_launcher()
         self.park(pid)
+        self.assertNotIn("xrefresh:", self.operations.read_text())
         self.stop_launcher()
         self.assertTrue((self.root / "graceful-exit").exists())
         self.assertEqual(len(self.traces("started")), 1)
         self.assert_recovered()
+        self.assertEqual(self.operations.read_text().count("xrefresh:"), 1)
+
+    def test_ordinary_application_exit_while_parked_repaints_stock_once(self) -> None:
+        pid = self.start_launcher()
+        self.park(pid)
+        self.assertNotIn("xrefresh:", self.operations.read_text())
+        # A stopped fake App needs CONT before its ordinary termination handler.
+        os.kill(pid, signal.SIGCONT)
+        os.kill(pid, signal.SIGTERM)
+        self.assertEqual(self.complete(), 0)
+        self.assertFalse(self.traces("terminated")[-1]["fallback"])
+        self.assertEqual(len(self.traces("started")), 1)
+        self.assert_recovered()
+        self.assertEqual(self.operations.read_text().count("xrefresh:"), 1)
 
     def test_usb_while_active_never_restarts_or_repaints_usb(self) -> None:
         self.start_launcher()
@@ -731,16 +892,11 @@ class LauncherTests(unittest.TestCase):
 
     def test_usb_while_parked_continues_then_terminates_without_restart(self) -> None:
         pid = self.start_launcher()
-        sleep_redraw_count = self.operations.read_text().count("xrefresh:")
         self.park(pid)
-        # Parking and the restored statusbar precede submission of the sleep
-        # repaint. Establish that repaint before measuring subsequent USB work.
-        wait_for(lambda: self.operations.read_text().count("xrefresh:") > sleep_redraw_count,
-                 description="sleep repaint submission before USB takeover")
-        redraw_count = self.operations.read_text().count("xrefresh:")
+        self.assertNotIn("xrefresh:", self.operations.read_text())
         self.event("usbConfigured")
         self.assertEqual(self.complete(), 143)
-        self.assertEqual(self.operations.read_text().count("xrefresh:"), redraw_count)
+        self.assertNotIn("xrefresh:", self.operations.read_text())
         self.assertEqual(len(self.traces("started")), 1)
         self.assertTrue((self.root / "graceful-exit").exists())
         self.assert_recovered(redraw=False)
@@ -775,13 +931,15 @@ class LauncherTests(unittest.TestCase):
         self.assert_recovered(redraw=False)
 
     def test_hung_stock_redraw_is_bounded_and_can_be_cancelled(self) -> None:
-        self.environment["AIDOKU_FAKE_REDRAW_HANG"] = "1"
+        self.environment.update(AIDOKU_FAKE_REDRAW_HANG="1", AIDOKU_FAKE_NO_ACK="1")
         pid = self.start_launcher()
         self.event("goingToScreenSaver", state="screenSaver")
-        wait_for(lambda: self.phase() == "parked" and "xrefresh:" in self.operations.read_text())
+        wait_for(lambda: "xrefresh:" in self.operations.read_text(), seconds=14,
+                 description="bounded fallback stock repaint")
         self.stop_launcher()
         self.assertTrue((self.root / "graceful-exit").exists())
         self.assert_recovered()
+        self.assertEqual(self.operations.read_text().count("xrefresh:"), 1)
 
     def test_integer_only_sleep_supports_guest_cleanup(self) -> None:
         self.shell(self.bin / "sleep", 'case "$1" in *.*) printf "%s\\n" "Fractional sleep is unsupported." >&2; exit 2 ;; esac; exec /bin/sleep "$@"')
@@ -798,6 +956,7 @@ class LauncherTests(unittest.TestCase):
         self.assertEqual(self.complete(), 1)
         self.assertEqual(marker.read_text(), "another-fixture-owner")
         self.assertEqual(self.traces(), [])
+        self.assertEqual(self.operations.read_text(), "")
 
     def test_native_portrait_cli_rejects_malformed_or_missing_epochs(self) -> None:
         executable = str(self.home / "app/aidoku")

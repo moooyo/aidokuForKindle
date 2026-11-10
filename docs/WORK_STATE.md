@@ -17,8 +17,10 @@ a fault fixture whose one-shot failure could be consumed by chapter prefetch.
 The entry observation is corrected, real dispatch regressions were added, and
 the held-failure fixture independently establishes foreground failure and old
 display protection. Original rejected records and r1 binaries remain preserved.
-Formal r2 timing and physical qualification are being completed separately;
-this status does not claim their success or an optical-panel speedup.
+The formal host cohort has completed 90/90 with strict independent reanalysis;
+its cached-turn counterexample is preserved alongside cold-start improvements.
+Native timing is still being completed separately and no optical speedup is
+claimed. See [the dated results](READER_E2E_RESULTS.md).
 
 The first cache pilot also proved that replacing local originals during fixture
 restoration invalidated warm PNG keys through source metadata identity. Those
@@ -32,6 +34,14 @@ idle waits run outside the lease. The r1 preparation lease was released at
 23:07:26 Asia/Shanghai with no App run; the upload failure and exact restoration
 record remain retained. See [project instructions](../AGENTS.md) and
 [the measurement contract](READER_E2E_MEASUREMENT.md).
+
+The physical b03 manual sequence proved unscripted input and retained same-PID
+wake, but the user observed stock-bookshelf flashes. The launcher now uses quiet
+normal power handoffs and earlier validated wake takeover, retaining final exit
+redraw and USB behavior. Remote launcher checks passed 37/37. The user confirmed
+neither transition flashed the bookshelf in bounded b09; original controls were
+restored and the lease was released at 02:37:03 on 2026-11-11. See
+[the continuity change and limits](SLEEP_WAKE_CONTINUITY.md).
 
 ## Preserved KOReader algorithm evaluation
 
