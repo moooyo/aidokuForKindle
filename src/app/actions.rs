@@ -8,6 +8,17 @@ use crate::{
 
 const BUNDLED_LICENSE_TEXT: &str = include_str!("../../assets/licenses/GPL-3.0-or-later.txt");
 
+pub(super) enum UserNetworkIntent {
+    Pairing,
+    Reader(ReaderTarget),
+    ReaderLoading,
+}
+
+pub(super) struct PendingUserNetwork {
+    intent: UserNetworkIntent,
+    expires: Instant,
+}
+
 impl App {
     pub fn dispatch(&mut self, section: &str, action: &str, value: &str) -> Result<()> {
         match self.dispatch_action(section, action, value) {
@@ -26,11 +37,35 @@ impl App {
     }
 
     fn dispatch_action(&mut self, section: &str, action: &str, value: &str) -> Result<()> {
+        if self.metadata_restore_active() && !(section == "app" && action == "exit") {
+            return Ok(());
+        }
         if self.suspended && section != "lifecycle" && !(section == "app" && action == "exit") {
             return Ok(());
         }
         if section != "lifecycle" {
             self.platform.note_user_activity();
+        }
+        if section == "navigation"
+            || action == "back"
+                && matches!(
+                    section,
+                    "app" | "reader" | "detail" | "settings" | "sources"
+                )
+            || section == "reader"
+                && matches!(
+                    action,
+                    "next" | "previous" | "next-chapter" | "previous-chapter" | "seek"
+                )
+            || section == "panel" && action == "close"
+        {
+            self.cancel_pending_user_network();
+            if section == "navigation"
+                || action == "back"
+                || section == "panel" && action == "close"
+            {
+                self.pending_wide_navigation = 0;
+            }
         }
         let picker_open = self.modal_context.starts_with("search-scope:")
             || self.modal_context.starts_with("source-migration:");
@@ -205,18 +240,7 @@ impl App {
                 }
                 "cancel-selection" => self.selected_chapters.clear(),
                 "download-selected" => self.download_selected_chapters()?,
-                "track" => self.show_choices(
-                    &tr("tracking"),
-                    "tracking",
-                    vec![
-                        (
-                            "tracking-info".into(),
-                            tr("no_tracking"),
-                            tr("tracking_help"),
-                        ),
-                        ("pairing".into(), tr("configure"), String::new()),
-                    ],
-                )?,
+                "track" => self.open_tracking_choices()?,
                 "migrate" => {
                     self.open_migration()?;
                 }
@@ -521,7 +545,13 @@ impl App {
                         .context("Use key=value for a preference")?;
                     self.set_preference(key, value)?;
                 }
-                _ => {}
+                _ => {
+                    if !self.category_action(action, value)?
+                        && !self.data_management_action(action, value)?
+                    {
+                        self.tracking_action(action, value)?;
+                    }
+                }
             },
             "keyboard" => self.keyboard_action(action, value)?,
             "panel" => match action {
@@ -701,6 +731,7 @@ impl App {
                 reader.menu_open = false;
             }
         }
+        self.poll_device_policies();
         self.prepare_demo_catalog_route()?;
         self.sync_view()?;
         if !transient_picker_action {
@@ -1211,6 +1242,7 @@ impl App {
     }
 
     pub(crate) fn load_chapter(&mut self, id: &str, page: u32) -> Result<()> {
+        self.pending_wide_navigation = 0;
         self.load_reader_target(ReaderTarget::new(id, page, 0, 1.0))
     }
 
@@ -1228,13 +1260,21 @@ impl App {
             .store
             .chapter(&target.chapter_id)?
             .context("This chapter is missing")?;
+        let retrying = self
+            .reader_recovery
+            .as_ref()
+            .is_some_and(|recovery| recovery.retrying);
+        if !self.options.offline
+            && !self.options.demo
+            && chapter.source_id != "local"
+            && (!chapter.downloaded || retrying)
+            && self.platform.network_policy_blocked()
+        {
+            self.request_user_network(UserNetworkIntent::Reader(target.clone()));
+            return Ok(());
+        }
         if self.store.has_pages(&target.chapter_id)? {
-            return self.enter_reader_at(
-                &target.chapter_id,
-                target.page,
-                target.vertical_offset,
-                target.zoom,
-            );
+            return self.begin_reader_image(target);
         }
         if self.options.offline {
             bail!("{}", tr("chapter_unavailable"));
@@ -1266,6 +1306,10 @@ impl App {
         zoom: f32,
     ) -> Result<()> {
         let target = ReaderTarget::new(chapter_id, page, vertical_offset, zoom);
+        self.enter_reader_target(target)
+    }
+
+    pub(super) fn enter_reader_target(&mut self, target: ReaderTarget) -> Result<()> {
         if let Err(error) = self.begin_reader_image(&target) {
             self.recover_reader_failure(target, error);
         }
@@ -1305,6 +1349,7 @@ impl App {
         reader.page = target.page.clamp(1, reader.total.max(1));
         reader.vertical_offset = target.vertical_offset;
         reader.zoom = target.zoom.clamp(1.0, 4.0);
+        reader.wide_half = target.wide_half.min(1);
         reader.menu_open = false;
         self.reader = Some(reader);
         self.route = "reader".into();
@@ -1320,6 +1365,12 @@ impl App {
     }
 
     fn reader_action(&mut self, action: &str, value: &str) -> Result<()> {
+        if matches!(
+            action,
+            "seek" | "next-chapter" | "previous-chapter" | "back"
+        ) {
+            self.pending_wide_navigation = 0;
+        }
         if action == "toc-tab" {
             if !matches!(value, "chapters" | "bookmarks") {
                 bail!("Unknown reader table-of-contents tab");
@@ -1382,6 +1433,23 @@ impl App {
             }
             return Ok(());
         }
+        let delta = match action {
+            "next" => Some(1),
+            "previous" => Some(-1),
+            "tap" => {
+                let (x, y) = value
+                    .split_once(',')
+                    .context("Use normalized x,y coordinates")?;
+                let (x, y) = (x.parse::<f32>()?, y.parse::<f32>()?);
+                self.reader
+                    .as_ref()
+                    .and_then(|reader| reader.tap_page_delta(x, y))
+            }
+            _ => None,
+        };
+        if delta.is_some_and(|delta| self.defer_wide_navigation(delta)) {
+            return Ok(());
+        }
         let Some(reader) = self.reader.as_mut() else {
             return Ok(());
         };
@@ -1417,6 +1485,68 @@ impl App {
             _ => return Ok(()),
         };
         self.apply_reader_update(update)
+    }
+
+    /// Unknown source geometry cannot determine whether a turn means the next
+    /// half or the next source page. Keep a bounded signed intent until the
+    /// current frame establishes that geometry.
+    fn defer_wide_navigation(&mut self, delta: i8) -> bool {
+        if !self.prefs.split_wide {
+            return false;
+        }
+        let preferences = self.effective_reader_preferences();
+        if !preferences.split_wide
+            || preferences.spread
+            || preferences.reading_direction == "vertical"
+            || self.reader_recovery.is_some()
+            || (self.reader_inflight.is_none()
+                && !self.reader_dirty
+                && self.chapter_inflight.is_none())
+        {
+            return false;
+        }
+        if self.reader.as_ref().is_none_or(|reader| reader.menu_open) {
+            return false;
+        }
+        self.pending_wide_navigation = self
+            .pending_wide_navigation
+            .saturating_add(delta)
+            .clamp(-16, 16);
+        true
+    }
+
+    fn take_pending_wide_update(&mut self) -> Option<ReaderUpdate> {
+        if self.pending_wide_navigation == 0 {
+            return None;
+        }
+        let reader = self.reader.as_mut()?;
+        let direction = self.pending_wide_navigation.signum();
+        self.pending_wide_navigation -= direction;
+        let update = if direction > 0 {
+            reader.next_page()
+        } else {
+            reader.previous_page()
+        };
+        if update.action == crate::reader::ReaderAction::None {
+            self.pending_wide_navigation = 0;
+        }
+        Some(update)
+    }
+
+    pub(super) fn replay_pending_wide_navigation(&mut self) -> Result<bool> {
+        if !self.modal.is_empty() || self.reader.as_ref().is_some_and(|reader| reader.menu_open) {
+            self.pending_wide_navigation = 0;
+            return Ok(false);
+        }
+        let Some(update) = self.take_pending_wide_update() else {
+            return Ok(false);
+        };
+        let changed = matches!(
+            update.action,
+            crate::reader::ReaderAction::PageChanged | crate::reader::ReaderAction::ChapterChanged
+        );
+        self.apply_reader_update(update)?;
+        Ok(changed)
     }
 
     fn back(&mut self) -> Result<()> {
@@ -1834,26 +1964,7 @@ impl App {
                     String::new(),
                 )
             }
-            "categories" => {
-                let counts = self.store.library_counts()?;
-                (
-                    vec![
-                        item("", "reading", counts.reading.to_string(), false),
-                        item("", "planned", counts.planned.to_string(), false),
-                        item("", "completed", counts.completed.to_string(), false),
-                        item(
-                            "",
-                            "uncategorized",
-                            counts
-                                .total
-                                .saturating_sub(counts.reading + counts.planned + counts.completed)
-                                .to_string(),
-                            false,
-                        ),
-                    ],
-                    String::new(),
-                )
-            }
+            "categories" => (self.category_setting_items()?, String::new()),
             "source-lists" => (
                 self.interactions
                     .repositories
@@ -1891,8 +2002,11 @@ impl App {
                 )],
                 String::new(),
             ),
-            "tracking" => (Vec::new(), tr("not_configured")),
-            "backup" | "logs" | "auto-update" | "pen" => (Vec::new(), tr("unavailable")),
+            "backup" | "logs" => self
+                .data_management_setting_items(self.interactions.settings_section.as_str())
+                .unwrap_or_default(),
+            "tracking" | "auto-update" => (Vec::new(), String::new()),
+            "pen" => (Vec::new(), tr("unavailable")),
             _ => (Vec::new(), String::new()),
         };
         if let Some(ui) = self.ui.upgrade() {
@@ -2128,6 +2242,7 @@ impl App {
     }
 
     fn refresh_library(&mut self) -> Result<()> {
+        self.invalidate_automatic_updates();
         if self.options.demo {
             self.notify(tr("library_update_demo"));
             return Ok(());
@@ -2316,7 +2431,18 @@ impl App {
         Ok(())
     }
 
-    fn open_pairing(&mut self) -> Result<()> {
+    pub(super) fn open_pairing(&mut self) -> Result<()> {
+        self.platform.request_network_for_user();
+        if !self.platform.user_network_ready() {
+            self.request_user_network(UserNetworkIntent::Pairing);
+            return Ok(());
+        }
+        let result = self.start_pairing_server();
+        self.platform.finish_user_network_request();
+        result
+    }
+
+    fn start_pairing_server(&mut self) -> Result<()> {
         if self.pairing.as_ref().is_none_or(|server| !server.active()) {
             self.pairing = Some(PairingServer::start(self.data_dir.clone())?);
         }
@@ -2354,6 +2480,63 @@ impl App {
         self.modal = "pairing".into();
         self.modal_context = "pairing".into();
         Ok(())
+    }
+
+    fn request_user_network(&mut self, intent: UserNetworkIntent) {
+        self.platform.request_network_for_user();
+        self.pending_user_network = Some(PendingUserNetwork {
+            intent,
+            expires: Instant::now() + Duration::from_secs(45),
+        });
+        self.notify(tr("loading"));
+    }
+
+    pub(super) fn cancel_pending_user_network(&mut self) {
+        if self.pending_user_network.take().is_some() {
+            self.platform.finish_user_network_request();
+        }
+    }
+
+    pub(super) fn poll_pending_user_network(&mut self) -> Result<()> {
+        let Some(pending) = self.pending_user_network.as_ref() else {
+            return Ok(());
+        };
+        if self.suspended || self.shutting_down || self.metadata_restore_active() {
+            self.cancel_pending_user_network();
+            return Ok(());
+        }
+        if Instant::now() >= pending.expires {
+            self.cancel_pending_user_network();
+            bail!("{}", tr("offline_help"));
+        }
+        if matches!(pending.intent, UserNetworkIntent::ReaderLoading) {
+            if self.chapter_inflight.is_none()
+                && self.reader_inflight.is_none()
+                && !self.reader_dirty
+            {
+                self.cancel_pending_user_network();
+            }
+            return Ok(());
+        }
+        if !self.platform.user_network_ready() {
+            return Ok(());
+        }
+        let pending = self.pending_user_network.take().unwrap();
+        match pending.intent {
+            UserNetworkIntent::Pairing => {
+                let result = self.start_pairing_server();
+                self.platform.finish_user_network_request();
+                result
+            }
+            UserNetworkIntent::Reader(target) => {
+                self.pending_user_network = Some(PendingUserNetwork {
+                    intent: UserNetworkIntent::ReaderLoading,
+                    expires: pending.expires,
+                });
+                self.load_reader_target(target)
+            }
+            UserNetworkIntent::ReaderLoading => Ok(()),
+        }
     }
 
     pub(super) fn open_keyboard(&mut self, target: &str, value: &str) -> Result<()> {
@@ -2433,6 +2616,11 @@ impl App {
                 let text = self.keyboard.commit();
                 self.modal.clear();
                 let target = self.keyboard_target.clone();
+                if self.category_keyboard_submit(&target, &text)?
+                    || self.tracking_keyboard_submit(&target, &text)?
+                {
+                    return Ok(());
+                }
                 if self.save_server_keyboard(&target, &text)? {
                     return Ok(());
                 }
@@ -2838,6 +3026,7 @@ impl App {
     }
 
     fn open_reader_panel(&mut self, panel: &str) -> Result<()> {
+        self.pending_wide_navigation = 0;
         let effective = self.effective_reader_preferences();
         let context = match panel {
             "mode" => "reader-mode",
@@ -3273,6 +3462,12 @@ impl App {
     }
 
     pub(crate) fn choose_panel(&mut self, id: &str) -> Result<()> {
+        if id == "data-restore-confirm" {
+            return self.begin_metadata_restore();
+        }
+        if self.tracking_choice(id)? || self.data_management_action(id, "")? {
+            return Ok(());
+        }
         if self.modal == "choices" && self.modal_context.starts_with("source-migration:") {
             return self.choose_source_migration_book(id);
         }
@@ -3663,15 +3858,9 @@ impl App {
                 self.store.set_library(&book.id, false)?;
                 self.modal.clear();
             }
-            "category" => self.show_choices(
-                &tr("category"),
-                "category",
-                vec![
-                    ("category:reading".into(), tr("reading"), String::new()),
-                    ("category:planned".into(), tr("planned"), String::new()),
-                    ("category:completed".into(), tr("completed"), String::new()),
-                ],
-            )?,
+            "category" => {
+                self.show_choices(&tr("category"), "category", self.category_choice_rows()?)?
+            }
             "bookmarks" => {
                 let book = self.current_book()?;
                 let rows = self
@@ -3925,118 +4114,139 @@ impl App {
     fn set_preference(&mut self, key: &str, value: &str) -> Result<()> {
         let before = self.effective_reader_preferences();
         let mut interaction_changed = false;
-        match key {
-            "reading_direction" | "reading-direction"
-                if matches!(value, "rtl" | "ltr" | "vertical" | "vertical-pages") =>
-            {
-                if self.route == "reader" && self.interactions.remember_book_direction {
-                    if let Some(id) = self.current_book_id.as_ref() {
-                        self.interactions
-                            .book_directions
-                            .insert(id.clone(), value.into());
-                        interaction_changed = true;
+        if !extended_preferences::set(&mut self.prefs, key, value)? {
+            match key {
+                "reading_direction" | "reading-direction"
+                    if matches!(value, "rtl" | "ltr" | "vertical" | "vertical-pages") =>
+                {
+                    if self.route == "reader" && self.interactions.remember_book_direction {
+                        if let Some(id) = self.current_book_id.as_ref() {
+                            self.interactions
+                                .book_directions
+                                .insert(id.clone(), value.into());
+                            interaction_changed = true;
+                        } else {
+                            self.prefs.reading_direction = value.into();
+                        }
                     } else {
                         self.prefs.reading_direction = value.into();
                     }
-                } else {
-                    self.prefs.reading_direction = value.into();
                 }
-            }
-            "tap_layout" | "tap-layout"
-                if matches!(
-                    value,
-                    "thirds" | "l-shaped" | "swipe-only" | "reverse" | "reversed"
-                ) =>
-            {
-                let reverse = matches!(self.prefs.tap_layout.as_str(), "reverse" | "reversed");
-                if matches!(value, "reverse" | "reversed") {
-                    self.prefs.tap_layout = "thirds".into();
-                    self.prefs.reverse_taps = true;
-                } else {
-                    self.prefs.tap_layout = value.into();
-                    self.prefs.reverse_taps |= reverse;
+                "tap_layout" | "tap-layout"
+                    if matches!(
+                        value,
+                        "thirds" | "l-shaped" | "swipe-only" | "reverse" | "reversed"
+                    ) =>
+                {
+                    let reverse = matches!(self.prefs.tap_layout.as_str(), "reverse" | "reversed");
+                    if matches!(value, "reverse" | "reversed") {
+                        self.prefs.tap_layout = "thirds".into();
+                        self.prefs.reverse_taps = true;
+                    } else {
+                        self.prefs.tap_layout = value.into();
+                        self.prefs.reverse_taps |= reverse;
+                    }
                 }
-            }
-            "reverse_taps" | "reverse-taps" => {
-                let reverse: bool = value.parse()?;
-                if matches!(self.prefs.tap_layout.as_str(), "reverse" | "reversed") {
-                    self.prefs.tap_layout = "thirds".into();
+                "reverse_taps" | "reverse-taps" => {
+                    let reverse: bool = value.parse()?;
+                    if matches!(self.prefs.tap_layout.as_str(), "reverse" | "reversed") {
+                        self.prefs.tap_layout = "thirds".into();
+                    }
+                    self.prefs.reverse_taps = reverse;
                 }
-                self.prefs.reverse_taps = reverse;
-            }
-            "cover_alone" | "cover-alone" => self.prefs.cover_alone = value.parse()?,
-            "refresh_every" | "refresh-every" => {
-                let count = value.parse()?;
-                if ![0, 1, 3, 6, 10].contains(&count) {
-                    bail!("Unsupported refresh interval");
+                "cover_alone" | "cover-alone" => self.prefs.cover_alone = value.parse()?,
+                "refresh_every" | "refresh-every" => {
+                    let count = value.parse()?;
+                    if ![0, 1, 3, 6, 10].contains(&count) {
+                        bail!("Unsupported refresh interval");
+                    }
+                    self.prefs.refresh_every = count;
                 }
-                self.prefs.refresh_every = count;
-            }
-            "incognito" => self.prefs.incognito = value.parse()?,
-            "night_mode" | "night-mode" => self.prefs.night_mode = value.parse()?,
-            "crop_borders" | "crop-borders" => self.prefs.crop_borders = value.parse()?,
-            "dither" => self.prefs.dither = value.parse()?,
-            "contrast" => {
-                let contrast: i32 = value.parse()?;
-                if !(-2..=2).contains(&contrast) {
-                    bail!("Unsupported contrast step");
+                "incognito" => self.prefs.incognito = value.parse()?,
+                "night_mode" | "night-mode" => self.prefs.night_mode = value.parse()?,
+                "crop_borders" | "crop-borders" => self.prefs.crop_borders = value.parse()?,
+                "dither" => self.prefs.dither = value.parse()?,
+                "contrast" => {
+                    let contrast: i32 = value.parse()?;
+                    if !(-2..=2).contains(&contrast) {
+                        bail!("Unsupported contrast step");
+                    }
+                    self.prefs.contrast = contrast * 10;
                 }
-                self.prefs.contrast = contrast * 10;
-            }
-            "flash_on_close" | "flash-on-close" => self.prefs.flash_on_close = value.parse()?,
-            "landscape" => {
-                self.prefs.landscape = value.parse()?;
-                self.prefs.reverse_landscape = false;
-            }
-            "reverse_landscape" | "reverse-landscape" => {
-                self.prefs.reverse_landscape = value.parse()?;
-                if self.prefs.reverse_landscape {
-                    self.prefs.landscape = true;
+                "flash_on_close" | "flash-on-close" => self.prefs.flash_on_close = value.parse()?,
+                "landscape" => {
+                    self.prefs.landscape = value.parse()?;
+                    self.prefs.reverse_landscape = false;
                 }
-            }
-            "orientation" if matches!(value, "portrait" | "landscape" | "reverse-landscape") => {
-                self.prefs.landscape = value != "portrait";
-                self.prefs.reverse_landscape = value == "reverse-landscape";
-            }
-            "spread" => {
-                self.prefs.spread = value.parse()?;
-                self.interactions.page_layout_mode = if self.prefs.spread {
-                    "double"
-                } else {
-                    "single"
+                "reverse_landscape" | "reverse-landscape" => {
+                    self.prefs.reverse_landscape = value.parse()?;
+                    if self.prefs.reverse_landscape {
+                        self.prefs.landscape = true;
+                    }
                 }
-                .into();
-                interaction_changed = true;
+                "orientation"
+                    if matches!(value, "portrait" | "landscape" | "reverse-landscape") =>
+                {
+                    self.prefs.landscape = value != "portrait";
+                    self.prefs.reverse_landscape = value == "reverse-landscape";
+                }
+                "spread" => {
+                    self.prefs.spread = value.parse()?;
+                    self.interactions.page_layout_mode = if self.prefs.spread {
+                        "double"
+                    } else {
+                        "single"
+                    }
+                    .into();
+                    interaction_changed = true;
+                }
+                "page_layout_mode" | "page-layout-mode"
+                    if matches!(value, "single" | "double" | "automatic") =>
+                {
+                    self.interactions.page_layout_mode = value.into();
+                    self.prefs.spread = value != "single";
+                    interaction_changed = true;
+                }
+                "remember_book_direction" | "remember-book-direction" => {
+                    self.interactions.remember_book_direction = value.parse()?;
+                    interaction_changed = true;
+                }
+                "show_tap_zones" | "show-tap-zones" => {
+                    self.interactions.show_tap_zones = value.parse()?;
+                    interaction_changed = true;
+                }
+                "double_tap_zoom" | "double-tap-zoom" => {
+                    self.prefs.double_tap_zoom = value.parse()?
+                }
+                "keep_awake" | "keep-awake" => self.prefs.keep_awake = value.parse()?,
+                "brightness" if self.platform.profile().has_frontlight() => {
+                    self.prefs.brightness = value.parse::<u8>()?.min(24)
+                }
+                "warmth" if self.platform.profile().has_warmth() => {
+                    self.prefs.warmth = value.parse::<u8>()?.min(24)
+                }
+                _ => bail!("Unknown or unsupported preference {key}"),
             }
-            "page_layout_mode" | "page-layout-mode"
-                if matches!(value, "single" | "double" | "automatic") =>
-            {
-                self.interactions.page_layout_mode = value.into();
-                self.prefs.spread = value != "single";
-                interaction_changed = true;
-            }
-            "remember_book_direction" | "remember-book-direction" => {
-                self.interactions.remember_book_direction = value.parse()?;
-                interaction_changed = true;
-            }
-            "show_tap_zones" | "show-tap-zones" => {
-                self.interactions.show_tap_zones = value.parse()?;
-                interaction_changed = true;
-            }
-            "double_tap_zoom" | "double-tap-zoom" => self.prefs.double_tap_zoom = value.parse()?,
-            "keep_awake" | "keep-awake" => self.prefs.keep_awake = value.parse()?,
-            "brightness" if self.platform.profile().has_frontlight() => {
-                self.prefs.brightness = value.parse::<u8>()?.min(24)
-            }
-            "warmth" if self.platform.profile().has_warmth() => {
-                self.prefs.warmth = value.parse::<u8>()?.min(24)
-            }
-            _ => bail!("Unknown or unsupported preference {key}"),
         }
         if interaction_changed {
             self.interactions.save(&self.store)?;
         }
         let after = self.effective_reader_preferences();
+        if before.write_logs != after.write_logs {
+            self.data_management.logs.set_enabled(after.write_logs)?;
+        }
+        if before.tracking_auto_sync && !after.tracking_auto_sync {
+            self.cancel_tracking_work();
+        }
+        if before.auto_update_interval != after.auto_update_interval
+            || before.update_wifi_only != after.update_wifi_only
+            || before.update_charging_only != after.update_charging_only
+            || before.update_skip_completed != after.update_skip_completed
+            || before.charging_updates != after.charging_updates
+            || before.ahead_chapters != after.ahead_chapters
+        {
+            self.invalidate_automatic_updates();
+        }
         let input_changed = before.reading_direction != after.reading_direction
             || before.tap_layout != after.tap_layout
             || before.reverse_taps != after.reverse_taps
@@ -4044,8 +4254,10 @@ impl App {
             || before.landscape != after.landscape
             || before.reverse_landscape != after.reverse_landscape
             || before.spread != after.spread
-            || before.cover_alone != after.cover_alone;
+            || before.cover_alone != after.cover_alone
+            || before.split_wide != after.split_wide;
         if input_changed {
+            self.pending_wide_navigation = 0;
             if let Some(ui) = self.ui.upgrade() {
                 let state = ui.global::<State>();
                 state.set_reader_input_epoch(state.get_reader_input_epoch().wrapping_add(1));
@@ -4055,6 +4267,7 @@ impl App {
             || before.landscape != after.landscape
             || before.spread != after.spread
             || before.cover_alone != after.cover_alone
+            || before.split_wide != after.split_wide
             || before.crop_borders != after.crop_borders
             || before.dither != after.dither
             || before.contrast != after.contrast;
@@ -4172,5 +4385,184 @@ mod offline_listing_tests {
         );
         config.kind = "komga".into();
         assert_eq!(remembered_listings(&config, false)[2].0, "title");
+    }
+}
+
+#[cfg(test)]
+mod followup_command_tests {
+    use super::*;
+    use crate::{app::tests::DemoRouteFixture, platform::DeviceProfile};
+
+    fn finish_data_operation(app: &mut App) {
+        let deadline = Instant::now() + Duration::from_secs(10);
+        while app.data_management.inflight.is_some() && Instant::now() < deadline {
+            app.poll();
+            std::thread::sleep(Duration::from_millis(5));
+        }
+        assert!(
+            app.data_management.inflight.is_none(),
+            "The data operation did not finish"
+        );
+    }
+
+    #[test]
+    fn a_turn_before_wide_geometry_is_ready_enters_the_second_half() {
+        let mut fixture = DemoRouteFixture::new("settings", DeviceProfile::Pw6, false);
+        let app = &mut fixture.app;
+        app.route = "reader".into();
+        app.prefs.split_wide = true;
+        app.interactions.page_layout_mode = "single".into();
+        let chapter = Chapter {
+            id: "pending-wide".into(),
+            book_id: "book".into(),
+            ..Chapter::default()
+        };
+        let mut reader = ReaderState::new(
+            vec![chapter],
+            "pending-wide",
+            1,
+            &app.effective_reader_preferences(),
+        )
+        .unwrap();
+        reader.set_total(2);
+        app.reader = Some(reader);
+        app.reader_inflight = Some(42);
+        app.reader_action("tap", "0.1,0.5").unwrap();
+        assert_eq!(app.reader.as_ref().unwrap().page, 1);
+        assert_eq!(app.pending_wide_navigation, 1);
+        app.reader.as_mut().unwrap().set_wide_page(true, 0);
+        let update = app.take_pending_wide_update().unwrap();
+        assert_eq!(update.action, crate::reader::ReaderAction::PageChanged);
+        let reader = app.reader.as_ref().unwrap();
+        assert_eq!((reader.page, reader.wide_half), (1, 1));
+        assert_eq!(app.pending_wide_navigation, 0);
+    }
+
+    #[test]
+    fn pending_wide_turns_are_bounded_and_opposite_input_cancels() {
+        let mut fixture = DemoRouteFixture::new("settings", DeviceProfile::Pw6, false);
+        let app = &mut fixture.app;
+        app.prefs.split_wide = true;
+        app.interactions.page_layout_mode = "single".into();
+        let chapter = Chapter {
+            id: "pending-wide".into(),
+            ..Chapter::default()
+        };
+        app.reader = Some(
+            ReaderState::new(
+                vec![chapter],
+                "pending-wide",
+                1,
+                &app.effective_reader_preferences(),
+            )
+            .unwrap(),
+        );
+        app.reader_inflight = Some(42);
+        assert!(app.defer_wide_navigation(1));
+        assert!(app.defer_wide_navigation(-1));
+        assert_eq!(app.pending_wide_navigation, 0);
+        for _ in 0..100 {
+            assert!(app.defer_wide_navigation(1));
+        }
+        assert_eq!(app.pending_wide_navigation, 16);
+        app.reader.as_mut().unwrap().menu_open = true;
+        assert!(!app.defer_wide_navigation(1));
+        assert!(!app.replay_pending_wide_navigation().unwrap());
+        assert_eq!(app.pending_wide_navigation, 0);
+    }
+
+    #[test]
+    fn leaving_the_reader_cancels_a_deferred_network_destination() {
+        let mut fixture = DemoRouteFixture::new("settings", DeviceProfile::Pw6, false);
+        fixture.app.route = "reader".into();
+        fixture.app.pending_user_network = Some(PendingUserNetwork {
+            intent: UserNetworkIntent::Reader(ReaderTarget::new("deferred-chapter", 1, 0, 1.0)),
+            expires: Instant::now() + Duration::from_secs(45),
+        });
+        fixture.app.dispatch("reader", "back", "").unwrap();
+        assert!(fixture.app.pending_user_network.is_none());
+        assert_eq!(fixture.app.route, "detail");
+    }
+
+    #[test]
+    fn settings_keyboard_and_category_choices_edit_the_actual_book() {
+        let mut fixture = DemoRouteFixture::new("settings", DeviceProfile::Pw6, false);
+        let app = &mut fixture.app;
+        let book = Book {
+            id: "command-book".into(),
+            source_id: "local".into(),
+            remote_id: "command-book".into(),
+            title: "Command fixture".into(),
+            in_library: true,
+            ..Book::default()
+        };
+        app.store.upsert_book(&book).unwrap();
+        app.current_book_id = Some(book.id.clone());
+        app.dispatch("settings", "category-create", "").unwrap();
+        app.keyboard.set_text("Favorites");
+        app.dispatch("keyboard", "done", "").unwrap();
+        assert!(app.modal.is_empty());
+        app.dispatch("panel", "choose", "category").unwrap();
+        assert!(
+            app.choice_rows
+                .iter()
+                .any(|row| row.0 == "category:Favorites")
+        );
+        app.dispatch("panel", "choose", "category:Favorites")
+            .unwrap();
+        assert_eq!(
+            app.store.book(&book.id).unwrap().unwrap().category,
+            "Favorites"
+        );
+        app.dispatch("settings", "category-rename", "Favorites")
+            .unwrap();
+        app.keyboard.set_text("Archive");
+        app.dispatch("keyboard", "done", "").unwrap();
+        assert_eq!(
+            app.store.book(&book.id).unwrap().unwrap().category,
+            "Archive"
+        );
+    }
+
+    #[test]
+    fn extended_settings_commands_persist_and_reject_invalid_values() {
+        let mut fixture = DemoRouteFixture::new("settings", DeviceProfile::Scribe, false);
+        let app = &mut fixture.app;
+        for setting in [
+            "ahead-chapters=2",
+            "resize-downloads=true",
+            "split-wide=true",
+            "write-logs=true",
+        ] {
+            app.dispatch("settings", "set", setting).unwrap();
+        }
+        let preferences = app.store.preferences().unwrap();
+        assert_eq!(preferences.ahead_chapters, 2);
+        assert!(preferences.resize_downloads && preferences.split_wide && preferences.write_logs);
+        assert!(app.dispatch("settings", "set", "ahead-chapters=4").is_err());
+        assert_eq!(app.store.preferences().unwrap(), preferences);
+    }
+
+    #[test]
+    fn backup_and_log_buttons_complete_real_background_file_operations() {
+        let mut fixture = DemoRouteFixture::new("settings", DeviceProfile::Pw5, false);
+        let app = &mut fixture.app;
+        app.dispatch("settings", "set", "write-logs=true").unwrap();
+        app.dispatch("settings", "backup-create", "").unwrap();
+        finish_data_operation(app);
+        assert_eq!(app.data_management.backups.len(), 1);
+        let info = &app.data_management.backups[0];
+        assert!(
+            app.data_management
+                .manager
+                .prepare_restore(&info.id)
+                .is_ok()
+        );
+        app.dispatch("settings", "logs-export", "").unwrap();
+        finish_data_operation(app);
+        let export = app.data_management.last_export.as_ref().unwrap();
+        let records = fs::read_to_string(export).unwrap();
+        assert!(records.contains("backup.created"));
+        assert!(!records.contains("access_token"));
     }
 }

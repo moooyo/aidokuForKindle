@@ -1,3 +1,5 @@
+import { Strings } from "strings.slint";
+
 export struct BookItem {
     id: string,
     title: string,
@@ -191,6 +193,9 @@ export global State {
     in-out property <int> reading-count: 0;
     in-out property <int> planned-count: 0;
     in-out property <int> completed-count: 0;
+    in-out property <string> category-reading-name: Strings.reading;
+    in-out property <string> category-planned-name: Strings.planned;
+    in-out property <string> category-completed-name: Strings.completed;
     in-out property <int> updated-count: 0;
     in-out property <int> chapter-update-count: 0;
     in-out property <int> weekly-read-count: 0;
@@ -281,6 +286,32 @@ export global State {
     in-out property <bool> dither: true;
     in-out property <int> contrast: 0;
     in-out property <bool> keep-awake: true;
+    in-out property <int> ahead-chapters: 0;
+    in-out property <bool> resize-downloads: false;
+    in-out property <bool> grayscale-downloads: false;
+    in-out property <string> auto-update-interval: "off";
+    in-out property <bool> update-wifi-only: false;
+    in-out property <bool> update-charging-only: false;
+    in-out property <bool> update-skip-completed: false;
+    in-out property <bool> charging-updates: false;
+    in-out property <bool> reading-wifi-off: false;
+    in-out property <string> screensaver-mode: "system";
+    in-out property <bool> stylus-navigation: false;
+    in-out property <bool> palm-rejection: false;
+    in-out property <bool> split-wide: false;
+    in-out property <string> language: "zh-CN";
+    in-out property <bool> tracking-auto-sync: false;
+    in-out property <bool> tracking-queue-offline: true;
+    in-out property <bool> write-logs: false;
+    in-out property <bool> wifi-policy-supported: false;
+    in-out property <bool> charging-status-supported: false;
+    in-out property <bool> screensaver-supported: false;
+    in-out property <bool> pen-supported: false;
+    in-out property <bool> anilist-connected: false;
+    in-out property <bool> myanimelist-connected: false;
+    in-out property <string> anilist-status;
+    in-out property <string> myanimelist-status;
+    in-out property <bool> tracking-busy: false;
     in-out property <int> brightness: 12;
     in-out property <int> warmth: 8;
     in-out property <int> refresh-every: 6;

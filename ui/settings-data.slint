@@ -181,7 +181,8 @@ export component CategoriesSettings inherits Rectangle {
     for item[index] in State.settings-details: SettingsValueRow {
         x: 0px; y: index * root.row-height; width: root.width; height: root.row-height;
         text: item.title; value: item.value == "" ? "" : item.value + " " + Strings.books-unit;
-        action: index < 3 ? Strings.rename : ""; enabled: false;
+        action: Strings.rename; enabled: item.enabled && !State.busy;
+        clicked => { Commands.action("settings", "category-rename", item.id); }
     }
     if State.settings-details.length == 0: Caption {
         x: 0px; y: 0px; width: root.width; height: 32px;
@@ -189,12 +190,8 @@ export component CategoriesSettings inherits Rectangle {
     }
     create := SettingsCreationButton {
         x: 0px; y: root.list-height + 12px; width: self.preferred-width; height: State.large-screen ? 54px : 48px;
-        text: Strings.create-category; enabled: false;
-    }
-    Caption {
-        x: 0px; y: create.y + create.height + 12px; width: root.width; height: State.large-screen ? 42px : 38px;
-        text: Strings.category-editing-unavailable;
-        font-size: State.large-screen ? 15px : 13px; wrap: word-wrap; vertical-alignment: top;
+        text: Strings.create-category; enabled: !State.busy;
+        clicked => { Commands.action("settings", "category-create", ""); }
     }
 }
 
@@ -227,17 +224,24 @@ component SettingsPathRow inherits Rectangle {
 
 export component DownloadSettings inherits Rectangle {
     property <length> row-height: State.large-screen ? 60px : 54px;
-    property <length> details-top: State.large-screen ? 237px : 204px;
+    property <bool> prepared-downloads: State.resize-downloads || State.grayscale-downloads;
+    property <length> prepared-help-height: root.prepared-downloads ? 64px : 0px;
+    property <length> details-top: (State.large-screen ? 237px : 204px) + root.prepared-help-height;
     x: 0px;
     y: 0px;
     GroupLabel { x: 0px; y: State.large-screen ? 10px : 0px; width: max(0px, root.width - 110px); height: State.large-screen ? 21px : 18px; text: Strings.ahead-download; font-size: State.large-screen ? 14px : 12px; }
-    Caption { x: root.width - 110px; y: State.large-screen ? 10px : 0px; width: 110px; height: State.large-screen ? 21px : 18px; text: Strings.unavailable; horizontal-alignment: right; }
     for label[index] in [Strings.no-advance-download, Strings.ahead-one, Strings.ahead-two, Strings.ahead-three]: SettingsChoice {
         x: index * (root.width + 8px) / 4; y: State.large-screen ? 43px : 28px; width: (root.width - 24px) / 4;
-        text: label; enabled: false;
+        text: label; selected: State.ahead-chapters == index;
+        clicked => { if State.ahead-chapters != index { Commands.action("settings", "set", "ahead-chapters=" + index); } }
     }
-    ToggleRow { x: 0px; y: State.large-screen ? 105px : 84px; width: root.width; height: root.row-height; text: Strings.resize-for-screen; value: false; enabled: false; }
-    ToggleRow { x: 0px; y: (State.large-screen ? 105px : 84px) + root.row-height; width: root.width; height: root.row-height; text: Strings.save-grayscale; value: false; enabled: false; }
+    ToggleRow { x: 0px; y: State.large-screen ? 105px : 84px; width: root.width; height: root.row-height; text: Strings.resize-for-screen; value: State.resize-downloads; toggled => { Commands.action("settings", "set", "resize-downloads=" + (State.resize-downloads ? "false" : "true")); } }
+    ToggleRow { x: 0px; y: (State.large-screen ? 105px : 84px) + root.row-height; width: root.width; height: root.row-height; text: Strings.save-grayscale; value: State.grayscale-downloads; toggled => { Commands.action("settings", "set", "grayscale-downloads=" + (State.grayscale-downloads ? "false" : "true")); } }
+    if root.prepared-downloads: Caption {
+        x: 0px; y: State.large-screen ? 237px : 204px; width: root.width; height: root.prepared-help-height - 8px;
+        text: Strings.download-prepared-help;
+        font-size: State.large-screen ? 15px : 13px; wrap: word-wrap; vertical-alignment: top;
+    }
     details := VerticalLayout {
         x: 0px; y: root.details-top; width: root.width; height: self.preferred-height;
         spacing: 0px; alignment: start;

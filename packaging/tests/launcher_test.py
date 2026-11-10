@@ -4,6 +4,8 @@
 Run only on the designated remote Linux worker. All services, framebuffers,
 checkpoints, IPC files, and window-manager processes belong to each fixture.
 No Kindle sleep, input event, or stock system service is modified.
+The portrait commands below model the launcher's CLI publication contract;
+they do not exercise framebuffer calibration or physical sensor acceptance.
 """
 
 from __future__ import annotations
@@ -84,6 +86,51 @@ if "--native-power-state" in sys.argv:
         sys.stdout.write(output)
         sys.stdout.flush()
     raise SystemExit(result)
+
+if "--capture-native-portrait" in sys.argv or "--authorize-native-portrait-resume" in sys.argv:
+    # Native portrait readers are short-lived helpers, not App generations.
+    # The real native record schema and device I/O have separate Rust/VM tests.
+    import argparse
+
+    parser = argparse.ArgumentParser(add_help=False)
+    parser.add_argument("--kindle", action="store_true", required=True)
+    parser.add_argument("--device", choices=("pw5", "pw6", "scribe", "scribe2", "scribe3", "scribe3-nofrontlight"), required=True)
+    commands = parser.add_mutually_exclusive_group(required=True)
+    commands.add_argument("--capture-native-portrait", action="store_true")
+    commands.add_argument("--authorize-native-portrait-resume")
+    arguments = parser.parse_args(sys.argv[1:])
+    epoch = arguments.authorize_native_portrait_resume
+    if epoch is not None:
+        if not epoch.isascii() or not epoch.isdigit() or not 1 <= int(epoch) <= 2**64 - 1:
+            raise SystemExit(2)
+        epoch = str(int(epoch))
+    directory = Path(os.environ.get("AIDOKU_LAUNCHER_DIR", ""))
+    nonce = os.environ.get("AIDOKU_LAUNCH_NONCE", "")
+    generation = os.environ.get("AIDOKU_LAUNCH_GENERATION", "")
+    try:
+        valid = (
+            directory == root / "launcher.lock"
+            and len(nonce) == 32
+            and all(value in "0123456789abcdefABCDEF" for value in nonce)
+            and generation.isascii() and generation.isdigit() and int(generation) > 0
+            and (directory / "nonce").read_text() == nonce + "\n"
+            and (directory / "generation").read_text() == generation + ":" + nonce + "\n"
+        )
+        if epoch is not None:
+            application = (directory / "application-pid").read_text().strip()
+            valid = (
+                valid
+                and application.isascii() and application.isdigit() and int(application) > 1
+                and (directory / "epoch").read_text() == epoch + "\n"
+                and (directory / "sleep-request").read_text() == application + " " + nonce + " " + epoch + "\n"
+            )
+    except (OSError, ValueError):
+        valid = False
+    if not valid:
+        raise SystemExit(1)
+    sys.stdout.write("PUBLISHED\n")
+    sys.stdout.flush()
+    raise SystemExit(0)
 
 directory = Path(os.environ["AIDOKU_LAUNCHER_DIR"])
 nonce = os.environ["AIDOKU_LAUNCH_NONCE"]
@@ -306,6 +353,9 @@ class LauncherTests(unittest.TestCase):
         self.shell(self.bin / "pidof", '[ "$1" = awesome ] && printf "%s\\n" "$AIDOKU_FAKE_WM"')
         self.shell(self.bin / "xrefresh", 'printf "%s\\n" "xrefresh:$*" >>"$AIDOKU_TEST_ROOT/operations"; if [ "${AIDOKU_FAKE_REDRAW_HANG:-0}" = 1 ]; then exec sleep 120; fi')
         self.shell(self.bin / "lipc-get-prop", 'if [ "${AIDOKU_FAKE_LIPC_HANG:-0}" = 1 ] && [ ! -f "$AIDOKU_TEST_ROOT/release-power-query" ]; then exec sleep 120; fi; cat "$AIDOKU_TEST_ROOT/power-state"')
+        # GNU hosts may lack the BusyBox usleep command available on Kindle.
+        # This replacement belongs only to the fixture's private PATH.
+        self.shell(self.bin / "usleep", "exec perl -e '@ARGV == 1 && $ARGV[0] =~ /\\A[0-9]+\\z/ or exit 2; select undef, undef, undef, $ARGV[0] / 1000000;' \"$@\"")
         self.python(self.bin / "lipc-wait-event", FAKE_POWER_EVENTS)
         self.python(self.home / "app/aidoku", FAKE_APP)
 
@@ -681,7 +731,12 @@ class LauncherTests(unittest.TestCase):
 
     def test_usb_while_parked_continues_then_terminates_without_restart(self) -> None:
         pid = self.start_launcher()
+        sleep_redraw_count = self.operations.read_text().count("xrefresh:")
         self.park(pid)
+        # Parking and the restored statusbar precede submission of the sleep
+        # repaint. Establish that repaint before measuring subsequent USB work.
+        wait_for(lambda: self.operations.read_text().count("xrefresh:") > sleep_redraw_count,
+                 description="sleep repaint submission before USB takeover")
         redraw_count = self.operations.read_text().count("xrefresh:")
         self.event("usbConfigured")
         self.assertEqual(self.complete(), 143)
@@ -742,6 +797,45 @@ class LauncherTests(unittest.TestCase):
         self.spawn_launcher()
         self.assertEqual(self.complete(), 1)
         self.assertEqual(marker.read_text(), "another-fixture-owner")
+        self.assertEqual(self.traces(), [])
+
+    def test_native_portrait_cli_rejects_malformed_or_missing_epochs(self) -> None:
+        executable = str(self.home / "app/aidoku")
+        base = [executable, "--kindle", "--device", "pw6"]
+        for arguments in (
+            ["--authorize-native-portrait-resume"],
+            ["--authorize-native-portrait-resume", "0"],
+            ["--authorize-native-portrait-resume", "-1"],
+            ["--authorize-native-portrait-resume", "not-an-epoch"],
+            ["--authorize-native-portrait-resume", str(2**64)],
+            ["--capture-native-portrait", "--authorize-native-portrait-resume", "1"],
+        ):
+            with self.subTest(arguments=arguments):
+                result = subprocess.run(base + arguments, env=self.environment, capture_output=True, timeout=3)
+                self.assertEqual(result.returncode, 2)
+                self.assertEqual(result.stdout, b"")
+        self.assertEqual(self.traces(), [])
+
+    def test_native_portrait_cli_publishes_only_for_the_current_fixture_epoch(self) -> None:
+        nonce = "a" * 32
+        self.lock.mkdir()
+        for name, value in {
+            "nonce": nonce,
+            "generation": "1:" + nonce,
+            "application-pid": "12345",
+            "epoch": "2",
+            "sleep-request": "12345 " + nonce + " 2",
+        }.items():
+            (self.lock / name).write_text(value + "\n")
+        environment = dict(self.environment, AIDOKU_LAUNCHER_DIR=str(self.lock), AIDOKU_LAUNCH_NONCE=nonce, AIDOKU_LAUNCH_GENERATION="1")
+        base = [str(self.home / "app/aidoku"), "--kindle", "--device", "pw6"]
+        for arguments in (["--capture-native-portrait"], ["--authorize-native-portrait-resume", "2"]):
+            result = subprocess.run(base + arguments, env=environment, capture_output=True, timeout=3)
+            self.assertEqual(result.returncode, 0, result.stderr)
+            self.assertEqual(result.stdout, b"PUBLISHED\n")
+        stale = subprocess.run(base + ["--authorize-native-portrait-resume", "1"], env=environment, capture_output=True, timeout=3)
+        self.assertEqual(stale.returncode, 1)
+        self.assertEqual(stale.stdout, b"")
         self.assertEqual(self.traces(), [])
 
     def tearDown(self) -> None:

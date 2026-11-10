@@ -212,6 +212,10 @@ impl App {
         source: Option<String>,
         operation: impl FnOnce() -> Result<JobResult> + Send + 'static,
     ) -> Result<u64> {
+        anyhow::ensure!(
+            !self.metadata_restore_active() || matches!(kind, JobKind::MetadataRestore),
+            "Metadata restoration is waiting for existing work to finish"
+        );
         let id = self.next_job;
         self.next_job += 1;
         let context = JobContext {
@@ -232,6 +236,7 @@ impl App {
             self.pending.insert(id);
             self.busy = true;
         }
+        self.active_jobs.insert(id);
         let tx = self.job_tx.clone();
         let ui = self.ui.clone();
         let ready_pending = self.foreground_ready_pending.clone();
@@ -264,6 +269,7 @@ impl App {
                 }
             });
         if let Err(error) = spawned {
+            self.active_jobs.remove(&id);
             self.pending.remove(&id);
             self.busy = !self.pending.is_empty();
             return Err(error).context("Start the source worker");

@@ -107,7 +107,9 @@ upload endpoint has a smaller 32 MiB request limit.
 
 Image processing composites alpha onto white, crops white margins when enabled,
 fits the viewport, adjusts contrast, and quantizes to sixteen gray levels with
-optional dithering. The reader preloads two following image files. It does not
+optional dithering. The reader normally preloads two following image frames,
+including bounded next-chapter and vertical source-image transitions. Wide-page
+mode prepares only the closest half-page to preserve its cache budget. It does not
 decode an unrestricted full-size bitmap simply because a provider supplies one.
 The reusable cover-texture cache is capped at 64 entries; history loads cover
 textures only for its visible page. Cover identity includes the resolved file
@@ -289,9 +291,15 @@ expected authority/origin, JSON/upload sizes, upload counts, and session expiry.
 Source configuration and imports are sent back to the application as events.
 The service uses HTTP on the local network rather than a public relay.
 
-The interface includes tracking and migration entry points. Complete external
-tracking authorization/synchronization is not implemented. Migration opens a
-title search; it does not yet copy all state between two provider identities.
-Scheduled charging/network-gated library updates and physical device acceptance
-remain separate work. See the verification and review evidence before making
-deployment or compatibility claims.
+Configured AniList/MyAnimeList accounts use explicit book association, completed
+chapter updates, and a persistent retry queue. Companion accepts legitimate
+tokens or the user's own OAuth client configuration. No account authorization
+is inferred from installation. Migration matches chapters and preserves supported
+local state, while conservatively resetting source-specific page positions.
+It does not copy tracking bindings between provider identities.
+
+Scheduled updates and opt-in advance downloads run on background workers with
+network/charging prerequisites, cancellation fences and persistent retry state.
+Metadata backups, bounded local logs and optional prepared download images are
+described in [the follow-up record](READING_FOLLOWUP.md). Physical-device and
+real-account acceptance retain their separate verification requirements.

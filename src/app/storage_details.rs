@@ -33,7 +33,7 @@ pub(super) struct StorageBookUsage {
 
 #[derive(Debug, Clone, Default, PartialEq, Eq, serde::Serialize)]
 pub(super) struct StorageDetailsSnapshot {
-    /// Completed chapter paths, deduplicated across every book.
+    /// Completed chapter originals and owned accelerators, globally deduplicated.
     pub downloaded_bytes: u64,
     /// Unpinned managed artifacts that have no cover alias or download path.
     /// An unclassified historical alias makes both cache categories unknown.
@@ -70,6 +70,8 @@ pub(super) struct StorageScanStats {
     pub paths_observed: u64,
     pub path_resolutions: u64,
     pub file_checks: u64,
+    pub owner_path_queries: u64,
+    pub owner_paths_observed: u64,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -560,6 +562,11 @@ fn scan_downloaded_books(
     guard.check()?;
     let store = Store::open_read_only(database)?;
     guard.check()?;
+    let cache = database
+        .parent()
+        .filter(|root| root.join("cache/shared-v1/index.sqlite3").is_file())
+        .map(CacheManager::open)
+        .transpose()?;
     let mut index = FileIndex::default();
     let mut books = Vec::new();
     let mut cursor = None;
@@ -577,7 +584,15 @@ fn scan_downloaded_books(
         for book in headers {
             guard.check()?;
             book_sequence += 1;
-            let bytes = scan_book(&store, &book, book_sequence, &mut index, stats, guard)?;
+            let bytes = scan_book(
+                &store,
+                cache.as_ref(),
+                &book,
+                book_sequence,
+                &mut index,
+                stats,
+                guard,
+            )?;
             if bytes > 0 {
                 books.push(StorageBookUsage {
                     id: book.id,
@@ -605,6 +620,7 @@ fn scan_downloaded_books(
 
 fn scan_book(
     store: &Store,
+    cache: Option<&CacheManager>,
     book: &StorageBookHeader,
     book_sequence: u64,
     index: &mut FileIndex,
@@ -652,6 +668,48 @@ fn scan_book(
                 guard.yield_batch()?;
                 if final_manifest_batch {
                     break;
+                }
+            }
+            if let Some(cache) = cache {
+                let mut owner_cursor: Option<(String, String)> = None;
+                loop {
+                    guard.check()?;
+                    stats.owner_path_queries += 1;
+                    let associations = cache.download_owner_paths_page(
+                        Some(&chapter.id),
+                        owner_cursor
+                            .as_ref()
+                            .map(|cursor| (cursor.0.as_str(), cursor.1.as_str())),
+                        STORAGE_BATCH,
+                    )?;
+                    guard.check()?;
+                    let final_owner_batch = associations.len() < STORAGE_BATCH;
+                    if let Some(last) = associations.last() {
+                        owner_cursor = Some((last.key.clone(), last.chapter_id.clone()));
+                    }
+                    for association in associations {
+                        stats.owner_paths_observed += 1;
+                        // Manifest paths have already contributed for this
+                        // book. Shared prepared copies contribute once to each
+                        // associated book and once to the global unique total.
+                        if index
+                            .files
+                            .get(&association.path)
+                            .is_some_and(|record| record.last_book == book_sequence)
+                        {
+                            continue;
+                        }
+                        total = total.saturating_add(index.observe_download(
+                            association.path,
+                            book_sequence,
+                            stats,
+                            guard,
+                        )?);
+                    }
+                    if final_owner_batch {
+                        break;
+                    }
+                    guard.yield_batch()?;
                 }
             }
         }
@@ -745,6 +803,72 @@ mod tests {
             pinned,
             cover,
         }
+    }
+
+    #[test]
+    fn owned_prepared_copies_contribute_to_each_book_and_one_global_total() {
+        let directory = tempfile::tempdir().unwrap();
+        let database = directory.path().join("library.sqlite3");
+        let store = Store::open(&database).unwrap();
+        let original = directory.path().join("original.bin");
+        fs::write(&original, [3; 53]).unwrap();
+        add_local_chapter(
+            &store,
+            "first",
+            "First",
+            "one",
+            std::slice::from_ref(&original),
+        );
+        add_local_chapter(
+            &store,
+            "second",
+            "Second",
+            "two",
+            std::slice::from_ref(&original),
+        );
+        let cache = CacheManager::open(directory.path()).unwrap();
+        let copy = Page {
+            url: "aidoku-prepared:accounting-fixture".into(),
+            ..Page::default()
+        };
+        let write = cache.begin_raw(&copy, Some("download:one"), 256).unwrap();
+        image::GrayImage::from_pixel(2, 3, image::Luma([17]))
+            .save_with_format(write.temp_path(), image::ImageFormat::Png)
+            .unwrap();
+        let prepared = write.commit().unwrap();
+        cache.pin_raw(&copy, "download:two").unwrap();
+        let first = cache.download_owner_paths_page(None, None, 1).unwrap();
+        let next = cache
+            .download_owner_paths_page(None, Some((&first[0].key, &first[0].chapter_id)), 1)
+            .unwrap();
+        assert_eq!(first.len(), 1);
+        assert_eq!(next.len(), 1);
+        assert_ne!(first[0].chapter_id, next[0].chapter_id);
+        let bytes = fs::metadata(&prepared).unwrap().len();
+        let tracker = StorageDetailsTracker::default();
+        let guard = guard_for(&tracker, directory.path());
+        let result = scan_storage_details(
+            &database,
+            &cache,
+            StorageRequest {
+                generation: 0,
+                sequence: 0,
+            },
+            &guard,
+        )
+        .unwrap();
+        assert_eq!(result.snapshot.downloaded_bytes, 53 + bytes);
+        assert_eq!(result.snapshot.books.len(), 2);
+        assert!(
+            result
+                .snapshot
+                .books
+                .iter()
+                .all(|book| book.bytes == 53 + bytes)
+        );
+        assert_eq!(result.snapshot.image_cache_bytes, Some(0));
+        assert_eq!(result.snapshot.cover_bytes, Some(0));
+        assert_eq!(result.stats.owner_paths_observed, 2);
     }
 
     #[test]

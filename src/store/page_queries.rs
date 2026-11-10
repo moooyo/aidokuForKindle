@@ -4,8 +4,8 @@
 use anyhow::{Context, Result, ensure};
 use rusqlite::{Connection, OptionalExtension, Transaction, TransactionBehavior, params};
 
-use super::{Store, decode, encode, local_file_exists};
-use crate::domain::{CachedPageUpdate, Page, cached_page_identity};
+use super::{Store, decode, encode, local_file_exists, query_document, write_chapter};
+use crate::domain::{CachedPageUpdate, Chapter, Page, cached_page_identity};
 
 const MAX_WINDOW: usize = 64;
 
@@ -30,6 +30,59 @@ impl Store {
             [chapter_id],
             |row| row.get(0),
         )?)
+    }
+
+    /// Publish speculative metadata only while the same chapter still has no
+    /// manifest. The immediate transaction prevents a foreground request or a
+    /// downloader from winning between the emptiness check and the insertion.
+    pub fn publish_prefetched_manifest(&self, expected: &Chapter, pages: &[Page]) -> Result<bool> {
+        ensure!(
+            !pages.is_empty() && pages.len() <= 20_000,
+            "A prefetched manifest must contain between one and 20,000 pages"
+        );
+        ensure!(
+            pages
+                .iter()
+                .all(|page| !page.url.is_empty() || page.local_path.is_some()),
+            "A prefetched page has no image location"
+        );
+        let transaction =
+            Transaction::new_unchecked(&self.connection, TransactionBehavior::Immediate)?;
+        let chapter: Option<Chapter> = query_document(
+            &transaction,
+            "SELECT document FROM chapters WHERE id=?1",
+            [&expected.id],
+        )?;
+        let Some(mut chapter) = chapter else {
+            transaction.commit()?;
+            return Ok(false);
+        };
+        if chapter.id != expected.id
+            || chapter.book_id != expected.book_id
+            || chapter.source_id != expected.source_id
+            || chapter.remote_id != expected.remote_id
+            || transaction.query_row(
+                "SELECT EXISTS(SELECT 1 FROM pages WHERE chapter_id=?1)",
+                [&expected.id],
+                |row| row.get::<_, bool>(0),
+            )?
+        {
+            transaction.commit()?;
+            return Ok(false);
+        }
+        for (index, page) in pages.iter().enumerate() {
+            transaction.execute(
+                "INSERT INTO pages(chapter_id,position,document) VALUES(?1,?2,?3)",
+                params![chapter.id, index as u32, encode(page)?],
+            )?;
+        }
+        chapter.page_count = pages.len() as u32;
+        // Speculative cache entries have no durable download owner. Completion
+        // remains the downloader's responsibility, independent of read-ahead.
+        chapter.downloaded = false;
+        write_chapter(&transaction, &chapter)?;
+        transaction.commit()?;
+        Ok(true)
     }
 
     /// Fetch at most 64 contiguous positions using the manifest primary key.
@@ -516,7 +569,11 @@ mod tests {
     }
 
     fn real_store() -> Store {
-        let store = Store::open(":memory:").unwrap();
+        real_store_at(Path::new(":memory:"))
+    }
+
+    fn real_store_at(path: &Path) -> Store {
+        let store = Store::open(path).unwrap();
         store
             .upsert_book(&Book {
                 id: "book".into(),
@@ -723,5 +780,130 @@ mod tests {
         assert!(store.update_cached_paths("chapter", &[evicted]).unwrap());
         assert_eq!(changes(&store.connection), before);
         assert_eq!(mapped_count(&store.connection, "chapter").unwrap(), 1);
+    }
+
+    #[test]
+    fn prefetched_manifest_only_fills_a_missing_chapter_without_changing_reading_state() {
+        let store = real_store();
+        store
+            .connection
+            .execute("DELETE FROM pages WHERE chapter_id='chapter'", [])
+            .unwrap();
+        let expected = store.chapter("chapter").unwrap().unwrap();
+        let before_book = store.book("book").unwrap();
+        let before_progress = store.chapter_progress("chapter").unwrap();
+        let pages = [page(10, false), page(11, false)];
+        assert!(
+            store
+                .publish_prefetched_manifest(&expected, &pages)
+                .unwrap()
+        );
+        assert_eq!(store.pages("chapter").unwrap(), pages);
+        assert_eq!(stats(&store.connection, "chapter"), (2, 0));
+        let chapter = store.chapter("chapter").unwrap().unwrap();
+        assert_eq!(chapter.page_count, 2);
+        assert_eq!(chapter.read, expected.read);
+        assert!(!chapter.downloaded);
+        assert_eq!(store.book("book").unwrap(), before_book);
+        assert_eq!(store.chapter_progress("chapter").unwrap(), before_progress);
+        let before = changes(&store.connection);
+        assert!(
+            !store
+                .publish_prefetched_manifest(&expected, &[page(99, false)])
+                .unwrap()
+        );
+        assert_eq!(changes(&store.connection), before);
+        assert_eq!(store.pages("chapter").unwrap(), pages);
+    }
+
+    #[test]
+    fn prefetched_manifest_rejects_reused_identity_and_invalid_pages() {
+        let store = real_store();
+        store
+            .connection
+            .execute("DELETE FROM pages WHERE chapter_id='chapter'", [])
+            .unwrap();
+        let expected = store.chapter("chapter").unwrap().unwrap();
+        let before = changes(&store.connection);
+        for stale in [
+            Chapter {
+                id: "removed".into(),
+                ..expected.clone()
+            },
+            Chapter {
+                book_id: "moved".into(),
+                ..expected.clone()
+            },
+            Chapter {
+                source_id: "replaced".into(),
+                ..expected.clone()
+            },
+            Chapter {
+                remote_id: "reassigned".into(),
+                ..expected.clone()
+            },
+        ] {
+            assert!(
+                !store
+                    .publish_prefetched_manifest(&stale, &[page(10, false)])
+                    .unwrap()
+            );
+        }
+        assert!(store.publish_prefetched_manifest(&expected, &[]).is_err());
+        assert!(
+            store
+                .publish_prefetched_manifest(&expected, &[Page::default()])
+                .is_err()
+        );
+        assert_eq!(changes(&store.connection), before);
+        assert!(!store.has_pages("chapter").unwrap());
+        assert_eq!(store.chapter("chapter").unwrap().unwrap(), expected);
+    }
+
+    #[test]
+    fn racing_prefetch_publishers_keep_one_whole_manifest() {
+        let directory = tempfile::tempdir().unwrap();
+        let database = directory.path().join("read-ahead.sqlite3");
+        let store = real_store_at(&database);
+        store
+            .connection
+            .execute("DELETE FROM pages WHERE chapter_id='chapter'", [])
+            .unwrap();
+        let expected = store.chapter("chapter").unwrap().unwrap();
+        let ready = Arc::new(Barrier::new(3));
+        let mut threads = Vec::new();
+        for seed in [10, 20] {
+            let database = database.clone();
+            let expected = expected.clone();
+            let ready = ready.clone();
+            threads.push(std::thread::spawn(move || {
+                let writer = Store::open_existing_for_write(database).unwrap();
+                let pages = [page(seed, false), page(seed + 1, false)];
+                ready.wait();
+                (
+                    writer
+                        .publish_prefetched_manifest(&expected, &pages)
+                        .unwrap(),
+                    pages,
+                )
+            }));
+        }
+        ready.wait();
+        let results: Vec<_> = threads
+            .into_iter()
+            .map(|thread| thread.join().unwrap())
+            .collect();
+        assert_eq!(
+            results.iter().filter(|(published, _)| *published).count(),
+            1
+        );
+        let winner = results
+            .into_iter()
+            .find(|(published, _)| *published)
+            .unwrap()
+            .1;
+        assert_eq!(store.pages("chapter").unwrap(), winner);
+        assert_eq!(store.chapter("chapter").unwrap().unwrap().page_count, 2);
+        assert_eq!(stats(&store.connection, "chapter"), (2, 0));
     }
 }

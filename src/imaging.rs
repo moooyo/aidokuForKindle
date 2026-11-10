@@ -1,8 +1,14 @@
+mod decode_scheduler;
+
+pub use decode_scheduler::{
+    DecodeCancellation, check_decode_cancelled, is_decode_cancelled, with_background_decode,
+};
+pub(crate) use decode_scheduler::{decode_permit, without_decode_cancellation};
+
 use std::{
     fs,
     io::{BufReader, Cursor, Read},
     path::Path,
-    sync::Mutex,
 };
 
 use anyhow::{Context, Result, bail, ensure};
@@ -22,9 +28,9 @@ const MAX_STREAM_WIDTH: u32 = 16_384;
 const MAX_STREAM_HEIGHT: u32 = 1_000_000;
 const MAX_STREAM_PIXELS: u64 = 256 * 1024 * 1024;
 const PNG_SIGNATURE: &[u8; 8] = b"\x89PNG\r\n\x1a\n";
-// Cover, reader, import, and download workers share one temporary source-bitmap
-// budget. Compressed inputs remain separately bounded by MAX_PAGE_BYTES.
-static DECODE_LOCK: Mutex<()> = Mutex::new(());
+// Cover, reader, import, and download workers share the scheduler's single
+// temporary source-bitmap budget. Compressed inputs remain separately bounded
+// by MAX_PAGE_BYTES. Foreground work can pass queued background preparation.
 
 #[cfg(test)]
 #[derive(Debug, Clone, Copy, Default, PartialEq, Eq)]
@@ -90,9 +96,8 @@ pub fn render_page(path: impl AsRef<Path>, options: &ImageOptions) -> Result<Gra
 /// Decode with explicit allocation limits, composite transparency onto paper,
 /// resize, and produce exactly sixteen printable gray levels.
 pub fn decode_page(bytes: &[u8], options: &ImageOptions) -> Result<GrayImage> {
-    let _decode_guard = DECODE_LOCK
-        .lock()
-        .unwrap_or_else(std::sync::PoisonError::into_inner);
+    let _decode_guard = decode_permit()?;
+    check_decode_cancelled()?;
     check_options(options)?;
     if needs_png_streaming(bytes)? {
         return render_streaming_png(bytes, options, None);
@@ -130,9 +135,8 @@ pub fn render_vertical_window_with_geometry(
     options: &ImageOptions,
     offset: u32,
 ) -> Result<VerticalWindow> {
-    let _decode_guard = DECODE_LOCK
-        .lock()
-        .unwrap_or_else(std::sync::PoisonError::into_inner);
+    let _decode_guard = decode_permit()?;
+    check_decode_cancelled()?;
     check_options(options)?;
     if needs_png_streaming(bytes)? {
         return render_streaming_png_with_geometry(bytes, options, Some(offset));
@@ -168,9 +172,8 @@ pub fn render_vertical_window_with_geometry(
 /// Return the complete, cropped strip size after fitting it to the viewport
 /// width. The height is not limited to the currently visible window.
 pub fn vertical_dimensions(bytes: &[u8], options: &ImageOptions) -> Result<(u32, u32)> {
-    let _decode_guard = DECODE_LOCK
-        .lock()
-        .unwrap_or_else(std::sync::PoisonError::into_inner);
+    let _decode_guard = decode_permit()?;
+    check_decode_cancelled()?;
     check_options(options)?;
     let (width, height) = if needs_png_streaming(bytes)? {
         let crop = scan_png_bounds(bytes, options.crop_borders)?;
@@ -199,9 +202,8 @@ fn scaled_vertical_height(width: u32, height: u32, target_width: u32) -> Result<
 /// Long noninterlaced PNGs are checked row by row, including their final chunks,
 /// without holding the complete source bitmap in memory.
 pub fn validate_page(bytes: &[u8]) -> Result<()> {
-    let _decode_guard = DECODE_LOCK
-        .lock()
-        .unwrap_or_else(std::sync::PoisonError::into_inner);
+    let _decode_guard = decode_permit()?;
+    check_decode_cancelled()?;
     if needs_png_streaming(bytes)? {
         scan_png_bounds(bytes, false)?;
     } else {
@@ -213,9 +215,8 @@ pub fn validate_page(bytes: &[u8]) -> Result<()> {
 /// Validate a downloaded file without retaining its compressed representation
 /// in RAM. Long PNGs are checked row by row under the shared decoder budget.
 pub fn validate_file(path: impl AsRef<Path>) -> Result<()> {
-    let _decode_guard = DECODE_LOCK
-        .lock()
-        .unwrap_or_else(std::sync::PoisonError::into_inner);
+    let _decode_guard = decode_permit()?;
+    check_decode_cancelled()?;
     let path = path.as_ref();
     let size = fs::metadata(path)
         .context("Read cached image metadata")?
@@ -276,6 +277,9 @@ pub fn validate_file(path: impl AsRef<Path>) -> Result<()> {
             .next_row()
             .context("Validate streaming PNG file row")?
         {
+            if rows % 64 == 0 {
+                check_decode_cancelled()?;
+            }
             ensure!(
                 rows < height && row.data().len() == expected,
                 "The PNG page contains an invalid row"
@@ -469,6 +473,9 @@ fn scan_png_bounds(bytes: &[u8], crop: bool) -> Result<CropRect> {
     let (mut left, mut right, mut top, mut bottom) = (width, 0, height, 0);
     let mut row_number = 0;
     while let Some(row) = reader.next_row().context("Decode streaming PNG row")? {
+        if row_number % 64 == 0 {
+            check_decode_cancelled()?;
+        }
         ensure!(
             row_number < height && row.data().len() == expected_row_bytes,
             "The PNG page contains an invalid row"
@@ -523,6 +530,7 @@ fn render_streaming_png_with_geometry(
     options: &ImageOptions,
     vertical_offset: Option<u32>,
 ) -> Result<VerticalWindow> {
+    check_decode_cancelled()?;
     let crop = if options.crop_borders {
         scan_png_bounds(bytes, true)?
     } else {
@@ -534,6 +542,7 @@ fn render_streaming_png_with_geometry(
             height: reader.info().height,
         }
     };
+    check_decode_cancelled()?;
     let (output_width, output_height, source_top, source_height, scaled_height) =
         match vertical_offset {
             Some(offset) => {
@@ -580,6 +589,9 @@ fn render_streaming_png_with_geometry(
         .next_row()
         .context("Decode streaming PNG viewport row")?
     {
+        if row_number % 64 == 0 {
+            check_decode_cancelled()?;
+        }
         ensure!(
             row_number < height && row.data().len() == expected_row_bytes,
             "The PNG page contains an invalid row"
@@ -645,6 +657,7 @@ fn png_gray_sample(row: &[u8], x: usize, color: png::ColorType) -> u8 {
 }
 
 fn decode_grayscale(bytes: &[u8]) -> Result<GrayImage> {
+    check_decode_cancelled()?;
     ensure!(
         !bytes.is_empty() && bytes.len() as u64 <= MAX_PAGE_BYTES,
         "The compressed page is empty or exceeds 32 MiB"

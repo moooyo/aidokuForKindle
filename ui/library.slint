@@ -355,9 +355,9 @@ export component LibraryPage inherits Rectangle {
             x: Theme.margin; y: 0px; height: parent.height;
             alignment: start; spacing: State.large-screen ? 30px : 24px;
             LibraryCategory { label: Strings.all; count: State.library-count; selected: State.library-filter == 0; clicked => { Commands.action("library", "filter", "0"); } }
-            LibraryCategory { label: Strings.reading; count: State.reading-count; selected: State.library-filter == 1; clicked => { Commands.action("library", "filter", "1"); } }
-            LibraryCategory { label: Strings.planned; count: State.planned-count; selected: State.library-filter == 2; clicked => { Commands.action("library", "filter", "2"); } }
-            LibraryCategory { label: Strings.completed; count: State.completed-count; selected: State.library-filter == 3; clicked => { Commands.action("library", "filter", "3"); } }
+            LibraryCategory { label: State.category-reading-name; count: State.reading-count; selected: State.library-filter == 1; clicked => { Commands.action("library", "filter", "1"); } }
+            LibraryCategory { label: State.category-planned-name; count: State.planned-count; selected: State.library-filter == 2; clicked => { Commands.action("library", "filter", "2"); } }
+            LibraryCategory { label: State.category-completed-name; count: State.completed-count; selected: State.library-filter == 3; clicked => { Commands.action("library", "filter", "3"); } }
             if State.large-screen: LibraryCategory {
                 label: Strings.uncategorized;
                 count: max(0, State.library-count - State.reading-count - State.planned-count - State.completed-count);

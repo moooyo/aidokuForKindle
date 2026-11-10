@@ -142,6 +142,23 @@ pub struct Preferences {
     pub spread: bool,
     pub cover_alone: bool,
     pub night_mode: bool,
+    pub ahead_chapters: u8,
+    pub resize_downloads: bool,
+    pub grayscale_downloads: bool,
+    pub auto_update_interval: String,
+    pub update_wifi_only: bool,
+    pub update_charging_only: bool,
+    pub update_skip_completed: bool,
+    pub charging_updates: bool,
+    pub reading_wifi_off: bool,
+    pub screensaver_mode: String,
+    pub stylus_navigation: bool,
+    pub palm_rejection: bool,
+    pub split_wide: bool,
+    pub language: String,
+    pub tracking_auto_sync: bool,
+    pub tracking_queue_offline: bool,
+    pub write_logs: bool,
 }
 
 impl Default for Preferences {
@@ -166,6 +183,23 @@ impl Default for Preferences {
             spread: true,
             cover_alone: false,
             night_mode: false,
+            ahead_chapters: 0,
+            resize_downloads: false,
+            grayscale_downloads: false,
+            auto_update_interval: "off".into(),
+            update_wifi_only: false,
+            update_charging_only: false,
+            update_skip_completed: false,
+            charging_updates: false,
+            reading_wifi_off: false,
+            screensaver_mode: "system".into(),
+            stylus_navigation: false,
+            palm_rejection: false,
+            split_wide: false,
+            language: "zh-CN".into(),
+            tracking_auto_sync: false,
+            tracking_queue_offline: true,
+            write_logs: false,
         }
     }
 }
@@ -252,6 +286,8 @@ pub struct ReaderSession {
     pub page: u32,
     pub total: u32,
     pub vertical_offset: u32,
+    pub wide_half: u8,
+    pub wide_page: bool,
     pub scaled_height: u32,
     pub viewport_height: u32,
     pub zoom: f32,
@@ -268,6 +304,8 @@ impl Default for ReaderSession {
             page: 1,
             total: 0,
             vertical_offset: 0,
+            wide_half: 0,
+            wide_page: false,
             scaled_height: 0,
             viewport_height: 0,
             zoom: 1.0,
@@ -330,6 +368,50 @@ mod tests {
             tap_layout: "l-shaped".into(),
             reverse_taps: true,
             cover_alone: true,
+            ..Preferences::default()
+        };
+        let serialized = serde_json::to_string(&preferences).unwrap();
+        let restored: Preferences = serde_json::from_str(&serialized).unwrap();
+        assert_eq!(restored, preferences);
+    }
+
+    #[test]
+    fn legacy_preferences_keep_optional_features_disabled() {
+        let preferences: Preferences =
+            serde_json::from_str(r#"{"reading_direction":"ltr","brightness":7}"#).unwrap();
+        let expected = Preferences {
+            reading_direction: "ltr".into(),
+            brightness: 7,
+            ..Preferences::default()
+        };
+        assert_eq!(preferences, expected);
+        assert_eq!(preferences.ahead_chapters, 0);
+        assert_eq!(preferences.auto_update_interval, "off");
+        assert_eq!(preferences.screensaver_mode, "system");
+        assert_eq!(preferences.language, "zh-CN");
+        assert!(preferences.tracking_queue_offline);
+    }
+
+    #[test]
+    fn extended_preferences_survive_a_persistent_round_trip() {
+        let preferences = Preferences {
+            ahead_chapters: 3,
+            resize_downloads: true,
+            grayscale_downloads: true,
+            auto_update_interval: "weekly".into(),
+            update_wifi_only: true,
+            update_charging_only: true,
+            update_skip_completed: true,
+            charging_updates: true,
+            reading_wifi_off: true,
+            screensaver_mode: "progress".into(),
+            stylus_navigation: true,
+            palm_rejection: true,
+            split_wide: true,
+            language: "ja".into(),
+            tracking_auto_sync: true,
+            tracking_queue_offline: false,
+            write_logs: true,
             ..Preferences::default()
         };
         let serialized = serde_json::to_string(&preferences).unwrap();

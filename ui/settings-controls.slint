@@ -290,7 +290,7 @@ export component SettingsValueRow inherits Rectangle {
     BodyText { x: 0px; y: root.detail == "" ? 0px : 3px; width: max(0px, parent.width - value-label.width - (root.action == "" ? 16px : button.width + 28px)); height: root.detail == "" ? parent.height : 28px; text: root.text; font-size: State.large-screen ? 17px : 16px; }
     if root.detail != "": Caption { x: 0px; y: 31px; width: max(0px, parent.width - (root.action == "" ? 0px : button.width + 14px)); height: 22px; text: root.detail; font-size: State.large-screen ? 14px : 13px; }
     value-label := Text { x: parent.width - self.width - (root.action == "" ? 0px : button.width + 14px); y: 0px; width: min(parent.width * 0.62, self.preferred-width); height: parent.height; text: root.value; font-family: Theme.numbers; font-size: State.large-screen ? 15px : 14px; color: Theme.secondary; horizontal-alignment: right; vertical-alignment: center; overflow: elide; }
-    button := ActionButton { visible: root.action != ""; x: parent.width - self.width; y: (parent.height - self.height) / 2; width: self.preferred-width; height: 42px; text: root.action; enabled: root.enabled; clicked => { root.clicked(); } }
+    button := ActionButton { visible: root.action != ""; x: parent.width - self.width; y: (parent.height - self.height) / 2; width: self.preferred-width; height: 44px; text: root.action; enabled: root.enabled; clicked => { root.clicked(); } }
     Rectangle { x: 0px; y: parent.height - 1px; width: parent.width; height: 1px; background: Theme.line; }
 }
 

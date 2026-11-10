@@ -97,6 +97,14 @@ pub struct StorageArtifact {
     pub cover: Option<bool>,
 }
 
+/// A durable download association, copied without any filesystem work.
+#[derive(Debug, Clone)]
+pub struct DownloadOwnerPath {
+    pub key: String,
+    pub chapter_id: String,
+    pub path: PathBuf,
+}
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 enum Kind {
     Raw,
@@ -411,6 +419,72 @@ impl CacheManager {
                     path,
                     pinned,
                     cover,
+                })
+            })
+            .collect()
+    }
+
+    /// Read at most 128 owner/path associations after a `(key, chapter_id)`
+    /// cursor. Passing a chapter restricts the indexed query to that owner.
+    /// This includes prepared copies that deliberately are not manifest paths.
+    pub fn download_owner_paths_page(
+        &self,
+        chapter_id: Option<&str>,
+        after: Option<(&str, &str)>,
+        limit: usize,
+    ) -> Result<Vec<DownloadOwnerPath>> {
+        let limit = limit.min(STORAGE_PAGE_LIMIT);
+        if limit == 0 {
+            return Ok(Vec::new());
+        }
+        let after_key = after.map(|cursor| cursor.0).unwrap_or_default();
+        let after_owner = after
+            .map(|cursor| format!("download:{}", cursor.1))
+            .unwrap_or_default();
+        let rows = {
+            let state = self.lock()?;
+            let sql = if chapter_id.is_some() {
+                "SELECT p.raw_key,p.owner FROM pins AS p JOIN artifacts AS a
+                    ON a.id='raw:'||p.raw_key
+                 WHERE p.owner=?1 AND p.raw_key>?2
+                 ORDER BY p.raw_key,p.owner LIMIT ?3"
+            } else {
+                "SELECT p.raw_key,p.owner FROM pins AS p JOIN artifacts AS a
+                    ON a.id='raw:'||p.raw_key
+                 WHERE substr(p.owner,1,9)='download:'
+                   AND (p.raw_key,p.owner)>(?2,?1)
+                 ORDER BY p.raw_key,p.owner LIMIT ?3"
+            };
+            let mut statement = state.database.prepare(sql)?;
+            let owner = chapter_id
+                .map(|chapter| format!("download:{chapter}"))
+                .unwrap_or(after_owner);
+            statement
+                .query_map(params![owner, after_key, limit as u64], |row| {
+                    Ok((row.get::<_, String>(0)?, row.get::<_, String>(1)?))
+                })?
+                .collect::<rusqlite::Result<Vec<_>>>()?
+        };
+        rows.into_iter()
+            .map(|(key, owner)| {
+                let chapter_id = owner
+                    .strip_prefix("download:")
+                    .filter(|chapter| !chapter.is_empty())
+                    .context("The cache index contains an invalid download owner")?
+                    .to_owned();
+                ensure!(
+                    valid_key(&key),
+                    "The cache index contains an invalid download artifact key"
+                );
+                Ok(DownloadOwnerPath {
+                    path: self
+                        .inner
+                        .root
+                        .join("raw")
+                        .join(&key[..2])
+                        .join(format!("{key}.raw")),
+                    key,
+                    chapter_id,
                 })
             })
             .collect()

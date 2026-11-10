@@ -1,5 +1,7 @@
+mod processing;
+
 use std::{
-    cell::RefCell,
+    cell::{Cell, RefCell},
     collections::{BTreeSet, HashMap, HashSet, VecDeque},
     path::{Path, PathBuf},
     sync::{
@@ -17,13 +19,25 @@ use sha2::{Digest, Sha256};
 use crate::store::download_management::{BookDownloadCandidate, BookDownloadRemovalKind};
 use crate::{
     cache::{CacheLease, CacheManager},
-    domain::{Book, Chapter, DownloadJob, Page},
+    domain::{Book, Chapter, DownloadJob, Page, Preferences},
     sources::{FetchPriority, SourceManager, is_network_interrupted},
     store::Store,
 };
 
 const PROGRESS_INTERVAL: Duration = Duration::from_millis(100);
 const COMMAND_INTERVAL: Duration = Duration::from_millis(40);
+
+/// Return an existing, opt-in offline accelerator. This never prepares pixels
+/// or changes the original page's canonical cache identity or manifest path.
+pub fn prepared_page_path(
+    cache: &CacheManager,
+    page: &Page,
+    original: &Path,
+    preferences: &Preferences,
+    logical_viewport: (u32, u32),
+) -> Result<Option<PathBuf>> {
+    processing::lookup(cache, page, original, preferences, logical_viewport)
+}
 
 #[derive(Debug, Clone)]
 pub enum DownloadEvent {
@@ -85,6 +99,7 @@ enum DatabaseStartup {
 
 enum Command {
     Enqueue(Book, Vec<Chapter>),
+    ProcessingViewport(u32, u32),
     Pause(String),
     Resume(String),
     Cancel(String),
@@ -387,6 +402,55 @@ impl DownloadWorker {
         self.send(Command::Enqueue(book.clone(), batch))
     }
 
+    /// Reserve only untouched queue identities. Automatic look-ahead must not
+    /// revive a user's paused or cancelled command that has not reached SQLite.
+    pub fn enqueue_automatic(&self, book: &Book, chapters: &[Chapter]) -> Result<()> {
+        ensure!(
+            chapters.len() <= 3,
+            "Automatic download look-ahead exceeds three chapters"
+        );
+        for chapter in chapters {
+            ensure!(
+                book.id == chapter.book_id
+                    && book.source_id == chapter.source_id
+                    && !chapter.id.is_empty(),
+                "The automatic download chapter belongs to another book"
+            );
+        }
+        let mut controls = self
+            .controls
+            .lock()
+            .map_err(|_| anyhow!("The download command lock is unavailable"))?;
+        let mut batch = Vec::new();
+        for chapter in chapters {
+            if let std::collections::hash_map::Entry::Vacant(entry) =
+                controls.entry(chapter.id.clone())
+            {
+                entry.insert(Control::Running);
+                batch.push(chapter.clone());
+            }
+        }
+        if batch.is_empty() {
+            return Ok(());
+        }
+        // The channel is unbounded, so publication cannot block on the worker.
+        // Keep this lock until publication to preserve ordering with user input.
+        if let Err(error) = self.send(Command::Enqueue(book.clone(), batch.clone())) {
+            for chapter in batch {
+                controls.remove(&chapter.id);
+            }
+            return Err(error);
+        }
+        Ok(())
+    }
+
+    /// Supply logical panel dimensions. Preparation uses native-resolution
+    /// pixels and a rotation-independent bounding square, without upscaling.
+    pub fn set_processing_viewport(&self, width: u32, height: u32) -> Result<()> {
+        processing::validate_viewport((width, height))?;
+        self.send(Command::ProcessingViewport(width, height))
+    }
+
     pub fn pause(&self, chapter_id: &str) -> Result<()> {
         self.set_control(chapter_id, Control::Paused)?;
         self.send(Command::Pause(chapter_id.into()))
@@ -485,6 +549,15 @@ impl DownloadWorker {
     pub fn shutdown(&self) {
         self.stopping.store(true, Ordering::Release);
         let _ = self.commands.send(Command::Stop);
+    }
+
+    /// Observe controller termination without waiting for or joining a thread.
+    pub fn is_stopped(&self) -> bool {
+        *self
+            .stopped
+            .0
+            .lock()
+            .unwrap_or_else(std::sync::PoisonError::into_inner)
     }
 
     /// Use only after the UI event loop ends. No live HTTP request is joined on timeout.
@@ -587,6 +660,7 @@ struct Controller<'a> {
     book_removals: &'a RefCell<VecDeque<BookRemovalTask>>,
     removal_books: &'a RefCell<BTreeSet<String>>,
     removal_active: &'a RefCell<BTreeSet<String>>,
+    processing_viewport: &'a Cell<(u32, u32)>,
 }
 
 #[derive(Default)]
@@ -738,128 +812,133 @@ fn worker_loop(
     suspend: &Arc<SuspendState>,
     options: DownloadOptions,
 ) -> Result<()> {
-    let deferred = RefCell::new(VecDeque::new());
-    let book_removals = RefCell::new(VecDeque::new());
-    let removal_books = RefCell::new(BTreeSet::new());
-    let removal_active = RefCell::new(BTreeSet::new());
-    let controller = Controller {
-        data_dir,
-        store,
-        cache,
-        commands,
-        events,
-        controls,
-        stopping,
-        suspend,
-        deferred: &deferred,
-        book_removals: &book_removals,
-        removal_books: &removal_books,
-        removal_active: &removal_active,
-    };
-    let mut managers = ManagerSlot::default();
-    let _book_compensations = BookCompensationGuard {
-        controller: &controller,
-    };
-    loop {
-        drain_commands(&controller, None)?;
-        if stopping.load(Ordering::Acquire) {
-            break;
-        }
-        let next = if options.offline || !suspend.network_ready.load(Ordering::Acquire) {
-            None
-        } else {
-            let excluded = controller
-                .removal_books
-                .borrow()
-                .iter()
-                .cloned()
-                .collect::<Vec<_>>();
-            retry_download_database(&controller, "Select the next queued download", || {
-                // A pending suspend must reach its durable checkpoint before
-                // another dequeue attempt. Ordinary commands remain deferred.
-                if suspend.strict.load(Ordering::Acquire)
-                    || !suspend.network_ready.load(Ordering::Acquire)
-                {
-                    return Ok(None);
-                }
-                if excluded.is_empty() {
-                    store.next_download()
-                } else {
-                    store.next_download_excluding_books(&excluded)
-                }
-            })?
-            .flatten()
+    crate::imaging::with_background_decode(None, || {
+        let deferred = RefCell::new(VecDeque::new());
+        let book_removals = RefCell::new(VecDeque::new());
+        let removal_books = RefCell::new(BTreeSet::new());
+        let removal_active = RefCell::new(BTreeSet::new());
+        let processing_viewport = Cell::new(processing::DEFAULT_VIEWPORT);
+        let controller = Controller {
+            data_dir,
+            store,
+            cache,
+            commands,
+            events,
+            controls,
+            stopping,
+            suspend,
+            deferred: &deferred,
+            book_removals: &book_removals,
+            removal_books: &removal_books,
+            removal_active: &removal_active,
+            processing_viewport: &processing_viewport,
         };
-        if stopping.load(Ordering::Acquire) {
-            break;
-        }
-        // Reapply command order before using a selection made after contention.
-        if suspend.strict.load(Ordering::Acquire) || !controller.deferred.borrow().is_empty() {
-            continue;
-        }
-        if let Some(mut job) = next {
-            let _busy = ActivityGuard::new(suspend, false);
-            if let Err(error) = run_job(
-                &controller,
-                &mut managers,
-                &mut job,
-                options.page_concurrency,
-            ) {
-                suspend_barrier(&controller, Some(&job.chapter_id))
-                    .context("Checkpoint suspension after a download job failed")?;
-                if store
-                    .chapter(&job.chapter_id)
-                    .context("Inspect the chapter after a download job failed")?
-                    .is_none()
-                {
-                    job.state = "cancelled".into();
-                    job.error.clear();
-                    cache
-                        .unpin_owner(&owner(&job.chapter_id))
-                        .context("Release cache ownership for a removed download chapter")?;
-                    let _ = events.send(DownloadEvent::StateChanged(job));
-                    continue;
-                }
-                job.state = halt_state(&controller, &job.chapter_id)
-                    .unwrap_or(if is_network_interrupted(&error) {
-                        "queued"
-                    } else {
-                        "failed"
-                    })
-                    .into();
-                job.error = if job.state == "failed" {
-                    format!("{error:#}")
-                } else {
-                    String::new()
-                };
-                store
-                    .record_download_progress(&job, &[])
-                    .context("Persist the state after a download job failed")?;
-                if job.state == "cancelled" && !book_removal_pending(&controller, &job.book_id) {
-                    cache
-                        .unpin_owner(&owner(&job.chapter_id))
-                        .context("Release cache ownership after a download was cancelled")?;
-                }
-                let _ = events.send(if job.state == "failed" {
-                    DownloadEvent::Failed(job)
-                } else {
-                    DownloadEvent::StateChanged(job)
-                });
+        let mut managers = ManagerSlot::default();
+        let _book_compensations = BookCompensationGuard {
+            controller: &controller,
+        };
+        loop {
+            drain_commands(&controller, None)?;
+            if stopping.load(Ordering::Acquire) {
+                break;
             }
-        } else {
-            let interval = if controller.book_removals.borrow().is_empty() {
-                PROGRESS_INTERVAL
+            let next = if options.offline || !suspend.network_ready.load(Ordering::Acquire) {
+                None
             } else {
-                COMMAND_INTERVAL
+                let excluded = controller
+                    .removal_books
+                    .borrow()
+                    .iter()
+                    .cloned()
+                    .collect::<Vec<_>>();
+                retry_download_database(&controller, "Select the next queued download", || {
+                    // A pending suspend must reach its durable checkpoint before
+                    // another dequeue attempt. Ordinary commands remain deferred.
+                    if suspend.strict.load(Ordering::Acquire)
+                        || !suspend.network_ready.load(Ordering::Acquire)
+                    {
+                        return Ok(None);
+                    }
+                    if excluded.is_empty() {
+                        store.next_download()
+                    } else {
+                        store.next_download_excluding_books(&excluded)
+                    }
+                })?
+                .flatten()
             };
-            match commands.recv_timeout(interval) {
-                Ok(command) => report_command(&controller, command, None),
-                Err(mpsc::RecvTimeoutError::Timeout) => {}
-                Err(mpsc::RecvTimeoutError::Disconnected) => break,
+            if stopping.load(Ordering::Acquire) {
+                break;
+            }
+            // Reapply command order before using a selection made after contention.
+            if suspend.strict.load(Ordering::Acquire) || !controller.deferred.borrow().is_empty() {
+                continue;
+            }
+            if let Some(mut job) = next {
+                let _busy = ActivityGuard::new(suspend, false);
+                if let Err(error) = run_job(
+                    &controller,
+                    &mut managers,
+                    &mut job,
+                    options.page_concurrency,
+                ) {
+                    suspend_barrier(&controller, Some(&job.chapter_id))
+                        .context("Checkpoint suspension after a download job failed")?;
+                    if store
+                        .chapter(&job.chapter_id)
+                        .context("Inspect the chapter after a download job failed")?
+                        .is_none()
+                    {
+                        job.state = "cancelled".into();
+                        job.error.clear();
+                        cache
+                            .unpin_owner(&owner(&job.chapter_id))
+                            .context("Release cache ownership for a removed download chapter")?;
+                        let _ = events.send(DownloadEvent::StateChanged(job));
+                        continue;
+                    }
+                    job.state = halt_state(&controller, &job.chapter_id)
+                        .unwrap_or(if is_network_interrupted(&error) {
+                            "queued"
+                        } else {
+                            "failed"
+                        })
+                        .into();
+                    job.error = if job.state == "failed" {
+                        format!("{error:#}")
+                    } else {
+                        String::new()
+                    };
+                    store
+                        .record_download_progress(&job, &[])
+                        .context("Persist the state after a download job failed")?;
+                    if job.state == "cancelled" && !book_removal_pending(&controller, &job.book_id)
+                    {
+                        cache
+                            .unpin_owner(&owner(&job.chapter_id))
+                            .context("Release cache ownership after a download was cancelled")?;
+                    }
+                    let _ = events.send(if job.state == "failed" {
+                        DownloadEvent::Failed(job)
+                    } else {
+                        DownloadEvent::StateChanged(job)
+                    });
+                }
+            } else {
+                let interval = if controller.book_removals.borrow().is_empty() {
+                    PROGRESS_INTERVAL
+                } else {
+                    COMMAND_INTERVAL
+                };
+                match commands.recv_timeout(interval) {
+                    Ok(command) => report_command(&controller, command, None),
+                    Err(mpsc::RecvTimeoutError::Timeout) => {}
+                    Err(mpsc::RecvTimeoutError::Disconnected) => break,
+                }
             }
         }
-    }
-    Ok(())
+        Ok(())
+    })
 }
 
 fn drain_commands(controller: &Controller<'_>, active: Option<&str>) -> Result<()> {
@@ -907,6 +986,10 @@ fn handle_command(
     active: Option<&str>,
 ) -> Result<()> {
     match command {
+        Command::ProcessingViewport(width, height) => {
+            processing::validate_viewport((width, height))?;
+            controller.processing_viewport.set((width, height));
+        }
         Command::Enqueue(book, chapters) => {
             ensure!(
                 !book_removal_pending(controller, &book.id),
@@ -1232,6 +1315,7 @@ fn completed_replay_repairs(
 ) -> Result<BTreeSet<String>> {
     let mut checked = BTreeSet::new();
     let mut repairs = BTreeSet::new();
+    let preferences = controller.store.preferences()?;
     for chapter in chapters {
         suspend_barrier(controller, None)?;
         if !checked.insert(chapter.id.as_str()) {
@@ -1272,6 +1356,20 @@ fn completed_replay_repairs(
                     Ok(current) if current == cached => {
                         if !page.url.is_empty() {
                             controller.cache.pin_raw(page, &owner(&chapter.id))?;
+                        }
+                        if (preferences.resize_downloads || preferences.grayscale_downloads)
+                            && processing::lookup(
+                                controller.cache,
+                                page,
+                                path,
+                                &preferences,
+                                controller.processing_viewport.get(),
+                            )?
+                            .is_none()
+                        {
+                            // Queue preparation against the already-pinned
+                            // originals; no page needs another HTTP request.
+                            repairs.insert(chapter.id.clone());
                         }
                     }
                     Ok(_) => {
@@ -2283,12 +2381,14 @@ fn run_job(
                             Err(anyhow!("The image request was paused for suspend"))
                         } else {
                             std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
-                                manager.fetch_page_for_source(
-                                    &source_id,
-                                    &request,
-                                    FetchPriority::Background,
-                                    Some(&pin_owner),
-                                )
+                                crate::imaging::with_background_decode(None, || {
+                                    manager.fetch_page_for_source(
+                                        &source_id,
+                                        &request,
+                                        FetchPriority::Background,
+                                        Some(&pin_owner),
+                                    )
+                                })
                             }))
                             .unwrap_or_else(|_| Err(anyhow!("The comic page request panicked")))
                         };
@@ -2378,7 +2478,7 @@ fn accept_result(
         let _ = handle.join();
     }
     match result.path.and_then(|path| {
-        controller.cache.validate_path(&path)?;
+        crate::imaging::with_background_decode(None, || controller.cache.validate_path(&path))?;
         Ok(path)
     }) {
         Ok(path) => {
@@ -2451,6 +2551,12 @@ fn complete(
             return Err(error).context("A downloaded image is missing or invalid");
         }
     }
+    if !prepare_downloaded_pages(controller, job, pages, dirty)? {
+        return finish_halt(controller, job, dirty);
+    }
+    if sync_control(controller, job, dirty)?.is_some() {
+        return finish_halt(controller, job, dirty);
+    }
     job.total = pages.len() as u32;
     job.completed = job.total;
     job.state = "completed".into();
@@ -2461,6 +2567,118 @@ fn complete(
         .events
         .send(DownloadEvent::Completed(job.clone()));
     Ok(())
+}
+
+fn prepare_downloaded_pages(
+    controller: &Controller<'_>,
+    job: &mut DownloadJob,
+    pages: &[Page],
+    dirty: &mut Vec<(u32, Page)>,
+) -> Result<bool> {
+    let preferences = controller.store.preferences()?;
+    let settings = processing::ProcessingSettings::from_preferences(
+        &preferences,
+        controller.processing_viewport.get(),
+    )?;
+    if !settings.enabled() {
+        return Ok(true);
+    }
+    let mut failures = 0usize;
+    let mut last_error = String::new();
+    for (index, page) in pages.iter().enumerate() {
+        if sync_control(controller, job, dirty)?.is_some() {
+            return Ok(false);
+        }
+        let original = page
+            .local_path
+            .clone()
+            .context("The offline preparation original is missing")?;
+        let page = page.clone();
+        let cache = controller.cache.clone();
+        let pin_owner = owner(&job.chapter_id);
+        let chapter_id = job.chapter_id.clone();
+        let controls = controller.controls.clone();
+        let suspend = controller.suspend.clone();
+        let epoch = suspend.epoch.load(Ordering::Acquire);
+        let cancellation = crate::imaging::DecodeCancellation::new();
+        let worker_cancellation = cancellation.clone();
+        let (sender, receiver) = mpsc::channel();
+        let activity = ActivityGuard::new(controller.suspend, false);
+        let handle = thread::Builder::new()
+            .name("aidoku-download-prepare".into())
+            .spawn(move || {
+                let _activity = activity;
+                let stopped = || {
+                    epoch != suspend.epoch.load(Ordering::Acquire)
+                        || suspend.strict.load(Ordering::Acquire)
+                        || matches!(
+                            controls
+                                .lock()
+                                .unwrap_or_else(std::sync::PoisonError::into_inner)
+                                .get(&chapter_id),
+                            Some(Control::Paused | Control::Cancelled)
+                        )
+                };
+                let result = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
+                    crate::imaging::with_background_decode(Some(&worker_cancellation), || {
+                        processing::prepare(
+                            &cache,
+                            &page,
+                            &original,
+                            settings,
+                            &pin_owner,
+                            &worker_cancellation,
+                            stopped,
+                        )
+                    })
+                }))
+                .unwrap_or_else(|_| Err(anyhow!("The offline image preparation worker panicked")));
+                let _ = sender.send(result);
+            })
+            .context("Start offline image preparation")?;
+        let mut joining = Fetches::default();
+        joining.threads.insert(index, handle);
+        let outcome = loop {
+            // Cancel before entering a sleep barrier, which intentionally parks
+            // the controller until wake. The worker also checks epoch and input
+            // state itself before it is permitted to publish the prepared file.
+            if controller.suspend.strict.load(Ordering::Acquire)
+                || epoch != controller.suspend.epoch.load(Ordering::Acquire)
+                || halt_state(controller, &job.chapter_id).is_some()
+            {
+                cancellation.cancel();
+            }
+            let halt = sync_control(controller, job, dirty)?;
+            if halt.is_some() {
+                cancellation.cancel();
+            }
+            match receiver.recv_timeout(COMMAND_INTERVAL) {
+                Ok(result) => break result,
+                Err(mpsc::RecvTimeoutError::Timeout) => {}
+                Err(mpsc::RecvTimeoutError::Disconnected) => {
+                    break Err(anyhow!(
+                        "The offline preparation worker stopped unexpectedly"
+                    ));
+                }
+            }
+        };
+        drop(joining);
+        if cancellation.is_cancelled() {
+            return Ok(false);
+        }
+        if let Err(error) = outcome {
+            failures += 1;
+            last_error = format!("{error:#}");
+        }
+    }
+    if failures > 0 {
+        // Optional accelerators must not turn a verified offline original into
+        // a failed download. The user receives a truthful, nonfatal explanation.
+        let _ = controller.events.send(DownloadEvent::Error(format!(
+            "Offline originals were retained; preparation failed for {failures} image(s): {last_error}"
+        )));
+    }
+    Ok(true)
 }
 
 #[cfg(test)]
@@ -5637,5 +5855,140 @@ mod tests {
                 .is_err()
             );
         }
+    }
+
+    #[test]
+    fn prepared_downloads_keep_canonical_manifests_and_reuse_after_restart() {
+        let directory = tempfile::tempdir().unwrap();
+        let server = HttpFixture::new(2, Duration::ZERO);
+        let (database, store, book, chapters) = network_fixture(directory.path(), &server, 1, 2);
+        let preferences = Preferences {
+            resize_downloads: true,
+            grayscale_downloads: true,
+            ..Preferences::default()
+        };
+        store.save_preferences(&preferences).unwrap();
+        let worker =
+            DownloadWorker::start(directory.path().to_path_buf(), database.clone()).unwrap();
+        worker.set_processing_viewport(2, 3).unwrap();
+        worker.enqueue(&book, &chapters[0]).unwrap();
+        wait_for(&worker, "completed");
+        let cache = CacheManager::open(directory.path()).unwrap();
+        let pages = store.pages(&chapters[0].id).unwrap();
+        assert_eq!(pages.len(), 2);
+        let mut prepared = Vec::new();
+        for page in &pages {
+            let original = page.local_path.as_ref().unwrap();
+            assert_eq!(cache.lookup_raw(page).unwrap().as_ref(), Some(original));
+            let copy = prepared_page_path(&cache, page, original, &preferences, (2, 3))
+                .unwrap()
+                .unwrap();
+            assert_ne!(copy, *original);
+            let image = image::ImageReader::open(&copy)
+                .unwrap()
+                .with_guessed_format()
+                .unwrap()
+                .decode()
+                .unwrap();
+            assert_eq!((image.width(), image.height()), (4, 6));
+            assert_eq!(image.color(), image::ColorType::L8);
+            prepared.push(copy);
+        }
+        assert_eq!(cache.stats().pinned_entries, 4);
+        let requests = server.records().len();
+        stop(&worker);
+        assert!(worker.is_stopped());
+
+        let restarted = DownloadWorker::start(directory.path().to_path_buf(), database).unwrap();
+        restarted.set_processing_viewport(3, 2).unwrap();
+        restarted.enqueue(&book, &chapters[0]).unwrap();
+        assert_eq!(wait_batch(&restarted), (0, 0, 1));
+        assert_eq!(server.records().len(), requests);
+        for (page, expected) in pages.iter().zip(prepared) {
+            assert_eq!(
+                prepared_page_path(
+                    &cache,
+                    page,
+                    page.local_path.as_ref().unwrap(),
+                    &preferences,
+                    (3, 2)
+                )
+                .unwrap(),
+                Some(expected)
+            );
+        }
+        stop(&restarted);
+    }
+
+    #[test]
+    fn enabling_offline_preparation_requeues_existing_originals_without_http() {
+        let directory = tempfile::tempdir().unwrap();
+        let server = HttpFixture::new(1, Duration::ZERO);
+        let (database, store, book, chapters) = network_fixture(directory.path(), &server, 1, 1);
+        let worker = DownloadWorker::start(directory.path().to_path_buf(), database).unwrap();
+        worker.set_processing_viewport(2, 3).unwrap();
+        worker.enqueue(&book, &chapters[0]).unwrap();
+        wait_for(&worker, "completed");
+        let original_pages = store.pages(&chapters[0].id).unwrap();
+        let requests = server.records().len();
+        let preferences = Preferences {
+            grayscale_downloads: true,
+            ..Preferences::default()
+        };
+        store.save_preferences(&preferences).unwrap();
+        worker.enqueue(&book, &chapters[0]).unwrap();
+        wait_for(&worker, "completed");
+        assert_eq!(store.pages(&chapters[0].id).unwrap(), original_pages);
+        assert_eq!(server.records().len(), requests);
+        let cache = CacheManager::open(directory.path()).unwrap();
+        let page = &original_pages[0];
+        assert!(
+            prepared_page_path(
+                &cache,
+                page,
+                page.local_path.as_ref().unwrap(),
+                &preferences,
+                (2, 3)
+            )
+            .unwrap()
+            .is_some()
+        );
+        stop(&worker);
+    }
+
+    #[test]
+    fn automatic_enqueue_cannot_replace_uncommitted_user_controls() {
+        let directory = tempfile::tempdir().unwrap();
+        let server = HttpFixture::new(1, Duration::ZERO);
+        let (database, store, book, chapters) = network_fixture(directory.path(), &server, 3, 1);
+        let worker =
+            DownloadWorker::start_with_options(directory.path().to_path_buf(), database, true)
+                .unwrap();
+        {
+            let mut controls = worker.controls.lock().unwrap();
+            controls.insert(chapters[0].id.clone(), Control::Paused);
+            controls.insert(chapters[1].id.clone(), Control::Cancelled);
+        }
+        worker.enqueue_automatic(&book, &chapters).unwrap();
+        assert_eq!(wait_batch(&worker), (1, 0, 0));
+        assert!(store.download(&chapters[0].id).unwrap().is_none());
+        assert!(store.download(&chapters[1].id).unwrap().is_none());
+        assert_eq!(
+            store.download(&chapters[2].id).unwrap().unwrap().state,
+            "queued"
+        );
+        {
+            let controls = worker.controls.lock().unwrap();
+            assert!(matches!(
+                controls.get(&chapters[0].id),
+                Some(Control::Paused)
+            ));
+            assert!(matches!(
+                controls.get(&chapters[1].id),
+                Some(Control::Cancelled)
+            ));
+        }
+        assert!(server.records().is_empty());
+        stop(&worker);
     }
 }

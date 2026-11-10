@@ -436,7 +436,8 @@ export component ReaderPanel inherits Rectangle {
             x: State.large-screen ? (parent.width + 48px) / 2 : 0px;
             y: crop-toggle.y + (State.large-screen ? 0px : crop-toggle.height);
             width: crop-toggle.width; height: crop-toggle.height;
-            text: Strings.split-wide; value: false; enabled: false; status: Strings.unavailable;
+            text: Strings.split-wide; value: State.split-wide;
+            toggled => { Commands.action("settings", "set", State.split-wide ? "split-wide=false" : "split-wide=true"); }
         }
     }
 
@@ -561,21 +562,20 @@ export component ReaderPanel inherits Rectangle {
             y: root.title-height + 14px + 100px - 62px;
             width: parent.width - self.x; height: 62px;
             BodyText { x: 0px; y: 0px; width: max(0px, parent.width - 202px); height: parent.height; text: Strings.wide-images; font-size: 17px; }
-            // Whole-page rendering is the only supported wide-image behavior.
-            Rectangle {
+            ReaderSegment {
                 x: parent.width - 190px; y: 9px; width: 78px; height: 44px;
-                border-radius: 4px; background: Theme.ink;
+                text: Strings.whole-page; text-family: Theme.sans; selected: !State.split-wide; outlined: false;
                 accessible-role: radio-button; accessible-label: Strings.whole-page;
-                accessible-checkable: true; accessible-checked: true;
-                BodyText { x: 4px; y: 0px; width: parent.width - 8px; height: parent.height; text: Strings.whole-page; font-size: 15px; font-weight: 700; color: Theme.paper; horizontal-alignment: center; }
+                accessible-checkable: true; accessible-checked: !State.split-wide;
+                clicked => { if State.split-wide { Commands.action("settings", "set", "split-wide=false"); } }
             }
             ReaderSegment {
-                x: parent.width - 104px; y: 0px; width: 104px; height: 40px;
-                text: Strings.split-two-pages; text-family: Theme.sans; enabled: false;
-                accessible-role: radio-button; accessible-checkable: true; accessible-checked: false;
-                accessible-label: Strings.split-two-pages + " · " + Strings.unavailable;
+                x: parent.width - 104px; y: 9px; width: 104px; height: 44px;
+                text: Strings.split-two-pages; text-family: Theme.sans; selected: State.split-wide;
+                accessible-role: radio-button; accessible-checkable: true; accessible-checked: State.split-wide;
+                accessible-label: Strings.split-two-pages;
+                clicked => { if !State.split-wide { Commands.action("settings", "set", "split-wide=true"); } }
             }
-            Caption { x: parent.width - 104px; y: 40px; width: 104px; height: 22px; text: Strings.unavailable; font-size: 13px; horizontal-alignment: center; }
         }
     }
 

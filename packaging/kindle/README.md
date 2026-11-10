@@ -4,6 +4,15 @@ This is an independent Rust/Slint application for jailbroken Kindle devices.
 It does not require the WeRead application, a WeRead account, or a KOReader plugin.
 The binary uses an isolated Aidoku data directory and a native framebuffer/input backend.
 
+The current source follow-up adds bounded cross-chapter prefetch, background
+image preparation, wide-page halves, category editing and runtime languages.
+Settings also provide local metadata backup/restore, logs, optional prepared
+download copies and scheduled updates. Backups include source/tracking account
+credentials and exclude comic images, caches and extension files. Tracking uses
+the user's legitimate credentials or registered OAuth client; automatic sync
+and scheduled updates are disabled by default. Stylus and custom sleep-screen
+controls remain unavailable until their native contracts are implemented.
+
 ## Build on the remote worker
 
 From Windows PowerShell, transfer this checkout to the designated `test-env` worker.

@@ -272,7 +272,7 @@ impl App {
         id: String,
         uri: String,
         path: PathBuf,
-        image: Arc<GrayImage>,
+        image: prepared_pixels::PreparedPixels,
     ) -> Result<()> {
         self.cover_pending.remove(&id);
         self.cover_retry_after.remove(&id);
@@ -303,7 +303,7 @@ impl App {
             image.width() > 0 && image.height() > 0,
             "The prepared cover contains no pixels"
         );
-        let texture = gray_image(image.as_ref());
+        let texture = image.into_image();
         self.cover_cache
             .retain(|(cached_id, _), _| cached_id != &id);
         self.cover_cache.insert((id.clone(), path.clone()), texture);
@@ -444,6 +444,18 @@ fn prepare_cover(
     allow_network: bool,
     configuration: Option<SourceConfig>,
 ) -> Result<JobResult> {
+    imaging::with_background_decode(None, || {
+        prepare_cover_pixels(manager, book, options, allow_network, configuration)
+    })
+}
+
+fn prepare_cover_pixels(
+    manager: Arc<SourceManager>,
+    book: Book,
+    options: ImageOptions,
+    allow_network: bool,
+    configuration: Option<SourceConfig>,
+) -> Result<JobResult> {
     let cache = manager.cache();
     let local = local_cover_path(&book.cover, book.source_id == "local")?.or_else(|| {
         (url::Url::parse(&book.cover).is_err() && Path::new(&book.cover).is_file())
@@ -548,7 +560,7 @@ fn prepare_cover(
         id: book.id,
         uri: book.cover,
         path: rendered.cache_path,
-        image: rendered.image,
+        image: prepared_pixels::prepare(rendered.image),
     })
 }
 
@@ -760,7 +772,10 @@ mod tests {
             let JobResult::Cover { path, image, .. } = result else {
                 panic!("Expected the cached cover result");
             };
-            assert_eq!(image, fixture.rendered.image);
+            assert_eq!(
+                image.as_bytes(),
+                prepared_pixels::prepare(fixture.rendered.image.clone()).as_bytes()
+            );
             assert_eq!(
                 cache.lookup_alias(&cover_source_alias(&identity)).unwrap(),
                 Some(fixture.raw.clone())
@@ -801,7 +816,10 @@ mod tests {
             panic!("Expected the processed cached cover result");
         };
         assert_eq!(path, fixture.rendered.cache_path);
-        assert_eq!(image, fixture.rendered.image);
+        assert_eq!(
+            image.as_bytes(),
+            prepared_pixels::prepare(fixture.rendered.image.clone()).as_bytes()
+        );
         assert!(
             cache
                 .lookup_alias(&cover_source_alias(&identity))
@@ -876,8 +894,11 @@ mod tests {
         let JobResult::Cover { image, .. } = result else {
             panic!("Expected the current cached raw cover result");
         };
-        assert!(image.as_raw().iter().all(|gray| *gray == 68));
-        assert_ne!(image, fixture.rendered.image);
+        assert!(image.as_bytes().iter().all(|component| *component == 68));
+        assert_ne!(
+            image.as_bytes(),
+            prepared_pixels::prepare(fixture.rendered.image.clone()).as_bytes()
+        );
         let identity = remote_cover_identity(&fixture.book, &fixture.configuration).unwrap();
         assert_eq!(
             cache.lookup_alias(&cover_source_alias(&identity)).unwrap(),

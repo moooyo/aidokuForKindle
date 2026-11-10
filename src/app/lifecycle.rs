@@ -5,9 +5,21 @@ use crate::domain::SearchSession;
 impl App {
     /// Stop new work and checkpoint navigation before the native process parks.
     pub fn prepare_suspend(&mut self) -> Result<()> {
+        self.pending_wide_navigation = 0;
+        self.cancel_pending_user_network();
         if self.suspended {
             return Ok(());
         }
+        anyhow::ensure!(
+            !self.metadata_restore_active(),
+            "Metadata restoration must finish before the application can suspend"
+        );
+        self.invalidate_automatic_updates();
+        self.cancel_tracking_work();
+        let _ = self
+            .data_management
+            .logs
+            .record("app.suspend", logging::LogOutcome::Success);
         self.cancel_sensitive_keyboard();
         self.clear_reader_recovery();
         if let Some(ui) = self.ui.upgrade() {
@@ -59,7 +71,10 @@ impl App {
 
     /// This is a controller barrier, not a wait for a disconnected HTTP socket.
     pub fn suspend_ready(&mut self) -> Result<bool> {
-        Ok(self.suspended && self.suspend_checkpoint_ready && self.downloads.suspend_ready())
+        Ok(self.suspended
+            && self.suspend_checkpoint_ready
+            && self.downloads.suspend_ready()
+            && self.platform.device_policies_restored())
     }
 
     /// Resume the retained scene before checking Wi-Fi or starting a decoder.
@@ -71,6 +86,10 @@ impl App {
         self.downloads
             .resume_owned(self.options.offline || self.options.demo)?;
         self.suspended = false;
+        let _ = self
+            .data_management
+            .logs
+            .record("app.resume", logging::LogOutcome::Success);
         self.suspend_checkpoint_ready = false;
         self.resume_frame_pending = true;
         self.invalidate_storage_details();
@@ -188,6 +207,7 @@ impl App {
         }
         reader.vertical_offset = saved.vertical_offset;
         reader.zoom = saved.zoom;
+        reader.set_wide_page(saved.wide_page, saved.wide_half);
         reader.menu_open = false;
         self.current_book_id = Some(saved.book_id.clone());
         self.reader = Some(reader);
@@ -265,6 +285,8 @@ impl App {
                     total: reader.total,
                     vertical_offset: reader.vertical_offset,
                     zoom: reader.zoom,
+                    wide_half: reader.wide_half,
+                    wide_page: reader.is_wide_page(),
                     landscape: reader.landscape,
                     spread: reader.spread,
                     menu_open: false,
@@ -351,6 +373,7 @@ impl App {
             return Ok(());
         };
         self.lifecycle_generation = self.lifecycle_generation.wrapping_add(1);
+        self.invalidate_automatic_updates();
         self.invalidate_reader_work();
         self.reader_inflight = None;
         self.prefetch_inflight = None;
@@ -415,11 +438,14 @@ impl App {
                 if self.store.chapter(&reader.chapter_id)?.is_some() {
                     self.prefs.landscape = reader.landscape;
                     self.sync_runtime_geometry()?;
-                    self.enter_reader_at(
-                        &reader.chapter_id,
-                        reader.page,
-                        reader.vertical_offset,
-                        reader.zoom,
+                    self.load_reader_target(
+                        ReaderTarget::new(
+                            &reader.chapter_id,
+                            reader.page,
+                            reader.vertical_offset,
+                            reader.zoom,
+                        )
+                        .with_wide_half(reader.wide_half),
                     )?;
                 } else {
                     self.route = "library".into();
@@ -542,8 +568,86 @@ fn same_reader_render(first: &Preferences, second: &Preferences) -> bool {
     first.landscape == second.landscape
         && first.spread == second.spread
         && first.cover_alone == second.cover_alone
+        && first.split_wide == second.split_wide
         && first.reading_direction == second.reading_direction
         && first.crop_borders == second.crop_borders
         && first.dither == second.dither
         && first.contrast == second.contrast
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::platform::DeviceProfile;
+
+    #[test]
+    fn retained_wide_halves_restore_navigation_without_decoding_again() {
+        for half in [0_u8, 1] {
+            let mut fixture =
+                super::super::tests::DemoRouteFixture::new("settings", DeviceProfile::Pw6, false);
+            let book = Book {
+                id: "wide:book".into(),
+                source_id: "local".into(),
+                remote_id: "book".into(),
+                title: "Retained wide page".into(),
+                in_library: true,
+                ..Book::default()
+            };
+            let chapter = Chapter {
+                id: "wide:chapter".into(),
+                book_id: book.id.clone(),
+                source_id: "local".into(),
+                remote_id: "chapter".into(),
+                number: 1.0,
+                page_count: 2,
+                ..Chapter::default()
+            };
+            fixture.app.store.upsert_book(&book).unwrap();
+            fixture
+                .app
+                .store
+                .save_chapters(&book.id, &[chapter.clone()])
+                .unwrap();
+            fixture.app.prefs.split_wide = true;
+            fixture.app.prefs.spread = false;
+            fixture.app.interactions.page_layout_mode = "single".into();
+            fixture.app.current_book_id = Some(book.id.clone());
+            fixture.app.route = "reader".into();
+            fixture.app.displayed_reader = Some(DisplayedReader {
+                session: ReaderSession {
+                    book_id: book.id,
+                    chapter_id: chapter.id,
+                    page: 1,
+                    total: 2,
+                    spread: false,
+                    wide_page: true,
+                    wide_half: half,
+                    ..ReaderSession::default()
+                },
+                preferences: fixture.app.effective_reader_preferences(),
+                first_path: PathBuf::from("retained-artwork.png"),
+                second_path: None,
+            });
+            fixture.app.restore_displayed_reader().unwrap();
+            let reader = fixture.app.reader.as_mut().unwrap();
+            assert!(reader.is_wide_page());
+            assert_eq!(reader.wide_half, half);
+            reader.next_page();
+            assert_eq!(
+                (reader.page, reader.wide_half),
+                if half == 0 { (1, 1) } else { (2, 0) }
+            );
+            assert_eq!(fixture.app.reader_image_jobs_started, 0);
+        }
+    }
+
+    #[test]
+    fn changing_wide_split_requires_repair_after_retained_resume() {
+        let before = Preferences::default();
+        let after = Preferences {
+            split_wide: true,
+            ..before.clone()
+        };
+        assert!(!same_reader_render(&before, &after));
+    }
 }

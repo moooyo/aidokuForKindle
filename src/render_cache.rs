@@ -11,7 +11,8 @@ use std::{
     fs::{self, File, OpenOptions},
     io::{BufReader, BufWriter, Read, Write},
     path::{Path, PathBuf},
-    sync::{Arc, Mutex, OnceLock, Weak},
+    sync::{Arc, Mutex, MutexGuard, OnceLock, TryLockError, Weak},
+    time::Duration,
 };
 
 use anyhow::{Context, Result, anyhow, ensure};
@@ -367,6 +368,7 @@ pub fn load_alias(
     drop(lease);
     match rendered {
         Ok(page) => Ok(Some(page)),
+        Err(error) if imaging::is_decode_cancelled(&error) => Err(error),
         Err(_) => {
             decoded(|state| state.invalidate(&decoded_key));
             cache.invalidate_processed(&key)?;
@@ -426,17 +428,46 @@ pub fn prefetch(
     offset: u32,
     zoom: f32,
 ) -> Result<RenderedPage> {
-    render_for_purpose(
-        cache,
-        page,
-        raw,
-        options,
-        vertical,
-        offset,
-        zoom,
-        RenderPurpose::Prefetch,
-        read_source,
-    )
+    imaging::with_background_decode(None, || {
+        render_for_purpose(
+            cache,
+            page,
+            raw,
+            options,
+            vertical,
+            offset,
+            zoom,
+            RenderPurpose::Prefetch,
+            read_source,
+        )
+    })
+}
+
+/// Stop obsolete preparation before decoding or while waiting for its shared
+/// budget. A completed valid image can still be published for a new reader.
+pub fn prefetch_cancellable(
+    cache: &CacheManager,
+    page: &Page,
+    raw: &Path,
+    options: &ImageOptions,
+    vertical: bool,
+    offset: u32,
+    zoom: f32,
+    cancellation: &imaging::DecodeCancellation,
+) -> Result<RenderedPage> {
+    imaging::with_background_decode(Some(cancellation), || {
+        render_for_purpose(
+            cache,
+            page,
+            raw,
+            options,
+            vertical,
+            offset,
+            zoom,
+            RenderPurpose::Prefetch,
+            read_source,
+        )
+    })
 }
 
 fn render_with_source(
@@ -473,6 +504,7 @@ fn render_for_purpose(
     purpose: RenderPurpose,
     source: impl FnOnce(&Path) -> Result<Vec<u8>>,
 ) -> Result<RenderedPage> {
+    imaging::check_decode_cancelled()?;
     decoded(|state| match purpose {
         RenderPurpose::Foreground => state.stats.foreground_requests += 1,
         RenderPurpose::Prefetch => state.stats.prefetch_requests += 1,
@@ -501,18 +533,17 @@ fn render_for_purpose(
         namespace: cache.namespace().to_path_buf(),
         render: key.clone(),
     };
-    if let Some(rendered) = lookup(cache, &decoded_key, purpose) {
+    if let Some(rendered) = lookup(cache, &decoded_key, purpose)? {
         return Ok(rendered);
     }
 
     let gate = render_gate(&decoded_key)?;
-    let _render_guard = gate
-        .lock()
-        .map_err(|_| anyhow!("The page-render gate is unavailable"))?;
-    if let Some(rendered) = lookup(cache, &decoded_key, purpose) {
+    let _render_guard = lock_render_gate(&gate)?;
+    if let Some(rendered) = lookup(cache, &decoded_key, purpose)? {
         return Ok(rendered);
     }
 
+    imaging::check_decode_cancelled()?;
     let bytes = source(raw)?;
     ensure!(
         !bytes.is_empty() && bytes.len() as u64 <= MAX_PAGE_BYTES,
@@ -541,17 +572,21 @@ fn render_for_purpose(
         scaled_height,
         viewport_height,
     };
-    let (cache_path, persisted) = match persist(cache, &key, &image, &metadata) {
-        Ok(path) => (path, true),
-        Err(error) => {
-            // A derivative is an optimization, never a prerequisite for reading
-            // an already validated local or downloaded source image.
-            eprintln!(
-                "aidoku: processed page temporarily uncached; using rendered pixels: {error:#}"
-            );
-            (raw.to_path_buf(), false)
-        }
-    };
+    // Completing a bounded, valid output is useful even if the original reader
+    // moved to that page meanwhile. Finish its durable publication without the
+    // obsolete caller's fence, then let that caller stop before its next frame.
+    let (cache_path, persisted) =
+        match imaging::without_decode_cancellation(|| persist(cache, &key, &image, &metadata)) {
+            Ok(path) => (path, true),
+            Err(error) => {
+                // A derivative is an optimization, never a prerequisite for reading
+                // an already validated local or downloaded source image.
+                eprintln!(
+                    "aidoku: processed page temporarily uncached; using rendered pixels: {error:#}"
+                );
+                (raw.to_path_buf(), false)
+            }
+        };
     let rendered = RenderedPage {
         image,
         cache_path,
@@ -564,6 +599,21 @@ fn render_for_purpose(
         remember(cache, decoded_key, &rendered, purpose);
     }
     Ok(rendered)
+}
+
+fn lock_render_gate(gate: &Mutex<()>) -> Result<MutexGuard<'_, ()>> {
+    loop {
+        imaging::check_decode_cancelled()?;
+        match gate.try_lock() {
+            Ok(guard) => return Ok(guard),
+            Err(TryLockError::Poisoned(_)) => {
+                return Err(anyhow!("The page-render gate is unavailable"));
+            }
+            Err(TryLockError::WouldBlock) => {
+                std::thread::park_timeout(Duration::from_millis(5));
+            }
+        }
+    }
 }
 
 fn persist(
@@ -594,7 +644,12 @@ fn remember(cache: &CacheManager, key: DecodedKey, page: &RenderedPage, purpose:
     }
 }
 
-fn lookup(cache: &CacheManager, key: &DecodedKey, purpose: RenderPurpose) -> Option<RenderedPage> {
+fn lookup(
+    cache: &CacheManager,
+    key: &DecodedKey,
+    purpose: RenderPurpose,
+) -> Result<Option<RenderedPage>> {
+    imaging::check_decode_cancelled()?;
     // A resident entry already knows its path. Lease it before the validating
     // lookup, avoiding a second index lookup while keeping clear() effective.
     let candidate = decoded(|state| {
@@ -609,14 +664,14 @@ fn lookup(cache: &CacheManager, key: &DecodedKey, purpose: RenderPurpose) -> Opt
         Ok(Some(artifact)) => artifact,
         Ok(None) => {
             decoded(|state| state.invalidate(key));
-            return None;
+            return Ok(None);
         }
         Err(error) => {
             decoded(|state| state.invalidate(key));
             eprintln!(
                 "aidoku: processed page lookup unavailable; rebuilding from source: {error:#}"
             );
-            return None;
+            return Ok(None);
         }
     };
     let lease = match resident_lease {
@@ -625,12 +680,12 @@ fn lookup(cache: &CacheManager, key: &DecodedKey, purpose: RenderPurpose) -> Opt
             Ok(lease) => lease,
             Err(_) => {
                 decoded(|state| state.invalidate(key));
-                return None;
+                return Ok(None);
             }
         },
     };
     if let Some(page) = decoded(|state| state.lookup(key, &path, &checksum, purpose)) {
-        return Some(page);
+        return Ok(Some(page));
     }
     let decoded_page = decode_processed(&path, &key.render);
     if let Ok(page) = &decoded_page {
@@ -641,7 +696,8 @@ fn lookup(cache: &CacheManager, key: &DecodedKey, purpose: RenderPurpose) -> Opt
     }
     drop(lease);
     match decoded_page {
-        Ok(image) => Some(image),
+        Ok(image) => Ok(Some(image)),
+        Err(error) if imaging::is_decode_cancelled(&error) => Err(error),
         Err(_) => {
             // Only the disposable derivative is invalidated. Download pins,
             // original images, and user-provided files remain independent.
@@ -649,7 +705,7 @@ fn lookup(cache: &CacheManager, key: &DecodedKey, purpose: RenderPurpose) -> Opt
             if let Err(error) = cache.invalidate_processed(&key.render) {
                 eprintln!("aidoku: invalid processed page could not be discarded: {error:#}");
             }
-            None
+            Ok(None)
         }
     }
 }
@@ -876,6 +932,7 @@ fn processed_reader(
 }
 
 fn validate_processed(path: &Path, key: &RenderKey, dimensions: (u32, u32)) -> Result<()> {
+    let _decode_guard = imaging::decode_permit()?;
     decoded(|state| state.stats.staged_validations += 1);
     #[cfg(test)]
     count_work(|work| work.staged_validations += 1);
@@ -909,6 +966,7 @@ fn validate_processed(path: &Path, key: &RenderKey, dimensions: (u32, u32)) -> R
 }
 
 fn decode_processed(path: &Path, key: &RenderKey) -> Result<RenderedPage> {
+    let _decode_guard = imaging::decode_permit()?;
     decoded(|state| state.stats.processed_decodes += 1);
     #[cfg(test)]
     count_work(|work| work.processed_decodes += 1);
@@ -1058,6 +1116,84 @@ mod tests {
                 ((x * 7 + y * 13) % 247) as u8
             }])
         })
+    }
+
+    #[test]
+    fn cancelled_prefetch_does_not_remove_a_valid_processed_page() {
+        let fixture = Fixture::new(artwork());
+        let prepared = render(
+            &fixture.cache,
+            &fixture.page,
+            &fixture.raw,
+            &options(),
+            false,
+            0,
+            1.0,
+        )
+        .unwrap();
+        let expected = fs::read(&prepared.cache_path).unwrap();
+        clear_memory(&fixture.cache);
+        let cancellation = imaging::DecodeCancellation::new();
+        cancellation.cancel();
+        let error = prefetch_cancellable(
+            &fixture.cache,
+            &fixture.page,
+            &fixture.raw,
+            &options(),
+            false,
+            0,
+            1.0,
+            &cancellation,
+        )
+        .unwrap_err();
+        assert!(imaging::is_decode_cancelled(&error));
+        assert_eq!(fs::read(&prepared.cache_path).unwrap(), expected);
+        let displayed = render(
+            &fixture.cache,
+            &fixture.page,
+            &fixture.raw,
+            &options(),
+            false,
+            0,
+            1.0,
+        )
+        .unwrap();
+        assert!(displayed.cache_hit && !displayed.memory_hit);
+        assert_eq!(displayed.image, prepared.image);
+    }
+
+    #[test]
+    fn cancelled_alias_decode_propagates_without_invalidating_its_png() {
+        let fixture = Fixture::new(artwork());
+        let prepared = render(
+            &fixture.cache,
+            &fixture.page,
+            &fixture.raw,
+            &options(),
+            false,
+            0,
+            1.0,
+        )
+        .unwrap();
+        fixture
+            .cache
+            .set_alias("cancelled-cover", &prepared.cache_path)
+            .unwrap();
+        let expected = fs::read(&prepared.cache_path).unwrap();
+        clear_memory(&fixture.cache);
+        let cancellation = imaging::DecodeCancellation::new();
+        let error = imaging::with_background_decode(Some(&cancellation), || {
+            cancellation.cancel();
+            load_alias(&fixture.cache, "cancelled-cover", &options())
+        })
+        .unwrap_err();
+        assert!(imaging::is_decode_cancelled(&error));
+        assert_eq!(fs::read(&prepared.cache_path).unwrap(), expected);
+        let displayed = load_alias(&fixture.cache, "cancelled-cover", &options())
+            .unwrap()
+            .unwrap();
+        assert!(displayed.cache_hit && !displayed.memory_hit);
+        assert_eq!(displayed.image, prepared.image);
     }
 
     #[test]

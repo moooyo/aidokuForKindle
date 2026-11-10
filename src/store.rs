@@ -18,6 +18,10 @@ use crate::domain::{
 
 const MAX_DOCUMENT_BYTES: usize = 8 * 1024 * 1024;
 
+#[path = "store/automatic_updates.rs"]
+mod automatic_updates;
+#[path = "store/categories.rs"]
+pub mod categories;
 #[path = "store/download_management.rs"]
 pub mod download_management;
 #[path = "store/migration.rs"]
@@ -158,6 +162,7 @@ impl Store {
              COMMIT;",
         )?;
         page_queries::ensure_page_counters(&connection)?;
+        categories::ensure_categories(&connection)?;
         #[cfg(unix)]
         if path != Path::new(":memory:") {
             use std::os::unix::fs::PermissionsExt;

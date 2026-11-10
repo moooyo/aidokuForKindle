@@ -3,6 +3,34 @@
 use super::*;
 use crate::reader::PageLayout;
 
+pub(super) struct Prefetched {
+    generation: u64,
+    chapters: Vec<PrefetchedChapter>,
+}
+
+struct PrefetchedChapter {
+    chapter: Chapter,
+    manifest: Option<Vec<Page>>,
+    paths: Vec<CachedPage>,
+}
+
+struct PrefetchFrame {
+    index: usize,
+    page: Page,
+    options: ImageOptions,
+    vertical: bool,
+    offset: u32,
+    zoom: f32,
+    half: u8,
+}
+
+struct NextChapterPrefetch {
+    chapter: Chapter,
+    book: Option<Book>,
+    window: crate::store::PageWindow,
+    capacity: usize,
+}
+
 impl App {
     pub(super) fn request_reader_images(&mut self) -> Result<()> {
         self.request_reader_images_with_refresh(RefreshRequest::Full)
@@ -12,6 +40,7 @@ impl App {
         &mut self,
         refresh: RefreshRequest,
     ) -> Result<()> {
+        self.cancel_reader_prefetch();
         self.reader_generation = self.reader_generation.wrapping_add(1);
         self.reader_dirty = true;
         self.reader_refresh = merge_refresh(self.reader_refresh, refresh);
@@ -51,6 +80,7 @@ impl App {
         let source_id = reader.current_chapter().source_id.clone();
         let page = reader.page;
         let zoom = reader.zoom;
+        let half = reader.wide_half;
         let effective = self.effective_reader_preferences();
         let vertical = is_strip(&effective);
         let offset = if vertical { reader.vertical_offset } else { 0 };
@@ -62,13 +92,10 @@ impl App {
             bail!("The chapter contains no pages");
         }
         let spread = frame_page_count(&effective, index, window.total) == 2;
-        let options = reader_image_options(
-            &effective,
-            self.platform.runtime_logical_size(effective.landscape),
-            index,
-            window.total,
-        );
-        let offline = self.options.offline || self.options.demo;
+        let viewport = self.platform.runtime_logical_size(effective.landscape);
+        let options = reader_image_options(&effective, viewport, index, window.total);
+        let offline =
+            self.options.offline || self.options.demo || self.platform.network_policy_blocked();
         let id = self.spawn_job_kind(true, JobKind::Reader, move |manager| {
             let mut pages = window.pages.into_iter();
             let request = pages
@@ -84,15 +111,22 @@ impl App {
                 FetchPriority::Interactive,
                 &mut paths,
             )?;
-            let rendered = crate::render_cache::render(
+            let prepared = render_reader_page(
                 manager.cache(),
                 &request,
                 &path,
                 &options,
+                &effective,
+                viewport,
                 vertical,
                 offset,
                 zoom,
+                half,
+                None,
             )?;
+            let wide = prepared.wide;
+            let wide_half = prepared.half;
+            let rendered = prepared.rendered;
             let scaled_height = rendered.scaled_height;
             let viewport_height = rendered.viewport_height;
             let first_path = rendered.cache_path;
@@ -110,15 +144,20 @@ impl App {
                     FetchPriority::Interactive,
                     &mut paths,
                 )?;
-                let rendered = crate::render_cache::render(
+                let prepared = render_reader_page(
                     manager.cache(),
                     &request,
                     &path,
                     &options,
+                    &effective,
+                    viewport,
                     false,
                     0,
                     zoom,
+                    0,
+                    None,
                 )?;
+                let rendered = prepared.rendered;
                 (Some(rendered.image), Some(rendered.cache_path))
             } else {
                 (None, None)
@@ -127,8 +166,10 @@ impl App {
                 chapter_id,
                 page,
                 offset,
-                first,
-                second,
+                wide,
+                wide_half,
+                first: super::prepared_pixels::prepare(first),
+                second: second.map(super::prepared_pixels::prepare),
                 scaled_height,
                 viewport_height,
                 preferences: effective,
@@ -154,12 +195,15 @@ impl App {
         }
         self.prefetch_dirty = false;
         let reader = self.reader.as_ref().context("No chapter is open")?;
-        let chapter_id = reader.current_chapter().id.clone();
-        let source_id = reader.current_chapter().source_id.clone();
+        let chapter = reader.current_chapter().clone();
+        let successor = successor_chapter(reader);
         let effective = self.effective_reader_preferences();
         let vertical = is_strip(&effective);
         let current = reader.visible_pages().start().saturating_sub(1) as usize;
+        let wide_mode = effective.split_wide && !effective.spread && !vertical;
+        let current_wide_remainder = wide_mode && reader.is_wide_page() && reader.wide_half == 0;
         let zoom = prefetch_zoom(&effective, reader.zoom);
+        let viewport = self.platform.runtime_logical_size(effective.landscape);
         let targets = if vertical {
             strip_prefetch_offsets(
                 reader.vertical_offset,
@@ -169,79 +213,194 @@ impl App {
         } else {
             Vec::new()
         };
-        if vertical && targets.is_empty() {
-            return Ok(());
-        }
         // The snapshot includes the current allocation and at most two future
         // pages: one row for strips, three for single pages, four for spreads.
         let window = self.store.page_window(
-            &chapter_id,
+            &chapter.id,
             current,
             prefetch_window_limit(&effective, current),
         )?;
-        let (first, pages, options) = prefetch_pages(
-            &effective,
-            window,
-            self.platform.runtime_logical_size(effective.landscape),
-        );
-        if pages.is_empty() {
-            return Ok(());
-        }
-        let offline = self.options.offline || self.options.demo;
-        let id = self.spawn_job_kind(false, JobKind::Prefetch, move |manager| {
-            let mut paths = Vec::with_capacity(pages.len());
-            if vertical {
-                if let Ok(path) = cached_page(
-                    &manager,
-                    &pages[0],
-                    &source_id,
-                    current,
-                    offline,
-                    FetchPriority::Prefetch,
-                    &mut paths,
-                ) {
-                    for target in targets {
-                        let _ = crate::render_cache::prefetch(
-                            manager.cache(),
-                            &pages[0],
-                            &path,
-                            &options,
-                            true,
-                            target,
-                            zoom,
-                        );
-                    }
+        let total = window.total;
+        let current_page = current_wide_remainder
+            .then(|| window.pages.first().cloned())
+            .flatten();
+        let (first, pages, options) = prefetch_pages(&effective, window, viewport);
+        let mut frames = Vec::with_capacity(2);
+        let mut chapter_end = first.saturating_add(pages.len()) >= total;
+        if vertical {
+            chapter_end = false;
+            // A strip turn first exhausts the current source image. Spend any
+            // remaining look-ahead slot on the next source image's top window.
+            let next_frame = if targets.len() < 2 {
+                let next_index = current.saturating_add(1);
+                let next = self.store.page_window(&chapter.id, next_index, 1)?;
+                if let Some(page) = next.pages.into_iter().next() {
+                    Some(PrefetchFrame {
+                        index: next_index,
+                        page,
+                        options: reader_image_options(&effective, viewport, next_index, total),
+                        vertical: true,
+                        offset: 0,
+                        zoom: 1.0,
+                        half: 0,
+                    })
+                } else {
+                    chapter_end = next_index >= total;
+                    None
                 }
             } else {
-                for (relative_index, request) in pages.iter().enumerate() {
-                    let index = first + relative_index;
-                    match cached_page(
-                        &manager,
-                        request,
-                        &source_id,
-                        index,
-                        offline,
-                        FetchPriority::Prefetch,
-                        &mut paths,
+                None
+            };
+            frames =
+                strip_prefetch_frames(current, pages.first(), options, &targets, zoom, next_frame);
+        } else {
+            if let Some(page) = current_page {
+                frames.push(PrefetchFrame {
+                    index: current,
+                    page,
+                    options: reader_image_options(&effective, viewport, current, total),
+                    vertical: false,
+                    offset: 0,
+                    zoom: 1.0,
+                    half: 1,
+                });
+            }
+            let capacity = 2_usize.saturating_sub(frames.len());
+            frames.extend(
+                pages
+                    .into_iter()
+                    .take(capacity)
+                    .enumerate()
+                    .map(|(relative, page)| PrefetchFrame {
+                        index: first + relative,
+                        page,
+                        options: options.clone(),
+                        vertical: false,
+                        offset: 0,
+                        zoom,
+                        half: 0,
+                    }),
+            );
+        }
+        if wide_mode {
+            // A full double-width source can consume most of the decoded
+            // budget. Preparing a farther source must not evict the nearest
+            // half-page before the next turn gets a chance to reuse it.
+            frames.truncate(1);
+        }
+        let offline =
+            self.options.offline || self.options.demo || self.platform.network_policy_blocked();
+        let remaining = if wide_mode && !frames.is_empty() {
+            0
+        } else {
+            2_usize.saturating_sub(frames.len())
+        };
+        let next_chapter = if chapter_end && remaining > 0 {
+            if let Some(next) = successor {
+                let window = self.store.page_window(&next.id, 0, 2)?;
+                if window.total > 0 {
+                    Some(NextChapterPrefetch {
+                        chapter: next,
+                        book: None,
+                        window,
+                        capacity: remaining,
+                    })
+                } else if !offline && next.source_id != "local" {
+                    self.store
+                        .book(&next.book_id)?
+                        .map(|book| NextChapterPrefetch {
+                            chapter: next,
+                            book: Some(book),
+                            window,
+                            capacity: remaining,
+                        })
+                } else {
+                    None
+                }
+            } else {
+                None
+            }
+        } else {
+            None
+        };
+        if frames.is_empty() && next_chapter.is_none() {
+            return Ok(());
+        }
+        let generation = self.reader_generation;
+        let cancellation = imaging::DecodeCancellation::new();
+        let worker_cancellation = cancellation.clone();
+        let id = self.spawn_job_kind(false, JobKind::Prefetch, move |manager| {
+            let token = &worker_cancellation;
+            // Shared raw transfers may have foreground followers. Background
+            // admission applies to their validation, but per-reader cancellation
+            // only surrounds fetches and the private render preparation.
+            let result = imaging::with_background_decode(None, || {
+                token.check()?;
+                let mut chapters = Vec::with_capacity(2);
+                if !frames.is_empty() {
+                    chapters.push(prefetch_chapter_frames(
+                        &manager, chapter, None, frames, offline, &effective, viewport, token,
+                    )?);
+                }
+                if let Some(next) = next_chapter {
+                    token.check()?;
+                    let chapter_id = next.chapter.id.clone();
+                    match prefetch_next_chapter(
+                        &manager, next, &effective, viewport, offline, token,
                     ) {
-                        Ok(path) => {
-                            let _ = crate::render_cache::prefetch(
-                                manager.cache(),
-                                request,
-                                &path,
-                                &options,
-                                false,
-                                0,
-                                zoom,
-                            );
+                        Ok(next) => chapters.push(next),
+                        Err(error) if !token.is_cancelled() => {
+                            eprintln!("aidoku: next chapter read-ahead {chapter_id}: {error:#}");
                         }
-                        Err(error) => eprintln!("aidoku: read-ahead page {index}: {error:#}"),
+                        Err(_) => {}
                     }
                 }
+                token.check()?;
+                Ok(Prefetched {
+                    generation,
+                    chapters,
+                })
+            });
+            if token.is_cancelled() {
+                return Ok(JobResult::Prefetched(Prefetched {
+                    generation,
+                    chapters: Vec::new(),
+                }));
             }
-            Ok(JobResult::Prefetched { chapter_id, paths })
+            result.map(JobResult::Prefetched)
         })?;
         self.prefetch_inflight = Some(id);
+        self.reader_prefetch_cancel = Some(cancellation);
+        Ok(())
+    }
+
+    pub(super) fn cancel_reader_prefetch(&mut self) {
+        if let Some(token) = self.reader_prefetch_cancel.take() {
+            token.cancel();
+        }
+    }
+
+    pub(super) fn accept_reader_prefetch(&mut self, result: Prefetched) -> Result<()> {
+        if result.generation != self.reader_generation || self.route != "reader" {
+            return Ok(());
+        }
+        for batch in result.chapters {
+            let Some(chapter) = self.store.chapter(&batch.chapter.id)? else {
+                continue;
+            };
+            if !same_chapter_identity(&chapter, &batch.chapter) {
+                continue;
+            }
+            if let Some(manifest) = batch.manifest {
+                if self
+                    .store
+                    .publish_prefetched_manifest(&batch.chapter, &manifest)?
+                {
+                    self.invalidate_storage_details();
+                }
+            }
+            self.save_cached_paths(&chapter.id, batch.paths)?;
+        }
         Ok(())
     }
 
@@ -260,6 +419,264 @@ impl App {
         Ok(report.current)
     }
 }
+
+fn same_chapter_identity(first: &Chapter, second: &Chapter) -> bool {
+    first.id == second.id
+        && first.book_id == second.book_id
+        && first.source_id == second.source_id
+        && first.remote_id == second.remote_id
+}
+
+fn successor_chapter(reader: &ReaderState) -> Option<Chapter> {
+    let current = reader.current_chapter();
+    reader
+        .chapters()
+        .get(reader.chapter_index().saturating_add(1))
+        .filter(|next| next.book_id == current.book_id && next.source_id == current.source_id)
+        .cloned()
+}
+
+fn prefetch_next_chapter(
+    manager: &SourceManager,
+    plan: NextChapterPrefetch,
+    preferences: &Preferences,
+    viewport: (u32, u32),
+    offline: bool,
+    cancellation: &imaging::DecodeCancellation,
+) -> Result<PrefetchedChapter> {
+    cancellation.check()?;
+    let (window, manifest) = if plan.window.total == 0 {
+        let book = plan.book.context("The next manga is missing")?;
+        let pages = manager.pages(&book, &plan.chapter)?;
+        cancellation.check()?;
+        anyhow::ensure!(
+            !pages.is_empty() && pages.len() <= 20_000,
+            "The next chapter has an invalid page count"
+        );
+        let window = crate::store::PageWindow {
+            offset: 0,
+            total: pages.len(),
+            pages: pages.iter().take(2).cloned().collect(),
+        };
+        (window, Some(pages))
+    } else {
+        (plan.window, None)
+    };
+    let frames = chapter_head_frames(preferences, window, viewport, plan.capacity);
+    prefetch_chapter_frames(
+        manager,
+        plan.chapter,
+        manifest,
+        frames,
+        offline,
+        preferences,
+        viewport,
+        cancellation,
+    )
+}
+
+fn chapter_head_frames(
+    preferences: &Preferences,
+    window: crate::store::PageWindow,
+    viewport: (u32, u32),
+    capacity: usize,
+) -> Vec<PrefetchFrame> {
+    let options = reader_image_options(preferences, viewport, 0, window.total);
+    let count = frame_page_count(preferences, 0, window.total).min(capacity.min(2));
+    window
+        .pages
+        .into_iter()
+        .take(count)
+        .enumerate()
+        .map(|(index, page)| PrefetchFrame {
+            index,
+            page,
+            options: options.clone(),
+            vertical: is_strip(preferences),
+            offset: 0,
+            zoom: 1.0,
+            half: 0,
+        })
+        .collect()
+}
+
+fn strip_prefetch_frames(
+    current: usize,
+    page: Option<&Page>,
+    options: ImageOptions,
+    targets: &[u32],
+    zoom: f32,
+    next: Option<PrefetchFrame>,
+) -> Vec<PrefetchFrame> {
+    let mut frames = Vec::with_capacity(2);
+    if let Some(page) = page {
+        frames.extend(targets.iter().take(2).map(|offset| PrefetchFrame {
+            index: current,
+            page: page.clone(),
+            options: options.clone(),
+            vertical: true,
+            offset: *offset,
+            zoom,
+            half: 0,
+        }));
+    }
+    if frames.len() < 2 {
+        frames.extend(next);
+    }
+    frames
+}
+
+fn prefetch_chapter_frames(
+    manager: &SourceManager,
+    chapter: Chapter,
+    manifest: Option<Vec<Page>>,
+    frames: Vec<PrefetchFrame>,
+    offline: bool,
+    preferences: &Preferences,
+    viewport: (u32, u32),
+    cancellation: &imaging::DecodeCancellation,
+) -> Result<PrefetchedChapter> {
+    let mut paths = Vec::with_capacity(frames.len());
+    let mut fetched = HashMap::<usize, PathBuf>::new();
+    let mut failed = HashSet::new();
+    for frame in frames {
+        cancellation.check()?;
+        if failed.contains(&frame.index) {
+            continue;
+        }
+        let path = if let Some(path) = fetched.get(&frame.index) {
+            path.clone()
+        } else {
+            match cached_page(
+                manager,
+                &frame.page,
+                &chapter.source_id,
+                frame.index,
+                offline,
+                FetchPriority::Prefetch,
+                &mut paths,
+            ) {
+                Ok(path) => {
+                    fetched.insert(frame.index, path.clone());
+                    path
+                }
+                Err(error) => {
+                    cancellation.check()?;
+                    failed.insert(frame.index);
+                    eprintln!("aidoku: read-ahead page {}: {error:#}", frame.index);
+                    continue;
+                }
+            }
+        };
+        cancellation.check()?;
+        match render_reader_page(
+            manager.cache(),
+            &frame.page,
+            &path,
+            &frame.options,
+            preferences,
+            viewport,
+            frame.vertical,
+            frame.offset,
+            frame.zoom,
+            frame.half,
+            Some(cancellation),
+        ) {
+            Ok(prepared) => {
+                cancellation.check()?;
+                let _ = super::prepared_pixels::prepare(prepared.rendered.image);
+            }
+            Err(error) => {
+                cancellation.check()?;
+                eprintln!("aidoku: read-ahead render {}: {error:#}", frame.index);
+            }
+        }
+    }
+    Ok(PrefetchedChapter {
+        chapter,
+        manifest,
+        paths,
+    })
+}
+
+fn prepared_source_is_eligible(preferences: &Preferences, vertical: bool, zoom: f32) -> bool {
+    if zoom != 1.0 || !(preferences.resize_downloads || preferences.grayscale_downloads) {
+        return false;
+    }
+    // Resampling before a crop, strip window, or half-page selection can change
+    // source geometry or discard detail needed by a later operation. Even a
+    // grayscale-only copy can quantize transparent edge pixels differently,
+    // changing a later content-boundary decision. Keep those paths on originals.
+    !vertical && !preferences.crop_borders && !preferences.split_wide
+}
+
+fn render_reader_page(
+    cache: &crate::cache::CacheManager,
+    page: &Page,
+    original: &Path,
+    options: &ImageOptions,
+    preferences: &Preferences,
+    viewport: (u32, u32),
+    vertical: bool,
+    offset: u32,
+    zoom: f32,
+    half: u8,
+    cancellation: Option<&imaging::DecodeCancellation>,
+) -> Result<super::wide_pages::WidePage> {
+    let render = |source: &Path| {
+        if let Some(token) = cancellation {
+            super::wide_pages::prefetch(
+                cache,
+                page,
+                source,
+                options,
+                vertical,
+                offset,
+                zoom,
+                preferences,
+                half,
+                token,
+            )
+        } else {
+            super::wide_pages::render(
+                cache,
+                page,
+                source,
+                options,
+                vertical,
+                offset,
+                zoom,
+                preferences,
+                half,
+            )
+        }
+    };
+    if !prepared_source_is_eligible(preferences, vertical, zoom) {
+        return render(original);
+    }
+    if let Some(token) = cancellation {
+        token.check()?;
+    }
+    // Retain the canonical original throughout lookup and rendering so a failed
+    // accelerator always has the same valid, in-use source available as fallback.
+    let _original_lease = cache.lease_path(original)?;
+    if let Ok(Some(prepared)) =
+        crate::downloads::prepared_page_path(cache, page, original, preferences, viewport)
+    {
+        if let Ok(_prepared_lease) = cache.lease_path(&prepared) {
+            if let Ok(rendered) = render(&prepared) {
+                return Ok(rendered);
+            }
+            if let Some(token) = cancellation {
+                token.check()?;
+            }
+        }
+    }
+    // This path only looks up download-time copies. It never creates or repairs
+    // one on a page turn, and never replaces Page.local_path with a derivative.
+    render(original)
+}
+
 fn cached_page(
     manager: &SourceManager,
     request: &Page,
@@ -392,6 +809,152 @@ fn strip_prefetch_offsets(offset: u32, viewport_height: u32, image_height: u32) 
 mod tests {
     use super::*;
     use crate::reader::ReaderAction;
+    use image::Pixel;
+
+    struct OfflineReaderFixture {
+        directory: tempfile::TempDir,
+        cache: crate::cache::CacheManager,
+        store: Store,
+        page: Page,
+        original: PathBuf,
+        book: Book,
+        chapter: Chapter,
+        preferences: Preferences,
+        viewport: (u32, u32),
+    }
+
+    impl OfflineReaderFixture {
+        fn new() -> Self {
+            let artwork = image::RgbImage::from_fn(96, 48, |x, y| {
+                image::Rgb([((x * 7) % 256) as u8, ((y * 9) % 256) as u8, 41])
+            });
+            Self::with_artwork(image::DynamicImage::ImageRgb8(artwork))
+        }
+
+        fn with_artwork(artwork: image::DynamicImage) -> Self {
+            let directory = tempfile::tempdir().unwrap();
+            let cache = crate::cache::CacheManager::open(directory.path()).unwrap();
+            let mut page = Page {
+                url: "https://example.test/prepared-reader.png".into(),
+                ..Page::default()
+            };
+            let write = cache.begin_raw(&page, None, 65_536).unwrap();
+            artwork
+                .save_with_format(write.temp_path(), image::ImageFormat::Png)
+                .unwrap();
+            cache.validate_path(write.temp_path()).unwrap();
+            let original = write.commit().unwrap();
+            page.local_path = Some(original.clone());
+            let store = Store::open(directory.path().join("library.sqlite3")).unwrap();
+            let book = Book {
+                id: "reader-book".into(),
+                source_id: "reader-fixture".into(),
+                remote_id: "reader-book".into(),
+                title: "Offline Reader".into(),
+                in_library: true,
+                ..Book::default()
+            };
+            let chapter = Chapter {
+                id: "reader-chapter".into(),
+                book_id: book.id.clone(),
+                source_id: book.source_id.clone(),
+                remote_id: "reader-chapter".into(),
+                number: 1.0,
+                page_count: 1,
+                ..Chapter::default()
+            };
+            store.upsert_book(&book).unwrap();
+            store.save_chapters(&book.id, &[chapter.clone()]).unwrap();
+            store.save_pages(&chapter.id, &[page.clone()]).unwrap();
+            let preferences = Preferences {
+                resize_downloads: true,
+                grayscale_downloads: true,
+                crop_borders: false,
+                dither: false,
+                spread: false,
+                ..Preferences::default()
+            };
+            Self {
+                directory,
+                cache,
+                store,
+                page,
+                original,
+                book,
+                chapter,
+                preferences,
+                viewport: (8, 12),
+            }
+        }
+
+        fn prepare_download(&self) -> PathBuf {
+            self.store.save_preferences(&self.preferences).unwrap();
+            let worker = crate::downloads::DownloadWorker::start_configured(
+                self.directory.path().to_path_buf(),
+                self.directory.path().join("library.sqlite3"),
+                crate::downloads::DownloadOptions {
+                    offline: false,
+                    ..crate::downloads::DownloadOptions::default()
+                },
+            )
+            .unwrap();
+            worker
+                .set_processing_viewport(self.viewport.0, self.viewport.1)
+                .unwrap();
+            worker.enqueue(&self.book, &self.chapter).unwrap();
+            let deadline = Instant::now() + Duration::from_secs(10);
+            loop {
+                let event = worker
+                    .events
+                    .recv_timeout(deadline.saturating_duration_since(Instant::now()))
+                    .expect("The cached offline download must complete without HTTP");
+                match event {
+                    DownloadEvent::Completed(job) if job.chapter_id == self.chapter.id => break,
+                    DownloadEvent::Failed(job) => {
+                        panic!("The offline fixture failed: {}", job.error)
+                    }
+                    DownloadEvent::Error(error) => panic!("The offline worker failed: {error}"),
+                    _ => {}
+                }
+            }
+            worker.shutdown();
+            assert!(worker.wait_stopped(Duration::from_secs(5)));
+            crate::downloads::prepared_page_path(
+                &self.cache,
+                &self.page,
+                &self.original,
+                &self.preferences,
+                self.viewport,
+            )
+            .unwrap()
+            .expect("The actual download worker must prepare the optional copy")
+        }
+
+        fn render(
+            &self,
+            preferences: &Preferences,
+            viewport: (u32, u32),
+            vertical: bool,
+            zoom: f32,
+            cancellation: Option<&imaging::DecodeCancellation>,
+        ) -> super::super::wide_pages::WidePage {
+            let options = reader_image_options(preferences, viewport, 0, 1);
+            render_reader_page(
+                &self.cache,
+                &self.page,
+                &self.original,
+                &options,
+                preferences,
+                viewport,
+                vertical,
+                0,
+                zoom,
+                0,
+                cancellation,
+            )
+            .unwrap()
+        }
+    }
 
     fn preferences(direction: &str, spread: bool) -> Preferences {
         Preferences {
@@ -747,5 +1310,372 @@ mod tests {
         }
         assert_eq!(strip_prefetch_offsets(0, 1_648, 10_000), [1_401, 2_802]);
         assert_eq!(strip_prefetch_offsets(2_500, 1_648, 5_000), [3_352]);
+    }
+
+    #[test]
+    fn next_chapter_head_keeps_foreground_geometry_and_the_global_budget() {
+        let viewport = (1_240, 930);
+        for direction in ["rtl", "ltr", "vertical-pages", "vertical"] {
+            for spread in [false, true] {
+                for cover_alone in [false, true] {
+                    for total in 1..=4 {
+                        for capacity in 0..=2 {
+                            let preferences = Preferences {
+                                cover_alone,
+                                ..preferences(direction, spread)
+                            };
+                            let window = crate::store::PageWindow {
+                                total,
+                                offset: 0,
+                                pages: (0..total)
+                                    .take(2)
+                                    .map(|index| Page {
+                                        url: format!("next-{index}"),
+                                        ..Page::default()
+                                    })
+                                    .collect(),
+                            };
+                            let frames =
+                                chapter_head_frames(&preferences, window, viewport, capacity);
+                            assert_eq!(
+                                frames.len(),
+                                frame_page_count(&preferences, 0, total).min(capacity)
+                            );
+                            for (index, frame) in frames.iter().enumerate() {
+                                assert_eq!(frame.index, index);
+                                assert_eq!(frame.page.url, format!("next-{index}"));
+                                assert_eq!(frame.offset, 0);
+                                assert_eq!(frame.zoom, 1.0);
+                                assert_eq!(frame.vertical, direction == "vertical");
+                                assert_eq!(
+                                    frame.options,
+                                    reader_image_options(&preferences, viewport, 0, total)
+                                );
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn strip_read_ahead_crosses_source_images_at_the_actual_turn_boundary() {
+        let preferences = preferences("vertical", false);
+        let viewport = (618, 824);
+        let current_page = Page {
+            url: "current-strip".into(),
+            ..Page::default()
+        };
+        for offset in [0, 2_500, 3_352] {
+            let mut reader = ReaderState::new(
+                vec![Chapter {
+                    id: "chapter".into(),
+                    page_count: 2,
+                    ..Chapter::default()
+                }],
+                "chapter",
+                1,
+                &preferences,
+            )
+            .unwrap();
+            reader.set_vertical_dimensions(5_000, 1_648);
+            reader.vertical_offset = offset;
+            reader.set_zoom(2.0);
+            let targets = strip_prefetch_offsets(offset, 1_648, 5_000);
+            let frames = strip_prefetch_frames(
+                0,
+                Some(&current_page),
+                reader_image_options(&preferences, viewport, 0, 2),
+                &targets,
+                reader.zoom,
+                Some(PrefetchFrame {
+                    index: 1,
+                    page: Page {
+                        url: "next-strip".into(),
+                        ..Page::default()
+                    },
+                    options: reader_image_options(&preferences, viewport, 1, 2),
+                    vertical: true,
+                    offset: 0,
+                    zoom: 1.0,
+                    half: 0,
+                }),
+            );
+            assert!(frames.len() <= 2);
+            assert_eq!(frames.len(), if offset == 3_352 { 1 } else { 2 });
+            for frame in frames {
+                assert_eq!(reader.next_page().action, ReaderAction::PageChanged);
+                assert_eq!(frame.index, reader.page as usize - 1);
+                assert_eq!(frame.offset, reader.vertical_offset);
+                assert_eq!(frame.zoom, reader.zoom);
+                assert_eq!(
+                    frame.options,
+                    reader_image_options(&preferences, viewport, frame.index, 2)
+                );
+            }
+        }
+    }
+
+    #[test]
+    fn read_ahead_follows_the_real_ordered_chapter_successor() {
+        let preferences = preferences("rtl", false);
+        let chapters = [
+            ("last", 8.0),
+            ("earlier", 1.0),
+            ("middle-z", 4.0),
+            ("middle-a", 4.0),
+        ]
+        .into_iter()
+        .map(|(id, number)| Chapter {
+            id: id.into(),
+            book_id: "book".into(),
+            source_id: "source".into(),
+            remote_id: id.into(),
+            number,
+            page_count: 1,
+            ..Chapter::default()
+        })
+        .collect();
+        let mut reader = ReaderState::new(chapters, "earlier", 1, &preferences).unwrap();
+        for expected in ["middle-a", "middle-z", "last"] {
+            assert_eq!(successor_chapter(&reader).unwrap().id, expected);
+            assert_eq!(reader.next_chapter().action, ReaderAction::ChapterChanged);
+            assert_eq!(reader.current_chapter().id, expected);
+        }
+        assert!(successor_chapter(&reader).is_none());
+    }
+
+    #[test]
+    fn changed_chapter_state_is_allowed_but_reused_identities_are_not() {
+        let original = Chapter {
+            id: "chapter".into(),
+            book_id: "book".into(),
+            source_id: "source".into(),
+            remote_id: "remote".into(),
+            ..Chapter::default()
+        };
+        let updated = Chapter {
+            read: true,
+            downloaded: true,
+            page_count: 120,
+            title: "A refreshed title".into(),
+            ..original.clone()
+        };
+        assert!(same_chapter_identity(&original, &updated));
+        for changed in [
+            Chapter {
+                book_id: "another-book".into(),
+                ..original.clone()
+            },
+            Chapter {
+                source_id: "another-source".into(),
+                ..original.clone()
+            },
+            Chapter {
+                remote_id: "another-remote".into(),
+                ..original.clone()
+            },
+        ] {
+            assert!(!same_chapter_identity(&original, &changed));
+        }
+    }
+
+    #[test]
+    fn prepared_reader_lookup_never_generates_a_copy_and_invalid_copies_fall_back() {
+        let fixture = OfflineReaderFixture::new();
+        let original_bytes = fs::read(&fixture.original).unwrap();
+        assert!(
+            crate::downloads::prepared_page_path(
+                &fixture.cache,
+                &fixture.page,
+                &fixture.original,
+                &fixture.preferences,
+                fixture.viewport,
+            )
+            .unwrap()
+            .is_none()
+        );
+        let original = fixture.render(&fixture.preferences, fixture.viewport, false, 1.0, None);
+        assert!(
+            crate::downloads::prepared_page_path(
+                &fixture.cache,
+                &fixture.page,
+                &fixture.original,
+                &fixture.preferences,
+                fixture.viewport,
+            )
+            .unwrap()
+            .is_none()
+        );
+        let prepared = fixture.prepare_download();
+        assert_ne!(prepared, fixture.original);
+        fs::write(&prepared, b"An invalid optional accelerator").unwrap();
+        let fallback = fixture.render(&fixture.preferences, fixture.viewport, false, 1.0, None);
+        assert_eq!(original.rendered.cache_path, fallback.rendered.cache_path);
+        assert_eq!(original.rendered.image, fallback.rendered.image);
+        assert_eq!(fs::read(&fixture.original).unwrap(), original_bytes);
+        assert_eq!(
+            fixture.store.pages(&fixture.chapter.id).unwrap()[0].local_path,
+            Some(fixture.original.clone())
+        );
+        assert_eq!(
+            fixture.cache.lookup_raw(&fixture.page).unwrap(),
+            Some(fixture.original)
+        );
+    }
+
+    #[test]
+    fn prepared_reader_prefetch_and_foreground_share_pixels_and_native_geometry() {
+        let fixture = OfflineReaderFixture::new();
+        let original_bytes = fs::read(&fixture.original).unwrap();
+        let prepared = fixture.prepare_download();
+        let cancellation = imaging::DecodeCancellation::new();
+        let prefetched = fixture.render(
+            &fixture.preferences,
+            fixture.viewport,
+            false,
+            1.0,
+            Some(&cancellation),
+        );
+        // Rotation reuses the same download copy, while each frame retains its
+        // actual foreground target geometry and its normal render-cache key.
+        let foreground = fixture.render(&fixture.preferences, fixture.viewport, false, 1.0, None);
+        let options = reader_image_options(&fixture.preferences, fixture.viewport, 0, 1);
+        let expected = crate::render_cache::render(
+            &fixture.cache,
+            &fixture.page,
+            &prepared,
+            &options,
+            false,
+            0,
+            1.0,
+        )
+        .unwrap();
+        assert!(Arc::ptr_eq(
+            &prefetched.rendered.image,
+            &foreground.rendered.image
+        ));
+        assert!(Arc::ptr_eq(&expected.image, &foreground.rendered.image));
+        assert_eq!(foreground.rendered.image.dimensions(), (16, 8));
+        assert_eq!(foreground.rendered.cache_path, expected.cache_path);
+        let rotated = fixture.render(&fixture.preferences, (12, 8), false, 1.0, None);
+        assert_eq!(rotated.rendered.image.dimensions(), (24, 12));
+        assert!(!prepared_source_is_eligible(
+            &fixture.preferences,
+            true,
+            1.0
+        ));
+        assert!(!prepared_source_is_eligible(
+            &fixture.preferences,
+            false,
+            2.0
+        ));
+        assert!(!prepared_source_is_eligible(
+            &Preferences {
+                crop_borders: true,
+                ..fixture.preferences.clone()
+            },
+            false,
+            1.0,
+        ));
+        assert!(!prepared_source_is_eligible(
+            &Preferences {
+                split_wide: true,
+                ..fixture.preferences.clone()
+            },
+            false,
+            1.0,
+        ));
+        assert!(!prepared_source_is_eligible(
+            &Preferences::default(),
+            false,
+            1.0
+        ));
+        assert_eq!(fs::read(&fixture.original).unwrap(), original_bytes);
+        assert_eq!(
+            fixture.store.pages(&fixture.chapter.id).unwrap()[0].local_path,
+            Some(fixture.original)
+        );
+    }
+
+    #[test]
+    fn transparent_gray_copies_cannot_change_reader_crop_or_strip_geometry() {
+        let artwork = image::RgbaImage::from_fn(16, 24, |x, y| {
+            if (4..12).contains(&x) && (6..18).contains(&y) {
+                image::Rgba([0, 0, 0, 255])
+            } else if x == 0 && y == 8 {
+                // Reader luma is 39, composited to 247. The download copy
+                // composites RGB to [252,245,245], then rounds luma to 246.
+                image::Rgba([185, 0, 0, 10])
+            } else {
+                image::Rgba([0, 0, 0, 0])
+            }
+        });
+        let mut fixture =
+            OfflineReaderFixture::with_artwork(image::DynamicImage::ImageRgba8(artwork));
+        fixture.preferences.resize_downloads = false;
+        fixture.preferences.crop_borders = true;
+        let prepared = fixture.prepare_download();
+        let source_pixels = image::ImageReader::open(&fixture.original)
+            .unwrap()
+            .with_guessed_format()
+            .unwrap()
+            .decode()
+            .unwrap()
+            .into_rgba8();
+        assert_eq!(source_pixels.get_pixel(0, 8).0, [185, 0, 0, 10]);
+        assert_eq!(source_pixels.get_pixel(0, 8).to_luma()[0], 39);
+        let prepared_pixels = image::ImageReader::open(&prepared)
+            .unwrap()
+            .with_guessed_format()
+            .unwrap()
+            .decode()
+            .unwrap()
+            .into_luma8();
+        assert_eq!(prepared_pixels.get_pixel(0, 8)[0], 246);
+        let options = reader_image_options(&fixture.preferences, fixture.viewport, 0, 1);
+        let original = crate::render_cache::render(
+            &fixture.cache,
+            &fixture.page,
+            &fixture.original,
+            &options,
+            false,
+            0,
+            1.0,
+        )
+        .unwrap();
+        let different_geometry = crate::render_cache::render(
+            &fixture.cache,
+            &fixture.page,
+            &prepared,
+            &options,
+            false,
+            0,
+            1.0,
+        )
+        .unwrap();
+        assert_ne!(
+            original.image.dimensions(),
+            different_geometry.image.dimensions()
+        );
+        for vertical in [false, true] {
+            let expected = crate::render_cache::render(
+                &fixture.cache,
+                &fixture.page,
+                &fixture.original,
+                &options,
+                vertical,
+                0,
+                1.0,
+            )
+            .unwrap();
+            let actual =
+                fixture.render(&fixture.preferences, fixture.viewport, vertical, 1.0, None);
+            assert_eq!(actual.rendered.cache_path, expected.cache_path);
+            assert_eq!(actual.rendered.image, expected.image);
+            assert_eq!(actual.rendered.scaled_height, expected.scaled_height);
+            assert_eq!(actual.rendered.viewport_height, expected.viewport_height);
+        }
     }
 }

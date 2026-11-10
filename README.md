@@ -6,7 +6,16 @@ WeRead project's software-rendered UI, native Kindle backend, remote build, and
 firmware-emulator workflow. It is not an official Aidoku release or a KOReader
 plugin and does not require the WeRead application.
 
-## Current Candidate18 result
+## Current development follow-up
+
+The working tree adds chapter-boundary and vertical-image prefetch, prioritized
+background decoding, prepared RGB publication, wide-page halves, editable
+categories, metadata backup/restore, bounded logs, optional download preparation,
+scheduled library updates, configured tracking accounts, and runtime languages.
+See [implementation and current verification](docs/READING_FOLLOWUP.md) and
+[the KOReader hardware review](docs/KOREADER_HARDWARE_RESEARCH.md).
+
+## Frozen Candidate18 delivery
 
 The final Candidate18 package uses the frozen source and payloads below. Its
 [strict verification](artifacts/phase3/candidate18-final-root-01/package-final-01/package-verification-01.json)
@@ -163,8 +172,10 @@ manual 90/270-degree preferences. Other orientations remain manual. Automatic
 brightness is not implemented or qualified; the lighting controls cover exposed
 frontlight/warmth capabilities. Missing automatic rows in supplied Scribe
 references are a documented limit, without establishing the model's hardware
-capabilities or unconditional reference parity. Complete tracking-service
-authorization/synchronization is not implemented.
+capabilities or unconditional reference parity. The development follow-up
+supports configured AniList/MyAnimeList accounts and synchronization; it requires
+the user's legitimate credentials or registered OAuth client. The frozen
+Candidate18 package retains its original feature scope.
 
 Inversion uses the implemented backend path and its full-refresh boundary.
 Physical ghosting, battery use, lighting behavior, sleep/wake, and touch quality

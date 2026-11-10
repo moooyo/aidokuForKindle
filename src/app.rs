@@ -1,20 +1,30 @@
 mod actions;
+mod automatic_updates;
+mod categories;
 mod cover_jobs;
+mod data_management;
+mod device_policies;
 mod diagnostics;
 mod download_usage;
+mod extended_preferences;
 mod interaction_models;
 mod lifecycle;
+mod logging;
 mod migration;
 mod orientation;
+mod prepared_pixels;
 mod reader_pipeline;
 mod reader_recovery;
 mod retained_scene;
+mod runtime_restore;
 mod search_scope;
 mod server_configuration;
 mod source_jobs;
 mod source_migration;
 mod storage_details;
+mod tracking_accounts;
 mod view;
+mod wide_pages;
 
 use interaction_models::InteractionState;
 use reader_recovery::{ReaderRecovery, ReaderTarget};
@@ -106,8 +116,10 @@ enum JobResult {
         chapter_id: String,
         page: u32,
         offset: u32,
-        first: Arc<GrayImage>,
-        second: Option<Arc<GrayImage>>,
+        first: prepared_pixels::PreparedPixels,
+        second: Option<prepared_pixels::PreparedPixels>,
+        wide: bool,
+        wide_half: u8,
         scaled_height: u32,
         viewport_height: u32,
         preferences: Preferences,
@@ -115,18 +127,20 @@ enum JobResult {
         second_path: Option<PathBuf>,
         paths: Vec<CachedPage>,
     },
-    Prefetched {
-        chapter_id: String,
-        paths: Vec<CachedPage>,
-    },
+    Prefetched(reader_pipeline::Prefetched),
     Cover {
         id: String,
         uri: String,
         path: PathBuf,
-        image: Arc<GrayImage>,
+        image: prepared_pixels::PreparedPixels,
     },
     DownloadUsage(download_usage::UsageResult),
     StorageDetails(storage_details::StorageDetailsResult),
+    DataManagement(data_management::DataManagementResult),
+    AutomaticUpdate(automatic_updates::UpdateResult),
+    AheadDownloads(automatic_updates::AheadResult),
+    Tracking(tracking_accounts::TrackingResult),
+    MetadataRestore(Result<runtime_restore::RestoreResult>),
     Search(SearchResult),
     Imported(Vec<ImportedBook>),
     Repository(Repository),
@@ -158,6 +172,10 @@ enum JobKind {
     StorageDetails,
     Migration,
     ServerConnection,
+    AutomaticUpdate,
+    AheadDownload,
+    Tracking,
+    MetadataRestore,
 }
 
 #[derive(Debug, Clone)]
@@ -248,6 +266,8 @@ pub struct App {
     pub(crate) message: String,
     message_until: Option<Instant>,
     pairing: Option<PairingServer>,
+    pending_user_network: Option<actions::PendingUserNetwork>,
+    pending_wide_navigation: i8,
     downloads: DownloadWorker,
     book_removal_completions: u64,
     last_book_removal: Option<Value>,
@@ -255,6 +275,7 @@ pub struct App {
     job_rx: Receiver<JobMessage>,
     next_job: u64,
     pending: HashSet<u64>,
+    active_jobs: HashSet<u64>,
     cover_pending: HashSet<String>,
     cover_queue: VecDeque<Book>,
     cover_inflight: Option<u64>,
@@ -269,6 +290,10 @@ pub struct App {
     pub(crate) cached_download_bytes: Option<u64>,
     download_usage: download_usage::UsageTracker,
     storage_details: storage_details::StorageDetailsTracker,
+    data_management: data_management::DataManagementState,
+    automatic_updates: automatic_updates::AutomaticUpdates,
+    tracking_accounts: tracking_accounts::TrackingAccounts,
+    metadata_restore: runtime_restore::RestoreRuntime,
     background_ui_dirty: bool,
     download_ui_dirty: bool,
     next_background_ui: Instant,
@@ -288,6 +313,7 @@ pub struct App {
     frame_refresh: Option<RefreshKind>,
     prefetch_inflight: Option<u64>,
     prefetch_dirty: bool,
+    reader_prefetch_cancel: Option<imaging::DecodeCancellation>,
     search_generation: u64,
     catalog_generation: u64,
     shutting_down: bool,
@@ -367,6 +393,12 @@ impl App {
         };
         let resume_network_pending = options.resume && !options.offline && !options.demo;
         let interactions = InteractionState::load(&store)?;
+        let data_management =
+            data_management::DataManagementState::open(&data_dir, prefs.write_logs)?;
+        let _ = data_management
+            .logs
+            .record("app.start", logging::LogOutcome::Success);
+        downloads.set_processing_viewport(width, height)?;
         let mut app = Self {
             ui: ui.as_weak(),
             options,
@@ -435,6 +467,8 @@ impl App {
             message: String::new(),
             message_until: None,
             pairing: None,
+            pending_user_network: None,
+            pending_wide_navigation: 0,
             downloads,
             book_removal_completions: 0,
             last_book_removal: None,
@@ -442,6 +476,7 @@ impl App {
             job_rx,
             next_job: 1,
             pending: HashSet::new(),
+            active_jobs: HashSet::new(),
             cover_pending: HashSet::new(),
             cover_queue: VecDeque::new(),
             cover_inflight: None,
@@ -456,6 +491,10 @@ impl App {
             cached_download_bytes: None,
             download_usage: download_usage::UsageTracker::default(),
             storage_details: storage_details::StorageDetailsTracker::default(),
+            data_management,
+            automatic_updates: automatic_updates::AutomaticUpdates::default(),
+            tracking_accounts: tracking_accounts::TrackingAccounts::default(),
+            metadata_restore: runtime_restore::RestoreRuntime::default(),
             background_ui_dirty: false,
             download_ui_dirty: false,
             next_background_ui: Instant::now(),
@@ -475,6 +514,7 @@ impl App {
             frame_refresh: None,
             prefetch_inflight: None,
             prefetch_dirty: false,
+            reader_prefetch_cancel: None,
             search_generation: 0,
             catalog_generation: 0,
             shutting_down: false,
@@ -534,15 +574,27 @@ impl App {
     }
 
     pub fn poll(&mut self) {
+        if self.metadata_restore_active() && !self.shutting_down {
+            self.poll_metadata_restore();
+            return;
+        }
         if self.shutting_down || self.suspended || self.resume_frame_pending {
             return;
         }
         self.poll_network_resume();
+        let network_pending = self.pending_user_network.is_some();
+        if let Err(error) = self.poll_pending_user_network() {
+            self.show_error(error);
+        }
+        self.poll_device_policies();
         self.platform
             .set_download_activity(self.downloads.active_count() > 0);
-        let mut changed = false;
+        let mut changed = network_pending && self.pending_user_network.is_none();
         while let Ok(message) = self.job_rx.try_recv() {
             self.pending.remove(&message.id);
+            self.active_jobs.remove(&message.id);
+            self.data_management.finish_job(message.id);
+            self.finish_automatic_job(message.id, message.result.is_err());
             self.busy = !self.pending.is_empty();
             if matches!(message.context.kind, JobKind::Migration)
                 && !self.migration_job_is_active(message.id)
@@ -616,6 +668,11 @@ impl App {
                             eprintln!("aidoku: read-ahead: {error:#}");
                         } else if matches!(
                             message.context.kind,
+                            JobKind::AutomaticUpdate | JobKind::AheadDownload
+                        ) {
+                            eprintln!("aidoku: automatic library work: {error:#}");
+                        } else if matches!(
+                            message.context.kind,
                             JobKind::DownloadUsage | JobKind::StorageDetails
                         ) {
                             eprintln!("aidoku: offline storage accounting: {error:#}");
@@ -648,7 +705,7 @@ impl App {
             } else if !prefetch_job
                 && !matches!(
                     message.context.kind,
-                    JobKind::DownloadUsage | JobKind::StorageDetails
+                    JobKind::DownloadUsage | JobKind::StorageDetails | JobKind::AutomaticUpdate
                 )
             {
                 changed = true;
@@ -760,6 +817,7 @@ impl App {
                 }),
                 PairingEvent::Repository(url) => self.fetch_repository(&url),
                 PairingEvent::Import(path) => self.import_local(&path),
+                PairingEvent::Tracking(request) => self.connect_tracking(request),
             };
             if let Err(error) = result {
                 self.show_error(error);
@@ -803,6 +861,18 @@ impl App {
         if let Err(error) = self.poll_download_usage() {
             eprintln!("aidoku: queue offline storage accounting: {error:#}");
         }
+        if let Err(error) = self.poll_automatic_updates(automatic_updates::PolicyEnvironment {
+            wifi_connected: self.platform.wifi_connected(),
+            charging: self.platform.is_charging(),
+        }) {
+            eprintln!("aidoku: automatic library update: {error:#}");
+        }
+        if let Err(error) = self.queue_reader_ahead_chapters() {
+            eprintln!("aidoku: automatic chapter download: {error:#}");
+        }
+        if let Err(error) = self.poll_tracking() {
+            eprintln!("aidoku: tracking queue: {error:#}");
+        }
         if let Err(error) = self.poll_storage_details() {
             eprintln!("aidoku: queue storage details accounting: {error:#}");
         }
@@ -842,12 +912,17 @@ impl App {
             }
             JobKind::Search => self.fail_search_group(context, &tr("request_superseded")),
             JobKind::ServerConnection => self.reconcile_server_connection_state(),
+            JobKind::AutomaticUpdate | JobKind::AheadDownload => {}
             _ if self.job_context_is_current(context) => self.notify(tr("request_superseded")),
             _ => {}
         }
     }
 
     pub(crate) fn source_images_changed(&mut self) {
+        self.pending_wide_navigation = 0;
+        self.cancel_pending_user_network();
+        self.cancel_reader_prefetch();
+        self.invalidate_automatic_updates();
         self.source_revision = self.source_revision.wrapping_add(1);
         self.source_configurations = None;
         self.source_configuration_revision
@@ -966,12 +1041,7 @@ impl App {
                     .reader_target
                     .clone()
                     .unwrap_or_else(|| ReaderTarget::new(&chapter_id, page, 0, 1.0));
-                self.enter_reader_at(
-                    &chapter_id,
-                    target.page,
-                    target.vertical_offset,
-                    target.zoom,
-                )?;
+                self.load_reader_target(target)?;
             }
             JobResult::ReaderImage {
                 chapter_id,
@@ -979,6 +1049,8 @@ impl App {
                 offset,
                 first,
                 second,
+                wide,
+                wide_half,
                 scaled_height,
                 viewport_height,
                 preferences,
@@ -1032,9 +1104,15 @@ impl App {
                             }
                         }
                         self.displayed_image_leases = leases;
-                        ui.global::<State>().set_reader_image(gray_image(first));
-                        ui.global::<State>()
-                            .set_reader_image_next(second.map(gray_image).unwrap_or_default());
+                        ui.global::<State>().set_reader_image(first.into_image());
+                        ui.global::<State>().set_reader_image_next(
+                            second
+                                .map(prepared_pixels::PreparedPixels::into_image)
+                                .unwrap_or_default(),
+                        );
+                        if let Some(reader) = self.reader.as_mut() {
+                            reader.set_wide_page(wide, wide_half);
+                        }
                         if let Some(reader) = self.reader.as_ref() {
                             self.displayed_reader = Some(DisplayedReader {
                                 session: ReaderSession {
@@ -1044,6 +1122,8 @@ impl App {
                                     total: reader.total,
                                     vertical_offset: reader.vertical_offset,
                                     zoom: reader.zoom,
+                                    wide_half: reader.wide_half,
+                                    wide_page: reader.is_wide_page(),
                                     landscape: reader.landscape,
                                     spread: reader.spread,
                                     menu_open: false,
@@ -1075,17 +1155,18 @@ impl App {
                         self.frame_refresh = Some(refresh_kind(context.reader_refresh));
                         self.reader_refresh = RefreshRequest::None;
                         self.save_reader_progress()?;
-                        self.prefetch_dirty = true;
-                        if let Err(error) = self.start_reader_prefetch() {
-                            self.prefetch_dirty = false;
-                            eprintln!("aidoku: read-ahead: {error:#}");
+                        self.queue_displayed_tracking_progress()?;
+                        if !self.replay_pending_wide_navigation()? {
+                            self.prefetch_dirty = true;
+                            if let Err(error) = self.start_reader_prefetch() {
+                                self.prefetch_dirty = false;
+                                eprintln!("aidoku: read-ahead: {error:#}");
+                            }
                         }
                     }
                 }
             }
-            JobResult::Prefetched { chapter_id, paths } => {
-                self.save_cached_paths(&chapter_id, paths)?;
-            }
+            JobResult::Prefetched(result) => self.accept_reader_prefetch(result)?,
             JobResult::Cover {
                 id,
                 uri,
@@ -1105,6 +1186,11 @@ impl App {
             JobResult::MigrationCandidates(result) => self.accept_migration_candidates(result)?,
             JobResult::MigrationPrepared(result) => self.accept_prepared_migration(result)?,
             JobResult::ServerConnected(result) => self.complete_server_connection(result)?,
+            JobResult::DataManagement(result) => self.accept_data_management(result)?,
+            JobResult::AutomaticUpdate(result) => self.accept_automatic_update(result)?,
+            JobResult::AheadDownloads(result) => self.accept_ahead_downloads(result)?,
+            JobResult::Tracking(result) => self.accept_tracking_result(result)?,
+            JobResult::MetadataRestore(result) => self.finish_metadata_restore(result)?,
             JobResult::Search(mut group) => {
                 if context.search_generation != self.search_generation
                     || context.query != self.query
@@ -1216,6 +1302,7 @@ impl App {
                     self.store.save_chapters(&book.id, &chapters)?;
                 }
                 self.invalidate_storage_details();
+                self.record_manual_library_update_success()?;
                 self.notify(if checked > 0 {
                     tr("library_update_complete").replace("{count}", &checked.to_string())
                 } else {
@@ -1252,6 +1339,7 @@ impl App {
     }
 
     pub(crate) fn invalidate_reader_work(&mut self) {
+        self.cancel_reader_prefetch();
         self.reader_generation = self.reader_generation.wrapping_add(1);
         self.reader_dirty = false;
         self.reader_refresh = RefreshRequest::None;
@@ -1298,6 +1386,7 @@ impl App {
     fn apply_reader_update(&mut self, update: ReaderUpdate) -> Result<()> {
         use crate::reader::ReaderAction;
         if update.action == ReaderAction::MenuOpened {
+            self.pending_wide_navigation = 0;
             let _ = self.platform.status();
         }
         if matches!(
@@ -1427,20 +1516,33 @@ impl App {
     }
 
     pub fn shutdown(&mut self) {
+        self.pending_wide_navigation = 0;
+        self.cancel_pending_user_network();
         if self.shutting_down {
             return;
         }
         self.shutting_down = true;
+        self.platform.restore_device_policies();
+        self.cancel_reader_prefetch();
+        self.invalidate_automatic_updates();
+        self.cancel_tracking_work();
+        let _ = self
+            .data_management
+            .logs
+            .record("app.stop", logging::LogOutcome::Success);
         self.sync_storage_details_visibility();
-        let _ = self.save_reader_progress();
-        let _ = self.checkpoint_navigation(true);
-        let _ = self.store.save_preferences(&self.prefs);
+        if !self.metadata_restore_active() {
+            let _ = self.save_reader_progress();
+            let _ = self.checkpoint_navigation(true);
+            let _ = self.store.save_preferences(&self.prefs);
+        }
         self.downloads.shutdown();
         self.pairing = None;
     }
 
     pub fn finish_shutdown(&self) -> bool {
         self.downloads.wait_stopped(Duration::from_secs(2))
+            && self.platform.device_policies_restored()
     }
 }
 
@@ -1576,6 +1678,8 @@ mod tests {
             }
             let prefs = store.preferences().unwrap();
             let interactions = InteractionState::load(&store).unwrap();
+            let data_management =
+                data_management::DataManagementState::open(&data_dir, prefs.write_logs).unwrap();
             let downloads = DownloadWorker::start_initialized(
                 data_dir.clone(),
                 database,
@@ -1669,6 +1773,8 @@ mod tests {
                 message: String::new(),
                 message_until: None,
                 pairing: None,
+                pending_user_network: None,
+                pending_wide_navigation: 0,
                 downloads,
                 book_removal_completions: 0,
                 last_book_removal: None,
@@ -1676,6 +1782,7 @@ mod tests {
                 job_rx,
                 next_job: 1,
                 pending: HashSet::new(),
+                active_jobs: HashSet::new(),
                 cover_pending: HashSet::new(),
                 cover_queue: VecDeque::new(),
                 cover_inflight: None,
@@ -1690,6 +1797,10 @@ mod tests {
                 cached_download_bytes: None,
                 download_usage: download_usage::UsageTracker::default(),
                 storage_details: storage_details::StorageDetailsTracker::default(),
+                data_management,
+                automatic_updates: automatic_updates::AutomaticUpdates::default(),
+                tracking_accounts: tracking_accounts::TrackingAccounts::default(),
+                metadata_restore: runtime_restore::RestoreRuntime::default(),
                 background_ui_dirty: false,
                 download_ui_dirty: false,
                 next_background_ui: Instant::now(),
@@ -1709,6 +1820,7 @@ mod tests {
                 frame_refresh: None,
                 prefetch_inflight: None,
                 prefetch_dirty: false,
+                reader_prefetch_cancel: None,
                 search_generation: 0,
                 catalog_generation: 0,
                 shutting_down: false,

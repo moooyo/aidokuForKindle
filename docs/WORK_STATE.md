@@ -1,6 +1,21 @@
 # Work state
 
-Updated: 2026-11-09.
+Updated: 2026-11-10.
+
+## Current development follow-up
+
+The current working tree adds reader prefetch/decoder/pixel-publication work and
+the requested application feature follow-up. Its implementation and separate
+verification status are tracked in [reading follow-up](READING_FOLLOWUP.md).
+Final remote checks passed 636 host library tests, 649 Kindle-feature library
+tests, thirteen primary UI cases, two actual Reader-panel pointer cases and
+twenty-nine mock launcher cases. Both library configurations retained two
+ignored opt-in benchmarks. The ARM release build passed. Final Cargo build
+concurrency was six; the verification worker was normally rebooted with explicit
+user authorization after becoming unavailable. Physical-device and real-account
+qualification remain outside these host results.
+The frozen Candidate18 delivery and historical acceptance below retain their
+original identities; the working changes are not covered by those old reports.
 
 After the final delivery, the user confirmed that automatic brightness is
 excluded from requirements and acceptance. Its absence is not an unfinished

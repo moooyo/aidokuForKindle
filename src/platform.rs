@@ -8,6 +8,10 @@ use serde::{Deserialize, Serialize};
 
 use crate::domain::Preferences;
 
+#[path = "device_policy.rs"]
+mod device_policy;
+pub use device_policy::{DevicePolicyCapabilities, DevicePolicyObservation};
+
 #[cfg(all(feature = "kindle", target_os = "linux"))]
 #[path = "platform_activity.rs"]
 mod activity;
@@ -226,6 +230,7 @@ pub struct Platform {
     applied_lighting: Cell<Option<(u8, u8)>>,
     sleep_requested: Cell<bool>,
     pointer_observer: RefCell<Option<PointerObserver>>,
+    device_policies: Option<device_policy::DevicePolicyWorker>,
     #[cfg(all(feature = "kindle", target_os = "linux"))]
     backend: RefCell<Option<slint_backend_kindle::KindleBackend>>,
     #[cfg(all(feature = "kindle", target_os = "linux"))]
@@ -259,6 +264,11 @@ impl Platform {
             applied_lighting: Cell::new(None),
             sleep_requested: Cell::new(false),
             pointer_observer: RefCell::new(None),
+            device_policies: if kindle {
+                Some(device_policy::DevicePolicyWorker::start()?)
+            } else {
+                None
+            },
             #[cfg(all(feature = "kindle", target_os = "linux"))]
             backend: RefCell::new(None),
             #[cfg(all(feature = "kindle", target_os = "linux"))]
@@ -274,6 +284,70 @@ impl Platform {
 
     pub const fn is_kindle(&self) -> bool {
         self.kindle
+    }
+
+    /// Read a background snapshot without invoking device services on the UI thread.
+    pub fn device_policy_observation(&self) -> DevicePolicyObservation {
+        self.device_policies
+            .as_ref()
+            .map(device_policy::DevicePolicyWorker::observation)
+            .unwrap_or_default()
+    }
+
+    pub fn device_policy_capabilities(&self) -> DevicePolicyCapabilities {
+        self.device_policy_observation().capabilities
+    }
+
+    pub fn is_charging(&self) -> Option<bool> {
+        self.device_policy_observation().charging
+    }
+
+    pub fn wifi_connected(&self) -> Option<bool> {
+        self.device_policy_observation().wifi_connected
+    }
+
+    /// Only a network-free Reader should request this optional policy.
+    pub fn set_reading_wifi_policy(&self, active: bool) {
+        if let Some(worker) = self.device_policies.as_ref() {
+            worker.request_wifi_disabled(active && !self.sleep_requested.get());
+        }
+    }
+
+    pub fn restore_device_policies(&self) {
+        self.set_reading_wifi_policy(false);
+    }
+
+    pub fn device_policies_restored(&self) -> bool {
+        self.device_policies
+            .as_ref()
+            .is_none_or(device_policy::DevicePolicyWorker::restored)
+    }
+
+    /// Release only our reading Wi-Fi lease and keep it released for a user action.
+    pub fn request_network_for_user(&self) {
+        if let Some(worker) = self.device_policies.as_ref() {
+            worker.request_network_for_user();
+        }
+    }
+
+    /// Reconnection is observed asynchronously; callers should retry from their poll.
+    pub fn user_network_ready(&self) -> bool {
+        self.device_policies
+            .as_ref()
+            .is_none_or(device_policy::DevicePolicyWorker::user_network_ready)
+    }
+
+    pub fn finish_user_network_request(&self) {
+        if let Some(worker) = self.device_policies.as_ref() {
+            worker.finish_user_network_request();
+        }
+    }
+
+    /// Background HTTP must wait while this application deliberately owns Wi-Fi off.
+    pub fn network_policy_blocked(&self) -> bool {
+        self.device_policies
+            .as_ref()
+            .is_some_and(device_policy::DevicePolicyWorker::network_policy_blocked)
     }
 
     pub fn install_control_callback(&self, callback: impl FnMut() + 'static) -> Result<()> {
@@ -304,6 +378,9 @@ impl Platform {
 
     pub fn begin_suspend(&self) -> Result<()> {
         self.sleep_requested.set(true);
+        if let Some(worker) = self.device_policies.as_ref() {
+            worker.pause();
+        }
         #[cfg(all(feature = "kindle", target_os = "linux"))]
         if self.kindle {
             if let Some(worker) = self.activity.borrow().as_ref() {
@@ -320,6 +397,9 @@ impl Platform {
     }
 
     pub fn park_for_suspend(&self) -> Result<()> {
+        if !self.device_policies_restored() {
+            bail!("The reading Wi-Fi policy has not restored device ownership yet");
+        }
         #[cfg(all(feature = "kindle", target_os = "linux"))]
         if self.kindle {
             if self
@@ -343,6 +423,9 @@ impl Platform {
     pub fn resume_after_sleep(&self) -> Result<()> {
         self.sleep_requested.set(false);
         self.invalidate_status_cache();
+        if let Some(worker) = self.device_policies.as_ref() {
+            worker.resume();
+        }
         #[cfg(all(feature = "kindle", target_os = "linux"))]
         if self.kindle {
             if let Some(worker) = self.activity.borrow().as_ref() {

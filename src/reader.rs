@@ -164,6 +164,8 @@ pub struct ReaderState {
     /// Effective page layout, resolved by the application for the active device.
     pub spread: bool,
     pub cover_alone: bool,
+    /// The displayed half in reading order; source-page coordinates stay stable.
+    pub wide_half: u8,
     pub vertical_offset: u32,
     pub image_height: u32,
     pub viewport_height: u32,
@@ -176,6 +178,8 @@ pub struct ReaderState {
     reverse_taps: bool,
     double_tap_zoom: bool,
     pending_vertical_bottom: bool,
+    split_wide: bool,
+    wide_page: bool,
 }
 
 impl ReaderState {
@@ -208,6 +212,7 @@ impl ReaderState {
             landscape: preferences.landscape,
             spread: preferences.spread,
             cover_alone: preferences.cover_alone,
+            wide_half: 0,
             vertical_offset: 0,
             image_height: 0,
             viewport_height: 1,
@@ -221,6 +226,8 @@ impl ReaderState {
                 || matches!(preferences.tap_layout.as_str(), "reverse" | "reversed"),
             double_tap_zoom: preferences.double_tap_zoom,
             pending_vertical_bottom: false,
+            split_wide: preferences.split_wide,
+            wide_page: false,
         })
     }
 
@@ -243,9 +250,25 @@ impl ReaderState {
     }
 
     pub fn set_total(&mut self, total: u32) {
+        let previous_page = self.page;
         self.total = total.max(1);
         self.chapters[self.chapter_index].page_count = self.total;
         self.page = self.page.clamp(1, self.total);
+        if self.page != previous_page {
+            self.reset_page_geometry();
+        }
+    }
+
+    /// Accept worker-resolved source geometry for the current source page.
+    /// Backward navigation requests half one before its dimensions are known;
+    /// a narrow page resolves that request to its only frame, half zero.
+    pub fn set_wide_page(&mut self, wide: bool, half: u8) {
+        self.wide_page = self.wide_split_enabled() && wide;
+        self.wide_half = if self.wide_page { half.min(1) } else { 0 };
+    }
+
+    pub fn is_wide_page(&self) -> bool {
+        self.wide_split_enabled() && self.wide_page
     }
 
     pub fn set_vertical_dimensions(&mut self, image_height: u32, viewport_height: u32) {
@@ -265,6 +288,9 @@ impl ReaderState {
 
     pub fn apply_preferences(&mut self, preferences: &Preferences) {
         let direction = ReadingDirection::from_preference(&preferences.reading_direction);
+        let split_changed = self.direction != direction
+            || self.spread != preferences.spread
+            || self.split_wide != preferences.split_wide;
         if self.direction != direction {
             self.reset_vertical_geometry();
         }
@@ -272,6 +298,11 @@ impl ReaderState {
         self.landscape = preferences.landscape;
         self.spread = preferences.spread;
         self.cover_alone = preferences.cover_alone;
+        self.split_wide = preferences.split_wide;
+        if split_changed {
+            self.wide_half = 0;
+            self.wide_page = false;
+        }
         self.refresh_every = preferences.refresh_every;
         self.flash_on_close = preferences.flash_on_close;
         self.tap_layout = TapLayout::from_preference(&preferences.tap_layout);
@@ -279,6 +310,23 @@ impl ReaderState {
             || matches!(preferences.tap_layout.as_str(), "reverse" | "reversed");
         self.double_tap_zoom = preferences.double_tap_zoom;
         self.footer_mode = preferences.footer_mode % 4;
+    }
+
+    /// Resolve a page-turn tap without mutating navigation or cloning chapters.
+    /// Menus, ignored regions and invalid coordinates have no page delta.
+    pub fn tap_page_delta(&self, x: f32, y: f32) -> Option<i8> {
+        if self.menu_open
+            || !x.is_finite()
+            || !y.is_finite()
+            || !(0.0..=1.0).contains(&x)
+            || !(0.0..=1.0).contains(&y)
+        {
+            return None;
+        }
+        match self.tap_region(x, y) {
+            TapRegion::Turn(advance) => Some(if advance != self.reverse_taps { 1 } else { -1 }),
+            TapRegion::None | TapRegion::Menu => None,
+        }
     }
 
     /// Coordinates cover the complete comic viewport. No corner is reserved for
@@ -364,6 +412,11 @@ impl ReaderState {
     }
 
     pub fn next_page(&mut self) -> ReaderUpdate {
+        if self.wide_split_enabled() && self.wide_page && self.wide_half == 0 {
+            self.wide_half = 1;
+            self.zoom = 1.0;
+            return self.page_changed();
+        }
         if self.direction == ReadingDirection::Vertical
             && self.vertical_offset < self.maximum_vertical_offset()
         {
@@ -382,6 +435,11 @@ impl ReaderState {
     }
 
     pub fn previous_page(&mut self) -> ReaderUpdate {
+        if self.wide_split_enabled() && self.wide_page && self.wide_half == 1 {
+            self.wide_half = 0;
+            self.zoom = 1.0;
+            return self.page_changed();
+        }
         if self.direction == ReadingDirection::Vertical && self.vertical_offset > 0 {
             self.vertical_offset = self.vertical_offset.saturating_sub(self.vertical_step());
             return self.page_changed();
@@ -391,6 +449,7 @@ impl ReaderState {
             self.page = self.page_layout().previous_index(first as usize - 1) as u32 + 1;
             self.reset_page_geometry();
             self.pending_vertical_bottom = self.direction == ReadingDirection::Vertical;
+            self.wide_half = u8::from(self.wide_split_enabled());
             return self.page_changed();
         }
         self.previous_chapter()
@@ -417,13 +476,14 @@ impl ReaderState {
         self.page = self.page_layout().last_index(self.total as usize) as u32 + 1;
         self.reset_page_geometry();
         self.pending_vertical_bottom = self.direction == ReadingDirection::Vertical;
+        self.wide_half = u8::from(self.wide_split_enabled());
         self.turns_since_full = 0;
         ReaderUpdate::new(ReaderAction::ChapterChanged, RefreshRequest::Full)
     }
 
     pub fn jump_to_page(&mut self, page: u32) -> ReaderUpdate {
         let target = self.frame_page(page);
-        if target == self.page && self.vertical_offset == 0 {
+        if target == self.page && self.vertical_offset == 0 && self.wide_half == 0 {
             return ReaderUpdate::unchanged();
         }
         self.page = target;
@@ -532,7 +592,8 @@ impl ReaderState {
             updated_at,
             completed: *self.visible_pages().end() >= self.total
                 && (self.direction != ReadingDirection::Vertical
-                    || self.vertical_offset >= self.maximum_vertical_offset()),
+                    || self.vertical_offset >= self.maximum_vertical_offset())
+                && (!self.wide_split_enabled() || !self.wide_page || self.wide_half == 1),
         }
     }
 
@@ -577,7 +638,13 @@ impl ReaderState {
 
     fn reset_page_geometry(&mut self) {
         self.reset_vertical_geometry();
+        self.wide_half = 0;
+        self.wide_page = false;
         self.zoom = 1.0;
+    }
+
+    fn wide_split_enabled(&self) -> bool {
+        self.split_wide && !self.spread && self.direction != ReadingDirection::Vertical
     }
 
     fn page_changed(&mut self) -> ReaderUpdate {
@@ -628,6 +695,225 @@ mod tests {
             preferences,
         )
         .unwrap()
+    }
+
+    fn split_preferences(direction: &str) -> Preferences {
+        Preferences {
+            split_wide: true,
+            reading_direction: direction.into(),
+            ..single_page_preferences()
+        }
+    }
+
+    #[test]
+    fn tap_page_delta_follows_both_axes_and_independent_reversal() {
+        for (direction, forward, backward) in [
+            ("rtl", (0.1, 0.5), (0.9, 0.5)),
+            ("ltr", (0.9, 0.5), (0.1, 0.5)),
+            ("vertical", (0.5, 0.9), (0.5, 0.1)),
+            ("vertical-pages", (0.5, 0.9), (0.5, 0.1)),
+        ] {
+            for reverse_taps in [false, true] {
+                let state = reader(Preferences {
+                    reading_direction: direction.into(),
+                    reverse_taps,
+                    ..single_page_preferences()
+                });
+                let delta = if reverse_taps { -1 } else { 1 };
+                assert_eq!(state.tap_page_delta(forward.0, forward.1), Some(delta));
+                assert_eq!(state.tap_page_delta(backward.0, backward.1), Some(-delta));
+                assert_eq!((state.page, state.zoom, state.menu_open), (4, 1.0, false));
+            }
+        }
+    }
+
+    #[test]
+    fn tap_page_delta_excludes_menus_and_disabled_tap_regions() {
+        for direction in ["rtl", "ltr", "vertical", "vertical-pages"] {
+            let mut state = reader(Preferences {
+                reading_direction: direction.into(),
+                ..single_page_preferences()
+            });
+            assert_eq!(state.tap_page_delta(0.5, 0.5), None);
+            state.menu_open = true;
+            for (x, y) in [(0.0, 0.0), (1.0, 1.0), (0.5, 0.5)] {
+                assert_eq!(state.tap_page_delta(x, y), None);
+            }
+        }
+        let state = reader(Preferences {
+            tap_layout: "swipe-only".into(),
+            ..single_page_preferences()
+        });
+        assert_eq!(state.tap_page_delta(0.1, 0.5), None);
+        assert_eq!(state.tap_page_delta(0.9, 0.5), None);
+    }
+
+    #[test]
+    fn tap_page_delta_reuses_l_shaped_and_legacy_reverse_layouts() {
+        let state = reader(Preferences {
+            tap_layout: "l-shaped".into(),
+            ..single_page_preferences()
+        });
+        assert_eq!(state.tap_page_delta(0.9, 0.9), Some(1));
+        assert_eq!(state.tap_page_delta(0.9, 0.1), Some(-1));
+        for legacy in ["reverse", "reversed"] {
+            let state = reader(Preferences {
+                tap_layout: legacy.into(),
+                ..single_page_preferences()
+            });
+            assert_eq!(state.tap_page_delta(0.1, 0.5), Some(-1));
+            assert_eq!(state.tap_page_delta(0.9, 0.5), Some(1));
+        }
+    }
+
+    #[test]
+    fn tap_page_delta_rejects_nonfinite_and_out_of_viewport_coordinates() {
+        let state = reader(single_page_preferences());
+        for (x, y) in [
+            (f32::NAN, 0.5),
+            (0.5, f32::NAN),
+            (f32::INFINITY, 0.5),
+            (0.5, f32::NEG_INFINITY),
+            (-0.01, 0.5),
+            (0.5, -0.01),
+            (1.01, 0.5),
+            (0.5, 1.01),
+        ] {
+            assert_eq!(state.tap_page_delta(x, y), None);
+        }
+    }
+
+    #[test]
+    fn wide_halves_advance_before_the_source_page_in_both_reading_directions() {
+        for direction in ["rtl", "ltr", "vertical-pages"] {
+            let mut state = reader(split_preferences(direction));
+            state.set_wide_page(true, 0);
+            state.zoom = 2.0;
+            assert!(state.is_wide_page());
+            assert_eq!(state.next_page().action, ReaderAction::PageChanged);
+            assert_eq!((state.page, state.wide_half, state.zoom), (4, 1, 1.0));
+            assert_eq!(state.visible_pages(), 4..=4);
+            let progress = state.progress(42);
+            assert_eq!((progress.page, progress.total), (4, 10));
+            assert_eq!(state.next_page().action, ReaderAction::PageChanged);
+            assert_eq!((state.page, state.wide_half), (5, 0));
+            assert!(!state.is_wide_page());
+        }
+    }
+
+    #[test]
+    fn the_first_half_of_the_last_source_page_does_not_finish_the_chapter() {
+        let preferences = split_preferences("rtl");
+        let mut state = bounded_reader(1, &preferences);
+        state.set_wide_page(true, 0);
+        assert!(!state.progress(1).completed);
+        state.next_page();
+        assert_eq!((state.page, state.wide_half), (1, 1));
+        assert!(state.progress(2).completed);
+        assert_eq!(state.next_page().action, ReaderAction::None);
+        assert_eq!((state.page, state.wide_half), (1, 1));
+    }
+
+    #[test]
+    fn wide_halves_do_not_skip_the_last_frame_at_chapter_boundaries() {
+        let mut state = reader(split_preferences("ltr"));
+        state.page = 10;
+        state.set_wide_page(true, 0);
+        assert_eq!(state.next_page().action, ReaderAction::PageChanged);
+        assert_eq!(
+            (state.chapter_index(), state.page, state.wide_half),
+            (1, 10, 1)
+        );
+        assert_eq!(state.next_page().action, ReaderAction::ChapterChanged);
+        assert_eq!(
+            (state.chapter_index(), state.page, state.wide_half),
+            (2, 1, 0)
+        );
+        assert_eq!(state.previous_page().action, ReaderAction::ChapterChanged);
+        assert_eq!(
+            (state.chapter_index(), state.page, state.wide_half),
+            (1, 10, 1)
+        );
+        state.set_wide_page(true, state.wide_half);
+        state.previous_page();
+        assert_eq!((state.page, state.wide_half), (10, 0));
+    }
+
+    #[test]
+    fn backward_navigation_resolves_wide_and_narrow_destination_pages() {
+        let mut state = reader(split_preferences("rtl"));
+        state.set_wide_page(true, 0);
+        state.previous_page();
+        assert_eq!((state.page, state.wide_half), (3, 1));
+        state.set_wide_page(true, state.wide_half);
+        assert!(state.is_wide_page());
+        state.previous_page();
+        assert_eq!((state.page, state.wide_half), (3, 0));
+        state.previous_page();
+        assert_eq!((state.page, state.wide_half), (2, 1));
+        state.set_wide_page(false, 0);
+        assert_eq!(state.wide_half, 0);
+        assert!(!state.is_wide_page());
+        state.previous_page();
+        assert_eq!(state.page, 1);
+    }
+
+    #[test]
+    fn selecting_the_displayed_source_page_returns_to_its_first_half() {
+        let mut state = reader(split_preferences("rtl"));
+        state.set_wide_page(true, 1);
+        assert_eq!(state.jump_to_page(4).action, ReaderAction::PageChanged);
+        assert_eq!((state.page, state.wide_half), (4, 0));
+        assert_eq!(state.jump_to_page(4).action, ReaderAction::None);
+    }
+
+    #[test]
+    fn spread_and_continuous_strip_preferences_disable_wide_halves() {
+        for preferences in [
+            Preferences {
+                spread: true,
+                ..split_preferences("rtl")
+            },
+            split_preferences("vertical"),
+            single_page_preferences(),
+        ] {
+            let mut state = reader(preferences);
+            state.set_wide_page(true, 1);
+            assert!(!state.is_wide_page());
+            assert_eq!(state.wide_half, 0);
+        }
+    }
+
+    #[test]
+    fn changing_split_layout_resets_the_half_without_rewriting_source_progress() {
+        let mut state = reader(split_preferences("rtl"));
+        state.set_wide_page(true, 1);
+        let mut preferences = split_preferences("rtl");
+        preferences.split_wide = false;
+        state.apply_preferences(&preferences);
+        assert_eq!((state.page, state.wide_half), (4, 0));
+        assert!(!state.is_wide_page());
+        preferences.split_wide = true;
+        state.apply_preferences(&preferences);
+        state.set_wide_page(true, 1);
+        preferences.reading_direction = "ltr".into();
+        state.apply_preferences(&preferences);
+        assert_eq!((state.page, state.wide_half), (4, 0));
+    }
+
+    #[test]
+    fn restoring_a_wide_half_preserves_the_next_source_page_boundary() {
+        let preferences = split_preferences("rtl");
+        let chapters = vec![Chapter {
+            id: "chapter".into(),
+            page_count: 7,
+            ..Chapter::default()
+        }];
+        let mut restored = ReaderState::new(chapters, "chapter", 5, &preferences).unwrap();
+        restored.wide_half = 1;
+        restored.set_wide_page(true, restored.wide_half);
+        restored.next_page();
+        assert_eq!((restored.page, restored.wide_half), (6, 0));
     }
 
     #[test]

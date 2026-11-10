@@ -30,6 +30,7 @@ pub enum PairingEvent {
     Source(SourceConfig),
     Repository(String),
     Import(PathBuf),
+    Tracking(crate::tracking::TrackingPairRequest),
 }
 
 pub struct PairingServer {
@@ -450,6 +451,14 @@ fn dispatch(request: Request, peer: SocketAddr, context: &mut ServerContext) -> 
             Ok(source) => send_event(context, PairingEvent::Source(source)),
             Err(_) => Response::error(400, "invalid_source"),
         },
+        ("POST", "/api/tracking") => {
+            match serde_json::from_slice::<crate::tracking::TrackingPairRequest>(&request.body) {
+                Ok(configuration) if configuration.validate().is_ok() => {
+                    send_event(context, PairingEvent::Tracking(configuration))
+                }
+                _ => Response::error(400, "invalid_tracking"),
+            }
+        }
         ("POST", "/api/repository") => {
             #[derive(Deserialize)]
             #[serde(deny_unknown_fields)]
@@ -726,6 +735,7 @@ const PAIRING_PAGE: &str = r##"<!doctype html>
 <section><h2>配置图源</h2><form id="source-form"><label for="kind">图源类型</label><select id="kind"><option value="komga">Komga</option><option value="kavita">Kavita</option><option value="suwayomi">Suwayomi</option><option value="mangadex">MangaDex</option></select><label for="name">显示名称（可选）</label><input id="name" maxlength="128" autocomplete="off"><label for="server">服务器地址</label><input id="server" type="url" placeholder="http://192.168.1.10:25600" autocomplete="url"><div class="row"><div><label for="username">用户名（可选）</label><input id="username" autocomplete="username"></div><div><label for="password">密码（可选）</label><input id="password" type="password" autocomplete="current-password"></div></div><label for="api-key">API Key（可选）</label><input id="api-key" type="password" autocomplete="off"><label for="source-id">Suwayomi 图源 ID（可选）</label><input id="source-id" autocomplete="off"><button>保存图源配置</button></form></section>
 <section><h2>添加 Aidoku 图源仓库</h2><form id="repository-form"><label for="repository">仓库地址</label><input id="repository" type="url" placeholder="https://example.org/sources/" required><button>添加仓库</button></form></section>
 <section><h2>导入本地漫画</h2><form id="import-form"><label for="archive">CBZ 或 ZIP 文件</label><input id="archive" type="file" accept=".cbz,.zip,application/zip" required><p class="muted">单个文件最大 32 MB。文件上传后，Kindle 会显示导入结果。</p><button>上传到 Kindle</button></form></section>
+<section><h2>连接阅读追踪账号</h2><p class="muted">在服务官网注册自己的 OAuth 客户端，或粘贴你已合法取得的访问令牌。Kindle 验证账号成功后才保存连接。自动同步需在 Kindle 设置中单独开启，并在作品详情中选择准确的关联条目。</p><form id="tracking-form"><label for="tracking-service">服务</label><select id="tracking-service"><option value="anilist">AniList</option><option value="myanimelist">MyAnimeList</option></select><label for="tracking-client">你注册的客户端 ID</label><input id="tracking-client" maxlength="128" autocomplete="off"><label for="tracking-redirect">注册的回调地址（MAL 可选，必须与注册值相同）</label><input id="tracking-redirect" type="url" maxlength="2048" autocomplete="off"><p class="muted">AniList 客户端的回调地址请设为 https://anilist.co/api/v2/oauth/pin。MyAnimeList 请注册原生应用；本页面使用其官方支持的 PKCE plain 流程，不收集客户端密钥。</p><button id="tracking-authorize" type="button">生成官方授权链接</button><p><a id="tracking-link" target="_blank" rel="noopener noreferrer" hidden>在服务官网授权</a></p><label for="tracking-token">访问令牌（AniList 授权页展示的令牌，或已有合法令牌）</label><input id="tracking-token" type="password" maxlength="8192" autocomplete="off"><label for="tracking-refresh">MAL 刷新令牌（可选，需同时填写客户端 ID）</label><input id="tracking-refresh" type="password" maxlength="8192" autocomplete="off"><label for="tracking-return">MAL 授权完成后的完整回调地址（包含 code 和 state）</label><input id="tracking-return" type="url" maxlength="4096" autocomplete="off"><button>验证并连接账号</button></form></section>
 </main>
 <script>
 let token=new URLSearchParams(location.search).get('token')||'';
@@ -733,9 +743,15 @@ history.replaceState(null,'',location.pathname);
 const status=document.getElementById('status');
 const messages={expired:'配对已过期，请在 Kindle 上重新打开添加图源页面。',pairing_required:'请先输入配对码。',invalid_pairing_code:'配对码不正确，请查看 Kindle 屏幕。',too_many_attempts:'尝试次数过多，请稍后重试或重新打开配对页面。',invalid_source:'图源配置不完整，请检查服务器地址和输入内容。',invalid_url:'请输入有效的 HTTP 或 HTTPS 地址。',invalid_filename:'请选择 CBZ 或 ZIP 文件。',invalid_archive:'文件不是有效的 ZIP / CBZ 压缩包。',body_too_large:'文件过大，单个文件最大 32 MB。',upload_limit:'本次配对已达到上传上限，请重新打开配对页面。',save_failed:'保存文件失败，请检查 Kindle 的剩余空间。',application_closed:'Kindle 应用已关闭。',request_timeout:'上传超时，请重试。',wrong_origin:'请使用 Kindle 屏幕上显示的地址打开此页面。'};
 function show(message){status.textContent=message;}
+messages.invalid_tracking='追踪授权信息不完整，或回调校验失败。请重新生成官方授权链接，或检查合法访问令牌。';
 function connected(){document.getElementById('pairing').hidden=true;document.getElementById('connected').hidden=false;show('已连接 Kindle。选择下方操作，结果将在 Kindle 上显示。');}
 async function request(path,body,headers={}){let response;try{response=await fetch(path,{method:'POST',headers:{'Authorization':'Bearer '+token,...headers},body});}catch{throw new Error('连接中断，请检查 Kindle 与当前设备是否连接同一 Wi-Fi。');}let result;try{result=await response.json();}catch{throw new Error('Kindle 返回了无法读取的响应，请重试。');}if(!response.ok)throw new Error(messages[result.error]||'操作未完成，请检查 Kindle 上的提示后重试。');return result;}
-async function submit(form,work){const button=form.querySelector('button');button.disabled=true;try{await work();}catch(error){show(error.message||'连接中断，请检查 Kindle 与当前设备是否连接同一 Wi-Fi。');}finally{button.disabled=false;}}
+async function submit(form,work){const button=form.querySelector('button[type="submit"],button:not([type])');button.disabled=true;try{await work();}catch(error){show(error.message||'连接中断，请检查 Kindle 与当前设备是否连接同一 Wi-Fi。');}finally{button.disabled=false;}}
+let trackingAuthorization=null;
+function trackingRandom(){const bytes=new Uint8Array(32);crypto.getRandomValues(bytes);return Array.from(bytes,value=>value.toString(16).padStart(2,'0')).join('');}
+document.getElementById('tracking-service').addEventListener('change',()=>{trackingAuthorization=null;document.getElementById('tracking-link').hidden=true;for(const id of ['tracking-token','tracking-refresh','tracking-return'])document.getElementById(id).value='';});
+document.getElementById('tracking-authorize').addEventListener('click',()=>{try{const service=document.getElementById('tracking-service').value,client=document.getElementById('tracking-client').value.trim(),redirect=document.getElementById('tracking-redirect').value.trim();if(!/^[A-Za-z0-9_-]{1,128}$/.test(client))throw new Error('请先填写你在服务官网注册的客户端 ID。');const state=trackingRandom(),verifier=trackingRandom(),url=new URL(service==='anilist'?'https://anilist.co/api/v2/oauth/authorize':'https://myanimelist.net/v1/oauth2/authorize');url.searchParams.set('client_id',client);url.searchParams.set('response_type',service==='anilist'?'token':'code');url.searchParams.set('state',state);if(service==='myanimelist'){url.searchParams.set('code_challenge',verifier);url.searchParams.set('code_challenge_method','plain');if(redirect)url.searchParams.set('redirect_uri',redirect);}trackingAuthorization={service,client,redirect,state,verifier};const link=document.getElementById('tracking-link');link.href=url.toString();link.hidden=false;show(service==='anilist'?'打开官方授权链接后，将官网展示的访问令牌粘贴到下方，再提交验证。':'打开官方授权链接完成授权，将最后的完整回调地址粘贴到下方。请保持本页面打开，以便校验 state 和 PKCE。');}catch(error){show(error.message||'无法生成授权链接，请使用支持安全随机数的浏览器。');}});
+document.getElementById('tracking-form').addEventListener('submit',event=>{event.preventDefault();submit(event.currentTarget,async()=>{const service=document.getElementById('tracking-service').value,access=document.getElementById('tracking-token').value.trim(),client=document.getElementById('tracking-client').value.trim();let configuration={service,access_token:access,refresh_token:document.getElementById('tracking-refresh').value.trim(),client_id:client};if(!access){const flow=trackingAuthorization;if(service!=='myanimelist'||!flow||flow.service!==service||flow.client!==client)throw new Error('请先生成官方授权链接，或填写合法访问令牌。');const returned=new URL(document.getElementById('tracking-return').value.trim());if(returned.searchParams.get('state')!==flow.state||!returned.searchParams.get('code'))throw new Error('授权回调的 state 不匹配，请重新生成链接并授权。');configuration={...configuration,code:returned.searchParams.get('code'),code_verifier:flow.verifier,redirect_uri:flow.redirect,state:flow.state,returned_state:returned.searchParams.get('state')};}await request('/api/tracking',JSON.stringify(configuration),{'Content-Type':'application/json'});for(const id of ['tracking-token','tracking-refresh','tracking-return'])document.getElementById(id).value='';trackingAuthorization=null;document.getElementById('tracking-link').hidden=true;show('授权信息已发送，Kindle 正在验证账号。请以 Kindle 上的验证结果为准。');});});
 document.getElementById('pair-form').addEventListener('submit',event=>{event.preventDefault();submit(event.currentTarget,async()=>{const result=await request('/api/pair',JSON.stringify({code:document.getElementById('code').value.trim()}),{'Content-Type':'application/json'});token=result.token;document.getElementById('code').value='';connected();});});
 document.getElementById('source-form').addEventListener('submit',event=>{event.preventDefault();submit(event.currentTarget,async()=>{const value=id=>document.getElementById(id).value;await request('/api/source',JSON.stringify({kind:value('kind'),name:value('name'),base_url:value('server'),username:value('username'),password:value('password'),token:value('api-key'),source_id:value('source-id')}),{'Content-Type':'application/json'});document.getElementById('password').value='';document.getElementById('api-key').value='';show('配置已发送到 Kindle，请在图源列表中打开该图源。');});});
 document.getElementById('repository-form').addEventListener('submit',event=>{event.preventDefault();submit(event.currentTarget,async()=>{await request('/api/repository',JSON.stringify({url:document.getElementById('repository').value}),{'Content-Type':'application/json'});show('仓库已发送到 Kindle。读取完成后，可在“可安装”页签选择图源。');});});
@@ -947,6 +963,56 @@ mod tests {
         }
         assert_eq!(context.total_attempts, 5);
         assert!(context.allow_pair_attempt(second));
+    }
+
+    #[test]
+    fn tracking_credentials_require_pairing_and_emit_only_a_redacted_event() {
+        let server = server();
+        let origin = server.url();
+        let credentials = br#"{"service":"anilist","access_token":"private-tracking-token"}"#;
+        assert_eq!(
+            call(
+                &server,
+                "/api/tracking",
+                credentials,
+                false,
+                Some(&origin),
+                ""
+            )
+            .0,
+            401
+        );
+        assert_eq!(
+            call(
+                &server,
+                "/api/tracking",
+                credentials,
+                true,
+                Some(&origin),
+                ""
+            )
+            .0,
+            200
+        );
+        let event = server.events.recv_timeout(Duration::from_secs(1)).unwrap();
+        assert!(!format!("{event:?}").contains("private-tracking-token"));
+        let PairingEvent::Tracking(request) = event else {
+            panic!("Expected a tracking event");
+        };
+        assert_eq!(request.service, crate::tracking::Service::AniList);
+        assert_eq!(request.access_token, "private-tracking-token");
+        assert_eq!(
+            call(
+                &server,
+                "/api/tracking",
+                br#"{"service":"anilist","access_token":""}"#,
+                true,
+                Some(&origin),
+                ""
+            )
+            .0,
+            400
+        );
     }
 
     #[test]

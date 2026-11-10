@@ -7,6 +7,7 @@ pub(super) struct ReaderTarget {
     pub page: u32,
     pub vertical_offset: u32,
     pub zoom: f32,
+    pub wide_half: u8,
 }
 
 impl ReaderTarget {
@@ -16,7 +17,13 @@ impl ReaderTarget {
             page: page.max(1),
             vertical_offset,
             zoom,
+            wide_half: 0,
         }
+    }
+
+    pub(super) fn with_wide_half(mut self, half: u8) -> Self {
+        self.wide_half = half.min(1);
+        self
     }
 }
 
@@ -279,6 +286,7 @@ impl App {
                 reader.vertical_offset,
                 reader.zoom,
             )
+            .with_wide_half(reader.wide_half)
         })
     }
 
@@ -303,6 +311,7 @@ impl App {
     }
 
     pub(super) fn recover_reader_failure(&mut self, target: ReaderTarget, error: anyhow::Error) {
+        self.pending_wide_navigation = 0;
         let reason = ReaderFailureReason::classify(&error);
         eprintln!(
             "aidoku: reader request {} page {}: {error:#}",
@@ -438,6 +447,7 @@ impl App {
     }
 
     pub(super) fn show_reader_action_error(&mut self, error: anyhow::Error) {
+        self.pending_wide_navigation = 0;
         eprintln!("aidoku: displayed page action: {error:#}");
         let title = tr(if self.displayed_reader_session().is_ok() {
             "reader_action_failed"

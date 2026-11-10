@@ -15,7 +15,7 @@ use std::{
 use anyhow::{Context, Result, ensure};
 
 use super::{App, JobKind, JobResult};
-use crate::{sources::NetworkControl, store::Store};
+use crate::{cache::CacheManager, sources::NetworkControl, store::Store};
 
 const PATH_BATCH: usize = 128;
 const MANIFEST_BATCH: usize = 64;
@@ -29,6 +29,9 @@ pub(super) struct UsageScanStats {
     pub manifest_windows: u64,
     pub paths_observed: u64,
     pub file_checks: u64,
+    /// Additional indexed cache-owner queries, separate from Store benchmarks.
+    pub owner_path_queries: u64,
+    pub owner_paths_observed: u64,
 }
 
 #[derive(Debug, Default)]
@@ -382,6 +385,65 @@ fn scan_usage(
             }
         }
     }
+    // Accounting must include durable prepared copies even after their option
+    // is switched off. Inspect existing ownership, never current preferences.
+    // Fixtures without a cache keep their original Store-only counters.
+    if let Some(root) = database
+        .parent()
+        .filter(|root| root.join("cache/shared-v1/index.sqlite3").is_file())
+    {
+        guard.check()?;
+        let cache = CacheManager::open(root)?;
+        let owners = match &request.kind {
+            RequestKind::Rebuild => vec![None],
+            RequestKind::Append(chapters) => chapters
+                .iter()
+                .map(|chapter| Some(chapter.as_str()))
+                .collect(),
+        };
+        for owner in owners {
+            let mut cursor: Option<(String, String)> = None;
+            loop {
+                guard.check()?;
+                stats.owner_path_queries += 1;
+                let paths = cache.download_owner_paths_page(
+                    owner,
+                    cursor
+                        .as_ref()
+                        .map(|cursor| (cursor.0.as_str(), cursor.1.as_str())),
+                    PATH_BATCH,
+                )?;
+                guard.check()?;
+                let final_batch = paths.len() < PATH_BATCH;
+                if let Some(last) = paths.last() {
+                    cursor = Some((last.key.clone(), last.chapter_id.clone()));
+                }
+                for association in paths {
+                    stats.owner_paths_observed += 1;
+                    if !snapshot
+                        .completed_chapters
+                        .contains(&association.chapter_id)
+                        || snapshot.files.contains_key(&association.path)
+                        || known.is_some_and(|known| known.files.contains_key(&association.path))
+                    {
+                        continue;
+                    }
+                    collect_files(
+                        std::iter::once(association.path),
+                        &mut snapshot,
+                        None,
+                        known,
+                        &mut stats,
+                        guard,
+                    )?;
+                }
+                if final_batch {
+                    break;
+                }
+                std::thread::yield_now();
+            }
+        }
+    }
     guard.check()?;
     Ok(UsageResult {
         generation: request.generation,
@@ -603,6 +665,39 @@ mod tests {
             tracker.next_request(now + RETRY_DELAY).unwrap().kind,
             RequestKind::Rebuild
         );
+    }
+
+    #[test]
+    fn owned_prepared_copies_are_counted_once_with_options_disabled() {
+        let directory = tempfile::tempdir().unwrap();
+        let database = directory.path().join("library.sqlite3");
+        let store = Store::open(&database).unwrap();
+        let original = directory.path().join("original.bin");
+        fs::write(&original, [3; 53]).unwrap();
+        add_local_chapter(&store, "one", std::slice::from_ref(&original));
+        add_local_chapter(&store, "two", std::slice::from_ref(&original));
+        let cache = CacheManager::open(directory.path()).unwrap();
+        let copy = Page {
+            url: "aidoku-prepared:accounting-fixture".into(),
+            ..Page::default()
+        };
+        let write = cache.begin_raw(&copy, Some("download:one"), 256).unwrap();
+        image::GrayImage::from_pixel(2, 3, image::Luma([17]))
+            .save_with_format(write.temp_path(), image::ImageFormat::Png)
+            .unwrap();
+        let prepared = write.commit().unwrap();
+        cache.pin_raw(&copy, "download:two").unwrap();
+        let bytes = fs::metadata(&prepared).unwrap().len();
+        assert!(!store.preferences().unwrap().resize_downloads);
+        let mut tracker = UsageTracker::default();
+        let request = tracker.next_request(Instant::now()).unwrap();
+        let guard = guard_for(&tracker, directory.path());
+        let result = scan_usage(&database, request, &guard, None).unwrap();
+        assert_eq!(result.snapshot.total, 53 + bytes);
+        assert_eq!(result.snapshot.files.len(), 2);
+        assert_eq!(result.stats.file_checks, 2);
+        assert_eq!(result.stats.owner_paths_observed, 2);
+        assert!(result.stats.owner_path_queries > 0);
     }
 
     #[test]

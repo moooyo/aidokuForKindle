@@ -94,6 +94,17 @@ impl App {
                 .is_some_and(|setting| setting.kind == "secure-text");
         snapshot["diagnostics_available"] = json!(true);
         snapshot["diagnostics_schema_version"] = json!(1);
+        snapshot["interface_language"] = json!(
+            ui.global::<crate::ui::Strings>()
+                .get_locale_code()
+                .to_string()
+        );
+        snapshot["interface_library_label"] =
+            json!(ui.global::<crate::ui::Strings>().get_library().to_string());
+        snapshot["reader_wide_page"] =
+            json!(self.reader.as_ref().map(|reader| reader.is_wide_page()));
+        snapshot["reader_wide_half"] = json!(self.reader.as_ref().map(|reader| reader.wide_half));
+        snapshot["pending_wide_navigation"] = json!(self.pending_wide_navigation);
         snapshot["cover_work_pending"] = json!(self.cover_work_pending());
         snapshot["capture_projection_pending"] = json!(self.capture_projection_pending());
         snapshot["cover_inflight"] = json!(self.cover_inflight.is_some());
@@ -361,7 +372,8 @@ impl App {
             "software_dither": true,
             "hardware_dither_qualified": false,
             "pen_input_implemented": false,
-            "tracking_authorization_implemented": false,
+            "tracking_authorization_implemented": true,
+            "tracking_authorization_scope": "Configured token or official OAuth credentials; account acceptance requires separate credentials and live-service checks",
             "server_configuration_implemented": true,
             "pairing_endpoint_running": self.pairing.is_some(),
         });

@@ -32,12 +32,16 @@ struct ReaderViewProjection {
 
 impl App {
     pub(crate) fn sync_view(&mut self) -> Result<()> {
+        crate::localization::set_language(&self.prefs.language);
         self.sync_storage_details_visibility();
         self.sync_runtime_geometry()?;
         let Some(ui) = self.ui.upgrade() else {
             return Ok(());
         };
+        crate::localization::apply_ui_labels(&ui);
         let state = ui.global::<State>();
+        extended_preferences::sync(&state, &self.prefs);
+        self.sync_tracking_accounts_state();
         self.sync_base_view(&state);
         if self.route == "reader" {
             self.sync_reader_view(&state)?;
@@ -54,6 +58,17 @@ impl App {
         let show_search = self.route == "search";
         let show_settings = self.route == "settings";
         let show_current_cover = show_library || self.route == "detail";
+        if show_library || show_settings {
+            for (id, name) in self.store.builtin_category_names()? {
+                let name = if name == id { tr(&id) } else { name };
+                match id.as_str() {
+                    "reading" => state.set_category_reading_name(name.into()),
+                    "planned" => state.set_category_planned_name(name.into()),
+                    "completed" => state.set_category_completed_name(name.into()),
+                    _ => {}
+                }
+            }
+        }
         let context = load_non_reader_context(&self.store, &self.route, large, self.options.demo)?;
         if context.has_source_snapshot {
             self.capture_server_configurations(&context.sources);
