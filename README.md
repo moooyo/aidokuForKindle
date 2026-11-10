@@ -13,6 +13,10 @@ pushed to main in `4c572ee`. Its 252 runtime inputs match the rebuilt ARM inputs
 byte for byte. Default and Kindle-feature library checks passed 676 and 689
 tests respectively, with two opt-in benchmarks ignored in each configuration.
 Controlled end-to-end and new physical qualification are tracked separately.
+The resumed physical warm-start workload completed 42 processes. A later
+cold-start preflight rejection and SSH connection timeout interrupted the native
+matrix; the owned lease was released and full comparison remains withheld.
+See [the dated results and continuation state](docs/READER_E2E_RESULTS.md).
 
 Commit `ffb3417`, merged and pushed to main, adds chapter-boundary and
 vertical-image prefetch, prioritized background decoding, prepared RGB

@@ -145,6 +145,25 @@ manual step is not ready, end the owned session and release before waiting.
 Later batches use fresh lease identities and tokens. The lease is not a
 reservation for a future build, measurement or response.
 
+A long native cohort can be split into shorter continuous device batches.
+Declare the full workload/count map and global trial schedule before starting.
+Select each batch from that schedule without restarting iteration numbering or
+AB/BA order. Individual fragments remain incomplete comparisons until the full
+declared matrix is collected and independently qualified.
+
+The resumed native cohort declares at most three read-only status observations
+within a single ten-second budget, including the first observation, with one
+second between observations. Re-observation is allowed only after a successful
+execute receipt and when the independent status getter's sole failed native
+check is `power_active`. App exit, generation, binary, fixture and trace
+identities must remain identical. Every original output and transport receipt
+is retained; one actual raw status must pass every original gate. No wake,
+repair, fixture reset or App rerun is inserted between observations. Transport
+timeout, output truncation, changed identity or execute failure stops the batch.
+This policy is declared before sampling and does not retrospectively qualify
+an earlier rejected cohort. Status observations occur after the timed App exits
+and do not change Rust-main or action-to-output timing boundaries.
+
 `scripts/benchmark-reader-e2e.py analyze --manifest <runs.json> --output <analysis.json>`
 qualifies already collected JSON files. A manifest contains `schema_version: 1`,
 `expected_pairs` (an integer or per-workload map), the `control` source paths

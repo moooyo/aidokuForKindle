@@ -19,14 +19,25 @@ the held-failure fixture independently establishes foreground failure and old
 display protection. Original rejected records and r1 binaries remain preserved.
 The formal host cohort has completed 90/90 with strict independent reanalysis;
 its cached-turn counterexample is preserved alongside cold-start improvements.
-Native timing is still being completed separately and no optical speedup is
-claimed. See [the dated results](READER_E2E_RESULTS.md).
+The resumed native warm-start workload completed 42 processes, 21 per role,
+with passing traces, cache/source gates and ordinary restoration/release.
+The next cold batch completed six App processes, then rejected a prelaunch
+slot with zero generations and later lost SSH connectivity. Its lease was
+released at 04:54:29 Asia/Shanghai under an explicit no-owned-state exception;
+strict native/lighting qualification remains false for that interrupted batch.
+The full native comparison is withheld pending physical connectivity and a
+fresh complete cold/long continuation. See [the dated results](READER_E2E_RESULTS.md)
+and [the continuation checkpoint](review/reader-native-continuation-20261111.json).
 
 The first cache pilot also proved that replacing local originals during fixture
 restoration invalidated warm PNG keys through source metadata identity. Those
 pilot results are marked cache-scope-invalid. Corrected workload-specific active
 roots retain original source identities; strict pilots confirmed disk, cold and
 memory paths before the formal host cohort started.
+
+The original b12 warm cohort remains incomplete diagnostic evidence, including
+its initial power-state rejection and later successful bounded restoration.
+Its 35 passing traces are not substituted into the resumed warm workload.
 
 The shared device lease covers only continuous actual Kindle operations and
 their necessary bounded restoration. Host builds, analysis, tool debugging and

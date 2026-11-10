@@ -6,7 +6,9 @@ Status: the corrected r2 host comparison completed and independently qualified
 all 90 measured processes. Physical native producer qualification and a bounded
 manual touch/retained-sleep sequence also completed. A user-reported bookshelf
 flash was fixed in the launcher and the user confirmed both transitions clear
-in a later bounded manual batch. Full native timing remains separate and pending.
+in a later bounded manual batch. The resumed native warm-start workload completed
+42 processes. The following cold-start batch stopped at a prelaunch rejection
+and later lost SSH connectivity; the full native comparison is withheld.
 
 ## Compared inputs
 
@@ -166,11 +168,55 @@ still null; this discrepancy is not rewritten into a stronger claim.
 
 Earlier manual windows with no observed actions, parameter-validation rejection,
 or a missed deployment remain failed or unqualified tool attempts. They do not
-become successful product tests. Full native timing cohorts are pending.
+become successful product tests.
 
 The earlier `aidoku-koreader-20261110-r1` native smoke and the stopped r1 upload
 attempt have separate identities and remain separate evidence. Neither is
 relabeled as final r2 application or performance acceptance.
+
+## Resumed native collection
+
+The original b12 warm-start plan stopped after 36 attempted processes. Thirty-five
+complete traces passed their individual gates; the next baseline status reported
+`power_active: false`. A final check passed about 5.20 seconds later, and the
+original lease was released at 03:47:26 Asia/Shanghai on November 11. The original
+manifest remains incomplete and its rejected record remains rejected. The whole
+b12 set is retained as diagnostic evidence.
+
+A new 90-process schedule was declared before execution. Startup workloads were
+split into seven-pair batches while retaining global iteration numbers and AB/BA
+ordering. Its independent status policy permits up to three actual read-only
+observations within ten seconds, only for a power-only transient after an already
+successful execute receipt. All original outputs remain retained.
+
+| Workload | Collected outcome | Comparison status |
+| --- | --- | --- |
+| Disk-cached startup | 42 complete processes, 21 per implementation, across r3-b01 through r3-b03. Every trace, disk-cache expectation, source-identity check and ordinary restoration/release passed. | Full workload retained intact; complete-matrix qualification is pending. |
+| Cold-render startup | Six complete App processes in r3-b04, followed by one prelaunch rejection with zero App generations. Seven later slots in that batch were skipped. | Entire incomplete cold batch retained as diagnostic evidence; a fresh complete 42-process cold cohort is required. |
+| Cached turns, chapter boundary and vertical windows | The six planned long-sequence processes have not run in the formal native cohort. | Pending. |
+
+The rejected global slot 49 returned helper code 64 before starting the App.
+Subsequent checks reported the native window manager and statusbar running,
+unchanged framebuffer and USB/WiFi controls, and no App, owned App lock or owned
+residual process. The active-state gate remained false. A bounded follow-up SSH
+attempt timed out without returning a powerd state. These observations establish
+unavailable active state followed by a lost connection; they do not establish
+an OS sleep cause or an application crash.
+
+After confirming that the transport was reaped and no active guard remained,
+the coordinator released its own r3-b04 lease at 04:54:29 Asia/Shanghai. This
+release ended ownership under an explicit no-owned-state exception. Strict
+native and lighting qualification remain false for this interrupted batch.
+The source-bound exception and additive explanation preserve that distinction
+from the lease API's restoration/connection-closure flag.
+
+The [public continuation checkpoint](review/reader-native-continuation-20261111.json)
+records counts, source-receipt hashes and release outcomes. The original
+90-process master remains incomplete. Any continuation must declare the intact
+42 warm trials and a fresh complete cold/long schedule before further sampling,
+retain consistent inputs and control conditions, and independently qualify the
+full matrix before reporting native performance ratios. Physical connectivity
+must be restored before that work can continue.
 
 ## Reproduction and evidence
 
