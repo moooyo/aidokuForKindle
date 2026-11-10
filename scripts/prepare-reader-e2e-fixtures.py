@@ -3,8 +3,8 @@
 
 Run only on the designated remote Linux worker. All imports, seeding, preference
 changes, captures and snapshot restoration happen outside the measured process.
-The generated host plan reuses one absolute active path so persisted local paths
-remain valid. Native operators must import or seed at their own device path.
+Each workload reuses its own absolute active path and immutable source identities
+while mutable state is reset. Native operators seed at their own device path.
 """
 
 from __future__ import annotations
@@ -17,6 +17,7 @@ import json
 import os
 from pathlib import Path
 import shutil
+import sqlite3
 import subprocess
 import sys
 import zipfile
@@ -68,13 +69,76 @@ def owned_paths(root: Path, snapshot: Path, active: Path) -> tuple[Path, Path, P
     return root, snapshot, expected_active
 
 
-def restore(root: Path, snapshot: Path, active: Path) -> dict:
-    _, snapshot, active = owned_paths(root, snapshot, active)
+def source_identity(path: Path, active: Path) -> dict:
+    require(not path.is_symlink() and path.resolve().is_relative_to(active.resolve()), "An immutable source escapes its active fixture")
+    before = path.stat()
+    checksum = sha256(path)
+    after = path.stat()
+    fields = lambda value: (value.st_dev, value.st_ino, value.st_size, value.st_mtime_ns, value.st_ctime_ns)
+    require(fields(before) == fields(after), "An immutable source changed while its identity was recorded")
+    return {"path": path.relative_to(active).as_posix(), "device": after.st_dev, "inode": after.st_ino, "bytes": after.st_size, "mtime_ns": after.st_mtime_ns, "ctime_ns": after.st_ctime_ns, "sha256": checksum}
+
+
+def remember_sources(root: Path) -> dict:
+    active = root / "active"
+    sources = set()
+    for database in active.rglob("library.sqlite3"):
+        with sqlite3.connect(f"file:{database}?mode=ro", uri=True) as connection:
+            for (document,) in connection.execute("SELECT document FROM pages"):
+                path = json.loads(document).get("local_path")
+                if path:
+                    sources.add(Path(path))
+    require(bool(sources), "A prepared Reader fixture has no actual local source files")
+    receipt = {"schema_version": 1, "active_path": str(active), "files": [source_identity(path, active) for path in sorted(sources)]}
+    path = root / "immutable-sources.json"
+    require(not path.exists(), "Preserve the original source-identity receipt")
+    save_json(path, receipt)
+    return receipt
+
+
+def verify_sources(root: Path, snapshot: Path, active: Path, required: bool) -> int:
+    path = root / "immutable-sources.json"
+    if not path.exists():
+        require(not required, "The required immutable-source receipt is missing")
+        return 0
+    receipt = json.loads(path.read_text(encoding="utf-8"))
+    require(receipt.get("schema_version") == 1 and receipt.get("active_path") == str(active), "The source receipt belongs to a different active fixture")
+    records = receipt.get("files")
+    require(isinstance(records, list) and bool(records), "The immutable-source inventory is empty")
+    for record in records:
+        relative = Path(record["path"])
+        require(not relative.is_absolute() and ".." not in relative.parts, "An immutable-source path is invalid")
+        require(source_identity(active / relative, active) == record, "An original source identity or content changed; do not repair it into a fake warm hit")
+        require((snapshot / relative).is_file() and sha256(snapshot / relative) == record["sha256"], "The snapshot does not contain its original immutable bytes")
+    return len(records)
+
+
+def restore(root: Path, snapshot: Path, active: Path, require_source_identity: bool = False) -> dict:
+    root, snapshot, active = owned_paths(root, snapshot, active)
     if active.exists():
         require(active.is_dir(), "The owned active path must be a directory")
-        shutil.rmtree(active)
-    shutil.copytree(snapshot, active, copy_function=shutil.copy2)
-    return {"restored": True, "snapshot": str(snapshot), "active": str(active), "files": len(inventory(active))}
+        inventory(active)
+    originals = verify_sources(root, snapshot, active, require_source_identity)
+    desired = {path.relative_to(snapshot) for path in snapshot.rglob("*") if path.is_file()}
+    if active.exists():
+        for path in sorted(active.rglob("*"), key=lambda value: len(value.parts), reverse=True):
+            relative = path.relative_to(active)
+            if path.is_file() and relative not in desired:
+                path.unlink()
+            elif path.is_dir() and not any(path.iterdir()):
+                path.rmdir()
+    active.mkdir(exist_ok=True)
+    unchanged = 0
+    for relative in sorted(desired):
+        source, target = snapshot / relative, active / relative
+        if target.is_file() and target.stat().st_size == source.stat().st_size and sha256(target) == sha256(source):
+            # Even copy2/utime on equal bytes changes ctime and the local page key.
+            unchanged += 1
+            continue
+        target.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(source, target)
+    require(verify_sources(root, snapshot, active, require_source_identity) == originals, "Source identity changed during mutable-state restoration")
+    return {"restored": True, "snapshot": str(snapshot), "active": str(active), "files": len(inventory(active)), "unchanged_files_not_rewritten": unchanged, "immutable_source_count": originals, "source_identity_preserved": bool(originals)}
 
 
 def actions(path: Path, entries: list[tuple[int, str, str, str]]) -> Path:
@@ -169,61 +233,130 @@ def create(arguments) -> dict:
     require(not root.exists(), "Preserve prior fixture evidence; choose a fresh output directory")
     require(arguments.samples >= 21, "At least 21 fresh-process startup pairs are required")
     root.mkdir(parents=True)
-    (root / ".reader-e2e-fixtures").write_text(MARKER + "\n", encoding="utf-8")
-    for name in ("active", "snapshots", "preparation", "actions", "inputs", "runtime"):
+    for name in ("workloads", "actions", "inputs", "runtime"):
         (root / name).mkdir()
     (root / "runtime").chmod(0o700)
     binary = arguments.candidate_binary.resolve(strict=True)
     helper = Path(__file__).resolve()
-    replay = actions(root / "actions" / "seed-single.json", [(400, "settings", "set", "page-layout-mode=single"), (600, "settings", "set", "split-wide=false"), (800, "settings", "set", "reading-direction=rtl"), (1200, "reader", "seek", "1")])
-    preparations = [capture_process(binary, root, "demo-warm", demo=True, resume=False, screen="reader", replay=replay)]
-    require(preparations[-1]["state"].get("reader_page") == 1, "The normal seed did not seek to page one")
-    snapshots = [snapshot(root, "demo-warm")]
-    require(bool(snapshots[-1]["prepared_pngs"]), "The warm seed has no processed PNG")
-    processed = root / "active" / "demo" / "cache" / "shared-v1" / "processed"
-    require(processed.is_dir() and processed.resolve().is_relative_to(root / "active"), "The expected isolated processed cache is missing")
-    shutil.rmtree(processed)
-    processed.mkdir()
-    snapshots.append(snapshot(root, "demo-cold-render"))
-    restore(root, root / "snapshots" / "demo-warm", root / "active")
-    boundary = actions(root / "actions" / "seed-boundary.json", [(700, "reader", "seek", "40")])
-    preparations.append(capture_process(binary, root, "demo-boundary", demo=True, resume=True, screen="reader", replay=boundary))
-    require(preparations[-1]["state"].get("reader_page") == 40, "The boundary seed did not display page forty")
-    snapshots.append(snapshot(root, "demo-boundary"))
-    shutil.rmtree(root / "active")
-    (root / "active").mkdir()
-    strip_archive = root / "inputs" / "long-strip.cbz"
-    strips = create_long_archive(strip_archive)
-    preparations.append(capture_process(binary, root, "strip-import", demo=False, resume=False, screen="library", import_path=strip_archive, duration=3500))
-    vertical = actions(root / "actions" / "seed-vertical.json", [(400, "settings", "set", "page-layout-mode=single"), (600, "settings", "set", "split-wide=false"), (900, "settings", "set", "reading-direction=vertical"), (1400, "reader", "seek", "1")])
-    preparations.append(capture_process(binary, root, "strip-vertical", demo=False, resume=False, screen="reader", replay=vertical, duration=7000))
-    strip_state = preparations[-1]["state"]
-    require(strip_state.get("reading_direction") == "vertical", "The strip fixture did not enable the normal vertical mode")
-    require(strip_state.get("reader_image_height", 0) > strip_state.get("reader_viewport_height", 0) > 0, "The imported strip has no scrollable vertical windows")
-    snapshots.append(snapshot(root, "strip-vertical"))
-    long_turns = actions(root / "actions" / "turns.json", [(2000 + index * 700, "reader", "next", "") for index in range(21)])
-    boundary_turns = actions(root / "actions" / "boundary-turns.json", [(2000 + index * 700, "reader", "next" if index % 2 == 0 else "previous", "") for index in range(21)])
+    preparations, snapshots, contexts = [], [], {}
 
-    def workload(name: str, snapshot_name: str, *, demo: bool, replay_path: Path | None = None, samples: int | None = None, boundary_actions: bool = False) -> dict:
-        command = ["xvfb-run", "-a", "-s", "-screen 0 2200x3000x24", "{binary}", "--device", "scribe", "--offline", "--resume", "--data-dir", str(root / "active"), "--screen", "reader", "--performance-trace", "{trace}", "--exit-after-ms", "18500" if replay_path else "2000"]
+    def context(name):
+        child = root / "workloads" / name
+        child.mkdir()
+        (child / ".reader-e2e-fixtures").write_text(MARKER + "\n", encoding="utf-8")
+        for directory in ("active", "snapshots", "preparation", "actions", "inputs", "runtime"):
+            (child / directory).mkdir()
+        (child / "runtime").chmod(0o700)
+        contexts[name] = child
+        return child
+
+    for name in ("cached-startup", "cold-render-startup", "cached-turns", "chapter-boundary"):
+        child = context(name)
+        target_page = 40 if name == "chapter-boundary" else 1
+        replay = actions(child / "actions" / "seed.json", [
+            (400, "settings", "set", "page-layout-mode=single"),
+            (600, "settings", "set", "split-wide=false"),
+            (800, "settings", "set", "reading-direction=rtl"),
+            (1200, "reader", "seek", str(target_page)),
+        ])
+        prepared = capture_process(binary, child, "seed", demo=True, resume=False, screen="reader", replay=replay)
+        preparations.append(prepared)
+        require(prepared["state"].get("reader_page") == target_page, "The normal seed did not display its requested source page")
+        require(bool(prepared_pngs(child / "active")), "The normal seed generated no processed PNG")
+        if name == "cold-render-startup":
+            processed = child / "active/demo/cache/shared-v1/processed"
+            require(processed.is_dir() and processed.resolve().is_relative_to(child / "active"), "The expected isolated processed cache is missing")
+            shutil.rmtree(processed)
+            processed.mkdir()
+        originals = remember_sources(child)
+        saved = snapshot(child, "seed")
+        saved.update(workload=name, active_path=str(child / "active"), immutable_sources=originals)
+        snapshots.append(saved)
+        verify_sources(child, child / "snapshots/seed", child / "active", True)
+
+    child = context("streamed-vertical-windows")
+    strip_archive = root / "inputs/long-strip.cbz"
+    strips = create_long_archive(strip_archive)
+    preparations.append(capture_process(binary, child, "import", demo=False, resume=False, screen="library", import_path=strip_archive, duration=3500))
+    vertical = actions(child / "actions/seed.json", [
+        (400, "settings", "set", "page-layout-mode=single"),
+        (600, "settings", "set", "split-wide=false"),
+        (900, "settings", "set", "reading-direction=vertical"),
+        (1400, "reader", "seek", "1"),
+    ])
+    prepared = capture_process(binary, child, "vertical", demo=False, resume=False, screen="reader", replay=vertical, duration=7000)
+    preparations.append(prepared)
+    state = prepared["state"]
+    require(state.get("reading_direction") == "vertical", "The strip fixture did not enable the normal vertical mode")
+    require(state.get("reader_image_height", 0) > state.get("reader_viewport_height", 0) > 0, "The imported strip has no scrollable vertical windows")
+    originals = remember_sources(child)
+    saved = snapshot(child, "seed")
+    saved.update(workload="streamed-vertical-windows", active_path=str(child / "active"), immutable_sources=originals)
+    snapshots.append(saved)
+    verify_sources(child, child / "snapshots/seed", child / "active", True)
+    long_turns = actions(root / "actions/turns.json", [(2000 + index * 700, "reader", "next", "") for index in range(21)])
+    boundary_turns = actions(root / "actions/boundary-turns.json", [(2000 + index * 700, "reader", "next" if index % 2 == 0 else "previous", "") for index in range(21)])
+
+    def workload(name, demo, replay_path=None, samples=None, boundary_actions=False):
+        child = contexts[name]
+        active = child / "active"
+        command = ["xvfb-run", "-a", "-s", "-screen 0 2200x3000x24", "{binary}", "--device", "scribe", "--offline", "--resume", "--data-dir", str(active), "--screen", "reader", "--performance-trace", "{trace}", "--exit-after-ms", "18500" if replay_path else "2000"]
         if demo:
             command.append("--demo")
         if replay_path:
             command.extend(["--actions", str(replay_path)])
-        expectation = {"scope": "desktop", "require_startup": True, "minimum_ui_requests": 22 if replay_path else 1}
+        cache_states = {"cold": 1} if name == "cold-render-startup" else {"disk": 1}
+        if replay_path:
+            cache_states["memory"] = 21
+        expectation = {"scope": "desktop", "require_startup": True, "minimum_ui_requests": 22 if replay_path else 1, "required_cache_states": cache_states}
         if replay_path:
             expectation["required_successful_actions"] = {"next": 11, "previous": 10} if boundary_actions else {"next": 21}
-        result = {"id": name, "prepare": [[sys.executable, str(helper), "restore", "--root", str(root), "--snapshot", str(root / "snapshots" / snapshot_name), "--active", str(root / "active")]], "command": command, "fixtures": [{"name": "active", "path": str(root / "active")}], "expectation": expectation, "cwd": str(root), "timeout_seconds": 75}
+        result = {
+            "id": name,
+            "prepare": [[sys.executable, str(helper), "restore", "--root", str(child), "--snapshot", str(child / "snapshots/seed"), "--active", str(active), "--require-source-identity"]],
+            "command": command,
+            "fixtures": [{"name": "active", "path": str(active)}, {"name": "source_identity", "path": str(child / "immutable-sources.json")}],
+            "expectation": expectation,
+            "cwd": str(child),
+            "timeout_seconds": 75,
+        }
         if samples is not None:
             result["samples"] = samples
         return result
 
-    plan = {"schema_version": 1, "scope": "desktop", "samples": arguments.samples, "environment": {"SLINT_SCALE_FACTOR": "1", "SLINT_BACKEND": "winit-software", "SLINT_RENDERER": "software", "XDG_RUNTIME_DIR": str(root / "runtime"), "TZ": "Asia/Shanghai"}, "control": {"baseline_commit": BASELINE, "baseline_observation_patch": str(arguments.baseline_observation_patch.resolve()), "baseline_review_receipt": str(arguments.baseline_review_receipt.resolve()), "shared_observation_files": [{"name": name, "baseline": str(arguments.baseline_source.resolve() / name), "candidate": str(arguments.candidate_source.resolve() / name)} for name in ("src/reader_timing.rs", "vendor/slint-backend-kindle/src/frame_observer.rs")]}, "implementations": {"baseline": {"binary": str(arguments.baseline_binary.resolve())}, "candidate": {"binary": str(binary)}}, "workloads": [workload("cached-startup", "demo-warm", demo=True), workload("cold-render-startup", "demo-cold-render", demo=True), workload("cached-turns", "demo-warm", demo=True, replay_path=long_turns, samples=1), workload("chapter-boundary", "demo-boundary", demo=True, replay_path=boundary_turns, samples=1, boundary_actions=True), workload("streamed-vertical-windows", "strip-vertical", demo=False, replay_path=long_turns, samples=1)], "limits": ["Fresh processes use warm OS page caches; no machine cache drop is performed.", "The demo uses two alternating bundled pages and does not model broad image diversity.", "The cold-render fixture removes only disposable processed PNGs while retaining original images and database state.", "Long strips exceed the production ordinary-pixel limit and select the existing noninterlaced PNG row decoder.", "Long-turn metrics come from one process per implementation and contain correlated actions; startup metrics use independent fresh processes.", "This host plan measures UI acceptance only, not a physical framebuffer or optical panel completion."]}
-    receipt = {"schema_version": 1, "creation_binary": {"path": str(binary), "sha256": sha256(binary)}, "tools": {path.name: sha256(path) for path in (helper, helper.with_name("benchmark-reader-e2e.py"))}, "active_path": str(root / "active"), "preparation": preparations, "snapshots": snapshots, "long_strips": strips, "plan": str(root / "plan.json"), "limits": plan["limits"]}
+    limits = [
+        "Fresh processes use warm OS page caches; no machine cache drop is performed.",
+        "The demo uses two alternating bundled pages and does not model broad image diversity.",
+        "Each workload owns one fixed active path shared by its baseline and candidate trials.",
+        "Original source bytes, device/inode and nanosecond mtime/ctime are verified before and after every mutable-state restore.",
+        "Byte-identical files are never copied or touched during restore. Recreating local sources would correctly invalidate their processed cache keys.",
+        "Warm PNGs are prepared against these final stable source identities; the cold-render workload removes only disposable processed files.",
+        "Long strips exceed the production ordinary-pixel limit and select the existing noninterlaced PNG row decoder.",
+        "Long-turn metrics come from one process per implementation and contain correlated actions; startup metrics use independent fresh processes.",
+        "This host plan measures UI acceptance only, not a physical framebuffer or optical panel completion.",
+    ]
+    plan = {
+        "schema_version": 1, "scope": "desktop", "samples": arguments.samples,
+        "environment": {"SLINT_SCALE_FACTOR": "1", "SLINT_BACKEND": "winit-software", "SLINT_RENDERER": "software", "XDG_RUNTIME_DIR": str(root / "runtime"), "TZ": "Asia/Shanghai"},
+        "control": {
+            "baseline_commit": BASELINE,
+            "baseline_observation_patch": str(arguments.baseline_observation_patch.resolve()),
+            "baseline_review_receipt": str(arguments.baseline_review_receipt.resolve()),
+            "shared_observation_files": [{"name": name, "baseline": str(arguments.baseline_source.resolve() / name), "candidate": str(arguments.candidate_source.resolve() / name)} for name in ("src/reader_timing.rs", "vendor/slint-backend-kindle/src/frame_observer.rs")],
+        },
+        "implementations": {"baseline": {"binary": str(arguments.baseline_binary.resolve())}, "candidate": {"binary": str(binary)}},
+        "workloads": [
+            workload("cached-startup", True), workload("cold-render-startup", True),
+            workload("cached-turns", True, long_turns, 1),
+            workload("chapter-boundary", True, boundary_turns, 1, True),
+            workload("streamed-vertical-windows", False, long_turns, 1),
+        ],
+        "limits": limits,
+    }
+    receipt = {"schema_version": 1, "creation_binary": {"path": str(binary), "sha256": sha256(binary)}, "tools": {path.name: sha256(path) for path in (helper, helper.with_name("benchmark-reader-e2e.py"))}, "active_paths": {name: str(child / "active") for name, child in contexts.items()}, "preparation": preparations, "snapshots": snapshots, "long_strips": strips, "plan": str(root / "plan.json"), "limits": limits}
     save_json(root / "fixtures.json", receipt)
     save_json(root / "plan.json", plan)
     return {"prepared": True, "root": str(root), "plan": str(root / "plan.json"), "snapshot_count": len(snapshots), "startup_processes_per_implementation": arguments.samples * 2, "long_action_processes_per_implementation": 3}
-
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
@@ -235,9 +368,10 @@ def main() -> int:
     reset = modes.add_parser("restore")
     for name in ("root", "snapshot", "active"):
         reset.add_argument("--" + name, type=Path, required=True)
+    reset.add_argument("--require-source-identity", action="store_true", help="Reject changed or recreated original sources instead of repairing cache identity")
     arguments = parser.parse_args()
     try:
-        result = create(arguments) if arguments.mode == "create" else restore(arguments.root, arguments.snapshot, arguments.active)
+        result = create(arguments) if arguments.mode == "create" else restore(arguments.root, arguments.snapshot, arguments.active, arguments.require_source_identity)
         print(json.dumps(result, sort_keys=True))
         return 0
     except (OSError, ValueError, subprocess.SubprocessError) as error:

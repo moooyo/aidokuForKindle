@@ -1,11 +1,42 @@
 # Work state
 
-Updated: 2026-11-10.
+Updated: 2026-11-11.
 
-## Current KOReader optimization evaluation
+## Current end-to-end delivery
 
-The current working tree evaluates the remaining KOReader techniques on top of
-the delivered `ffb3417`. It adopts output-compatible native-channel grayscale
+The reader optimization and causal timing implementation is merged and pushed
+to main as `4c572ee90355572aa2e9ee631cff829e8a61f1e3`. Its 252 runtime, UI,
+asset and production-manifest inputs match the r2 build inputs byte for byte.
+R2 default and Kindle-feature library suites passed 676 and 689 tests, retaining
+two ignored opt-in benchmarks each. Python trace/fixture checks passed 59 tests.
+The unchanged native backend component retains its 108-test passing record.
+Both desktop and both ARM release builds passed.
+
+The actual producer qualification exposed missing Reader-entry observation and
+a fault fixture whose one-shot failure could be consumed by chapter prefetch.
+The entry observation is corrected, real dispatch regressions were added, and
+the held-failure fixture independently establishes foreground failure and old
+display protection. Original rejected records and r1 binaries remain preserved.
+Formal r2 timing and physical qualification are being completed separately;
+this status does not claim their success or an optical-panel speedup.
+
+The first cache pilot also proved that replacing local originals during fixture
+restoration invalidated warm PNG keys through source metadata identity. Those
+pilot results are marked cache-scope-invalid. Corrected workload-specific active
+roots retain original source identities; strict pilots confirmed disk, cold and
+memory paths before the formal host cohort started.
+
+The shared device lease covers only continuous actual Kindle operations and
+their necessary bounded restoration. Host builds, analysis, tool debugging and
+idle waits run outside the lease. The r1 preparation lease was released at
+23:07:26 Asia/Shanghai with no App run; the upload failure and exact restoration
+record remain retained. See [project instructions](../AGENTS.md) and
+[the measurement contract](READER_E2E_MEASUREMENT.md).
+
+## Preserved KOReader algorithm evaluation
+
+The algorithm evaluation on top of the delivered `ffb3417` adopts
+output-compatible native-channel grayscale
 conversion, row-buffer Lanczos3 scaling, processed-PNG reuse with fresh external
 source integrity, a neutral Gray8 retained scene on actual 8-bpp mappings, and
 distinct successful-update markers. It corrects the earlier omission of Scribe
@@ -27,7 +58,8 @@ progress 12 -> 13 -> 12, exercised the menu and exited normally. All eleven
 bounded smoke checks passed, original lighting and native controls were restored,
 and the owned lease was released. See the
 [physical smoke report](../artifacts/koreader-eval-physical-20261110-r1/reports/PHYSICAL_SMOKE.md).
-These are actual native functional observations, not panel-latency, ghosting,
+These are actual native functional observations of the earlier algorithm
+candidate, not acceptance of every later instrumented executable or panel-latency, ghosting,
 battery, physical-input or comparative on-device performance measurements.
 Host stage timings must not be presented as complete Kindle page-turn gains.
 

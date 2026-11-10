@@ -8,6 +8,12 @@ plugin and does not require the WeRead application.
 
 ## Current development follow-up
 
+The compatible reader optimizations and optional causal timing are merged and
+pushed to main in `4c572ee`. Its 252 runtime inputs match the rebuilt ARM inputs
+byte for byte. Default and Kindle-feature library checks passed 676 and 689
+tests respectively, with two opt-in benchmarks ignored in each configuration.
+Controlled end-to-end and new physical qualification are tracked separately.
+
 Commit `ffb3417`, merged and pushed to main, adds chapter-boundary and
 vertical-image prefetch, prioritized background decoding, prepared RGB
 publication, wide-page halves, editable
@@ -19,10 +25,12 @@ See [implementation and current verification](docs/READING_FOLLOWUP.md) and
 The current [KOReader optimization evaluation](docs/KOREADER_OPTIMIZATION_EVALUATION.md)
 adds compatible grayscale conversion, row-buffer scaling, existing-PNG reuse,
 an 8-bpp grayscale retained scene and distinct framebuffer update markers.
-Remote tests and the ARM release build passed. The candidate also completed
-an isolated native Reader smoke on a physical Scribe, including page changes,
+Remote tests and the ARM release build passed. The preceding algorithm candidate
+also completed an isolated native Reader smoke on a physical Scribe, including page changes,
 menu controls, normal exit and restored native controls; see the
 [physical report](artifacts/koreader-eval-physical-20261110-r1/reports/PHYSICAL_SMOKE.md).
+That report has its own executable identity and does not qualify every later
+instrumented build.
 Host stage measurements do not establish physical page-turn latency, ghosting
 or battery improvements. Experimental MTK flags remain disabled.
 

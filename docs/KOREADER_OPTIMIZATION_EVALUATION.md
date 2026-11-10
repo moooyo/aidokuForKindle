@@ -137,9 +137,11 @@ post-release check confirmed its absence. See the
 [physical smoke report](../artifacts/koreader-eval-physical-20261110-r1/reports/PHYSICAL_SMOKE.md)
 and [eleven checks](../artifacts/koreader-eval-physical-20261110-r1/reports/candidate-capture-verification-01.json).
 
-## Integrated verification
+## Algorithm-candidate integrated verification
 
-All host checks ran on `ssh test-env`, with Cargo build concurrency six. The
+This table belongs to the algorithm candidate with ARM SHA-256 `e0e8338...`,
+before the optional end-to-end timing delivery. The host checks ran on
+`ssh test-env`, with Cargo build concurrency six. The
 separately owned physical smoke was coordinated through that worker:
 
 | Check | Result | Evidence |
@@ -162,6 +164,8 @@ have their separate measurement identities; they are not production dependencies
 Original intermediate failures and exploratory runs are retained in the isolated remote root
 `/root/aidoku-koreader-eval-20261110-01`. Local operations were source editing,
 ordinary transfer/extraction and reading records. No tests, builds or runtime
-probes ran on the Windows workstation. This evaluation is a working-tree change
-on top of the previously merged and pushed `ffb3417`; it does not relabel the
-earlier frozen delivery or claim another main push.
+probes ran on the Windows workstation. The evaluated changes were subsequently
+merged with optional causal timing and pushed to main in `4c572ee`. Its
+[end-to-end measurement procedure](READER_E2E_MEASUREMENT.md) and later results
+retain separate input identities. That delivery does not relabel this earlier
+algorithm candidate's physical smoke or the frozen Candidate18 records.

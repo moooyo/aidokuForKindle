@@ -1,6 +1,7 @@
 """Check fixture restoration ownership boundaries on the remote worker."""
 
 import importlib.util
+import json
 from pathlib import Path
 import tempfile
 import unittest
@@ -66,6 +67,40 @@ class RestoreOwnershipTests(unittest.TestCase):
         (self.snapshot / "external.bin").symlink_to(outside)
         with self.assertRaises(ValueError):
             fixtures.restore(self.root, self.snapshot, self.active)
+        self.assertEqual((self.active / "stale.bin").read_bytes(), b"retired")
+
+    def immutable_source(self):
+        path = self.active / "source.png"
+        path.write_bytes(b"immutable source bytes")
+        (self.snapshot / path.name).write_bytes(path.read_bytes())
+        recorded = fixtures.source_identity(path, self.active)
+        (self.root / "immutable-sources.json").write_text(json.dumps({"schema_version": 1, "active_path": str(self.active), "files": [recorded]}))
+        return path, recorded
+
+    def test_mutable_restore_preserves_actual_original_inode_and_ctime(self):
+        source, before = self.immutable_source()
+        result = fixtures.restore(self.root, self.snapshot, self.active, True)
+        self.assertEqual(fixtures.source_identity(source, self.active), before)
+        self.assertTrue(result["source_identity_preserved"])
+        self.assertEqual(result["immutable_source_count"], 1)
+        self.assertEqual((self.active / "database.bin").read_bytes(), (self.snapshot / "database.bin").read_bytes())
+
+    def test_changed_original_is_rejected_before_mutable_state_is_reset(self):
+        source, _ = self.immutable_source()
+        source.write_bytes(b"modified source bytes")
+        with self.assertRaises(ValueError):
+            fixtures.restore(self.root, self.snapshot, self.active, True)
+        self.assertEqual(source.read_bytes(), b"modified source bytes")
+        self.assertEqual((self.active / "stale.bin").read_bytes(), b"retired")
+
+    def test_same_bytes_with_replaced_inode_are_not_repaired_into_a_warm_hit(self):
+        source, before = self.immutable_source()
+        replacement = self.active / "replacement.png"
+        replacement.write_bytes(source.read_bytes())
+        replacement.replace(source)
+        self.assertEqual(fixtures.sha256(source), before["sha256"])
+        with self.assertRaises(ValueError):
+            fixtures.restore(self.root, self.snapshot, self.active, True)
         self.assertEqual((self.active / "stale.bin").read_bytes(), b"retired")
 
 

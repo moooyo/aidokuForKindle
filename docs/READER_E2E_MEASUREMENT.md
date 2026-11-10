@@ -47,10 +47,18 @@ the integration review. Shared observation modules must be byte-identical across
 the two source trees. Hash equality of an observer does not independently prove
 that the rest of the baseline patch contains no algorithm change.
 
-Seed fixtures before collecting measured processes. Restore the same immutable
-snapshot to the same fixed active path before each process. This preserves
-SQLite's stored absolute image paths without interpreting an arbitrary copied
-database as an equivalent fixture. The harness hashes all declared fixture files
+Seed fixtures before collecting measured processes. Each workload keeps its own
+fixed active path, shared by both implementations. Restore mutable state before
+each process while retaining the original source files in place. Local page keys
+include source metadata identity: replacing an equal-byte original or calling
+copy2/chmod/utime on it can invalidate the processed cache through inode/ctime.
+The fixture helper records actual SQLite page-source paths and verifies SHA,
+device, inode, length, mtime and ctime before and after each restoration. Identical
+files are not rewritten. Warm PNGs are generated normally against those final
+source identities; cold cases remove only owned processed derivatives.
+
+This also preserves SQLite's stored absolute image paths without interpreting an
+arbitrary copied database as an equivalent fixture. The harness hashes all declared fixture files
 after preparation and requires equal bytes across both implementations and all
 iterations of a workload. Preparation, source inventories and file copies are
 outside the trace interval. Inventory reads warm the OS page cache; the procedure
