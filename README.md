@@ -111,6 +111,9 @@ remain historical evidence. The original Phase 2 package remains preserved in
 
 - Exit through the action at the top of Settings. Application startup and normal
   exit show localized activity feedback with low-frequency dots.
+- The [manual performance comics](docs/MANUAL_PERFORMANCE_COMICS.md) provide
+  six attributed or original CBZ workloads for local loading, page turns,
+  wide pages, vertical reading and cache checks inside Aidoku's library.
 - Import a CBZ/ZIP archive or an image directory through Browse > Local files or
   the library menu. Imported content, progress, bookmarks, categories, and settings
   persist in SQLite and the application's content cache.
