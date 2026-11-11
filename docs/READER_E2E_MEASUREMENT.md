@@ -164,6 +164,16 @@ This policy is declared before sampling and does not retrospectively qualify
 an earlier rejected cohort. Status observations occur after the timed App exits
 and do not change Rust-main or action-to-output timing boundaries.
 
+If source identities drift between completed workloads, preserve the original
+receipt and whole completed workload. Establish a separately named identity
+epoch only after verifying original content and actual database source paths;
+keep the full stat/SHA stability checks and leave original images untouched.
+Regenerate and qualify caches through normal application behavior as needed.
+Freeze new named fixtures and declare their actual inputs before measurement.
+A joint report must retain each run's original collection/ordinal, source epoch,
+source receipt and helper identity, and provide independently qualified epoch
+views. It must not relabel an interrupted original master as completed.
+
 `scripts/benchmark-reader-e2e.py analyze --manifest <runs.json> --output <analysis.json>`
 qualifies already collected JSON files. A manifest contains `schema_version: 1`,
 `expected_pairs` (an integer or per-workload map), the `control` source paths

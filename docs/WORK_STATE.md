@@ -19,15 +19,23 @@ the held-failure fixture independently establishes foreground failure and old
 display protection. Original rejected records and r1 binaries remain preserved.
 The formal host cohort has completed 90/90 with strict independent reanalysis;
 its cached-turn counterexample is preserved alongside cold-start improvements.
-The resumed native warm-start workload completed 42 processes, 21 per role,
-with passing traces, cache/source gates and ordinary restoration/release.
-The next cold batch completed six App processes, then rejected a prelaunch
-slot with zero generations and later lost SSH connectivity. Its lease was
-released at 04:54:29 Asia/Shanghai under an explicit no-owned-state exception;
-strict native/lighting qualification remains false for that interrupted batch.
-The full native comparison is withheld pending physical connectivity and a
-fresh complete cold/long continuation. See [the dated results](READER_E2E_RESULTS.md)
-and [the continuation checkpoint](review/reader-native-continuation-20261111.json).
+The completed physical native table contains 90 valid measured processes,
+216 UI/write/SEND associations and 126 successful actions. Official strict
+analysis qualifies the joint table and both epoch views independently. The
+original warm42 remains epoch 1; fresh cold42 and long6 use epoch 2 with current
+source identities and normally generated caches. Original images, old pins,
+raw records and unsuccessful attempts are preserved. Every measured batch
+restored native controls and lighting; the final owner/token release completed
+at 21:17:36 Asia/Shanghai on November 11.
+
+Native software-submission medians were 6550.273 -> 2848.611 ms for cold startup
+and 209.653 -> 160.880 ms for cached turns. UI acceptance did not improve
+uniformly, each long distribution shares one process, and optical latency and
+battery remain unmeasured. See [the dated results](READER_E2E_RESULTS.md) and
+[the earlier incomplete checkpoint](review/reader-native-continuation-20261111.json).
+The standalone public native evidence export passed privacy/member checks and
+fresh three-view reanalysis; its returned Windows copy matched remotely.
+See [the export receipt](review/reader-native-export-20261111.json).
 
 The first cache pilot also proved that replacing local originals during fixture
 restoration invalidated warm PNG keys through source metadata identity. Those
