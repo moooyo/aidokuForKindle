@@ -8,6 +8,17 @@ plugin and does not require the WeRead application.
 
 ## Current development follow-up
 
+Version 0.1.1 adds silent KPM entry scripts, early localized native startup
+activity, an explicit settings-page exit action, and submitted-frame exit
+feedback. It also cancels obsolete private Reader work and checks paused or
+cancelled downloads before dispatch. The
+[BiliComics comparison and verification](docs/bilicomics-followup-20261111.md)
+records the adopted techniques, current checks, and acceptance boundaries.
+Remote suites, the ARM build and the bounded physical KPM startup/exit check
+passed. The user also confirmed loading-only startup and exit through the
+existing bookstore/KPM entry. Native state was restored and the lease released.
+The earlier measurements below retain their own executable identities.
+
 The compatible reader optimizations and optional causal timing are merged and
 pushed to main in `4c572ee`. Its 252 runtime inputs match the rebuilt ARM inputs
 byte for byte. Default and Kindle-feature library checks passed 676 and 689
@@ -98,6 +109,8 @@ remain historical evidence. The original Phase 2 package remains preserved in
 
 ## Use the application
 
+- Exit through the action at the top of Settings. Application startup and normal
+  exit show localized activity feedback with low-frequency dots.
 - Import a CBZ/ZIP archive or an image directory through Browse > Local files or
   the library menu. Imported content, progress, bookmarks, categories, and settings
   persist in SQLite and the application's content cache.
@@ -182,6 +195,14 @@ an explicit source-bound manifest and independent remote verification recorded i
 [PHASE3_VERIFICATION.md](docs/PHASE3_VERIFICATION.md).
 
 ## Install on Kindle
+
+For an existing KPM installation, use the
+[KPM package instructions](packaging/kpm/README.md). Close Aidoku, install the
+versioned `.kpkg` through KPM, then launch it from the existing KPM frontend.
+The package also provides a silent `documents/Aidoku.sh` Scriptlet. This path
+preserves the current device profile and user data and does not require KUAL.
+
+For the separately preserved legacy ZIP, follow the instructions below.
 
 Extract the delivered ZIP at the root of the device's USB storage, preserving
 the `aidoku`, `extensions`, and `documents` directories. Open KUAL, select the

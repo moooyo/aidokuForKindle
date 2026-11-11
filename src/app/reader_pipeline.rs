@@ -40,6 +40,7 @@ impl App {
         &mut self,
         refresh: RefreshRequest,
     ) -> Result<()> {
+        self.cancel_reader_image();
         self.cancel_reader_prefetch();
         self.reader_generation = self.reader_generation.wrapping_add(1);
         crate::reader_timing::request(self.reader_generation, self.lifecycle_generation);
@@ -108,7 +109,10 @@ impl App {
         let options = reader_image_options(&effective, viewport, index, window.total);
         let offline =
             self.options.offline || self.options.demo || self.platform.network_policy_blocked();
+        let cancellation = imaging::DecodeCancellation::new();
+        let worker_cancellation = cancellation.clone();
         let id = self.spawn_job_kind(true, JobKind::Reader, move |manager| {
+            worker_cancellation.check()?;
             let mut pages = window.pages.into_iter();
             let request = pages
                 .next()
@@ -125,19 +129,23 @@ impl App {
             )?;
             drop(fetch_timing);
             let mut render_timing = crate::reader_timing::Stage::new(timing, "render_finished");
-            let prepared = render_reader_page(
-                manager.cache(),
-                &request,
-                &cached.path,
-                &options,
-                &effective,
-                viewport,
-                vertical,
-                offset,
-                zoom,
-                half,
-                None,
-            )?;
+            // A raw transfer can have download or reader followers. Only the
+            // private render uses this reader generation's cancellation fence.
+            let prepared = imaging::with_decode_cancellation(&worker_cancellation, || {
+                render_reader_page(
+                    manager.cache(),
+                    &request,
+                    &cached.path,
+                    &options,
+                    &effective,
+                    viewport,
+                    vertical,
+                    offset,
+                    zoom,
+                    half,
+                    None,
+                )
+            })?;
             render_timing.render_result(prepared.rendered.cache_hit, prepared.rendered.memory_hit);
             drop(render_timing);
             paths.push(cached);
@@ -149,6 +157,7 @@ impl App {
             let first_path = rendered.cache_path;
             let first = rendered.image;
             let (second, second_path) = if spread {
+                worker_cancellation.check()?;
                 let request = pages
                     .next()
                     .context("The second spread page is outside this chapter")?;
@@ -163,19 +172,21 @@ impl App {
                 )?;
                 drop(fetch_timing);
                 let mut render_timing = crate::reader_timing::Stage::new(timing, "render_finished");
-                let prepared = render_reader_page(
-                    manager.cache(),
-                    &request,
-                    &cached.path,
-                    &options,
-                    &effective,
-                    viewport,
-                    false,
-                    0,
-                    zoom,
-                    0,
-                    None,
-                )?;
+                let prepared = imaging::with_decode_cancellation(&worker_cancellation, || {
+                    render_reader_page(
+                        manager.cache(),
+                        &request,
+                        &cached.path,
+                        &options,
+                        &effective,
+                        viewport,
+                        false,
+                        0,
+                        zoom,
+                        0,
+                        None,
+                    )
+                })?;
                 render_timing
                     .render_result(prepared.rendered.cache_hit, prepared.rendered.memory_hit);
                 drop(render_timing);
@@ -185,6 +196,7 @@ impl App {
             } else {
                 (None, None)
             };
+            worker_cancellation.check()?;
             let prepare_timing = crate::reader_timing::Stage::new(timing, "prepare_finished");
             let first = super::prepared_pixels::prepare(first);
             let second = second.map(super::prepared_pixels::prepare);
@@ -206,9 +218,16 @@ impl App {
             })
         })?;
         self.reader_inflight = Some(id);
+        self.reader_image_cancel = Some(cancellation);
         self.reader_image_jobs_started = self.reader_image_jobs_started.saturating_add(1);
         self.reader_dirty = false;
         Ok(())
+    }
+
+    pub(super) fn cancel_reader_image(&mut self) {
+        if let Some(token) = self.reader_image_cancel.take() {
+            token.cancel();
+        }
     }
 
     pub(super) fn start_reader_prefetch(&mut self) -> Result<()> {
@@ -841,7 +860,113 @@ fn strip_prefetch_offsets(offset: u32, viewport_height: u32, image_height: u32) 
 mod tests {
     use super::*;
     use crate::reader::ReaderAction;
+    use crate::{app::tests::DemoRouteFixture, platform::DeviceProfile};
     use image::Pixel;
+
+    #[test]
+    fn foreground_turns_cancel_old_work_before_starting_the_latest_frame() {
+        let mut fixture = DemoRouteFixture::new("settings", DeviceProfile::Pw6, false);
+        let app = &mut fixture.app;
+        let book = Book {
+            id: "cancel-reader-book".into(),
+            source_id: "local".into(),
+            remote_id: "cancel-reader-book".into(),
+            title: "Reader cancellation fixture".into(),
+            ..Book::default()
+        };
+        let chapter = Chapter {
+            id: "cancel-reader-chapter".into(),
+            book_id: book.id.clone(),
+            source_id: book.source_id.clone(),
+            remote_id: "cancel-reader-chapter".into(),
+            page_count: 2,
+            ..Chapter::default()
+        };
+        let pages = (0..2)
+            .map(|index| {
+                let path = app.data_dir.join(format!("cancel-reader-{index}.png"));
+                GrayImage::from_pixel(16, 24, image::Luma([48 + index * 64]))
+                    .save(&path)
+                    .unwrap();
+                Page {
+                    local_path: Some(path),
+                    ..Page::default()
+                }
+            })
+            .collect::<Vec<_>>();
+        app.store.upsert_book(&book).unwrap();
+        app.store
+            .save_chapters(&book.id, &[chapter.clone()])
+            .unwrap();
+        app.store.save_pages(&chapter.id, &pages).unwrap();
+        app.route = "reader".into();
+        app.prefs.crop_borders = false;
+        app.prefs.split_wide = false;
+        app.prefs.spread = false;
+        app.prefs.dither = false;
+        app.reader =
+            Some(ReaderState::new(vec![chapter.clone()], &chapter.id, 1, &app.prefs).unwrap());
+        app.reader.as_mut().unwrap().set_total(2);
+
+        // Keep the real decoder budget occupied. Superseding a render must
+        // release its worker even before this budget becomes available.
+        let active = imaging::decode_permit().unwrap();
+        app.request_reader_images().unwrap();
+        let first = app.reader_inflight.unwrap();
+        let cancelled = app.reader_image_cancel.as_ref().unwrap().clone();
+        app.reader.as_mut().unwrap().page = 2;
+        app.request_reader_images().unwrap();
+        assert!(cancelled.is_cancelled());
+        assert_eq!(app.reader_inflight, Some(first));
+        assert_eq!(app.reader_image_jobs_started, 1);
+        assert!(app.reader_dirty);
+
+        let obsolete = app.job_rx.recv_timeout(Duration::from_secs(10)).unwrap();
+        assert_eq!(obsolete.id, first);
+        assert!(imaging::is_decode_cancelled(
+            obsolete.result.as_ref().err().unwrap()
+        ));
+        app.job_tx.send(obsolete).unwrap();
+        app.poll();
+        let latest = app.reader_inflight.unwrap();
+        assert_ne!(latest, first);
+        assert_eq!(app.reader_image_jobs_started, 2);
+        assert!(!app.reader_dirty);
+        assert!(app.reader_recovery.is_none());
+        assert!(!app.reader_image_cancel.as_ref().unwrap().is_cancelled());
+        drop(active);
+
+        let completed = app.job_rx.recv_timeout(Duration::from_secs(10)).unwrap();
+        assert_eq!(completed.id, latest);
+        match completed.result.as_ref().unwrap() {
+            JobResult::ReaderImage { page, first, .. } => {
+                assert_eq!(*page, 2);
+                assert!(first.as_bytes().iter().all(|value| *value == 119));
+            }
+            _ => panic!("The latest reader job must prepare its requested frame"),
+        }
+        app.job_tx.send(completed).unwrap();
+        app.poll();
+        assert!(app.reader_inflight.is_none());
+        assert!(app.reader_image_cancel.is_none());
+        assert!(app.reader_recovery.is_none());
+    }
+
+    #[test]
+    fn invalidating_reader_work_cancels_the_private_render_and_keeps_worker_ownership() {
+        let mut fixture = DemoRouteFixture::new("settings", DeviceProfile::Pw6, false);
+        let app = &mut fixture.app;
+        let cancellation = imaging::DecodeCancellation::new();
+        app.reader_inflight = Some(42);
+        app.reader_image_cancel = Some(cancellation.clone());
+        app.pending.insert(42);
+        app.invalidate_reader_work();
+        assert!(cancellation.is_cancelled());
+        assert_eq!(app.reader_inflight, Some(42));
+        assert!(!app.pending.contains(&42));
+        assert!(!app.reader_dirty);
+        assert!(app.reader_image_cancel.is_none());
+    }
 
     struct OfflineReaderFixture {
         directory: tempfile::TempDir,

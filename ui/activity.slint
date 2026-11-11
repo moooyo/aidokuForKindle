@@ -1,0 +1,47 @@
+import { State } from "state.slint";
+import { Theme } from "theme.slint";
+import { Strings } from "strings.slint";
+import { BodyText, Caption, TitleText } from "widgets.slint";
+
+export component ExitActivity inherits Rectangle {
+    background: Theme.paper;
+    accessible-role: text;
+    accessible-label: Strings.exiting + " " + State.exit-stage;
+    Rectangle {
+        x: Theme.margin;
+        y: (parent.height - self.height) / 2;
+        width: parent.width - Theme.margin * 2;
+        height: State.large-screen ? 230px : 210px;
+        TitleText {
+            x: 0px; y: 0px; width: parent.width; height: Theme.title-line;
+            text: "Aidoku";
+            horizontal-alignment: center;
+        }
+        BodyText {
+            x: 0px; y: State.large-screen ? 86px : 72px;
+            width: parent.width; height: 36px;
+            text: Strings.exiting;
+            font-size: State.large-screen ? 24px : 21px;
+            horizontal-alignment: center;
+        }
+        Caption {
+            x: 0px; y: State.large-screen ? 136px : 120px;
+            width: parent.width; height: 30px;
+            text: State.exit-stage;
+            horizontal-alignment: center;
+            overflow: elide;
+        }
+        Rectangle {
+            x: (parent.width - self.width) / 2;
+            y: parent.height - self.height;
+            width: 60px; height: 12px;
+            for index in 3: Rectangle {
+                x: index * 24px; y: 0px;
+                width: 12px; height: 12px;
+                border-radius: 6px;
+                background: index == State.exit-frame ? Theme.ink : Theme.dotted;
+            }
+        }
+    }
+    TouchArea {}
+}

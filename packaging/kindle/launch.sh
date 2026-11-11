@@ -1,5 +1,6 @@
 #!/bin/sh
 # Name: Aidoku for Kindle
+# DontUseFBInk
 # Keep the app in RAM while stock powerd owns the screen and input.
 set -eu
 umask 077
@@ -65,6 +66,7 @@ fi
 # A different launcher's lock is never stolen or repaired.
 mkdir "$LOCK_DIR" 2>/dev/null || fail 'Another Aidoku launcher owns the display lock.'
 printf '%s\n' "$ROOT_PID" >"$LOCK_DIR/pid"
+printf 'aidoku: Launcher worker started (pid=%s).\n' "$ROOT_PID" >&2
 APP_PID=''; RUNNER_PID=''; OBSERVER_PID=''; ACK_PID=''; WAKE_PID=''; RESUME_PID=''; REDRAW_PID=''
 APP_GENERATION=0; APP_PHASE=starting; SLEEP_EPOCH=0; SLEEP_GENERATION=0
 NATIVE_READ_PID=''; NATIVE_READ_BIRTH=''; NATIVE_READ_SEQUENCE=0
@@ -495,7 +497,9 @@ cleanup() {
     if [ "$EVENT_FD_OPEN" -eq 1 ]; then exec 3>&-; EVENT_FD_OPEN=0; fi
     for record in pid nonce generation phase epoch application-pid power-events sleep-request sleep-ready resume-request resume-ready fallback-sleep ordinary-exit lifecycle-state.json native-portrait-calibration resume-native-portrait-calibration native-read-output native-read-done native-read-command native-read-go runner-child runner-command observer-child observer-command ack-child ack-command wake-child wake-command wake-power resume-child resume-command; do rm -f "$LOCK_DIR/$record" "$LOCK_DIR/$record.pending"; done
     rm -f "$LOCK_DIR"/resume-native-portrait-calibration-*.pending
-    rmdir "$LOCK_DIR" 2>/dev/null || :; exit "$cleanup_status"
+    rmdir "$LOCK_DIR" 2>/dev/null || :
+    printf 'aidoku: Launcher worker exited with status %s.\n' "$cleanup_status" >&2
+    exit "$cleanup_status"
 }
 trap 'cleanup "$?"' 0
 trap 'exit 129' HUP

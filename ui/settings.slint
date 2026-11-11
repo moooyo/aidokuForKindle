@@ -1,7 +1,7 @@
 import { State, Commands } from "state.slint";
 import { Theme } from "theme.slint";
 import { Strings } from "strings.slint";
-import { BodyText, Caption, GroupLabel, Icon, PageBar, TitleText } from "widgets.slint";
+import { ActionButton, BodyText, Caption, GroupLabel, Icon, PageBar, TitleText } from "widgets.slint";
 import { DeviceGlyph, SettingsListRow } from "settings-controls.slint";
 import { SettingsBody } from "settings-sections.slint";
 
@@ -59,11 +59,19 @@ export component SettingsPage inherits Rectangle {
         TitleText {
             x: State.large-screen ? 36px : 22px;
             y: State.large-screen ? 34.5px : 25.5px;
-            width: State.large-screen ? 250px : parent.width - 44px;
+            width: State.large-screen ? 230px : max(0px, parent.width - 226px);
             height: Theme.title-line;
             text: Strings.settings;
             font-size: Theme.title;
-            letter-spacing: Theme.title-tracking;
+            letter-spacing: State.large-screen ? 2px : Theme.title-tracking;
+        }
+        ActionButton {
+            x: State.large-screen ? max(320px, parent.width - 474px) - 168px : parent.width - self.width - 22px;
+            y: State.large-screen ? 34.5px : 25.5px;
+            width: 160px;
+            height: 44px;
+            text: Strings.exit;
+            clicked => { Commands.action("app", "exit", ""); }
         }
         if State.large-screen: Rectangle {
             x: max(320px, parent.width - 474px);

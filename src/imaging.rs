@@ -5,7 +5,9 @@ mod row_resize;
 pub use decode_scheduler::{
     DecodeCancellation, check_decode_cancelled, is_decode_cancelled, with_background_decode,
 };
-pub(crate) use decode_scheduler::{decode_permit, without_decode_cancellation};
+pub(crate) use decode_scheduler::{
+    decode_permit, with_decode_cancellation, without_decode_cancellation,
+};
 
 use std::{
     fs,

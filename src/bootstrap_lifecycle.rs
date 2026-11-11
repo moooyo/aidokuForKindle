@@ -416,7 +416,7 @@ pub fn signal_poke() {}
 pub fn install_signal_wakeup(fd: Option<i32>) -> Result<()> {
     SIGNAL_WAKE_FD.store(fd.unwrap_or(-1), Ordering::Release);
     #[cfg(unix)]
-    if fd.is_some() {
+    {
         // SAFETY: the handlers only update atomics and write the retained pipe.
         unsafe {
             for signal in [libc::SIGUSR1, libc::SIGUSR2] {
@@ -430,6 +430,13 @@ pub fn install_signal_wakeup(fd: Option<i32>) -> Result<()> {
         }
     }
     Ok(())
+}
+
+/// Startup feedback must stop before a pending native ownership transition.
+pub fn display_activity_allowed() -> bool {
+    !SUSPEND_REQUESTED.load(Ordering::Acquire)
+        && !RESUME_REQUESTED.load(Ordering::Acquire)
+        && !crate::STOP_REQUESTED.load(Ordering::Acquire)
 }
 
 pub fn clear_signal_wakeup() {

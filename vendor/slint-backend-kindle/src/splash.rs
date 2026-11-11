@@ -7,7 +7,7 @@ use std::sync::{Arc, mpsc};
 use std::thread::JoinHandle;
 use std::time::{Duration, Instant};
 
-use crate::framebuffer::Framebuffer;
+use crate::framebuffer::{Framebuffer, NativeFramebufferObservation};
 use crate::render_control::GrayMode;
 
 const UPDATE_INTERVAL: Duration = Duration::from_millis(1_250);
@@ -65,6 +65,8 @@ struct Renderer {
     images: StartupImages,
     flipped: bool,
     dark_mode: bool,
+    can_present: fn() -> bool,
+    anchor: NativeFramebufferObservation,
     title_y: usize,
     starting_y: usize,
     dynamic_x: usize,
@@ -83,6 +85,8 @@ impl Renderer {
         images: StartupImages,
         flipped: bool,
         dark_mode: bool,
+        can_present: fn() -> bool,
+        anchor: NativeFramebufferObservation,
     ) -> io::Result<Self> {
         let stage_width = images.stages.iter().map(|image| image.width).max().unwrap();
         let stage_height = images
@@ -114,6 +118,8 @@ impl Renderer {
             images,
             flipped,
             dark_mode,
+            can_present,
+            anchor,
             title_y,
             starting_y,
             dynamic_x: (width - dynamic_width) / 2,
@@ -127,7 +133,8 @@ impl Renderer {
         })
     }
 
-    fn draw_initial(&mut self, stage: usize) {
+    fn draw_initial(&mut self, stage: usize) -> io::Result<()> {
+        self.ensure_current()?;
         self.framebuffer.fill(
             GrayMode {
                 dark_mode: self.dark_mode,
@@ -158,10 +165,12 @@ impl Renderer {
             self.dark_mode,
         );
         self.draw_dynamic(stage);
-        if let Err(error) = self.framebuffer.refresh_full() {
-            log::error!("startup framebuffer refresh was rejected: {error}");
+        if !(self.can_present)() {
+            return Err(io::Error::other("startup display ownership was withdrawn"));
         }
+        self.framebuffer.refresh_full()?;
         self.last_update = Instant::now();
+        Ok(())
     }
 
     fn draw_dynamic(&mut self, stage: usize) {
@@ -200,7 +209,11 @@ impl Renderer {
         );
     }
 
-    fn update(&mut self, stage: usize) {
+    fn update(&mut self, stage: usize) -> bool {
+        if let Err(error) = self.ensure_current() {
+            log::debug!("startup display stopped: {error}");
+            return false;
+        }
         // Match normal rendering: submit updates without blocking on panel
         // completion. The low submission rate avoids continuous e-ink activity.
         self.pulse = (self.pulse + 1) % 3;
@@ -214,13 +227,29 @@ impl Renderer {
             (self.dynamic_width, self.dynamic_height),
             self.flipped,
         );
+        if !(self.can_present)() {
+            return false;
+        }
         if let Err(error) = self.framebuffer.refresh_region(
             slint::PhysicalPosition::new(x as i32, y as i32),
             slint::PhysicalSize::new(self.dynamic_width as u32, self.dynamic_height as u32),
         ) {
             log::error!("startup framebuffer region refresh was rejected: {error}");
+            return false;
         }
         self.last_update = Instant::now();
+        true
+    }
+
+    fn ensure_current(&self) -> io::Result<()> {
+        if !(self.can_present)() {
+            return Err(io::Error::other("startup display ownership is unavailable"));
+        }
+        let observed = self.framebuffer.observe_native_rotation(self.anchor)?;
+        if observed.rotation != self.anchor.rotation {
+            return Err(io::Error::other("startup portrait calibration changed"));
+        }
+        Ok(())
     }
 }
 
@@ -316,6 +345,30 @@ impl StartupSplash {
         approved_size: (u32, u32),
         dark_mode: bool,
     ) -> io::Result<Self> {
+        Self::show_with_orientation(
+            images,
+            approved_size,
+            dark_mode,
+            crate::platform::launch_render_offset() == 180,
+            || true,
+            crate::framebuffer::probe_native_framebuffer()?,
+        )
+    }
+
+    /// Use a same-run authenticated portrait direction and ownership gate.
+    /// The gate must turn false before native sleep, USB takeover, or shutdown;
+    /// a cancelled worker retains its last frame and never resumes by itself.
+    pub fn show_with_orientation(
+        images: StartupImages,
+        approved_size: (u32, u32),
+        dark_mode: bool,
+        flipped: bool,
+        can_present: fn() -> bool,
+        anchor: NativeFramebufferObservation,
+    ) -> io::Result<Self> {
+        if !can_present() {
+            return Err(io::Error::other("startup display ownership is unavailable"));
+        }
         let framebuffer = Framebuffer::open()?;
         if (framebuffer.width, framebuffer.height) != approved_size {
             return Err(io::Error::new(
@@ -323,9 +376,9 @@ impl StartupSplash {
                 "framebuffer dimensions changed after launch approval",
             ));
         }
-        let flipped = crate::platform::launch_render_offset() == 180;
-        let mut renderer = Renderer::new(framebuffer, images, flipped, dark_mode)?;
-        renderer.draw_initial(0);
+        let mut renderer =
+            Renderer::new(framebuffer, images, flipped, dark_mode, can_present, anchor)?;
+        renderer.draw_initial(0)?;
         let mut splash = Self {
             renderer: Some(renderer),
             stage: Arc::new(AtomicUsize::new(0)),
@@ -370,14 +423,19 @@ impl StartupSplash {
         let stage = self.stage.clone();
         let (stop, receiver) = mpsc::channel();
         let worker = std::thread::Builder::new()
-            .name("weread-startup".into())
+            .name("native-startup".into())
             .spawn(move || {
                 loop {
+                    if !(renderer.can_present)() {
+                        break;
+                    }
                     let remaining = UPDATE_INTERVAL.saturating_sub(renderer.last_update.elapsed());
                     match receiver.recv_timeout(remaining) {
                         Ok(()) | Err(mpsc::RecvTimeoutError::Disconnected) => break,
                         Err(mpsc::RecvTimeoutError::Timeout) => {
-                            renderer.update(stage.load(Ordering::Relaxed));
+                            if !renderer.update(stage.load(Ordering::Relaxed)) {
+                                break;
+                            }
                         }
                     }
                 }

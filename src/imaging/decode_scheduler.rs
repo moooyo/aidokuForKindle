@@ -51,7 +51,7 @@ struct DecodeCancelled;
 
 impl fmt::Display for DecodeCancelled {
     fn fmt(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
-        formatter.write_str("The background image work was superseded")
+        formatter.write_str("The image work was superseded")
     }
 }
 
@@ -100,6 +100,26 @@ pub fn with_background_decode<T>(
     let _context = ContextGuard(Some(previous));
     check_decode_cancelled()?;
     operation()
+}
+
+/// Fence private image preparation without changing its decoder priority.
+/// Shared transfers and their image validation must remain outside this scope.
+pub(crate) fn with_decode_cancellation<T>(
+    cancellation: &DecodeCancellation,
+    operation: impl FnOnce() -> Result<T>,
+) -> Result<T> {
+    let previous = WORK_CONTEXT.with(|context| {
+        let background = context.borrow().background;
+        context.replace(WorkContext {
+            background,
+            cancellation: Some(cancellation.clone()),
+        })
+    });
+    let _context = ContextGuard(Some(previous));
+    check_decode_cancelled()?;
+    let output = operation()?;
+    check_decode_cancelled()?;
+    Ok(output)
 }
 
 /// Finish publishing an already completed image without making its validity
@@ -325,32 +345,34 @@ mod tests {
 
     #[test]
     fn cancelled_waiter_releases_its_queue_position_without_entering_decoder() {
-        let scheduler = Arc::new(DecodeScheduler::new());
-        let active = scheduler.acquire(false, None).unwrap();
-        let cancellation = DecodeCancellation::new();
-        let (sender, receiver) = mpsc::channel();
-        let waiting = {
-            let scheduler = scheduler.clone();
-            let cancellation = cancellation.clone();
-            thread::spawn(move || {
-                let result = scheduler.acquire(true, Some(&cancellation));
-                sender
-                    .send(
-                        result
-                            .err()
-                            .is_some_and(|error| is_decode_cancelled(&error)),
-                    )
-                    .unwrap();
-            })
-        };
-        wait_for_waiters(&scheduler, 1);
-        cancellation.cancel();
-        assert!(receiver.recv_timeout(Duration::from_secs(5)).unwrap());
-        assert!(scheduler.state.lock().unwrap().active);
-        assert!(scheduler.state.lock().unwrap().waiters.is_empty());
-        drop(active);
-        waiting.join().unwrap();
-        let _next = scheduler.acquire(false, None).unwrap();
+        for background in [false, true] {
+            let scheduler = Arc::new(DecodeScheduler::new());
+            let active = scheduler.acquire(false, None).unwrap();
+            let cancellation = DecodeCancellation::new();
+            let (sender, receiver) = mpsc::channel();
+            let waiting = {
+                let scheduler = scheduler.clone();
+                let cancellation = cancellation.clone();
+                thread::spawn(move || {
+                    let result = scheduler.acquire(background, Some(&cancellation));
+                    sender
+                        .send(
+                            result
+                                .err()
+                                .is_some_and(|error| is_decode_cancelled(&error)),
+                        )
+                        .unwrap();
+                })
+            };
+            wait_for_waiters(&scheduler, 1);
+            cancellation.cancel();
+            assert!(receiver.recv_timeout(Duration::from_secs(5)).unwrap());
+            assert!(scheduler.state.lock().unwrap().active);
+            assert!(scheduler.state.lock().unwrap().waiters.is_empty());
+            drop(active);
+            waiting.join().unwrap();
+            let _next = scheduler.acquire(false, None).unwrap();
+        }
     }
 
     #[test]
@@ -378,6 +400,50 @@ mod tests {
         assert!(result.is_err());
         assert!(check_decode_cancelled().is_ok());
         assert!(!WORK_CONTEXT.with(|context| context.borrow().background));
+    }
+
+    #[test]
+    fn private_cancellation_preserves_priority_and_restores_the_previous_scope() {
+        let cancellation = DecodeCancellation::new();
+        with_decode_cancellation(&cancellation, || {
+            assert!(!WORK_CONTEXT.with(|context| context.borrow().background));
+            cancellation.cancel();
+            let error = decode_permit().err().unwrap();
+            assert!(is_decode_cancelled(&error));
+            Ok(())
+        })
+        .unwrap_err();
+        assert!(check_decode_cancelled().is_ok());
+
+        let background = DecodeCancellation::new();
+        let private = DecodeCancellation::new();
+        with_background_decode(Some(&background), || {
+            with_decode_cancellation(&private, || {
+                assert!(WORK_CONTEXT.with(|context| context.borrow().background));
+                Ok(())
+            })?;
+            background.cancel();
+            assert!(check_decode_cancelled().is_err());
+            Ok(())
+        })
+        .unwrap();
+        assert!(check_decode_cancelled().is_ok());
+        assert!(!WORK_CONTEXT.with(|context| context.borrow().background));
+    }
+
+    #[test]
+    fn private_cancellation_rejects_output_after_uncancelled_publication() {
+        let cancellation = DecodeCancellation::new();
+        let error = with_decode_cancellation(&cancellation, || {
+            without_decode_cancellation(|| {
+                cancellation.cancel();
+                assert!(check_decode_cancelled().is_ok());
+                Ok(42)
+            })
+        })
+        .unwrap_err();
+        assert!(is_decode_cancelled(&error));
+        assert!(check_decode_cancelled().is_ok());
     }
 
     #[test]

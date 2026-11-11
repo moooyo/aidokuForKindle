@@ -115,6 +115,7 @@ export global Commands {
     callback action(string, string, string);
     callback refresh(string);
     callback job-ready();
+    callback exit-requested();
 }
 
 export global State {
@@ -129,6 +130,9 @@ export global State {
     in-out property <string> settings-section: "";
     in-out property <string> message;
     in-out property <bool> busy: false;
+    in-out property <bool> exiting: false;
+    in-out property <int> exit-frame: 0;
+    in-out property <string> exit-stage;
     in-out property <bool> demo: false;
     in-out property <string> time: "18:44";
     in-out property <int> battery: 87;

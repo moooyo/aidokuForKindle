@@ -19,6 +19,7 @@ pub struct LifecycleStatus {
     pub pause_count: u64,
     pub resume_count: u64,
     pub frame_write_count: u64,
+    pub frame_send_count: u64,
     pub resume_full_frame_count: u64,
     pub input_generation: u64,
 }
@@ -59,6 +60,7 @@ pub(crate) struct LifecycleState {
     pub(crate) pause_count: AtomicU64,
     pub(crate) resume_count: AtomicU64,
     pub(crate) frame_write_count: AtomicU64,
+    pub(crate) frame_send_count: AtomicU64,
     pub(crate) resume_full_frame_count: AtomicU64,
     pub(crate) input_generation: AtomicU64,
     pub(crate) native_io_started: AtomicBool,
@@ -164,6 +166,7 @@ impl LifecycleHandle {
             pause_count: self.state.pause_count.load(Ordering::Acquire),
             resume_count: self.state.resume_count.load(Ordering::Acquire),
             frame_write_count: self.state.frame_write_count.load(Ordering::Acquire),
+            frame_send_count: self.state.frame_send_count.load(Ordering::Acquire),
             resume_full_frame_count: self.state.resume_full_frame_count.load(Ordering::Acquire),
             input_generation: self.state.input_generation.load(Ordering::Acquire),
         }

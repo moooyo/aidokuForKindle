@@ -1,4 +1,5 @@
 mod bootstrap_lifecycle;
+mod bootstrap_presentation;
 
 use std::{
     cell::{Cell, RefCell},
@@ -238,22 +239,32 @@ fn run(arguments: Arguments) -> Result<()> {
         .map(Ok)
         .unwrap_or_else(|| default_data_dir(arguments.kindle))?;
     fs::create_dir_all(&data_dir).context("Create the application data directory")?;
+    bootstrap_lifecycle::install_signal_wakeup(None)?;
     let platform = Rc::new(Platform::new(arguments.device, arguments.kindle)?);
     aidoku_kindle::reader_timing::mark("platform_initialized");
-    let fonts = BUNDLED_FONTS
-        .iter()
-        .map(|(family, weight, bytes)| {
-            decompress_font(bytes).with_context(|| format!("Load bundled {family} weight {weight}"))
-        })
-        .collect::<Result<Vec<_>>>()?;
+    let mut startup_feedback =
+        bootstrap_presentation::StartupFeedback::show(&platform, &data_dir, arguments.demo)?;
+    let mut fonts = Vec::with_capacity(BUNDLED_FONTS.len());
+    for (family, weight, bytes) in BUNDLED_FONTS {
+        if STOP_REQUESTED.load(Ordering::Acquire) {
+            return Ok(());
+        }
+        fonts.push(
+            decompress_font(bytes)
+                .with_context(|| format!("Load bundled {family} weight {weight}"))?,
+        );
+    }
     aidoku_kindle::reader_timing::mark("fonts_loaded");
     if STOP_REQUESTED.load(Ordering::Relaxed) {
         return Ok(());
     }
     // The Kindle backend changes its default-font environment variable. Install
     // it before Tokio or any other background worker is started.
+    startup_feedback.set_stage(1);
+    startup_feedback.pause()?;
     platform.install_backend(fonts[0].as_slice())?;
     bootstrap_lifecycle::install_signal_wakeup(platform.signal_wakeup_fd())?;
+    startup_feedback.resume()?;
     let ui = AppWindow::new().context("Create the application window")?;
     register_fonts(&ui, &fonts)?;
     ui.global::<State>()
@@ -271,6 +282,7 @@ fn run(arguments: Arguments) -> Result<()> {
         },
         platform.clone(),
     )?;
+    startup_feedback.set_stage(2);
     if let Some(path) = arguments.import.as_deref() {
         app.borrow_mut().dispatch(
             "local",
@@ -284,6 +296,24 @@ fn run(arguments: Arguments) -> Result<()> {
 
     let failures = Rc::new(RefCell::new(Vec::<String>::new()));
     let quitting = Rc::new(Cell::new(false));
+    let exit_feedback = Rc::new(RefCell::new(bootstrap_presentation::ExitFeedback::new(
+        Instant::now(),
+    )));
+    let exit_render_requested = Arc::new(AtomicBool::new(false));
+    let exit_rendered = Arc::new(AtomicBool::new(false));
+    let rendering_notifier = {
+        let requested = exit_render_requested.clone();
+        let rendered = exit_rendered.clone();
+        ui.window()
+            .set_rendering_notifier(move |state, _| {
+                if matches!(state, slint::RenderingState::AfterRendering)
+                    && requested.load(Ordering::Acquire)
+                {
+                    rendered.store(true, Ordering::Release);
+                }
+            })
+            .is_ok()
+    };
     let capture_attempted = Rc::new(Cell::new(false));
     let capture_settle_covers = arguments.capture_settle_covers;
     let capture_path = arguments.capture;
@@ -293,10 +323,59 @@ fn run(arguments: Arguments) -> Result<()> {
     )));
     {
         let ui_weak = ui.as_weak();
+        let platform = platform.clone();
+        let lifecycle = lifecycle.clone();
+        let quitting = quitting.clone();
+        let failures = failures.clone();
+        let feedback = exit_feedback.clone();
+        let render_requested = exit_render_requested.clone();
+        ui.global::<Commands>().on_exit_requested(move || {
+            if quitting.get() || feedback.borrow().requested() {
+                return;
+            }
+            let Some(ui) = ui_weak.upgrade() else {
+                return;
+            };
+            if !bootstrap_presentation::exit_display_owned(
+                lifecycle.borrow().active(),
+                platform.sleep_status(),
+                bootstrap_lifecycle::display_activity_allowed(),
+            ) {
+                request_quit(&quitting, &failures);
+                return;
+            }
+            // The exit overlay must never consume a pending Reader timing token.
+            platform.cancel_reader_frame();
+            let state = ui.global::<State>();
+            state.set_exit_frame(0);
+            state.set_exit_stage(aidoku_kindle::localization::translate("exit_saving").into());
+            state.set_exiting(true);
+            ui.window().request_redraw();
+            platform.refresh(aidoku_kindle::platform::RefreshKind::Ui);
+            render_requested.store(true, Ordering::Release);
+            feedback
+                .borrow_mut()
+                .request(platform.sleep_status().frame_send_count, Instant::now());
+            aidoku_kindle::reader_timing::mark("exit_feedback_requested");
+        });
+    }
+    {
+        let ui_weak = ui.as_weak();
+        ui.window().on_close_requested(move || {
+            if let Some(ui) = ui_weak.upgrade() {
+                ui.global::<Commands>()
+                    .invoke_action("app".into(), "exit".into(), "".into());
+            }
+            slint::CloseRequestResponse::KeepWindowShown
+        });
+    }
+    {
+        let ui_weak = ui.as_weak();
         let app = Rc::downgrade(&app);
         let platform = Rc::downgrade(&platform);
         let lifecycle = lifecycle.clone();
         let quitting = quitting.clone();
+        let exit_feedback = exit_feedback.clone();
         let failures = failures.clone();
         ui.global::<Commands>().on_job_ready(move || {
             if quitting.get() {
@@ -310,6 +389,12 @@ fn run(arguments: Arguments) -> Result<()> {
             if STOP_REQUESTED.load(Ordering::Acquire) {
                 lifecycle.borrow().announce_ordinary_exit();
                 request_quit(&quitting, &failures);
+                return;
+            }
+            if exit_feedback.borrow().requested() {
+                if !bootstrap_lifecycle::display_activity_allowed() {
+                    request_quit(&quitting, &failures);
+                }
                 return;
             }
             // Handle a pending sleep before accepting a worker result. This
@@ -335,6 +420,7 @@ fn run(arguments: Arguments) -> Result<()> {
         let platform_weak = Rc::downgrade(&platform);
         let lifecycle = lifecycle.clone();
         let quitting = quitting.clone();
+        let exit_feedback = exit_feedback.clone();
         let failures = failures.clone();
         platform.install_control_callback(move || {
             let (Some(ui), Some(app), Some(platform)) =
@@ -347,10 +433,19 @@ fn run(arguments: Arguments) -> Result<()> {
                 request_quit(&quitting, &failures);
                 return;
             }
+            if exit_feedback.borrow().requested()
+                && !bootstrap_lifecycle::display_activity_allowed()
+            {
+                request_quit(&quitting, &failures);
+                return;
+            }
             if let Err(error) = lifecycle.borrow_mut().drive(&ui, &app, &platform) {
                 failures
                     .borrow_mut()
                     .push(format!("Lifecycle control failed: {error:#}"));
+                request_quit(&quitting, &failures);
+            }
+            if exit_feedback.borrow().requested() && !lifecycle.borrow().active() {
                 request_quit(&quitting, &failures);
             }
         })?;
@@ -365,6 +460,8 @@ fn run(arguments: Arguments) -> Result<()> {
         let capture_path = capture_path.clone();
         let pointer_observer = pointer_observer.clone();
         let lifecycle = lifecycle.clone();
+        let exit_feedback = exit_feedback.clone();
+        let exit_rendered = exit_rendered.clone();
         let next_action = Cell::new(0usize);
         poll_timer.start(
             slint::TimerMode::Repeated,
@@ -381,6 +478,12 @@ fn run(arguments: Arguments) -> Result<()> {
                     request_quit(&quitting, &failures);
                     return;
                 }
+                if exit_feedback.borrow().requested()
+                    && !bootstrap_lifecycle::display_activity_allowed()
+                {
+                    request_quit(&quitting, &failures);
+                    return;
+                }
                 if let Err(error) = lifecycle.borrow_mut().drive(&ui, &app, &platform) {
                     failures
                         .borrow_mut()
@@ -389,6 +492,55 @@ fn run(arguments: Arguments) -> Result<()> {
                     return;
                 }
                 if !lifecycle.borrow().active() {
+                    if exit_feedback.borrow().requested() {
+                        request_quit(&quitting, &failures);
+                    }
+                    return;
+                }
+                if exit_feedback.borrow().requested() {
+                    let now = Instant::now();
+                    let mut feedback = exit_feedback.borrow_mut();
+                    if feedback.frame_submitted(
+                        platform.is_kindle(),
+                        platform.sleep_status().frame_send_count,
+                        exit_rendered.load(Ordering::Acquire),
+                        rendering_notifier,
+                    ) {
+                        aidoku_kindle::reader_timing::mark("exit_feedback_submitted");
+                        feedback.begin_shutdown(now);
+                        aidoku_kindle::reader_timing::mark("shutdown_started");
+                        app.borrow_mut().shutdown();
+                        if !bootstrap_lifecycle::display_activity_allowed() {
+                            request_quit(&quitting, &failures);
+                            return;
+                        }
+                        ui.global::<State>().set_exit_stage(
+                            aidoku_kindle::localization::translate("exit_stopping").into(),
+                        );
+                    }
+                    if feedback.started_shutdown() {
+                        if app.borrow().shutdown_ready() {
+                            aidoku_kindle::reader_timing::mark("shutdown_complete");
+                            request_quit(&quitting, &failures);
+                            return;
+                        }
+                        if feedback.shutdown_timed_out(now) {
+                            aidoku_kindle::reader_timing::mark("shutdown_timeout");
+                            request_quit(&quitting, &failures);
+                            return;
+                        }
+                    } else if feedback.frame_timed_out(now) {
+                        failures.borrow_mut().push(
+                            "The exit feedback frame was not submitted within two seconds".into(),
+                        );
+                        request_quit(&quitting, &failures);
+                        return;
+                    }
+                    if let Some(frame) = feedback.next_activity_frame(now) {
+                        ui.global::<State>().set_exit_frame(frame);
+                        ui.window().request_redraw();
+                        platform.refresh(aidoku_kindle::platform::RefreshKind::Ui);
+                    }
                     return;
                 }
                 let elapsed = lifecycle.borrow().active_elapsed(started);
@@ -422,6 +574,9 @@ fn run(arguments: Arguments) -> Result<()> {
                             action.section, action.action
                         ));
                         request_quit(&quitting, &failures);
+                        return;
+                    }
+                    if exit_feedback.borrow().requested() {
                         return;
                     }
                 }
@@ -467,6 +622,7 @@ fn run(arguments: Arguments) -> Result<()> {
         ui.get_canvas_height(),
         ui.window().scale_factor()
     );
+    startup_feedback.finish()?;
     aidoku_kindle::reader_timing::mark("event_loop_started");
     let event_loop_result = slint::run_event_loop();
     poll_timer.stop();
@@ -482,7 +638,13 @@ fn run(arguments: Arguments) -> Result<()> {
             .push(format!("Final capture failed: {error:#}"));
     }
     app.borrow_mut().shutdown();
-    if !app.borrow().finish_shutdown() {
+    let already_drained = exit_feedback.borrow().started_shutdown();
+    let shutdown_finished = if already_drained && !app.borrow().shutdown_ready() {
+        false
+    } else {
+        app.borrow().finish_shutdown()
+    };
+    if !shutdown_finished {
         eprintln!("aidoku: a bounded network request is still stopping");
     }
     bootstrap_lifecycle::clear_signal_wakeup();
@@ -537,6 +699,7 @@ fn pagination_observer(
     let observed_app = Rc::downgrade(app);
     let enabled_app = Rc::downgrade(app);
     let activity_platform = Rc::downgrade(platform);
+    let enabled_ui = ui.as_weak();
     let ui = ui.as_weak();
     let mut pagination = PointerPagination::default();
     PointerObserver::new(
@@ -550,6 +713,13 @@ fn pagination_observer(
                 pagination.cancel();
                 return false;
             };
+            if ui
+                .upgrade()
+                .is_some_and(|ui| ui.global::<State>().get_exiting())
+            {
+                pagination.cancel();
+                return false;
+            }
             let enabled = {
                 let application = app.borrow();
                 let (route, modal) = application.gesture_context();
@@ -598,6 +768,12 @@ fn pagination_observer(
             decision.consume
         },
         move || {
+            if enabled_ui
+                .upgrade()
+                .is_some_and(|ui| ui.global::<State>().get_exiting())
+            {
+                return false;
+            }
             enabled_app.upgrade().is_some_and(|app| {
                 let application = app.borrow();
                 let (route, modal) = application.gesture_context();

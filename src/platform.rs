@@ -198,6 +198,7 @@ pub struct SleepStatus {
     pub pause_count: u64,
     pub resume_count: u64,
     pub frame_write_count: u64,
+    pub frame_send_count: u64,
     pub resume_full_frame_count: u64,
     pub input_generation: u64,
 }
@@ -230,7 +231,7 @@ pub struct Platform {
     applied_lighting: Cell<Option<(u8, u8)>>,
     sleep_requested: Cell<bool>,
     pointer_observer: RefCell<Option<PointerObserver>>,
-    device_policies: Option<device_policy::DevicePolicyWorker>,
+    device_policies: RefCell<Option<device_policy::DevicePolicyWorker>>,
     #[cfg(all(feature = "kindle", target_os = "linux"))]
     backend: RefCell<Option<slint_backend_kindle::KindleBackend>>,
     #[cfg(all(feature = "kindle", target_os = "linux"))]
@@ -264,11 +265,7 @@ impl Platform {
             applied_lighting: Cell::new(None),
             sleep_requested: Cell::new(false),
             pointer_observer: RefCell::new(None),
-            device_policies: if kindle {
-                Some(device_policy::DevicePolicyWorker::start()?)
-            } else {
-                None
-            },
+            device_policies: RefCell::new(None),
             #[cfg(all(feature = "kindle", target_os = "linux"))]
             backend: RefCell::new(None),
             #[cfg(all(feature = "kindle", target_os = "linux"))]
@@ -289,6 +286,7 @@ impl Platform {
     /// Read a background snapshot without invoking device services on the UI thread.
     pub fn device_policy_observation(&self) -> DevicePolicyObservation {
         self.device_policies
+            .borrow()
             .as_ref()
             .map(device_policy::DevicePolicyWorker::observation)
             .unwrap_or_default()
@@ -308,7 +306,7 @@ impl Platform {
 
     /// Only a network-free Reader should request this optional policy.
     pub fn set_reading_wifi_policy(&self, active: bool) {
-        if let Some(worker) = self.device_policies.as_ref() {
+        if let Some(worker) = self.device_policies.borrow().as_ref() {
             worker.request_wifi_disabled(active && !self.sleep_requested.get());
         }
     }
@@ -319,13 +317,14 @@ impl Platform {
 
     pub fn device_policies_restored(&self) -> bool {
         self.device_policies
+            .borrow()
             .as_ref()
             .is_none_or(device_policy::DevicePolicyWorker::restored)
     }
 
     /// Release only our reading Wi-Fi lease and keep it released for a user action.
     pub fn request_network_for_user(&self) {
-        if let Some(worker) = self.device_policies.as_ref() {
+        if let Some(worker) = self.device_policies.borrow().as_ref() {
             worker.request_network_for_user();
         }
     }
@@ -333,12 +332,13 @@ impl Platform {
     /// Reconnection is observed asynchronously; callers should retry from their poll.
     pub fn user_network_ready(&self) -> bool {
         self.device_policies
+            .borrow()
             .as_ref()
             .is_none_or(device_policy::DevicePolicyWorker::user_network_ready)
     }
 
     pub fn finish_user_network_request(&self) {
-        if let Some(worker) = self.device_policies.as_ref() {
+        if let Some(worker) = self.device_policies.borrow().as_ref() {
             worker.finish_user_network_request();
         }
     }
@@ -346,6 +346,7 @@ impl Platform {
     /// Background HTTP must wait while this application deliberately owns Wi-Fi off.
     pub fn network_policy_blocked(&self) -> bool {
         self.device_policies
+            .borrow()
             .as_ref()
             .is_some_and(device_policy::DevicePolicyWorker::network_policy_blocked)
     }
@@ -378,7 +379,7 @@ impl Platform {
 
     pub fn begin_suspend(&self) -> Result<()> {
         self.sleep_requested.set(true);
-        if let Some(worker) = self.device_policies.as_ref() {
+        if let Some(worker) = self.device_policies.borrow().as_ref() {
             worker.pause();
         }
         #[cfg(all(feature = "kindle", target_os = "linux"))]
@@ -423,7 +424,7 @@ impl Platform {
     pub fn resume_after_sleep(&self) -> Result<()> {
         self.sleep_requested.set(false);
         self.invalidate_status_cache();
-        if let Some(worker) = self.device_policies.as_ref() {
+        if let Some(worker) = self.device_policies.borrow().as_ref() {
             worker.resume();
         }
         #[cfg(all(feature = "kindle", target_os = "linux"))]
@@ -492,6 +493,7 @@ impl Platform {
                 pause_count: status.pause_count,
                 resume_count: status.resume_count,
                 frame_write_count: status.frame_write_count,
+                frame_send_count: status.frame_send_count,
                 resume_full_frame_count: status.resume_full_frame_count,
                 input_generation: status.input_generation,
             };
@@ -581,8 +583,11 @@ impl Platform {
                 self.native_presentation.replace(presentation);
                 *self.backend.borrow_mut() = Some(backend);
                 // Backend installation mutates its default-font environment.
-                // Start this worker only after that single-threaded step.
-                *self.activity.borrow_mut() = Some(activity::ActivityWorker::start()?);
+                // Start native service workers only after that single-threaded step.
+                let device_policies = device_policy::DevicePolicyWorker::start()?;
+                let activity = activity::ActivityWorker::start()?;
+                *self.device_policies.borrow_mut() = Some(device_policies);
+                *self.activity.borrow_mut() = Some(activity);
                 return Ok(());
             }
             #[cfg(not(all(feature = "kindle", target_os = "linux")))]

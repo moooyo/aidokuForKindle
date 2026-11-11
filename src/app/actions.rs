@@ -43,6 +43,27 @@ impl App {
         if self.suspended && section != "lifecycle" && !(section == "app" && action == "exit") {
             return Ok(());
         }
+        if self
+            .ui
+            .upgrade()
+            .is_some_and(|ui| ui.global::<State>().get_exiting())
+        {
+            return Ok(());
+        }
+        if section == "app" && action == "exit"
+            || section == "panel" && action == "choose" && value == "exit"
+        {
+            self.platform.announce_exit_intent()?;
+            crate::reader_timing::cancel_action("shutdown");
+            crate::reader_timing::cancel_native("not_visible");
+            self.platform.cancel_reader_frame();
+            if let Some(ui) = self.ui.upgrade() {
+                ui.global::<Commands>().invoke_exit_requested();
+            } else {
+                self.shutdown();
+            }
+            return Ok(());
+        }
         let reader_entry = matches!(
             (section, action),
             ("detail", "open-chapter" | "continue") | ("library", "continue") | ("history", "open")
@@ -775,11 +796,6 @@ impl App {
                     } else {
                         self.dispatch("page", "turn", if action == "left" { "-1" } else { "1" })?;
                     }
-                }
-                "exit" => {
-                    self.platform.announce_exit_intent()?;
-                    self.shutdown();
-                    slint::quit_event_loop()?;
                 }
                 _ => {}
             },
@@ -4050,11 +4066,6 @@ impl App {
                 )?;
             }
             "exit-reader" => self.reader_action("back", "")?,
-            "exit" => {
-                self.platform.announce_exit_intent()?;
-                self.shutdown();
-                slint::quit_event_loop()?;
-            }
             _ => {}
         }
         Ok(())

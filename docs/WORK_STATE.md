@@ -1,6 +1,29 @@
 # Work state
 
-Updated: 2026-11-11.
+Updated: 2026-11-12.
+
+## Current BiliComics follow-up
+
+Version 0.1.1 implements early localized native startup activity, an explicit
+settings exit action, submitted-frame ordinary-exit feedback, silent detached
+KPM entry, cancellation of obsolete private Reader rendering, and download
+state checks before dispatch. The
+[dated comparison](bilicomics-followup-20261111.md) records implementation,
+remote checks, and the separate physical acceptance status. Its executable and
+package identities supersede neither the historical measurements nor their
+source epochs below. All current verification uses `ssh test-env` with Cargo
+concurrency six; the shared physical lease remains limited to continuous
+device operations and bounded restoration.
+
+The final 0.1.1 package was installed and the identity-bound native startup/exit
+trial passed. User metadata, other packages and native controls were preserved;
+the demo database was removed and the lease was released with owner/token
+checks. The user subsequently confirmed loading-only launch and exit through
+the existing bookstore/KPM entry. See the
+[delivery receipt](review/bili-lifecycle-delivery-20261112.json). The KPM 0.2.2
+local same-ID upgrade conflict is handled through a scoped normal uninstall
+and fresh file installation; the earlier failed attempt and restored old
+version remain separate diagnostic evidence.
 
 ## Current end-to-end delivery
 

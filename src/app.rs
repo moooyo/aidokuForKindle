@@ -308,6 +308,7 @@ pub struct App {
     reader_generation: u64,
     chapter_inflight: Option<u64>,
     reader_inflight: Option<u64>,
+    reader_image_cancel: Option<imaging::DecodeCancellation>,
     reader_dirty: bool,
     reader_refresh: RefreshRequest,
     frame_refresh: Option<RefreshKind>,
@@ -509,6 +510,7 @@ impl App {
             reader_generation: 0,
             chapter_inflight: None,
             reader_inflight: None,
+            reader_image_cancel: None,
             reader_dirty: false,
             reader_refresh: RefreshRequest::None,
             frame_refresh: None,
@@ -624,6 +626,7 @@ impl App {
             }
             if reader_job && self.reader_inflight == Some(message.id) {
                 self.reader_inflight = None;
+                self.reader_image_cancel = None;
             }
             if prefetch_job && self.prefetch_inflight == Some(message.id) {
                 self.prefetch_inflight = None;
@@ -956,6 +959,7 @@ impl App {
     pub(crate) fn source_images_changed(&mut self) {
         self.pending_wide_navigation = 0;
         self.cancel_pending_user_network();
+        self.cancel_reader_image();
         self.cancel_reader_prefetch();
         self.invalidate_automatic_updates();
         self.source_revision = self.source_revision.wrapping_add(1);
@@ -1380,6 +1384,7 @@ impl App {
     pub(crate) fn invalidate_reader_work(&mut self) {
         crate::reader_timing::invalidate("invalidated");
         self.platform.cancel_reader_frame();
+        self.cancel_reader_image();
         self.cancel_reader_prefetch();
         self.reader_generation = self.reader_generation.wrapping_add(1);
         self.reader_dirty = false;
@@ -1591,6 +1596,7 @@ impl App {
         self.platform.cancel_reader_frame();
         self.shutting_down = true;
         self.platform.restore_device_policies();
+        self.cancel_reader_image();
         self.cancel_reader_prefetch();
         self.invalidate_automatic_updates();
         self.cancel_tracking_work();
@@ -1611,6 +1617,11 @@ impl App {
     pub fn finish_shutdown(&self) -> bool {
         self.downloads.wait_stopped(Duration::from_secs(2))
             && self.platform.device_policies_restored()
+    }
+
+    /// Observe shutdown without blocking the event loop that presents feedback.
+    pub fn shutdown_ready(&self) -> bool {
+        self.downloads.is_stopped() && self.platform.device_policies_restored()
     }
 }
 
@@ -1883,6 +1894,7 @@ mod tests {
                 reader_generation: 0,
                 chapter_inflight: None,
                 reader_inflight: None,
+                reader_image_cancel: None,
                 reader_dirty: false,
                 reader_refresh: RefreshRequest::None,
                 frame_refresh: None,

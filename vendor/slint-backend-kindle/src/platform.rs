@@ -858,6 +858,11 @@ impl Platform for KindlePlatform {
             };
             let submission_elapsed =
                 submission_started.map_or(Duration::ZERO, |start| start.elapsed());
+            if matches!(&submission, Some(Ok(()))) {
+                self.lifecycle
+                    .frame_send_count
+                    .fetch_add(1, Ordering::AcqRel);
+            }
             if let Some(observed) = observed_frame.as_mut() {
                 match &submission {
                     Some(Ok(())) => {

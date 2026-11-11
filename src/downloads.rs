@@ -2369,6 +2369,8 @@ fn run_job(
                 let source_id = chapter.source_id.clone();
                 let epoch = run_epoch;
                 let suspend = controller.suspend.clone();
+                let controls = controller.controls.clone();
+                let chapter_id = chapter.id.clone();
                 let activity = ActivityGuard::new(controller.suspend, true);
                 match thread::Builder::new()
                     .name("aidoku-download-page".into())
@@ -2376,9 +2378,18 @@ fn run_job(
                         let _activity = activity;
                         let interrupted = epoch != suspend.epoch.load(Ordering::Acquire)
                             || !suspend.network_ready.load(Ordering::Acquire)
-                            || suspend.strict.load(Ordering::Acquire);
+                            || suspend.strict.load(Ordering::Acquire)
+                            || matches!(
+                                controls
+                                    .lock()
+                                    .unwrap_or_else(std::sync::PoisonError::into_inner)
+                                    .get(&chapter_id),
+                                Some(Control::Paused | Control::Cancelled)
+                            );
                         let path = if interrupted {
-                            Err(anyhow!("The image request was paused for suspend"))
+                            Err(anyhow!(
+                                "The image request was paused or cancelled before dispatch"
+                            ))
                         } else {
                             std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
                                 crate::imaging::with_background_decode(None, || {
