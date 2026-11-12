@@ -103,15 +103,16 @@ export component SettingsBody inherits Rectangle {
         property <length> saver-label-height: State.large-screen ? root.group-height : 17.5px;
         property <length> saver-grid-top: self.saver-label-top + self.saver-label-height + root.section-gap;
         property <length> saver-card-height: State.large-screen ? 201px : 179px;
+        property <length> saver-hint-height: State.large-screen ? 42px : 40px;
+        property <string> saver-mode: State.screensaver-mode == "cover" && !State.sleep-cover ? "system" : State.screensaver-mode;
         ToggleRow { x: 0px; y: 0px; width: parent.width; text: Strings.keep-awake; value: State.keep-awake; toggled => { Commands.action("settings", "set", "keep-awake=" + (State.keep-awake ? "false" : "true")); } }
         ToggleRow { x: 0px; y: root.row-height; width: parent.width; text: Strings.charging-updates; value: State.charging-updates; enabled: State.charging-status-supported; toggled => { Commands.action("settings", "set", "charging-updates=" + (State.charging-updates ? "false" : "true")); } }
         ToggleRow { x: 0px; y: root.row-height * 2; width: parent.width; text: Strings.reading-wifi-off; value: State.reading-wifi-off; enabled: State.wifi-policy-supported; toggled => { Commands.action("settings", "set", "reading-wifi-off=" + (State.reading-wifi-off ? "false" : "true")); } }
-        GroupLabel { x: 0px; y: parent.saver-label-top; width: parent.width - 110px; height: parent.saver-label-height; text: Strings.screensaver; font-size: State.large-screen ? 14px : 12px; }
-        if !State.screensaver-supported: Caption { x: parent.width - 110px; y: parent.saver-label-top; width: 110px; height: parent.saver-label-height; text: Strings.unavailable; horizontal-alignment: right; }
+        GroupLabel { x: 0px; y: parent.saver-label-top; width: parent.width; height: parent.saver-label-height; text: Strings.screensaver; font-size: State.large-screen ? 14px : 12px; }
         for label[index] in [Strings.saver-cover, Strings.saver-progress, Strings.saver-system]: Rectangle {
             property <string> mode: index == 0 ? "cover" : index == 1 ? "progress" : "system";
-            property <bool> selected: State.screensaver-mode == self.mode;
-            property <bool> available: State.screensaver-supported || self.mode == "system";
+            property <bool> selected: parent.saver-mode == self.mode;
+            property <bool> available: self.mode != "progress" || State.screensaver-supported;
             x: index * (parent.width + (State.large-screen ? 14px : 12px)) / 3;
             y: parent.saver-grid-top;
             width: (parent.width - (State.large-screen ? 28px : 24px)) / 3;
@@ -120,9 +121,9 @@ export component SettingsBody inherits Rectangle {
             Rectangle {
                 x: 0px; y: 0px; width: parent.width; height: State.large-screen ? 170px : 150px;
                 background: Theme.paper; border-width: parent.selected ? 2px : 1px; border-color: parent.selected ? Theme.ink : parent.available ? Theme.secondary : Theme.disabled; border-radius: Theme.control-radius; clip: true;
-                if index == 0 && State.current-book.cover.width > 0: Image { x: 1px; y: 1px; width: parent.width - 2px; height: parent.height - 2px; source: State.current-book.cover; image-fit: cover; }
-                if index == 0 && State.current-book.cover.width == 0: TitleText { x: 8px; y: 12px; width: parent.width - 16px; height: parent.height - 24px; text: State.current-book.title; font-size: State.large-screen ? 17px : 15px; horizontal-alignment: center; wrap: word-wrap; }
-                if index == 1: Text { x: 8px; y: 0px; width: parent.width - 16px; height: parent.height; text: State.reader-image-ready ? State.reader-page + " / " + State.reader-total : "—"; font-family: Theme.numbers; font-size: State.large-screen ? 19px : 17px; font-weight: 700; color: Theme.secondary; horizontal-alignment: center; vertical-alignment: center; }
+                if index == 0 && State.current-book.cover.width > 0: Image { x: 1px; y: 1px; width: parent.width - 2px; height: parent.height - 2px; source: State.current-book.cover; image-fit: contain; }
+                if index == 0 && State.current-book.cover.width == 0: TitleText { x: 8px; y: 12px; width: parent.width - 16px; height: parent.height - 24px; text: State.current-book.title != "" ? State.current-book.title : Strings.sleep-neutral; font-size: State.large-screen ? 17px : 15px; horizontal-alignment: center; wrap: word-wrap; }
+                if index == 1: Text { x: 8px; y: 0px; width: parent.width - 16px; height: parent.height; text: !State.screensaver-supported ? Strings.unavailable : State.reader-image-ready ? State.reader-page + " / " + State.reader-total : "—"; font-family: State.screensaver-supported ? Theme.numbers : Theme.sans; font-size: State.screensaver-supported ? (State.large-screen ? 19px : 17px) : Theme.caption; font-weight: 700; color: Theme.secondary; horizontal-alignment: center; vertical-alignment: center; wrap: word-wrap; }
                 if index == 2 && State.large-screen: Text { x: 0px; y: 0px; width: parent.width; height: parent.height; text: "Kindle"; font-family: Theme.numbers; font-size: State.large-screen ? 19px : 17px; font-weight: 700; color: Theme.secondary; horizontal-alignment: center; vertical-alignment: center; }
                 if index == 2 && !State.large-screen: Rectangle {
                     x: (parent.width - self.width) / 2; y: parent.height - self.height - 10px;
@@ -142,9 +143,17 @@ export component SettingsBody inherits Rectangle {
                 clicked => { if !parent.selected { Commands.action("settings", "set", "screensaver-mode=" + parent.mode); } }
             }
         }
+        Caption {
+            x: 0px;
+            y: parent.saver-grid-top + parent.saver-card-height + root.section-gap;
+            width: parent.width; height: parent.saver-hint-height;
+            text: Strings.sleep-cover-hint;
+            wrap: word-wrap;
+            vertical-alignment: top;
+        }
         Rectangle {
             x: 0px;
-            y: parent.saver-grid-top + parent.saver-card-height + root.section-gap + (State.large-screen ? 0px : 3px);
+            y: parent.saver-grid-top + parent.saver-card-height + root.section-gap * 2 + parent.saver-hint-height + (State.large-screen ? 0px : 3px);
             width: parent.width; height: State.large-screen ? 60px : 74px;
             border-width: State.large-screen ? 0px : Theme.control-border;
             border-color: Theme.ink; border-radius: Theme.control-radius; background: Theme.paper;

@@ -1,6 +1,10 @@
 mod decode_scheduler;
 mod grayscale;
+mod reader_raster;
 mod row_resize;
+
+#[cfg(test)]
+pub(crate) mod fixture_profile;
 
 pub use decode_scheduler::{
     DecodeCancellation, check_decode_cancelled, is_decode_cancelled, with_background_decode,
@@ -10,9 +14,11 @@ pub(crate) use decode_scheduler::{
 };
 
 use std::{
+    borrow::Cow,
     fs,
     io::{BufReader, Cursor, Read},
     path::Path,
+    sync::Arc,
 };
 
 use anyhow::{Context, Result, bail, ensure};
@@ -82,6 +88,68 @@ pub struct VerticalWindow {
     pub viewport_height: u32,
 }
 
+/// Immutable, unrotated grayscale pixels from a completed bounded decode.
+/// Only this module can construct one; cache owners must additionally bind it
+/// to the current encoded bytes' checksum and length before retaining it.
+#[derive(Debug, Clone)]
+pub(crate) struct ReaderSource {
+    image: Arc<GrayImage>,
+}
+
+impl ReaderSource {
+    pub(crate) fn allocation_bytes(&self) -> usize {
+        self.image.as_raw().capacity()
+    }
+
+    pub(crate) fn dimensions(&self) -> (u32, u32) {
+        self.image.dimensions()
+    }
+
+    pub(crate) fn allocation_identity(&self) -> usize {
+        Arc::as_ptr(&self.image) as usize
+    }
+
+    #[cfg(test)]
+    pub(crate) fn same_allocation(&self, other: &Self) -> bool {
+        Arc::ptr_eq(&self.image, &other.image)
+    }
+
+    #[cfg(test)]
+    pub(crate) fn from_test_image(image: GrayImage) -> Self {
+        Self {
+            image: Arc::new(image),
+        }
+    }
+}
+
+#[derive(Clone, Copy)]
+enum RasterAlgorithm {
+    Lanczos3,
+    BiliTriangle,
+}
+
+fn resize_raster(
+    source: &GrayImage,
+    width: u32,
+    height: u32,
+    algorithm: RasterAlgorithm,
+) -> Result<GrayImage> {
+    match algorithm {
+        RasterAlgorithm::Lanczos3 => row_resize::resize_gray(source, width, height),
+        RasterAlgorithm::BiliTriangle => reader_raster::resize_gray(source, width, height),
+    }
+}
+
+fn quantize_raster(image: &mut GrayImage, dither: bool, algorithm: RasterAlgorithm) -> Result<()> {
+    match algorithm {
+        RasterAlgorithm::Lanczos3 => {
+            quantize(image, dither);
+            Ok(())
+        }
+        RasterAlgorithm::BiliTriangle => reader_raster::quantize_gray(image, dither),
+    }
+}
+
 /// Decode a local page and fit it inside the requested screen rectangle.
 pub fn render_page(path: impl AsRef<Path>, options: &ImageOptions) -> Result<GrayImage> {
     let path = path.as_ref();
@@ -100,21 +168,36 @@ pub fn render_page(path: impl AsRef<Path>, options: &ImageOptions) -> Result<Gra
 /// Decode with explicit allocation limits, composite transparency onto paper,
 /// resize, and produce exactly sixteen printable gray levels.
 pub fn decode_page(bytes: &[u8], options: &ImageOptions) -> Result<GrayImage> {
+    decode_page_with_algorithm(bytes, options, RasterAlgorithm::Lanczos3)
+}
+
+/// Prepare the Reader with BiliComics' single-channel Triangle sampler and
+/// crop-local Bayer tone tables. Cover and download derivatives retain their
+/// original renderer; callers must namespace this algorithm's cache keys.
+pub fn decode_reader_raster(bytes: &[u8], options: &ImageOptions) -> Result<GrayImage> {
+    decode_page_with_algorithm(bytes, options, RasterAlgorithm::BiliTriangle)
+}
+
+fn decode_page_with_algorithm(
+    bytes: &[u8],
+    options: &ImageOptions,
+    algorithm: RasterAlgorithm,
+) -> Result<GrayImage> {
     let _decode_guard = decode_permit()?;
     check_decode_cancelled()?;
     check_options(options)?;
     if needs_png_streaming(bytes)? {
-        return render_streaming_png(bytes, options, None);
+        return Ok(render_streaming_png_with_algorithm(bytes, options, None, algorithm)?.image);
     }
-    let mut gray = decode_grayscale(bytes)?;
+    let mut gray = decode_grayscale_for_algorithm(bytes, algorithm)?;
     if options.crop_borders {
         gray = crop_white_borders(gray);
     }
     let (width, height) =
         fit_dimensions(gray.width(), gray.height(), options.width, options.height);
-    let mut output = row_resize::resize_gray(&gray, width, height)?;
+    let mut output = resize_raster(&gray, width, height, algorithm)?;
     apply_contrast(&mut output, options.contrast);
-    quantize(&mut output, options.dither);
+    quantize_raster(&mut output, options.dither, algorithm)?;
     Ok(output)
 }
 
@@ -139,16 +222,93 @@ pub fn render_vertical_window_with_geometry(
     options: &ImageOptions,
     offset: u32,
 ) -> Result<VerticalWindow> {
+    render_vertical_window_with_algorithm(bytes, options, offset, RasterAlgorithm::Lanczos3)
+}
+
+pub fn render_vertical_raster_with_geometry(
+    bytes: &[u8],
+    options: &ImageOptions,
+    offset: u32,
+) -> Result<VerticalWindow> {
+    Ok(render_vertical_raster_with_source(bytes, options, offset, None)?.0)
+}
+
+pub(crate) fn render_vertical_raster_with_source(
+    bytes: &[u8],
+    options: &ImageOptions,
+    offset: u32,
+    source: Option<ReaderSource>,
+) -> Result<(VerticalWindow, Option<ReaderSource>)> {
     let _decode_guard = decode_permit()?;
     check_decode_cancelled()?;
     check_options(options)?;
     if needs_png_streaming(bytes)? {
-        return render_streaming_png_with_geometry(bytes, options, Some(offset));
+        return Ok((
+            render_streaming_png_with_algorithm(
+                bytes,
+                options,
+                Some(offset),
+                RasterAlgorithm::BiliTriangle,
+            )?,
+            None,
+        ));
     }
-    let mut gray = decode_grayscale(bytes)?;
+    let source = if let Some(source) = source {
+        source
+    } else {
+        ReaderSource {
+            image: Arc::new(decode_reader_grayscale(bytes)?),
+        }
+    };
+    let crop = if options.crop_borders {
+        white_border_crop(&source.image)
+    } else {
+        CropRect {
+            x: 0,
+            y: 0,
+            width: source.image.width(),
+            height: source.image.height(),
+        }
+    };
+    let gray =
+        if crop.x == 0 && crop.y == 0 && (crop.width, crop.height) == source.image.dimensions() {
+            Cow::Borrowed(source.image.as_ref())
+        } else {
+            Cow::Owned(
+                imageops::crop_imm(&*source.image, crop.x, crop.y, crop.width, crop.height)
+                    .to_image(),
+            )
+        };
+    let window = render_vertical_gray(&gray, options, offset, RasterAlgorithm::BiliTriangle)?;
+    drop(gray);
+    Ok((window, Some(source)))
+}
+
+fn render_vertical_window_with_algorithm(
+    bytes: &[u8],
+    options: &ImageOptions,
+    offset: u32,
+    algorithm: RasterAlgorithm,
+) -> Result<VerticalWindow> {
+    let _decode_guard = decode_permit()?;
+    check_decode_cancelled()?;
+    check_options(options)?;
+    if needs_png_streaming(bytes)? {
+        return render_streaming_png_with_algorithm(bytes, options, Some(offset), algorithm);
+    }
+    let mut gray = decode_grayscale_for_algorithm(bytes, algorithm)?;
     if options.crop_borders {
         gray = crop_white_borders(gray);
     }
+    render_vertical_gray(&gray, options, offset, algorithm)
+}
+
+fn render_vertical_gray(
+    gray: &GrayImage,
+    options: &ImageOptions,
+    offset: u32,
+    algorithm: RasterAlgorithm,
+) -> Result<VerticalWindow> {
     let scaled_height = scaled_vertical_height(gray.width(), gray.height(), options.width)?;
     let viewport_height = options.height.min(scaled_height);
     let scale = f64::from(options.width) / f64::from(gray.width());
@@ -162,10 +322,10 @@ pub fn render_vertical_window_with_geometry(
         .ceil()
         .min(f64::from(gray.height())) as u32;
     let source_height = source_bottom.saturating_sub(source_top).max(1);
-    let strip = imageops::crop_imm(&gray, 0, source_top, gray.width(), source_height).to_image();
-    let mut output = row_resize::resize_gray(&strip, options.width, output_height)?;
+    let strip = imageops::crop_imm(gray, 0, source_top, gray.width(), source_height).to_image();
+    let mut output = resize_raster(&strip, options.width, output_height, algorithm)?;
     apply_contrast(&mut output, options.contrast);
-    quantize(&mut output, options.dither);
+    quantize_raster(&mut output, options.dither, algorithm)?;
     Ok(VerticalWindow {
         image: output,
         scaled_height,
@@ -470,6 +630,14 @@ fn streaming_png_reader(bytes: &[u8]) -> Result<png::Reader<Cursor<&[u8]>>> {
 }
 
 fn scan_png_bounds(bytes: &[u8], crop: bool) -> Result<CropRect> {
+    scan_png_bounds_with_algorithm(bytes, crop, RasterAlgorithm::Lanczos3)
+}
+
+fn scan_png_bounds_with_algorithm(
+    bytes: &[u8],
+    crop: bool,
+    algorithm: RasterAlgorithm,
+) -> Result<CropRect> {
     let mut reader = streaming_png_reader(bytes)?;
     let (width, height) = (reader.info().width, reader.info().height);
     let color = reader.output_color_type().0;
@@ -486,7 +654,7 @@ fn scan_png_bounds(bytes: &[u8], crop: bool) -> Result<CropRect> {
         );
         if crop {
             for x in 0..width {
-                if png_gray_sample(row.data(), x as usize, color) < 247 {
+                if png_gray_sample(row.data(), x as usize, color, algorithm) < 247 {
                     left = left.min(x);
                     right = right.max(x);
                     top = top.min(row_number);
@@ -521,22 +689,15 @@ fn scan_png_bounds(bytes: &[u8], crop: bool) -> Result<CropRect> {
 
 /// A long PNG is sampled directly into a screen-sized buffer. A crop pass is
 /// optional and row based as well; neither pass allocates a source-sized image.
-fn render_streaming_png(
+fn render_streaming_png_with_algorithm(
     bytes: &[u8],
     options: &ImageOptions,
     vertical_offset: Option<u32>,
-) -> Result<GrayImage> {
-    Ok(render_streaming_png_with_geometry(bytes, options, vertical_offset)?.image)
-}
-
-fn render_streaming_png_with_geometry(
-    bytes: &[u8],
-    options: &ImageOptions,
-    vertical_offset: Option<u32>,
+    algorithm: RasterAlgorithm,
 ) -> Result<VerticalWindow> {
     check_decode_cancelled()?;
     let crop = if options.crop_borders {
-        scan_png_bounds(bytes, true)?
+        scan_png_bounds_with_algorithm(bytes, true, algorithm)?
     } else {
         let reader = streaming_png_reader(bytes)?;
         CropRect {
@@ -602,7 +763,7 @@ fn render_streaming_png_with_geometry(
         );
         while output_y < output_height && sample_y[output_y as usize] == row_number {
             for (output_x, source_x) in sample_x.iter().copied().enumerate() {
-                let gray = png_gray_sample(row.data(), source_x as usize, color);
+                let gray = png_gray_sample(row.data(), source_x as usize, color, algorithm);
                 output.put_pixel(output_x as u32, output_y, Luma([gray]));
             }
             output_y += 1;
@@ -624,7 +785,7 @@ fn render_streaming_png_with_geometry(
         work.set(current);
     });
     apply_contrast(&mut output, options.contrast);
-    quantize(&mut output, options.dither);
+    quantize_raster(&mut output, options.dither, algorithm)?;
     Ok(VerticalWindow {
         image: output,
         scaled_height,
@@ -636,17 +797,28 @@ fn render_streaming_png_with_geometry(
     })
 }
 
-fn png_gray_sample(row: &[u8], x: usize, color: png::ColorType) -> u8 {
+fn png_gray_sample(row: &[u8], x: usize, color: png::ColorType, algorithm: RasterAlgorithm) -> u8 {
     let offset = x * color.samples();
     let (gray, alpha) = match color {
         png::ColorType::Grayscale => (u32::from(row[offset]), 255),
         png::ColorType::GrayscaleAlpha => (u32::from(row[offset]), u32::from(row[offset + 1])),
         png::ColorType::Rgb | png::ColorType::Rgba => {
-            let gray = (u32::from(row[offset]) * 2_126
-                + u32::from(row[offset + 1]) * 7_152
-                + u32::from(row[offset + 2]) * 722
-                + 5_000)
-                / 10_000;
+            let gray = match algorithm {
+                RasterAlgorithm::Lanczos3 => {
+                    (u32::from(row[offset]) * 2_126
+                        + u32::from(row[offset + 1]) * 7_152
+                        + u32::from(row[offset + 2]) * 722
+                        + 5_000)
+                        / 10_000
+                }
+                RasterAlgorithm::BiliTriangle => {
+                    (u32::from(row[offset]) * 54
+                        + u32::from(row[offset + 1]) * 183
+                        + u32::from(row[offset + 2]) * 19
+                        + 128)
+                        / 256
+                }
+            };
             let alpha = if color == png::ColorType::Rgba {
                 u32::from(row[offset + 3])
             } else {
@@ -661,6 +833,21 @@ fn png_gray_sample(row: &[u8], x: usize, color: png::ColorType) -> u8 {
 }
 
 fn decode_grayscale(bytes: &[u8]) -> Result<GrayImage> {
+    Ok(grayscale::into_grayscale(decode_bounded_image(bytes)?))
+}
+
+fn decode_reader_grayscale(bytes: &[u8]) -> Result<GrayImage> {
+    grayscale::into_reader_grayscale(decode_bounded_image(bytes)?)
+}
+
+fn decode_grayscale_for_algorithm(bytes: &[u8], algorithm: RasterAlgorithm) -> Result<GrayImage> {
+    match algorithm {
+        RasterAlgorithm::Lanczos3 => decode_grayscale(bytes),
+        RasterAlgorithm::BiliTriangle => decode_reader_grayscale(bytes),
+    }
+}
+
+fn decode_bounded_image(bytes: &[u8]) -> Result<image::DynamicImage> {
     check_decode_cancelled()?;
     ensure!(
         !bytes.is_empty() && bytes.len() as u64 <= MAX_PAGE_BYTES,
@@ -686,29 +873,76 @@ fn decode_grayscale(bytes: &[u8]) -> Result<GrayImage> {
         current.bitmap_decodes += 1;
         work.set(current);
     });
-    Ok(grayscale::into_grayscale(image))
+    Ok(image)
 }
 
 fn crop_white_borders(image: GrayImage) -> GrayImage {
     let (width, height) = image.dimensions();
-    let (mut left, mut right, mut top, mut bottom) = (width, 0, height, 0);
-    for (x, y, pixel) in image.enumerate_pixels() {
-        if pixel[0] < 247 {
-            left = left.min(x);
-            right = right.max(x);
-            top = top.min(y);
-            bottom = bottom.max(y);
-        }
-    }
-    if left > right || top > bottom {
-        return image;
-    }
-    let crop = bounded_crop(width, height, left, right, top, bottom);
+    let crop = white_border_crop(&image);
     if crop.x == 0 && crop.y == 0 && crop.width == width && crop.height == height {
         image
     } else {
         imageops::crop_imm(&image, crop.x, crop.y, crop.width, crop.height).to_image()
     }
+}
+
+fn white_border_crop(image: &GrayImage) -> CropRect {
+    let (width, height) = image.dimensions();
+    let whole = CropRect {
+        x: 0,
+        y: 0,
+        width,
+        height,
+    };
+    if width == 0 || height == 0 {
+        return whole;
+    }
+    let rows = image.as_raw()[..width as usize * height as usize].chunks_exact(width as usize);
+    let Some(top) = rows
+        .clone()
+        .position(|row| row.iter().any(|value| *value < 247))
+    else {
+        return whole;
+    };
+    let bottom = rows
+        .clone()
+        .rposition(|row| row.iter().any(|value| *value < 247))
+        .expect("The first content row proves that a final content row exists");
+
+    // The crop retains two paper pixels and discards at most one fifth of an
+    // edge. Only those edge strips can change the resulting horizontal bounds;
+    // artwork in the middle cannot move an already clamped crop boundary.
+    // Shrink each remaining search after finding a closer content pixel. Pages
+    // whose artwork reaches all four edges need only the boundary samples.
+    let search = (width / 5).saturating_add(2).min(width) as usize;
+    let (mut left, mut right_margin) = (search, search);
+    for row in rows.skip(top).take(bottom - top + 1) {
+        if left > 2 {
+            if let Some(position) = row[..left].iter().position(|value| *value < 247) {
+                left = position;
+            }
+        }
+        if right_margin > 2 {
+            if let Some(position) = row[row.len() - right_margin..]
+                .iter()
+                .rev()
+                .position(|value| *value < 247)
+            {
+                right_margin = position;
+            }
+        }
+        if left <= 2 && right_margin <= 2 {
+            break;
+        }
+    }
+    bounded_crop(
+        width,
+        height,
+        left as u32,
+        width - 1 - right_margin.min(width as usize - 1) as u32,
+        top as u32,
+        bottom as u32,
+    )
 }
 
 fn bounded_crop(width: u32, height: u32, left: u32, right: u32, top: u32, bottom: u32) -> CropRect {
@@ -764,10 +998,14 @@ fn apply_contrast(image: &mut GrayImage, contrast: i32) {
         return;
     }
     let factor = (259.0 * (f64::from(contrast) + 255.0)) / (255.0 * (259.0 - f64::from(contrast)));
-    for pixel in image.pixels_mut() {
-        pixel[0] = (factor * (f64::from(pixel[0]) - 128.0) + 128.0)
+    let values = std::array::from_fn::<_, 256, _>(|value| {
+        (factor * (value as f64 - 128.0) + 128.0)
             .round()
-            .clamp(0.0, 255.0) as u8;
+            .clamp(0.0, 255.0) as u8
+    });
+    let length = image.width() as usize * image.height() as usize;
+    for value in &mut image.as_mut()[..length] {
+        *value = values[*value as usize];
     }
 }
 
@@ -779,9 +1017,13 @@ fn quantize(image: &mut GrayImage, dither: bool) {
         return;
     }
     let width = image.width() as usize;
+    if width == 0 {
+        return;
+    }
     let mut current = vec![0_i32; width + 2];
     let mut next = vec![0_i32; width + 2];
-    for y in 0..image.height() {
+    let length = width * image.height() as usize;
+    for (y, row) in image.as_mut()[..length].chunks_exact_mut(width).enumerate() {
         let reverse = y % 2 == 1;
         for position in 0..width {
             let x = if reverse {
@@ -789,10 +1031,9 @@ fn quantize(image: &mut GrayImage, dither: bool) {
             } else {
                 position
             };
-            let value = (i32::from(image.get_pixel(x as u32, y)[0]) * 16 + current[x + 1])
-                .clamp(0, 255 * 16);
+            let value = (i32::from(row[x]) * 16 + current[x + 1]).clamp(0, 255 * 16);
             let gray = ((value + 136) / 272 * 17).clamp(0, 255);
-            image.put_pixel(x as u32, y, Luma([gray as u8]));
+            row[x] = gray as u8;
             let error = value - gray * 16;
             if reverse {
                 current[x] += error * 7 / 16;
@@ -830,6 +1071,198 @@ mod tests {
             crop_borders: false,
             dither: false,
             contrast: 0,
+        }
+    }
+
+    pub(super) fn reference_crop_white_borders(image: GrayImage) -> GrayImage {
+        let (width, height) = image.dimensions();
+        // Empty images have no content bounds. The legacy extrema scan's
+        // sentinel values otherwise resemble a zero-coordinate content pixel.
+        if width == 0 || height == 0 {
+            return image;
+        }
+        let (mut left, mut right, mut top, mut bottom) = (width, 0, height, 0);
+        for (x, y, pixel) in image.enumerate_pixels() {
+            if pixel[0] < 247 {
+                left = left.min(x);
+                right = right.max(x);
+                top = top.min(y);
+                bottom = bottom.max(y);
+            }
+        }
+        if left > right || top > bottom {
+            return image;
+        }
+        let crop = bounded_crop(width, height, left, right, top, bottom);
+        if crop.x == 0 && crop.y == 0 && crop.width == width && crop.height == height {
+            image
+        } else {
+            imageops::crop_imm(&image, crop.x, crop.y, crop.width, crop.height).to_image()
+        }
+    }
+
+    pub(super) fn reference_apply_contrast(image: &mut GrayImage, contrast: i32) {
+        let value = contrast.clamp(-100, 100);
+        if value == 0 {
+            return;
+        }
+        let factor = (259.0 * (f64::from(value) + 255.0)) / (255.0 * (259.0 - f64::from(value)));
+        for pixel in image.pixels_mut() {
+            pixel[0] = (factor * (f64::from(pixel[0]) - 128.0) + 128.0)
+                .round()
+                .clamp(0.0, 255.0) as u8;
+        }
+    }
+
+    pub(super) fn reference_quantize(image: &mut GrayImage, dither: bool) {
+        if !dither {
+            for pixel in image.pixels_mut() {
+                pixel[0] = (((u16::from(pixel[0]) + 8) / 17) * 17) as u8;
+            }
+            return;
+        }
+        let width = image.width() as usize;
+        let mut current = vec![0_i32; width + 2];
+        let mut next = vec![0_i32; width + 2];
+        for y in 0..image.height() {
+            let reverse = y % 2 == 1;
+            for position in 0..width {
+                let x = if reverse {
+                    width - position - 1
+                } else {
+                    position
+                };
+                let value = (i32::from(image.get_pixel(x as u32, y)[0]) * 16 + current[x + 1])
+                    .clamp(0, 255 * 16);
+                let gray = ((value + 136) / 272 * 17).clamp(0, 255);
+                image.put_pixel(x as u32, y, Luma([gray as u8]));
+                let error = value - gray * 16;
+                if reverse {
+                    current[x] += error * 7 / 16;
+                    next[x + 2] += error * 3 / 16;
+                    next[x + 1] += error * 5 / 16;
+                    next[x] += error / 16;
+                } else {
+                    current[x + 2] += error * 7 / 16;
+                    next[x] += error * 3 / 16;
+                    next[x + 1] += error * 5 / 16;
+                    next[x + 2] += error / 16;
+                }
+            }
+            std::mem::swap(&mut current, &mut next);
+            next.fill(0);
+        }
+    }
+
+    #[test]
+    fn edge_strip_crop_matches_full_pixel_bounds_and_thresholds() {
+        let mut state = 0x7d31_4a9b_632e_0851_u64;
+        let mut next = || {
+            state ^= state << 13;
+            state ^= state >> 7;
+            state ^= state << 17;
+            state as u8
+        };
+        for width in [0, 1, 2, 3, 4, 5, 6, 9, 10, 11, 17, 31, 64, 97] {
+            for height in [0, 1, 2, 3, 4, 5, 6, 9, 10, 11, 17, 31, 64, 97] {
+                for pattern in 0..10 {
+                    let source = GrayImage::from_fn(width, height, |x, y| {
+                        Luma([match pattern {
+                            0 => 255,
+                            1 => 247,
+                            2 => 246,
+                            3 => u8::from(x > 0 && y > 0) * 255,
+                            4 => u8::from(x + 1 < width && y + 1 < height) * 255,
+                            5 => {
+                                if x == width / 2 && y == height / 2 {
+                                    246
+                                } else {
+                                    247
+                                }
+                            }
+                            6 => {
+                                if x < width / 5 + 2 || x >= width.saturating_sub(width / 5 + 2) {
+                                    255
+                                } else {
+                                    0
+                                }
+                            }
+                            7 => {
+                                if y < height / 5 + 2 || y >= height.saturating_sub(height / 5 + 2)
+                                {
+                                    255
+                                } else {
+                                    0
+                                }
+                            }
+                            8 => {
+                                if next() < 4 {
+                                    246
+                                } else {
+                                    255
+                                }
+                            }
+                            _ => next(),
+                        }])
+                    });
+                    let expected = reference_crop_white_borders(source.clone());
+                    let actual = crop_white_borders(source);
+                    assert_eq!(
+                        actual, expected,
+                        "Crop mismatch for {width}x{height}, pattern {pattern}"
+                    );
+                }
+            }
+        }
+        let source =
+            GrayImage::from_raw(3, 2, vec![255, 247, 246, 255, 255, 255, 0, 0, 0]).unwrap();
+        assert_eq!(
+            crop_white_borders(source.clone()),
+            reference_crop_white_borders(source)
+        );
+    }
+
+    #[test]
+    fn contrast_lookup_preserves_every_level_and_clamped_setting() {
+        for contrast in -120..=120 {
+            let mut source =
+                GrayImage::from_raw(256, 1, (0..=255).chain([13, 27]).collect()).unwrap();
+            let mut expected = source.clone();
+            reference_apply_contrast(&mut expected, contrast);
+            apply_contrast(&mut source, contrast);
+            assert_eq!(
+                source.as_raw(),
+                expected.as_raw(),
+                "Contrast mismatch at {contrast}"
+            );
+        }
+    }
+
+    #[test]
+    fn row_quantization_preserves_serpentine_diffusion_and_trailing_storage() {
+        let mut state = 0xa92e_3d17_54bc_806f_u64;
+        for width in [0, 1, 2, 3, 7, 16, 31, 65] {
+            for height in [0, 1, 2, 3, 7, 16, 31] {
+                let mut pixels = Vec::new();
+                for _ in 0..width * height + 3 {
+                    state ^= state << 13;
+                    state ^= state >> 7;
+                    state ^= state << 17;
+                    pixels.push(state as u8);
+                }
+                let source = GrayImage::from_raw(width, height, pixels).unwrap();
+                for dither in [false, true] {
+                    let mut expected = source.clone();
+                    reference_quantize(&mut expected, dither);
+                    let mut actual = source.clone();
+                    quantize(&mut actual, dither);
+                    assert_eq!(
+                        actual.as_raw(),
+                        expected.as_raw(),
+                        "Quantization mismatch for {width}x{height}, dither {dither}"
+                    );
+                }
+            }
         }
     }
 
@@ -971,6 +1404,28 @@ mod tests {
             (settings.width, window.scaled_height)
         );
         eprintln!("Combined bounded vertical viewport work: {work:?}");
+    }
+
+    #[test]
+    fn reader_raster_adjacent_vertical_windows_share_one_source_decode() {
+        let source = GrayImage::from_fn(80, 600, |x, y| Luma([((x * 7 + y / 3) % 247) as u8]));
+        let bytes = png(source);
+        let settings = options(160, 100);
+        let ((first, source), work) = measured_work(|| {
+            render_vertical_raster_with_source(&bytes, &settings, 0, None).unwrap()
+        });
+        assert_eq!(work.bitmap_decodes, 1);
+        let source = source.unwrap();
+        let ((second, reused), work) = measured_work(|| {
+            render_vertical_raster_with_source(&bytes, &settings, 85, Some(source.clone())).unwrap()
+        });
+        assert_eq!(work.bitmap_decodes, 0);
+        assert!(source.same_allocation(&reused.unwrap()));
+        assert_eq!(first.scaled_height, second.scaled_height);
+        assert_ne!(first.image, second.image);
+        let expected = render_vertical_raster_with_geometry(&bytes, &settings, 85).unwrap();
+        assert_eq!(second.image, expected.image);
+        assert_eq!(second.viewport_height, expected.viewport_height);
     }
 
     #[test]

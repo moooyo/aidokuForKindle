@@ -44,13 +44,15 @@ impl App {
         self.sync_tracking_accounts_state();
         self.sync_base_view(&state);
         if self.route == "reader" {
-            self.sync_reader_view(&state)?;
+            let sleep_book = self.sync_reader_view(&state)?;
+            self.observe_sleep_book(sleep_book);
             self.page = 1;
             state.set_page(1);
             state.set_page_count(1);
             self.sync_overlay_view(&state);
             return Ok(());
         }
+        self.observe_sleep_book(None);
         let large = self.platform.profile().is_scribe();
         let show_library = self.route == "library";
         let show_catalog = self.route == "catalog";
@@ -1095,7 +1097,7 @@ impl App {
         Ok(detail_chapter_page_count(visible.total, large))
     }
 
-    fn sync_reader_view(&self, state: &State<'_>) -> Result<()> {
+    fn sync_reader_view(&self, state: &State<'_>) -> Result<Option<Book>> {
         let Some(reader) = self.reader.as_ref() else {
             state.set_current_book(BookItem::default());
             state.set_current_chapter_id(Default::default());
@@ -1107,7 +1109,7 @@ impl App {
             state.set_reader_bookmarked(false);
             state.set_next_downloaded(false);
             state.set_reader_footer(Default::default());
-            return Ok(());
+            return Ok(None);
         };
         let metadata = load_reader_metadata(
             &self.store,
@@ -1209,7 +1211,7 @@ impl App {
         }
         // Reader images belong to the image worker. Metadata synchronization
         // must never clear, decode, or replace a committed image.
-        Ok(())
+        Ok(metadata.book)
     }
 
     fn sync_overlay_view(&mut self, state: &State<'_>) {

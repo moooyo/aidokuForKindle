@@ -86,6 +86,10 @@ struct TouchState {
     // Protocol-B coordinates persist per slot, including untracked contacts.
     // The kernel does not resend unchanged absolute values for a new contact.
     slots: Option<Vec<TouchSlot>>,
+    // Slotless drivers can report coordinates before contact ownership. Keep
+    // both axes optional until a fresh synchronization has observed each one.
+    legacy_x: Option<i32>,
+    legacy_y: Option<i32>,
     x: f32,
     y: f32,
     pressed: bool,
@@ -549,6 +553,8 @@ impl TouchState {
             active_slot: 0,
             tracked_slot: None,
             slots: None,
+            legacy_x: None,
+            legacy_y: None,
             x: 0.0,
             y: 0.0,
             pressed: false,
@@ -567,6 +573,8 @@ impl TouchState {
         self.x = 0.0;
         self.y = 0.0;
         self.slots = None;
+        self.legacy_x = None;
+        self.legacy_y = None;
         if let Some(snapshot) = snapshot {
             self.active_slot = snapshot.active_slot;
             if let Some(slot) = snapshot.slots.get(snapshot.active_slot as usize) {
@@ -596,6 +604,10 @@ impl TouchState {
                     } else {
                         slot.y = value;
                     }
+                } else if code == TOUCH_POSITION_X {
+                    self.legacy_x = Some(value);
+                } else {
+                    self.legacy_y = Some(value);
                 }
                 if self.tracked_slot == Some(self.active_slot) {
                     if code == TOUCH_POSITION_X {
@@ -675,6 +687,12 @@ impl TouchState {
     // a press if the finger just touched down, or a move if it was already down.
     fn commit(&mut self, scale_factor: f32) -> Option<WindowEvent> {
         self.tracked_slot?;
+        if self.slots.is_none() {
+            // Protocol A has no trustworthy initial axis snapshot. Unknown
+            // coordinates must not create an origin press or reuse old input.
+            self.x = (self.legacy_x? as f32) * self.screen_width / self.max_x;
+            self.y = (self.legacy_y? as f32) * self.screen_height / self.max_y;
+        }
         let position = self.logical_position(scale_factor);
         let pointer_event = if self.pressed {
             WindowEvent::PointerMoved { position }
@@ -1136,6 +1154,123 @@ mod tests {
             );
             let center = LogicalPosition::new(318.0, 424.0);
             assert_eq!(output, [("press", center), ("release", center)]);
+        }
+    }
+
+    #[test]
+    fn slotless_coordinates_precede_contacts_and_survive_unchanged_axes() {
+        for (kind, code, down, up) in [
+            (EVENT_ABSOLUTE_AXIS, TOUCH_TRACKING_ID, 3, -1),
+            (EVENT_KEY, BTN_TOUCH, 1, 0),
+        ] {
+            let mut state = TouchState::new(1272, 1696, 1272.0, 1696.0);
+            let center = LogicalPosition::new(318.0, 424.0);
+            let lower = LogicalPosition::new(318.0, 500.0);
+            assert_eq!(
+                replay(
+                    &mut state,
+                    &[
+                        (EVENT_ABSOLUTE_AXIS, TOUCH_POSITION_X, 636),
+                        (EVENT_ABSOLUTE_AXIS, TOUCH_POSITION_Y, 848),
+                        (kind, code, down),
+                        (EVENT_SYNC, SYNC_REPORT, 0),
+                        (kind, code, up),
+                        (kind, code, down),
+                        (EVENT_SYNC, SYNC_REPORT, 0),
+                        (kind, code, up),
+                        (EVENT_ABSOLUTE_AXIS, TOUCH_POSITION_Y, 1000),
+                        (kind, code, down),
+                        (EVENT_SYNC, SYNC_REPORT, 0),
+                        (kind, code, up),
+                    ],
+                ),
+                [
+                    ("press", center),
+                    ("release", center),
+                    ("press", center),
+                    ("release", center),
+                    ("press", lower),
+                    ("release", lower),
+                ],
+            );
+        }
+    }
+
+    #[test]
+    fn slotless_contact_waits_for_both_coordinates_before_its_first_press() {
+        for (kind, code, down, up) in [
+            (EVENT_ABSOLUTE_AXIS, TOUCH_TRACKING_ID, 3, -1),
+            (EVENT_KEY, BTN_TOUCH, 1, 0),
+        ] {
+            let mut state = TouchState::new(1272, 1696, 1272.0, 1696.0);
+            assert!(
+                replay(
+                    &mut state,
+                    &[
+                        (kind, code, down),
+                        (EVENT_SYNC, SYNC_REPORT, 0),
+                        (EVENT_ABSOLUTE_AXIS, TOUCH_POSITION_X, 636),
+                        (EVENT_SYNC, SYNC_REPORT, 0),
+                    ],
+                )
+                .is_empty()
+            );
+            let center = LogicalPosition::new(318.0, 424.0);
+            assert_eq!(
+                replay(
+                    &mut state,
+                    &[
+                        (EVENT_ABSOLUTE_AXIS, TOUCH_POSITION_Y, 848),
+                        (EVENT_SYNC, SYNC_REPORT, 0),
+                        (kind, code, up),
+                    ],
+                ),
+                [("press", center), ("release", center)],
+            );
+        }
+    }
+
+    #[test]
+    fn slotless_resynchronization_discards_coordinates_from_before_the_boundary() {
+        for (kind, code, down, up) in [
+            (EVENT_ABSOLUTE_AXIS, TOUCH_TRACKING_ID, 3, -1),
+            (EVENT_KEY, BTN_TOUCH, 1, 0),
+        ] {
+            let mut state = TouchState::new(1272, 1696, 1272.0, 1696.0);
+            replay(
+                &mut state,
+                &[
+                    (EVENT_ABSOLUTE_AXIS, TOUCH_POSITION_X, 636),
+                    (EVENT_ABSOLUTE_AXIS, TOUCH_POSITION_Y, 848),
+                    (kind, code, down),
+                    (EVENT_SYNC, SYNC_REPORT, 0),
+                    (kind, code, up),
+                ],
+            );
+            state.synchronize(None);
+            assert!(
+                replay(
+                    &mut state,
+                    &[
+                        (kind, code, down),
+                        (EVENT_ABSOLUTE_AXIS, TOUCH_POSITION_Y, 1000),
+                        (EVENT_SYNC, SYNC_REPORT, 0),
+                    ],
+                )
+                .is_empty()
+            );
+            let lower = LogicalPosition::new(318.0, 500.0);
+            assert_eq!(
+                replay(
+                    &mut state,
+                    &[
+                        (EVENT_ABSOLUTE_AXIS, TOUCH_POSITION_X, 636),
+                        (EVENT_SYNC, SYNC_REPORT, 0),
+                        (kind, code, up),
+                    ],
+                ),
+                [("press", lower), ("release", lower)],
+            );
         }
     }
 

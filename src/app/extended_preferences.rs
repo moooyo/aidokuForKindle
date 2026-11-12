@@ -35,6 +35,12 @@ pub(super) fn set(preferences: &mut Preferences, key: &str, value: &str) -> Resu
                 "Unsupported screensaver mode"
             );
             preferences.screensaver_mode = value.into();
+            preferences.sleep_cover = value == "cover";
+        }
+        "sleep_cover" => {
+            let enabled = boolean(value)?;
+            preferences.sleep_cover = enabled;
+            preferences.screensaver_mode = if enabled { "cover" } else { "system" }.into();
         }
         "stylus_navigation" => preferences.stylus_navigation = boolean(value)?,
         "palm_rejection" => preferences.palm_rejection = boolean(value)?,
@@ -72,6 +78,7 @@ pub(super) fn sync(state: &State, preferences: &Preferences) {
     state.set_charging_updates(preferences.charging_updates);
     state.set_reading_wifi_off(preferences.reading_wifi_off);
     state.set_screensaver_mode(preferences.screensaver_mode.as_str().into());
+    state.set_sleep_cover(preferences.sleep_cover);
     state.set_stylus_navigation(preferences.stylus_navigation);
     state.set_palm_rejection(preferences.palm_rejection);
     state.set_split_wide(preferences.split_wide);
@@ -87,7 +94,7 @@ mod tests {
 
     #[test]
     fn every_switch_accepts_both_command_key_spellings() {
-        let switches: [(&str, fn(&Preferences) -> bool); 13] = [
+        let switches: [(&str, fn(&Preferences) -> bool); 14] = [
             ("resize_downloads", |value| value.resize_downloads),
             ("grayscale_downloads", |value| value.grayscale_downloads),
             ("update_wifi_only", |value| value.update_wifi_only),
@@ -95,6 +102,7 @@ mod tests {
             ("update_skip_completed", |value| value.update_skip_completed),
             ("charging_updates", |value| value.charging_updates),
             ("reading_wifi_off", |value| value.reading_wifi_off),
+            ("sleep_cover", |value| value.sleep_cover),
             ("stylus_navigation", |value| value.stylus_navigation),
             ("palm_rejection", |value| value.palm_rejection),
             ("split_wide", |value| value.split_wide),
@@ -127,11 +135,27 @@ mod tests {
         for mode in ["system", "cover", "progress"] {
             assert!(set(&mut preferences, "screensaver-mode", mode).unwrap());
             assert_eq!(preferences.screensaver_mode, mode);
+            assert_eq!(preferences.sleep_cover, mode == "cover");
         }
         for language in ["zh-CN", "zh-TW", "en", "ja"] {
             assert!(set(&mut preferences, "language", language).unwrap());
             assert_eq!(preferences.language, language);
         }
+    }
+
+    #[test]
+    fn sleep_cover_switch_and_screensaver_mode_stay_consistent() {
+        let mut preferences = Preferences {
+            screensaver_mode: "progress".into(),
+            sleep_cover: false,
+            ..Preferences::default()
+        };
+        assert!(set(&mut preferences, "sleep-cover", "true").unwrap());
+        assert!(preferences.sleep_cover);
+        assert_eq!(preferences.screensaver_mode, "cover");
+        assert!(set(&mut preferences, "sleep_cover", "false").unwrap());
+        assert!(!preferences.sleep_cover);
+        assert_eq!(preferences.screensaver_mode, "system");
     }
 
     #[test]
@@ -144,6 +168,7 @@ mod tests {
             ("ahead-chapters", "256"),
             ("resize-downloads", "1"),
             ("write_logs", "TRUE"),
+            ("sleep_cover", "enabled"),
             ("auto_update_interval", "hourly"),
             ("screensaver_mode", "custom"),
             ("language", "de"),

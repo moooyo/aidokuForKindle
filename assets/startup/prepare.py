@@ -21,7 +21,7 @@ import PIL
 ROOT = Path(__file__).resolve().parents[2]
 DESTINATION = ROOT / "assets" / "startup"
 LOCALES = ("zh-CN", "zh-TW", "en", "ja")
-LABELS = ("startup_loading", "startup_fonts", "startup_data", "startup_interface")
+LABELS = ("startup_loading", "startup_fonts", "startup_data", "startup_interface", "exit", "error")
 
 
 def sha256(data: bytes) -> str:

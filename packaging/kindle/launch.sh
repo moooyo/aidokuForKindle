@@ -73,6 +73,8 @@ NATIVE_READ_PID=''; NATIVE_READ_BIRTH=''; NATIVE_READ_SEQUENCE=0
 NATIVE_RESUME_ATTEMPTS=0
 SLEEP_APP_PID=0; SLEEP_PENDING=0; WAKE_PENDING=0
 DISPLAY_OWNED=0; PAUSED_WM_RECORDS=''; STATUSBAR_STOPPED=0; STOCK_REPAINT_PENDING=0; EXIT_REDRAW=1; EVENT_FD_OPEN=0
+STATUSBAR_QUIESCED=0; COVER_SLEEP_SUPPORTED=0; SLEEP_COVER_ACTIVE=0
+COVER_SEQUENCE=0; SLEEP_COVER_SEQUENCE=0; SLEEP_APP_BIRTH=''; SLEEP_RUNNER_BIRTH=''
 
 native_read_is_owned() {
     [ -n "$NATIVE_READ_PID" ] && [ -n "$NATIVE_READ_BIRTH" ] || return 1
@@ -201,9 +203,119 @@ native_read_hex() {
     od -An -v -tx1 "$LOCK_DIR/native-read-output" | tr -d ' \n'
 }
 
+configure_cover_sleep() {
+    # Adopt the BiliComics read-only blanket observation. An unknown module,
+    # advertisement module, malformed response or failed query keeps stock sleep.
+    # Probe once before display takeover; capability belongs to this managed
+    # session. Sleep and wake still recheck current ownership independently.
+    COVER_SLEEP_SUPPORTED=0
+    native_read_command lipc-get-prop -s com.lab126.blanket load || return 0
+    cover_configuration_size=$(LC_ALL=C stat -c %s "$LOCK_DIR/native-read-output") || return 0
+    [ "$cover_configuration_size" -gt 0 ] && [ "$cover_configuration_size" -le 128 ] || return 0
+    cover_configuration_bytes=$(od -An -v -tu1 "$LOCK_DIR/native-read-output") || return 0
+    for cover_byte in $cover_configuration_bytes; do
+        case "$cover_byte" in 9|10|13) continue ;; esac
+        [ "$cover_byte" -ge 32 ] && [ "$cover_byte" -le 126 ] || return 0
+    done
+    cover_configuration=$(cat "$LOCK_DIR/native-read-output") || return 0
+    case "$cover_configuration" in *[!a-z_[:space:]]*) return 0 ;; esac
+    cover_seen_screensaver=0
+    for cover_module in $cover_configuration; do
+        case "$cover_module" in
+            screensaver) cover_seen_screensaver=1 ;;
+            # Standard resident modules may coexist with the stock screensaver.
+            langpicker|blankwindow|usb) ;;
+            *) return 0 ;;
+        esac
+    done
+    [ "$cover_seen_screensaver" -eq 1 ] || return 0
+    COVER_SLEEP_SUPPORTED=1
+}
+
+clear_sleep_cover_records() {
+    # These are the only cover protocol leaves; never remove a wildcard path.
+    rm -f "$LOCK_DIR/sleep-cover-request" "$LOCK_DIR/sleep-cover-request.pending" "$LOCK_DIR/sleep-cover-ready" "$LOCK_DIR/sleep-cover-ready.pending"
+    SLEEP_COVER_ACTIVE=0; SLEEP_COVER_SEQUENCE=0
+}
+
+sleep_cover_context_is_current() {
+    [ "$SLEEP_GENERATION" = "$APP_GENERATION" ] && [ "$SLEEP_APP_PID" = "$APP_PID" ] &&
+        [ "$SLEEP_COVER_SEQUENCE" -gt 0 ] && [ -n "$SLEEP_APP_BIRTH" ] && [ -n "$SLEEP_RUNNER_BIRTH" ] || return 1
+    owned_pid "$APP_PID" "$RUNNER_PID" && owned_pid "$RUNNER_PID" "$ROOT_PID" || return 1
+    [ "$(process_birth "$APP_PID")" = "$SLEEP_APP_BIRTH" ] &&
+        [ "$(process_birth "$RUNNER_PID")" = "$SLEEP_RUNNER_BIRTH" ]
+}
+
+cover_sleep_can_own_display() {
+    [ "$COVER_SLEEP_SUPPORTED" -eq 1 ] && [ "$DISPLAY_OWNED" -eq 1 ] &&
+        [ "$STATUSBAR_STOPPED" -eq 1 ] && [ "$STATUSBAR_QUIESCED" -eq 1 ] &&
+        [ -n "$PAUSED_WM_RECORDS" ] || return 1
+    # A passcode configured after launch immediately revokes custom ownership.
+    [ ! -e /var/local/system/userpasswdenabled ] && [ ! -L /var/local/system/userpasswdenabled ] || return 1
+    case "$(status statusbar 2>/dev/null || :)" in *stop/waiting*) ;; *) return 1 ;; esac
+    for cover_wm_record in $PAUSED_WM_RECORDS; do
+        cover_wm_pid=${cover_wm_record%%:*}; cover_wm_birth=${cover_wm_record#*:}
+        [ -n "$cover_wm_birth" ] && [ "$(process_birth "$cover_wm_pid")" = "$cover_wm_birth" ] || return 1
+        case "$(process_state "$cover_wm_pid")" in T*|t*) ;; *) return 1 ;; esac
+    done
+}
+
+sleep_cover_records_match() {
+    sleep_cover_context_is_current || return 1
+    cover_expected="$SLEEP_GENERATION $SLEEP_APP_PID $NONCE $SLEEP_EPOCH $SLEEP_COVER_SEQUENCE suspend"
+    cover_leaves=sleep-cover-request
+    [ "${1:-ready}" = request ] || cover_leaves="$cover_leaves sleep-cover-ready"
+    # Mutable leaves are read in the existing bounded private reader group.
+    # Exact sizes reject extra lines/NULs; before/after identities reject edits.
+    if native_read_command sh -c '
+        directory=$1; expected=$2; leaves=$3; owner=$4; shift 4
+        [ -d "$directory" ] && [ ! -L "$directory" ] || exit 1
+        directory_record=$(LC_ALL=C stat -c "%d:%i:%u:%f" "$directory") || exit 1
+        directory_tail=${directory_record#*:*:}
+        [ "${directory_tail%%:*}" = "$owner" ] || exit 1
+        case "${directory_tail#*:}" in 41c0|45c0) ;; *) exit 1 ;; esac
+        check_record() {
+            path=$directory/$1; value=$2
+            [ -f "$path" ] && [ ! -L "$path" ] || return 1
+            before=$(LC_ALL=C stat -c "%d:%i:%u:%f:%h:%s:%Y:%Z" "$path") || return 1
+            tail=${before#*:*:}
+            [ "${tail%%:*}" = "$owner" ] || return 1
+            tail=${tail#*:}
+            case "${tail%%:*}" in 8180|8100) ;; *) return 1 ;; esac
+            tail=${tail#*:}
+            [ "${tail%%:*}" = 1 ] || return 1
+            tail=${tail#*:}
+            [ "${tail%%:*}" = "$((${#value} + 1))" ] || return 1
+            IFS= read -r record <"$path" || return 1
+            [ "$record" = "$value" ] || return 1
+            after=$(LC_ALL=C stat -c "%d:%i:%u:%f:%h:%s:%Y:%Z" "$path") || return 1
+            [ "$before" = "$after" ]
+        }
+        while [ "$#" -gt 0 ]; do check_record "$1" "$2" || exit 1; shift 2; done
+        for leaf in $leaves; do check_record "$leaf" "$expected" || exit 1; done
+        [ "$(LC_ALL=C stat -c "%d:%i:%u:%f" "$directory")" = "$directory_record" ] || exit 1
+        printf "cover-ready\n"
+    ' sh "$LOCK_DIR" "$cover_expected" "$cover_leaves" "$(id -u)" \
+        nonce "$NONCE" generation "$SLEEP_GENERATION:$NONCE" application-pid "$SLEEP_APP_PID" \
+        epoch "$SLEEP_EPOCH" sleep-request "$SLEEP_APP_PID $NONCE $SLEEP_EPOCH"; then
+        [ "$(native_read_hex)" = 636f7665722d72656164790a ] && sleep_cover_context_is_current
+    else
+        return 1
+    fi
+}
+
+retain_sleep_cover() {
+    [ "$COVER_SLEEP_SUPPORTED" -eq 1 ] || return 1
+    cover_sleep_can_own_display && sleep_cover_records_match || return 1
+    # The Rust ready record certifies its independent full-update completion,
+    # saved checkpoint and paused native display/input/activity barrier.
+    case "$(process_state "$APP_PID")" in T*|t*) ;; *) return 1 ;; esac
+    SLEEP_COVER_ACTIVE=1
+}
+
 take_display() {
     [ "$DISPLAY_OWNED" -eq 0 ] || return 0
-    DISPLAY_OWNED=1; PAUSED_WM_RECORDS=''; STATUSBAR_STOPPED=0; STOCK_REPAINT_PENDING=1
+    DISPLAY_OWNED=1; PAUSED_WM_RECORDS=''; STATUSBAR_STOPPED=0; STATUSBAR_QUIESCED=0; STOCK_REPAINT_PENDING=1
     # Freeze the WM before stopping statusbar can damage the stock X11 scene.
     if command -v pidof >/dev/null 2>&1; then
         for wm_pid in $(pidof awesome 2>/dev/null || :); do
@@ -216,7 +328,11 @@ take_display() {
     fi
     if command -v status >/dev/null 2>&1 && command -v stop >/dev/null 2>&1 && command -v start >/dev/null 2>&1; then
         case "$(status statusbar 2>/dev/null || :)" in
-            *start/running*) if stop statusbar >/dev/null 2>&1; then STATUSBAR_STOPPED=1; fi ;;
+            *start/running*)
+                if stop statusbar >/dev/null 2>&1; then
+                    STATUSBAR_STOPPED=1
+                    case "$(status statusbar 2>/dev/null || :)" in *stop/waiting*) STATUSBAR_QUIESCED=1 ;; esac
+                fi ;;
         esac
     fi
 }
@@ -241,7 +357,7 @@ release_display() {
         done
         PAUSED_WM_RECORDS=''
         if [ "$STATUSBAR_STOPPED" -eq 1 ]; then start statusbar >/dev/null 2>&1 || :; fi
-        STATUSBAR_STOPPED=0; DISPLAY_OWNED=0
+        STATUSBAR_STOPPED=0; STATUSBAR_QUIESCED=0; DISPLAY_OWNED=0
     fi
     # Direct framebuffer writes bypass X damage. Preserve one final repaint
     # across quiet power handoffs, including an exit while the App is parked.
@@ -252,6 +368,8 @@ release_display() {
     fi
 }
 handoff_power_display() {
+    if retain_sleep_cover; then return 0; fi
+    clear_sleep_cover_records
     # Stock powerd paints its own screensaver transition. Forcing the X11 scene
     # here can expose the native bookshelf before sleep or retained restoration.
     release_display 0
@@ -339,6 +457,7 @@ run_application() {
 }
 start_application() {
     APP_GENERATION=$((APP_GENERATION + 1)); APP_PID=''
+    clear_sleep_cover_records
     rm -f "$LOCK_DIR/application-pid" "$LOCK_DIR/sleep-request" "$LOCK_DIR/sleep-ready" "$LOCK_DIR/resume-request" "$LOCK_DIR/resume-ready" "$LOCK_DIR/fallback-sleep" "$LOCK_DIR/ordinary-exit" "$LOCK_DIR/native-portrait-calibration" "$LOCK_DIR/native-portrait-calibration.pending" "$LOCK_DIR/resume-native-portrait-calibration" "$LOCK_DIR/resume-native-portrait-calibration.pending"
     rm -f "$LOCK_DIR"/resume-native-portrait-calibration-*.pending
     write_record generation "$APP_GENERATION:$NONCE"
@@ -367,8 +486,8 @@ stop_application() {
 }
 
 run_ack_watch() {
-    ack_epoch=$1; ack_generation=$2; ack_application=$3
-    helper_setup ack; ack_remaining=5
+    ack_epoch=$1; ack_generation=$2; ack_application=$3; ack_budget=$4
+    helper_setup ack; ack_remaining=$ack_budget
     while :; do
         [ "$HELPER_STOPPING" -eq 0 ] || return 0
         if matches_record sleep-ready "$ack_application $NONCE $ack_epoch"; then
@@ -381,12 +500,27 @@ run_ack_watch() {
 }
 begin_sleep() {
     SLEEP_GENERATION=$APP_GENERATION; SLEEP_APP_PID=$APP_PID
+    SLEEP_APP_BIRTH=$(process_birth "$APP_PID" 2>/dev/null || :)
+    SLEEP_RUNNER_BIRTH=$(process_birth "$RUNNER_PID" 2>/dev/null || :)
     NATIVE_RESUME_ATTEMPTS=0
+    clear_sleep_cover_records
+    COVER_SEQUENCE=$((COVER_SEQUENCE + 1)); SLEEP_COVER_SEQUENCE=$COVER_SEQUENCE
     write_record sleep-request "$SLEEP_APP_PID $NONCE $SLEEP_EPOCH"
     rm -f "$LOCK_DIR/sleep-ready" "$LOCK_DIR/resume-request" "$LOCK_DIR/resume-ready" "$LOCK_DIR/fallback-sleep" "$LOCK_DIR/resume-native-portrait-calibration" "$LOCK_DIR/resume-native-portrait-calibration.pending"
     rm -f "$LOCK_DIR"/resume-native-portrait-calibration-*.pending
+    sleep_ack_budget=5
+    if cover_sleep_can_own_display && sleep_cover_context_is_current; then
+        write_record sleep-cover-request "$SLEEP_GENERATION $SLEEP_APP_PID $NONCE $SLEEP_EPOCH $SLEEP_COVER_SEQUENCE suspend"
+        if sleep_cover_records_match request; then
+            # The independent presentation deadline precedes checkpoint/pause.
+            # Keep the existing five-second budget for every stock transition.
+            sleep_ack_budget=12
+        else
+            clear_sleep_cover_records
+        fi
+    fi
     set_phase pausing; signal_child "$APP_PID" "$RUNNER_PID" USR1 || :
-    run_ack_watch "$SLEEP_EPOCH" "$SLEEP_GENERATION" "$SLEEP_APP_PID" & ACK_PID=$!
+    run_ack_watch "$SLEEP_EPOCH" "$SLEEP_GENERATION" "$SLEEP_APP_PID" "$sleep_ack_budget" & ACK_PID=$!
 }
 monotonic_centiseconds() {
     read -r clock_uptime clock_idle </proc/uptime || return 1
@@ -437,6 +571,8 @@ run_wake_probe() {
 }
 start_wake_probe() {
     [ -z "$WAKE_PID" ] || return 0
+    # A retained cover keeps DISPLAY_OWNED=1. It still needs bounded active-state
+    # retries; applying a stock-only ownership guard here strands that wake.
     run_wake_probe "$SLEEP_EPOCH" "$SLEEP_GENERATION" "$SLEEP_APP_PID" & WAKE_PID=$!
 }
 run_resume_watch() {
@@ -463,8 +599,34 @@ send_resume() {
     signal_child "$APP_PID" "$RUNNER_PID" CONT || :
     signal_child "$APP_PID" "$RUNNER_PID" USR2 || :
 }
+cover_wake_power_is_active() {
+    # A user-wake intent is required by the caller before either observation.
+    native_read_command lipc-get-prop -s com.lab126.powerd state || return 1
+    case "$(native_read_hex)" in 616374697665|6163746976650a) ;; *) return 1 ;; esac
+    native_read_command lipc-get-prop -s com.lab126.powerd state || return 1
+    case "$(native_read_hex)" in 616374697665|6163746976650a) ;; *) return 1 ;; esac
+}
+begin_user_wake() {
+    [ "$SLEEP_PENDING" -eq 1 ] || return 0
+    NATIVE_RESUME_ATTEMPTS=0
+    WAKE_PENDING=1; stop_ack
+    if [ "$APP_PHASE" = pausing ]; then set_phase wake-live; fi
+    if matches_record sleep-ready "$SLEEP_APP_PID $NONCE $SLEEP_EPOCH"; then handoff_power_display; fi
+    start_wake_probe
+}
 resume_application() {
-    stop_ack; stop_wake; WAKE_PENDING=0
+    [ "$SLEEP_PENDING" -eq 1 ] && [ "$WAKE_PENDING" -eq 1 ] || return 0
+    stop_ack; stop_wake
+    if [ "$SLEEP_COVER_ACTIVE" -eq 1 ] && [ "$DISPLAY_OWNED" -eq 1 ]; then
+        if ! cover_sleep_can_own_display || ! sleep_cover_records_match; then
+            clear_sleep_cover_records
+            release_display 0
+        elif ! cover_wake_power_is_active; then
+            WAKE_PENDING=1; start_wake_probe
+            return 0
+        fi
+    fi
+    WAKE_PENDING=0
     if [ "$APP_PHASE" = fallback ]; then SLEEP_PENDING=0; start_application 1; return 0; fi
     if [ -n "$APP_PID" ] && owned_pid "$APP_PID" "$RUNNER_PID"; then
         # The current wake passed the native active-state gate. Freeze stock
@@ -474,7 +636,9 @@ resume_application() {
         # suspended App resolves fresh GETVAR against this generation's anchor
         # and obtains holding from its separate trusted sensor snapshot.
         if ! native_read_command "$APP_DIR/aidoku" --kindle --device "$PROFILE" --authorize-native-portrait-resume "$SLEEP_EPOCH"; then
-            handoff_power_display
+            # A failed fresh portrait permission revokes retained ownership.
+            clear_sleep_cover_records
+            release_display 0
             printf '%s\n' 'aidoku: Waiting for a current native portrait resume permission.' >&2
             WAKE_PENDING=1
             NATIVE_RESUME_ATTEMPTS=$((NATIVE_RESUME_ATTEMPTS + 1))
@@ -493,6 +657,7 @@ resume_application() {
 cleanup() {
     cleanup_status=$1; set +e; trap - 0; trap '' HUP INT TERM; APP_PHASE=closing
     stop_native_read; stop_redraw; stop_ack; stop_wake; stop_resume; stop_application; stop_helper "$OBSERVER_PID" observer; OBSERVER_PID=''
+    clear_sleep_cover_records
     release_display "$EXIT_REDRAW"
     if [ "$EVENT_FD_OPEN" -eq 1 ]; then exec 3>&-; EVENT_FD_OPEN=0; fi
     for record in pid nonce generation phase epoch application-pid power-events sleep-request sleep-ready resume-request resume-ready fallback-sleep ordinary-exit lifecycle-state.json native-portrait-calibration resume-native-portrait-calibration native-read-output native-read-done native-read-command native-read-go runner-child runner-command observer-child observer-command ack-child ack-command wake-child wake-command wake-power resume-child resume-command; do rm -f "$LOCK_DIR/$record" "$LOCK_DIR/$record.pending"; done
@@ -518,6 +683,7 @@ mkfifo "$LOCK_DIR/power-events"
 exec 3<>"$LOCK_DIR/power-events"; EVENT_FD_OPEN=1
 run_observer & OBSERVER_PID=$!
 sleep 1
+configure_cover_sleep
 start_application 0
 
 while IFS= read -r event <&3; do
@@ -529,14 +695,12 @@ while IFS= read -r event <&3; do
                 SLEEP_PENDING=1; SLEEP_GENERATION=$APP_GENERATION; SLEEP_APP_PID=${APP_PID:-0}
                 if [ "$APP_PHASE" = active ] || [ "$APP_PHASE" = resuming ]; then begin_sleep; fi
             fi ;;
-        outOfScreenSaver*|exitingScreenSaver*)
-            if [ "$SLEEP_PENDING" -eq 1 ]; then
-                NATIVE_RESUME_ATTEMPTS=0
-                WAKE_PENDING=1; stop_ack
-                if [ "$APP_PHASE" = pausing ]; then set_phase wake-live; fi
-                if matches_record sleep-ready "$SLEEP_APP_PID $NONCE $SLEEP_EPOCH"; then handoff_power_display; fi
-                start_wake_probe
-            fi ;;
+        outOfScreenSaver*) begin_user_wake ;;
+        exitingScreenSaver*)
+            # Dismissal alone is not a user wake. RTC/background wake messages
+            # and their companion dismissal never acquire native display/input.
+            if [ "$WAKE_PENDING" -eq 1 ]; then start_wake_probe; fi ;;
+        wakeupFromSuspend*) ;;
         usbConfigured*) EXIT_REDRAW=0; exit 143 ;;
         'app-started '*)
             set -- $event
@@ -555,7 +719,7 @@ while IFS= read -r event <&3; do
             if ordinary_exit "$3"; then exit "$app_exit_status"; fi
             if [ "$SLEEP_PENDING" -eq 0 ] && [ "$app_exit_phase" != resuming ]; then exit "$app_exit_status"; fi
             if [ "$app_exit_phase" = resuming ]; then stop_resume; SLEEP_PENDING=1; WAKE_PENDING=1; fi
-            stop_ack; release_display 1; set_phase fallback
+            stop_ack; clear_sleep_cover_records; release_display 1; set_phase fallback
             if [ "$WAKE_PENDING" -eq 1 ]; then start_wake_probe; fi ;;
         'sleep-ready '*)
             set -- $event
@@ -572,7 +736,7 @@ while IFS= read -r event <&3; do
             [ "$APP_PHASE" = pausing ] && [ "$SLEEP_PENDING" -eq 1 ] && [ "$WAKE_PENDING" -eq 0 ] || continue
             if ordinary_exit "$SLEEP_APP_PID"; then exit 0; fi
             stop_ack; write_record fallback-sleep "$SLEEP_APP_PID $NONCE $SLEEP_EPOCH"
-            stop_application; release_display 1; set_phase fallback ;;
+            stop_application; clear_sleep_cover_records; release_display 1; set_phase fallback ;;
         'wake-parked '*)
             set -- $event
             [ "$#" -eq 5 ] && valid_sleep_message "$2" "$3" "$4" "$5" || continue
@@ -587,26 +751,28 @@ while IFS= read -r event <&3; do
         'wake-timeout '*)
             set -- $event
             [ "$#" -eq 5 ] && valid_sleep_message "$2" "$3" "$4" "$5" || continue
-            stop_wake; printf '%s\n' 'aidoku: Waiting for native screen-saver dismissal or unlock.' >&2 ;;
+            stop_wake
+            if [ "$SLEEP_COVER_ACTIVE" -eq 1 ]; then clear_sleep_cover_records; release_display 0; fi
+            printf '%s\n' 'aidoku: Waiting for native screen-saver dismissal or unlock.' >&2 ;;
         'resume-check '*)
             set -- $event
             [ "$#" -eq 5 ] && valid_sleep_message "$2" "$3" "$4" "$5" || continue
             [ "$APP_PHASE" = resuming ] && [ "$SLEEP_PENDING" -eq 0 ] && [ "$4" = "$APP_PID" ] || continue
-            if matches_record resume-ready "$APP_PID $NONCE $SLEEP_EPOCH"; then stop_resume; set_phase active; continue; fi
+            if matches_record resume-ready "$APP_PID $NONCE $SLEEP_EPOCH"; then stop_resume; clear_sleep_cover_records; set_phase active; continue; fi
             send_resume ;;
         'resume-ready '*)
             set -- $event
             [ "$#" -eq 5 ] && valid_sleep_message "$2" "$3" "$4" "$5" || continue
-            if [ "$APP_PHASE" = resuming ] && [ "$4" = "$APP_PID" ] && matches_record resume-ready "$APP_PID $NONCE $SLEEP_EPOCH"; then stop_resume; set_phase active; fi ;;
+            if [ "$APP_PHASE" = resuming ] && [ "$4" = "$APP_PID" ] && matches_record resume-ready "$APP_PID $NONCE $SLEEP_EPOCH"; then stop_resume; clear_sleep_cover_records; set_phase active; fi ;;
         'resume-timeout '*)
             set -- $event
             [ "$#" -eq 5 ] && valid_sleep_message "$2" "$3" "$4" "$5" || continue
             [ "$APP_PHASE" = resuming ] && [ "$4" = "$APP_PID" ] || continue
             stop_resume
-            if matches_record resume-ready "$APP_PID $NONCE $SLEEP_EPOCH"; then set_phase active; continue; fi
+            if matches_record resume-ready "$APP_PID $NONCE $SLEEP_EPOCH"; then clear_sleep_cover_records; set_phase active; continue; fi
             if ordinary_exit "$APP_PID"; then exit 0; fi
             write_record fallback-sleep "$APP_PID $NONCE $SLEEP_EPOCH"
-            stop_application; release_display 1; set_phase fallback
+            stop_application; clear_sleep_cover_records; release_display 1; set_phase fallback
             SLEEP_PENDING=1; WAKE_PENDING=1; start_wake_probe ;;
         'observer-exited '*)
             set -- $event

@@ -54,6 +54,7 @@ def expected_inputs(root: Path) -> dict[str, Path]:
     }
     groups = {
         "backend": ("vendor/slint-backend-kindle", ("LICENSE-MIT", "LICENSE-APACHE", "UPSTREAM_REVISION", "PATCHES.md", "AIDOKU_PROVENANCE.md")),
+        "image-triangle": ("vendor/image-triangle-reference-0.25.10", ("README.md", "LICENSE-MIT", "LICENSE-APACHE")),
         "pinyin": ("assets/pinyin", ("LICENSE-AOSP.txt", "README.md")),
         "sources": ("src/sources", ("aidoku-rs.LICENSE", "README.md")),
         "icons": ("assets/icons", ("README.md",)),

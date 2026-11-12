@@ -5,11 +5,12 @@
 //! does not expand grayscale pixels or copy the shared RGB payload.
 
 use std::{
-    collections::HashMap,
+    collections::{HashMap, HashSet},
     sync::{Arc, Mutex, OnceLock, Weak},
 };
 
 use image::GrayImage;
+use serde::Serialize;
 use slint::{Image, Rgb8Pixel, SharedPixelBuffer};
 
 /// This budget covers retained RGB pixel payloads, not allocator bookkeeping,
@@ -18,6 +19,85 @@ const MAX_PREPARED_BYTES: usize = 12 * 1024 * 1024;
 const MAX_PREPARED_ENTRIES: usize = 16;
 
 static PREPARED: OnceLock<Mutex<PreparedCache>> = OnceLock::new();
+pub(super) const MAX_NEXT_FRAME_BYTES: usize = 32 * 1024 * 1024;
+static NEXT_FRAME: OnceLock<Arc<Mutex<NextFrameState>>> = OnceLock::new();
+
+#[derive(Debug, Default)]
+struct NextFrameState {
+    bytes: usize,
+    peak_bytes: usize,
+    reservations: usize,
+}
+
+/// A separate BiliComics-style single ready-frame payload. This does not change
+/// either existing 12 MiB LRU, and its pixels are counted explicitly as a new
+/// budget rather than being hidden as ordinary cache ownership.
+#[derive(Debug)]
+pub(super) struct PreparedReservation {
+    state: Arc<Mutex<NextFrameState>>,
+    bytes: usize,
+}
+
+impl Drop for PreparedReservation {
+    fn drop(&mut self) {
+        let mut state = self
+            .state
+            .lock()
+            .unwrap_or_else(std::sync::PoisonError::into_inner);
+        state.bytes = state.bytes.saturating_sub(self.bytes);
+        state.reservations = state.reservations.saturating_sub(1);
+    }
+}
+
+#[derive(Debug, Clone, Copy, Serialize)]
+pub(super) struct NextFrameStats {
+    pub(super) budget_bytes: usize,
+    pub(super) bytes: usize,
+    pub(super) peak_bytes: usize,
+    pub(super) reservations: usize,
+}
+
+fn next_frame_state() -> &'static Arc<Mutex<NextFrameState>> {
+    NEXT_FRAME.get_or_init(|| Arc::new(Mutex::new(NextFrameState::default())))
+}
+
+fn reserve_with_state(
+    state: &Arc<Mutex<NextFrameState>>,
+    bytes: usize,
+) -> Option<PreparedReservation> {
+    if bytes == 0 || bytes > MAX_NEXT_FRAME_BYTES {
+        return None;
+    }
+    let mut usage = state
+        .lock()
+        .unwrap_or_else(std::sync::PoisonError::into_inner);
+    if usage.reservations != 0 {
+        return None;
+    }
+    usage.bytes = bytes;
+    usage.peak_bytes = usage.peak_bytes.max(bytes);
+    usage.reservations = 1;
+    Some(PreparedReservation {
+        state: state.clone(),
+        bytes,
+    })
+}
+
+pub(super) fn reserve_next_frame(bytes: usize) -> Option<PreparedReservation> {
+    reserve_with_state(next_frame_state(), bytes)
+}
+
+pub(super) fn next_frame_stats() -> NextFrameStats {
+    let usage = next_frame_state()
+        .lock()
+        .unwrap_or_else(std::sync::PoisonError::into_inner);
+    NextFrameStats {
+        budget_bytes: MAX_NEXT_FRAME_BYTES,
+        bytes: usage.bytes,
+        peak_bytes: usage.peak_bytes,
+        reservations: usage.reservations,
+    }
+}
 
 /// Ready-to-publish, immutable RGB pixels. Cloning shares the pixel allocation.
 #[derive(Clone, Debug)]
@@ -56,9 +136,32 @@ impl PreparedPixels {
         Self { pixels }
     }
 
-    fn byte_len(&self) -> usize {
+    pub(super) fn byte_len(&self) -> usize {
         self.pixels.as_bytes().len()
     }
+
+    /// Compare the immutable shared payload, rather than equal pixel contents.
+    pub(super) fn same_allocation(&self, other: &Self) -> bool {
+        self.allocation_key() == other.allocation_key()
+    }
+
+    fn allocation_key(&self) -> (usize, usize) {
+        let bytes = self.pixels.as_bytes();
+        (bytes.as_ptr() as usize, bytes.len())
+    }
+}
+
+/// Count each live shared RGB payload once, including clones in one frame.
+/// Saturation makes an impossible aggregate fail the ordinary slot admission.
+pub(super) fn unique_prepared_bytes(pixels: &[&PreparedPixels]) -> usize {
+    let mut allocations = HashSet::new();
+    let mut bytes = 0_usize;
+    for pixels in pixels {
+        if allocations.insert(pixels.allocation_key()) {
+            bytes = bytes.saturating_add(pixels.byte_len());
+        }
+    }
+    bytes
 }
 
 struct PreparedEntry {
@@ -164,6 +267,42 @@ pub(super) fn prepare(image: Arc<GrayImage>) -> PreparedPixels {
     prepare_with_cache(cache, image)
 }
 
+/// Reader workers retain BiliComics' cooperative raster boundaries while
+/// expanding the already quantized grayscale frame into Slint's shared RGB.
+pub(super) fn prepare_cancellable(image: Arc<GrayImage>) -> anyhow::Result<PreparedPixels> {
+    crate::imaging::check_decode_cancelled()?;
+    let cache = PREPARED
+        .get_or_init(|| Mutex::new(PreparedCache::new(MAX_PREPARED_BYTES, MAX_PREPARED_ENTRIES)));
+    if let Some(prepared) = cache
+        .lock()
+        .expect("Prepared pixel cache lock")
+        .lookup(&image)
+    {
+        return Ok(prepared);
+    }
+    let mut pixels = SharedPixelBuffer::<Rgb8Pixel>::new(image.width(), image.height());
+    let length = image.width() as usize * image.height() as usize;
+    let output = pixels.make_mut_bytes();
+    for (block, values) in image.as_raw()[..length].chunks(256).enumerate() {
+        crate::imaging::check_decode_cancelled()?;
+        let first = block * 256 * 3;
+        for (rgb, gray) in output[first..first + values.len() * 3]
+            .chunks_exact_mut(3)
+            .zip(values)
+        {
+            rgb.fill(*gray);
+        }
+    }
+    crate::imaging::check_decode_cancelled()?;
+    let prepared = PreparedPixels { pixels };
+    let mut state = cache.lock().expect("Prepared pixel cache lock");
+    if let Some(existing) = state.lookup(&image) {
+        return Ok(existing);
+    }
+    state.remember(&image, prepared.clone());
+    Ok(prepared)
+}
+
 fn prepare_with_cache(cache: &Mutex<PreparedCache>, image: Arc<GrayImage>) -> PreparedPixels {
     if let Some(prepared) = cache
         .lock()
@@ -199,6 +338,89 @@ mod tests {
     fn worker_pixels_are_send_and_sync() {
         fn require_send_sync<T: Send + Sync>() {}
         require_send_sync::<PreparedPixels>();
+        require_send_sync::<PreparedReservation>();
+    }
+
+    #[test]
+    fn next_frame_reservation_covers_scribe_and_releases_on_drop() {
+        let state = Arc::new(Mutex::new(NextFrameState::default()));
+        let scribe_rgb = 1_860 * 2_480 * 3;
+        assert!(scribe_rgb > MAX_PREPARED_BYTES);
+        let reservation = reserve_with_state(&state, scribe_rgb).unwrap();
+        assert_eq!(state.lock().unwrap().bytes, scribe_rgb);
+        assert!(reserve_with_state(&state, 1).is_none());
+        drop(reservation);
+        assert_eq!(state.lock().unwrap().bytes, 0);
+        assert_eq!(state.lock().unwrap().reservations, 0);
+        assert!(reserve_with_state(&state, MAX_NEXT_FRAME_BYTES + 1).is_none());
+        let reservation = reserve_with_state(&state, MAX_NEXT_FRAME_BYTES).unwrap();
+        assert_eq!(state.lock().unwrap().peak_bytes, MAX_NEXT_FRAME_BYTES);
+        drop(reservation);
+        assert_eq!(state.lock().unwrap().bytes, 0);
+    }
+
+    #[test]
+    fn unique_rgb_payload_bytes_count_shared_clones_once() {
+        let pixels =
+            PreparedPixels::from_grayscale(&GrayImage::from_raw(3, 1, vec![17, 68, 255]).unwrap());
+        let first_clone = pixels.clone();
+        let second_clone = first_clone.clone();
+        assert!(pixels.same_allocation(&first_clone));
+        assert!(first_clone.same_allocation(&second_clone));
+        assert_eq!(
+            unique_prepared_bytes(&[&pixels, &first_clone, &second_clone]),
+            9
+        );
+        assert_eq!(unique_prepared_bytes(&[]), 0);
+    }
+
+    #[test]
+    fn unique_rgb_payload_bytes_count_equal_but_distinct_allocations() {
+        let image = GrayImage::from_raw(3, 1, vec![17, 68, 255]).unwrap();
+        let first = PreparedPixels::from_grayscale(&image);
+        let second = PreparedPixels::from_grayscale(&image);
+        let second_clone = second.clone();
+        assert_eq!(first.as_bytes(), second.as_bytes());
+        assert!(!first.same_allocation(&second));
+        assert!(second.same_allocation(&second_clone));
+        assert_eq!(unique_prepared_bytes(&[&first, &second, &second_clone]), 18);
+    }
+
+    #[test]
+    fn next_frame_reservation_counts_scribe_rgb_and_gray_payloads_together() {
+        let state = Arc::new(Mutex::new(NextFrameState::default()));
+        let image = GrayImage::from_pixel(1_860, 2_480, image::Luma([68]));
+        let pixels = PreparedPixels::from_grayscale(&image);
+        let shared_pixels = pixels.clone();
+        let retained_bytes = unique_prepared_bytes(&[&pixels, &shared_pixels])
+            .checked_add(image.as_raw().capacity())
+            .unwrap();
+        assert_eq!(retained_bytes, 1_860 * 2_480 * 4);
+        assert!(retained_bytes > MAX_PREPARED_BYTES);
+        assert!(retained_bytes < MAX_NEXT_FRAME_BYTES);
+        let reservation = reserve_with_state(&state, retained_bytes).unwrap();
+        assert_eq!(state.lock().unwrap().bytes, retained_bytes);
+        assert!(reserve_with_state(&state, retained_bytes).is_none());
+        drop(reservation);
+        assert_eq!(state.lock().unwrap().bytes, 0);
+        assert_eq!(state.lock().unwrap().reservations, 0);
+        assert!(retained_bytes * 2 > MAX_NEXT_FRAME_BYTES);
+        assert!(reserve_with_state(&state, retained_bytes * 2).is_none());
+        assert_eq!(state.lock().unwrap().bytes, 0);
+        let reservation = reserve_with_state(&state, retained_bytes).unwrap();
+        assert_eq!(state.lock().unwrap().peak_bytes, retained_bytes);
+        drop(reservation);
+        assert_eq!(state.lock().unwrap().bytes, 0);
+    }
+
+    #[test]
+    fn cancellable_reader_pixels_match_the_existing_expansion() {
+        let source = Arc::new(GrayImage::from_raw(2, 2, vec![0, 68, 127, 255, 13, 27]).unwrap());
+        let expected = PreparedPixels::from_grayscale(&source);
+        let actual = prepare_cancellable(source).unwrap();
+        assert_eq!(actual.width(), expected.width());
+        assert_eq!(actual.height(), expected.height());
+        assert_eq!(actual.as_bytes(), expected.as_bytes());
     }
 
     #[test]

@@ -14,6 +14,11 @@ use anyhow::{Context, Result};
 use serde_json::json;
 use slint::ComponentHandle;
 
+use crate::{
+    sleep_cover_protocol::{CoverRecords, CoverRequest},
+    sleep_cover_runtime::{CoverProgress, SleepCoverRuntime},
+};
+
 static SUSPEND_REQUESTED: AtomicBool = AtomicBool::new(false);
 static RESUME_REQUESTED: AtomicBool = AtomicBool::new(false);
 static SIGNAL_WAKE_FD: AtomicI32 = AtomicI32::new(-1);
@@ -34,6 +39,7 @@ impl Token {
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 enum Phase {
     Active,
+    Presenting,
     Quiescing,
     Suspended,
 }
@@ -42,6 +48,7 @@ impl Phase {
     fn name(self) -> &'static str {
         match self {
             Self::Active => "active",
+            Self::Presenting => "presenting",
             Self::Quiescing => "quiescing",
             Self::Suspended => "suspended",
         }
@@ -64,6 +71,11 @@ pub struct Coordinator {
     completed_epoch: u64,
     resume_pending: bool,
     quick_resume_pending: bool,
+    generation: u64,
+    cover_records: Option<CoverRecords>,
+    cover_runtime: SleepCoverRuntime<CoverRequest>,
+    cover_request: Option<CoverRequest>,
+    cover_presented: bool,
 }
 
 impl Coordinator {
@@ -73,6 +85,9 @@ impl Coordinator {
         } else {
             None
         };
+        let cover_records = directory
+            .as_deref()
+            .and_then(|path| CoverRecords::open(path).ok());
         Self {
             directory,
             nonce: std::env::var("AIDOKU_LAUNCH_NONCE").unwrap_or_default(),
@@ -89,11 +104,23 @@ impl Coordinator {
             completed_epoch: 0,
             resume_pending: false,
             quick_resume_pending: false,
+            generation: std::env::var("AIDOKU_LAUNCH_GENERATION")
+                .ok()
+                .and_then(|value| value.parse().ok())
+                .unwrap_or(0),
+            cover_records,
+            cover_runtime: SleepCoverRuntime::default(),
+            cover_request: None,
+            cover_presented: false,
         }
     }
 
     pub fn active(&self) -> bool {
         self.phase == Phase::Active
+    }
+
+    pub fn application_work_allowed(&self) -> bool {
+        self.active() && self.resume_frame_baseline.is_none()
     }
 
     pub fn active_elapsed(&self, started: Instant) -> Duration {
@@ -104,7 +131,7 @@ impl Coordinator {
             .saturating_sub(current_pause)
     }
 
-    pub fn publish_initial(&self, app: &Rc<RefCell<App>>, platform: &Platform) {
+    pub fn publish_initial(&self, app: Option<&Rc<RefCell<App>>>, platform: &Platform) {
         if let Err(error) = self.publish_state(app, platform) {
             eprintln!("aidoku: initial lifecycle record failed: {error:#}");
         }
@@ -113,7 +140,7 @@ impl Coordinator {
     pub fn drive(
         &mut self,
         ui: &AppWindow,
-        app: &Rc<RefCell<App>>,
+        app: Option<&Rc<RefCell<App>>>,
         platform: &Platform,
     ) -> Result<()> {
         if self.directory.is_none() || self.nonce.is_empty() {
@@ -129,6 +156,10 @@ impl Coordinator {
         if let Some(incoming) = resume_token {
             self.token = Some(incoming);
             if self.phase != Phase::Active {
+                if self.phase == Phase::Presenting {
+                    self.cancel_cover(app, platform)?;
+                    self.complete_quiesce(app, platform)?;
+                }
                 self.resume(app, platform)?;
             } else if self
                 .token
@@ -138,7 +169,7 @@ impl Coordinator {
                 // Both power events can precede the UI callback. The pending
                 // input and unaccepted reader/network work still need the same
                 // checkpoint/cancellation path, even without a native park.
-                self.quiesce(ui, app, platform)?;
+                self.quiesce(ui, app, platform, false)?;
                 self.quick_resume_pending = true;
                 self.resume(app, platform)?;
             }
@@ -147,8 +178,16 @@ impl Coordinator {
                 if token.epoch <= self.completed_epoch {
                     return Ok(());
                 }
+                let duplicate = self.token.as_ref() == Some(&token) && self.phase != Phase::Active;
                 self.token = Some(token);
-                self.quiesce(ui, app, platform)?;
+                if !duplicate {
+                    self.quiesce(ui, app, platform, true)?;
+                    if self.phase == Phase::Presenting {
+                        // A freshly published overlay must leave this callback
+                        // before its independent completion is observed.
+                        return Ok(());
+                    }
+                }
             }
         } else if resume && self.phase == Phase::Suspended {
             // A cancelled older resume-watch can deliver a final CONT/USR2
@@ -162,10 +201,14 @@ impl Coordinator {
             return Ok(());
         }
 
+        if self.phase == Phase::Presenting {
+            self.advance_cover(app, platform)?;
+        }
+
         if self.phase == Phase::Quiescing {
             let native = platform.sleep_status();
-            let ready = match app.borrow_mut().suspend_ready() {
-                Ok(ready) => ready,
+            let ready = match app.map(|app| app.borrow_mut().suspend_ready()).transpose() {
+                Ok(ready) => ready.unwrap_or_else(|| platform.device_policies_restored()),
                 Err(error) => {
                     self.last_error = Some(format!("Suspend barrier: {error:#}"));
                     false
@@ -185,6 +228,29 @@ impl Coordinator {
                 platform.park_for_suspend()?;
                 self.phase = Phase::Suspended;
                 self.publish_state(app, platform)?;
+                if self.cover_presented {
+                    let publication = (|| -> Result<()> {
+                        let request = self
+                            .cover_request
+                            .as_ref()
+                            .context("No presented sleep-cover request")?;
+                        let records = self
+                            .cover_records
+                            .as_ref()
+                            .context("No private sleep-cover directory")?;
+                        records.publish_ready(request, || {
+                            anyhow::ensure!(
+                                self.current_cover_request()?.as_ref() == Some(request),
+                                "The cover request changed before acknowledgement"
+                            );
+                            Ok(())
+                        })
+                    })();
+                    if let Err(error) = publication {
+                        self.last_error = Some(format!("Sleep-cover acknowledgement: {error:#}"));
+                        self.cancel_cover(app, platform)?;
+                    }
+                }
                 if let Some(token) = &self.token {
                     self.write_token("sleep-ready", token)?;
                 }
@@ -214,7 +280,9 @@ impl Coordinator {
                 && !native.input_released
                 && native.resume_full_frame_count > baseline
             {
-                app.borrow_mut().finish_resume_frame()?;
+                if let Some(app) = app {
+                    app.borrow_mut().finish_resume_frame()?;
+                }
                 self.resume_frame_baseline = None;
                 self.publish_state(app, platform)?;
                 if let Some(token) = &self.token {
@@ -228,33 +296,148 @@ impl Coordinator {
     fn quiesce(
         &mut self,
         ui: &AppWindow,
-        app: &Rc<RefCell<App>>,
+        app: Option<&Rc<RefCell<App>>>,
         platform: &Platform,
+        allow_cover: bool,
     ) -> Result<()> {
-        let was_active = self.phase == Phase::Active;
-        self.phase = Phase::Quiescing;
+        self.cancel_cover(app, platform)?;
+        self.phase = Phase::Presenting;
         if self.pause_started.is_none() {
             self.pause_started = Some(Instant::now());
         }
         self.resume_frame_baseline = None;
         self.resume_pending = false;
         self.quick_resume_pending = false;
-        platform.begin_suspend()?;
+        if let Some(app) = app {
+            app.borrow_mut().begin_sleep_transition(false)?;
+        }
+        // Close application and transport admission before even reading the
+        // optional private intent; cancellation may emit widget callbacks.
         platform.cancel_pending_pointer(ui.window())?;
-        if was_active && let Err(error) = app.borrow_mut().prepare_suspend() {
+        let requested = if allow_cover {
+            match self.current_cover_request() {
+                Ok(request) => request,
+                Err(error) => {
+                    self.last_error = Some(format!("Sleep-cover request: {error:#}"));
+                    None
+                }
+            }
+        } else {
+            None
+        };
+        let shown = if requested.is_some() {
+            app.map(|app| app.borrow_mut().begin_sleep_transition(true))
+                .transpose()?
+                .unwrap_or(false)
+        } else {
+            false
+        };
+        if shown && let Some(request) = requested {
+            self.cover_request = Some(request.clone());
+            let result = self.cover_runtime.poll(
+                Some(request),
+                Instant::now(),
+                || platform.request_sleep_presentation(),
+                |token| platform.sleep_presentation_completed(token),
+            );
+            match result {
+                Ok(CoverProgress::Pending) => return Ok(()),
+                Ok(_) => {}
+                Err(error) => {
+                    self.last_error = Some(format!("Sleep-cover presentation: {error:#}"))
+                }
+            }
+        }
+        self.cancel_cover(app, platform)?;
+        self.complete_quiesce(app, platform)
+    }
+
+    fn advance_cover(&mut self, app: Option<&Rc<RefCell<App>>>, platform: &Platform) -> Result<()> {
+        let request = self.current_cover_request();
+        let progress = match request {
+            Ok(request) if request.as_ref() == self.cover_request.as_ref() => {
+                self.cover_runtime.poll(
+                    request,
+                    Instant::now(),
+                    || anyhow::bail!("A pending sleep cover lost its renderer token"),
+                    |token| platform.sleep_presentation_completed(token),
+                )
+            }
+            Ok(_) => Ok(CoverProgress::Stock),
+            Err(error) => Err(error),
+        };
+        match progress {
+            Ok(CoverProgress::Pending) => return Ok(()),
+            Ok(CoverProgress::Presented(elapsed)) => {
+                self.cover_presented = true;
+                eprintln!(
+                    "aidoku: sleep cover presented {} ms after application sleep handling began",
+                    elapsed.as_millis()
+                );
+                aidoku_kindle::reader_timing::mark("sleep_cover_presented");
+            }
+            Ok(CoverProgress::Stock) => self.cancel_cover(app, platform)?,
+            Err(error) => {
+                self.last_error = Some(format!("Sleep-cover completion: {error:#}"));
+                self.cancel_cover(app, platform)?;
+            }
+        }
+        self.complete_quiesce(app, platform)
+    }
+
+    fn complete_quiesce(
+        &mut self,
+        app: Option<&Rc<RefCell<App>>>,
+        platform: &Platform,
+    ) -> Result<()> {
+        platform.begin_suspend()?;
+        self.phase = Phase::Quiescing;
+        if let Some(app) = app
+            && let Err(error) = app.borrow_mut().complete_sleep_checkpoint()
+        {
             self.last_error = Some(format!("Prepare suspend: {error:#}"));
             return Err(error).context("Prepare application suspend");
         }
         Ok(())
     }
 
-    fn resume(&mut self, app: &Rc<RefCell<App>>, platform: &Platform) -> Result<()> {
+    pub fn cancel_cover(
+        &mut self,
+        app: Option<&Rc<RefCell<App>>>,
+        platform: &Platform,
+    ) -> Result<()> {
+        self.cover_runtime.cancel();
+        self.cover_request = None;
+        self.cover_presented = false;
+        platform.cancel_sleep_presentation()?;
+        if let Some(app) = app {
+            app.borrow_mut().hide_sleep_cover();
+        }
+        Ok(())
+    }
+
+    /// The finished native loop has already terminated its presentation tokens
+    /// and closed control admission. Only local state and the overlay remain.
+    pub fn retire_cover_after_event_loop(&mut self, app: Option<&Rc<RefCell<App>>>) {
+        self.cover_runtime.cancel();
+        self.cover_request = None;
+        self.cover_presented = false;
+        if let Some(app) = app {
+            app.borrow_mut().hide_sleep_cover();
+        }
+    }
+
+    fn resume(&mut self, app: Option<&Rc<RefCell<App>>>, platform: &Platform) -> Result<()> {
+        self.cancel_cover(app, platform)?;
         self.resume_pending = true;
         let native = platform.sleep_status();
         if !native.render_paused
             || !native.input_released
             || !native.activity_paused
-            || !app.borrow_mut().suspend_ready()?
+            || !app
+                .map(|app| app.borrow_mut().suspend_ready())
+                .transpose()?
+                .unwrap_or_else(|| platform.device_policies_restored())
         {
             return Ok(());
         }
@@ -273,7 +456,9 @@ impl Coordinator {
             return Ok(());
         }
         let baseline = native.resume_full_frame_count;
-        if let Err(error) = app.borrow_mut().resume_after_sleep() {
+        if let Some(app) = app
+            && let Err(error) = app.borrow_mut().resume_after_sleep()
+        {
             self.last_error = Some(format!("Resume application: {error:#}"));
             return Err(error).context("Restore application after sleep");
         }
@@ -328,6 +513,43 @@ impl Coordinator {
         self.read_token("sleep-request")
     }
 
+    fn current_cover_request(&self) -> Result<Option<CoverRequest>> {
+        let (Some(records), Some(token)) = (&self.cover_records, &self.token) else {
+            return Ok(None);
+        };
+        if self.generation == 0 {
+            return Ok(None);
+        }
+        let Some(raw) = records.optional("sleep-cover-request")? else {
+            return Ok(None);
+        };
+        let Some(request) = CoverRequest::parse(&raw) else {
+            return Ok(None);
+        };
+        if request.generation != self.generation
+            || request.pid != self.pid
+            || request.nonce != self.nonce
+            || request.epoch != token.epoch
+            || token.pid != self.pid
+            || token.nonce != self.nonce
+            || records.read("generation")? != format!("{}:{}\n", self.generation, self.nonce)
+            || records.read("nonce")? != format!("{}\n", self.nonce)
+            || records.read("application-pid")? != format!("{}\n", self.pid)
+            || records.read("epoch")? != format!("{}\n", token.epoch)
+            || records.read("sleep-request")? != token.line()
+            || records
+                .optional("resume-request")?
+                .is_some_and(|resume| resume == token.line())
+        {
+            return Ok(None);
+        }
+        anyhow::ensure!(
+            records.read("sleep-cover-request")? == raw,
+            "The sleep-cover request changed while matching"
+        );
+        Ok(Some(request))
+    }
+
     fn matching_resume_request(&self) -> Option<Token> {
         let sleep = self.read_request()?;
         let resume = self.read_token("resume-request")?;
@@ -354,7 +576,7 @@ impl Coordinator {
         Ok(())
     }
 
-    fn publish_state(&self, app: &Rc<RefCell<App>>, platform: &Platform) -> Result<()> {
+    fn publish_state(&self, app: Option<&Rc<RefCell<App>>>, platform: &Platform) -> Result<()> {
         let Some(directory) = &self.directory else {
             return Ok(());
         };
@@ -363,7 +585,11 @@ impl Coordinator {
             "phase": self.phase.name(), "same_process_resumes": self.same_process_resumes,
             "quick_cleanup_count": self.quick_cleanup_count, "last_resume_kind": self.last_resume_kind,
             "font_initializations": crate::FONT_INITIALIZATIONS.load(Ordering::Acquire),
-            "platform": platform.sleep_status(), "application": app.borrow().lifecycle_snapshot(), "last_error": self.last_error,
+            "platform": platform.sleep_status(), "application": app.map(|app| app.borrow().lifecycle_snapshot()),
+            "startup": app.is_none_or(|app| app.borrow().is_starting()), "last_error": self.last_error,
+            "sleep_cover_pending": self.phase == Phase::Presenting,
+            "sleep_cover_presented": self.cover_presented,
+            "sleep_cover_sequence": self.cover_request.as_ref().map(|request| request.sequence),
         });
         write_atomic(
             directory,
@@ -453,6 +679,160 @@ mod tests {
         coordinator.pid = 42;
         coordinator.nonce = "test-nonce".into();
         coordinator
+    }
+
+    #[test]
+    fn unfinished_resume_blocks_bootstrap_work_until_the_retained_frame() {
+        let directory = tempfile::tempdir().unwrap();
+        let mut coordinator = coordinator(directory.path());
+        assert!(coordinator.application_work_allowed());
+        coordinator.resume_frame_baseline = Some(3);
+        assert!(!coordinator.application_work_allowed());
+        coordinator.resume_frame_baseline = None;
+        coordinator.phase = Phase::Quiescing;
+        assert!(!coordinator.application_work_allowed());
+        coordinator.phase = Phase::Presenting;
+        assert!(!coordinator.application_work_allowed());
+    }
+
+    #[test]
+    fn post_loop_cover_cleanup_requires_no_live_native_control() {
+        let request = CoverRequest {
+            generation: 3,
+            pid: 42,
+            nonce: "0123456789abcdef0123456789abcdef".into(),
+            epoch: 7,
+            sequence: 11,
+        };
+        let now = Instant::now();
+        for presented in [false, true] {
+            let mut coordinator = Coordinator::new(false);
+            coordinator
+                .cover_runtime
+                .poll(
+                    Some(request.clone()),
+                    now,
+                    || Ok(37),
+                    |_| panic!("A new presentation must yield before completion"),
+                )
+                .unwrap();
+            if presented {
+                coordinator
+                    .cover_runtime
+                    .poll(
+                        Some(request.clone()),
+                        now,
+                        || panic!("The pending presentation already has a token"),
+                        |token| {
+                            assert_eq!(token, 37);
+                            Ok(true)
+                        },
+                    )
+                    .unwrap();
+            }
+            coordinator.cover_request = Some(request.clone());
+            coordinator.cover_presented = presented;
+
+            // A terminated event loop cannot accept another cancellation request.
+            coordinator.retire_cover_after_event_loop(None);
+            coordinator.retire_cover_after_event_loop(None);
+            assert!(coordinator.cover_request.is_none());
+            assert!(!coordinator.cover_presented);
+            let fresh = coordinator
+                .cover_runtime
+                .poll(
+                    Some(request.clone()),
+                    now,
+                    || Ok(38),
+                    |_| panic!("Post-loop cleanup must discard the retired renderer token"),
+                )
+                .unwrap();
+            assert!(matches!(fresh, CoverProgress::Pending));
+        }
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn cover_intent_matches_the_current_generation_process_nonce_and_sleep_epoch() {
+        use std::os::unix::fs::PermissionsExt;
+        let directory = tempfile::tempdir().unwrap();
+        fs::set_permissions(directory.path(), fs::Permissions::from_mode(0o700)).unwrap();
+        let mut coordinator = coordinator(directory.path());
+        coordinator.generation = 3;
+        coordinator.nonce = "0123456789abcdef0123456789abcdef".into();
+        coordinator.token = Some(Token {
+            pid: 42,
+            nonce: coordinator.nonce.clone(),
+            epoch: 7,
+        });
+        coordinator.cover_records = Some(CoverRecords::open(directory.path()).unwrap());
+        let request = CoverRequest {
+            generation: 3,
+            pid: 42,
+            nonce: coordinator.nonce.clone(),
+            epoch: 7,
+            sequence: 11,
+        };
+        let write = |name: &str, content: &str| {
+            fs::write(directory.path().join(name), content).unwrap();
+            fs::set_permissions(
+                directory.path().join(name),
+                fs::Permissions::from_mode(0o600),
+            )
+            .unwrap();
+        };
+        write("generation", &format!("3:{}\n", coordinator.nonce));
+        write("nonce", &format!("{}\n", coordinator.nonce));
+        write("application-pid", "42\n");
+        write("epoch", "7\n");
+        write("sleep-request", &coordinator.token.as_ref().unwrap().line());
+        write("sleep-cover-request", &request.line());
+        assert_eq!(
+            coordinator.current_cover_request().unwrap(),
+            Some(request.clone())
+        );
+        for mismatch in [
+            CoverRequest {
+                generation: 4,
+                ..request.clone()
+            },
+            CoverRequest {
+                pid: 43,
+                ..request.clone()
+            },
+            CoverRequest {
+                nonce: "abcdef0123456789abcdef0123456789".into(),
+                ..request.clone()
+            },
+            CoverRequest {
+                epoch: 8,
+                ..request.clone()
+            },
+        ] {
+            write("sleep-cover-request", &mismatch.line());
+            assert!(coordinator.current_cover_request().unwrap().is_none());
+        }
+        write("sleep-cover-request", &request.line());
+        write(
+            "resume-request",
+            &coordinator.token.as_ref().unwrap().line(),
+        );
+        assert!(coordinator.current_cover_request().unwrap().is_none());
+    }
+
+    #[test]
+    fn the_boot_lifecycle_snapshot_has_no_fabricated_application_state() {
+        let directory = tempfile::tempdir().unwrap();
+        let coordinator = coordinator(directory.path());
+        let platform = Platform::new(aidoku_kindle::platform::DeviceProfile::Pw5, false).unwrap();
+        coordinator.publish_state(None, &platform).unwrap();
+        let record: serde_json::Value = serde_json::from_slice(
+            &fs::read(directory.path().join("lifecycle-state.json")).unwrap(),
+        )
+        .unwrap();
+        assert!(record["application"].is_null());
+        assert_eq!(record["startup"], true);
+        assert_eq!(record["phase"], "active");
     }
 
     #[test]

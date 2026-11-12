@@ -3,27 +3,29 @@ use super::*;
 use crate::domain::SearchSession;
 
 impl App {
-    /// Stop new work and checkpoint navigation before the native process parks.
-    pub fn prepare_suspend(&mut self) -> Result<()> {
+    /// Close application and transport admission, then project prepared memory.
+    /// The caller must return to the event loop before checkpointing a cover.
+    pub fn begin_sleep_transition(&mut self, show_cover: bool) -> Result<bool> {
+        if self.suspended {
+            if show_cover && self.sleep_cover_enabled() {
+                self.show_sleep_cover()?;
+                return Ok(true);
+            }
+            self.hide_sleep_cover();
+            return Ok(false);
+        }
+        anyhow::ensure!(
+            !self.metadata_restore_active(),
+            "Metadata restoration must finish before the application can suspend"
+        );
         crate::reader_timing::mark("suspend_requested");
         crate::reader_timing::cancel_action("lifecycle");
         crate::reader_timing::cancel_native("lifecycle");
         self.platform.cancel_reader_frame();
         self.pending_wide_navigation = 0;
         self.cancel_pending_user_network();
-        if self.suspended {
-            return Ok(());
-        }
-        anyhow::ensure!(
-            !self.metadata_restore_active(),
-            "Metadata restoration must finish before the application can suspend"
-        );
         self.invalidate_automatic_updates();
         self.cancel_tracking_work();
-        let _ = self
-            .data_management
-            .logs
-            .record("app.suspend", logging::LogOutcome::Success);
         self.cancel_sensitive_keyboard();
         self.clear_reader_recovery();
         if let Some(ui) = self.ui.upgrade() {
@@ -34,17 +36,19 @@ impl App {
             && self.displayed_reader.as_ref().is_none_or(|frame| {
                 !same_reader_render(&frame.preferences, &self.effective_reader_preferences())
             });
-        self.downloads.pause_for_suspend()?;
-        self.network_control.suspend();
         self.suspended = true;
+        self.cancel_sleep_cover_preparation();
+        self.network_control.begin_suspend_gate();
+        self.downloads.begin_suspend_gate()?;
         self.sync_storage_details_visibility();
         self.suspend_checkpoint_ready = false;
+        self.suspend_checkpoint_started = false;
         self.lifecycle_generation = self.lifecycle_generation.wrapping_add(1);
         self.resume_network_pending = false;
         self.resume_frame_pending = false;
         self.network_probe_inflight = false;
         self.network_probe_rx = None;
-        self.invalidate_reader_work();
+        self.gate_reader_work_for_sleep();
         self.reader_inflight = None;
         self.prefetch_inflight = None;
         self.cover_inflight = None;
@@ -61,17 +65,55 @@ impl App {
         self.busy = false;
         self.message.clear();
         self.message_until = None;
+        if show_cover && self.sleep_cover_enabled() {
+            self.show_sleep_cover()?;
+            return Ok(true);
+        }
+        self.hide_sleep_cover();
+        Ok(false)
+    }
+
+    /// Run only after checked cover presentation, or during a stock handoff.
+    pub fn complete_sleep_checkpoint(&mut self) -> Result<()> {
+        if !self.suspended {
+            self.begin_sleep_transition(false)?;
+        }
+        if self.suspend_checkpoint_ready {
+            return Ok(());
+        }
+        // A ready frame can own disk-cache leases whose destructors prune the
+        // cache. Keep them through cover presentation and release them now.
+        self.clear_reader_next_frame();
+        if !self.suspend_checkpoint_started {
+            // This strong fence can wait for an earlier checksum or sync. It
+            // deliberately occurs after the prepared cover has been presented.
+            self.network_control.suspend();
+            self.downloads.pause_for_suspend()?;
+            self.suspend_checkpoint_started = true;
+            let _ = self
+                .data_management
+                .logs
+                .record("app.suspend", logging::LogOutcome::Success);
+        }
         self.restore_displayed_reader()?;
         if self.route == "reader" {
             self.modal.clear();
             self.modal_context.clear();
         }
         let _ = self.platform.abort_outbound_network_for_suspend()?;
-        self.save_reader_progress()?;
-        self.checkpoint_navigation(true)?;
+        if !self.is_starting() {
+            self.save_reader_progress()?;
+            self.checkpoint_navigation(true)?;
+        }
         self.suspend_checkpoint_ready = true;
         crate::reader_timing::mark("suspend_checkpoint_ready");
         Ok(())
+    }
+
+    /// Compatibility path for callers that require the normal stock handoff.
+    pub fn prepare_suspend(&mut self) -> Result<()> {
+        self.begin_sleep_transition(false)?;
+        self.complete_sleep_checkpoint()
     }
 
     /// This is a controller barrier, not a wait for a disconnected HTTP socket.
@@ -84,6 +126,7 @@ impl App {
 
     /// Resume the retained scene before checking Wi-Fi or starting a decoder.
     pub fn resume_after_sleep(&mut self) -> Result<()> {
+        self.hide_sleep_cover();
         if !self.suspended {
             return Ok(());
         }
@@ -97,6 +140,7 @@ impl App {
             .logs
             .record("app.resume", logging::LogOutcome::Success);
         self.suspend_checkpoint_ready = false;
+        self.suspend_checkpoint_started = false;
         self.resume_frame_pending = true;
         self.invalidate_storage_details();
         let needs_first_image = self.route == "reader" && self.displayed_reader.is_none();
@@ -248,6 +292,9 @@ impl App {
         }
         crate::reader_timing::mark("retained_resume_frame_acknowledged");
         self.resume_frame_pending = false;
+        // A fast wake can precede checkpoint permission. Release its obsolete
+        // next frame only after the retained foreground frame is visible.
+        self.clear_reader_next_frame();
         if self.route == "reader" && !self.options.demo {
             if let Some(ui) = self.ui.upgrade() {
                 ui.global::<State>()

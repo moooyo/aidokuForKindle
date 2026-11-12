@@ -11,10 +11,13 @@ import { SettingsPage } from "settings.slint";
 import { ReaderPage } from "reader.slint";
 import { Panels } from "panels.slint";
 import { ExitActivity } from "activity.slint";
+import { StartupActivity } from "startup.slint";
+import { SleepScreen, SleepScreenModel } from "sleep-screen.slint";
 
 export { State, Commands, BookItem, ChapterItem, SourceItem, HistoryItem, SearchGroup, SettingItem, DownloadItem, FilterOption, SourcePreferenceGroup } from "state.slint";
 export { Theme } from "theme.slint";
 export { Strings } from "strings.slint";
+export { SleepScreenModel } from "sleep-screen.slint";
 
 export component AppWindow inherits Window {
     in-out property <length> canvas-width: 618px;
@@ -30,23 +33,23 @@ export component AppWindow inherits Window {
     default-font-family: Theme.sans;
     default-font-size: Theme.body;
     property <bool> has-navigation: State.route != "reader" && State.route != "detail" && (State.route != "catalog" || State.large-screen) && State.modal != "keyboard";
-    if State.route != "reader": StatusBar { y: 0px; width: root.width; }
+    if !State.booting && State.route != "reader": StatusBar { y: 0px; width: root.width; }
     content := Rectangle {
         x: 0px; y: State.route == "reader" ? 0px : Theme.status-height;
         width: root.width;
         height: root.height - (State.route == "reader" ? 0px : Theme.status-height) - (root.has-navigation ? Theme.nav-height : 0px);
-        if State.route == "library": LibraryPage {}
-        if State.route == "detail": DetailPage {}
-        if State.route == "sources": SourcesPage {}
-        if State.route == "catalog": CatalogPage {}
-        if State.route == "search": SearchPage {}
-        if State.route == "history": HistoryPage {}
-        if State.route == "settings": SettingsPage {}
-        if State.route == "reader": ReaderPage {}
+        if !State.booting && State.route == "library": LibraryPage {}
+        if !State.booting && State.route == "detail": DetailPage {}
+        if !State.booting && State.route == "sources": SourcesPage {}
+        if !State.booting && State.route == "catalog": CatalogPage {}
+        if !State.booting && State.route == "search": SearchPage {}
+        if !State.booting && State.route == "history": HistoryPage {}
+        if !State.booting && State.route == "settings": SettingsPage {}
+        if !State.booting && State.route == "reader": ReaderPage {}
     }
-    if root.has-navigation: Navigation { y: root.height - Theme.nav-height; width: root.width; }
-    if State.modal != "": Panels { width: root.width; height: root.height; }
-    if (State.message != "" || State.busy) && State.modal == "" && (State.route != "reader" || State.reader-menu): Rectangle {
+    if !State.booting && root.has-navigation: Navigation { y: root.height - Theme.nav-height; width: root.width; }
+    if !State.booting && State.modal != "": Panels { width: root.width; height: root.height; }
+    if !State.booting && (State.message != "" || State.busy) && State.modal == "" && (State.route != "reader" || State.reader-menu): Rectangle {
         x: (root.width - self.width) / 2;
         y: root.height - 140px - self.height;
         width: min(root.width - Theme.margin * 2, notice-text.preferred-width + (State.large-screen ? 56px : 48px));
@@ -59,11 +62,18 @@ export component AppWindow inherits Window {
         accessible-label: State.message != "" ? State.message : Strings.loading;
         notice-text := BodyText { x: State.large-screen ? 28px : 24px; width: parent.width - self.x * 2; height: parent.height; text: State.message != "" ? State.message : Strings.loading; color: Theme.ink; font-size: State.large-screen ? 18px : 15px; font-weight: 500; horizontal-alignment: center; overflow: elide; }
     }
+    if State.booting: StartupActivity { width: root.width; height: root.height; }
     if State.exiting: ExitActivity { width: root.width; height: root.height; }
+    if SleepScreenModel.active: SleepScreen { width: root.width; height: root.height; }
     forward-focus: keys;
     keys := FocusScope {
         key-pressed(event) => {
+            if SleepScreenModel.active { return accept; }
             if State.exiting { return accept; }
+            if State.booting {
+                if event.text == Key.Escape { Commands.exit-requested(); }
+                return accept;
+            }
             if event.text == Key.Escape { Commands.action("app", "back", ""); return accept; }
             if event.text == Key.LeftArrow { Commands.action("app", "left", ""); return accept; }
             if event.text == Key.RightArrow { Commands.action("app", "right", ""); return accept; }

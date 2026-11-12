@@ -1,0 +1,182 @@
+{
+  "schema_version": 1,
+  "version": "0.1.2",
+  "status": "installed_and_verified_with_operational_log_appends",
+  "work_started_local_date": "2026-11-12",
+  "delivery_local_date": "2026-11-13",
+  "references": {
+    "reader_startup_lifecycle": "0e2b816b13aef5b0fe5cad87be4e85c0d75e088d",
+    "prepared_sleep_cover": "9f6b6884f9cc9a080318cff9b3d5e5f2a7f1d632"
+  },
+  "artifacts": {
+    "desktop": {"bytes": 60648776, "sha256": "a5d93347134f66d788223672ee93ffa730d440202f5201c7997ef904f16c9f4d"},
+    "arm": {"bytes": 50092040, "sha256": "c9d4276920532c4e9fa9f1888c12444fbc650eee0c6d1fca1dc438b8f46e8ccf"},
+    "launcher": {"bytes": 41433, "sha256": "faf705dafaba9c6b31292fd196947fa1b8660d601337832a4d15b06fc65f746f"},
+    "kpm_package": {
+      "bytes": 30425529,
+      "sha256": "50cc0ed8f70b5c9d56c41bcfe19f35dfd5882c46f358e8b6a450de348e3be25b",
+      "sidecar_sha256": "5298ed0fcc98d2080dd767166637ccf1b71dcbc8415173526bbd44a38cc2a861",
+      "payload_manifest_sha256": "f705802e98d0d96de547a583650fea3cb5f01abcee9575f627ba3054e1de3546",
+      "payload_files": 30,
+      "independent_static_archive_check_passed": true,
+      "sample_or_user_data_payload": false
+    },
+    "elf_build_source_snapshot": {
+      "files": 395,
+      "sha256": "553c93ca616f0f0866541932444804ac3d082223df4f585dbd3bbb2664a6a161",
+      "captured_before_elf_build": true,
+      "scope": "Original runtime, assets, packaging, and host script snapshot; subsequent external launcher changes are recorded separately"
+    },
+    "unchanged_elf_inputs": {
+      "files": 311,
+      "sha256": "3bf49a76f5031da66e9a795fd593806d9c85b2e24a0e0d54f92627be77a6b3d3",
+      "all_files_identical_to_prebuild_snapshot": true
+    },
+    "final_runtime_and_packaging_source": {
+      "files": 395,
+      "sha256": "3d81320a191057143e31b139c6c91e9916c22c02183d978c4e78e08ae41f8d02",
+      "captured_after_elf_build": true,
+      "external_changes_after_elf_build": ["packaging/kindle/launch.sh", "packaging/tests/launcher_test.py"],
+      "all_files_match_staged_git_archive": true,
+      "staged_archive_sha256": "c401177d029c7d8baa933c63ff928a46ea35dcdf897ccde86ef4766782f3de7d",
+      "standalone_sleep_ui_test_source_matches": true,
+      "algorithm": "SHA-256 of sorted sha256-space-bytes-space-relative-path-newline records"
+    }
+  },
+  "verification": {
+    "environment": "ssh test-env",
+    "cargo_jobs": 6,
+    "local_verification_performed": false,
+    "unchanged_shared_components": {
+      "default_library": {"passed": 735, "ignored": 5},
+      "kindle_library": {"passed": 748, "ignored": 5},
+      "kindle_backend": {"passed": 140},
+      "sleep_screen_ui": {"cases": 40, "png_captures": 56}
+    },
+    "final_executable_and_reader_checks": {
+      "default_executable": {"passed": 24},
+      "kindle_executable": {"passed": 24},
+      "render_cache": {"passed": 38, "ignored": 1},
+      "desktop_release_build": "passed",
+      "arm_release_build": "passed",
+      "reader_gui_functional_scenarios": {"passed": 18}
+    },
+    "final_launcher": {"status": "passed", "tests": 73, "targeted_cache_contract_tests_passed": 3},
+    "kpm_package_fixtures": {"status": "passed", "tests": 4}
+  },
+  "desktop_performance": {
+    "status": "historical_comparison_retained_with_exact_identity",
+    "measured_candidate_sha256": "f0b988b46e5963451ae2f69ea514adc73e4a92d7aa688ef042288521d18307c4",
+    "final_candidate_sha256": "a5d93347134f66d788223672ee93ffa730d440202f5201c7997ef904f16c9f4d",
+    "valid_processes": 20,
+    "paired_samples_per_workload": 5,
+    "final_numeric_rerun_performed": false,
+    "unchanged_core_input_files": 309,
+    "main_before_event_loop_call_identical": true,
+    "reason_not_repeated": "The later executable refinement only changes post-loop cover teardown. Final A5 has 18 functional GUI checks and final C9 has direct native reading qualification. Historical medians are not relabeled as A5 measurements.",
+    "historical_summary_sha256": "15f30d07dac70f135a7b3276f53093b6a831c7d7e3f5431ac076d507c6311a1f",
+    "measurement_boundary": "Actual action receipt to UI image acceptance; separate equivalent business-ready boundary",
+    "optical_panel_completion_measured": false
+  },
+  "native_reading_observations": {
+    "status": "passed",
+    "observations_per_variant": 1,
+    "statistical_performance_claim": false,
+    "measurement_boundary": "Action receipt to request-bound accepted native driver SEND",
+    "baseline_binary_sha256": "c2123e189066bd1efe7cc72ee4749a66d1636b850a590d93cc3d7a65729dddc1",
+    "candidate_binary_sha256": "c9d4276920532c4e9fa9f1888c12444fbc650eee0c6d1fca1dc438b8f46e8ccf",
+    "candidate_launcher_at_observation_sha256": "d05cd09379c36aee3c89f36317b2a6841c2114bdac264f536da685cb9c50b52d",
+    "accepted_ui_and_native_requests_per_variant": 4,
+    "source_paths_and_encoded_bytes_unchanged": true,
+    "source_page_count": 20,
+    "baseline_native_send_ms": {"open": 2961.371, "next": 178.097, "previous": 334.387, "latest_seek": 2621.079},
+    "candidate_native_send_ms": {"open": 1026.375, "next": 143.347, "previous": 184.116, "latest_seek": 895.198},
+    "business_ready_ms": {"baseline": 3157.651, "candidate": 3728.565},
+    "observed_vm_hwm_kib": {"baseline": 105352, "candidate": 108380},
+    "normal_exit_passed": true,
+    "limits": ["One observation cannot establish p50, p95, or a statistical speedup.", "OS file-cache warmth is uncontrolled.", "Native SEND acceptance is not optical panel completion.", "The final launcher has separate sleep qualification; the observed Reader ELF is unchanged."]
+  },
+  "native_stock_sleep_resume": {
+    "status": "passed",
+    "candidate_launcher_sha256": "d3d32429e8bcca171c29ae6a9860f05f742daf712fadba458ad53e79ef739fa8",
+    "same_process_retained": true,
+    "fresh_full_resume_frame_acknowledged": true,
+    "post_wake_right_previous_and_left_next_with_native_send": true,
+    "normal_exit_passed": true,
+    "qualified_as_sleep_cover": false
+  },
+  "native_sleep_cover": {
+    "status": "passed",
+    "candidate_binary_sha256": "c9d4276920532c4e9fa9f1888c12444fbc650eee0c6d1fca1dc438b8f46e8ccf",
+    "launcher_sha256": "faf705dafaba9c6b31292fd196947fa1b8660d601337832a4d15b06fc65f746f",
+    "software_evidence_gates_passed": 50,
+    "cover_evidence_sha256": "9bc947415c12cfb50c5581510c902c38ef2f1f222818ba14ae02028ee88b4933",
+    "canonical_six_field_request_ready_match": true,
+    "same_process_wake_and_post_wake_pointer_navigation": true,
+    "normal_exit_passed": true,
+    "source_page_one_bitmap_visually_verified": true,
+    "reader_page_eight_restored": true,
+    "restored_visible_pixels_changed": 0,
+    "native_state_restored_and_lease_released": true,
+    "isolated_device_stage_archived_and_removed": true,
+    "current_polarity_observed": false,
+    "projection_conditional_on_bound_startup_mode": true,
+    "physical_orientation_sensor_retested": false,
+    "optical_panel_completion_measured": false
+  },
+  "installation": {
+    "status": "installed_and_verified_with_operational_log_appends",
+    "isolated_kpm_entry_startup_and_exit_passed": true,
+    "standard_fds_isolated": true,
+    "caller_output_silent": true,
+    "all_production_metadata_backed_up": true,
+    "native_state_restored_and_lease_released": true,
+    "installed_manifest_version": [0, 1, 2],
+    "current_payload_files_verified": 30,
+    "user_file_count_before": 112,
+    "user_file_count_after": 112,
+    "root_presence_and_file_set_unchanged": true,
+    "byte_and_mode_identical_nonlog_files": 110,
+    "all_user_metadata_preserved": true,
+    "original_log_prefixes_preserved": true,
+    "verified_operational_log_appends": {"data/logs/kpm-entry.log": 87, "data/logs/kpm-launch.log": 101},
+    "all_user_files_byte_identical": false,
+    "metadata_backup_manifest_matches": true,
+    "other_installed_package_snapshots_identical": true,
+    "unrelated_root_hook_snapshots_identical": true,
+    "own_registration_and_zero_dependency_edges_checked_during_installation": true,
+    "additional_post_install_sql_probe_completed": false,
+    "preservation_composite_sha256": "10ee072f161a540842c072b2042c142635cd851aa7b0724966276e3e345737aa",
+    "original_install_controller_result_preserved": "The strict whole-file comparison correctly reported the two expected entry/launch log appends; subsequent read-only evidence proves all other files and original log prefixes unchanged.",
+    "method": "Supported own-package KPM uninstall and fresh local installation",
+    "old_program_files": 25,
+    "new_program_files": 30,
+    "program_union_files": 30,
+    "comic_import_into_native_library_performed": false
+  },
+  "prior_attempts": {
+    "failed_native_evidence_preserved": true,
+    "initial_baseline_open_superseded_before_ui_acceptance": true,
+    "post_loop_native_control_error_fixed_and_retested": true,
+    "standard_resident_module_admission_fixed": true,
+    "transition_probe_policy_aligned_with_bili_managed_session": true,
+    "diagnostic_launcher_not_used_for_production_qualification": true,
+    "all_completed_native_test_batches_restored_native_state_and_user_data": true,
+    "all_completed_batches_released_with_owner_and_token_checks": true,
+    "all_completed_isolated_device_stages_archived_and_removed": true
+  },
+  "evidence": [
+    "source-before-exit-final-03.json",
+    "build-exit-final-03.log",
+    "frozen-cached-final-05.json",
+    "source-package-cached-final-05.json",
+    "staged-runtime-package-final-05-verification.json",
+    "test-cached-capability-targeted-05.log",
+    "test-launcher-cached-final-05.log",
+    "test-kpm-cached-final-05.log",
+    "comparison-functional-exit-final-03.log",
+    "historical-gui-scope-final-05.json",
+    "cover-evidence-private-mode-v2.json",
+    "primary-visual-review.json"
+  ]
+}

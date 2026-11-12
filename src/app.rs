@@ -19,8 +19,10 @@ mod retained_scene;
 mod runtime_restore;
 mod search_scope;
 mod server_configuration;
+mod sleep_screen;
 mod source_jobs;
 mod source_migration;
+mod startup;
 mod storage_details;
 mod tracking_accounts;
 mod view;
@@ -28,6 +30,7 @@ mod wide_pages;
 
 use interaction_models::InteractionState;
 use reader_recovery::{ReaderRecovery, ReaderTarget};
+pub use startup::PreparedApp;
 
 use std::{
     cell::RefCell,
@@ -126,13 +129,19 @@ enum JobResult {
         first_path: PathBuf,
         second_path: Option<PathBuf>,
         paths: Vec<CachedPage>,
+        prepared: bool,
     },
+    ReaderPreparationStale,
     Prefetched(reader_pipeline::Prefetched),
     Cover {
         id: String,
         uri: String,
         path: PathBuf,
         image: prepared_pixels::PreparedPixels,
+    },
+    SleepCover {
+        identity: sleep_screen::CoverIdentity,
+        image: sleep_screen::PreparedCover,
     },
     DownloadUsage(download_usage::UsageResult),
     StorageDetails(storage_details::StorageDetailsResult),
@@ -168,6 +177,7 @@ enum JobKind {
     Reader,
     Prefetch,
     Cover(String),
+    SleepCover,
     DownloadUsage,
     StorageDetails,
     Migration,
@@ -250,6 +260,8 @@ pub struct App {
     reader_image_jobs_started: u64,
     pub(crate) suspended: bool,
     suspend_checkpoint_ready: bool,
+    suspend_checkpoint_started: bool,
+    sleep_screen: sleep_screen::SleepScreenState,
     pub(crate) cover_cache: HashMap<(String, PathBuf), Image>,
     pub(crate) cover_paths: HashMap<String, PathBuf>,
     pub(crate) cover_uris: HashMap<String, String>,
@@ -309,6 +321,9 @@ pub struct App {
     chapter_inflight: Option<u64>,
     reader_inflight: Option<u64>,
     reader_image_cancel: Option<imaging::DecodeCancellation>,
+    reader_next_frame: reader_pipeline::NextFrameSlot,
+    reader_next_frame_hits: u64,
+    reader_next_frame_misses: u64,
     reader_dirty: bool,
     reader_refresh: RefreshRequest,
     frame_refresh: Option<RefreshKind>,
@@ -318,6 +333,7 @@ pub struct App {
     search_generation: u64,
     catalog_generation: u64,
     shutting_down: bool,
+    startup_stage: Option<startup::AttachStage>,
 }
 
 impl App {
@@ -330,40 +346,30 @@ impl App {
         options: AppOptions,
         platform: Rc<Platform>,
     ) -> Result<Rc<RefCell<Self>>> {
-        let data_dir = if options.demo {
-            options.data_dir.join("demo")
-        } else {
-            options.data_dir.clone()
-        };
-        fs::create_dir_all(&data_dir).context("Create the application data directory")?;
-        let database = data_dir.join("library.sqlite3");
-        let store = Store::open(&database)?;
-        let disk_cache = crate::cache::CacheManager::open(&data_dir)?;
-        let network_control = crate::sources::NetworkControl::open(&data_dir)?;
-        if options.resume {
-            network_control.suspend();
-        }
-        if options.demo {
-            crate::demo::seed_for_screen(
-                &store,
-                &data_dir,
-                normalize_route(&options.initial_screen),
-            )?;
-        }
-        if store.sources()?.is_empty() {
-            for source in default_sources() {
-                store.save_source(&source)?;
-            }
-        }
-        let mut prefs = store.preferences()?;
-        if options.landscape {
-            prefs.landscape = true;
-            prefs.reverse_landscape = false;
-        }
-        if !platform.profile().has_frontlight() {
-            prefs.brightness = 0;
-            prefs.warmth = 0;
-        }
+        let prepared = Self::prepare(options, platform.profile())?;
+        let app = Self::attach_prepared(ui, prepared, platform)?;
+        while !app.borrow_mut().advance_startup()? {}
+        Ok(app)
+    }
+
+    /// Attach worker-owned metadata without repeating its filesystem work.
+    pub fn attach_prepared(
+        ui: &AppWindow,
+        prepared: PreparedApp,
+        platform: Rc<Platform>,
+    ) -> Result<Rc<RefCell<Self>>> {
+        let PreparedApp {
+            options,
+            data_dir,
+            store,
+            disk_cache,
+            network_control,
+            prefs,
+            current_book_id,
+            interactions,
+            data_management,
+            downloads,
+        } = prepared;
         let initial_rotation = orientation::reader_display_rotation_degrees(
             normalize_route(&options.initial_screen),
             &prefs,
@@ -375,27 +381,9 @@ impl App {
         platform.configure_window_rotation(ui.window(), initial_rotation)?;
         ui.global::<State>().set_landscape(initial_landscape);
         platform.apply_preferences(&prefs)?;
-        let download_options = crate::downloads::DownloadOptions {
-            offline: options.offline || options.demo,
-            ..crate::downloads::DownloadOptions::default()
-        };
-        let downloads = DownloadWorker::start_initialized(
-            data_dir.clone(),
-            database,
-            download_options,
-            options.resume,
-        )?;
         let (job_tx, job_rx) = mpsc::channel();
         let route = normalize_route(&options.initial_screen).to_owned();
-        let current_book_id = if options.demo {
-            Some(crate::demo::primary_id())
-        } else {
-            store.library_continuation(None)?
-        };
         let resume_network_pending = options.resume && !options.offline && !options.demo;
-        let interactions = InteractionState::load(&store)?;
-        let data_management =
-            data_management::DataManagementState::open(&data_dir, prefs.write_logs)?;
         let _ = data_management
             .logs
             .record("app.start", logging::LogOutcome::Success);
@@ -452,6 +440,8 @@ impl App {
             reader_image_jobs_started: 0,
             suspended: false,
             suspend_checkpoint_ready: false,
+            suspend_checkpoint_started: false,
+            sleep_screen: sleep_screen::SleepScreenState::default(),
             cover_cache: HashMap::new(),
             cover_paths: HashMap::new(),
             cover_uris: HashMap::new(),
@@ -511,6 +501,9 @@ impl App {
             chapter_inflight: None,
             reader_inflight: None,
             reader_image_cancel: None,
+            reader_next_frame: reader_pipeline::NextFrameSlot::default(),
+            reader_next_frame_hits: 0,
+            reader_next_frame_misses: 0,
             reader_dirty: false,
             reader_refresh: RefreshRequest::None,
             frame_refresh: None,
@@ -520,32 +513,10 @@ impl App {
             search_generation: 0,
             catalog_generation: 0,
             shutting_down: false,
+            startup_stage: Some(startup::AttachStage::Route),
         };
         if app.options.demo {
             app.available = crate::demo::available_sources();
-            if app.route == "search" {
-                app.query = demo_query();
-                app.run_search()?;
-            }
-        }
-        if !app.options.resume && app.route == "reader" {
-            app.route = "detail".into();
-            app.resume_reader()?;
-        }
-        if !app.options.resume && app.options.initial_screen == "downloads" {
-            app.route = "settings".into();
-            app.open_downloads()?;
-        }
-        if app.options.resume {
-            app.restore_saved_session()?;
-        }
-        app.prepare_demo_catalog_route()?;
-        app.sync_view()?;
-        if app.route == "settings" {
-            app.refresh_setting_details()?;
-        }
-        if app.refresh_visible_covers()? {
-            app.sync_view()?;
         }
         let application = Rc::new(RefCell::new(app));
         let weak = Rc::downgrade(&application);
@@ -553,6 +524,15 @@ impl App {
             .on_action(move |section, action, value| {
                 if let Some(application) = weak.upgrade() {
                     let mut application = application.borrow_mut();
+                    if application.is_starting() {
+                        if section == "app"
+                            && action == "exit"
+                            && let Some(ui) = application.ui.upgrade()
+                        {
+                            ui.global::<Commands>().invoke_exit_requested();
+                        }
+                        return;
+                    }
                     if let Err(error) =
                         application.dispatch(section.as_str(), action.as_str(), value.as_str())
                     {
@@ -605,6 +585,7 @@ impl App {
             }
             changed |= self.finish_migration_job(message.id, message.result.as_ref().err());
             self.finish_usage_job(message.id);
+            self.finish_sleep_cover_job(message.id, message.result.as_ref().err());
             if self.finish_storage_details_job(message.id) && self.storage_details_visible() {
                 self.background_ui_dirty = true;
             }
@@ -630,6 +611,8 @@ impl App {
             }
             if prefetch_job && self.prefetch_inflight == Some(message.id) {
                 self.prefetch_inflight = None;
+                self.reader_prefetch_cancel = None;
+                self.finish_reader_next_frame_preparation(message.context.reader_generation);
             }
             if message.foreground {
                 self.busy = !self.pending.is_empty();
@@ -677,6 +660,10 @@ impl App {
                             self.cover_retry_after
                                 .insert(id.clone(), Instant::now() + Duration::from_secs(30));
                             eprintln!("aidoku: cover {id}: {error:#}");
+                        } else if matches!(message.context.kind, JobKind::SleepCover) {
+                            if !imaging::is_decode_cancelled(&error) {
+                                eprintln!("aidoku: optional sleep cover: {error:#}");
+                            }
                         } else if prefetch_job {
                             eprintln!("aidoku: read-ahead: {error:#}");
                         } else if matches!(
@@ -728,7 +715,10 @@ impl App {
             } else if !prefetch_job
                 && !matches!(
                     message.context.kind,
-                    JobKind::DownloadUsage | JobKind::StorageDetails | JobKind::AutomaticUpdate
+                    JobKind::DownloadUsage
+                        | JobKind::StorageDetails
+                        | JobKind::AutomaticUpdate
+                        | JobKind::SleepCover
                 )
             {
                 changed = true;
@@ -889,6 +879,9 @@ impl App {
             Ok(false) => {}
             Err(error) => eprintln!("aidoku: queue visible covers: {error:#}"),
         }
+        if let Err(error) = self.prepare_sleep_screen() {
+            eprintln!("aidoku: queue optional sleep cover: {error:#}");
+        }
         if let Err(error) = self.poll_download_usage() {
             eprintln!("aidoku: queue offline storage accounting: {error:#}");
         }
@@ -948,6 +941,7 @@ impl App {
                 self.cover_pending.remove(id);
                 self.cover_view.clear();
             }
+            JobKind::SleepCover => {}
             JobKind::Search => self.fail_search_group(context, &tr("request_superseded")),
             JobKind::ServerConnection => self.reconcile_server_connection_state(),
             JobKind::AutomaticUpdate | JobKind::AheadDownload => {}
@@ -957,10 +951,12 @@ impl App {
     }
 
     pub(crate) fn source_images_changed(&mut self) {
+        self.clear_sleep_screen();
         self.pending_wide_navigation = 0;
         self.cancel_pending_user_network();
         self.cancel_reader_image();
         self.cancel_reader_prefetch();
+        self.clear_reader_next_frame();
         self.invalidate_automatic_updates();
         self.source_revision = self.source_revision.wrapping_add(1);
         self.source_configurations = None;
@@ -993,7 +989,9 @@ impl App {
                     && context.source == self.current_source
                     && context.catalog_filter == self.catalog_filter
             }
-            JobKind::Cover(_) => context.source_revision == self.source_revision,
+            JobKind::Cover(_) | JobKind::SleepCover => {
+                context.source_revision == self.source_revision
+            }
             _ => true,
         }
     }
@@ -1096,6 +1094,7 @@ impl App {
                 first_path,
                 second_path,
                 paths,
+                prepared,
             } => {
                 let raw_paths = paths
                     .iter()
@@ -1133,6 +1132,10 @@ impl App {
                     self.start_reader_image_job()?;
                 } else if accepted {
                     if let Some(ui) = self.ui.upgrade() {
+                        if prepared {
+                            self.reader_next_frame_hits =
+                                self.reader_next_frame_hits.saturating_add(1);
+                        }
                         let mut leases = Vec::new();
                         for path in std::iter::once(&first_path)
                             .chain(second_path.iter())
@@ -1209,6 +1212,11 @@ impl App {
                     }
                 }
             }
+            JobResult::ReaderPreparationStale => {
+                self.reader_next_frame_misses = self.reader_next_frame_misses.saturating_add(1);
+                self.reader_dirty = true;
+                self.start_reader_image_job()?;
+            }
             JobResult::Prefetched(result) => self.accept_reader_prefetch(result)?,
             JobResult::Cover {
                 id,
@@ -1216,6 +1224,7 @@ impl App {
                 path,
                 image,
             } => self.accept_cover(context, id, uri, path, image)?,
+            JobResult::SleepCover { identity, image } => self.accept_sleep_cover(identity, image),
             JobResult::DownloadUsage(result) => {
                 if self.accept_download_usage(result) && self.route == "settings" {
                     self.refresh_setting_details()?;
@@ -1382,6 +1391,12 @@ impl App {
     }
 
     pub(crate) fn invalidate_reader_work(&mut self) {
+        self.gate_reader_work_for_sleep();
+        self.clear_reader_next_frame();
+    }
+
+    /// Cancel work without releasing cache leases before a sleep cover is shown.
+    pub(super) fn gate_reader_work_for_sleep(&mut self) {
         crate::reader_timing::invalidate("invalidated");
         self.platform.cancel_reader_frame();
         self.cancel_reader_image();
@@ -1530,6 +1545,13 @@ impl App {
         });
         snapshot["cache"] = json!(self.disk_cache.stats());
         snapshot["render_cache"] = json!(crate::render_cache::stats());
+        snapshot["reader_next_frame"] = json!({
+            "state": self.reader_next_frame.label(),
+            "retained_bytes": self.reader_next_frame.retained_bytes(),
+            "hits": self.reader_next_frame_hits,
+            "stale_misses": self.reader_next_frame_misses,
+            "allocation": prepared_pixels::next_frame_stats(),
+        });
         snapshot["source_manager_builds"] = json!(self.source_manager_pool.build_count());
         snapshot["foreground_ready_posts"] =
             json!(self.foreground_ready_posts.load(Ordering::Relaxed));
@@ -1548,6 +1570,7 @@ impl App {
         snapshot["reader_recovery"] = json!(self.reader_recovery);
         snapshot["reader_effective"] = json!(self.effective_reader_preferences());
         snapshot["suspended"] = json!(self.suspended);
+        snapshot["sleep_screen"] = self.sleep_screen_snapshot();
         snapshot["lifecycle"] = self.lifecycle_snapshot();
         snapshot["panel_page"] = json!(self.panel_page + 1);
         snapshot["panel_page_count"] = json!(
@@ -1586,6 +1609,7 @@ impl App {
     }
 
     pub fn shutdown(&mut self) {
+        self.clear_sleep_screen();
         self.pending_wide_navigation = 0;
         self.cancel_pending_user_network();
         if self.shutting_down {
@@ -1605,7 +1629,7 @@ impl App {
             .logs
             .record("app.stop", logging::LogOutcome::Success);
         self.sync_storage_details_visibility();
-        if !self.metadata_restore_active() {
+        if !self.metadata_restore_active() && !self.is_starting() {
             let _ = self.save_reader_progress();
             let _ = self.checkpoint_navigation(true);
             let _ = self.store.save_preferences(&self.prefs);
@@ -1836,6 +1860,8 @@ mod tests {
                 reader_image_jobs_started: 0,
                 suspended: false,
                 suspend_checkpoint_ready: false,
+                suspend_checkpoint_started: false,
+                sleep_screen: sleep_screen::SleepScreenState::default(),
                 cover_cache: HashMap::new(),
                 cover_paths: HashMap::new(),
                 cover_uris: HashMap::new(),
@@ -1895,6 +1921,9 @@ mod tests {
                 chapter_inflight: None,
                 reader_inflight: None,
                 reader_image_cancel: None,
+                reader_next_frame: reader_pipeline::NextFrameSlot::default(),
+                reader_next_frame_hits: 0,
+                reader_next_frame_misses: 0,
                 reader_dirty: false,
                 reader_refresh: RefreshRequest::None,
                 frame_refresh: None,
@@ -1904,6 +1933,7 @@ mod tests {
                 search_generation: 0,
                 catalog_generation: 0,
                 shutting_down: false,
+                startup_stage: None,
             };
             app.prepare_demo_catalog_route().unwrap();
             Self {

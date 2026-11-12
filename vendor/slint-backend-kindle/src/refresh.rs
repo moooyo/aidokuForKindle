@@ -5,6 +5,8 @@ use std::os::fd::OwnedFd;
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::{Arc, Mutex};
 
+use crate::lifecycle::LifecycleState;
+
 const MAX_PENDING: usize = 32;
 
 #[derive(Clone, Copy, Debug, Default, Eq, PartialEq)]
@@ -55,6 +57,7 @@ pub enum RefreshError {
     EmptyRegion,
     EventLoopTerminated,
     QueuePoisoned,
+    DisplaySuspended,
 }
 
 impl fmt::Display for RefreshError {
@@ -63,6 +66,7 @@ impl fmt::Display for RefreshError {
             Self::EmptyRegion => "refresh rectangle has no area",
             Self::EventLoopTerminated => "the Kindle event loop has terminated",
             Self::QueuePoisoned => "the refresh queue lock was poisoned",
+            Self::DisplaySuspended => "the Kindle display is suspended",
         })
     }
 }
@@ -106,6 +110,7 @@ pub struct RefreshHandle {
     pub(crate) pending: Arc<Mutex<PendingRefresh>>,
     pub(crate) wake: Arc<OwnedFd>,
     pub(crate) quit: Arc<AtomicBool>,
+    pub(crate) lifecycle: Arc<LifecycleState>,
 }
 
 impl RefreshHandle {
@@ -118,6 +123,9 @@ impl RefreshHandle {
         if self.quit.load(Ordering::SeqCst) {
             return Err(RefreshError::EventLoopTerminated);
         }
+        if self.is_suspended() {
+            return Err(RefreshError::DisplaySuspended);
+        }
         {
             let mut pending = self
                 .pending
@@ -126,10 +134,18 @@ impl RefreshHandle {
             if self.quit.load(Ordering::SeqCst) {
                 return Err(RefreshError::EventLoopTerminated);
             }
+            if self.is_suspended() {
+                return Err(RefreshError::DisplaySuspended);
+            }
             pending.push(request);
         }
         crate::wakeup::poke(&self.wake);
         Ok(())
+    }
+
+    fn is_suspended(&self) -> bool {
+        self.lifecycle.pause_requested.load(Ordering::Acquire)
+            || self.lifecycle.applied_paused.load(Ordering::Acquire)
     }
 }
 
@@ -281,6 +297,19 @@ fn union(first: PhysicalRect, second: PhysicalRect) -> PhysicalRect {
 mod tests {
     use super::*;
 
+    fn producer() -> (RefreshHandle, Arc<OwnedFd>) {
+        let wake = crate::wakeup::make_wakeup().unwrap();
+        (
+            RefreshHandle {
+                pending: Arc::new(Mutex::new(PendingRefresh::default())),
+                wake: wake.write,
+                quit: Arc::new(AtomicBool::new(false)),
+                lifecycle: Arc::new(LifecycleState::default()),
+            },
+            wake.read,
+        )
+    }
+
     fn rect(x: i32, y: i32, width: u32, height: u32) -> PhysicalRect {
         PhysicalRect {
             x,
@@ -404,12 +433,7 @@ mod tests {
     fn the_producer_is_thread_safe_and_queue_growth_is_bounded() {
         fn require_send_sync<T: Send + Sync>() {}
         require_send_sync::<RefreshHandle>();
-        let wake = crate::wakeup::make_wakeup().unwrap();
-        let handle = RefreshHandle {
-            pending: Arc::new(Mutex::new(PendingRefresh::default())),
-            wake: wake.write,
-            quit: Arc::new(AtomicBool::new(false)),
-        };
+        let (handle, _reader) = producer();
         let workers: Vec<_> = (0..8)
             .map(|_| {
                 let handle = handle.clone();
@@ -437,5 +461,50 @@ mod tests {
             handle.request(RefreshRequest::full()),
             Err(RefreshError::EventLoopTerminated)
         );
+    }
+
+    #[test]
+    fn suspend_intent_and_applied_ownership_both_reject_refresh_without_waking() {
+        use std::os::fd::AsRawFd;
+
+        for (requested, applied) in [(true, false), (true, true), (false, true)] {
+            let (handle, reader) = producer();
+            handle
+                .lifecycle
+                .pause_requested
+                .store(requested, Ordering::Release);
+            handle
+                .lifecycle
+                .applied_paused
+                .store(applied, Ordering::Release);
+            assert_eq!(
+                handle.request(RefreshRequest::full()),
+                Err(RefreshError::DisplaySuspended),
+            );
+            assert!(handle.pending.lock().unwrap().is_empty());
+            let mut byte = 0u8;
+            // SAFETY: The nonblocking pipe and one-byte buffer remain live.
+            assert_eq!(
+                unsafe { libc::read(reader.as_raw_fd(), (&mut byte as *mut u8).cast(), 1) },
+                -1,
+            );
+            assert_eq!(
+                std::io::Error::last_os_error().kind(),
+                std::io::ErrorKind::WouldBlock,
+            );
+            handle
+                .lifecycle
+                .pause_requested
+                .store(false, Ordering::Release);
+            handle
+                .lifecycle
+                .applied_paused
+                .store(false, Ordering::Release);
+            handle.request(RefreshRequest::full()).unwrap();
+            assert_eq!(
+                handle.pending.lock().unwrap().requests,
+                [RefreshRequest::full()]
+            );
+        }
     }
 }

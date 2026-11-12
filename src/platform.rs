@@ -397,6 +397,55 @@ impl Platform {
         Ok(())
     }
 
+    /// Request a checked full presentation without pausing native rendering.
+    pub fn request_sleep_presentation(&self) -> Result<u64> {
+        #[cfg(all(feature = "kindle", target_os = "linux"))]
+        if self.kindle {
+            return self
+                .backend
+                .borrow()
+                .as_ref()
+                .context("The native backend is not installed")?
+                .lifecycle_handle()
+                .request_sleep_presentation()
+                .map_err(Into::into);
+        }
+        bail!("Checked sleep presentation requires the native Kindle backend")
+    }
+
+    /// A true result requires this token's full update and independent wait.
+    pub fn sleep_presentation_completed(&self, token: u64) -> Result<bool> {
+        #[cfg(all(feature = "kindle", target_os = "linux"))]
+        if self.kindle {
+            return self
+                .backend
+                .borrow()
+                .as_ref()
+                .context("The native backend is not installed")?
+                .lifecycle_handle()
+                .sleep_presentation_completed(token)
+                .map_err(Into::into);
+        }
+        let _ = token;
+        bail!("Checked sleep presentation requires the native Kindle backend")
+    }
+
+    /// Retire a stale cover token before hiding its temporary application scene.
+    pub fn cancel_sleep_presentation(&self) -> Result<()> {
+        #[cfg(all(feature = "kindle", target_os = "linux"))]
+        if self.kindle {
+            return self
+                .backend
+                .borrow()
+                .as_ref()
+                .context("The native backend is not installed")?
+                .lifecycle_handle()
+                .cancel_sleep_presentation()
+                .map_err(Into::into);
+        }
+        Ok(())
+    }
+
     pub fn park_for_suspend(&self) -> Result<()> {
         if !self.device_policies_restored() {
             bail!("The reading Wi-Fi policy has not restored device ownership yet");

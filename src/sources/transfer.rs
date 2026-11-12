@@ -496,46 +496,70 @@ impl NetworkControl {
         self.coordinator.gate.lifecycle.check(epoch)
     }
 
+    /// Close admission and interrupt old flights using memory-only state.
+    /// Existing disk publications and HTTP responses may still be active.
+    /// Call from a normal control thread, never from a signal handler.
+    pub fn begin_suspend_gate(&self) -> u64 {
+        let lifecycle = &self.coordinator.gate.lifecycle;
+        let epoch = {
+            let mut state = lock(&self.coordinator.gate.state);
+            if lifecycle.suspended.load(Ordering::Acquire) {
+                self.epoch()
+            } else {
+                lifecycle.suspended.store(true, Ordering::Release);
+                let epoch = lifecycle
+                    .epoch
+                    .fetch_add(1, Ordering::AcqRel)
+                    .wrapping_add(1);
+                state.waiting.clear();
+                self.coordinator.gate.changed.notify_all();
+                epoch
+            }
+        };
+        // Never hold the flight map while acquiring an outcome lock. A late
+        // leader is allowed to finish, but cannot overwrite this interruption.
+        // A concurrent resume may already admit the current epoch, so retain
+        // its flights rather than letting an old gate cancel resumed work.
+        let (flights, interrupted_epoch) = {
+            let mut flights = lock(&self.coordinator.flights);
+            let _admission = lock(&self.coordinator.gate.state);
+            let current_epoch = lifecycle.epoch.load(Ordering::Acquire);
+            let suspended = lifecycle.suspended.load(Ordering::Acquire);
+            let mut interrupted = Vec::new();
+            flights.retain(|_, flight| {
+                if suspended || flight.token.epoch != current_epoch {
+                    interrupted.push(Arc::clone(flight));
+                    false
+                } else {
+                    true
+                }
+            });
+            (interrupted, current_epoch)
+        };
+        for flight in flights {
+            let mut outcome = lock(&flight.outcome);
+            if outcome.is_none() {
+                *outcome = Some(FlightOutcome::Interrupted(NetworkInterrupted {
+                    epoch: interrupted_epoch,
+                }));
+            }
+            drop(outcome);
+            flight.completed.notify_all();
+        }
+        epoch
+    }
+
     /// Cancel queued work immediately, then fence final disk publications.
     /// Call from a normal control thread, never from a signal handler. This
     /// does not wait for HTTP responses or release their live permits.
     pub fn suspend(&self) -> u64 {
         let lifecycle = &self.coordinator.gate.lifecycle;
         let _transition = lock(&lifecycle.transitions);
-        let epoch = {
-            let mut state = lock(&self.coordinator.gate.state);
-            if lifecycle.suspended.load(Ordering::Acquire) {
-                return self.epoch();
-            }
-            lifecycle.suspended.store(true, Ordering::Release);
-            let epoch = lifecycle
-                .epoch
-                .fetch_add(1, Ordering::AcqRel)
-                .wrapping_add(1);
-            state.waiting.clear();
-            self.coordinator.gate.changed.notify_all();
-            epoch
-        };
-        // Never hold the flight map while acquiring an outcome lock. A late
-        // leader is allowed to finish, but cannot overwrite this interruption.
-        let flights = {
-            let mut flights = lock(&self.coordinator.flights);
-            flights
-                .drain()
-                .map(|(_, flight)| flight)
-                .collect::<Vec<_>>()
-        };
-        for flight in flights {
-            let mut outcome = lock(&flight.outcome);
-            if outcome.is_none() {
-                *outcome = Some(FlightOutcome::Interrupted(NetworkInterrupted { epoch }));
-            }
-            drop(outcome);
-            flight.completed.notify_all();
-        }
+        let epoch = self.begin_suspend_gate();
         // Epoch closure above prevents new readers from entering a commit.
         // An existing commit may finish its checksum/sync/publication before
-        // this method acknowledges suspension. The admission mutex stays free.
+        // this method acknowledges suspension, including after an earlier gate.
+        // The admission mutex stays free while the transition excludes resume.
         let _publication_fence = lifecycle
             .commits
             .write()
@@ -1725,6 +1749,48 @@ mod tests {
         );
         assert_eq!(fs::read(new_path).unwrap(), b"new");
         assert!(lock(&coordinator.flights).is_empty());
+    }
+
+    #[test]
+    fn suspend_gate_avoids_publication_and_transition_waits_but_suspend_still_fences() {
+        let directory = tempfile::tempdir().unwrap();
+        let coordinator = coordinator(directory.path());
+        let control = coordinator.control();
+        let publication = coordinator.gate.lifecycle.commits.read().unwrap();
+        let transition = lock(&coordinator.gate.lifecycle.transitions);
+        let (gated, gate_acknowledgement) = mpsc::channel();
+        let gate = {
+            let control = control.clone();
+            thread::spawn(move || gated.send(control.begin_suspend_gate()).unwrap())
+        };
+        // A strong suspend may own transition while waiting for this same
+        // publication. The memory gate must be independent of both locks.
+        let gate_result = gate_acknowledgement.recv_timeout(TIMEOUT);
+        drop(transition);
+        if gate_result.is_err() {
+            drop(publication);
+            gate.join().unwrap();
+            panic!("The memory suspend gate waited for a publication or transition");
+        }
+        assert_eq!(gate_result.unwrap(), 1);
+        gate.join().unwrap();
+        assert_eq!(control.begin_suspend_gate(), 1);
+
+        let (suspended, suspension_acknowledgement) = mpsc::channel();
+        let suspend = {
+            let control = control.clone();
+            thread::spawn(move || suspended.send(control.suspend()).unwrap())
+        };
+        assert!(
+            suspension_acknowledgement
+                .recv_timeout(Duration::from_millis(100))
+                .is_err(),
+            "A previously gated suspend skipped its publication fence"
+        );
+        drop(publication);
+        assert_eq!(suspension_acknowledgement.recv_timeout(TIMEOUT).unwrap(), 1);
+        suspend.join().unwrap();
+        assert_eq!(control.resume(), 1);
     }
 
     #[test]

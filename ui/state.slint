@@ -130,6 +130,18 @@ export global State {
     in-out property <string> settings-section: "";
     in-out property <string> message;
     in-out property <bool> busy: false;
+    in-out property <bool> booting: false;
+    in-out property <bool> startup-dark: false;
+    in-out property <bool> startup-failed: false;
+    in-out property <int> startup-frame: 0;
+    in-out property <int> startup-stage: 0;
+    in-out property <image> startup-title;
+    in-out property <image> startup-loading;
+    in-out property <image> startup-fonts;
+    in-out property <image> startup-data;
+    in-out property <image> startup-interface;
+    in-out property <image> startup-exit;
+    in-out property <image> startup-error;
     in-out property <bool> exiting: false;
     in-out property <int> exit-frame: 0;
     in-out property <string> exit-stage;
@@ -299,7 +311,8 @@ export global State {
     in-out property <bool> update-skip-completed: false;
     in-out property <bool> charging-updates: false;
     in-out property <bool> reading-wifi-off: false;
-    in-out property <string> screensaver-mode: "system";
+    in-out property <string> screensaver-mode: "cover";
+    in-out property <bool> sleep-cover: true;
     in-out property <bool> stylus-navigation: false;
     in-out property <bool> palm-rejection: false;
     in-out property <bool> split-wide: false;

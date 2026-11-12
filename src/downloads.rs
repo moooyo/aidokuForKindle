@@ -131,6 +131,8 @@ type Controls = Arc<Mutex<HashMap<String, Control>>>;
 
 struct SuspendState {
     strict: AtomicBool,
+    gate_pending: AtomicBool,
+    checkpoint_allowed: AtomicBool,
     network_ready: AtomicBool,
     epoch: AtomicU64,
     acknowledged: AtomicU64,
@@ -145,6 +147,8 @@ impl SuspendState {
     fn new(suspended: bool) -> Self {
         Self {
             strict: AtomicBool::new(suspended),
+            gate_pending: AtomicBool::new(false),
+            checkpoint_allowed: AtomicBool::new(suspended),
             network_ready: AtomicBool::new(!suspended),
             epoch: AtomicU64::new(if suspended { 1 } else { 0 }),
             acknowledged: AtomicU64::new(0),
@@ -497,22 +501,53 @@ impl DownloadWorker {
         self.send(Command::RemoveBookDownloads(book_id.into()))
     }
 
-    pub fn pause_for_suspend(&self) -> Result<()> {
-        let epoch = {
-            let _transition = self
-                .suspend
-                .transition
-                .lock()
-                .unwrap_or_else(std::sync::PoisonError::into_inner);
-            self.suspend.network_ready.store(false, Ordering::Release);
-            let epoch = self
-                .suspend
+    /// Close transport admission without authorizing a durable checkpoint.
+    /// The controller parks ordinary commands until checkpoint or wake arrives.
+    pub fn begin_suspend_gate(&self) -> Result<()> {
+        let _transition = self
+            .suspend
+            .transition
+            .lock()
+            .unwrap_or_else(std::sync::PoisonError::into_inner);
+        self.suspend.network_ready.store(false, Ordering::Release);
+        let epoch = if self.suspend.gate_pending.load(Ordering::Acquire) {
+            self.suspend.epoch.load(Ordering::Acquire)
+        } else {
+            self.suspend
                 .epoch
                 .fetch_add(1, Ordering::AcqRel)
-                .wrapping_add(1);
-            self.suspend.strict.store(true, Ordering::Release);
-            epoch
+                .wrapping_add(1)
         };
+        self.suspend.gate_pending.store(true, Ordering::Release);
+        self.suspend
+            .checkpoint_allowed
+            .store(false, Ordering::Release);
+        self.suspend.barrier_active.store(false, Ordering::Release);
+        self.suspend.strict.store(true, Ordering::Release);
+        self.send(Command::Suspend(epoch))
+    }
+
+    pub fn pause_for_suspend(&self) -> Result<()> {
+        let _transition = self
+            .suspend
+            .transition
+            .lock()
+            .unwrap_or_else(std::sync::PoisonError::into_inner);
+        self.suspend.network_ready.store(false, Ordering::Release);
+        // A two-phase caller authorizes the gate's existing epoch. Standalone
+        // legacy calls still invalidate every previously queued wake request.
+        let epoch = if self.suspend.gate_pending.swap(false, Ordering::AcqRel) {
+            self.suspend.epoch.load(Ordering::Acquire)
+        } else {
+            self.suspend
+                .epoch
+                .fetch_add(1, Ordering::AcqRel)
+                .wrapping_add(1)
+        };
+        self.suspend
+            .checkpoint_allowed
+            .store(true, Ordering::Release);
+        self.suspend.strict.store(true, Ordering::Release);
         self.send(Command::Suspend(epoch))
     }
 
@@ -520,16 +555,26 @@ impl DownloadWorker {
     /// HTTP and temporary cache writes may still be alive until the PID is stopped.
     pub fn suspend_ready(&self) -> bool {
         self.suspend.strict.load(Ordering::Acquire)
+            && self.suspend.checkpoint_allowed.load(Ordering::Acquire)
             && self.suspend.barrier_active.load(Ordering::Acquire)
             && self.suspend.acknowledged.load(Ordering::Acquire)
                 == self.suspend.epoch.load(Ordering::Acquire)
     }
 
     pub fn resume_owned(&self, network_ready: bool) -> Result<()> {
+        let _transition = self
+            .suspend
+            .transition
+            .lock()
+            .unwrap_or_else(std::sync::PoisonError::into_inner);
         self.send(Command::ResumeOwned {
             epoch: self.suspend.epoch.load(Ordering::Acquire),
             network_ready,
-        })
+        })?;
+        // A new gate after this accepted wake must invalidate that wake even
+        // when the controller has not consumed its command yet.
+        self.suspend.gate_pending.store(false, Ordering::Release);
+        Ok(())
     }
 
     pub fn active_count(&self) -> usize {
@@ -931,7 +976,9 @@ fn worker_loop(
                     COMMAND_INTERVAL
                 };
                 match commands.recv_timeout(interval) {
-                    Ok(command) => report_command(&controller, command, None),
+                    // Re-enter the suspend barrier before starting a command
+                    // received while the controller was waiting for work.
+                    Ok(command) => controller.deferred.borrow_mut().push_back(command),
                     Err(mpsc::RecvTimeoutError::Timeout) => {}
                     Err(mpsc::RecvTimeoutError::Disconnected) => break,
                 }
@@ -968,6 +1015,15 @@ fn drain_commands(controller: &Controller<'_>, active: Option<&str>) -> Result<(
 }
 
 fn report_command(controller: &Controller<'_>, command: Command, active: Option<&str>) {
+    if controller.suspend.strict.load(Ordering::Acquire)
+        && !matches!(
+            &command,
+            Command::Suspend(_) | Command::ResumeOwned { .. } | Command::Stop
+        )
+    {
+        controller.deferred.borrow_mut().push_back(command);
+        return;
+    }
     let _busy = if matches!(&command, Command::Suspend(_)) {
         None
     } else {
@@ -1105,13 +1161,19 @@ fn suspend_barrier(controller: &Controller<'_>, _active: Option<&str>) -> Result
         && !controller.stopping.load(Ordering::Acquire)
     {
         let epoch = controller.suspend.epoch.load(Ordering::Acquire);
-        if controller.suspend.acknowledged.load(Ordering::Acquire) != epoch {
+        if controller
+            .suspend
+            .checkpoint_allowed
+            .load(Ordering::Acquire)
+            && controller.suspend.acknowledged.load(Ordering::Acquire) != epoch
+        {
             controller
                 .suspend
                 .barrier_active
                 .store(false, Ordering::Release);
-            let Some(()) = retry_download_database(
+            let Some(()) = retry_download_database_for_epoch(
                 controller,
+                epoch,
                 "Commit the download suspend checkpoint",
                 || {
                     let _busy = ActivityGuard::new(controller.suspend, false);
@@ -1119,10 +1181,11 @@ fn suspend_barrier(controller: &Controller<'_>, _active: Option<&str>) -> Result
                 },
             )?
             else {
-                break;
+                continue;
             };
-            let Some(owned) = retry_download_database(
+            let Some(owned) = retry_download_database_for_epoch(
                 controller,
+                epoch,
                 "Load ownership after the download suspend checkpoint",
                 || {
                     let _busy = ActivityGuard::new(controller.suspend, false);
@@ -1130,8 +1193,22 @@ fn suspend_barrier(controller: &Controller<'_>, _active: Option<&str>) -> Result
                 },
             )?
             else {
-                break;
+                continue;
             };
+            let _transition = controller
+                .suspend
+                .transition
+                .lock()
+                .unwrap_or_else(std::sync::PoisonError::into_inner);
+            if epoch != controller.suspend.epoch.load(Ordering::Acquire)
+                || !controller
+                    .suspend
+                    .checkpoint_allowed
+                    .load(Ordering::Acquire)
+                || controller.stopping.load(Ordering::Acquire)
+            {
+                continue;
+            }
             *controller
                 .suspend
                 .owned
@@ -1228,6 +1305,14 @@ fn resume_from_suspend(controller: &Controller<'_>, epoch: u64, ready: bool) -> 
         {
             return Ok(());
         }
+        controller
+            .suspend
+            .gate_pending
+            .store(false, Ordering::Release);
+        controller
+            .suspend
+            .checkpoint_allowed
+            .store(false, Ordering::Release);
         controller
             .suspend
             .barrier_active
@@ -4130,6 +4215,114 @@ mod tests {
     }
 
     #[test]
+    fn sleep_gate_authorizes_its_existing_epoch_only_after_explicit_checkpoint() {
+        let directory = tempfile::tempdir().unwrap();
+        let (database, _, chapter) = local_fixture(directory.path(), "queued", true);
+        let (worker, observed) = observed_runtime_worker_with_options(
+            directory.path().to_path_buf(),
+            database.clone(),
+            DownloadOptions {
+                offline: true,
+                ..DownloadOptions::default()
+            },
+        );
+        let blocker = rusqlite::Connection::open(&database).unwrap();
+        blocker.execute_batch("BEGIN EXCLUSIVE;").unwrap();
+        worker.begin_suspend_gate().unwrap();
+        let epoch = worker.suspend.epoch.load(Ordering::Acquire);
+        worker.begin_suspend_gate().unwrap();
+        assert_eq!(worker.suspend.epoch.load(Ordering::Acquire), epoch);
+        assert!(!worker.suspend_ready());
+        assert!(!worker.suspend.checkpoint_allowed.load(Ordering::Acquire));
+        assert!(observed.recv_timeout(Duration::from_millis(100)).is_err());
+        assert!(worker.events.try_recv().is_err());
+
+        worker.pause_for_suspend().unwrap();
+        assert_eq!(worker.suspend.epoch.load(Ordering::Acquire), epoch);
+        expect_busy_entered(&worker, &observed, 1);
+        blocker.execute_batch("ROLLBACK;").unwrap();
+        assert!(matches!(
+            worker.events.recv_timeout(Duration::from_secs(5)).unwrap(),
+            DownloadEvent::Suspended
+        ));
+        wait_suspend_ready(&worker);
+        let store = Store::open_read_only(&database).unwrap();
+        assert_eq!(
+            store.download(&chapter.id).unwrap().unwrap().state,
+            "paused"
+        );
+        assert_eq!(
+            store.suspended_download_ids().unwrap(),
+            BTreeSet::from([chapter.id])
+        );
+        stop(&worker);
+    }
+
+    #[test]
+    fn sleep_gate_accepts_a_wake_without_checkpointing_a_locked_database() {
+        let directory = tempfile::tempdir().unwrap();
+        let (database, _, _) = local_fixture(directory.path(), "paused", true);
+        let (worker, observed) = observed_runtime_worker_with_options(
+            directory.path().to_path_buf(),
+            database.clone(),
+            DownloadOptions {
+                offline: true,
+                ..DownloadOptions::default()
+            },
+        );
+        let blocker = rusqlite::Connection::open(&database).unwrap();
+        blocker.execute_batch("BEGIN EXCLUSIVE;").unwrap();
+        worker.begin_suspend_gate().unwrap();
+        worker.resume_owned(false).unwrap();
+        assert!(matches!(
+            worker.events.recv_timeout(Duration::from_secs(2)).unwrap(),
+            DownloadEvent::Resumed {
+                network_ready: false
+            }
+        ));
+        assert!(!worker.suspend_ready());
+        assert!(!worker.suspend.strict.load(Ordering::Acquire));
+        assert!(observed.try_recv().is_err());
+        stop(&worker);
+        blocker.execute_batch("ROLLBACK;").unwrap();
+    }
+
+    #[test]
+    fn sleep_gate_defers_ordinary_commands_and_stops_without_a_database_checkpoint() {
+        let directory = tempfile::tempdir().unwrap();
+        let (database, book, chapter) = local_fixture(directory.path(), "paused", true);
+        let (worker, observed) = observed_runtime_worker_with_options(
+            directory.path().to_path_buf(),
+            database.clone(),
+            DownloadOptions {
+                offline: true,
+                ..DownloadOptions::default()
+            },
+        );
+        let queued = Chapter {
+            id: "local:gate-deferred".into(),
+            remote_id: "gate-deferred".into(),
+            ..chapter
+        };
+        let blocker = rusqlite::Connection::open(&database).unwrap();
+        blocker.execute_batch("BEGIN EXCLUSIVE;").unwrap();
+        worker.begin_suspend_gate().unwrap();
+        worker.enqueue(&book, &queued).unwrap();
+        worker.pause_all().unwrap();
+        assert!(observed.recv_timeout(Duration::from_millis(100)).is_err());
+        assert!(worker.events.try_recv().is_err());
+        worker.shutdown();
+        assert!(worker.wait_stopped(Duration::from_secs(2)));
+        assert!(worker.terminal_error.lock().unwrap().is_none());
+        assert!(observed.try_recv().is_err());
+        assert!(worker.events.try_recv().is_err());
+        blocker.execute_batch("ROLLBACK;").unwrap();
+        let store = Store::open_read_only(&database).unwrap();
+        assert!(store.download(&queued.id).unwrap().is_none());
+        assert!(store.suspended_download_ids().unwrap().is_empty());
+    }
+
+    #[test]
     fn sleep_checkpoint_does_not_wait_for_http_and_defers_user_commands_fifo() {
         let directory = tempfile::tempdir().unwrap();
         let server = HttpFixture::new(3, Duration::ZERO);
@@ -4259,8 +4452,11 @@ mod tests {
         let worker = DownloadWorker::start(directory.path().to_path_buf(), database).unwrap();
         worker.enqueue(&book, chapter).unwrap();
         server.wait_for_images(2);
+        worker.begin_suspend_gate().unwrap();
+        let gate_epoch = network.begin_suspend_gate();
+        assert!(!worker.suspend_ready());
         worker.pause_for_suspend().unwrap();
-        network.suspend();
+        assert_eq!(network.suspend(), gate_epoch);
         wait_suspend_ready(&worker);
         worker.resume_owned(false).unwrap();
         network.resume();

@@ -152,6 +152,7 @@ pub struct Preferences {
     pub charging_updates: bool,
     pub reading_wifi_off: bool,
     pub screensaver_mode: String,
+    pub sleep_cover: bool,
     pub stylus_navigation: bool,
     pub palm_rejection: bool,
     pub split_wide: bool,
@@ -192,7 +193,8 @@ impl Default for Preferences {
             update_skip_completed: false,
             charging_updates: false,
             reading_wifi_off: false,
-            screensaver_mode: "system".into(),
+            screensaver_mode: "cover".into(),
+            sleep_cover: true,
             stylus_navigation: false,
             palm_rejection: false,
             split_wide: false,
@@ -376,7 +378,7 @@ mod tests {
     }
 
     #[test]
-    fn legacy_preferences_keep_optional_features_disabled() {
+    fn legacy_preferences_keep_reader_and_network_defaults() {
         let preferences: Preferences =
             serde_json::from_str(r#"{"reading_direction":"ltr","brightness":7}"#).unwrap();
         let expected = Preferences {
@@ -387,9 +389,36 @@ mod tests {
         assert_eq!(preferences, expected);
         assert_eq!(preferences.ahead_chapters, 0);
         assert_eq!(preferences.auto_update_interval, "off");
-        assert_eq!(preferences.screensaver_mode, "system");
+        assert_eq!(preferences.screensaver_mode, "cover");
+        assert!(preferences.sleep_cover);
         assert_eq!(preferences.language, "zh-CN");
         assert!(preferences.tracking_queue_offline);
+    }
+
+    #[test]
+    fn explicit_legacy_screensaver_modes_survive_missing_sleep_cover() {
+        for mode in ["system", "progress", "cover"] {
+            let preferences: Preferences = serde_json::from_value(serde_json::json!({
+                "screensaver_mode": mode,
+            }))
+            .unwrap();
+            assert_eq!(preferences.screensaver_mode, mode);
+            assert!(preferences.sleep_cover);
+            let serialized = serde_json::to_string(&preferences).unwrap();
+            let restored: Preferences = serde_json::from_str(&serialized).unwrap();
+            assert_eq!(restored, preferences);
+        }
+    }
+
+    #[test]
+    fn explicit_sleep_cover_opt_out_survives_a_preferences_round_trip() {
+        let preferences: Preferences =
+            serde_json::from_str(r#"{"screensaver_mode":"cover","sleep_cover":false}"#).unwrap();
+        assert_eq!(preferences.screensaver_mode, "cover");
+        assert!(!preferences.sleep_cover);
+        let serialized = serde_json::to_string(&preferences).unwrap();
+        let restored: Preferences = serde_json::from_str(&serialized).unwrap();
+        assert_eq!(restored, preferences);
     }
 
     #[test]
@@ -405,6 +434,7 @@ mod tests {
             charging_updates: true,
             reading_wifi_off: true,
             screensaver_mode: "progress".into(),
+            sleep_cover: false,
             stylus_navigation: true,
             palm_rejection: true,
             split_wide: true,

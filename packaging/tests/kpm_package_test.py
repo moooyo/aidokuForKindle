@@ -83,6 +83,18 @@ class KpmPackageTests(unittest.TestCase):
             self.assertIn("payload/aidoku/licenses/demo/manifest.json", files)
             self.assertIn("payload/aidoku/LICENSE", files)
             self.assertIn("payload/aidoku/THIRD_PARTY_NOTICES.md", files)
+            notices = {
+                "aidoku/licenses/image-triangle/README.md": "vendor/image-triangle-reference-0.25.10/README.md",
+                "aidoku/licenses/image-triangle/LICENSE-MIT": "vendor/image-triangle-reference-0.25.10/LICENSE-MIT",
+                "aidoku/licenses/image-triangle/LICENSE-APACHE": "vendor/image-triangle-reference-0.25.10/LICENSE-APACHE",
+                "aidoku/licenses/fonts/bootstrap-provenance.json": "assets/fonts/bootstrap-provenance.json",
+                "aidoku/licenses/fonts/OFL.txt": "assets/fonts/OFL.txt",
+            }
+            for relative, source in notices.items():
+                name = "payload/" + relative
+                self.assertIn(name, files)
+                self.assertEqual(files[name][0], (REPOSITORY / source).read_bytes(), relative)
+                self.assertEqual(files[name][1].mode, 0o644, relative)
             rows = [line.split("|") for line in files["payload.tsv"][0].decode("ascii").splitlines()]
             self.assertEqual(len(rows), len({row[3] for row in rows}))
             self.assertEqual({"payload/" + row[3] for row in rows}, {name for name in files if name.startswith("payload/")})

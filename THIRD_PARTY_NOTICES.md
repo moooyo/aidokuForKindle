@@ -66,6 +66,25 @@ family, and license records. `assets/fonts/README.md`, `manifest.json`, and
 preparation input was the already licensed sibling WeRead subset. Noto is a
 trademark of Google Inc.; the project does not claim ownership of font names.
 
+The unchanged `StartupSansSC.otf` bootstrap face retains its original
+`BiliComics Startup` family and Adobe copyright. It was adopted from sibling
+BiliComics revision `0e2b816b13aef5b0fe5cad87be4e85c0d75e088d` under the same
+OFL terms; `assets/fonts/bootstrap-provenance.json` records the original Noto
+source revision, preparation identity, output digest, and retained licenses.
+The yielding startup preparation, incremental font registration, and coalesced
+wake/continuation structure in `src/bootstrap_*.rs` and `src/app/startup.rs`
+follow that sibling project's `src/main.rs`, `src/fonts.rs`,
+`src/runtime_wakeup.rs`, and `src/app/startup.rs`, adapted to Aidoku's data and
+native ownership boundaries. Existing third-party licenses are unchanged.
+
+The generic sleep-presentation driver in `src/sleep_cover_runtime.rs` is reused
+from sibling BiliComics revision `9f6b6884f9cc9a080318cff9b3d5e5f2a7f1d632`.
+Its checked presentation/checkpoint ordering, temporary sleep scene, private
+request/ready records, and retained-display wake retry also inform the local
+application and launcher adapters. The protocol is adapted to Aidoku's space
+records and native ownership checks; sibling verification is not Aidoku device
+acceptance. The original Noto, Slint, and backend notices remain applicable.
+
 ## Icons and demo artwork
 
 The interface SVG icons are original drawings made for this implementation from

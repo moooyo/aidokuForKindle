@@ -12,7 +12,7 @@ jobs, then package that exact output from the production source tree:
 ```sh
 python3 scripts/package-kpm.py \
   --application target/armv7-unknown-linux-musleabihf/release/aidoku \
-  --output dist/aidoku-0.1.1.kpkg
+  --output dist/aidoku-0.1.2.kpkg
 ```
 
 The numeric package version comes from `--version`, `CARGO_PKG_VERSION`, or
@@ -37,7 +37,7 @@ For a fresh installation with no Aidoku registration, install the archive with
 the existing KPM installation using a local file URL:
 
 ```sh
-/var/local/kmc/bin/kpm -y install file:///mnt/us/aidoku-0.1.1.kpkg
+/var/local/kmc/bin/kpm -y install file:///mnt/us/aidoku-0.1.2.kpkg
 ```
 
 The installation hook updates only files named by `payload.tsv`; executable and launcher identities
@@ -48,7 +48,7 @@ progress, and a valid device profile remain in place. Only a missing profile
 receives the default `scribe` value. An optional public sample is copied into
 imports only when that import does not already exist.
 
-### Updating this project from 0.1.0 to 0.1.1 on KPM 0.2.2
+### Updating an existing local Aidoku package on KPM 0.2.2
 
 Use a controlled Aidoku-only removal followed by a fresh installation. Official
 KPM 0.2.2 compares an installed package id with the raw `file://` target before
@@ -78,7 +78,7 @@ are absent, and other installed packages are unchanged. Then install the new
 local package:
 
 ```sh
-/var/local/kmc/bin/kpm -y install file:///mnt/us/aidoku-0.1.1.kpkg
+/var/local/kmc/bin/kpm -y install file:///mnt/us/aidoku-0.1.2.kpkg
 ```
 
 Aidoku's owned uninstall removes only unchanged program files named by its

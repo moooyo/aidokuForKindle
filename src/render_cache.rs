@@ -1,7 +1,9 @@
-//! Bounded, persistent screen-sized grayscale rendering for background workers.
+//! Bounded screen-sized grayscale rendering for background workers.
 //!
 //! The raw artifact remains canonical. A processed PNG is a disposable derivative
-//! containing its own geometry metadata. A small decoded LRU also preserves
+//! containing its own geometry metadata. Reader frames use BiliComics' in-memory
+//! Raster preparation and never wait for derivative encoding or publication.
+//! A shared decoded LRU also preserves
 //! prefetched pixels, so a resident viewport needs neither source nor PNG
 //! decoding. Network scheduling and raw-file validation belong to the source
 //! manager, while this module coalesces identical cold renders.
@@ -21,7 +23,7 @@ use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
 
 use crate::{
-    cache::{CacheManager, CacheWrite, RenderKey},
+    cache::{CacheLease, CacheManager, CacheWrite, RenderKey},
     domain::Page,
     imaging::{self, ImageOptions, MAX_DECODE_BYTES, MAX_PAGE_BYTES, MAX_PAGE_PIXELS},
 };
@@ -31,6 +33,7 @@ const METADATA_KEY: &str = "AidokuRender";
 const MAX_METADATA_BYTES: usize = 2_048;
 const MAX_TARGET_SIDE: u32 = 8_192;
 const WRITE_BUFFER_BYTES: usize = 64 * 1024;
+const READER_RASTER_VERSION: &str = "bili-triangle-bayer-raster-v1";
 /// Retained grayscale buffers only. Live readers can keep an evicted Arc alive;
 /// diagnostics report those output buffers separately from the retained budget.
 pub const DECODED_CACHE_BYTES: usize = 12 * 1024 * 1024;
@@ -72,10 +75,190 @@ pub struct RenderedPage {
     pub viewport_height: u32,
     pub cache_hit: bool,
     pub memory_hit: bool,
+    /// The source identity that produced these pixels, never a later snapshot.
+    pub source_proof: Option<SourceProof>,
+    /// Full-raster pixels and their sealed key before any caller selects a half.
+    pub retained_raster: Option<RetainedRaster>,
 }
 
-/// Counters cover this process's rendered grayscale outputs, not source decoder
-/// scratch space, the UI's RGB buffer, or total resident memory.
+/// A completed Reader raster that can move from the bounded next-frame slot
+/// into the existing grayscale LRU. Its key and pixels cannot be substituted
+/// independently, including when a caller crops the public display image.
+#[derive(Clone)]
+pub struct RetainedRaster {
+    key: DecodedKey,
+    image: Arc<GrayImage>,
+    cache_path: PathBuf,
+    scaled_height: u32,
+    viewport_height: u32,
+    proof: SourceProof,
+    source: Option<(SourceKey, imaging::ReaderSource)>,
+}
+
+impl std::fmt::Debug for RetainedRaster {
+    fn fmt(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        formatter
+            .debug_struct("RetainedRaster")
+            .field("dimensions", &self.image.dimensions())
+            .field("retained_bytes", &self.retained_bytes())
+            .finish_non_exhaustive()
+    }
+}
+
+impl RetainedRaster {
+    fn new(
+        key: DecodedKey,
+        page: &RenderedPage,
+        proof: SourceProof,
+        mut source: Option<(SourceKey, imaging::ReaderSource)>,
+    ) -> Self {
+        if source.as_ref().is_some_and(|(_, source)| {
+            source.allocation_bytes()
+                > DECODED_CACHE_BYTES.saturating_sub(page.image.as_raw().capacity())
+        }) {
+            // A source that cannot be admitted with its viewport has no reuse
+            // benefit in this pool. Do not retain it in the next-frame budget.
+            source = None;
+        }
+        Self {
+            key,
+            image: page.image.clone(),
+            cache_path: page.cache_path.clone(),
+            scaled_height: page.scaled_height,
+            viewport_height: page.viewport_height,
+            proof,
+            source,
+        }
+    }
+
+    pub fn retained_bytes(&self) -> usize {
+        Self::unique_retained_bytes(std::slice::from_ref(self))
+    }
+
+    /// Count each immutable pixel allocation once across a spread or clones.
+    pub fn unique_retained_bytes(rasters: &[Self]) -> usize {
+        let mut allocations = HashMap::new();
+        for raster in rasters {
+            allocations.insert(
+                Arc::as_ptr(&raster.image) as usize,
+                raster.image.as_raw().capacity(),
+            );
+            if let Some((_, source)) = &raster.source {
+                allocations.insert(source.allocation_identity(), source.allocation_bytes());
+            }
+        }
+        allocations
+            .values()
+            .copied()
+            .fold(0_usize, usize::saturating_add)
+    }
+
+    /// Move valid pixels into the history LRU without source I/O. The caller
+    /// must freshly verify every frame SourceProof before publishing the frame.
+    /// Cache admission itself grants no permission to skip future verification.
+    pub fn promote(&self, cache: &CacheManager) -> Result<()> {
+        ensure!(
+            self.key.namespace == cache.namespace(),
+            "The retained Raster belongs to another data directory"
+        );
+        decoded(|state| self.promote_into(state));
+        Ok(())
+    }
+
+    fn promote_into(&self, state: &mut DecodedCache) {
+        let page = RenderedPage {
+            image: self.image.clone(),
+            cache_path: self.cache_path.clone(),
+            scaled_height: self.scaled_height,
+            viewport_height: self.viewport_height,
+            cache_hit: true,
+            memory_hit: true,
+            source_proof: Some(self.proof.clone()),
+            retained_raster: None,
+        };
+        if let Some((key, source)) = &self.source {
+            state.remember_source(key.clone(), source.clone(), self.image.as_raw().capacity());
+        }
+        state.remember(
+            self.key.clone(),
+            &page,
+            self.proof.checksum.clone(),
+            RenderPurpose::Foreground,
+        );
+    }
+}
+
+/// A sealed identity of the encoded source used to prepare a complete frame.
+/// Metadata alone cannot validate a mutable local file. A ready-frame worker
+/// must call verify() before reusing its pixels for a later Reader request.
+#[derive(Debug, Clone)]
+pub struct SourceProof {
+    requested_path: PathBuf,
+    source_path: PathBuf,
+    checksum: String,
+    bytes: u64,
+    page: Page,
+    page_identity: String,
+}
+
+impl SourceProof {
+    pub fn source_path(&self) -> &Path {
+        &self.source_path
+    }
+
+    pub fn matches_page(&self, page: &Page) -> bool {
+        self.page_identity == CacheManager::page_key(page)
+    }
+
+    /// Keep a managed source from being evicted while a bounded next frame owns
+    /// it. External source files remain mutable and still require verify().
+    pub fn lease_source(&self, cache: &CacheManager) -> Result<CacheLease> {
+        cache.lease_path(&self.source_path)
+    }
+
+    pub fn verify(&self, cache: &CacheManager) -> Result<bool> {
+        imaging::check_decode_cancelled()?;
+        let Ok(path) = fs::canonicalize(&self.requested_path) else {
+            return Ok(false);
+        };
+        if path != self.source_path || !self.matches_page(&self.page) {
+            return Ok(false);
+        }
+        let Ok(metadata) = fs::metadata(&path) else {
+            return Ok(false);
+        };
+        if !metadata.is_file() || metadata.len() != self.bytes {
+            return Ok(false);
+        }
+        // CacheManager freshly hashes external bytes and applies its validated
+        // private-artifact identity checks to atomically published cache files.
+        let Ok(checksum) = cache.fingerprint(&path) else {
+            return Ok(false);
+        };
+        imaging::check_decode_cancelled()?;
+        Ok(checksum == self.checksum
+            && self.matches_page(&self.page)
+            && fs::canonicalize(&self.requested_path)
+                .is_ok_and(|current| current == self.source_path))
+    }
+
+    fn for_source(page: &Page, raw: &Path, checksum: &str, bytes: u64) -> Result<Self> {
+        let requested_path =
+            std::path::absolute(raw).context("Resolve the requested Reader source path")?;
+        Ok(Self {
+            source_path: fs::canonicalize(&requested_path)
+                .context("Resolve the prepared Reader source")?,
+            requested_path,
+            checksum: checksum.into(),
+            bytes,
+            page: page.clone(),
+            page_identity: CacheManager::page_key(page),
+        })
+    }
+}
+
+/// Counters cover retained grayscale outputs and immutable vertical sources,
+/// not decoder scratch space, the UI's RGB buffer, or total resident memory.
 #[derive(Debug, Clone, Default, Serialize)]
 pub struct RenderStats {
     pub foreground_requests: u64,
@@ -85,6 +268,16 @@ pub struct RenderStats {
     pub prefetch_memory_hits: u64,
     pub disk_hits: u64,
     pub cold_renders: u64,
+    pub raster_requests: u64,
+    pub raster_cold_renders: u64,
+    pub raster_memory_hits: u64,
+    pub raster_persistence_skips: u64,
+    pub source_memory_hits: u64,
+    pub source_cold_decodes: u64,
+    pub source_memory_entries: u64,
+    pub source_memory_bytes: u64,
+    pub source_memory_evictions: u64,
+    pub source_oversized_skips: u64,
     /// Full-output processed PNG decode attempts. Row validation is separate.
     pub processed_decodes: u64,
     pub processed_decode_failures: u64,
@@ -110,10 +303,36 @@ struct DecodedKey {
     render: RenderKey,
 }
 
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+struct SourceKey {
+    namespace: PathBuf,
+    checksum: String,
+    encoded_bytes: u64,
+}
+
+struct SourceEntry {
+    source: imaging::ReaderSource,
+    bytes: usize,
+    access: u64,
+}
+
 #[derive(Clone, Copy, PartialEq, Eq)]
 enum RenderPurpose {
     Foreground,
     Prefetch,
+}
+
+#[derive(Clone, Copy, PartialEq, Eq)]
+enum RenderMode {
+    Persistent,
+    ReaderRaster,
+    ReaderNextFrame,
+}
+
+impl RenderMode {
+    fn is_reader(self) -> bool {
+        self != Self::Persistent
+    }
 }
 
 struct DecodedEntry {
@@ -132,6 +351,7 @@ struct LiveOutput {
 #[derive(Default)]
 struct DecodedCache {
     entries: HashMap<DecodedKey, DecodedEntry>,
+    sources: HashMap<SourceKey, SourceEntry>,
     bytes: usize,
     access: u64,
     live: Vec<LiveOutput>,
@@ -139,6 +359,96 @@ struct DecodedCache {
 }
 
 impl DecodedCache {
+    fn remove_source(&mut self, key: &SourceKey) -> bool {
+        if let Some(entry) = self.sources.remove(key) {
+            self.bytes -= entry.bytes;
+            return true;
+        }
+        false
+    }
+
+    fn evict_oldest(&mut self) -> bool {
+        let output = self
+            .entries
+            .iter()
+            .min_by_key(|(_, entry)| entry.access)
+            .map(|(key, entry)| (key.clone(), entry.access));
+        let source = self
+            .sources
+            .iter()
+            .min_by_key(|(_, entry)| entry.access)
+            .map(|(key, entry)| (key.clone(), entry.access));
+        match (output, source) {
+            (Some((_, access)), Some((source, source_access))) if source_access < access => {
+                self.remove_source(&source);
+                self.stats.source_memory_evictions += 1;
+            }
+            (Some((key, _)), _) => {
+                self.remove(&key);
+            }
+            (None, Some((key, _))) => {
+                self.remove_source(&key);
+                self.stats.source_memory_evictions += 1;
+            }
+            (None, None) => return false,
+        }
+        self.stats.memory_evictions += 1;
+        true
+    }
+
+    fn lookup_source(&mut self, key: &SourceKey) -> Option<imaging::ReaderSource> {
+        let entry = self.sources.get_mut(key)?;
+        self.access = self.access.saturating_add(1);
+        entry.access = self.access;
+        self.stats.source_memory_hits += 1;
+        Some(entry.source.clone())
+    }
+
+    fn peek_source(&mut self, key: &SourceKey) -> Option<imaging::ReaderSource> {
+        let source = self.sources.get(key)?.source.clone();
+        self.stats.source_memory_hits += 1;
+        Some(source)
+    }
+
+    fn remember_source(
+        &mut self,
+        key: SourceKey,
+        source: imaging::ReaderSource,
+        viewport_bytes: usize,
+    ) {
+        let bytes = source.allocation_bytes();
+        let (width, height) = source.dimensions();
+        if width == 0
+            || height == 0
+            || u64::from(width) * u64::from(height) > MAX_PAGE_PIXELS
+            || key.encoded_bytes == 0
+            || key.encoded_bytes > MAX_PAGE_BYTES
+            || bytes > DECODED_CACHE_BYTES.saturating_sub(viewport_bytes)
+        {
+            self.stats.source_oversized_skips += 1;
+            return;
+        }
+        self.remove_source(&key);
+        while bytes > DECODED_CACHE_BYTES.saturating_sub(self.bytes)
+            || self.entries.len() + self.sources.len() >= MAX_DECODED_ENTRIES
+        {
+            if !self.evict_oldest() {
+                break;
+            }
+        }
+        self.access = self.access.saturating_add(1);
+        self.bytes += bytes;
+        self.stats.peak_memory_bytes = self.stats.peak_memory_bytes.max(self.bytes as u64);
+        self.sources.insert(
+            key,
+            SourceEntry {
+                source,
+                bytes,
+                access: self.access,
+            },
+        );
+    }
+
     fn remove(&mut self, key: &DecodedKey) -> bool {
         if let Some(entry) = self.entries.remove(key) {
             self.bytes -= entry.bytes;
@@ -183,6 +493,22 @@ impl DecodedCache {
         Some(page)
     }
 
+    fn peek(&mut self, key: &DecodedKey, path: &Path, checksum: &str) -> Option<RenderedPage> {
+        if self
+            .entries
+            .get(key)
+            .is_some_and(|entry| entry.page.cache_path != path || entry.checksum != checksum)
+        {
+            self.invalidate(key);
+        }
+        let mut page = self.entries.get(key)?.page.clone();
+        self.stats.memory_hits += 1;
+        // Speculation reuses pixels without changing the displayed-history LRU.
+        page.cache_hit = true;
+        page.memory_hit = true;
+        Some(page)
+    }
+
     fn remember(
         &mut self,
         key: DecodedKey,
@@ -196,26 +522,25 @@ impl DecodedCache {
             self.stats.oversized_skips += 1;
             return;
         }
-        while self.bytes + bytes > DECODED_CACHE_BYTES || self.entries.len() >= MAX_DECODED_ENTRIES
+        while self.bytes + bytes > DECODED_CACHE_BYTES
+            || self.entries.len() + self.sources.len() >= MAX_DECODED_ENTRIES
         {
-            let Some(oldest) = self
-                .entries
-                .iter()
-                .min_by_key(|(_, entry)| entry.access)
-                .map(|(key, _)| key.clone())
-            else {
+            if !self.evict_oldest() {
                 break;
-            };
-            self.remove(&oldest);
-            self.stats.memory_evictions += 1;
+            }
         }
         self.access = self.access.saturating_add(1);
         self.bytes += bytes;
         self.stats.peak_memory_bytes = self.stats.peak_memory_bytes.max(self.bytes as u64);
+        let mut page = page.clone();
+        // A next-frame handle can also own its unrotated source. Cached output
+        // entries retain only their counted output Arc; sources have their own
+        // counted entry in this same pool.
+        page.retained_raster = None;
         self.entries.insert(
             key,
             DecodedEntry {
-                page: page.clone(),
+                page,
                 checksum,
                 bytes,
                 access: self.access,
@@ -250,7 +575,9 @@ impl DecodedCache {
         let live_bytes = self.live_output_bytes();
         let mut stats = self.stats.clone();
         stats.memory_bytes = self.bytes as u64;
-        stats.memory_entries = self.entries.len() as u64;
+        stats.memory_entries = (self.entries.len() + self.sources.len()) as u64;
+        stats.source_memory_entries = self.sources.len() as u64;
+        stats.source_memory_bytes = self.sources.values().map(|entry| entry.bytes as u64).sum();
         stats.live_output_bytes = live_bytes;
         stats
     }
@@ -280,6 +607,17 @@ pub fn clear_memory(cache: &CacheManager) {
             .collect::<Vec<_>>();
         for key in keys {
             state.invalidate(&key);
+        }
+        let sources = state
+            .sources
+            .keys()
+            .filter(|key| key.namespace == cache.namespace())
+            .cloned()
+            .collect::<Vec<_>>();
+        for key in sources {
+            if state.remove_source(&key) {
+                state.stats.memory_invalidations += 1;
+            }
         }
     });
 }
@@ -416,6 +754,112 @@ pub fn render(
     )
 }
 
+/// Prepare the Reader's BiliComics Raster in memory. The canonical source and a
+/// proof tied to its decoded bytes accompany the frame; no processed PNG is
+/// encoded, inflated again or committed before display.
+pub fn render_raster(
+    cache: &CacheManager,
+    page: &Page,
+    raw: &Path,
+    options: &ImageOptions,
+    vertical: bool,
+    offset: u32,
+    zoom: f32,
+) -> Result<RenderedPage> {
+    render_for_purpose(
+        cache,
+        page,
+        raw,
+        options,
+        vertical,
+        offset,
+        zoom,
+        RenderPurpose::Foreground,
+        RenderMode::ReaderRaster,
+        read_source,
+    )
+}
+
+pub fn prefetch_raster(
+    cache: &CacheManager,
+    page: &Page,
+    raw: &Path,
+    options: &ImageOptions,
+    vertical: bool,
+    offset: u32,
+    zoom: f32,
+) -> Result<RenderedPage> {
+    imaging::with_background_decode(None, || {
+        render_for_purpose(
+            cache,
+            page,
+            raw,
+            options,
+            vertical,
+            offset,
+            zoom,
+            RenderPurpose::Prefetch,
+            RenderMode::ReaderRaster,
+            read_source,
+        )
+    })
+}
+
+pub fn prefetch_raster_cancellable(
+    cache: &CacheManager,
+    page: &Page,
+    raw: &Path,
+    options: &ImageOptions,
+    vertical: bool,
+    offset: u32,
+    zoom: f32,
+    cancellation: &imaging::DecodeCancellation,
+) -> Result<RenderedPage> {
+    imaging::with_background_decode(Some(cancellation), || {
+        render_for_purpose(
+            cache,
+            page,
+            raw,
+            options,
+            vertical,
+            offset,
+            zoom,
+            RenderPurpose::Prefetch,
+            RenderMode::ReaderRaster,
+            read_source,
+        )
+    })
+}
+
+/// Prepare the nearest private NextFrame without admitting its future pixels
+/// to the displayed-history LRU. The slot accounts for its returned retention
+/// handle; accepting the frame promotes that handle after fresh proof checks.
+pub fn prefetch_next_raster_cancellable(
+    cache: &CacheManager,
+    page: &Page,
+    raw: &Path,
+    options: &ImageOptions,
+    vertical: bool,
+    offset: u32,
+    zoom: f32,
+    cancellation: &imaging::DecodeCancellation,
+) -> Result<RenderedPage> {
+    imaging::with_background_decode(Some(cancellation), || {
+        render_for_purpose(
+            cache,
+            page,
+            raw,
+            options,
+            vertical,
+            offset,
+            zoom,
+            RenderPurpose::Prefetch,
+            RenderMode::ReaderNextFrame,
+            read_source,
+        )
+    })
+}
+
 /// Prepare the same output as render(), preserving it for later display when it
 /// fits the decoded budget. The return value also allows explicit pinning by a
 /// bounded caller; the LRU itself never leases the disk artifact.
@@ -438,6 +882,7 @@ pub fn prefetch(
             offset,
             zoom,
             RenderPurpose::Prefetch,
+            RenderMode::Persistent,
             read_source,
         )
     })
@@ -465,6 +910,7 @@ pub fn prefetch_cancellable(
             offset,
             zoom,
             RenderPurpose::Prefetch,
+            RenderMode::Persistent,
             read_source,
         )
     })
@@ -489,6 +935,7 @@ fn render_with_source(
         offset,
         zoom,
         RenderPurpose::Foreground,
+        RenderMode::Persistent,
         source,
     )
 }
@@ -502,6 +949,7 @@ fn render_for_purpose(
     offset: u32,
     zoom: f32,
     purpose: RenderPurpose,
+    mode: RenderMode,
     source: impl FnOnce(&Path) -> Result<Vec<u8>>,
 ) -> Result<RenderedPage> {
     imaging::check_decode_cancelled()?;
@@ -509,6 +957,9 @@ fn render_for_purpose(
         RenderPurpose::Foreground => state.stats.foreground_requests += 1,
         RenderPurpose::Prefetch => state.stats.prefetch_requests += 1,
     });
+    if mode.is_reader() {
+        decoded(|state| state.stats.raster_requests += 1);
+    }
     check_options(options)?;
     let zoom_milli = normalize_zoom(zoom)?;
     let _raw_lease = cache.lease_path(raw)?;
@@ -518,8 +969,14 @@ fn render_for_purpose(
         "The raw comic is empty or exceeds the compressed-image limit"
     );
     let source_checksum = cache.fingerprint(raw)?;
+    let source_proof = SourceProof::for_source(page, raw, &source_checksum, metadata.len())?;
+    let source_key = format!("{}:{source_checksum}", CacheManager::page_key(page));
     let key = RenderKey {
-        source_key: format!("{}:{source_checksum}", CacheManager::page_key(page)),
+        source_key: if mode.is_reader() {
+            format!("{READER_RASTER_VERSION}:{source_key}")
+        } else {
+            source_key
+        },
         width: options.width,
         height: options.height,
         crop_borders: options.crop_borders,
@@ -533,13 +990,42 @@ fn render_for_purpose(
         namespace: cache.namespace().to_path_buf(),
         render: key.clone(),
     };
-    if let Some(rendered) = lookup(cache, &decoded_key, purpose)? {
+    let lookup_frame = || -> Result<Option<RenderedPage>> {
+        if mode.is_reader() {
+            let frame = decoded(|state| {
+                if mode == RenderMode::ReaderNextFrame {
+                    state.peek(&decoded_key, raw, &source_checksum)
+                } else {
+                    state.lookup(&decoded_key, raw, &source_checksum, purpose)
+                }
+            });
+            if frame.is_some() {
+                decoded(|state| state.stats.raster_memory_hits += 1);
+            }
+            Ok(frame)
+        } else {
+            lookup(cache, &decoded_key, purpose)
+        }
+    };
+    if let Some(mut rendered) = lookup_frame()? {
+        if rendered.source_proof.is_none() {
+            rendered.source_proof = Some(source_proof);
+        }
+        if mode == RenderMode::ReaderNextFrame {
+            attach_retained_raster(&decoded_key, &mut rendered, None);
+        }
         return Ok(rendered);
     }
 
     let gate = render_gate(&decoded_key)?;
     let _render_guard = lock_render_gate(&gate)?;
-    if let Some(rendered) = lookup(cache, &decoded_key, purpose)? {
+    if let Some(mut rendered) = lookup_frame()? {
+        if rendered.source_proof.is_none() {
+            rendered.source_proof = Some(source_proof);
+        }
+        if mode == RenderMode::ReaderNextFrame {
+            attach_retained_raster(&decoded_key, &mut rendered, None);
+        }
         return Ok(rendered);
     }
 
@@ -550,14 +1036,52 @@ fn render_for_purpose(
         "The raw comic changed beyond the compressed-image limit"
     );
     ensure!(
+        format!("{:x}", Sha256::digest(&bytes)) == source_checksum,
+        "The decoded source bytes do not match the prepared image identity"
+    );
+    ensure!(
         cache.fingerprint(raw)? == source_checksum,
         "The source image changed while preparing the rendered page"
     );
+    let mut retained_source = None;
     let (image, scaled_height, viewport_height) = if vertical {
-        let window = imaging::render_vertical_window_with_geometry(&bytes, options, offset)?;
+        let window = if mode.is_reader() {
+            // BiliComics retains an immutable unrotated grayscale source for
+            // adjacent windows. Share this module's existing 12 MiB pool: an
+            // ordinary page never inserts its much larger source bitmap.
+            let source_key = SourceKey {
+                namespace: cache.namespace().to_path_buf(),
+                checksum: source_checksum.clone(),
+                encoded_bytes: bytes.len() as u64,
+            };
+            let source = decoded(|state| {
+                if mode == RenderMode::ReaderNextFrame {
+                    state.peek_source(&source_key)
+                } else {
+                    state.lookup_source(&source_key)
+                }
+            });
+            let cold = source.is_none();
+            let (window, source) =
+                imaging::render_vertical_raster_with_source(&bytes, options, offset, source)?;
+            if let Some(source) = source {
+                if cold {
+                    decoded(|state| state.stats.source_cold_decodes += 1);
+                }
+                retained_source = Some((source_key, source));
+            }
+            window
+        } else {
+            imaging::render_vertical_window_with_geometry(&bytes, options, offset)?
+        };
         (window.image, window.scaled_height, window.viewport_height)
     } else {
-        (imaging::decode_page(&bytes, options)?, 0, 0)
+        let image = if mode.is_reader() {
+            imaging::decode_reader_raster(&bytes, options)?
+        } else {
+            imaging::decode_page(&bytes, options)?
+        };
+        (image, 0, 0)
     };
     drop(bytes);
     let image = Arc::new(zoom_image(image, zoom_milli));
@@ -565,6 +1089,33 @@ fn render_for_purpose(
         state.stats.cold_renders += 1;
         state.track_output(&image);
     });
+    if mode.is_reader() {
+        let mut rendered = RenderedPage {
+            image,
+            cache_path: raw.to_path_buf(),
+            scaled_height,
+            viewport_height,
+            cache_hit: false,
+            memory_hit: false,
+            source_proof: Some(source_proof),
+            retained_raster: None,
+        };
+        decoded(|state| {
+            state.stats.raster_cold_renders += 1;
+            state.stats.raster_persistence_skips += 1;
+        });
+        if mode == RenderMode::ReaderNextFrame {
+            attach_retained_raster(&decoded_key, &mut rendered, retained_source);
+            return Ok(rendered);
+        }
+        decoded(|state| {
+            if let Some((key, source)) = retained_source {
+                state.remember_source(key, source, rendered.image.as_raw().capacity());
+            }
+            state.remember(decoded_key, &rendered, source_checksum, purpose);
+        });
+        return Ok(rendered);
+    }
     let metadata = Metadata {
         version: FORMAT_VERSION,
         key: key_digest(&key)?,
@@ -594,11 +1145,40 @@ fn render_for_purpose(
         viewport_height,
         cache_hit: false,
         memory_hit: false,
+        source_proof: Some(source_proof),
+        retained_raster: None,
     };
     if persisted {
         remember(cache, decoded_key, &rendered, purpose);
     }
     Ok(rendered)
+}
+
+fn attach_retained_raster(
+    key: &DecodedKey,
+    page: &mut RenderedPage,
+    source: Option<(SourceKey, imaging::ReaderSource)>,
+) {
+    let Some(proof) = page.source_proof.clone() else {
+        return;
+    };
+    let source = source.or_else(|| {
+        if !key.render.vertical {
+            return None;
+        }
+        let source_key = SourceKey {
+            namespace: key.namespace.clone(),
+            checksum: proof.checksum.clone(),
+            encoded_bytes: proof.bytes,
+        };
+        decoded(|state| {
+            state
+                .sources
+                .get(&source_key)
+                .map(|entry| (source_key.clone(), entry.source.clone()))
+        })
+    });
+    page.retained_raster = Some(RetainedRaster::new(key.clone(), page, proof, source));
 }
 
 fn lock_render_gate(gate: &Mutex<()>) -> Result<MutexGuard<'_, ()>> {
@@ -809,6 +1389,15 @@ impl Write for ReservedWriter<'_> {
 }
 
 fn encode(write: &mut CacheWrite, image: &GrayImage, metadata: &Metadata) -> Result<()> {
+    encode_with_compression(write, image, metadata, None)
+}
+
+fn encode_with_compression(
+    write: &mut CacheWrite,
+    image: &GrayImage,
+    metadata: &Metadata,
+    compression: Option<png::Compression>,
+) -> Result<()> {
     let file = OpenOptions::new()
         .write(true)
         .truncate(true)
@@ -823,6 +1412,12 @@ fn encode(write: &mut CacheWrite, image: &GrayImage, metadata: &Metadata) -> Res
     let mut encoder = png::Encoder::new(&mut output, image.width(), image.height());
     encoder.set_color(png::ColorType::Grayscale);
     encoder.set_depth(png::BitDepth::Eight);
+    // Cover and download derivatives retain their established durable codec.
+    // Reader Raster frames never enter this encoder. The optional compression
+    // parameter supports an isolated, lossless comparison in the opt-in profile.
+    if let Some(compression) = compression {
+        encoder.set_compression(compression);
+    }
     encoder
         .add_text_chunk(METADATA_KEY.into(), serde_json::to_string(metadata)?)
         .context("Write the rendered geometry metadata")?;
@@ -1008,6 +1603,8 @@ fn decode_processed_inner(path: &Path, key: &RenderKey) -> Result<RenderedPage> 
         viewport_height: metadata.viewport_height,
         cache_hit: true,
         memory_hit: false,
+        source_proof: None,
+        retained_raster: None,
     })
 }
 
@@ -1128,6 +1725,522 @@ mod tests {
                 ((x * 7 + y * 13) % 247) as u8
             }])
         })
+    }
+
+    #[test]
+    fn reader_raster_reuses_prefetched_pixels_without_processed_publication() {
+        let fixture = Fixture::new(artwork());
+        let original = fs::read(&fixture.raw).unwrap();
+        let expected = imaging::decode_reader_raster(&original, &options()).unwrap();
+        let prepared = prefetch_raster(
+            &fixture.cache,
+            &fixture.page,
+            &fixture.raw,
+            &options(),
+            false,
+            0,
+            1.0,
+        )
+        .unwrap();
+        assert_eq!(*prepared.image, expected);
+        assert_eq!(prepared.cache_path, fixture.raw);
+        assert!(!prepared.cache_hit);
+        assert!(
+            prepared
+                .source_proof
+                .as_ref()
+                .unwrap()
+                .verify(&fixture.cache)
+                .unwrap()
+        );
+        assert_eq!(fixture.cache.stats().commits, 0);
+        assert_eq!(fixture.cache.stats().entries, 0);
+        RENDER_WORK.with(|work| work.set(RenderWork::default()));
+        let foreground = render_for_purpose(
+            &fixture.cache,
+            &fixture.page,
+            &fixture.raw,
+            &options(),
+            false,
+            0,
+            1.0,
+            RenderPurpose::Foreground,
+            RenderMode::ReaderRaster,
+            |_| panic!("A ready Raster must not read or decode its original again"),
+        )
+        .unwrap();
+        assert!(foreground.memory_hit && foreground.cache_hit);
+        assert!(Arc::ptr_eq(&prepared.image, &foreground.image));
+        assert_eq!(
+            RENDER_WORK.with(std::cell::Cell::get),
+            RenderWork {
+                prefetch_memory_hits: 1,
+                ..RenderWork::default()
+            }
+        );
+        assert_eq!(fixture.cache.stats().commits, 0);
+        assert_eq!(fs::read(&fixture.raw).unwrap(), original);
+    }
+
+    #[test]
+    fn private_next_raster_stays_out_of_history_until_promoted() {
+        let fixture = Fixture::new(artwork());
+        let cancellation = imaging::DecodeCancellation::new();
+        let prepared = prefetch_next_raster_cancellable(
+            &fixture.cache,
+            &fixture.page,
+            &fixture.raw,
+            &options(),
+            false,
+            0,
+            1.0,
+            &cancellation,
+        )
+        .unwrap();
+        assert!(prepared.retained_raster.is_some());
+        assert!(decoded(|state| !state
+            .entries
+            .keys()
+            .any(|key| key.namespace == fixture.cache.namespace())));
+        assert!(
+            prepared
+                .source_proof
+                .as_ref()
+                .unwrap()
+                .verify(&fixture.cache)
+                .unwrap()
+        );
+        let retained = prepared.retained_raster.as_ref().unwrap();
+        assert_eq!(
+            RetainedRaster::unique_retained_bytes(&[retained.clone(), retained.clone()]),
+            prepared.image.as_raw().capacity()
+        );
+        retained.promote(&fixture.cache).unwrap();
+        let foreground = render_for_purpose(
+            &fixture.cache,
+            &fixture.page,
+            &fixture.raw,
+            &options(),
+            false,
+            0,
+            1.0,
+            RenderPurpose::Foreground,
+            RenderMode::ReaderRaster,
+            |_| panic!("A promoted full Raster must not decode its original"),
+        )
+        .unwrap();
+        assert!(foreground.memory_hit);
+        assert!(foreground.retained_raster.is_none());
+        assert!(Arc::ptr_eq(&foreground.image, &prepared.image));
+        assert!(decoded(|state| state
+            .entries
+            .values()
+            .all(|entry| entry.page.retained_raster.is_none())));
+        assert_eq!(fixture.cache.stats().commits, 0);
+    }
+
+    #[test]
+    fn reader_raster_version_isolated_from_persistent_rendering() {
+        let fixture = Fixture::new(artwork());
+        let mut settings = options();
+        settings.dither = true;
+        let persistent = render(
+            &fixture.cache,
+            &fixture.page,
+            &fixture.raw,
+            &settings,
+            false,
+            0,
+            1.0,
+        )
+        .unwrap();
+        let committed = fixture.cache.stats().commits;
+        let raster = render_raster(
+            &fixture.cache,
+            &fixture.page,
+            &fixture.raw,
+            &settings,
+            false,
+            0,
+            1.0,
+        )
+        .unwrap();
+        assert_eq!(fixture.cache.stats().commits, committed);
+        assert_ne!(persistent.cache_path, raster.cache_path);
+        assert_eq!(raster.cache_path, fixture.raw);
+        assert_eq!(
+            *raster.image,
+            imaging::decode_reader_raster(&fs::read(&fixture.raw).unwrap(), &settings).unwrap()
+        );
+        assert_ne!(persistent.image, raster.image);
+        clear_memory(&fixture.cache);
+        let restored = render(
+            &fixture.cache,
+            &fixture.page,
+            &fixture.raw,
+            &settings,
+            false,
+            0,
+            1.0,
+        )
+        .unwrap();
+        assert!(restored.cache_hit);
+        assert_eq!(persistent.image, restored.image);
+        let rebuilt = render_raster(
+            &fixture.cache,
+            &fixture.page,
+            &fixture.raw,
+            &settings,
+            false,
+            0,
+            1.0,
+        )
+        .unwrap();
+        assert!(!rebuilt.cache_hit);
+        assert_eq!(raster.image, rebuilt.image);
+    }
+
+    #[test]
+    fn reader_raster_proof_rejects_source_changes_and_removal() {
+        let fixture = Fixture::new(artwork());
+        let raster = render_raster(
+            &fixture.cache,
+            &fixture.page,
+            &fixture.raw,
+            &options(),
+            false,
+            0,
+            1.0,
+        )
+        .unwrap();
+        let proof = raster.source_proof.unwrap();
+        assert_eq!(proof.source_path(), fs::canonicalize(&fixture.raw).unwrap());
+        assert!(proof.matches_page(&fixture.page));
+        assert!(proof.verify(&fixture.cache).unwrap());
+        let metadata = fs::metadata(&fixture.raw).unwrap();
+        let mut changed = fs::read(&fixture.raw).unwrap();
+        let middle = changed.len() / 2;
+        changed[middle] ^= 0x40;
+        fs::write(&fixture.raw, changed).unwrap();
+        let file = File::options().write(true).open(&fixture.raw).unwrap();
+        file.set_times(fs::FileTimes::new().set_modified(metadata.modified().unwrap()))
+            .unwrap();
+        assert!(!proof.verify(&fixture.cache).unwrap());
+        fs::remove_file(&fixture.raw).unwrap();
+        assert!(!proof.verify(&fixture.cache).unwrap());
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn reader_raster_proof_rejects_retargeted_raw_alias() {
+        let fixture = Fixture::new(artwork());
+        let alias = fixture.directory.path().join("reader-alias.png");
+        let replacement = fixture.directory.path().join("replacement.png");
+        GrayImage::from_pixel(96, 384, Luma([153]))
+            .save(&replacement)
+            .unwrap();
+        std::os::unix::fs::symlink(&fixture.raw, &alias).unwrap();
+        let page = Page {
+            url: "https://example.test/reader-alias.png".into(),
+            local_path: Some(alias.clone()),
+            ..Page::default()
+        };
+        let raster =
+            render_raster(&fixture.cache, &page, &alias, &options(), false, 0, 1.0).unwrap();
+        let proof = raster.source_proof.unwrap();
+        assert!(proof.verify(&fixture.cache).unwrap());
+        fs::remove_file(&alias).unwrap();
+        std::os::unix::fs::symlink(&replacement, &alias).unwrap();
+        assert!(proof.matches_page(&page));
+        assert!(!proof.verify(&fixture.cache).unwrap());
+    }
+
+    #[test]
+    fn vertical_raster_cache_reuses_sources_and_rejects_changed_encoded_identity() {
+        let fixture = Fixture::new(GrayImage::from_fn(64, 500, |x, y| {
+            Luma([((x * 3 + y / 2) % 247) as u8])
+        }));
+        let settings = ImageOptions {
+            width: 128,
+            height: 100,
+            ..options()
+        };
+        let first = render_raster(
+            &fixture.cache,
+            &fixture.page,
+            &fixture.raw,
+            &settings,
+            true,
+            0,
+            1.0,
+        )
+        .unwrap();
+        let source_key = SourceKey {
+            namespace: fixture.cache.namespace().to_path_buf(),
+            checksum: fixture.cache.fingerprint(&fixture.raw).unwrap(),
+            encoded_bytes: fs::metadata(&fixture.raw).unwrap().len(),
+        };
+        let source = decoded(|state| state.sources.get(&source_key).unwrap().source.clone());
+        let second = render_raster(
+            &fixture.cache,
+            &fixture.page,
+            &fixture.raw,
+            &settings,
+            true,
+            85,
+            1.0,
+        )
+        .unwrap();
+        let reused = decoded(|state| state.sources.get(&source_key).unwrap().source.clone());
+        assert!(source.same_allocation(&reused));
+        assert_ne!(first.image, second.image);
+        assert_eq!(first.scaled_height, second.scaled_height);
+        GrayImage::from_fn(64, 500, |x, y| Luma([((x * 11 + y / 7 + 37) % 247) as u8]))
+            .save(&fixture.raw)
+            .unwrap();
+        let replacement = render_raster(
+            &fixture.cache,
+            &fixture.page,
+            &fixture.raw,
+            &settings,
+            true,
+            85,
+            1.0,
+        )
+        .unwrap();
+        assert_ne!(replacement.image, second.image);
+        assert!(!second.source_proof.unwrap().verify(&fixture.cache).unwrap());
+        assert!(
+            replacement
+                .source_proof
+                .as_ref()
+                .unwrap()
+                .verify(&fixture.cache)
+                .unwrap()
+        );
+        let expected = imaging::render_vertical_raster_with_geometry(
+            &fs::read(&fixture.raw).unwrap(),
+            &settings,
+            85,
+        )
+        .unwrap();
+        assert_eq!(*replacement.image, expected.image);
+        assert_eq!(fixture.cache.stats().commits, 0);
+        assert!(decoded(|state| state.bytes <= DECODED_CACHE_BYTES));
+        clear_memory(&fixture.cache);
+        assert!(decoded(|state| !state
+            .sources
+            .keys()
+            .any(|key| key.namespace == fixture.cache.namespace())));
+    }
+
+    #[test]
+    fn source_and_viewport_arcs_share_one_existing_decoded_budget() {
+        let mut memory = DecodedCache::default();
+        let (old_key, old) = decoded_fixture("old-viewport", GrayImage::new(2_048, 2_048));
+        memory.remember(
+            old_key.clone(),
+            &old,
+            "old".into(),
+            RenderPurpose::Foreground,
+        );
+        let mut allocation = Vec::with_capacity(8 * 1024 * 1024);
+        allocation.push(17);
+        let source =
+            imaging::ReaderSource::from_test_image(GrayImage::from_raw(1, 1, allocation).unwrap());
+        let source_key = SourceKey {
+            namespace: PathBuf::from("memory-test"),
+            checksum: "sealed-source".into(),
+            encoded_bytes: 1,
+        };
+        let (new_key, viewport) = decoded_fixture("new-viewport", GrayImage::new(2_048, 2_048));
+        memory.remember_source(
+            source_key.clone(),
+            source.clone(),
+            viewport.image.as_raw().capacity(),
+        );
+        memory.remember(
+            new_key.clone(),
+            &viewport,
+            "new".into(),
+            RenderPurpose::Foreground,
+        );
+        assert!(!memory.entries.contains_key(&old_key));
+        assert!(memory.entries.contains_key(&new_key));
+        assert!(source.same_allocation(&memory.sources[&source_key].source));
+        assert_eq!(memory.bytes, DECODED_CACHE_BYTES);
+        memory.remember_source(
+            source_key.clone(),
+            source,
+            viewport.image.as_raw().capacity(),
+        );
+        assert_eq!(memory.bytes, DECODED_CACHE_BYTES);
+        assert_eq!(memory.sources.len(), 1);
+        let mut allocation = Vec::with_capacity(DECODED_CACHE_BYTES + 1);
+        allocation.push(34);
+        let oversized =
+            imaging::ReaderSource::from_test_image(GrayImage::from_raw(1, 1, allocation).unwrap());
+        memory.remember_source(
+            SourceKey {
+                checksum: "oversized".into(),
+                ..source_key
+            },
+            oversized,
+            0,
+        );
+        assert_eq!(memory.bytes, DECODED_CACHE_BYTES);
+        assert_eq!(memory.sources.len(), 1);
+        assert_eq!(memory.stats.source_oversized_skips, 1);
+    }
+
+    fn profile_persistence(
+        cache: &CacheManager,
+        key: &RenderKey,
+        image: &GrayImage,
+        metadata: &Metadata,
+        previous: bool,
+    ) -> Result<(PathBuf, serde_json::Value)> {
+        use crate::imaging::fixture_profile::elapsed_ns;
+
+        let total = Instant::now();
+        let mut write = cache.begin_processed(key, 0)?;
+        let reservation_ns = elapsed_ns(total);
+        let started = Instant::now();
+        if previous {
+            encode(&mut write, image, metadata)?;
+        } else {
+            encode_with_compression(&mut write, image, metadata, Some(png::Compression::Fastest))?;
+        }
+        let encode_ns = elapsed_ns(started);
+        let started = Instant::now();
+        validate_processed(write.temp_path(), key, image.dimensions())?;
+        let complete_validation_ns = elapsed_ns(started);
+        let started = Instant::now();
+        let path = write.commit()?;
+        let commit_ns = elapsed_ns(started);
+        let total_ns = elapsed_ns(total);
+        let bytes = fs::metadata(&path)?.len();
+        Ok((
+            path,
+            serde_json::json!({
+                "reservation_ns": reservation_ns,
+                "encode_ns": encode_ns,
+                "complete_validation_ns": complete_validation_ns,
+                "commit_ns": commit_ns,
+                "total_ns": total_ns,
+                "png_bytes": bytes,
+            }),
+        ))
+    }
+
+    #[test]
+    #[ignore = "Run only on the remote worker with a release build and real fixture manifest"]
+    fn real_reader_processed_png_profile() -> Result<()> {
+        use crate::imaging::fixture_profile::{digest, load, save};
+        use serde_json::json;
+
+        let input = load()?;
+        let _guard = TEST_RENDER_LOCK
+            .lock()
+            .unwrap_or_else(std::sync::PoisonError::into_inner);
+        let mut cases = Vec::new();
+        for case in &input.cases {
+            let bytes = fs::read(&case.path)?;
+            let image = imaging::decode_page(&bytes, &case.options())?;
+            let page = Page {
+                local_path: Some(case.path.clone()),
+                ..Page::default()
+            };
+            let key = RenderKey {
+                source_key: format!("{}:{}", CacheManager::page_key(&page), digest(&bytes)),
+                width: case.target_width,
+                height: case.target_height,
+                crop_borders: case.crop_borders,
+                dither: case.dither,
+                contrast: case.contrast,
+                vertical: false,
+                offset: 0,
+                zoom_milli: 1_000,
+            };
+            let metadata = Metadata {
+                version: FORMAT_VERSION,
+                key: key_digest(&key)?,
+                render_key: Some(key.clone()),
+                scaled_height: 0,
+                viewport_height: 0,
+            };
+            let directory = tempfile::tempdir()?;
+            // Both variants use the ordinary production disk policy. The
+            // fixture never increases a cache, source or decoder memory limit.
+            let caches = [
+                CacheManager::open(directory.path().join("previous"))?,
+                CacheManager::open(directory.path().join("production"))?,
+            ];
+            for (index, cache) in caches.iter().enumerate() {
+                let (path, _) = profile_persistence(cache, &key, &image, &metadata, index == 0)?;
+                let restored = decode_processed_inner(&path, &key)?;
+                ensure!(
+                    *restored.image == image,
+                    "A warmed processed PNG differs for {}",
+                    case.name
+                );
+            }
+            let mut previous = Vec::new();
+            let mut production = Vec::new();
+            let mut order = Vec::new();
+            for sample in 0..input.samples {
+                let pair = if sample % 2 == 0 { [0, 1] } else { [1, 0] };
+                order.push(if pair[0] == 0 { "AB" } else { "BA" });
+                for variant in pair {
+                    let (path, timing) = profile_persistence(
+                        &caches[variant],
+                        &key,
+                        &image,
+                        &metadata,
+                        variant == 0,
+                    )?;
+                    // This full decode is outside the timing window, after the
+                    // production validator and durable commit already finished.
+                    let restored = decode_processed_inner(&path, &key)?;
+                    ensure!(
+                        *restored.image == image
+                            && restored.scaled_height == 0
+                            && restored.viewport_height == 0,
+                        "A sampled processed PNG differs for {}",
+                        case.name
+                    );
+                    if variant == 0 {
+                        previous.push(timing);
+                    } else {
+                        production.push(timing);
+                    }
+                }
+            }
+            cases.push(json!({
+                "case": case,
+                "source_sha256": digest(&bytes),
+                "source_bytes": bytes.len(),
+                "pixel_sha256": digest(image.as_raw()),
+                "output_dimensions": image.dimensions(),
+                "pixel_equal": true,
+                "order": order,
+                "previous": previous,
+                "production": production,
+            }));
+        }
+        save(
+            &input,
+            "processed-png",
+            &json!({
+                "schema_version": 1,
+                "scope": "Release processed PNG encoding, complete staged validation and durable commit on the remote host; excludes source decoding, UI and native display",
+                "comparison": "Unchanged persistent codec versus the isolated Fastest candidate; the production Reader bypasses both, and covers/downloads retain the default codec",
+                "samples_per_variant": input.samples,
+                "disk_policy": CacheConfig::default(),
+                "decoded_output_budget": DECODED_CACHE_BYTES,
+                "cases": cases,
+            }),
+        )
     }
 
     #[test]
@@ -1630,8 +2743,193 @@ mod tests {
             viewport_height: 0,
             cache_hit: false,
             memory_hit: false,
+            source_proof: None,
+            retained_raster: None,
         };
         (key, page)
+    }
+
+    fn retained_fixture(
+        name: &str,
+        image: GrayImage,
+    ) -> (DecodedKey, RenderedPage, RetainedRaster) {
+        let (key, mut page) = decoded_fixture(name, image);
+        // This fixture isolates cache ownership and admission. Codec and fresh
+        // filesystem proof validation are exercised by the real-source tests.
+        let source_page = Page {
+            local_path: Some(page.cache_path.clone()),
+            ..Page::default()
+        };
+        let proof = SourceProof {
+            requested_path: page.cache_path.clone(),
+            source_path: page.cache_path.clone(),
+            checksum: format!("source-{name}"),
+            bytes: 1,
+            page_identity: CacheManager::page_key(&source_page),
+            page: source_page,
+        };
+        page.source_proof = Some(proof.clone());
+        let retained = RetainedRaster::new(key.clone(), &page, proof, None);
+        (key, page, retained)
+    }
+
+    #[test]
+    fn private_native_next_frame_preserves_previous_history_until_consumption() {
+        let mut history = DecodedCache::default();
+        let (key1, page1, first) =
+            retained_fixture("page-one", GrayImage::from_pixel(1_753, 2_480, Luma([34])));
+        let (_, _, second) =
+            retained_fixture("page-two", GrayImage::from_pixel(1_753, 2_480, Luma([68])));
+        let (key3, _, third) = retained_fixture(
+            "page-three",
+            GrayImage::from_pixel(1_753, 2_480, Luma([102])),
+        );
+        let bytes = first.retained_bytes();
+        assert_eq!(bytes, 4_347_440);
+        assert!(bytes * 3 > DECODED_CACHE_BYTES);
+        first.promote_into(&mut history);
+        second.promote_into(&mut history);
+        // The private third frame already exists, but its owner is the 32 MiB
+        // next-frame slot rather than the two-entry grayscale history here.
+        assert!(!history.entries.contains_key(&key3));
+        assert_eq!(history.bytes, bytes * 2);
+        let previous = history
+            .lookup(
+                &key1,
+                &page1.cache_path,
+                &first.proof.checksum,
+                RenderPurpose::Foreground,
+            )
+            .unwrap();
+        assert!(previous.memory_hit);
+        assert!(Arc::ptr_eq(&previous.image, &first.image));
+        assert_eq!(third.retained_bytes(), bytes);
+
+        let mut sequential = DecodedCache::default();
+        first.promote_into(&mut sequential);
+        second.promote_into(&mut sequential);
+        third.promote_into(&mut sequential);
+        assert_eq!(sequential.bytes, bytes * 2);
+        assert!(!sequential.entries.contains_key(&key1));
+        let previous = sequential
+            .lookup(
+                &second.key,
+                &second.cache_path,
+                &second.proof.checksum,
+                RenderPurpose::Foreground,
+            )
+            .unwrap();
+        assert!(previous.memory_hit);
+        assert!(Arc::ptr_eq(&previous.image, &second.image));
+        // A deeper return to page one is an ordinary bounded-cache miss.
+        assert!(
+            sequential
+                .lookup(
+                    &key1,
+                    &page1.cache_path,
+                    &first.proof.checksum,
+                    RenderPurpose::Foreground
+                )
+                .is_none()
+        );
+    }
+
+    #[test]
+    fn retained_full_raster_key_cannot_be_replaced_by_a_display_half() {
+        let mut history = DecodedCache::default();
+        let (key, mut public_page, retained) = retained_fixture(
+            "full-wide",
+            GrayImage::from_fn(7, 4, |x, y| Luma([(x + y * 17) as u8])),
+        );
+        public_page.image =
+            Arc::new(image::imageops::crop_imm(&*public_page.image, 0, 0, 3, 4).to_image());
+        assert_eq!(public_page.image.dimensions(), (3, 4));
+        retained.promote_into(&mut history);
+        let restored = history
+            .lookup(
+                &key,
+                &public_page.cache_path,
+                &retained.proof.checksum,
+                RenderPurpose::Foreground,
+            )
+            .unwrap();
+        assert!(restored.memory_hit);
+        assert_eq!(restored.image.dimensions(), (7, 4));
+        assert!(Arc::ptr_eq(&restored.image, &retained.image));
+        assert_eq!(history.bytes, 28);
+    }
+
+    #[test]
+    fn retained_gray_accounting_deduplicates_output_and_vertical_source_allocations() {
+        let (key1, page1, first) = retained_fixture("vertical-one", GrayImage::new(2, 2));
+        let (key2, page2, second) = retained_fixture("vertical-two", GrayImage::new(2, 2));
+        let source = imaging::ReaderSource::from_test_image(GrayImage::new(4, 4));
+        let source_key = SourceKey {
+            namespace: PathBuf::from("memory-test"),
+            checksum: "shared-vertical-source".into(),
+            encoded_bytes: 1,
+        };
+        let first = RetainedRaster::new(
+            key1,
+            &page1,
+            first.proof,
+            Some((source_key.clone(), source.clone())),
+        );
+        let second = RetainedRaster::new(
+            key2,
+            &page2,
+            second.proof,
+            Some((source_key.clone(), source)),
+        );
+        assert_eq!(first.retained_bytes(), 20);
+        assert_eq!(
+            RetainedRaster::unique_retained_bytes(&[first.clone(), first.clone()]),
+            20
+        );
+        assert_eq!(
+            RetainedRaster::unique_retained_bytes(&[first.clone(), second]),
+            24
+        );
+        let mut history = DecodedCache::default();
+        first.promote_into(&mut history);
+        assert_eq!(history.bytes, 20);
+        assert!(
+            history
+                .entries
+                .values()
+                .all(|entry| entry.page.retained_raster.is_none())
+        );
+        history.remove_source(&source_key);
+        assert_eq!(history.bytes, 4);
+    }
+
+    #[test]
+    fn speculative_resident_peek_does_not_reorder_foreground_history() {
+        let mut history = DecodedCache::default();
+        let (key1, page1, first) = retained_fixture("peek-one", GrayImage::new(2, 2));
+        let (_, _, second) = retained_fixture("peek-two", GrayImage::new(2, 2));
+        first.promote_into(&mut history);
+        second.promote_into(&mut history);
+        let before = history.entries[&key1].access;
+        let peeked = history
+            .peek(&key1, &page1.cache_path, &first.proof.checksum)
+            .unwrap();
+        assert!(peeked.memory_hit);
+        assert_eq!(history.entries[&key1].access, before);
+        assert!(history.entries[&key1].access < history.entries[&second.key].access);
+        let source_key = SourceKey {
+            namespace: PathBuf::from("memory-test"),
+            checksum: "peek-source".into(),
+            encoded_bytes: 1,
+        };
+        history.remember_source(
+            source_key.clone(),
+            imaging::ReaderSource::from_test_image(GrayImage::new(4, 4)),
+            4,
+        );
+        let before = history.sources[&source_key].access;
+        assert!(history.peek_source(&source_key).is_some());
+        assert_eq!(history.sources[&source_key].access, before);
     }
 
     #[test]

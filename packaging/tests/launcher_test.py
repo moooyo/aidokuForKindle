@@ -158,6 +158,7 @@ if "--capture-native-portrait" in sys.argv or "--authorize-native-portrait-resum
 
 directory = Path(os.environ["AIDOKU_LAUNCHER_DIR"])
 nonce = os.environ["AIDOKU_LAUNCH_NONCE"]
+generation = os.environ["AIDOKU_LAUNCH_GENERATION"]
 state = {"route": "reader", "book": "fixture-book", "chapter": "fixture-chapter", "page": 12, "offset": 29}
 if "--resume" in sys.argv and (root / "checkpoint.json").exists():
     state = json.loads((root / "checkpoint.json").read_text())
@@ -174,6 +175,10 @@ resume_record = None
 parked_record = None
 drive_hold_until = None
 delayed_epochs = set()
+cover_at = None
+cover_record = None
+cover_sleep_record = None
+cover_visible = False
 
 def trace(event, **fields):
     entry = {"event": event, "pid": pid, "time": time.monotonic(), **fields}
@@ -198,6 +203,61 @@ def current_record():
     except FileNotFoundError:
         pass
     return f"{pid} {nonce} 0"
+
+def current_cover_request(value):
+    try:
+        raw = (directory / "sleep-cover-request").read_text()
+        fields = raw.removesuffix("\n").split(" ")
+        expected = value.split(" ")
+        if (len(fields) == 6 and len(expected) == 3
+                and fields[:4] == [generation, str(pid), nonce, expected[2]]
+                and fields[4].isascii() and fields[4].isdigit() and int(fields[4]) > 0
+                and fields[5] == "suspend" and raw == " ".join(fields) + "\n"):
+            return " ".join(fields)
+    except (OSError, ValueError):
+        pass
+    return None
+
+def checkpoint_sleep(value, now):
+    global ack_at, ack_record
+    (root / "checkpoint.json").write_text(json.dumps(state))
+    trace("checkpoint", record=value, state=state)
+    mode = os.environ.get("AIDOKU_FAKE_SLEEP_EXIT", "")
+    if mode == "ordinary":
+        ordinary_exit()
+        trace("ordinary-exit")
+        raise SystemExit(0)
+    if mode == "crash":
+        trace("crashed")
+        os._exit(73)
+    if exit_prepared_at is None and os.environ.get("AIDOKU_FAKE_NO_ACK") != "1":
+        delay_key = "AIDOKU_FAKE_SECOND_ACK_DELAY" if value.endswith(" 2") else "AIDOKU_FAKE_ACK_DELAY"
+        ack_at = now + float(os.environ.get(delay_key, os.environ.get("AIDOKU_FAKE_ACK_DELAY", "0")))
+        ack_record = value
+
+def publish_cover_ready(value):
+    mode = os.environ.get("AIDOKU_FAKE_SLEEP_COVER_MODE", "disabled")
+    fields = value.split(" ")
+    if mode == "missing":
+        return
+    if mode in ("generation", "pid", "nonce", "epoch", "sequence"):
+        index = {"generation": 0, "pid": 1, "nonce": 2, "epoch": 3, "sequence": 4}[mode]
+        fields[index] = "f" * 32 if mode == "nonce" else str(int(fields[index]) + 1)
+        value = " ".join(fields)
+    elif mode == "extra":
+        value += "\nextra"
+    elif mode == "binary":
+        value += "\0"
+    write_record("sleep-cover-ready", value)
+    path = directory / "sleep-cover-ready"
+    if mode == "public":
+        path.chmod(0o644)
+    elif mode == "hardlink":
+        os.link(path, root / "extra-ready-link")
+    elif mode == "symlink":
+        external = root / "linked-ready"
+        path.replace(external)
+        path.symlink_to(external)
 
 def ordinary_exit():
     value = current_record()
@@ -244,19 +304,20 @@ while True:
         resume_at = None
         value = current_record()
         trace("sleep-requested", record=value, state=state)
-        (root / "checkpoint.json").write_text(json.dumps(state))
-        mode = os.environ.get("AIDOKU_FAKE_SLEEP_EXIT", "")
-        if mode == "ordinary":
-            ordinary_exit()
-            trace("ordinary-exit")
-            raise SystemExit(0)
-        if mode == "crash":
-            trace("crashed")
-            os._exit(73)
-        if exit_prepared_at is None and os.environ.get("AIDOKU_FAKE_NO_ACK") != "1":
-            delay_key = "AIDOKU_FAKE_SECOND_ACK_DELAY" if value.endswith(" 2") else "AIDOKU_FAKE_ACK_DELAY"
-            ack_at = now + float(os.environ.get(delay_key, os.environ.get("AIDOKU_FAKE_ACK_DELAY", "0")))
-            ack_record = value
+        candidate = current_cover_request(value)
+        if candidate is not None and os.environ.get("AIDOKU_FAKE_SLEEP_COVER_MODE", "disabled") != "disabled":
+            cover_record = candidate
+            cover_sleep_record = value
+            cover_visible = True
+            cover_at = now + float(os.environ.get("AIDOKU_FAKE_COVER_DELAY", "0"))
+            trace("cover-requested", record=candidate)
+        else:
+            cover_record = None
+            checkpoint_sleep(value, now)
+    if cover_at is not None and now >= cover_at:
+        cover_at = None
+        trace("cover-presented", record=cover_record)
+        checkpoint_sleep(cover_sleep_record, now)
     if resume_flag:
         resume_flag = False
         value = current_record()
@@ -272,6 +333,13 @@ while True:
             trace("resume-ignored", record=value)
         else:
             parked_record = None
+            if cover_visible:
+                cover_visible = False
+                trace("cover-hidden", record=value)
+            if cover_at is not None:
+                cover_at = None
+                cover_record = None
+                checkpoint_sleep(value, now)
             if os.environ.get("AIDOKU_FAKE_LATE_ACK") != "1":
                 ack_at = None
             if resumed_epoch == value:
@@ -284,9 +352,11 @@ while True:
         resume_at = None
         resumed_epoch = resume_record
         write_record("resume-ready", resume_record)
-        trace("resumed", record=resume_record, state=state)
+        trace("resumed", record=resume_record, state=state, cover_visible=cover_visible)
     if ack_at is not None and now >= ack_at:
         ack_at = None
+        if cover_record is not None and current_cover_request(ack_record) == cover_record:
+            publish_cover_ready(cover_record)
         write_record("sleep-ready", ack_record)
         if resumed_epoch == ack_record:
             # A deliberately obsolete ACK must not make the supervisor STOP us.
@@ -357,6 +427,15 @@ class LauncherTests(unittest.TestCase):
         self.statusbar = self.root / "statusbar"
         self.statusbar.write_text("running")
         (self.root / "power-state").write_text("active")
+        # All existing fixtures keep their original stock-sleep behavior. Cover
+        # fixtures explicitly opt into this known framework observation.
+        (self.root / "cover-configuration").write_text("unknown\n")
+        self.fixture_launcher = self.root / "launch.sh"
+        self.fixture_launcher.write_text(
+            LAUNCHER.read_text().replace(
+                "/var/local/system/userpasswdenabled", str(self.root / "passcode")
+            )
+        )
         os.mkfifo(self.root / "event-input", 0o600)
         self.event_descriptor = os.open(self.root / "event-input", os.O_RDWR | os.O_NONBLOCK)
         self.wm = subprocess.Popen(["sleep", "120"], start_new_session=True)
@@ -380,7 +459,18 @@ printf stopped >"$AIDOKU_TEST_ROOT/statusbar"
 ''')
         self.shell(self.bin / "pidof", '[ "$1" = awesome ] && printf "%s\\n" "$AIDOKU_FAKE_WM"')
         self.shell(self.bin / "xrefresh", 'printf "%s\\n" "xrefresh:$*" >>"$AIDOKU_TEST_ROOT/operations"; if [ "${AIDOKU_FAKE_REDRAW_HANG:-0}" = 1 ]; then exec sleep 120; fi')
-        self.shell(self.bin / "lipc-get-prop", 'if [ "${AIDOKU_FAKE_LIPC_HANG:-0}" = 1 ] && [ ! -f "$AIDOKU_TEST_ROOT/release-power-query" ]; then exec sleep 120; fi; cat "$AIDOKU_TEST_ROOT/power-state"')
+        self.shell(self.bin / "lipc-get-prop", r'''
+if [ "$*" = "-s com.lab126.blanket load" ]; then
+    printf '%s\n' "$*" >>"$AIDOKU_TEST_ROOT/cover-queries"
+    printf '%s|%s\n' "$(cat "$AIDOKU_TEST_ROOT/power-state")" "$(cat "$AIDOKU_TEST_ROOT/statusbar")" >>"$AIDOKU_TEST_ROOT/cover-query-context"
+    if [ -f "$AIDOKU_TEST_ROOT/fail-cover-query" ]; then exit 7; fi
+    if [ -f "$AIDOKU_TEST_ROOT/hang-cover-query" ]; then exec sleep 120; fi
+    cat "$AIDOKU_TEST_ROOT/cover-configuration"
+    exit "${AIDOKU_FAKE_COVER_CONFIGURATION_EXIT:-0}"
+fi
+if [ "${AIDOKU_FAKE_LIPC_HANG:-0}" = 1 ] && [ ! -f "$AIDOKU_TEST_ROOT/release-power-query" ]; then exec sleep 120; fi
+cat "$AIDOKU_TEST_ROOT/power-state"
+''')
         # GNU hosts may lack the BusyBox usleep command available on Kindle.
         # This replacement belongs only to the fixture's private PATH.
         self.shell(self.bin / "usleep", "exec perl -e '@ARGV == 1 && $ARGV[0] =~ /\\A[0-9]+\\z/ or exit 2; select undef, undef, undef, $ARGV[0] / 1000000;' \"$@\"")
@@ -434,12 +524,13 @@ printf stopped >"$AIDOKU_TEST_ROOT/statusbar"
 
     def spawn_launcher(self) -> None:
         self.log = (self.root / "launcher.log").open("wb")
-        self.launcher = subprocess.Popen(["sh", str(LAUNCHER), "--foreground"], env=self.environment, stdout=self.log, stderr=subprocess.STDOUT, start_new_session=True)
+        self.launcher = subprocess.Popen(["sh", str(self.fixture_launcher), "--foreground"], env=self.environment, stdout=self.log, stderr=subprocess.STDOUT, start_new_session=True)
 
     def start_launcher(self) -> int:
+        previous_starts = len(self.traces("started"))
         self.spawn_launcher()
-        wait_for(lambda: bool(self.traces("started")) and self.phase() == "active", description="initialized app")
-        return self.traces("started")[0]["pid"]
+        wait_for(lambda: len(self.traces("started")) > previous_starts and self.phase() == "active", description="initialized app")
+        return self.traces("started")[-1]["pid"]
 
     def event(self, event: str, *, state: str | None = None) -> None:
         if state is not None:
@@ -480,6 +571,48 @@ printf stopped >"$AIDOKU_TEST_ROOT/statusbar"
         self.event("outOfScreenSaver", state="active")
         self.event("exitingScreenSaver")
         wait_for(lambda: bool(self.traces("resumed")) and self.phase() == "active", description="same-process resume")
+
+    def configure_sleep_cover(self, mode: str = "normal") -> None:
+        # Match the resident module list captured on the physical Kindle.
+        (self.root / "cover-configuration").write_text("screensaver langpicker blankwindow usb\n")
+        self.environment["AIDOKU_FAKE_SLEEP_COVER_MODE"] = mode
+
+    def park_with_cover(self, pid: int, *, seconds: float = 12) -> None:
+        self.event("goingToScreenSaver", state="screenSaver")
+        wait_for(
+            lambda: self.phase() == "parked" and self.process_state(pid).startswith("T")
+            and self.statusbar.read_text() == "stopped"
+            and self.process_state(self.wm.pid).startswith("T")
+            and (self.lock / "sleep-cover-ready").exists(),
+            seconds=seconds, description="completed, retained cover",
+        )
+
+    def assert_cover_fallback(self, mode: str = "normal", *, requested: bool = True) -> None:
+        self.environment["AIDOKU_FAKE_SLEEP_COVER_MODE"] = mode
+        pid = self.start_launcher()
+        self.park(pid)
+        self.assertEqual(bool(self.traces("cover-requested")), requested and mode != "disabled")
+        self.assertFalse((self.lock / "sleep-cover-ready").exists())
+        self.assertFalse((self.lock / "sleep-cover-request").exists())
+        self.assertFalse(self.process_state(self.wm.pid).startswith("T"))
+        self.stop_launcher()
+        self.assert_recovered()
+
+    def assert_cached_cover_survives_unavailable_getter(self, fault_leaf: str) -> None:
+        self.configure_sleep_cover()
+        pid = self.start_launcher()
+        queries = self.root / "cover-queries"
+        self.assertEqual(len(queries.read_text().splitlines()), 1)
+        self.assertEqual((self.root / "cover-query-context").read_text().splitlines(), ["active|running"])
+        (self.root / fault_leaf).touch()
+        self.park_with_cover(pid)
+        self.wake()
+        resumed = self.traces("resumed")[-1]
+        self.assertEqual(resumed["pid"], pid)
+        self.assertEqual(resumed["state"], MEMORY_STATE)
+        self.assertEqual(len(queries.read_text().splitlines()), 1)
+        self.stop_launcher()
+        self.assert_recovered()
 
     def test_exit_code_and_stock_repaint_are_preserved(self) -> None:
         self.environment.update(AIDOKU_FAKE_EXIT_AFTER="0.2", AIDOKU_FAKE_EXIT_CODE="7")
@@ -561,6 +694,316 @@ printf stopped >"$AIDOKU_TEST_ROOT/statusbar"
         self.stop_launcher()
         self.assert_recovered()
         self.assertEqual(self.operations.read_text().count("xrefresh:"), 1)
+
+    def test_sleep_cover_retains_owned_native_state_and_restores_the_same_reader(self) -> None:
+        self.configure_sleep_cover()
+        pid = self.start_launcher()
+        self.park_with_cover(pid)
+        request = (self.lock / "sleep-cover-request").read_text()
+        generation = (self.lock / "generation").read_text().split(":", 1)[0]
+        nonce = (self.lock / "nonce").read_text().strip()
+        self.assertEqual(request, f"{generation} {pid} {nonce} 1 1 suspend\n")
+        self.assertEqual((self.lock / "sleep-cover-ready").read_text(), request)
+        self.assertEqual(self.statusbar.read_text(), "stopped")
+        self.assertNotIn("start:statusbar", self.operations.read_text())
+        self.assertNotIn("xrefresh:", self.operations.read_text())
+        self.assertLess(self.traces("cover-presented")[0]["time"], self.traces("checkpoint")[0]["time"])
+        self.wake()
+        resumed = self.traces("resumed")[-1]
+        self.assertEqual(resumed["pid"], pid)
+        self.assertEqual(resumed["state"], MEMORY_STATE)
+        self.assertFalse(resumed["cover_visible"])
+        self.assertLess(self.traces("cover-hidden")[-1]["time"], resumed["time"])
+        self.assertEqual(len(self.traces("started")), 1)
+        self.assertNotIn("start:statusbar", self.operations.read_text())
+        for leaf in ("sleep-cover-request", "sleep-cover-request.pending", "sleep-cover-ready", "sleep-cover-ready.pending"):
+            self.assertFalse((self.lock / leaf).exists())
+        self.stop_launcher()
+        self.assert_recovered()
+
+    def test_retained_cover_user_wake_retries_while_display_is_still_owned(self) -> None:
+        self.configure_sleep_cover()
+        pid = self.start_launcher()
+        self.park_with_cover(pid)
+        self.event("outOfScreenSaver 1", state="screenSaver")
+        wait_for(lambda: bool(self.power_queries("started")), description="inactive retained-cover probe")
+        self.assertEqual(self.traces("resumed"), [])
+        self.assertEqual(self.statusbar.read_text(), "stopped")
+        self.assertTrue(self.process_state(self.wm.pid).startswith("T"))
+        (self.root / "power-state").write_text("active")
+        wait_for(lambda: bool(self.traces("resumed")) and self.phase() == "active", description="retry of retained-cover user wake")
+        self.assertEqual(self.traces("resumed")[-1]["pid"], pid)
+        self.assertEqual(len(self.traces("resumed")), 1)
+        self.assertNotIn("start:statusbar", self.operations.read_text())
+        self.stop_launcher()
+        self.assert_recovered()
+
+    def test_sleep_cover_rtc_wake_and_dismissal_do_not_query_or_resume(self) -> None:
+        self.configure_sleep_cover()
+        pid = self.start_launcher()
+        self.park_with_cover(pid)
+        before = self.power_queries()
+        self.event("wakeupFromSuspend 0")
+        self.event("exitingScreenSaver 1")
+        time.sleep(0.25)
+        self.assertEqual(self.power_queries(), before)
+        self.assertEqual(self.traces("resumed"), [])
+        self.assertTrue(self.process_state(pid).startswith("T"))
+        self.assertTrue(self.process_state(self.wm.pid).startswith("T"))
+        self.assertEqual(self.statusbar.read_text(), "stopped")
+        self.stop_launcher()
+        self.assert_recovered()
+
+    def test_sleep_cover_presentation_and_checkpoint_have_a_separate_bounded_budget(self) -> None:
+        self.configure_sleep_cover()
+        self.environment.update(AIDOKU_FAKE_COVER_DELAY="4.7", AIDOKU_FAKE_ACK_DELAY="1.5")
+        pid = self.start_launcher()
+        self.park_with_cover(pid, seconds=15)
+        requested = self.traces("sleep-requested")[0]["time"]
+        self.assertGreater(self.traces("parked")[0]["time"] - requested, 5)
+        self.assertEqual(len(self.traces("started")), 1)
+        self.assertEqual(self.statusbar.read_text(), "stopped")
+        self.stop_launcher()
+        self.assert_recovered()
+
+    def test_disabled_sleep_cover_uses_stock_handoff(self) -> None:
+        self.configure_sleep_cover("disabled")
+        self.assert_cover_fallback("disabled")
+
+    def test_missing_sleep_cover_ready_uses_stock_handoff(self) -> None:
+        self.configure_sleep_cover("missing")
+        self.assert_cover_fallback("missing")
+
+    def test_wrong_generation_sleep_cover_ready_uses_stock_handoff(self) -> None:
+        self.configure_sleep_cover("generation")
+        self.assert_cover_fallback("generation")
+
+    def test_wrong_pid_sleep_cover_ready_uses_stock_handoff(self) -> None:
+        self.configure_sleep_cover("pid")
+        self.assert_cover_fallback("pid")
+
+    def test_wrong_nonce_sleep_cover_ready_uses_stock_handoff(self) -> None:
+        self.configure_sleep_cover("nonce")
+        self.assert_cover_fallback("nonce")
+
+    def test_wrong_epoch_sleep_cover_ready_uses_stock_handoff(self) -> None:
+        self.configure_sleep_cover("epoch")
+        self.assert_cover_fallback("epoch")
+
+    def test_wrong_sequence_sleep_cover_ready_uses_stock_handoff(self) -> None:
+        self.configure_sleep_cover("sequence")
+        self.assert_cover_fallback("sequence")
+
+    def test_extra_sleep_cover_ready_records_use_stock_handoff(self) -> None:
+        self.configure_sleep_cover("extra")
+        self.assert_cover_fallback("extra")
+
+    def test_public_sleep_cover_ready_cannot_retain_display(self) -> None:
+        self.configure_sleep_cover("public")
+        self.assert_cover_fallback("public")
+
+    def test_hardlinked_sleep_cover_ready_cannot_retain_display(self) -> None:
+        self.configure_sleep_cover("hardlink")
+        self.assert_cover_fallback("hardlink")
+
+    def test_symlinked_sleep_cover_ready_cannot_retain_display(self) -> None:
+        self.configure_sleep_cover("symlink")
+        self.assert_cover_fallback("symlink")
+
+    def test_binary_sleep_cover_ready_cannot_retain_display(self) -> None:
+        self.configure_sleep_cover("binary")
+        self.assert_cover_fallback("binary")
+
+    def test_advertisement_configuration_keeps_stock_sleep(self) -> None:
+        self.configure_sleep_cover()
+        (self.root / "cover-configuration").write_text("screensaver langpicker blankwindow usb ad_screensaver\n")
+        self.assert_cover_fallback(requested=False)
+
+    def test_unknown_module_configuration_keeps_stock_sleep(self) -> None:
+        self.configure_sleep_cover()
+        (self.root / "cover-configuration").write_text("screensaver langpicker blankwindow usb unknown\n")
+        self.assert_cover_fallback(requested=False)
+
+    def test_resident_modules_without_screensaver_keep_stock_sleep(self) -> None:
+        self.configure_sleep_cover()
+        (self.root / "cover-configuration").write_text("langpicker blankwindow usb\n")
+        self.assert_cover_fallback(requested=False)
+
+    def test_failed_configuration_query_keeps_stock_sleep(self) -> None:
+        self.configure_sleep_cover()
+        self.environment["AIDOKU_FAKE_COVER_CONFIGURATION_EXIT"] = "7"
+        self.assert_cover_fallback(requested=False)
+
+    def test_empty_configuration_keeps_stock_sleep(self) -> None:
+        self.configure_sleep_cover()
+        (self.root / "cover-configuration").write_text(" \n")
+        self.assert_cover_fallback(requested=False)
+
+    def test_binary_configuration_keeps_stock_sleep(self) -> None:
+        self.configure_sleep_cover()
+        (self.root / "cover-configuration").write_bytes(b"screensaver\0\n")
+        self.assert_cover_fallback(requested=False)
+
+    def test_overflowed_configuration_keeps_stock_sleep(self) -> None:
+        self.configure_sleep_cover()
+        (self.root / "cover-configuration").write_bytes(b"screensaver " + b"x" * 128)
+        self.assert_cover_fallback(requested=False)
+
+    def test_native_passcode_configuration_keeps_stock_sleep(self) -> None:
+        self.configure_sleep_cover()
+        (self.root / "passcode").touch()
+        self.assert_cover_fallback(requested=False)
+
+    def test_dangling_native_passcode_marker_keeps_stock_sleep(self) -> None:
+        self.configure_sleep_cover()
+        (self.root / "passcode").symlink_to(self.root / "absent-password-marker")
+        self.assert_cover_fallback(requested=False)
+
+    def test_new_passcode_revokes_an_already_retained_cover_before_wake(self) -> None:
+        self.configure_sleep_cover()
+        pid = self.start_launcher()
+        self.park_with_cover(pid)
+        (self.root / "passcode").touch()
+        self.event("outOfScreenSaver 1", state="screenSaver")
+        wait_for(lambda: self.statusbar.read_text() == "running"
+                 and not self.process_state(self.wm.pid).startswith("T"), description="revoked cover stock handoff")
+        self.assertEqual(self.traces("resumed"), [])
+        self.assertFalse((self.lock / "sleep-cover-request").exists())
+        (self.root / "power-state").write_text("active")
+        wait_for(lambda: bool(self.traces("resumed")) and self.phase() == "active")
+        self.stop_launcher()
+        self.assert_recovered()
+
+    def test_cached_cover_capability_survives_a_failing_transition_getter(self) -> None:
+        self.assert_cached_cover_survives_unavailable_getter("fail-cover-query")
+
+    def test_cached_cover_capability_survives_a_blocked_transition_getter(self) -> None:
+        self.assert_cached_cover_survives_unavailable_getter("hang-cover-query")
+
+    def test_new_managed_session_rechecks_changed_advertisement_configuration(self) -> None:
+        self.configure_sleep_cover()
+        pid = self.start_launcher()
+        self.park_with_cover(pid)
+        (self.root / "cover-configuration").write_text("screensaver langpicker blankwindow usb ad_screensaver\n")
+        self.wake()
+        self.assertEqual(self.traces("resumed")[-1]["pid"], pid)
+        queries = self.root / "cover-queries"
+        self.assertEqual(len(queries.read_text().splitlines()), 1)
+        self.stop_launcher()
+        self.assert_recovered()
+
+        new_pid = self.start_launcher()
+        self.assertNotEqual(new_pid, pid)
+        self.assertEqual(len(queries.read_text().splitlines()), 2)
+        self.park(new_pid)
+        self.assertEqual([row for row in self.traces("cover-requested") if row["pid"] == new_pid], [])
+        self.assertFalse((self.lock / "sleep-cover-ready").exists())
+        self.assertFalse((self.lock / "sleep-cover-request").exists())
+        self.stop_launcher()
+        self.assert_recovered()
+
+    def test_changed_window_manager_state_revokes_a_retained_cover(self) -> None:
+        self.configure_sleep_cover()
+        pid = self.start_launcher()
+        self.park_with_cover(pid)
+        os.kill(self.wm.pid, signal.SIGCONT)
+        self.event("outOfScreenSaver 1", state="screenSaver")
+        wait_for(lambda: self.statusbar.read_text() == "running", description="changed native ownership stock handoff")
+        self.assertEqual(self.traces("resumed"), [])
+        self.assertFalse((self.lock / "sleep-cover-ready").exists())
+        self.stop_launcher()
+        self.assert_recovered()
+
+    def test_changed_statusbar_state_revokes_a_retained_cover(self) -> None:
+        self.configure_sleep_cover()
+        pid = self.start_launcher()
+        self.park_with_cover(pid)
+        self.statusbar.write_text("running")
+        self.event("outOfScreenSaver 1", state="screenSaver")
+        wait_for(lambda: not (self.lock / "sleep-cover-request").exists()
+                 and not self.process_state(self.wm.pid).startswith("T"), description="changed statusbar stock handoff")
+        self.assertEqual(self.traces("resumed"), [])
+        self.stop_launcher()
+        self.assert_recovered()
+
+    def test_an_earlier_cover_sequence_cannot_authorize_the_next_sleep(self) -> None:
+        self.configure_sleep_cover()
+        pid = self.start_launcher()
+        self.park_with_cover(pid)
+        previous = (self.lock / "sleep-cover-ready").read_text()
+        self.wake()
+        self.park_with_cover(pid)
+        current = (self.lock / "sleep-cover-request").read_text()
+        self.assertNotEqual(current, previous)
+        self.assertEqual(current.split(" ")[3:5], ["2", "2"])
+        (self.lock / "sleep-cover-ready").write_text(previous)
+        self.event("outOfScreenSaver 1", state="screenSaver")
+        wait_for(lambda: self.statusbar.read_text() == "running"
+                 and not (self.lock / "sleep-cover-ready").exists(), description="stale cover sequence stock handoff")
+        self.assertEqual(len(self.traces("resumed")), 1)
+        (self.root / "power-state").write_text("active")
+        wait_for(lambda: len(self.traces("resumed")) == 2 and self.phase() == "active")
+        self.assertEqual(len(self.traces("started")), 1)
+        self.stop_launcher()
+        self.assert_recovered()
+
+    def test_failed_fresh_portrait_permission_revokes_retained_cover_before_retry(self) -> None:
+        self.configure_sleep_cover()
+        (self.root / "reject-portrait-resume").touch()
+        pid = self.start_launcher()
+        self.park_with_cover(pid)
+        self.event("outOfScreenSaver 1", state="active")
+        wait_for(lambda: len(self.portrait_queries("rejected", action="resume")) == 3
+                 and self.statusbar.read_text() == "running", seconds=16,
+                 description="retained cover portrait failure stock restoration")
+        self.assertEqual(self.traces("resumed"), [])
+        self.assertFalse((self.lock / "sleep-cover-ready").exists())
+        self.assertFalse((self.lock / "sleep-cover-request").exists())
+        self.assertTrue(self.process_state(pid).startswith("T"))
+        (self.root / "reject-portrait-resume").unlink()
+        self.wake()
+        self.assertEqual(self.traces("resumed")[-1]["pid"], pid)
+        self.stop_launcher()
+        self.assert_recovered()
+
+    def test_failed_cover_checkpoint_times_out_to_stock_without_reusing_the_app(self) -> None:
+        self.configure_sleep_cover()
+        self.environment["AIDOKU_FAKE_NO_ACK"] = "1"
+        self.start_launcher()
+        self.event("goingToScreenSaver", state="screenSaver")
+        wait_for(lambda: self.phase() == "fallback", seconds=18, description="cover checkpoint fallback")
+        self.assertEqual(len(self.traces("started")), 1)
+        self.assertEqual(self.traces("resumed"), [])
+        self.assertEqual(self.statusbar.read_text(), "running")
+        self.assertFalse(self.process_state(self.wm.pid).startswith("T"))
+        self.assertFalse((self.lock / "sleep-cover-request").exists())
+        self.stop_launcher()
+        self.assert_recovered()
+
+    def test_cover_cleanup_removes_only_the_four_exact_protocol_leaves(self) -> None:
+        self.configure_sleep_cover()
+        pid = self.start_launcher()
+        self.park_with_cover(pid)
+        foreign = self.lock / "sleep-cover-unrelated"
+        foreign.write_text("preserve\n")
+        self.event("usbConfigured 1")
+        self.assertEqual(self.complete(), 143)
+        self.assertEqual(foreign.read_text(), "preserve\n")
+        for leaf in ("sleep-cover-request", "sleep-cover-request.pending", "sleep-cover-ready", "sleep-cover-ready.pending"):
+            self.assertFalse((self.lock / leaf).exists())
+        self.assertFalse(self.process_state(self.wm.pid).startswith("T"))
+        self.assertEqual(self.statusbar.read_text(), "running")
+        self.assertNotIn("xrefresh:", self.operations.read_text())
+
+    def test_retained_cover_usb_takeover_restores_control_without_repainting_usb(self) -> None:
+        self.configure_sleep_cover()
+        pid = self.start_launcher()
+        self.park_with_cover(pid)
+        self.event("usbConfigured 1")
+        self.assertEqual(self.complete(), 143)
+        self.assertEqual(len(self.traces("started")), 1)
+        self.assert_recovered(redraw=False)
+        self.assertNotIn("xrefresh:", self.operations.read_text())
 
     def test_wake_freezes_stock_before_portrait_authorization(self) -> None:
         pid = self.start_launcher()

@@ -320,7 +320,7 @@ fn cover_pixels_fit(width: u32, height: u32, options: &ImageOptions) -> bool {
     width > 0 && height > 0 && (width >= options.width || height >= options.height)
 }
 
-fn local_cover_path(cover: &str, local_source: bool) -> Result<Option<PathBuf>> {
+pub(super) fn local_cover_path(cover: &str, local_source: bool) -> Result<Option<PathBuf>> {
     if let Ok(url) = url::Url::parse(cover) {
         if url.scheme() == "file" {
             return url
@@ -344,7 +344,7 @@ fn windows_drive_path(value: &str) -> bool {
         && matches!(bytes[2], b'/' | b'\\')
 }
 
-fn remote_cover_identity(book: &Book, configuration: &SourceConfig) -> Result<String> {
+pub(super) fn remote_cover_identity(book: &Book, configuration: &SourceConfig) -> Result<String> {
     // Include credentials and request options without persisting plaintext in
     // an alias or render key. Listing labels and connection verification are
     // derived UI metadata updated without invalidating the source pool.
@@ -370,7 +370,7 @@ fn cover_identity_with_configuration(book: &Book, configuration: &SourceConfig) 
     Ok(format!("{:x}", hash.finalize()))
 }
 
-fn legacy_metadata_cover_identities(
+pub(super) fn legacy_metadata_cover_identities(
     book: &Book,
     configuration: &SourceConfig,
 ) -> Result<Vec<String>> {
@@ -396,7 +396,7 @@ fn legacy_metadata_cover_identities(
         .collect()
 }
 
-fn cover_source_alias(identity: &str) -> String {
+pub(super) fn cover_source_alias(identity: &str) -> String {
     format!("cover-source-v2:{identity}")
 }
 
@@ -429,7 +429,7 @@ fn local_cover_render_alias(
     ))
 }
 
-fn cover_source_allows_network(configuration: &SourceConfig) -> bool {
+pub(super) fn cover_source_allows_network(configuration: &SourceConfig) -> bool {
     configuration.enabled
         && matches!(
             configuration.kind.to_ascii_lowercase().as_str(),
@@ -1149,6 +1149,8 @@ mod tests {
         let mut rendered = crate::render_cache::RenderedPage {
             image: Arc::new(GrayImage::new(1, 1)),
             cache_path: raw.to_path_buf(),
+            source_proof: None,
+            retained_raster: None,
             scaled_height: 0,
             viewport_height: 0,
             cache_hit: false,

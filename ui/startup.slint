@@ -1,0 +1,81 @@
+import { State, Commands } from "state.slint";
+import { Strings } from "strings.slint";
+
+// The yielding startup screen follows BiliComics. Existing localized masks
+// preserve all Aidoku locales before the complete UI font bundle is available.
+export component StartupActivity inherits Rectangle {
+    background: State.startup-dark ? #000 : #fff;
+    property <color> ink: State.startup-dark ? #fff : #000;
+    property <length> content-top: max(24px, root.height / 2 - 120px);
+    property <image> stage-image: State.startup-stage == 2 ? State.startup-interface :
+        State.startup-stage == 1 ? State.startup-data : State.startup-fonts;
+    accessible-role: text;
+    accessible-label: State.startup-failed ? Strings.error : Strings.startup-loading;
+    Image {
+        x: (parent.width - self.width) / 2;
+        y: root.content-top;
+        width: State.startup-title.width * 0.5px;
+        height: State.startup-title.height * 0.5px;
+        source: State.startup-title;
+        colorize: root.ink;
+    }
+    if !State.startup-failed: Image {
+        x: (parent.width - self.width) / 2;
+        y: root.content-top + 76px;
+        width: State.startup-loading.width * 0.5px;
+        height: State.startup-loading.height * 0.5px;
+        source: State.startup-loading;
+        colorize: root.ink;
+    }
+    if !State.startup-failed: Image {
+        x: (parent.width - self.width) / 2;
+        y: root.content-top + 126px;
+        width: root.stage-image.width * 0.5px;
+        height: root.stage-image.height * 0.5px;
+        source: root.stage-image;
+        colorize: root.ink;
+    }
+    if State.startup-failed: Image {
+        x: (parent.width - self.width) / 2;
+        y: root.content-top + 76px;
+        width: State.startup-error.width * 0.5px;
+        height: State.startup-error.height * 0.5px;
+        source: State.startup-error;
+        colorize: root.ink;
+    }
+    if !State.startup-failed: Rectangle {
+        x: (parent.width - self.width) / 2;
+        y: root.content-top + 178px;
+        width: 60px; height: 12px;
+        for index in 3: Rectangle {
+            x: index * 24px; y: 0px;
+            width: 12px; height: 12px;
+            border-radius: 6px;
+            border-width: 1.5px;
+            border-color: root.ink;
+            background: index == State.startup-frame ? root.ink : parent.background;
+        }
+    }
+    Rectangle {
+        x: (parent.width - self.width) / 2;
+        y: root.content-top + 222px;
+        width: max(132px, State.startup-exit.width * 0.5px + 32px); height: 48px;
+        border-width: 1.5px;
+        border-color: root.ink;
+        background: exit-touch.pressed ? root.ink : root.background;
+        accessible-role: button;
+        accessible-label: Strings.exit;
+        Image {
+            x: (parent.width - self.width) / 2;
+            y: (parent.height - self.height) / 2;
+            width: State.startup-exit.width * 0.5px;
+            height: State.startup-exit.height * 0.5px;
+            source: State.startup-exit;
+            colorize: exit-touch.pressed ? root.background : root.ink;
+        }
+        exit-touch := TouchArea {
+            clicked => { Commands.exit-requested(); }
+        }
+    }
+    TouchArea { enabled: false; }
+}

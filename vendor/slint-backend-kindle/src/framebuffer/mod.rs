@@ -1,6 +1,11 @@
 mod ffi;
 mod markers;
 
+#[cfg(test)]
+mod sleep_fence_tests;
+#[cfg(test)]
+mod test_support;
+
 use crate::refresh::{RefreshWaveform, ResolvedRefresh};
 use std::cell::Cell;
 use std::io;
@@ -234,6 +239,28 @@ pub(crate) struct Framebuffer {
     update_markers: UpdateMarkers,
 }
 
+/// A checked full update accepted by this exact live framebuffer owner.
+/// Callers cannot manufacture a receipt from a counter or a queued request.
+pub(crate) struct SubmittedUpdate<'a> {
+    framebuffer: &'a Framebuffer,
+    marker: u32,
+}
+
+impl SubmittedUpdate<'_> {
+    pub(crate) fn marker(&self) -> u32 {
+        self.marker
+    }
+}
+
+impl std::fmt::Debug for SubmittedUpdate<'_> {
+    fn fmt(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        formatter
+            .debug_struct("SubmittedUpdate")
+            .field("marker", &self.marker)
+            .finish()
+    }
+}
+
 // SAFETY: The mmap is process-wide and we only access it from the event loop thread.
 unsafe impl Send for Framebuffer {}
 
@@ -412,6 +439,19 @@ impl Framebuffer {
         })
     }
 
+    fn submit_update_checked_with(
+        &self,
+        mut send: impl FnMut(UpdateVariant, u32) -> io::Result<()>,
+    ) -> io::Result<SubmittedUpdate<'_>> {
+        let marker = self.update_markers.submit_checked(|marker| {
+            submit_update(&self.update_variant, |variant| send(variant, marker))
+        })?;
+        Ok(SubmittedUpdate {
+            framebuffer: self,
+            marker,
+        })
+    }
+
     /// Issue one specific update ioctl variant. Returns whether it succeeded.
     fn send_update_variant(
         &self,
@@ -558,6 +598,29 @@ impl Framebuffer {
         )
     }
 
+    /// Submit a full frame and retain its independent accepted marker.
+    pub(crate) fn refresh_full_checked(&self) -> io::Result<SubmittedUpdate<'_>> {
+        let region = UpdateRect {
+            top: 0,
+            left: 0,
+            width: self.width,
+            height: self.height,
+        };
+        self.submit_update_checked_with(|variant, marker| {
+            if self.send_update_variant(
+                variant,
+                region,
+                WAVEFORM_MODE_GC16,
+                UPDATE_MODE_FULL,
+                marker,
+            ) {
+                Ok(())
+            } else {
+                Err(io::Error::last_os_error())
+            }
+        })
+    }
+
     /// Observe the accepted SEND identity without issuing an ioctl or a wait.
     pub(crate) fn last_submitted_marker(&self) -> Option<u32> {
         self.update_markers.last_submitted()
@@ -571,29 +634,68 @@ impl Framebuffer {
         let _ = self.wait_for_update_complete_checked();
     }
 
+    /// Settle preceding asynchronous reads before changing mapped pixels.
+    /// No accepted update means there is no preceding scanout to settle.
+    pub(crate) fn wait_for_pending_update_complete_checked(&self) -> io::Result<()> {
+        self.update_markers
+            .wait_for_last_submitted(|target| self.wait_for_marker_ioctl(target))
+    }
+
     /// Use the accepted update's identity, without waiting on a rejected frame.
     /// Some vendor kernels return success even when their internal wait times
     /// out; this acknowledges the ioctl, not independent panel completion.
     pub(crate) fn wait_for_update_complete_checked(&self) -> io::Result<()> {
-        self.update_markers.wait_for_last_submitted(|target| {
-            let mut marker = UpdateMarkerData {
-                update_marker: target,
-                collision_test: 0,
-            };
-            // SAFETY: The complete marker ABI buffer stays live for this call.
-            let result = unsafe {
-                libc::ioctl(
-                    self.file.as_raw_fd(),
-                    MXCFB_WAIT_FOR_UPDATE_COMPLETE as _,
-                    &mut marker as *mut _,
-                )
-            };
-            if result >= 0 {
-                Ok(())
-            } else {
-                Err(io::Error::last_os_error())
-            }
+        let marker = self
+            .update_markers
+            .last_submitted()
+            .ok_or_else(|| io::Error::other("no EPDC update was successfully submitted"))?;
+        self.update_markers
+            .wait_for_submitted(marker, |target| self.wait_for_marker_ioctl(target))
+    }
+
+    /// Completion belongs to this receipt, never to a later frame or counter.
+    pub(crate) fn wait_for_submission_complete_checked(
+        &self,
+        submission: &SubmittedUpdate<'_>,
+    ) -> io::Result<()> {
+        self.wait_for_submission_complete_with(submission, |target| {
+            self.wait_for_marker_ioctl(target)
         })
+    }
+
+    fn wait_for_submission_complete_with(
+        &self,
+        submission: &SubmittedUpdate<'_>,
+        wait: impl FnMut(u32) -> io::Result<()>,
+    ) -> io::Result<()> {
+        if !std::ptr::eq(self, submission.framebuffer) {
+            return Err(io::Error::new(
+                io::ErrorKind::InvalidInput,
+                "the update receipt belongs to a different framebuffer owner",
+            ));
+        }
+        self.update_markers
+            .wait_for_submitted(submission.marker, wait)
+    }
+
+    fn wait_for_marker_ioctl(&self, target: u32) -> io::Result<()> {
+        let mut marker = UpdateMarkerData {
+            update_marker: target,
+            collision_test: 0,
+        };
+        // SAFETY: The complete marker ABI buffer stays live for this call.
+        let result = unsafe {
+            libc::ioctl(
+                self.file.as_raw_fd(),
+                MXCFB_WAIT_FOR_UPDATE_COMPLETE as _,
+                &mut marker as *mut _,
+            )
+        };
+        if result >= 0 {
+            Ok(())
+        } else {
+            Err(io::Error::last_os_error())
+        }
     }
 
     /// Partial refresh of a dirty rectangle

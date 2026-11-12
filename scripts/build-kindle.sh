@@ -21,6 +21,7 @@ cd "$REPO_ROOT"
 cargo zigbuild --locked --release --no-default-features --features kindle --target "$TARGET"
 
 mkdir -p "$STAGING_ROOT/aidoku/app" "$STAGING_ROOT/aidoku/licenses/backend" \
+    "$STAGING_ROOT/aidoku/licenses/image-triangle" \
     "$STAGING_ROOT/aidoku/licenses/pinyin" "$STAGING_ROOT/aidoku/licenses/sources" \
     "$STAGING_ROOT/aidoku/licenses/icons" "$STAGING_ROOT/aidoku/licenses/demo" \
     "$STAGING_ROOT/extensions/aidoku" "$STAGING_ROOT/documents"
@@ -34,6 +35,9 @@ install -m 644 packaging/kual/menu.json packaging/kual/config.xml "$STAGING_ROOT
 install -m 755 packaging/kual/set-profile.sh "$STAGING_ROOT/extensions/aidoku/"
 for notice in LICENSE-MIT LICENSE-APACHE UPSTREAM_REVISION PATCHES.md AIDOKU_PROVENANCE.md; do
     install -m 644 "vendor/slint-backend-kindle/$notice" "$STAGING_ROOT/aidoku/licenses/backend/$notice"
+done
+for notice in README.md LICENSE-MIT LICENSE-APACHE; do
+    install -m 644 "vendor/image-triangle-reference-0.25.10/$notice" "$STAGING_ROOT/aidoku/licenses/image-triangle/$notice"
 done
 # Fonts, dictionary data, and icons are embedded in the ELF. Retain their full
 # license/provenance records without staging another copy of those payloads.

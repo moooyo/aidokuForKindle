@@ -6,6 +6,7 @@ startup.
 
 | Asset | Family to request | Weight |
 | --- | --- | --- |
+| `StartupSansSC.otf` | `BiliComics Startup` | 400 |
 | `NotoSansSC-Regular.otf.gz` | `Noto Sans CJK SC` | 400 |
 | `NotoSansSC-Medium.otf.gz` | `Noto Sans CJK SC` | 500 |
 | `NotoSansSC-Bold.otf.gz` | `Noto Sans CJK SC` | 700 |
@@ -20,6 +21,13 @@ The Regular, Bold, and Black faces share the family `Noto Serif CJK SC`.
 Request weights 400, 700, and 900 respectively. The legacy family of the Black
 face is `Noto Serif CJK SC Black`.
 Literata is instantiated at optical size 12 for compact screen text.
+
+The uncompressed 22,040-byte bootstrap face is adopted without modification
+from the sibling BiliComics project. It installs the backend before background
+workers start. Existing four-locale grayscale startup labels remain independent
+of its small glyph set. `bootstrap-provenance.json` records its exact source,
+digest, original family, transformation, and retained OFL terms. Normal UI
+families switch only after all nine full faces have been registered.
 
 The regular serif asset adds 3,342,333 compressed bytes and 4,140,532 bytes of raw
 font data. Startup decompresses and registers it; parser allocations, raster

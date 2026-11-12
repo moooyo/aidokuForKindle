@@ -8,6 +8,15 @@ plugin and does not require the WeRead application.
 
 ## Current development follow-up
 
+Version 0.1.2 ports BiliComics' in-memory Reader Raster and complete next-frame
+reuse, preserves previous-page history during prefetch, and adds staged startup
+and a prepared sleep-cover lifecycle. A final startup refinement removes the
+initial maintenance-timer delay while retaining the first-frame gate. The
+[runtime port and qualification report](docs/BILI_READER_RUNTIME_PORT_20261112.md)
+and [sanitized delivery receipt](docs/review/bili-reader-port-20261112.json)
+bind the new executables, package, tests, and measured behavior. Physical and
+installation qualification are tracked separately from host checks.
+
 Version 0.1.1 adds silent KPM entry scripts, early localized native startup
 activity, an explicit settings-page exit action, and submitted-frame exit
 feedback. It also cancels obsolete private Reader work and checks paused or
@@ -247,6 +256,7 @@ claimed by this README.
 
 - [Architecture and data boundaries](docs/ARCHITECTURE.md)
 - [Remote verification and evidence](docs/VERIFICATION.md)
+- [BiliComics Reader, startup, and sleep-cover port](docs/BILI_READER_RUNTIME_PORT_20261112.md)
 - [Design fidelity and intentional differences](docs/DESIGN_FIDELITY.md)
 - [Source runtime contract](src/sources/README.md)
 - [Download performance method and recorded results](docs/DOWNLOAD_PERFORMANCE.md)

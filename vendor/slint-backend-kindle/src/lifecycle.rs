@@ -66,6 +66,7 @@ pub(crate) struct LifecycleState {
     pub(crate) native_io_started: AtomicBool,
     pub(crate) portrait_calibration: Mutex<Option<NativePortraitBinding>>,
     pub(crate) portrait_revision: AtomicU64,
+    pub(crate) sleep_presentation: crate::sleep_presentation::SleepPresentationControl,
 }
 
 /// Enqueues ownership changes; applied status is published only by the UI loop.
@@ -77,6 +78,73 @@ pub struct LifecycleHandle {
 }
 
 impl LifecycleHandle {
+    /// Request a complete frame and a checked EPDC completion receipt.
+    ///
+    /// This queues no storage or native device work. The caller must display
+    /// its prepared state, inhibit ordinary intents, then return to the event
+    /// loop before polling the token. Sleeping displays reject new requests.
+    pub fn request_sleep_presentation(&self) -> std::io::Result<u64> {
+        if self.sleep_presentation_unavailable() {
+            return Err(std::io::Error::other(
+                "the Kindle display is unavailable for sleep presentation",
+            ));
+        }
+        let token = self.state.sleep_presentation.request()?;
+        if self.sleep_presentation_unavailable() {
+            let _ = self.state.sleep_presentation.cancel_pending();
+            return Err(std::io::Error::other(
+                "the Kindle display is unavailable for sleep presentation",
+            ));
+        }
+        self.state
+            .full_repaint_requested
+            .store(true, Ordering::Release);
+        crate::wakeup::poke(&self.wake);
+        Ok(token)
+    }
+
+    /// True only after the requested full frame's independent update completed.
+    /// Queued refreshes, SEND counts and unrelated frames cannot satisfy it.
+    pub fn sleep_presentation_completed(&self, token: u64) -> std::io::Result<bool> {
+        if self.quit.load(Ordering::SeqCst) {
+            return Err(std::io::Error::other(
+                "the Kindle event loop has terminated",
+            ));
+        }
+        self.state.sleep_presentation.completed(token)
+    }
+
+    /// Retire unfinished presentation before replacing or hiding prepared state.
+    pub fn cancel_sleep_presentation(&self) -> std::io::Result<()> {
+        if self.quit.load(Ordering::SeqCst) {
+            return Err(std::io::Error::other(
+                "the Kindle event loop has terminated",
+            ));
+        }
+        self.state.sleep_presentation.cancel_pending()?;
+        crate::wakeup::poke(&self.wake);
+        Ok(())
+    }
+
+    pub(crate) fn pending_sleep_presentation(&self) -> std::io::Result<Option<u64>> {
+        self.state.sleep_presentation.pending()
+    }
+
+    pub(crate) fn complete_sleep_presentation(&self, token: u64) -> std::io::Result<()> {
+        if self.quit.load(Ordering::SeqCst) {
+            return Err(std::io::Error::other(
+                "the Kindle event loop has terminated",
+            ));
+        }
+        self.state.sleep_presentation.acknowledge(token)
+    }
+
+    fn sleep_presentation_unavailable(&self) -> bool {
+        self.quit.load(Ordering::SeqCst)
+            || self.state.pause_requested.load(Ordering::Acquire)
+            || self.state.applied_paused.load(Ordering::Acquire)
+    }
+
     /// Enable live portrait observation from a trusted same-run calibration.
     ///
     /// The owner must authenticate the independent holding and scanout poses
@@ -127,6 +195,7 @@ impl LifecycleHandle {
         self.ensure_live()?;
         self.state.parked.store(false, Ordering::Release);
         self.state.pause_requested.store(true, Ordering::Release);
+        let _ = self.state.sleep_presentation.cancel_pending();
         crate::wakeup::poke(&self.wake);
         Ok(())
     }
@@ -146,6 +215,7 @@ impl LifecycleHandle {
     /// Retake input and rewrite the complete canonical RGB frame before GC16.
     pub fn resume(&self) -> Result<(), LifecycleError> {
         self.ensure_live()?;
+        let _ = self.state.sleep_presentation.cancel_pending();
         self.state.parked.store(false, Ordering::Release);
         self.state.pause_requested.store(false, Ordering::Release);
         self.state
@@ -201,6 +271,73 @@ mod tests {
             },
             wake.read,
         )
+    }
+
+    #[test]
+    fn sleep_presentation_is_deferred_and_frame_counters_are_not_receipts() {
+        fn require_send_sync<T: Send + Sync>() {}
+        require_send_sync::<LifecycleHandle>();
+        let (handle, _read) = handle();
+        let token = handle.request_sleep_presentation().unwrap();
+        assert_eq!(handle.pending_sleep_presentation().unwrap(), Some(token));
+        assert!(!handle.sleep_presentation_completed(token).unwrap());
+        assert!(handle.state.full_repaint_requested.load(Ordering::Acquire));
+        assert!(!handle.state.native_io_started.load(Ordering::Acquire));
+        handle
+            .state
+            .frame_write_count
+            .fetch_add(1, Ordering::AcqRel);
+        handle.state.frame_send_count.fetch_add(1, Ordering::AcqRel);
+        assert!(!handle.sleep_presentation_completed(token).unwrap());
+        handle.complete_sleep_presentation(token).unwrap();
+        assert!(handle.sleep_presentation_completed(token).unwrap());
+    }
+
+    #[test]
+    fn ownership_handoffs_cancel_unfinished_sleep_presentation() {
+        let (handle, _read) = handle();
+        let interrupted = handle.request_sleep_presentation().unwrap();
+        handle.begin_pause().unwrap();
+        assert!(handle.sleep_presentation_completed(interrupted).is_err());
+        assert!(handle.request_sleep_presentation().is_err());
+        handle.resume().unwrap();
+        let completed = handle.request_sleep_presentation().unwrap();
+        handle.complete_sleep_presentation(completed).unwrap();
+        handle.begin_pause().unwrap();
+        assert!(handle.sleep_presentation_completed(completed).unwrap());
+        handle.resume().unwrap();
+        let stale = handle.request_sleep_presentation().unwrap();
+        handle.resume().unwrap();
+        assert!(handle.sleep_presentation_completed(stale).is_err());
+    }
+
+    #[test]
+    fn a_replaced_sleep_presentation_cannot_complete_after_its_overlay_is_hidden() {
+        let (handle, _read) = handle();
+        let stale = handle.request_sleep_presentation().unwrap();
+        handle.cancel_sleep_presentation().unwrap();
+        assert_eq!(handle.pending_sleep_presentation().unwrap(), None);
+        assert!(handle.complete_sleep_presentation(stale).is_err());
+        let fresh = handle.request_sleep_presentation().unwrap();
+        handle.complete_sleep_presentation(fresh).unwrap();
+        assert!(handle.sleep_presentation_completed(fresh).unwrap());
+        assert!(handle.sleep_presentation_completed(stale).is_err());
+    }
+
+    #[test]
+    fn sleep_requests_remain_unavailable_until_applied_pause_is_released() {
+        let (handle, _read) = handle();
+        handle.begin_pause().unwrap();
+        handle.state.applied_paused.store(true, Ordering::Release);
+        handle.resume().unwrap();
+        assert!(handle.request_sleep_presentation().is_err());
+        handle.state.applied_paused.store(false, Ordering::Release);
+        let token = handle.request_sleep_presentation().unwrap();
+        handle.quit.store(true, Ordering::Release);
+        assert!(handle.request_sleep_presentation().is_err());
+        assert!(handle.sleep_presentation_completed(token).is_err());
+        assert!(handle.complete_sleep_presentation(token).is_err());
+        assert!(handle.cancel_sleep_presentation().is_err());
     }
 
     #[test]

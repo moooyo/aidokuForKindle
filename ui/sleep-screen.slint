@@ -1,0 +1,70 @@
+import { Theme } from "theme.slint";
+
+export global SleepScreenModel {
+    in-out property <bool> active: false;
+    in-out property <bool> has-cover: false;
+    in-out property <image> cover;
+    in-out property <string> title;
+    in-out property <string> author;
+}
+
+export component SleepScreen inherits Rectangle {
+    background: Theme.paper;
+    clip: true;
+    accessible-role: text;
+    accessible-label: SleepScreenModel.title + (SleepScreenModel.author != "" ? ", " + SleepScreenModel.author : "");
+
+    if SleepScreenModel.has-cover: Image {
+        width: parent.width;
+        height: parent.height;
+        source: SleepScreenModel.cover;
+        image-fit: contain;
+    }
+
+    if !SleepScreenModel.has-cover: Rectangle {
+        x: parent.width * 0.12;
+        y: parent.height * 0.13;
+        width: parent.width * 0.76;
+        height: parent.height * 0.74;
+        border-width: Theme.popup-border;
+        border-color: Theme.ink;
+        background: Theme.paper;
+        clip: true;
+
+        Text {
+            x: Theme.margin;
+            y: parent.height * 0.18 + (parent.height * 0.42 - self.height) / 2;
+            width: max(0px, parent.width - Theme.margin * 2);
+            height: min(self.preferred-height, parent.height * 0.42);
+            text: SleepScreenModel.title;
+            color: Theme.ink;
+            font-family: Theme.serif;
+            font-size: Theme.title;
+            font-weight: 600;
+            wrap: word-wrap;
+            overflow: elide;
+            horizontal-alignment: center;
+            vertical-alignment: top;
+        }
+
+        Text {
+            x: Theme.margin;
+            y: parent.height * 0.69 + (parent.height * 0.15 - self.height) / 2;
+            width: max(0px, parent.width - Theme.margin * 2);
+            height: min(self.preferred-height, parent.height * 0.15);
+            text: SleepScreenModel.author;
+            color: Theme.secondary;
+            font-family: Theme.sans;
+            font-size: Theme.book-title;
+            wrap: word-wrap;
+            overflow: elide;
+            horizontal-alignment: center;
+            vertical-alignment: top;
+        }
+    }
+
+    TouchArea {
+        width: parent.width;
+        height: parent.height;
+    }
+}

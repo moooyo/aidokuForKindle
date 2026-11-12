@@ -5,8 +5,12 @@ use std::{
     time::{Duration, Instant},
 };
 
-use aidoku_kindle::platform::{Platform, SleepStatus};
-use anyhow::Result;
+use aidoku_kindle::{
+    platform::{Platform, SleepStatus},
+    ui::{AppWindow, State},
+};
+use anyhow::{Result, ensure};
+use slint::ComponentHandle;
 
 pub const ACTIVITY_INTERVAL: Duration = Duration::from_millis(1_250);
 const FEEDBACK_TIMEOUT: Duration = Duration::from_secs(2);
@@ -53,26 +57,10 @@ impl StartupFeedback {
         Ok(Self::default())
     }
 
-    pub fn set_stage(&self, stage: usize) {
-        #[cfg(all(feature = "kindle", target_os = "linux"))]
-        if let Some(splash) = &self.splash {
-            splash.set_stage(stage);
-        }
-        let _ = stage;
-    }
-
     pub fn pause(&mut self) -> Result<()> {
         #[cfg(all(feature = "kindle", target_os = "linux"))]
         if let Some(splash) = &mut self.splash {
             splash.pause()?;
-        }
-        Ok(())
-    }
-
-    pub fn resume(&mut self) -> Result<()> {
-        #[cfg(all(feature = "kindle", target_os = "linux"))]
-        if let Some(splash) = &mut self.splash {
-            splash.resume()?;
         }
         Ok(())
     }
@@ -86,14 +74,12 @@ impl StartupFeedback {
     }
 }
 
-#[cfg(any(test, all(feature = "kindle", target_os = "linux")))]
 #[derive(Debug, PartialEq, Eq)]
 struct StartupStyle {
     language: String,
     dark_mode: bool,
 }
 
-#[cfg(any(test, all(feature = "kindle", target_os = "linux")))]
 fn startup_style(data_dir: &Path, demo: bool) -> StartupStyle {
     use rusqlite::{Connection, OpenFlags};
 
@@ -132,6 +118,88 @@ fn startup_style(data_dir: &Path, demo: bool) -> StartupStyle {
             .and_then(serde_json::Value::as_bool)
             .unwrap_or(false),
     }
+}
+
+/// Keep every existing locale available before full font registration. The
+/// labels share the exact pre-rasterized sources used by the raw native frame.
+pub fn configure_startup(ui: &AppWindow, data_dir: &Path, demo: bool) -> Result<()> {
+    let style = startup_style(data_dir, demo);
+    aidoku_kindle::localization::set_language(&style.language);
+    aidoku_kindle::localization::apply_ui_labels(ui);
+    let state = ui.global::<State>();
+    state.set_booting(true);
+    state.set_startup_dark(style.dark_mode);
+    state.set_startup_title(startup_mask(include_bytes!(
+        "../assets/startup/title.gray"
+    ))?);
+    macro_rules! labels {
+        ($locale:literal) => {
+            [
+                include_bytes!(concat!(
+                    "../assets/startup/",
+                    $locale,
+                    "-startup_loading.gray"
+                ))
+                .as_slice(),
+                include_bytes!(concat!(
+                    "../assets/startup/",
+                    $locale,
+                    "-startup_fonts.gray"
+                ))
+                .as_slice(),
+                include_bytes!(concat!("../assets/startup/", $locale, "-startup_data.gray"))
+                    .as_slice(),
+                include_bytes!(concat!(
+                    "../assets/startup/",
+                    $locale,
+                    "-startup_interface.gray"
+                ))
+                .as_slice(),
+                include_bytes!(concat!("../assets/startup/", $locale, "-exit.gray")).as_slice(),
+                include_bytes!(concat!("../assets/startup/", $locale, "-error.gray")).as_slice(),
+            ]
+        };
+    }
+    let labels = match style.language.as_str() {
+        "zh-TW" => labels!("zh-TW"),
+        "en" => labels!("en"),
+        "ja" => labels!("ja"),
+        _ => labels!("zh-CN"),
+    };
+    state.set_startup_loading(startup_mask(labels[0])?);
+    state.set_startup_fonts(startup_mask(labels[1])?);
+    state.set_startup_data(startup_mask(labels[2])?);
+    state.set_startup_interface(startup_mask(labels[3])?);
+    state.set_startup_exit(startup_mask(labels[4])?);
+    state.set_startup_error(startup_mask(labels[5])?);
+    Ok(())
+}
+
+fn startup_mask(bytes: &[u8]) -> Result<slint::Image> {
+    let header = bytes
+        .get(..8)
+        .ok_or_else(|| anyhow::anyhow!("A startup label has no header"))?;
+    let width = u32::from_le_bytes(header[..4].try_into().unwrap());
+    let height = u32::from_le_bytes(header[4..].try_into().unwrap());
+    let pixels = &bytes[8..];
+    ensure!(
+        width > 0
+            && width <= 2_048
+            && height > 0
+            && height <= 256
+            && (width as usize).checked_mul(height as usize) == Some(pixels.len()),
+        "A startup label has invalid dimensions or pixels"
+    );
+    let mut mask = slint::SharedPixelBuffer::<slint::Rgba8Pixel>::new(width, height);
+    for (target, value) in mask.make_mut_slice().iter_mut().zip(pixels) {
+        *target = slint::Rgba8Pixel {
+            r: 0,
+            g: 0,
+            b: 0,
+            a: 255 - *value,
+        };
+    }
+    Ok(slint::Image::from_rgba8(mask))
 }
 
 #[cfg(all(feature = "kindle", target_os = "linux"))]
@@ -370,5 +438,19 @@ mod tests {
             }
         );
         assert_eq!(startup_style(directory.path(), true).language, "zh-CN");
+    }
+
+    #[test]
+    fn localized_label_masks_preserve_coverage_for_light_and_dark_ink() {
+        let label = startup_mask(&[2, 0, 0, 0, 1, 0, 0, 0, 0, 255]).unwrap();
+        let pixels = label.to_rgba8().unwrap();
+        assert_eq!(pixels.as_bytes(), &[0, 0, 0, 255, 0, 0, 0, 0]);
+        for invalid in [
+            &[][..],
+            &[0, 0, 0, 0, 1, 0, 0, 0][..],
+            &[2, 0, 0, 0, 1, 0, 0, 0, 0][..],
+        ] {
+            assert!(startup_mask(invalid).is_err());
+        }
     }
 }

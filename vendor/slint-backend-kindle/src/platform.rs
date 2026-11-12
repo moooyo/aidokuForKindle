@@ -217,7 +217,7 @@ impl KindlePlatform {
         Ok(Self {
             window,
             start: Instant::now(),
-            queue: Arc::new(Mutex::new(Vec::new())),
+            queue: wakeup::new_queue(),
             wakeup,
             quit_flag: Arc::new(AtomicBool::new(false)),
             wake_schedule,
@@ -239,6 +239,7 @@ impl KindlePlatform {
             pending: self.refresh_pending.clone(),
             wake: self.wakeup.write.clone(),
             quit: self.quit_flag.clone(),
+            lifecycle: self.lifecycle.clone(),
         }
     }
 
@@ -261,6 +262,83 @@ impl KindlePlatform {
     fn drive_control(&self) {
         if let Some(callback) = self.control_callback.borrow_mut().as_mut() {
             callback();
+        }
+    }
+
+    fn event_loop_result(&self) -> Result<(), PlatformError> {
+        match wakeup::failure(&self.queue, &self.quit_flag) {
+            Some(message) => Err(PlatformError::Other(message)),
+            None => Ok(()),
+        }
+    }
+
+    fn pending_sleep_presentation(&self) -> Result<Option<u64>, PlatformError> {
+        self.lifecycle
+            .sleep_presentation
+            .pending()
+            .map_err(|error| PlatformError::Other(error.to_string()))
+    }
+
+    fn dispatch_queued_control(&self) {
+        // A producer arriving during a callback keeps a new readable wakeup.
+        wakeup::drain(&self.wakeup.read);
+        for callback in wakeup::take_pending(&self.queue, &self.quit_flag) {
+            if self.quit_flag.load(Ordering::SeqCst) {
+                break;
+            }
+            callback();
+        }
+    }
+
+    /// An initially sleeping process owns neither native display nor input.
+    /// Control and quit remain available without running animations or sensors.
+    fn wait_for_native_ownership(&self) -> Result<bool, PlatformError> {
+        loop {
+            if self.quit_flag.load(Ordering::SeqCst) {
+                return Ok(false);
+            }
+            self.drive_control();
+            if self.quit_flag.load(Ordering::SeqCst) {
+                return Ok(false);
+            }
+            if !self.lifecycle.pause_requested.load(Ordering::Acquire) {
+                return Ok(true);
+            }
+            if !self.lifecycle.applied_paused.load(Ordering::Acquire) {
+                self.lifecycle.input_released.store(true, Ordering::Release);
+                self.lifecycle.applied_paused.store(true, Ordering::Release);
+                self.lifecycle.pause_count.fetch_add(1, Ordering::AcqRel);
+                let _ = self
+                    .refresh_pending
+                    .lock()
+                    .expect("refresh queue poisoned")
+                    .take();
+            }
+            let mut descriptor = libc::pollfd {
+                fd: self.wakeup.read.as_raw_fd(),
+                events: libc::POLLIN,
+                revents: 0,
+            };
+            // SAFETY: The initialized descriptor remains live for the wait.
+            let result = unsafe { libc::poll(&mut descriptor, 1, -1) };
+            if result < 0 {
+                let error = io::Error::last_os_error();
+                if error.kind() == io::ErrorKind::Interrupted {
+                    continue;
+                }
+                return Err(PlatformError::Other(format!(
+                    "initial native ownership wait failed: {error}"
+                )));
+            }
+            if descriptor.revents & (libc::POLLERR | libc::POLLHUP | libc::POLLNVAL) != 0 {
+                return Err(PlatformError::Other(format!(
+                    "initial native ownership control descriptor failed (revents={:#x})",
+                    descriptor.revents,
+                )));
+            }
+            if descriptor.revents & libc::POLLIN != 0 {
+                self.dispatch_queued_control();
+            }
         }
     }
 
@@ -346,11 +424,7 @@ impl KindlePlatform {
         // Pending Slint timers don't block suspend: they'll just fire on
         // resume (a 1 Hz clock timer would otherwise pin the device awake).
         let nothing_pending = !self.window.has_active_animations()
-            && self
-                .queue
-                .lock()
-                .expect("event loop closure queue poisoned")
-                .is_empty();
+            && wakeup::queue_is_empty(&self.queue, &self.quit_flag);
         let nothing_pending = nothing_pending
             && self
                 .refresh_pending
@@ -421,19 +495,35 @@ impl Platform for KindlePlatform {
     fn new_event_loop_proxy(&self) -> Option<Box<dyn EventLoopProxy>> {
         Some(Box::new(KindleEventLoopProxy {
             queue: self.queue.clone(),
+            _read_fd: self.wakeup.read.clone(),
             write_fd: self.wakeup.write.clone(),
             quit_flag: self.quit_flag.clone(),
         }))
     }
 
     fn run_event_loop(&self) -> Result<(), PlatformError> {
-        struct QuitOnExit(Arc<AtomicBool>);
+        struct QuitOnExit {
+            quit: Arc<AtomicBool>,
+            queue: Queue,
+            lifecycle: Arc<LifecycleState>,
+        }
         impl Drop for QuitOnExit {
             fn drop(&mut self) {
-                self.0.store(true, Ordering::SeqCst);
+                let pending = wakeup::close_and_take_pending(&self.queue, &self.quit);
+                self.lifecycle.sleep_presentation.terminate();
+                drop(pending);
             }
         }
-        let _quit_on_exit = QuitOnExit(self.quit_flag.clone());
+        // Native I/O locals are declared after this guard, so their ownership
+        // is released before pending control captures are destroyed on exit.
+        let _quit_on_exit = QuitOnExit {
+            quit: self.quit_flag.clone(),
+            queue: self.queue.clone(),
+            lifecycle: self.lifecycle.clone(),
+        };
+        if !self.wait_for_native_ownership()? {
+            return self.event_loop_result();
+        }
         // Serialize the pre-I/O calibration claim with its public setter.
         let (binding, revision) = {
             let binding = self
@@ -458,9 +548,12 @@ impl Platform for KindlePlatform {
                 PlatformError::Other(format!("failed to open touch input: {error}"))
             })?;
 
+        if self.quit_flag.load(Ordering::SeqCst) {
+            return self.event_loop_result();
+        }
         self.drive_control();
         if self.quit_flag.load(Ordering::SeqCst) {
-            return Ok(());
+            return self.event_loop_result();
         }
         self.synchronize_portrait_ownership(
             &mut touch_input,
@@ -511,6 +604,9 @@ impl Platform for KindlePlatform {
         let mut last_interaction = Instant::now();
 
         loop {
+            if self.quit_flag.load(Ordering::SeqCst) {
+                break;
+            }
             self.drive_control();
             if self.quit_flag.load(Ordering::SeqCst) {
                 break;
@@ -524,9 +620,11 @@ impl Platform for KindlePlatform {
                 last_interaction = Instant::now();
             }
             let ownership_paused = self.lifecycle.applied_paused.load(Ordering::Acquire);
+            let sleep_token = self.pending_sleep_presentation()?;
             if !ownership_paused
                 && !portrait.is_blocked()
                 && !input_epoch.is_blocked()
+                && sleep_token.is_none()
                 && self.suspend_if_idle(
                     &frame_buffer,
                     &mut touch_input,
@@ -542,22 +640,24 @@ impl Platform for KindlePlatform {
 
             // A full-frame barrier runs once without waiting for another input.
             // Idle orientation observation itself adds no periodic timeout.
-            let timeout_ms: libc::c_int =
-                if !ownership_paused && !portrait.is_blocked() && input_epoch.needs_frame() {
-                    0
-                } else if self.lifecycle.parked.load(Ordering::Acquire) {
-                    -1
-                } else {
-                    match (
-                        self.window.has_active_animations(),
-                        slint::platform::duration_until_next_timer_update(),
-                    ) {
-                        (true, Some(duration)) => duration_to_ms(duration.min(ANIMATION_FRAME)),
-                        (true, None) => duration_to_ms(ANIMATION_FRAME),
-                        (false, Some(duration)) => duration_to_ms(duration),
-                        (false, None) => -1,
-                    }
-                };
+            let timeout_ms: libc::c_int = if !ownership_paused
+                && !portrait.is_blocked()
+                && (input_epoch.needs_frame() || sleep_token.is_some())
+            {
+                0
+            } else if self.lifecycle.parked.load(Ordering::Acquire) {
+                -1
+            } else {
+                match (
+                    self.window.has_active_animations(),
+                    slint::platform::duration_until_next_timer_update(),
+                ) {
+                    (true, Some(duration)) => duration_to_ms(duration.min(ANIMATION_FRAME)),
+                    (true, None) => duration_to_ms(ANIMATION_FRAME),
+                    (false, Some(duration)) => duration_to_ms(duration),
+                    (false, None) => -1,
+                }
+            };
             let (portrait_fd, portrait_generation) = portrait.poll_snapshot();
             let touch_generation = input_epoch.snapshot();
             // Orientation is processed before touch from the same poll batch.
@@ -605,18 +705,15 @@ impl Platform for KindlePlatform {
                 )));
             }
             if file_descriptors[2].revents & libc::POLLIN != 0 {
-                wakeup::drain(&self.wakeup.read);
-                let pending: Vec<_> = self
-                    .queue
-                    .lock()
-                    .expect("event loop closure queue poisoned")
-                    .drain(..)
-                    .collect();
-                for callback in pending {
-                    callback();
-                }
+                self.dispatch_queued_control();
+            }
+            if self.quit_flag.load(Ordering::SeqCst) {
+                break;
             }
             self.drive_control();
+            if self.quit_flag.load(Ordering::SeqCst) {
+                break;
+            }
             if self.synchronize_portrait_ownership(
                 &mut touch_input,
                 &frame_buffer,
@@ -629,6 +726,7 @@ impl Platform for KindlePlatform {
                 break;
             }
             let ownership_paused = self.lifecycle.applied_paused.load(Ordering::Acquire);
+            let sleep_token = self.pending_sleep_presentation()?;
             if !ownership_paused {
                 // Snapshot application rotation before accepting input. A manual
                 // 90/270 preference remains independent of native holding pose.
@@ -670,7 +768,8 @@ impl Platform for KindlePlatform {
                 )? {
                     last_interaction = Instant::now();
                 }
-                if !portrait.is_blocked()
+                if sleep_token.is_none()
+                    && !portrait.is_blocked()
                     && input_epoch.awaiting_snapshot()
                     && (file_descriptors[1].revents & libc::POLLIN != 0
                         || file_descriptors[2].revents & libc::POLLIN != 0)
@@ -684,7 +783,8 @@ impl Platform for KindlePlatform {
                             )));
                         }
                     }
-                } else if !portrait.is_blocked()
+                } else if sleep_token.is_none()
+                    && !portrait.is_blocked()
                     && input_epoch.accepts(touch_generation)
                     && file_descriptors[1].revents & libc::POLLIN != 0
                 {
@@ -729,7 +829,8 @@ impl Platform for KindlePlatform {
                 &mut applied_rotation,
                 (panel_width, panel_height),
             )?;
-            if input_epoch.awaiting_snapshot() {
+            let sleep_token = self.pending_sleep_presentation()?;
+            if input_epoch.awaiting_snapshot() && sleep_token.is_none() {
                 // GC16 is already complete. Do not repaint the same barrier or
                 // spin at 0ms while waiting for the next complete touch frame.
                 continue;
@@ -755,16 +856,30 @@ impl Platform for KindlePlatform {
                 .lifecycle
                 .full_repaint_requested
                 .swap(false, Ordering::AcqRel)
-                || input_epoch.is_blocked();
+                || input_epoch.is_blocked()
+                || sleep_token.is_some();
             if !pending.is_empty() || force_full {
                 self.window.request_redraw();
+            }
+            // An earlier accepted update may still scan this same mapping.
+            // Sleep presentation must settle it before changing mapped bytes.
+            if sleep_token.is_some() {
+                frame_buffer
+                    .wait_for_pending_update_complete_checked()
+                    .map_err(|error| {
+                        PlatformError::Other(format!(
+                            "failed to settle preceding display update: {error}"
+                        ))
+                    })?;
             }
             // An armed image belongs to this single output attempt. Snapshot
             // rendering and later menu/wake redraws cannot consume it again.
             let mut observed_frame = self.frame_observer.begin();
             let render_started = observed_frame.as_ref().map(|_| Instant::now());
             let mut dirty_region = None;
+            let mut did_draw = false;
             self.window.draw_if_needed(|renderer| {
+                did_draw = true;
                 let _scanout_rotation = ScanoutRotation::new(
                     renderer,
                     match render_rotation {
@@ -776,11 +891,11 @@ impl Platform for KindlePlatform {
                 );
                 // Rotation changes require a complete retained scene; Slint
                 // does not invalidate its dirty cache for output rotation alone.
-                if rotation_changed {
+                if rotation_changed || sleep_token.is_some() {
                     renderer.set_repaint_buffer_type(RepaintBufferType::NewBuffer);
                 }
                 let dirty = scene.render(renderer, width);
-                if rotation_changed {
+                if rotation_changed || sleep_token.is_some() {
                     renderer.set_repaint_buffer_type(RepaintBufferType::ReusedBuffer);
                 }
                 let origin = dirty.bounding_box_origin();
@@ -792,6 +907,14 @@ impl Platform for KindlePlatform {
                     height: size.height,
                 });
             });
+            if sleep_token.is_some() && !did_draw {
+                // A redraw request is not evidence that a complete sleep scene
+                // was rendered. Keep the token pending until a visible draw.
+                if let Some(observed) = observed_frame.as_mut() {
+                    observed.unavailable(NativeFrameUnavailable::NoWrite);
+                }
+                continue;
+            }
             if force_full {
                 dirty_region = Some(PhysicalRect {
                     x: 0,
@@ -819,11 +942,13 @@ impl Platform for KindlePlatform {
             if let Some(observed) = observed_frame.as_mut() {
                 if let Some(region) = written.region {
                     let sequence = frame_sequence.expect("written output has a sequence");
-                    if reader_output_eligible(
-                        sequence,
-                        self.lifecycle.resume_frame_pending.load(Ordering::Acquire),
-                        rotation_changed || written.mode_changed || force_full,
-                    ) {
+                    if sleep_token.is_none()
+                        && reader_output_eligible(
+                            sequence,
+                            self.lifecycle.resume_frame_pending.load(Ordering::Acquire),
+                            rotation_changed || written.mode_changed || force_full,
+                        )
+                    {
                         let full = region.x == 0
                             && region.y == 0
                             && region.width == panel_width
@@ -839,7 +964,21 @@ impl Platform for KindlePlatform {
                 }
             }
             let submission_started = observed_frame.as_ref().map(|_| Instant::now());
-            let submission = if rotation_changed || written.mode_changed || force_full {
+            let mut sleep_submission = None;
+            let submission = if sleep_token.is_some() {
+                Some(
+                    frame_buffer
+                        .refresh_full_checked()
+                        .map(|receipt| {
+                            sleep_submission = Some(receipt);
+                        })
+                        .map_err(|error| {
+                            PlatformError::Other(format!(
+                                "sleep presentation update was rejected: {error}"
+                            ))
+                        }),
+                )
+            } else if rotation_changed || written.mode_changed || force_full {
                 Some(frame_buffer.refresh_full().map_err(|error| {
                     PlatformError::Other(format!("full framebuffer refresh was rejected: {error}"))
                 }))
@@ -877,6 +1016,35 @@ impl Platform for KindlePlatform {
             }
             drawn_rotation = applied_rotation;
             drawn_render_rotation = render_rotation;
+            if let Some(token) = sleep_token {
+                let receipt = sleep_submission.as_ref().ok_or_else(|| {
+                    PlatformError::Other("sleep presentation has no accepted update".into())
+                })?;
+                frame_buffer
+                    .wait_for_submission_complete_checked(receipt)
+                    .map_err(|error| {
+                        PlatformError::Other(format!(
+                            "sleep presentation update did not complete: {error}"
+                        ))
+                    })?;
+                // A layout/scanout change during the update needs a fresh full
+                // sleep frame. Keep its token pending and preserve the input gate.
+                if self.observe_portrait(
+                    &frame_buffer,
+                    &mut touch_input,
+                    &mut portrait,
+                    &mut input_epoch,
+                )? || portrait.is_blocked()
+                {
+                    continue;
+                }
+                self.lifecycle_handle()
+                    .complete_sleep_presentation(token)
+                    .map_err(|error| PlatformError::Other(error.to_string()))?;
+                // The caller inhibits ordinary intents and suspends next. Its
+                // checkpoint must not wait for a new touch SYN_REPORT here.
+                continue;
+            }
             if input_epoch.is_blocked() {
                 frame_buffer
                     .wait_for_update_complete_checked()
@@ -917,7 +1085,7 @@ impl Platform for KindlePlatform {
                 }
             }
         }
-        Ok(())
+        self.event_loop_result()
     }
 }
 
@@ -929,7 +1097,9 @@ fn duration_to_ms(d: Duration) -> libc::c_int {
 
 impl Drop for KindlePlatform {
     fn drop(&mut self) {
-        self.quit_flag.store(true, Ordering::SeqCst);
+        let pending = wakeup::close_and_take_pending(&self.queue, &self.quit_flag);
+        self.lifecycle.sleep_presentation.terminate();
+        drop(pending);
     }
 }
 
@@ -1025,6 +1195,179 @@ fn set_orientation_pipe_nonblocking(descriptor: RawFd) -> io::Result<()> {
 fn retire_orientation_child(mut child: Child) {
     let _ = child.kill();
     let _ = child.wait();
+}
+
+#[cfg(test)]
+mod control_queue_tests {
+    use super::*;
+    use std::sync::mpsc;
+
+    fn platform() -> KindlePlatform {
+        KindlePlatform::new(
+            Arc::new(Mutex::new(None)),
+            Rc::new(RefCell::new(None)),
+            Arc::new(AtomicBool::new(false)),
+            Arc::new(AtomicU32::new(0)),
+            Rc::new(RefCell::new(None)),
+            Rc::new(RefCell::new(None)),
+            Rc::new(FrameObserverState::default()),
+        )
+        .unwrap()
+    }
+
+    fn sleeping_platform() -> KindlePlatform {
+        let platform = platform();
+        platform.lifecycle_handle().begin_pause().unwrap();
+        platform
+    }
+
+    #[test]
+    fn a_sleeping_loop_accepts_control_and_quit_without_opening_native_devices() {
+        let platform = sleeping_platform();
+        let lifecycle = platform.lifecycle_handle();
+        let observed = lifecycle.clone();
+        let proxy = platform.new_event_loop_proxy().unwrap();
+        let quitter = platform.new_event_loop_proxy().unwrap();
+        proxy
+            .invoke_from_event_loop(Box::new(move || {
+                let status = observed.status();
+                assert!(status.render_paused && status.input_released);
+                observed.park().unwrap();
+                quitter.quit_event_loop().unwrap();
+            }))
+            .unwrap();
+        platform.run_event_loop().unwrap();
+        let status = lifecycle.status();
+        assert!(status.render_paused && status.input_released && status.parked);
+        assert_eq!(status.pause_count, 1);
+        assert_eq!(status.resume_count, 0);
+        assert_eq!(status.frame_write_count, 0);
+        assert_eq!(status.frame_send_count, 0);
+        assert!(!lifecycle.state.native_io_started.load(Ordering::Acquire));
+    }
+
+    #[test]
+    fn initial_resume_defers_native_reacquisition_and_its_counter_until_io_starts() {
+        let platform = sleeping_platform();
+        let lifecycle = platform.lifecycle_handle();
+        let observed = lifecycle.clone();
+        platform
+            .new_event_loop_proxy()
+            .unwrap()
+            .invoke_from_event_loop(Box::new(move || {
+                observed.park().unwrap();
+                observed.resume().unwrap();
+            }))
+            .unwrap();
+        assert!(platform.wait_for_native_ownership().unwrap());
+        let status = lifecycle.status();
+        assert!(status.render_paused && status.input_released);
+        assert!(!status.parked);
+        assert_eq!(status.pause_count, 1);
+        assert_eq!(status.resume_count, 0);
+        assert!(!lifecycle.state.native_io_started.load(Ordering::Acquire));
+    }
+
+    #[test]
+    fn sleeping_control_quit_cancels_the_remainder_of_its_batch() {
+        let platform = sleeping_platform();
+        let proxy = platform.new_event_loop_proxy().unwrap();
+        let quitter = platform.new_event_loop_proxy().unwrap();
+        proxy
+            .invoke_from_event_loop(Box::new(move || quitter.quit_event_loop().unwrap()))
+            .unwrap();
+        let (sender, receiver) = mpsc::channel::<()>();
+        proxy
+            .invoke_from_event_loop(Box::new(move || {
+                drop(sender);
+                panic!("a control callback ran after quit");
+            }))
+            .unwrap();
+        platform.run_event_loop().unwrap();
+        assert_eq!(
+            receiver.recv_timeout(Duration::from_secs(2)),
+            Err(mpsc::RecvTimeoutError::Disconnected),
+        );
+        assert!(!platform.lifecycle.native_io_started.load(Ordering::Acquire));
+    }
+
+    #[test]
+    fn panicking_sleeping_control_still_closes_admission_and_releases_captures() {
+        let platform = sleeping_platform();
+        let proxy = platform.new_event_loop_proxy().unwrap();
+        proxy
+            .invoke_from_event_loop(Box::new(|| panic!("controlled callback failure")))
+            .unwrap();
+        let (sender, receiver) = mpsc::channel::<()>();
+        proxy
+            .invoke_from_event_loop(Box::new(move || drop(sender)))
+            .unwrap();
+        let result =
+            std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| platform.run_event_loop()));
+        assert!(result.is_err());
+        assert_eq!(
+            receiver.recv_timeout(Duration::from_secs(2)),
+            Err(mpsc::RecvTimeoutError::Disconnected),
+        );
+        assert!(wakeup::queue_is_empty(&platform.queue, &platform.quit_flag));
+        assert!(proxy.invoke_from_event_loop(Box::new(|| {})).is_err());
+        assert!(!platform.lifecycle.native_io_started.load(Ordering::Acquire));
+    }
+
+    #[test]
+    fn quit_before_native_io_releases_pending_work_and_closes_admission() {
+        let platform = platform();
+        let lifecycle = platform.lifecycle_handle();
+        let proxy = platform.new_event_loop_proxy().unwrap();
+        let (sender, receiver) = mpsc::channel::<()>();
+        proxy
+            .invoke_from_event_loop(Box::new(move || drop(sender)))
+            .unwrap();
+        proxy.quit_event_loop().unwrap();
+        platform.run_event_loop().unwrap();
+        assert_eq!(
+            receiver.recv_timeout(Duration::from_secs(2)),
+            Err(mpsc::RecvTimeoutError::Disconnected),
+        );
+        assert!(!lifecycle.state.native_io_started.load(Ordering::Acquire));
+        assert!(lifecycle.resume().is_err());
+        assert!(proxy.invoke_from_event_loop(Box::new(|| {})).is_err());
+    }
+
+    #[test]
+    fn queue_capacity_failure_returns_without_acquiring_native_devices() {
+        let platform = platform();
+        let proxy = platform.new_event_loop_proxy().unwrap();
+        for _ in 0..wakeup::MAX_QUEUED_CLOSURES {
+            proxy.invoke_from_event_loop(Box::new(|| {})).unwrap();
+        }
+        assert!(proxy.invoke_from_event_loop(Box::new(|| {})).is_err());
+        let error = platform.run_event_loop().unwrap_err();
+        assert!(format!("{error}").contains("capacity"));
+        assert!(!platform.lifecycle.native_io_started.load(Ordering::Acquire));
+        assert!(wakeup::queue_is_empty(&platform.queue, &platform.quit_flag));
+    }
+
+    #[test]
+    fn platform_drop_releases_captures_while_proxies_keep_the_pipe_reader_alive() {
+        let platform = platform();
+        let lifecycle = platform.lifecycle_handle();
+        let token = lifecycle.request_sleep_presentation().unwrap();
+        let proxy = platform.new_event_loop_proxy().unwrap();
+        let (sender, receiver) = mpsc::channel::<()>();
+        proxy
+            .invoke_from_event_loop(Box::new(move || drop(sender)))
+            .unwrap();
+        drop(platform);
+        assert_eq!(
+            receiver.recv_timeout(Duration::from_secs(2)),
+            Err(mpsc::RecvTimeoutError::Disconnected),
+        );
+        assert!(proxy.invoke_from_event_loop(Box::new(|| {})).is_err());
+        proxy.quit_event_loop().unwrap();
+        assert!(lifecycle.sleep_presentation_completed(token).is_err());
+        assert!(lifecycle.pending_sleep_presentation().is_err());
+    }
 }
 
 #[cfg(test)]

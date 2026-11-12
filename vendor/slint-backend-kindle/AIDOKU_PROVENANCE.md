@@ -84,3 +84,67 @@ No additional repaint, wait, driver flag or MDP operation is requested. The
 application's observer is installed only for opt-in timing; physical e-ink
 completion still requires a separate observation. See the
 [measurement contract](../../docs/READER_E2E_MEASUREMENT.md).
+
+## BiliComics lifecycle and input refinement
+
+On 2026-11-12, Aidoku adopts selected backend behaviors from the operator's
+sibling BiliComics revision
+`0e2b816b13aef5b0fe5cad87be4e85c0d75e088d`. The bounded 256-entry FIFO wakeup
+queue is directly reused, including synchronized admission/shutdown, explicit
+capacity and poison failures, unlocked capture destruction, and pipe-reader
+ownership while proxies remain alive. The platform adapts that queue and
+defers initial native I/O while suspended. The refresh producer rejects both
+requested and applied suspend state. Slotless touch input retains optional
+coordinates independently of contact ownership and waits for both axes before
+its first press.
+
+The existing direction observer already shares the reference's core sensor
+protocol and is retained. Aidoku also retains its authenticated native portrait
+calibration, fresh layout checks, invalid/flat pose handling, input epochs,
+Protocol-B snapshot and tracking-ID suppression, SYN_DROPPED recovery, retained
+Gray8/RGB rendering, and distinct successful SEND markers. The port does not
+replace these more complete Aidoku boundaries with the reference's rendering
+or lifecycle structures. The application adapter and normal native cleanup
+remain Aidoku-owned.
+
+That four-file control/input refinement passed all 125 backend library tests
+on `test-env`, with six Cargo jobs, before the checked sleep follow-up. Its
+`test-backend-01.log` belongs to the isolated
+`aidoku-reader-fix-20261112-01` verification run. These controlled tests do not
+establish a physical Kindle result.
+
+## Checked sleep-frame receipt
+
+The next extension follows BiliComics revision
+`9f6b6884f9cc9a080318cff9b3d5e5f2a7f1d632`, documented there in
+`docs/SLEEP_COVER.md`, which in turn credits WeRead revision
+`6a1d070f3b4730146eafeea849fe8b67fc5cf14d`. Aidoku adapts the independent
+sleep-presentation token state to its shared lifecycle synchronization instead
+of copying the sibling's lifecycle ownership structure.
+
+The application requests a token after showing prepared sleep state and yields
+to the native event loop. The backend waits for the preceding accepted update
+before changing mapped pixels, renders the complete sleep scene, submits a
+checked full update with a distinct marker, and acknowledges only after that
+marker completes. The request's completion cannot be inferred from Reader
+observations, UI properties, timers, queue admission, or a SEND counter.
+An opaque `SubmittedUpdate` receipt binds the checked wait to its owning
+framebuffer and independent marker; foreign or stale receipts are rejected.
+Settling preceding work permits an empty history, while checked completion
+without a successful submission cannot succeed. Checked marker allocation
+returns `EOVERFLOW` at exhaustion instead of wrapping and reusing a marker or
+completion-cache entry.
+
+Unfinished tokens are cancelled by pause, resume, or termination.
+`LifecycleHandle::cancel_sleep_presentation()` also supports replacement or an
+early hide of prepared sleep state. This separate receipt does not wait for a
+new touch report before allowing the application to perform its deferred sleep
+checkpoint.
+
+Cover preparation, saved checkpoints, capability decisions, stock screensaver
+fallback, supervisor identity matching, and native process restoration remain
+outside this backend receipt. Their integration and the checked-sleep backend
+follow-up require separate Aidoku verification and exact executable identities.
+The earlier 125-test run and the sibling projects' test counts or physical
+acceptance do not certify this new path. Original licenses and all earlier
+attribution remain preserved.

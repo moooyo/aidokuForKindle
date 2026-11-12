@@ -18,7 +18,7 @@ The upstream manifest declares `fontique 0.11` and `fontdb 0.24`, whereas Slint 
 
 Rectangles use physical window pixels before render rotation. Empty rectangles are rejected immediately. Other rectangles are intersected with the actual window geometry and rotated into panel coordinates before an update is submitted. Signed positions and unsigned dimensions use widened arithmetic, preventing wraparound when a caller supplies a negative origin or a very large size.
 
-A successful call means that the request entered the producer queue. It is not a completion receipt or evidence of panel quality. Requests after event-loop termination are rejected. The queue holds at most 32 requests; overload collapses to one conservative GC16 full-screen request rather than growing memory without a bound.
+A successful call means that the request entered the producer queue. It is not a completion receipt or evidence of panel quality. Requests after event-loop termination, or while suspend is requested or applied, are rejected. The queue holds at most 32 requests; overload collapses to one conservative GC16 full-screen request rather than growing memory without a bound.
 
 ## Rendering order
 
@@ -51,7 +51,8 @@ The application adapter maps UI and reading partial requests to AUTO, press feed
 - `src/platform.rs`: queue wiring, render-mode changes, suspend eligibility, post-render execution, bounded startup orientation queries, and termination state.
 - `src/render_control.rs`: software dark-mode requests, canonical-buffer conversion, and controlled rendering tests.
 - `src/splash.rs`: an exclusive temporary framebuffer owner for startup text, stages, and low-frequency loading feedback.
-- `src/wakeup.rs`: make the existing pipe nudge usable inside this crate and retry interrupted writes.
+- `src/wakeup.rs`: bounded control-closure admission, shutdown cancellation, retained pipe readers, and interrupted-write handling.
+- `src/sleep_presentation.rs`: independent checked sleep-frame tokens and cancellation state.
 - `src/framebuffer/mod.rs`: execute resolved plans through the existing driver and map driver-specific waveforms.
 - `src/framebuffer/ffi.rs`: reviewed DU/A2 and monochrome constants.
 - `Cargo.toml`: omit the unavailable example workspace and align font dependencies with Slint 1.17.1's actual resolved versions and dlopen requirements.
@@ -116,7 +117,7 @@ After adding the clipboard extension, five additional pure standard-library test
 
 After the native touch-scale fix, the complete standalone dependency suite passed 17 tests on `test-env`, including the new four-rotation/scale-2 coordinate vectors. The pinned PW6 firmware emulator independently reproduced the old physical-coordinate mismatch and exercised corrected QEMU-injected taps through the guest input driver. These are separate controlled-test and emulator observations; neither establishes physical-device input acceptance.
 
-The current standalone dependency suite passed 31 tests on `test-env`, including software display-mode conversion, complete rewrites on mode changes, startup rendering, and bounded orientation queries. The earlier counts above retain their historical scope. Current physical and firmware-emulator observations, with their separate executable identities and outstanding gates, are recorded in [Physical testing](../../docs/PHYSICAL_TESTING.md).
+An earlier standalone dependency suite passed 31 tests on `test-env`, including software display-mode conversion, complete rewrites on mode changes, startup rendering, and bounded orientation queries. The earlier counts above retain their historical scope. Current physical and firmware-emulator observations, with their separate executable identities and outstanding gates, are recorded in [Physical testing](../../docs/PHYSICAL_TESTING.md).
 
 ## Aidoku native pointer observation
 
@@ -204,3 +205,90 @@ submission ordering, wait targets or input ownership. Successful SEND means
 driver acceptance, not optical panel completion. Application timing and its
 controlled baseline procedure are documented in
 [Reader end-to-end measurement](../../docs/READER_E2E_MEASUREMENT.md).
+
+## BiliComics control, sleep, and input parity
+
+The 2026-11-12 refinement uses the operator's sibling BiliComics revision
+`0e2b816b13aef5b0fe5cad87be4e85c0d75e088d` as its source reference. It ports
+specific control and ownership behaviors into Aidoku's existing backend.
+
+- `src/wakeup.rs` directly adopts BiliComics' 256-entry FIFO control queue.
+  Admission and shutdown share the same lock. Capacity exhaustion and a
+  poisoned lock close admission explicitly, pending captures are released
+  outside the lock, and outstanding proxies retain a pipe reader. Each queued
+  callback checks termination before it can run.
+- `src/platform.rs` defers framebuffer mapping, evdev acquisition, and the
+  `native_io_started` claim while an initially sleeping process waits. The
+  control pipe remains available for checkpoint readiness, resume, and quit;
+  the wait does not run Slint timers, sensor work, or rendering. Resume rejoins
+  Aidoku's existing native acquisition and full-frame input barrier.
+- `src/refresh.rs` adapts BiliComics' suspend admission checks to Aidoku's
+  separate `pause_requested` and `applied_paused` state. Both are checked
+  before and after locking the producer queue, preventing new refresh work
+  from accumulating after native display ownership is released.
+- `src/touch.rs` adopts optional X/Y state for slotless Protocol-A and Kindle
+  snow-protocol input. Coordinates may arrive before the contact event; a
+  first press requires both axes. Ordinary release preserves unchanged axes,
+  while synchronization discards coordinates from the previous generation.
+
+The direction observer already shares BiliComics' recognized sensor selection,
+post-drain sampling, complete SYN frames, and dropped-frame recovery. Its
+implementation is retained. Aidoku additionally preserves invalid/flat sample
+handling, authenticated holding/scanout calibration, fresh framebuffer-layout
+checks, input epochs, Protocol-B slot snapshots and tracking-ID suppression.
+The retained Gray8 renderer and its RGB fallback, independent software output
+mode, distinct successful SEND markers, and Reader observations remain intact.
+These adaptations preserve those boundaries rather than replacing the backend
+with BiliComics' RGB rendering loop.
+
+The four-file control/input refinement passed all 125 standalone backend
+library tests on `test-env` with Cargo concurrency six. The preceding backend
+had 108 tests. `test-backend-01.log` in the isolated
+`aidoku-reader-fix-20261112-01` verification workspace records that run. It
+includes real nonblocking control-pipe tests and controlled lifecycle/input
+fixtures without opening a Kindle framebuffer. It precedes the checked sleep
+presentation follow-up below and establishes no new physical-device result.
+
+## Checked sleep presentation
+
+The separate sleep-frame contract follows BiliComics revision
+`9f6b6884f9cc9a080318cff9b3d5e5f2a7f1d632` and its `docs/SLEEP_COVER.md`.
+That reference credits the sibling WeRead sleep-cover implementation at
+`6a1d070f3b4730146eafeea849fe8b67fc5cf14d`. Existing upstream and sibling
+attribution and licenses remain unchanged.
+
+`LifecycleHandle::request_sleep_presentation()` requests an independent full
+frame and returns a token. The application must first show its prepared sleep
+state, inhibit ordinary intents, and yield to the event loop.
+`sleep_presentation_completed(token)` becomes true only after the backend has
+captured that token, rendered the complete scene, submitted its checked full
+update, and completed the wait for that update's distinct marker. Before
+rewriting mapped pixels, the backend also finishes any preceding accepted
+update. A queued refresh, UI property change, timer, SEND counter, failed ioctl,
+or older completion marker cannot acknowledge the token.
+
+Framebuffer submission returns an opaque `SubmittedUpdate` receipt bound to
+its owning framebuffer and independent marker. Checked completion rejects a
+foreign or stale receipt. Settling preceding work may do nothing when no update
+exists; a checked completion request without a successful submission cannot
+succeed. Marker allocation follows the reference's checked increment and
+returns `EOVERFLOW` at exhaustion instead of wrapping, preventing a reused
+marker or completion-cache entry from acknowledging a different update.
+
+The token control is adapted to Aidoku's shared lifecycle synchronization while
+preserving the existing public handle's thread-safety. Pause, resume, and
+termination cancel unfinished tokens; suspended and terminated displays reject
+new requests. `LifecycleHandle::cancel_sleep_presentation()` also lets the
+application cancel a pending request when replacing or hiding its prepared
+sleep state early. A request arriving after the render snapshot requires a
+later frame. This receipt is separate from Reader timing observations and the
+wake/reorientation contact-drain barrier. Sleep presentation can complete
+without waiting for a new touch SYN_REPORT, allowing deferred checkpoint work
+to proceed before display ownership is handed off.
+
+This backend contract does not acquire a comic, decode a cover, write a
+checkpoint, authorize custom screensavers, or change stock powerd policy. Those
+responsibilities remain at the application and supervisor boundaries. The
+checked sleep follow-up requires its own Aidoku remote tests, runtime checks,
+and exact device evidence; neither the earlier 125-test run nor BiliComics'
+separate test counts or physical results establish its acceptance.

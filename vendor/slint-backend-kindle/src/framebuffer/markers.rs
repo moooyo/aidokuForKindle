@@ -9,6 +9,7 @@ use std::io;
 pub(super) struct UpdateMarkers {
     allocated: Cell<u32>,
     last_submitted: Cell<Option<u32>>,
+    last_completed: Cell<Option<u32>>,
 }
 
 impl UpdateMarkers {
@@ -17,27 +18,59 @@ impl UpdateMarkers {
     }
 
     pub(super) fn submit(&self, send: impl FnOnce(u32) -> io::Result<()>) -> io::Result<()> {
-        // Zero means no update in the kernel APIs. Keep every allocated marker
-        // nonzero, including the first one after the u32 counter wraps.
-        let marker = self.allocated.get().wrapping_add(1).max(1);
+        self.submit_checked(send).map(|_| ())
+    }
+
+    pub(super) fn submit_checked(
+        &self,
+        send: impl FnOnce(u32) -> io::Result<()>,
+    ) -> io::Result<u32> {
+        // A reused marker could match an old pending or completed update. Zero
+        // is never a submitted identity, and exhaustion must not wrap to one.
+        let marker = self
+            .allocated
+            .get()
+            .checked_add(1)
+            .ok_or_else(|| io::Error::from_raw_os_error(libc::EOVERFLOW))?;
         self.allocated.set(marker);
         send(marker)?;
         self.last_submitted.set(Some(marker));
-        Ok(())
+        Ok(marker)
     }
 
     pub(super) fn wait_for_last_submitted(
         &self,
-        mut wait: impl FnMut(u32) -> io::Result<()>,
+        wait: impl FnMut(u32) -> io::Result<()>,
     ) -> io::Result<()> {
         let Some(marker) = self.last_submitted.get() else {
             // Opening a framebuffer does not create an update to wait for.
             return Ok(());
         };
+        self.wait_for_submitted(marker, wait)
+    }
+
+    pub(super) fn wait_for_submitted(
+        &self,
+        marker: u32,
+        mut wait: impl FnMut(u32) -> io::Result<()>,
+    ) -> io::Result<()> {
+        if self.last_submitted.get() != Some(marker) {
+            return Err(io::Error::new(
+                io::ErrorKind::InvalidInput,
+                "the update receipt is not the current accepted submission",
+            ));
+        }
+        if self.last_completed.get() == Some(marker) {
+            return Ok(());
+        }
         loop {
             match wait(marker) {
                 Err(error) if error.kind() == io::ErrorKind::Interrupted => continue,
-                result => return result,
+                Err(error) => return Err(error),
+                Ok(()) => {
+                    self.last_completed.set(Some(marker));
+                    return Ok(());
+                }
             }
         }
     }
@@ -123,27 +156,26 @@ mod tests {
     }
 
     #[test]
-    fn wrapping_keeps_zero_out_of_submissions_and_fences() {
+    fn marker_exhaustion_cannot_reuse_an_old_submission_or_completion() {
         let markers = UpdateMarkers {
             allocated: Cell::new(u32::MAX - 1),
             ..Default::default()
         };
-        let mut sent = Vec::new();
-        for expected in [u32::MAX, 1, 2] {
-            markers
-                .submit(|marker| {
-                    sent.push(marker);
-                    Ok(())
-                })
-                .unwrap();
-            markers
-                .wait_for_last_submitted(|target| {
-                    assert_eq!(target, expected);
-                    Ok(())
-                })
-                .unwrap();
-        }
-        assert_eq!(sent, [u32::MAX, 1, 2]);
+        assert_eq!(markers.submit_checked(|_| Ok(())).unwrap(), u32::MAX);
+        markers
+            .wait_for_last_submitted(|target| {
+                assert_eq!(target, u32::MAX);
+                Ok(())
+            })
+            .unwrap();
+        let error = markers
+            .submit_checked(|_| panic!("an exhausted session cannot issue another SEND"))
+            .unwrap_err();
+        assert_eq!(error.raw_os_error(), Some(libc::EOVERFLOW));
+        assert_eq!(markers.last_submitted(), Some(u32::MAX));
+        markers
+            .wait_for_last_submitted(|_| panic!("the accepted completion remains cached"))
+            .unwrap();
     }
 
     #[test]

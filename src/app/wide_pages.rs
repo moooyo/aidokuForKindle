@@ -2,7 +2,7 @@
 //!
 //! The normal renderer prepares a double-width page before a worker selects a
 //! half. This keeps each half at viewport resolution and reuses the existing
-//! raw validation, persistent render key, decoder budget and prefetch scheduler.
+//! raw validation, versioned Raster key, decoder budget and prefetch scheduler.
 
 use std::{
     path::Path,
@@ -55,6 +55,7 @@ pub(super) fn render(
         preferences,
         half,
         None,
+        false,
     )
 }
 
@@ -81,6 +82,34 @@ pub(super) fn prefetch(
         preferences,
         half,
         Some(cancellation),
+        false,
+    )
+}
+
+pub(super) fn prefetch_next(
+    cache: &CacheManager,
+    page: &Page,
+    raw: &Path,
+    options: &ImageOptions,
+    vertical: bool,
+    offset: u32,
+    zoom: f32,
+    preferences: &Preferences,
+    half: u8,
+    cancellation: &DecodeCancellation,
+) -> Result<WidePage> {
+    render_page(
+        cache,
+        page,
+        raw,
+        options,
+        vertical,
+        offset,
+        zoom,
+        preferences,
+        half,
+        Some(cancellation),
+        true,
     )
 }
 
@@ -95,6 +124,7 @@ fn render_page(
     preferences: &Preferences,
     half: u8,
     cancellation: Option<&DecodeCancellation>,
+    private_next: bool,
 ) -> Result<WidePage> {
     ensure!(
         zoom.is_finite() && (1.0..=4.0).contains(&zoom),
@@ -114,18 +144,31 @@ fn render_page(
     // would discard the outside edges before either half was selected.
     let render_zoom = if wide { 1.0 } else { zoom };
     let mut rendered = if let Some(cancellation) = cancellation {
-        render_cache::prefetch_cancellable(
-            cache,
-            page,
-            raw,
-            &target,
-            vertical,
-            offset,
-            render_zoom,
-            cancellation,
-        )?
+        if private_next {
+            render_cache::prefetch_next_raster_cancellable(
+                cache,
+                page,
+                raw,
+                &target,
+                vertical,
+                offset,
+                render_zoom,
+                cancellation,
+            )?
+        } else {
+            render_cache::prefetch_raster_cancellable(
+                cache,
+                page,
+                raw,
+                &target,
+                vertical,
+                offset,
+                render_zoom,
+                cancellation,
+            )?
+        }
     } else {
-        render_cache::render(cache, page, raw, &target, vertical, offset, render_zoom)?
+        render_cache::render_raster(cache, page, raw, &target, vertical, offset, render_zoom)?
     };
     if let Some(cancellation) = cancellation {
         cancellation.check()?;
@@ -403,5 +446,76 @@ mod tests {
         assert!(Arc::ptr_eq(&image, &returned));
         assert!(cache.entries.is_empty());
         assert_eq!(cache.bytes, 0);
+    }
+
+    #[test]
+    fn next_half_retains_and_promotes_the_full_raster_key() {
+        let directory = tempfile::tempdir().unwrap();
+        let raw = directory.path().join("wide-source.png");
+        GrayImage::from_fn(7, 4, |x, y| image::Luma([(x + y * 17) as u8]))
+            .save(&raw)
+            .unwrap();
+        let page = Page {
+            local_path: Some(raw.clone()),
+            ..Page::default()
+        };
+        let cache = CacheManager::open_with_config(
+            directory.path().join("state"),
+            crate::cache::CacheConfig {
+                max_unpinned_bytes: 128 * 1024 * 1024,
+                min_free_bytes: 0,
+            },
+        )
+        .unwrap();
+        let preferences = Preferences {
+            split_wide: true,
+            spread: false,
+            reading_direction: "rtl".into(),
+            ..Preferences::default()
+        };
+        let options = ImageOptions {
+            width: 4,
+            height: 4,
+            crop_borders: false,
+            dither: false,
+            contrast: 0,
+        };
+        let cancellation = DecodeCancellation::new();
+        let prepared = prefetch_next(
+            &cache,
+            &page,
+            &raw,
+            &options,
+            false,
+            0,
+            1.0,
+            &preferences,
+            0,
+            &cancellation,
+        )
+        .unwrap();
+        assert!(prepared.wide);
+        assert_eq!(prepared.rendered.image.dimensions(), (4, 4));
+        let retained = prepared.rendered.retained_raster.unwrap();
+        assert_eq!(retained.retained_bytes(), 28);
+        assert!(
+            prepared
+                .rendered
+                .source_proof
+                .unwrap()
+                .verify(&cache)
+                .unwrap()
+        );
+        retained.promote(&cache).unwrap();
+        let full_options = ImageOptions {
+            width: 8,
+            ..options
+        };
+        let full =
+            render_cache::render_raster(&cache, &page, &raw, &full_options, false, 0, 1.0).unwrap();
+        assert!(full.memory_hit);
+        assert_eq!(full.image.dimensions(), (7, 4));
+        assert_eq!(cache.stats().commits, 0);
+        render_cache::clear_memory(&cache);
     }
 }

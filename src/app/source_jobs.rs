@@ -210,7 +210,7 @@ impl App {
         self.spawn_worker(foreground, false, kind, None, None, operation)
     }
 
-    fn spawn_worker(
+    pub(super) fn spawn_worker(
         &mut self,
         foreground: bool,
         source_dependent: bool,

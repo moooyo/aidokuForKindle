@@ -1,10 +1,13 @@
+mod bootstrap_fonts;
 mod bootstrap_lifecycle;
 mod bootstrap_presentation;
+mod bootstrap_startup;
+mod sleep_cover_protocol;
+mod sleep_cover_runtime;
 
 use std::{
     cell::{Cell, RefCell},
     fs,
-    io::Read,
     path::{Path, PathBuf},
     rc::Rc,
     sync::{
@@ -18,61 +21,18 @@ use aidoku_kindle::{
     app::{App, AppOptions},
     gestures::PointerPagination,
     platform::{DeviceProfile, Platform, PointerInput, PointerObserver, PointerPhase},
-    ui::{AppWindow, Commands, State, Theme},
+    ui::{AppWindow, Commands, State},
 };
 use anyhow::{Context, Result, bail};
 use clap::Parser;
-use flate2::read::GzDecoder;
 use serde::{Deserialize, Serialize};
-use slint::{ComponentHandle, fontique_010::fontique};
+use slint::ComponentHandle;
+
+use bootstrap_fonts::Fonts;
+use bootstrap_startup::{ApplicationSlot, Startup};
 
 static STOP_REQUESTED: AtomicBool = AtomicBool::new(false);
 static FONT_INITIALIZATIONS: AtomicU64 = AtomicU64::new(0);
-
-const SANS_REGULAR: &[u8] = include_bytes!("../assets/fonts/NotoSansSC-Regular.otf.gz");
-const BUNDLED_FONTS: &[(&str, f32, &[u8])] = &[
-    ("Noto Sans CJK SC", 400.0, SANS_REGULAR),
-    (
-        "Noto Sans CJK SC",
-        500.0,
-        include_bytes!("../assets/fonts/NotoSansSC-Medium.otf.gz"),
-    ),
-    (
-        "Noto Sans CJK SC",
-        700.0,
-        include_bytes!("../assets/fonts/NotoSansSC-Bold.otf.gz"),
-    ),
-    (
-        "Noto Serif CJK SC",
-        400.0,
-        include_bytes!("../assets/fonts/NotoSerifSC-Regular.otf.gz"),
-    ),
-    (
-        "Noto Serif CJK SC",
-        700.0,
-        include_bytes!("../assets/fonts/NotoSerifSC-Bold.otf.gz"),
-    ),
-    (
-        "Noto Serif CJK SC",
-        900.0,
-        include_bytes!("../assets/fonts/NotoSerifSC-Black.otf.gz"),
-    ),
-    (
-        "Literata",
-        400.0,
-        include_bytes!("../assets/fonts/Literata-Regular.ttf.gz"),
-    ),
-    (
-        "Literata",
-        600.0,
-        include_bytes!("../assets/fonts/Literata-SemiBold.ttf.gz"),
-    ),
-    (
-        "Literata",
-        700.0,
-        include_bytes!("../assets/fonts/Literata-Bold.ttf.gz"),
-    ),
-];
 
 #[derive(Debug, Parser)]
 #[command(name = "aidoku", version, about = "Independent Kindle manga reader")]
@@ -244,33 +204,26 @@ fn run(arguments: Arguments) -> Result<()> {
     aidoku_kindle::reader_timing::mark("platform_initialized");
     let mut startup_feedback =
         bootstrap_presentation::StartupFeedback::show(&platform, &data_dir, arguments.demo)?;
-    let mut fonts = Vec::with_capacity(BUNDLED_FONTS.len());
-    for (family, weight, bytes) in BUNDLED_FONTS {
-        if STOP_REQUESTED.load(Ordering::Acquire) {
-            return Ok(());
-        }
-        fonts.push(
-            decompress_font(bytes)
-                .with_context(|| format!("Load bundled {family} weight {weight}"))?,
-        );
-    }
-    aidoku_kindle::reader_timing::mark("fonts_loaded");
     if STOP_REQUESTED.load(Ordering::Relaxed) {
         return Ok(());
     }
     // The Kindle backend changes its default-font environment variable. Install
     // it before Tokio or any other background worker is started.
-    startup_feedback.set_stage(1);
     startup_feedback.pause()?;
-    platform.install_backend(fonts[0].as_slice())?;
+    platform.install_backend(Fonts::bootstrap_bytes())?;
     bootstrap_lifecycle::install_signal_wakeup(platform.signal_wakeup_fd())?;
-    startup_feedback.resume()?;
     let ui = AppWindow::new().context("Create the application window")?;
-    register_fonts(&ui, &fonts)?;
+    Fonts::register_bootstrap(&ui)?;
     ui.global::<State>()
         .set_large_screen(arguments.device.is_scribe());
-
-    let app = App::attach(
+    ui.global::<State>().set_landscape(arguments.landscape);
+    let (width, height) = platform.runtime_logical_size(arguments.landscape);
+    ui.set_canvas_width(width as f32);
+    ui.set_canvas_height(height as f32);
+    platform.configure_window(ui.window(), arguments.landscape)?;
+    bootstrap_presentation::configure_startup(&ui, &data_dir, arguments.demo)?;
+    let app: ApplicationSlot = Rc::new(RefCell::new(None));
+    let startup = Rc::new(RefCell::new(Startup::new(
         &ui,
         AppOptions {
             data_dir,
@@ -280,16 +233,21 @@ fn run(arguments: Arguments) -> Result<()> {
             landscape: arguments.landscape,
             resume: arguments.resume,
         },
-        platform.clone(),
-    )?;
-    startup_feedback.set_stage(2);
-    if let Some(path) = arguments.import.as_deref() {
-        app.borrow_mut().dispatch(
-            "local",
-            "import",
-            path.to_str()
-                .context("The import path must be valid Unicode")?,
-        )?;
+        arguments.device,
+        arguments.import,
+        platform.sleep_status().frame_send_count,
+    )));
+    {
+        let ui_weak = ui.as_weak();
+        ui.global::<Commands>()
+            .on_action(move |section, action, _| {
+                if section == "app"
+                    && action == "exit"
+                    && let Some(ui) = ui_weak.upgrade()
+                {
+                    ui.global::<Commands>().invoke_exit_requested();
+                }
+            });
     }
     let pointer_observer = pagination_observer(&ui, &app, &platform);
     platform.install_input_observer(ui.window(), pointer_observer.clone())?;
@@ -301,15 +259,18 @@ fn run(arguments: Arguments) -> Result<()> {
     )));
     let exit_render_requested = Arc::new(AtomicBool::new(false));
     let exit_rendered = Arc::new(AtomicBool::new(false));
+    let startup_rendered = Arc::new(AtomicBool::new(false));
     let rendering_notifier = {
         let requested = exit_render_requested.clone();
         let rendered = exit_rendered.clone();
+        let startup_rendered = startup_rendered.clone();
         ui.window()
             .set_rendering_notifier(move |state, _| {
-                if matches!(state, slint::RenderingState::AfterRendering)
-                    && requested.load(Ordering::Acquire)
-                {
-                    rendered.store(true, Ordering::Release);
+                if matches!(state, slint::RenderingState::AfterRendering) {
+                    startup_rendered.store(true, Ordering::Release);
+                    if requested.load(Ordering::Acquire) {
+                        rendered.store(true, Ordering::Release);
+                    }
                 }
             })
             .is_ok()
@@ -318,11 +279,71 @@ fn run(arguments: Arguments) -> Result<()> {
     let capture_settle_covers = arguments.capture_settle_covers;
     let capture_path = arguments.capture;
     let started = Instant::now();
+    let startup_ready_elapsed = Rc::new(Cell::new(None::<Duration>));
     let lifecycle = Rc::new(RefCell::new(bootstrap_lifecycle::Coordinator::new(
         arguments.kindle,
     )));
+    let advance_startup: Rc<RefCell<dyn FnMut() -> bool>> = {
+        let ui = ui.as_weak();
+        let app = Rc::downgrade(&app);
+        let platform = Rc::downgrade(&platform);
+        let lifecycle = lifecycle.clone();
+        let startup = startup.clone();
+        let rendered = startup_rendered.clone();
+        let ready_elapsed = startup_ready_elapsed.clone();
+        let failures = failures.clone();
+        let quitting = quitting.clone();
+        Rc::new(RefCell::new(move || {
+            if !lifecycle.borrow().application_work_allowed() {
+                return false;
+            }
+            if ready_elapsed.get().is_some() {
+                return true;
+            }
+            if startup.borrow().failed() {
+                return false;
+            }
+            let (Some(ui), Some(app), Some(platform)) =
+                (ui.upgrade(), app.upgrade(), platform.upgrade())
+            else {
+                return false;
+            };
+            let result = startup.borrow_mut().advance(
+                &ui,
+                &platform,
+                &app,
+                rendered.load(Ordering::Acquire),
+                rendering_notifier,
+            );
+            match result {
+                Ok(true) => {
+                    ready_elapsed.set(Some(lifecycle.borrow().active_elapsed(started)));
+                    lifecycle
+                        .borrow()
+                        .publish_initial(app.borrow().as_ref(), &platform);
+                    true
+                }
+                Ok(false) => false,
+                Err(error) => {
+                    failures
+                        .borrow_mut()
+                        .push(format!("Startup failed: {error:#}"));
+                    if let Some(app) = app.borrow().as_ref() {
+                        app.borrow_mut().shutdown();
+                    }
+                    startup.borrow_mut().fail(&ui, &platform);
+                    if deadline.is_some() {
+                        request_quit(&quitting, &failures);
+                    }
+                    false
+                }
+            }
+        }))
+    };
     {
         let ui_weak = ui.as_weak();
+        let app = app.clone();
+        let startup = startup.clone();
         let platform = platform.clone();
         let lifecycle = lifecycle.clone();
         let quitting = quitting.clone();
@@ -336,6 +357,19 @@ fn run(arguments: Arguments) -> Result<()> {
             let Some(ui) = ui_weak.upgrade() else {
                 return;
             };
+            startup.borrow_mut().cancel();
+            // Commands can request exit while dispatch still owns RefMut<App>.
+            // Retire the renderer now; the post-loop path hides the App scene.
+            if let Err(error) = lifecycle.borrow_mut().cancel_cover(None, &platform) {
+                failures
+                    .borrow_mut()
+                    .push(format!("Cancel sleep presentation failed: {error:#}"));
+            }
+            if app.borrow().is_none() {
+                lifecycle.borrow().announce_ordinary_exit();
+                request_quit(&quitting, &failures);
+                return;
+            }
             if !bootstrap_presentation::exit_display_owned(
                 lifecycle.borrow().active(),
                 platform.sleep_status(),
@@ -377,6 +411,7 @@ fn run(arguments: Arguments) -> Result<()> {
         let quitting = quitting.clone();
         let exit_feedback = exit_feedback.clone();
         let failures = failures.clone();
+        let advance_startup = advance_startup.clone();
         ui.global::<Commands>().on_job_ready(move || {
             if quitting.get() {
                 return;
@@ -387,6 +422,7 @@ fn run(arguments: Arguments) -> Result<()> {
                 return;
             };
             if STOP_REQUESTED.load(Ordering::Acquire) {
+                retire_sleep_cover(&lifecycle, &app, &platform, &failures);
                 lifecycle.borrow().announce_ordinary_exit();
                 request_quit(&quitting, &failures);
                 return;
@@ -399,18 +435,28 @@ fn run(arguments: Arguments) -> Result<()> {
             }
             // Handle a pending sleep before accepting a worker result. This
             // event must preserve the same ownership gate as the poll timer.
-            if let Err(error) = lifecycle.borrow_mut().drive(&ui, &app, &platform) {
+            let application = app.borrow().clone();
+            if let Err(error) = lifecycle
+                .borrow_mut()
+                .drive(&ui, application.as_ref(), &platform)
+            {
                 failures
                     .borrow_mut()
                     .push(format!("Lifecycle job-ready failed: {error:#}"));
                 request_quit(&quitting, &failures);
                 return;
             }
-            if !lifecycle.borrow().active() {
-                app.borrow().acknowledge_foreground_jobs_ready();
+            if !lifecycle.borrow().application_work_allowed() {
+                if let Some(app) = application {
+                    app.borrow().acknowledge_foreground_jobs_ready();
+                }
                 return;
             }
-            app.borrow_mut().poll_foreground_jobs();
+            let ready = (advance_startup.borrow_mut())();
+            let application = app.borrow().clone();
+            if ready && let Some(application) = application {
+                application.borrow_mut().poll_foreground_jobs();
+            }
         });
     }
     let poll_timer = slint::Timer::default();
@@ -429,6 +475,7 @@ fn run(arguments: Arguments) -> Result<()> {
                 return;
             };
             if STOP_REQUESTED.load(Ordering::Acquire) {
+                retire_sleep_cover(&lifecycle, &app, &platform, &failures);
                 lifecycle.borrow().announce_ordinary_exit();
                 request_quit(&quitting, &failures);
                 return;
@@ -439,7 +486,11 @@ fn run(arguments: Arguments) -> Result<()> {
                 request_quit(&quitting, &failures);
                 return;
             }
-            if let Err(error) = lifecycle.borrow_mut().drive(&ui, &app, &platform) {
+            let application = app.borrow().clone();
+            if let Err(error) = lifecycle
+                .borrow_mut()
+                .drive(&ui, application.as_ref(), &platform)
+            {
                 failures
                     .borrow_mut()
                     .push(format!("Lifecycle control failed: {error:#}"));
@@ -462,6 +513,8 @@ fn run(arguments: Arguments) -> Result<()> {
         let lifecycle = lifecycle.clone();
         let exit_feedback = exit_feedback.clone();
         let exit_rendered = exit_rendered.clone();
+        let advance_startup = advance_startup.clone();
+        let startup_ready_elapsed = startup_ready_elapsed.clone();
         let next_action = Cell::new(0usize);
         poll_timer.start(
             slint::TimerMode::Repeated,
@@ -474,6 +527,7 @@ fn run(arguments: Arguments) -> Result<()> {
                     return;
                 };
                 if STOP_REQUESTED.load(Ordering::Acquire) {
+                    retire_sleep_cover(&lifecycle, &app, &platform, &failures);
                     lifecycle.borrow().announce_ordinary_exit();
                     request_quit(&quitting, &failures);
                     return;
@@ -484,7 +538,12 @@ fn run(arguments: Arguments) -> Result<()> {
                     request_quit(&quitting, &failures);
                     return;
                 }
-                if let Err(error) = lifecycle.borrow_mut().drive(&ui, &app, &platform) {
+                let application = app.borrow().clone();
+                if let Err(error) =
+                    lifecycle
+                        .borrow_mut()
+                        .drive(&ui, application.as_ref(), &platform)
+                {
                     failures
                         .borrow_mut()
                         .push(format!("Lifecycle poll failed: {error:#}"));
@@ -498,6 +557,10 @@ fn run(arguments: Arguments) -> Result<()> {
                     return;
                 }
                 if exit_feedback.borrow().requested() {
+                    let Some(app) = application else {
+                        request_quit(&quitting, &failures);
+                        return;
+                    };
                     let now = Instant::now();
                     let mut feedback = exit_feedback.borrow_mut();
                     if feedback.frame_submitted(
@@ -543,7 +606,18 @@ fn run(arguments: Arguments) -> Result<()> {
                     }
                     return;
                 }
-                let elapsed = lifecycle.borrow().active_elapsed(started);
+                if !lifecycle.borrow().application_work_allowed()
+                    || !(advance_startup.borrow_mut())()
+                {
+                    return;
+                }
+                let Some(app) = app.borrow().clone() else {
+                    return;
+                };
+                let elapsed = lifecycle
+                    .borrow()
+                    .active_elapsed(started)
+                    .saturating_sub(startup_ready_elapsed.get().unwrap_or_default());
                 while let Some(action) = actions.get(next_action.get()) {
                     if Duration::from_millis(action.at_ms) > elapsed {
                         break;
@@ -596,7 +670,9 @@ fn run(arguments: Arguments) -> Result<()> {
                     }
                     if let Some(path) = capture_path.as_deref() {
                         capture_attempted.set(true);
-                        if let Err(error) = capture_window(&ui, path, &platform, &app.borrow()) {
+                        if let Err(error) =
+                            capture_window(&ui, path, &platform, Some(&app.borrow()))
+                        {
                             failures
                                 .borrow_mut()
                                 .push(format!("Capture failed: {error:#}"));
@@ -607,45 +683,48 @@ fn run(arguments: Arguments) -> Result<()> {
             },
         );
     }
+    startup_feedback.finish()?;
     ui.show().context("Show the application window")?;
     aidoku_kindle::reader_timing::mark("window_shown");
-    lifecycle.borrow().publish_initial(&app, &platform);
-    eprintln!(
-        "aidoku: {} window ready; profile={}, logical={}x{}, scale={}",
-        if arguments.kindle {
-            "native"
-        } else {
-            "desktop"
-        },
-        platform.profile().id(),
-        ui.get_canvas_width(),
-        ui.get_canvas_height(),
-        ui.window().scale_factor()
-    );
-    startup_feedback.finish()?;
+    aidoku_kindle::reader_timing::mark("startup_window_shown");
+    // Yield into the first-scene gate without waiting for the maintenance tick.
+    startup.borrow().schedule();
+    lifecycle.borrow().publish_initial(None, &platform);
     aidoku_kindle::reader_timing::mark("event_loop_started");
     let event_loop_result = slint::run_event_loop();
     poll_timer.stop();
+    lifecycle
+        .borrow_mut()
+        .retire_cover_after_event_loop(app.borrow().as_ref());
+    startup.borrow_mut().cancel();
     if event_loop_result.is_ok() && failures.borrow().is_empty() {
         lifecycle.borrow().announce_ordinary_exit();
     }
+    let application = app.borrow().clone();
+    let capture_app = application.as_ref().map(|app| app.borrow());
     if let Some(path) = capture_path.as_deref()
         && !capture_attempted.replace(true)
-        && let Err(error) = capture_window(&ui, path, &platform, &app.borrow())
+        && let Err(error) = capture_window(&ui, path, &platform, capture_app.as_deref())
     {
         failures
             .borrow_mut()
             .push(format!("Final capture failed: {error:#}"));
     }
-    app.borrow_mut().shutdown();
-    let already_drained = exit_feedback.borrow().started_shutdown();
-    let shutdown_finished = if already_drained && !app.borrow().shutdown_ready() {
-        false
-    } else {
-        app.borrow().finish_shutdown()
-    };
-    if !shutdown_finished {
-        eprintln!("aidoku: a bounded network request is still stopping");
+    drop(capture_app);
+    if let Some(app) = application {
+        app.borrow_mut().shutdown();
+        let already_drained = exit_feedback.borrow().started_shutdown();
+        let shutdown_finished = if already_drained && !app.borrow().shutdown_ready() {
+            false
+        } else {
+            app.borrow().finish_shutdown()
+        };
+        if !shutdown_finished {
+            eprintln!("aidoku: a bounded network request is still stopping");
+        }
+    }
+    if !startup.borrow_mut().finish() {
+        eprintln!("aidoku: a bounded startup preparation is still stopping");
     }
     bootstrap_lifecycle::clear_signal_wakeup();
     event_loop_result.context("Run the application event loop")?;
@@ -655,45 +734,9 @@ fn run(arguments: Arguments) -> Result<()> {
     Ok(())
 }
 
-fn decompress_font(bytes: &[u8]) -> Result<Arc<Vec<u8>>> {
-    let mut decoded = Vec::new();
-    GzDecoder::new(bytes)
-        .take(64 * 1024 * 1024 + 1)
-        .read_to_end(&mut decoded)
-        .context("Decompress the bundled font")?;
-    if decoded.len() > 64 * 1024 * 1024 {
-        bail!("A bundled font exceeds the decompression limit");
-    }
-    Ok(Arc::new(decoded))
-}
-
-fn register_fonts(ui: &AppWindow, fonts: &[Arc<Vec<u8>>]) -> Result<()> {
-    // The Slint software renderer uses this same Fontique collection. Register
-    // actual faces for every requested weight instead of synthetic bolding.
-    let mut collection = slint::fontique_010::shared_collection();
-    for ((expected_family, expected_weight, _), bytes) in BUNDLED_FONTS.iter().zip(fonts) {
-        let registered = collection.register_fonts(fontique::Blob::new(bytes.clone()), None);
-        let found = registered.iter().any(|(family, faces)| {
-            collection.family_name(*family) == Some(*expected_family)
-                && faces
-                    .iter()
-                    .any(|face| face.weight().value() == *expected_weight)
-        });
-        if !found {
-            bail!("Bundled font did not register as {expected_family} weight {expected_weight}");
-        }
-    }
-    drop(collection);
-    ui.global::<Theme>().set_sans("Noto Sans CJK SC".into());
-    ui.global::<Theme>().set_serif("Noto Serif CJK SC".into());
-    ui.global::<Theme>().set_numbers("Literata".into());
-    FONT_INITIALIZATIONS.fetch_add(1, Ordering::AcqRel);
-    Ok(())
-}
-
 fn pagination_observer(
     ui: &AppWindow,
-    app: &Rc<RefCell<App>>,
+    app: &ApplicationSlot,
     platform: &Rc<Platform>,
 ) -> PointerObserver {
     let observed_app = Rc::downgrade(app);
@@ -709,17 +752,27 @@ fn pagination_observer(
             {
                 platform.note_user_activity();
             }
-            let Some(app) = observed_app.upgrade() else {
-                pagination.cancel();
-                return false;
-            };
-            if ui
-                .upgrade()
-                .is_some_and(|ui| ui.global::<State>().get_exiting())
-            {
+            if input.phase == PointerPhase::Cancel {
+                if let Some(ui) = ui.upgrade() {
+                    let state = ui.global::<State>();
+                    state.set_reader_input_epoch(state.get_reader_input_epoch().wrapping_add(1));
+                }
                 pagination.cancel();
                 return false;
             }
+            if ui.upgrade().is_some_and(|ui| {
+                ui.global::<State>().get_exiting() || ui.global::<State>().get_booting()
+            }) {
+                pagination.cancel();
+                return false;
+            }
+            let Some(app) = observed_app
+                .upgrade()
+                .and_then(|slot| slot.borrow().clone())
+            else {
+                pagination.cancel();
+                return false;
+            };
             let enabled = {
                 let application = app.borrow();
                 let (route, modal) = application.gesture_context();
@@ -737,11 +790,6 @@ fn pagination_observer(
                     pagination.release(input.position.x, input.position.y, now, enabled)
                 }
                 PointerPhase::Cancel => {
-                    if let Some(ui) = ui.upgrade() {
-                        let state = ui.global::<State>();
-                        state
-                            .set_reader_input_epoch(state.get_reader_input_epoch().wrapping_add(1));
-                    }
                     pagination.cancel();
                     return false;
                 }
@@ -768,17 +816,19 @@ fn pagination_observer(
             decision.consume
         },
         move || {
-            if enabled_ui
-                .upgrade()
-                .is_some_and(|ui| ui.global::<State>().get_exiting())
-            {
+            if enabled_ui.upgrade().is_some_and(|ui| {
+                ui.global::<State>().get_exiting() || ui.global::<State>().get_booting()
+            }) {
                 return false;
             }
-            enabled_app.upgrade().is_some_and(|app| {
-                let application = app.borrow();
-                let (route, modal) = application.gesture_context();
-                route != "reader" && modal.is_empty()
-            })
+            enabled_app
+                .upgrade()
+                .and_then(|slot| slot.borrow().clone())
+                .is_some_and(|app| {
+                    let application = app.borrow();
+                    let (route, modal) = application.gesture_context();
+                    route != "reader" && modal.is_empty()
+                })
         },
     )
 }
@@ -912,7 +962,12 @@ fn dispatch_observed_pointer(
     Ok(())
 }
 
-fn capture_window(ui: &AppWindow, path: &Path, platform: &Platform, app: &App) -> Result<()> {
+fn capture_window(
+    ui: &AppWindow,
+    path: &Path,
+    platform: &Platform,
+    app: Option<&App>,
+) -> Result<()> {
     let landscape = ui.global::<State>().get_landscape();
     let (design_width, design_height) = platform.profile().logical_size(landscape);
     let (width, height) = platform.runtime_logical_size(landscape);
@@ -936,7 +991,11 @@ fn capture_window(ui: &AppWindow, path: &Path, platform: &Platform, app: &App) -
         image::ImageFormat::Png,
     )
     .with_context(|| format!("Write screenshot {}", path.display()))?;
-    let mut state = app.snapshot();
+    let mut state = app.map(App::snapshot).unwrap_or_else(|| {
+        serde_json::json!({
+            "route": "startup", "startup_failed": ui.global::<State>().get_startup_failed(),
+        })
+    });
     let metadata = CaptureMetadata {
         route: state["route"].as_str().unwrap_or("unknown").to_owned(),
         profile: platform.profile().id().to_owned(),
@@ -970,6 +1029,23 @@ fn capture_window(ui: &AppWindow, path: &Path, platform: &Platform, app: &App) -
         serde_json::to_vec_pretty(&state)?,
     )?;
     Ok(())
+}
+
+fn retire_sleep_cover(
+    lifecycle: &RefCell<bootstrap_lifecycle::Coordinator>,
+    app: &ApplicationSlot,
+    platform: &Platform,
+    failures: &RefCell<Vec<String>>,
+) {
+    let application = app.borrow().clone();
+    if let Err(error) = lifecycle
+        .borrow_mut()
+        .cancel_cover(application.as_ref(), platform)
+    {
+        failures
+            .borrow_mut()
+            .push(format!("Cancel sleep presentation failed: {error:#}"));
+    }
 }
 
 fn request_quit(quitting: &Cell<bool>, failures: &RefCell<Vec<String>>) {
