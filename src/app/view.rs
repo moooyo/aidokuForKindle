@@ -878,6 +878,7 @@ impl App {
         state.set_cover_alone(self.prefs.cover_alone);
         state.set_incognito(self.prefs.incognito);
         state.set_night_mode(self.prefs.night_mode);
+        state.set_native_scene_inverted(self.platform.scene_is_inverted());
         state.set_brightness(self.prefs.brightness as i32);
         state.set_warmth(self.prefs.warmth as i32);
         state.set_refresh_every(self.prefs.refresh_every as i32);

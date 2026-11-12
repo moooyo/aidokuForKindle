@@ -148,3 +148,17 @@ follow-up require separate Aidoku verification and exact executable identities.
 The earlier 125-test run and the sibling projects' test counts or physical
 acceptance do not certify this new path. Original licenses and all earlier
 attribution remain preserved.
+
+## Native grayscale polarity follow-up
+
+Aidoku's 2026-11-13 change encodes canonical Gray8 into the same framebuffer's
+observed normal or inverted byte format. It is an Aidoku adaptation informed by
+the corresponding Amazon HWTCON source and independent FBInk/KOReader polarity
+handling; no upstream revision or license is replaced. Software night mode and
+native scanout encoding remain separate transformations.
+
+The eight-bit writer and fill path apply the encoding once. Existing layout,
+ownership, submission receipt, and resume gates remain authoritative, including
+rejection of a format that differs from its same-run anchor. New mapped-memory
+tests preserve all byte values and the original scene through both polarities.
+See `PATCHES.md` for the six regression scopes and the 146-test remote result.

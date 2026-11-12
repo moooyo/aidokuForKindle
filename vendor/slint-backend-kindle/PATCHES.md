@@ -292,3 +292,23 @@ responsibilities remain at the application and supervisor boundaries. The
 checked sleep follow-up requires its own Aidoku remote tests, runtime checks,
 and exact device evidence; neither the earlier 125-test run nor BiliComics'
 separate test counts or physical results establish its acceptance.
+
+## Native Y8INV byte encoding
+
+The 2026-11-13 Aidoku follow-up normalizes canonical luma at the framebuffer
+write boundary. The observed eight-bit `grayscale = 2` format inverts native
+input; it is separate from application software night mode. `write_line` and
+`fill` encode `255 - value` for that format, while normal Gray8 and 32-bit writes
+retain their previous behavior. Canonical scene buffers are never inverted in
+place, and all 256 byte values remain representable at this boundary.
+
+Polarity comes from the same descriptor's GETVAR observation. The existing
+35-field layout and same-run anchor must still match before a refreshed
+observation is accepted. A changed format cannot silently rebind an old owner
+or bypass the full-frame/input barrier. This changes neither waveforms nor
+hardware settings and makes no additional optical gray-level claim.
+
+Six anonymous-mmap regressions cover byte precision, stride padding, software
+night composition, RGB fallback, fill, matched refresh, and rejected stale or
+changed anchors. All 146 standalone backend tests passed remotely; device
+acceptance remains bound to the subsequently rebuilt ARM artifact.

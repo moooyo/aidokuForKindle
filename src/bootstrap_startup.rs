@@ -201,10 +201,10 @@ impl Startup {
             >= crate::bootstrap_presentation::ACTIVITY_INTERVAL
         {
             self.activity_at = now;
-            self.activity_frame = (self.activity_frame + 1) % 3;
+            self.activity_frame = (self.activity_frame + 1) % 4;
             ui.global::<State>().set_startup_frame(self.activity_frame);
             ui.window().request_redraw();
-            platform.refresh(RefreshKind::Ui);
+            platform.refresh(RefreshKind::Fast);
         }
         if !self.started {
             if !self.first_scene.submitted(
@@ -217,6 +217,9 @@ impl Startup {
                 return Ok(false);
             }
             aidoku_kindle::reader_timing::mark("startup_scene_submitted");
+            if platform.is_kindle() {
+                aidoku_kindle::reader_timing::mark("startup_feedback_submitted");
+            }
             self.start_workers()?;
             self.started = true;
         }

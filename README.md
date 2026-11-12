@@ -8,6 +8,12 @@ plugin and does not require the WeRead application.
 
 ## Current development follow-up
 
+Version 0.1.3 uses one BiliComics-style startup scene, removes the exit animation,
+and keeps Reader controls on readable light surfaces in night mode. Native Gray8
+encoding distinguishes normal and inverted scanout without changing canonical
+scene pixels. See the [startup and Reader UI follow-up](docs/STARTUP_READER_UX_20261113.md)
+and [grayscale feasibility research](docs/KINDLE_GRAYSCALE_RESEARCH_20261113.md).
+
 Version 0.1.2 ports BiliComics' in-memory Reader Raster and complete next-frame
 reuse, preserves previous-page history during prefetch, and adds staged startup
 and a prepared sleep-cover lifecycle. A final startup refinement removes the

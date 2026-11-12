@@ -439,6 +439,19 @@ run_observer() {
     HELPER_COMMAND=''; rm -f "$LOCK_DIR/observer-command"
     if [ "$HELPER_STOPPING" -eq 0 ]; then printf 'observer-exited %s %s\n' "$NONCE" "$HELPER_STATUS" >&3; fi
 }
+start_observer() {
+    run_observer & OBSERVER_PID=$!
+    # Admit native observation as soon as the current observer owns its source.
+    observer_checks=20
+    while [ "$observer_checks" -gt 0 ]; do
+        observer_command=$(cat "$LOCK_DIR/observer-command" 2>/dev/null || :)
+        if owned_pid "$OBSERVER_PID" "$ROOT_PID" && owned_pid "$observer_command" "$OBSERVER_PID"; then return 0; fi
+        owned_pid "$OBSERVER_PID" "$ROOT_PID" || fail 'Power event observation ended before startup.'
+        observer_checks=$((observer_checks - 1))
+        usleep 100000
+    done
+    fail 'Power event observer ownership was not established before startup.'
+}
 run_application() {
     runner_generation=$1; runner_resume=$2
     helper_setup runner
@@ -681,8 +694,7 @@ export AIDOKU_HOME AIDOKU_LAUNCHER_DIR AIDOKU_LAUNCH_NONCE
 mkfifo "$LOCK_DIR/power-events"
 # Keep both ends open so transitions cannot drop queued wake or exit events.
 exec 3<>"$LOCK_DIR/power-events"; EVENT_FD_OPEN=1
-run_observer & OBSERVER_PID=$!
-sleep 1
+start_observer
 configure_cover_sleep
 start_application 0
 

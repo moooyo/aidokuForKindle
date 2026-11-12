@@ -1,4 +1,4 @@
-//! Offline Slint evidence for sleep-cover geometry, text, and retained pixels.
+//! Offline Slint evidence for sleep covers, readable controls, and retained pixels.
 //!
 //! The headless renderer does not open native display/input devices. Native
 //! night-mode conversion belongs to the Kindle backend, after this UI scene.
@@ -169,6 +169,68 @@ fn save_evidence(
         )?;
     }
     Ok(())
+}
+
+fn projected_controls(
+    pixels: &SharedPixelBuffer<Rgba8Pixel>,
+    native_inverted: bool,
+) -> SharedPixelBuffer<Rgba8Pixel> {
+    let mut result = pixels.clone();
+    if native_inverted {
+        for pixel in result.make_mut_slice() {
+            pixel.r = 255 - pixel.r;
+            pixel.g = 255 - pixel.g;
+            pixel.b = 255 - pixel.b;
+        }
+    }
+    result
+}
+
+fn assert_readable_reader_controls(
+    pixels: &SharedPixelBuffer<Rgba8Pixel>,
+    large: bool,
+    landscape: bool,
+) -> Result<Value> {
+    let width = pixels.width();
+    let height = pixels.height();
+    let panel_height = if large { 210 } else { 188 };
+    let toolbar_height = if large { 77 } else { 69 };
+    let inset = if large && landscape {
+        120
+    } else if large {
+        24
+    } else {
+        0
+    };
+    let mut paper_pixels = 0;
+    for y in height - panel_height..height {
+        for x in 0..width {
+            paper_pixels += usize::from(paper(&pixels.as_slice()[(y * width + x) as usize]));
+        }
+    }
+    let paper_fraction = paper_pixels as f64 / f64::from(width * panel_height);
+    ensure!(
+        paper_fraction > 0.80,
+        "Reader controls must retain a light opaque surface"
+    );
+    let mut tool_ink = Vec::new();
+    for index in 0..5 {
+        let left = inset + (width - inset * 2) * index / 5 + 4;
+        let right = inset + (width - inset * 2) * (index + 1) / 5 - 4;
+        let mut count = 0;
+        for y in height - toolbar_height + 7..height - 10 {
+            for x in left..right {
+                let pixel = pixels.as_slice()[(y * width + x) as usize];
+                count += usize::from(pixel.r < 64 && pixel.g < 64 && pixel.b < 64);
+            }
+        }
+        ensure!(
+            count > 40,
+            "Every Reader tool must have readable dark glyphs and labels"
+        );
+        tool_ink.push(count);
+    }
+    Ok(json!({"light_surface_fraction": paper_fraction, "dark_pixels_per_tool": tool_ink}))
 }
 
 fn configure_layout(
@@ -502,6 +564,8 @@ fn sleep_screen_preserves_complete_covers_text_and_retained_reader_at_all_layout
         fs::create_dir_all(root)?;
     }
     let mut reports = Vec::new();
+    let mut reader_control_reports = Vec::new();
+    let mut startup_color_reports = Vec::new();
 
     for profile in [DeviceProfile::Pw5, DeviceProfile::Scribe] {
         for landscape in [false, true] {
@@ -512,6 +576,31 @@ fn sleep_screen_preserves_complete_covers_text_and_retained_reader_at_all_layout
             );
             let (width, height) = profile.logical_size(landscape);
             configure_layout(&ui, &window, profile, landscape);
+            for dark in [false, true] {
+                let state = ui.global::<State>();
+                state.set_booting(true);
+                state.set_startup_dark(dark);
+                state.set_native_scene_inverted(false);
+                let before_transform = snapshot(&ui)?;
+                state.set_native_scene_inverted(true);
+                let after_transform = projected_controls(&snapshot(&ui)?, true);
+                ensure!(
+                    before_transform.width() == after_transform.width()
+                        && before_transform.height() == after_transform.height()
+                        && before_transform
+                            .as_slice()
+                            .iter()
+                            .zip(after_transform.as_slice())
+                            .all(|(a, b)| a.r.abs_diff(b.r) <= 1
+                                && a.g.abs_diff(b.g) <= 1
+                                && a.b.abs_diff(b.b) <= 1),
+                    "The single startup scene must retain its visible colors when native inversion activates"
+                );
+                startup_color_reports.push(json!({"layout": layout, "requested_dark": dark,
+                    "native_inversion_activation_preserves_visible_scene": true}));
+                state.set_booting(false);
+                state.set_native_scene_inverted(false);
+            }
             for night_mode in [false, true] {
                 let name = format!(
                     "{layout}-{}",
@@ -629,6 +718,26 @@ fn sleep_screen_preserves_complete_covers_text_and_retained_reader_at_all_layout
                 ui.global::<State>().set_reader_menu(false);
                 ui.global::<State>().set_busy(false);
                 let before = snapshot(&ui)?;
+                ui.global::<State>().set_native_scene_inverted(night_mode);
+                ui.global::<State>().set_reader_menu(true);
+                let controls = snapshot(&ui)?;
+                let projected = projected_controls(&controls, night_mode);
+                let checks =
+                    assert_readable_reader_controls(&projected, profile.is_scribe(), landscape)?;
+                save_evidence(
+                    evidence.as_deref(),
+                    &format!("{name}-reader-controls"),
+                    &projected,
+                )?;
+                reader_control_reports.push(json!({"case": name, "native_scene_inverted": night_mode,
+                    "conversion_scope": "Software simulation of the backend's full-scene inversion; not hardware scanout", "checks": checks}));
+                ui.global::<State>().set_reader_menu(false);
+                ui.global::<State>().set_native_scene_inverted(false);
+                let closed = snapshot(&ui)?;
+                ensure!(
+                    before.as_bytes() == closed.as_bytes(),
+                    "Closing controls must retain the exact comic pixels"
+                );
                 let position = retained_position(&app.borrow().lifecycle_snapshot());
                 ensure!(
                     app.borrow_mut().begin_sleep_transition(true)?,
@@ -735,6 +844,8 @@ fn sleep_screen_preserves_complete_covers_text_and_retained_reader_at_all_layout
                 "native_dark_conversion_exercised": false,
                 "night_mode_boundary": "The Kindle backend converts the light Slint scene after this renderer; dark-preference PNGs are raw Slint evidence, not native framebuffer captures",
                 "cases": reports,
+                "reader_control_cases": reader_control_reports,
+                "startup_color_cases": startup_color_reports,
             }))?,
         )?;
     }

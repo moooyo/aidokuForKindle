@@ -349,6 +349,7 @@ impl App {
         let prepared = Self::prepare(options, platform.profile())?;
         let app = Self::attach_prepared(ui, prepared, platform)?;
         while !app.borrow_mut().advance_startup()? {}
+        ui.global::<State>().set_booting(false);
         Ok(app)
     }
 
@@ -380,7 +381,10 @@ impl App {
         ui.set_canvas_height(height as f32);
         platform.configure_window_rotation(ui.window(), initial_rotation)?;
         ui.global::<State>().set_landscape(initial_landscape);
-        platform.apply_preferences(&prefs)?;
+        let applied = platform.apply_preferences(&prefs);
+        ui.global::<State>()
+            .set_native_scene_inverted(platform.scene_is_inverted());
+        applied?;
         let (job_tx, job_rx) = mpsc::channel();
         let route = normalize_route(&options.initial_screen).to_owned();
         let resume_network_pending = options.resume && !options.offline && !options.demo;

@@ -1406,7 +1406,9 @@ mod tests {
                 installed.set(true);
             }
         });
-        AppWindow::new().unwrap()
+        let ui = AppWindow::new().unwrap();
+        ui.global::<State>().set_booting(false);
+        ui
     }
 
     #[test]

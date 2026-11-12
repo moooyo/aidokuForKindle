@@ -61,6 +61,7 @@ fn with_ui(work: impl FnOnce(&AppWindow) -> Result<()> + Send + 'static) -> Resu
         );
         slint::platform::set_platform(Box::new(HeadlessPlatform { window }))?;
         let ui = AppWindow::new()?;
+        ui.global::<State>().set_booting(false);
         work(&ui)
     })
     .join()

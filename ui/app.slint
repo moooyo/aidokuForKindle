@@ -10,7 +10,6 @@ import { HistoryPage } from "history.slint";
 import { SettingsPage } from "settings.slint";
 import { ReaderPage } from "reader.slint";
 import { Panels } from "panels.slint";
-import { ExitActivity } from "activity.slint";
 import { StartupActivity } from "startup.slint";
 import { SleepScreen, SleepScreenModel } from "sleep-screen.slint";
 
@@ -63,7 +62,6 @@ export component AppWindow inherits Window {
         notice-text := BodyText { x: State.large-screen ? 28px : 24px; width: parent.width - self.x * 2; height: parent.height; text: State.message != "" ? State.message : Strings.loading; color: Theme.ink; font-size: State.large-screen ? 18px : 15px; font-weight: 500; horizontal-alignment: center; overflow: elide; }
     }
     if State.booting: StartupActivity { width: root.width; height: root.height; }
-    if State.exiting: ExitActivity { width: root.width; height: root.height; }
     if SleepScreenModel.active: SleepScreen { width: root.width; height: root.height; }
     forward-focus: keys;
     keys := FocusScope {

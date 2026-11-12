@@ -138,6 +138,7 @@ if "--capture-native-portrait" in sys.argv or "--authorize-native-portrait-resum
             "action": "startup" if epoch is None else "resume", "epoch": epoch,
             "wm_state": wm_state, "statusbar": (root / "statusbar").read_text(),
             "power_state": (root / "power-state").read_text(),
+            "observer_command_published": (directory / "observer-command").is_file(),
         }
         descriptor = os.open(root / "portrait-probe.jsonl", os.O_WRONLY | os.O_CREAT | os.O_APPEND, 0o600)
         try:
@@ -629,6 +630,34 @@ cat "$AIDOKU_TEST_ROOT/power-state"
         self.assertFalse(self.process_state(self.wm.pid).startswith(("T", "t")))
         self.assertEqual(self.statusbar.read_text(), "running")
         self.assertEqual(self.operations.read_text(), "")
+
+    def test_native_startup_waits_for_owned_observer_command(self) -> None:
+        original = 'HELPER_COMMAND=$!; write_record observer-command "$HELPER_COMMAND"'
+        delayed = 'HELPER_COMMAND=$!; usleep 1500000; write_record observer-command "$HELPER_COMMAND"'
+        source = self.fixture_launcher.read_text()
+        self.assertEqual(source.count(original), 1)
+        self.fixture_launcher.write_text(source.replace(original, delayed))
+        self.start_launcher()
+        observations = self.portrait_queries("started", action="startup")
+        self.assertEqual(len(observations), 1)
+        self.assertTrue(observations[0]["observer_command_published"])
+        self.assertFalse(observations[0]["wm_state"].startswith(("T", "t")))
+        self.assertEqual(observations[0]["statusbar"], "running")
+        self.stop_launcher()
+        self.assert_recovered()
+
+    def test_observer_failure_before_publication_prevents_takeover(self) -> None:
+        original = 'helper_setup observer\n'
+        source = self.fixture_launcher.read_text()
+        self.assertEqual(source.count(original), 1)
+        self.fixture_launcher.write_text(source.replace(original, original + '    exit 7\n'))
+        self.spawn_launcher()
+        self.assertEqual(self.complete(), 1)
+        self.assertEqual(self.traces(), [])
+        self.assertEqual(self.portrait_queries(), [])
+        self.assertEqual(self.operations.read_text(), "")
+        self.assertFalse(self.lock.exists())
+        self.assertEqual(self.statusbar.read_text(), "running")
 
     def test_window_manager_is_paused_before_statusbar_is_stopped(self) -> None:
         pid = self.start_launcher()

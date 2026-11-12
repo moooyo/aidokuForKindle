@@ -51,6 +51,7 @@ impl Framebuffer {
             stride,
             bytes_per_pixel,
             retained_layout: None,
+            inverted_gray8: std::cell::Cell::new(false),
             update_variant: std::cell::Cell::new(None),
             update_markers: UpdateMarkers::default(),
         })

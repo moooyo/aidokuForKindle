@@ -229,6 +229,7 @@ pub struct Platform {
     refresh_count: Cell<u64>,
     status_cache: RefCell<Option<(Option<Instant>, DeviceStatus)>>,
     applied_lighting: Cell<Option<(u8, u8)>>,
+    scene_inverted: Cell<bool>,
     sleep_requested: Cell<bool>,
     pointer_observer: RefCell<Option<PointerObserver>>,
     device_policies: RefCell<Option<device_policy::DevicePolicyWorker>>,
@@ -263,6 +264,7 @@ impl Platform {
             refresh_count: Cell::new(0),
             status_cache: RefCell::new(None),
             applied_lighting: Cell::new(None),
+            scene_inverted: Cell::new(false),
             sleep_requested: Cell::new(false),
             pointer_observer: RefCell::new(None),
             device_policies: RefCell::new(None),
@@ -281,6 +283,11 @@ impl Platform {
 
     pub const fn is_kindle(&self) -> bool {
         self.kindle
+    }
+
+    /// The accepted software output transform, independent of hardware polarity.
+    pub fn scene_is_inverted(&self) -> bool {
+        self.scene_inverted.get()
     }
 
     /// Read a background snapshot without invoking device services on the UI thread.
@@ -856,6 +863,7 @@ impl Platform {
                 .render_handle()
                 .set_dark_mode(preferences.night_mode)
                 .context("Apply the native software night-mode fallback")?;
+            self.scene_inverted.set(preferences.night_mode);
         }
         let brightness = preferences.brightness.min(24);
         let warmth = preferences.warmth.min(24);

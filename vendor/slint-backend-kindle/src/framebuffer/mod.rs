@@ -2,6 +2,8 @@ mod ffi;
 mod markers;
 
 #[cfg(test)]
+mod polarity_tests;
+#[cfg(test)]
 mod sleep_fence_tests;
 #[cfg(test)]
 mod test_support;
@@ -29,6 +31,7 @@ use ffi::{
 pub struct NativeFramebufferObservation {
     pub rotation: u32,
     layout: FramebufferLayout,
+    inverted_gray8: bool,
 }
 
 impl NativeFramebufferObservation {
@@ -62,6 +65,7 @@ impl NativeFramebufferObservation {
         Self {
             rotation,
             layout: FramebufferLayout::from_information(&variable, &fixed).unwrap(),
+            inverted_gray8: gray8_is_inverted(&variable),
         }
     }
 }
@@ -144,6 +148,16 @@ fn invalid_layout(message: &'static str) -> io::Error {
     io::Error::new(io::ErrorKind::InvalidData, message)
 }
 
+fn gray8_is_inverted(variable: &FbVarScreeninfo) -> bool {
+    variable.bits_per_pixel == 8 && variable.grayscale == 2
+}
+
+/// Encode canonical luma for the current native Y8 or Y8INV scanout.
+/// This preserves all 256 values and is independent of software night mode.
+fn encode_native_gray(value: u8, inverted_gray8: bool) -> u8 {
+    if inverted_gray8 { 255 - value } else { value }
+}
+
 fn read_variable(fd: libc::c_int) -> io::Result<FbVarScreeninfo> {
     let mut variable = FbVarScreeninfo::default();
     // SAFETY: This read-only GET fills the matching initialized ABI buffer.
@@ -183,6 +197,7 @@ fn read_native_framebuffer(fd: libc::c_int) -> io::Result<NativeFramebufferObser
     Ok(NativeFramebufferObservation {
         rotation: variable.rotate,
         layout,
+        inverted_gray8: gray8_is_inverted(&variable),
     })
 }
 
@@ -233,6 +248,8 @@ pub(crate) struct Framebuffer {
     /// 4 (32-bit BGRA/RGBA, e.g. Kindle Colorsoft).
     bytes_per_pixel: usize,
     retained_layout: Option<FramebufferLayout>,
+    /// Derived only from this descriptor's checked native pixel format.
+    inverted_gray8: Cell<bool>,
     /// The update ioctl variant this kernel accepts, cached after the first
     /// successful refresh. `None` until then.
     update_variant: Cell<Option<UpdateVariant>>,
@@ -362,6 +379,7 @@ impl Framebuffer {
             stride,
             bytes_per_pixel,
             retained_layout,
+            inverted_gray8: Cell::new(gray8_is_inverted(&vinfo)),
             update_variant: Cell::new(None),
             update_markers: UpdateMarkers::default(),
         })
@@ -373,18 +391,30 @@ impl Framebuffer {
         &self,
         anchor: NativeFramebufferObservation,
     ) -> io::Result<NativeFramebufferObservation> {
-        let observed = read_native_framebuffer(self.file.as_raw_fd())?;
+        self.observe_native_rotation_with(anchor, || read_native_framebuffer(self.file.as_raw_fd()))
+    }
+
+    fn observe_native_rotation_with(
+        &self,
+        anchor: NativeFramebufferObservation,
+        observe: impl FnOnce() -> io::Result<NativeFramebufferObservation>,
+    ) -> io::Result<NativeFramebufferObservation> {
+        let observed = observe()?;
         if self.retained_layout != Some(observed.layout) || observed.layout != anchor.layout {
             return Err(invalid_layout(
                 "native framebuffer layout changed from its same-run anchor",
             ));
         }
+        // Polarity is current only after the same ownership/layout check that
+        // admits native rendering. A changed format still requires a new owner.
+        self.inverted_gray8.set(observed.inverted_gray8);
         Ok(observed)
     }
 
-    /// Write a horizontal span of grayscale pixels into the mmap at row `y`.
+    /// Encode a horizontal span of canonical grayscale into the mmap at row `y`.
     pub(crate) fn write_line(&mut self, y: usize, x_range: Range<usize>, pixels: &[u8]) {
         let bpp = self.bytes_per_pixel;
+        let inverted_gray8 = self.inverted_gray8.get();
         let row_span = unsafe {
             std::slice::from_raw_parts_mut(
                 self.map.add(y * self.stride + x_range.start * bpp),
@@ -392,6 +422,11 @@ impl Framebuffer {
             )
         };
         match bpp {
+            1 if inverted_gray8 => {
+                for (destination, &value) in row_span.iter_mut().zip(pixels) {
+                    *destination = encode_native_gray(value, inverted_gray8);
+                }
+            }
             1 => row_span.copy_from_slice(pixels),
             _ => {
                 for (dst, &g) in row_span.chunks_exact_mut(4).zip(pixels) {
@@ -401,9 +436,11 @@ impl Framebuffer {
         }
     }
 
-    /// Fill the entire visible area with a single grayscale value (0x00 = black, 0xff = white).
+    /// Fill visible pixels from canonical luma (0x00 = black, 0xff = white).
+    /// Native scanout polarity is applied here, independently of software modes.
     pub(crate) fn fill(&mut self, value: u8) {
         let bpp = self.bytes_per_pixel;
+        let native_gray = encode_native_gray(value, self.inverted_gray8.get());
         for y in 0..self.height as usize {
             let row = unsafe {
                 std::slice::from_raw_parts_mut(
@@ -412,7 +449,7 @@ impl Framebuffer {
                 )
             };
             match bpp {
-                1 => row.fill(value),
+                1 => row.fill(native_gray),
                 _ => {
                     for px in row.chunks_exact_mut(4) {
                         px.copy_from_slice(&[value, value, value, 0xff]);

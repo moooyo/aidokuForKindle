@@ -16,6 +16,17 @@ export global ReaderMetrics {
     out property <length> chapter-height: State.large-screen ? 44px : 40px;
 }
 
+export global ReaderControlPalette {
+    // Keep controls on light paper after the native full-scene night inversion.
+    // Comic pixels continue to use the user's ordinary night-mode path.
+    out property <color> paper: State.native-scene-inverted ? #000 : #fff;
+    out property <color> ink: State.native-scene-inverted ? #fff : #000;
+    out property <color> secondary: State.native-scene-inverted ? #eee : #111;
+    out property <color> disabled: State.native-scene-inverted ? #999 : #666;
+    out property <color> line: State.native-scene-inverted ? #777 : #888;
+    out property <color> dotted: State.native-scene-inverted ? #777 : #888;
+}
+
 component ReaderGlyph inherits Path {
     in property <string> kind;
     in property <color> color: Theme.ink;
@@ -56,7 +67,7 @@ component ReaderTool inherits Rectangle {
     in property <string> action;
     in property <string> text;
     in property <bool> active;
-    background: touch.pressed ? Theme.ink : Theme.paper;
+    background: touch.pressed ? ReaderControlPalette.ink : ReaderControlPalette.paper;
     accessible-role: button;
     accessible-label: root.text;
     accessible-checkable: true;
@@ -66,7 +77,7 @@ component ReaderTool inherits Rectangle {
         y: 0px;
         width: parent.width * (State.large-screen ? 0.40 : 0.48);
         height: 4px;
-        background: touch.pressed ? Theme.paper : Theme.ink;
+        background: touch.pressed ? ReaderControlPalette.paper : ReaderControlPalette.ink;
     }
     ReaderGlyph {
         x: (parent.width - self.width) / 2;
@@ -74,7 +85,7 @@ component ReaderTool inherits Rectangle {
         width: State.large-screen ? 26px : 23px;
         height: self.width;
         kind: root.action;
-        color: touch.pressed ? Theme.paper : root.active ? Theme.ink : Theme.secondary;
+        color: touch.pressed ? ReaderControlPalette.paper : root.active ? ReaderControlPalette.ink : ReaderControlPalette.secondary;
         active: root.active;
     }
     BodyText {
@@ -84,9 +95,9 @@ component ReaderTool inherits Rectangle {
         height: State.large-screen ? 22px : 19.5px;
         text: root.text;
         font-size: State.large-screen ? 15px : 13px;
-        font-weight: root.active ? 700 : 400;
+        font-weight: root.active ? 700 : 600;
         letter-spacing: State.large-screen ? 2px : 1px;
-        color: touch.pressed ? Theme.paper : root.active ? Theme.ink : Theme.secondary;
+        color: touch.pressed ? ReaderControlPalette.paper : root.active ? ReaderControlPalette.ink : ReaderControlPalette.secondary;
         horizontal-alignment: center;
     }
     touch := TouchArea {
@@ -105,7 +116,7 @@ component ReaderHeaderAction inherits Rectangle {
     in property <bool> active;
     width: State.large-screen ? 56px : 48px;
     height: self.width;
-    background: touch.pressed ? Theme.ink : Theme.paper;
+    background: touch.pressed ? ReaderControlPalette.ink : ReaderControlPalette.paper;
     accessible-role: button;
     accessible-label: root.label;
     accessible-checkable: root.action == "bookmark" || root.action == "toc";
@@ -116,7 +127,7 @@ component ReaderHeaderAction inherits Rectangle {
         width: root.action == "back" ? (State.large-screen ? 28px : 24px) : (State.large-screen ? 25px : 22px);
         height: self.width;
         kind: root.action;
-        color: touch.pressed ? Theme.paper : Theme.ink;
+        color: touch.pressed ? ReaderControlPalette.paper : ReaderControlPalette.ink;
         marked: root.marked;
         active: root.active;
     }
@@ -125,7 +136,7 @@ component ReaderHeaderAction inherits Rectangle {
         y: parent.height - (State.large-screen ? 6px : 5px);
         width: parent.width - self.x * 2;
         height: 3px;
-        background: touch.pressed ? Theme.paper : Theme.ink;
+        background: touch.pressed ? ReaderControlPalette.paper : ReaderControlPalette.ink;
     }
     touch := TouchArea {
         pointer-event(event) => {
@@ -143,7 +154,7 @@ component ReaderChapterAction inherits Rectangle {
     in property <bool> enabled: true;
     width: State.large-screen ? 180px : 150px;
     height: ReaderMetrics.chapter-height;
-    background: touch.pressed && root.enabled ? Theme.ink : Theme.paper;
+    background: touch.pressed && root.enabled ? ReaderControlPalette.ink : ReaderControlPalette.paper;
     accessible-role: button;
     accessible-label: root.text;
     accessible-enabled: root.enabled;
@@ -153,7 +164,7 @@ component ReaderChapterAction inherits Rectangle {
         width: State.large-screen ? 18px : 16px;
         height: self.width;
         kind: root.trailing ? "chevron-right" : "chevron-left";
-        color: !root.enabled ? Theme.disabled : touch.pressed ? Theme.paper : Theme.ink;
+        color: !root.enabled ? ReaderControlPalette.disabled : touch.pressed ? ReaderControlPalette.paper : ReaderControlPalette.ink;
         active: true;
     }
     BodyText {
@@ -162,7 +173,7 @@ component ReaderChapterAction inherits Rectangle {
         height: parent.height;
         text: root.text;
         font-size: State.large-screen ? 16px : 14px;
-        color: !root.enabled ? Theme.disabled : touch.pressed ? Theme.paper : Theme.ink;
+        color: !root.enabled ? ReaderControlPalette.disabled : touch.pressed ? ReaderControlPalette.paper : ReaderControlPalette.ink;
         horizontal-alignment: root.trailing ? right : left;
     }
     touch := TouchArea {
@@ -477,14 +488,14 @@ export component ReaderPage inherits Rectangle {
         y: 0px;
         width: root.width;
         height: root.top-height;
-        background: Theme.paper;
+        background: ReaderControlPalette.paper;
         if !State.large-screen: Rectangle {
             x: 0px;
             y: 0px;
             width: parent.width;
             height: 26px;
-            background: State.incognito ? Theme.ink : Theme.paper;
-            property <color> foreground: State.incognito ? Theme.paper : Theme.ink;
+            background: State.incognito ? ReaderControlPalette.ink : ReaderControlPalette.paper;
+            property <color> foreground: State.incognito ? ReaderControlPalette.paper : ReaderControlPalette.ink;
             Text {
                 x: 20px;
                 y: 0px;
@@ -505,6 +516,7 @@ export component ReaderPage inherits Rectangle {
                 kind: "wifi";
                 enabled: State.wifi;
                 inverted: State.incognito;
+                colorize: State.wifi ? parent.foreground : ReaderControlPalette.disabled;
             }
             reader-battery := Text {
                 x: parent.width - 51px - self.preferred-width;
@@ -531,7 +543,7 @@ export component ReaderPage inherits Rectangle {
                     height: parent.height / 14 * 12;
                     background: transparent;
                     border-width: 1.5px;
-                    border-color: State.incognito ? Theme.paper : Theme.ink;
+                    border-color: State.incognito ? ReaderControlPalette.paper : ReaderControlPalette.ink;
                     border-radius: 3px;
                 }
                 Rectangle {
@@ -539,7 +551,7 @@ export component ReaderPage inherits Rectangle {
                     y: parent.height / 14 * 3.5;
                     width: parent.width / 26 * 16.5 * clamp(State.battery / 100.0, 0, 1);
                     height: parent.height / 14 * 7;
-                    background: State.incognito ? Theme.paper : Theme.ink;
+                    background: State.incognito ? ReaderControlPalette.paper : ReaderControlPalette.ink;
                     border-radius: 1px;
                 }
                 Rectangle {
@@ -547,7 +559,7 @@ export component ReaderPage inherits Rectangle {
                     y: parent.height / 14 * 4.5;
                     width: parent.width / 26 * 2;
                     height: parent.height / 14 * 5;
-                    background: State.incognito ? Theme.paper : Theme.ink;
+                    background: State.incognito ? ReaderControlPalette.paper : ReaderControlPalette.ink;
                     border-radius: 1px;
                 }
             }
@@ -564,6 +576,7 @@ export component ReaderPage inherits Rectangle {
             width: max(0px, (root.wide ? rotation.x : bookmark.x) - self.x - (State.large-screen ? 6px : 2px));
             height: State.large-screen ? 18px : 17px;
             text: State.current-book.title;
+            color: ReaderControlPalette.secondary;
             font-size: State.large-screen ? 13px : 12px;
             letter-spacing: State.large-screen ? 4px : 3px;
         }
@@ -577,7 +590,7 @@ export component ReaderPage inherits Rectangle {
             font-size: State.large-screen ? 23px : 19px;
             font-weight: 900;
             letter-spacing: State.large-screen ? 2px : 1px;
-            color: Theme.ink;
+            color: ReaderControlPalette.ink;
             vertical-alignment: center;
             overflow: elide;
         }
@@ -587,9 +600,9 @@ export component ReaderPage inherits Rectangle {
             width: max(124px, rotation-caption.preferred-width + 56px);
             height: 48px;
             visible: root.wide;
-            background: rotation-touch.pressed ? Theme.ink : Theme.paper;
+            background: rotation-touch.pressed ? ReaderControlPalette.ink : ReaderControlPalette.paper;
             border-width: 1.5px;
-            border-color: Theme.ink;
+            border-color: ReaderControlPalette.ink;
             border-radius: Theme.control-radius;
             accessible-role: button;
             accessible-label: Strings.manual-rotation;
@@ -599,7 +612,7 @@ export component ReaderPage inherits Rectangle {
                 width: 20px;
                 height: 20px;
                 kind: "lock";
-                color: rotation-touch.pressed ? Theme.paper : Theme.ink;
+                color: rotation-touch.pressed ? ReaderControlPalette.paper : ReaderControlPalette.ink;
             }
             rotation-caption := BodyText {
                 x: 40px;
@@ -608,7 +621,7 @@ export component ReaderPage inherits Rectangle {
                 text: Strings.manual-rotation;
                 font-size: 16px;
                 font-weight: 700;
-                color: rotation-touch.pressed ? Theme.paper : Theme.ink;
+                color: rotation-touch.pressed ? ReaderControlPalette.paper : ReaderControlPalette.ink;
             }
             // This action opens supported manual orientations without implying
             // that an automatic sensor subscription or lock toggle exists.
@@ -640,7 +653,7 @@ export component ReaderPage inherits Rectangle {
             width: 1px;
             height: 34px;
             visible: State.large-screen;
-            background: Theme.dotted;
+            background: ReaderControlPalette.dotted;
         }
         reader-status := Text {
             x: parent.width - 24px - self.preferred-width;
@@ -652,7 +665,7 @@ export component ReaderPage inherits Rectangle {
             font-family: Theme.numbers;
             font-size: 16px;
             font-weight: 600;
-            color: Theme.ink;
+            color: ReaderControlPalette.ink;
             vertical-alignment: center;
         }
         Rectangle {
@@ -660,7 +673,7 @@ export component ReaderPage inherits Rectangle {
             y: parent.height - 1.5px;
             width: parent.width;
             height: 1.5px;
-            background: Theme.ink;
+            background: ReaderControlPalette.ink;
         }
     }
 
@@ -669,19 +682,20 @@ export component ReaderPage inherits Rectangle {
         y: root.height - root.bottom-height;
         width: root.width;
         height: root.bottom-height;
-        background: Theme.paper;
+        background: ReaderControlPalette.paper;
         Rectangle {
             x: 0px;
             y: 0px;
             width: parent.width;
             height: State.reader-panel == "" ? 1.5px : 1px;
-            background: State.reader-panel == "" ? Theme.ink : Theme.line;
+            background: State.reader-panel == "" ? ReaderControlPalette.ink : ReaderControlPalette.line;
         }
         Caption {
             x: root.track-inset;
             y: State.large-screen ? 15.5px : 13.5px;
             width: max(0px, page-number.x - self.x - 12px);
             height: State.large-screen ? 27.5px : 23.5px;
+            color: ReaderControlPalette.secondary;
             text: Strings.chapter-remaining + " " + max(0, State.reader-total - root.shown-page) + " " + Strings.pages-unit + (State.next-downloaded ? " · " + Strings.next-chapter-downloaded : "");
             font-size: State.large-screen ? 15px : 13px;
         }
@@ -694,7 +708,7 @@ export component ReaderPage inherits Rectangle {
             font-family: Theme.numbers;
             font-size: State.large-screen ? 20px : 17px;
             font-weight: 700;
-            color: Theme.ink;
+            color: ReaderControlPalette.ink;
             vertical-alignment: center;
         }
         page-total := Text {
@@ -705,7 +719,7 @@ export component ReaderPage inherits Rectangle {
             text: " / " + State.reader-total;
             font-family: Theme.numbers;
             font-size: State.large-screen ? 16px : 14px;
-            color: Theme.secondary;
+            color: ReaderControlPalette.secondary;
             vertical-alignment: center;
         }
         Rectangle {
@@ -713,13 +727,13 @@ export component ReaderPage inherits Rectangle {
             y: ReaderMetrics.range-top + (State.large-screen ? 18px : 16px);
             width: root.track-width;
             height: 4px;
-            background: Theme.line;
+            background: ReaderControlPalette.line;
             border-radius: 2px;
             Rectangle {
                 x: State.reading-direction == "rtl" ? parent.width * (1 - root.progress) : 0px;
                 width: parent.width * root.progress;
                 height: parent.height;
-                background: Theme.ink;
+                background: ReaderControlPalette.ink;
                 border-radius: 2px;
             }
             Rectangle {
@@ -728,15 +742,15 @@ export component ReaderPage inherits Rectangle {
                 width: State.large-screen ? 27px : 25px;
                 height: self.width;
                 border-width: 1.5px;
-                border-color: Theme.ink;
+                border-color: ReaderControlPalette.ink;
                 border-radius: 4.5px;
-                background: Theme.paper;
+                background: ReaderControlPalette.paper;
                 Rectangle {
                     x: 4.5px;
                     y: 4.5px;
                     width: parent.width - 9px;
                     height: parent.height - 9px;
-                    background: Theme.ink;
+                    background: ReaderControlPalette.ink;
                 }
             }
         }
@@ -796,7 +810,7 @@ export component ReaderPage inherits Rectangle {
             y: root.controls-height;
             width: parent.width;
             height: 1px;
-            background: Theme.ink;
+            background: ReaderControlPalette.ink;
         }
         for action[index] in root.tool-actions: ReaderTool {
             x: ReaderMetrics.tools-inset + index * (root.width - ReaderMetrics.tools-inset * 2) / root.tool-actions.length;
