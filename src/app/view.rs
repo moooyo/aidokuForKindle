@@ -1413,11 +1413,10 @@ impl App {
             tr("only_chapter")
         } else {
             format!(
-                "{} {} {} · {}",
+                "{} {} {}",
                 tr("every"),
                 self.prefs.refresh_every,
-                tr("pages_unit"),
-                tr("balanced")
+                tr("pages_unit")
             )
         };
         let mut first = vec![item(

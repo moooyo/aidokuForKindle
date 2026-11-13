@@ -75,10 +75,9 @@ export component StorageSettings inherits Rectangle {
     property <length> row-height: State.large-screen ? 60px : 54px;
     property <length> legend-top: State.large-screen ? 44px : 40px;
     property <length> legend-pitch: State.large-screen ? 30px : 28px;
-    property <length> scope-top: root.legend-top + root.legend-pitch * 2 + 4px;
-    property <length> scope-height: State.large-screen ? 22px : 20px;
+    property <length> status-top: root.legend-top + root.legend-pitch * 2 + 4px;
     property <bool> has-status-line: State.storage-scale-known && State.storage-status != "";
-    property <length> ranking-title-top: root.scope-top + root.scope-height + (root.has-status-line ? 40px : 12px);
+    property <length> ranking-title-top: root.status-top + (root.has-status-line ? 40px : 12px);
     property <length> ranking-top: root.ranking-title-top + (State.large-screen ? 34px : 30px);
     property <length> ranking-height: max(1, State.storage-books.length) * root.row-height;
     x: 0px;
@@ -126,12 +125,8 @@ export component StorageSettings inherits Rectangle {
         text: Strings.available-space; value: State.storage-free-known ? State.storage-free-text : "—";
         swatch: Theme.paper; outlined: true;
     }
-    Caption {
-        x: 0px; y: root.scope-top; width: root.width; height: root.scope-height;
-        text: Strings.storage-tracked-scope; font-size: State.large-screen ? 14px : 13px;
-    }
     if root.has-status-line: Caption {
-        x: 0px; y: root.scope-top + root.scope-height + 4px; width: root.width; height: 24px;
+        x: 0px; y: root.status-top; width: root.width; height: 24px;
         text: State.storage-status; font-size: State.large-screen ? 14px : 13px;
     }
     GroupLabel {
@@ -224,9 +219,7 @@ component SettingsPathRow inherits Rectangle {
 
 export component DownloadSettings inherits Rectangle {
     property <length> row-height: State.large-screen ? 60px : 54px;
-    property <bool> prepared-downloads: State.resize-downloads || State.grayscale-downloads;
-    property <length> prepared-help-height: root.prepared-downloads ? 64px : 0px;
-    property <length> details-top: (State.large-screen ? 237px : 204px) + root.prepared-help-height;
+    property <length> details-top: State.large-screen ? 237px : 204px;
     x: 0px;
     y: 0px;
     GroupLabel { x: 0px; y: State.large-screen ? 10px : 0px; width: max(0px, root.width - 110px); height: State.large-screen ? 21px : 18px; text: Strings.ahead-download; font-size: State.large-screen ? 14px : 12px; }
@@ -237,11 +230,6 @@ export component DownloadSettings inherits Rectangle {
     }
     ToggleRow { x: 0px; y: State.large-screen ? 105px : 84px; width: root.width; height: root.row-height; text: Strings.resize-for-screen; value: State.resize-downloads; toggled => { Commands.action("settings", "set", "resize-downloads=" + (State.resize-downloads ? "false" : "true")); } }
     ToggleRow { x: 0px; y: (State.large-screen ? 105px : 84px) + root.row-height; width: root.width; height: root.row-height; text: Strings.save-grayscale; value: State.grayscale-downloads; toggled => { Commands.action("settings", "set", "grayscale-downloads=" + (State.grayscale-downloads ? "false" : "true")); } }
-    if root.prepared-downloads: Caption {
-        x: 0px; y: State.large-screen ? 237px : 204px; width: root.width; height: root.prepared-help-height - 8px;
-        text: Strings.download-prepared-help;
-        font-size: State.large-screen ? 15px : 13px; wrap: word-wrap; vertical-alignment: top;
-    }
     details := VerticalLayout {
         x: 0px; y: root.details-top; width: root.width; height: self.preferred-height;
         spacing: 0px; alignment: start;

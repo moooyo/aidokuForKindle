@@ -4,6 +4,7 @@
 //! night-mode conversion belongs to the Kindle backend, after this UI scene.
 
 use std::{
+    cell::RefCell,
     collections::VecDeque,
     fs,
     io::Read,
@@ -16,7 +17,7 @@ use std::{
 use aidoku_kindle::{
     app::{App, AppOptions},
     platform::{DeviceProfile, Platform},
-    ui::{AppWindow, SleepScreenModel, State},
+    ui::{AppWindow, Commands, SleepScreenModel, State},
 };
 use anyhow::{Context, Result, ensure};
 use flate2::read::GzDecoder;
@@ -545,6 +546,130 @@ fn retained_position(snapshot: &Value) -> Value {
     )
 }
 
+fn tap(ui: &AppWindow, x: f32, y: f32) -> Result<()> {
+    use slint::platform::{PointerEventButton, WindowEvent};
+
+    let position = slint::LogicalPosition::new(x, y);
+    // Native touch can begin without a preceding hover or move event.
+    ui.window()
+        .try_dispatch_event(WindowEvent::PointerPressed {
+            position,
+            button: PointerEventButton::Left,
+        })?;
+    ui.window()
+        .try_dispatch_event(WindowEvent::PointerReleased {
+            position,
+            button: PointerEventButton::Left,
+        })?;
+    slint::platform::update_timers_and_animations();
+    Ok(())
+}
+
+fn assert_reader_toolbar_interactions(
+    ui: &AppWindow,
+    app: &Rc<RefCell<App>>,
+    profile: DeviceProfile,
+    landscape: bool,
+) -> Result<Value> {
+    let actions = Rc::new(RefCell::new(Vec::<(String, String)>::new()));
+    let observed = actions.clone();
+    let application = Rc::downgrade(app);
+    ui.global::<Commands>()
+        .on_action(move |section, action, value| {
+            observed
+                .borrow_mut()
+                .push((section.to_string(), action.to_string()));
+            application
+                .upgrade()
+                .expect("The pointer fixture application must remain attached")
+                .borrow_mut()
+                .dispatch(section.as_str(), action.as_str(), value.as_str())
+                .expect("A pointer control action must complete successfully");
+        });
+    let (width, height) = profile.logical_size(landscape);
+    let (width, height) = (width as f32, height as f32);
+    let large = profile.is_scribe();
+    let header = if large { 78.0 } else { 89.5 };
+    let bottom = if large { 210.0 } else { 188.0 };
+    let toolbar = if large { 77.0 } else { 69.0 };
+    let inset = if large && landscape {
+        120.0
+    } else if large {
+        24.0
+    } else {
+        0.0
+    };
+    let tools: &[&str] = if large && landscape {
+        &["mode", "layout", "picture", "brightness", "more"]
+    } else {
+        &["mode", "picture", "brightness", "orientation", "more"]
+    };
+    let original_page = app.borrow().snapshot()["reader_page"].clone();
+    snapshot(ui)?;
+    tap(ui, width / 2.0, height / 2.0)?;
+    ensure!(
+        ui.global::<State>().get_reader_menu(),
+        "A content tap must open the Reader controls"
+    );
+
+    // Header and footer paper belong to the controls, never to the page tap area.
+    actions.borrow_mut().clear();
+    tap(ui, width / 2.0, 3.0)?;
+    tap(ui, width / 2.0, height - bottom + 5.0)?;
+    ensure!(
+        actions.borrow().is_empty() && ui.global::<State>().get_reader_menu(),
+        "Blank control surfaces must not dismiss the menu or turn the page"
+    );
+
+    for (index, action) in tools.iter().enumerate() {
+        let x = inset + (index as f32 + 0.5) * (width - inset * 2.0) / tools.len() as f32;
+        for activation in 0..2 {
+            actions.borrow_mut().clear();
+            tap(ui, x, height - toolbar / 2.0)?;
+            snapshot(ui)?;
+            ensure!(
+                *actions.borrow() == vec![("reader".into(), (*action).into())],
+                "Each {action} tab contact must dispatch exactly one Reader action"
+            );
+            let state = ui.global::<State>();
+            ensure!(
+                state.get_reader_panel().as_str() == *action
+                    && !state.get_modal().is_empty()
+                    && state.get_reader_menu()
+                    && app.borrow().snapshot()["reader_page"] == original_page,
+                "Reader tab {action} must remain open after activation {activation}"
+            );
+        }
+    }
+
+    actions.borrow_mut().clear();
+    tap(ui, width / 2.0, header + 8.0)?;
+    snapshot(ui)?;
+    ensure!(
+        *actions.borrow() == vec![("panel".into(), "close".into())]
+            && ui.global::<State>().get_modal().is_empty()
+            && ui.global::<State>().get_reader_menu(),
+        "An outside-panel tap must close only the panel and retain the toolbar"
+    );
+    actions.borrow_mut().clear();
+    tap(ui, width / 2.0, height / 2.0)?;
+    ensure!(
+        *actions.borrow() == vec![("reader".into(), "menu".into())]
+            && !ui.global::<State>().get_reader_menu(),
+        "A subsequent content tap must dismiss the Reader controls once"
+    );
+    actions.borrow_mut().clear();
+    tap(ui, width * 0.1, height / 2.0)?;
+    ensure!(
+        *actions.borrow() == vec![("reader".into(), "next".into())]
+            && app.borrow().snapshot()["reader_page"] != original_page,
+        "The closed-menu page tap area must resume normal page turns"
+    );
+    Ok(json!({"profile": profile.id(), "landscape": landscape,
+        "tabs": tools, "activations_per_tab": 2, "one_action_per_contact": true,
+        "blank_controls_isolated": true, "outside_close_and_page_turn_retained": true}))
+}
+
 #[test]
 fn sleep_screen_preserves_complete_covers_text_and_retained_reader_at_all_layouts() -> Result<()> {
     let events = EventQueue::default();
@@ -565,6 +690,7 @@ fn sleep_screen_preserves_complete_covers_text_and_retained_reader_at_all_layout
     }
     let mut reports = Vec::new();
     let mut reader_control_reports = Vec::new();
+    let mut reader_interaction_reports = Vec::new();
     let mut startup_color_reports = Vec::new();
 
     for profile in [DeviceProfile::Pw5, DeviceProfile::Scribe] {
@@ -776,6 +902,9 @@ fn sleep_screen_preserves_complete_covers_text_and_retained_reader_at_all_layout
                 app.borrow_mut().finish_resume_frame()?;
             }
 
+            reader_interaction_reports.push(assert_reader_toolbar_interactions(
+                &ui, &app, profile, landscape,
+            )?);
             app.borrow_mut().dispatch("navigation", "tab", "0")?;
             for night_mode in [false, true] {
                 let name = format!(
@@ -845,6 +974,7 @@ fn sleep_screen_preserves_complete_covers_text_and_retained_reader_at_all_layout
                 "night_mode_boundary": "The Kindle backend converts the light Slint scene after this renderer; dark-preference PNGs are raw Slint evidence, not native framebuffer captures",
                 "cases": reports,
                 "reader_control_cases": reader_control_reports,
+                "reader_interaction_cases": reader_interaction_reports,
                 "startup_color_cases": startup_color_reports,
             }))?,
         )?;

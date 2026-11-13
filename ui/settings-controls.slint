@@ -37,35 +37,6 @@ export component SettingSymbol inherits Path {
         "M12 2.5a9.5 9.5 0 1 0 0 19a9.5 9.5 0 1 0 0-19zM12 11v6M12 7.5h.01";
 }
 
-export component DeviceGlyph inherits Rectangle {
-    x: 0px;
-    y: 0px;
-    width: State.large-screen ? 38px : 40px;
-    height: State.large-screen ? 50px : 54px;
-    border-width: 2px;
-    border-color: Theme.ink;
-    border-radius: State.large-screen ? 3px : 2px;
-    background: Theme.paper;
-    Rectangle {
-        x: State.large-screen ? 9px : 5px;
-        y: State.large-screen ? 4px : 5px;
-        width: parent.width - self.x - 4px;
-        height: parent.height - self.y - (State.large-screen ? 4px : 9px);
-        border-width: 1px;
-        border-color: Theme.secondary;
-        background: Theme.paper;
-        clip: true;
-        for index in 77: Rectangle {
-            x: 2px + mod(index, 7) * 4px;
-            y: 2px + floor(index / 7) * 4px;
-            width: 1.5px;
-            height: 1.5px;
-            background: Theme.ink;
-            border-radius: 1px;
-        }
-    }
-}
-
 export component SettingsListRow inherits Rectangle {
     in property <SettingItem> item;
     in property <bool> sidebar: false;

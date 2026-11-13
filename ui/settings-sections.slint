@@ -58,7 +58,7 @@ export component SettingsBody inherits Rectangle {
         }
         GroupLabel { x: 0px; y: State.large-screen ? 115px : 90px; width: parent.width - 110px; height: root.group-height; text: Strings.page-quality; font-size: State.large-screen ? 14px : 12px; }
         Caption { x: parent.width - 110px; y: State.large-screen ? 115px : 90px; width: 110px; height: root.group-height; text: Strings.unavailable; horizontal-alignment: right; }
-        for label[index] in [Strings.quality-first, Strings.balanced-recommended, Strings.speed-first]: RadioCard {
+        for label[index] in [Strings.quality-first, Strings.balanced, Strings.speed-first]: RadioCard {
             x: 0px;
             y: (State.large-screen ? 148px : 118px) + index * (State.large-screen ? 68px : 60px);
             width: parent.width;
@@ -66,7 +66,7 @@ export component SettingsBody inherits Rectangle {
             selected: false;
             enabled: false;
         }
-        ToggleRow { x: 0px; y: State.large-screen ? 356px : 304px; width: parent.width; text: Strings.chapter-full-refresh + " · " + Strings.fixed-on; value: true; enabled: false; }
+        ToggleRow { x: 0px; y: State.large-screen ? 356px : 304px; width: parent.width; text: Strings.chapter-full-refresh; value: true; enabled: false; }
         ToggleRow { x: 0px; y: (State.large-screen ? 356px : 304px) + root.row-height; width: parent.width; text: Strings.flash-close; value: State.flash-on-close; toggled => { Commands.action("settings", "set", "flash-on-close=" + (State.flash-on-close ? "false" : "true")); } }
         ToggleRow { x: 0px; y: (State.large-screen ? 356px : 304px) + root.row-height * 2; width: parent.width; text: Strings.night-mode; value: State.night-mode; toggled => { Commands.action("settings", "set", "night-mode=" + (State.night-mode ? "false" : "true")); } }
         GroupLabel { x: 0px; y: State.large-screen ? 558px : 482px; width: parent.width; height: root.group-height; text: Strings.grayscale-test; font-size: State.large-screen ? 14px : 12px; }
@@ -103,7 +103,6 @@ export component SettingsBody inherits Rectangle {
         property <length> saver-label-height: State.large-screen ? root.group-height : 17.5px;
         property <length> saver-grid-top: self.saver-label-top + self.saver-label-height + root.section-gap;
         property <length> saver-card-height: State.large-screen ? 201px : 179px;
-        property <length> saver-hint-height: State.large-screen ? 42px : 40px;
         property <string> saver-mode: State.screensaver-mode == "cover" && !State.sleep-cover ? "system" : State.screensaver-mode;
         ToggleRow { x: 0px; y: 0px; width: parent.width; text: Strings.keep-awake; value: State.keep-awake; toggled => { Commands.action("settings", "set", "keep-awake=" + (State.keep-awake ? "false" : "true")); } }
         ToggleRow { x: 0px; y: root.row-height; width: parent.width; text: Strings.charging-updates; value: State.charging-updates; enabled: State.charging-status-supported; toggled => { Commands.action("settings", "set", "charging-updates=" + (State.charging-updates ? "false" : "true")); } }
@@ -142,25 +141,6 @@ export component SettingsBody inherits Rectangle {
                 }
                 clicked => { if !parent.selected { Commands.action("settings", "set", "screensaver-mode=" + parent.mode); } }
             }
-        }
-        Caption {
-            x: 0px;
-            y: parent.saver-grid-top + parent.saver-card-height + root.section-gap;
-            width: parent.width; height: parent.saver-hint-height;
-            text: Strings.sleep-cover-hint;
-            wrap: word-wrap;
-            vertical-alignment: top;
-        }
-        Rectangle {
-            x: 0px;
-            y: parent.saver-grid-top + parent.saver-card-height + root.section-gap * 2 + parent.saver-hint-height + (State.large-screen ? 0px : 3px);
-            width: parent.width; height: State.large-screen ? 60px : 74px;
-            border-width: State.large-screen ? 0px : Theme.control-border;
-            border-color: Theme.ink; border-radius: Theme.control-radius; background: Theme.paper;
-            if State.large-screen: Rectangle { x: 0px; y: 0px; width: parent.width; height: 1px; background: Theme.line; }
-            BodyText { x: State.large-screen ? 0px : 18px; y: 0px; width: max(0px, parent.width - self.x - 196px); height: parent.height; text: Strings.exit-to-home; font-size: State.large-screen ? 17px : 16px; font-weight: State.large-screen ? 400 : 700; }
-            ActionButton { x: parent.width - self.width - (State.large-screen ? 0px : 18px); y: (parent.height - self.height) / 2; height: 44px; width: 160px; text: Strings.exit; primary: !State.large-screen; clicked => { Commands.action("app", "exit", ""); } }
-            if State.large-screen: Rectangle { x: 0px; y: parent.height - 1px; width: parent.width; height: 1px; background: Theme.line; }
         }
     }
 
@@ -258,18 +238,13 @@ export component SettingsBody inherits Rectangle {
 
     if root.section == "backup" || root.section == "logs" || root.section == "about": Rectangle {
         x: 0px; y: 0px; width: parent.width; height: parent.height;
-        property <length> list-top: root.section == "backup" ? (State.large-screen ? 173px : 167px) : root.section == "logs" ? root.row-height + (State.large-screen ? 116px : 110px) : 0px;
+        property <length> list-top: root.section == "backup" ? (State.large-screen ? 105px : 96px) : root.section == "logs" ? root.row-height + (State.large-screen ? 116px : 110px) : 0px;
         if root.section == "backup": HorizontalLayout {
             x: 0px; y: 0px; width: parent.width; height: State.large-screen ? 54px : 48px; spacing: 12px; alignment: start;
             ActionButton { text: Strings.backup-now; horizontal-padding: 24px; primary: true; enabled: !State.busy; clicked => { Commands.action("settings", "backup-create", ""); } }
             ActionButton { text: Strings.restore-backup; horizontal-padding: 24px; enabled: !State.busy; clicked => { Commands.action("settings", "backup-restore", ""); } }
         }
-        if root.section == "backup": Caption {
-            x: 0px; y: State.large-screen ? 66px : 60px; width: parent.width; height: 64px;
-            text: Strings.metadata-backup-scope; wrap: word-wrap; vertical-alignment: top;
-            font-size: State.large-screen ? 15px : 13px;
-        }
-        if root.section == "backup": GroupLabel { x: 0px; y: State.large-screen ? 140px : 134px; width: parent.width; height: root.group-height; text: Strings.recent-backups; font-size: State.large-screen ? 14px : 12px; }
+        if root.section == "backup": GroupLabel { x: 0px; y: State.large-screen ? 72px : 64px; width: parent.width; height: root.group-height; text: Strings.recent-backups; font-size: State.large-screen ? 14px : 12px; }
         if root.section == "logs": ToggleRow { x: 0px; y: 0px; width: parent.width; text: Strings.write-logs; value: State.write-logs; toggled => { Commands.action("settings", "set", "write-logs=" + (State.write-logs ? "false" : "true")); } }
         if root.section == "logs": Rectangle {
             x: 0px; y: root.row-height + 12px; width: parent.width; height: State.large-screen ? 54px : 48px;

@@ -318,8 +318,10 @@ export component ReaderPage inherits Rectangle {
     }
 
     page-touch := TouchArea {
+        y: State.reader-menu ? root.top-height : 0px;
         width: root.width;
-        height: root.height;
+        height: State.reader-menu ? max(0px, root.height - root.top-height - root.bottom-height) : root.height;
+        enabled: State.modal == "";
         moved => {
             if self.pressed && root.gesture-input-epoch == State.reader-input-epoch && (abs(self.mouse-x - root.gesture-start-x) >= 33px || abs(self.mouse-y - root.gesture-start-y) >= 33px) {
                 root.suppress-click = true;

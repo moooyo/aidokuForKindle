@@ -55,15 +55,16 @@ REVIEW_CASES = (
     "downloads-failed-controls",
 )
 FEEDBACK_CASES = ("batch-last-chapter-empty", "batch-completed-only", "batch-empty-selected", "status-strip")
+SETTINGS_CASES = ("settings-exit-root", "settings-exit-section")
 SESSION_CASES = (
     "session-library-restore", "session-detail-restore", "session-reader-restore", "session-landscape-restore", "session-cross-book-detail",
     "session-vertical-restore", "session-secrets", "session-incognito-ram", "lifecycle-retained-reader",
     "lifecycle-pending-direction", "lifecycle-pending-rotation", "lifecycle-doubletap-reset", "lifecycle-seek-reset",
     "demo-assets-upgrade",
 )
-SELECTABLE_CASES = CHAPTER_CASES + BATCH_CASES + DOWNLOAD_CASES + CACHE_CASES + REVIEW_CASES + FEEDBACK_CASES + SESSION_CASES + (
+SELECTABLE_CASES = CHAPTER_CASES + BATCH_CASES + DOWNLOAD_CASES + CACHE_CASES + REVIEW_CASES + FEEDBACK_CASES + SETTINGS_CASES + SESSION_CASES + (
     "reader-long-press-600", "reader-long-press-650", "reader-long-press-800",
-    "baseline-large-readers", "local-cbz-roundtrip", "reader-bottom-right-vertical",
+    "baseline-large-readers", "local-cbz-roundtrip", "reader-bottom-right-vertical", "settings-pointer-direction",
 )
 
 
@@ -83,6 +84,11 @@ def save_json(path: Path, value: Any) -> None:
 def ui_label(key: str) -> str:
     labels = json.loads((Path(__file__).resolve().parent.parent / "assets/i18n/zh-CN.json").read_text(encoding="utf-8"))
     return labels[key]
+
+
+def settings_storage_hit(device: str = "pw5") -> tuple[int, int]:
+    # Real row centers after removing the device card and simplifying the header.
+    return (160, 333) if device.startswith("scribe") else (200, 320)
 
 
 class Replay:
@@ -267,6 +273,7 @@ class Suite:
         expected_route: str | None = None,
         capture_delay: int = 650,
         allow_busy: bool = False,
+        record_performance: bool = False,
     ) -> dict[str, Any]:
         if self.process_cleanup_failed:
             raise RuntimeError("An owned process group was not stopped; abort subsequent UI scenarios")
@@ -299,7 +306,7 @@ class Suite:
         if import_path is not None:
             command.extend(["--import", str(import_path)])
         performance_trace = None
-        if getattr(self.args, "performance_traces", False):
+        if record_performance or getattr(self.args, "performance_traces", False):
             performance_trace = self.output / f"{name}.performance.json"
             command.extend(["--performance-trace", str(performance_trace)])
         environment = os.environ.copy()
@@ -589,11 +596,7 @@ class Suite:
         self.expect(restarted, "bookmark_count", initial_bookmarks - 1)
 
         settings_data = Path(self.reference_cases["pw5-settings"]["data_dir"])
-        changed = self.run("settings-pointer-direction", "settings", replay=Replay().tap(200, 504).tap(308, 443), data=settings_data, expected_route="settings")
-        self.preference(changed, "reading_direction", "ltr")
-        self.expect(changed, "modal", "")
-        persisted = self.run("settings-restart", "settings", data=settings_data)
-        self.preference(persisted, "reading_direction", "ltr")
+        self.settings_direction(settings_data)
 
         history = self.run("incognito-pointer-enable", "history", replay=Replay().tap(498, 70), expected_route="history")
         self.preference(history, "incognito", True)
@@ -603,6 +606,41 @@ class Suite:
         self.preference(hidden, "incognito", True)
         rows_after = self.database_rows(hidden, "SELECT chapter_id,page,total,completed,updated_at FROM progress ORDER BY chapter_id")
         self.check(hidden, "Incognito reading does not modify any persisted history row", rows_before == rows_after, {"before": rows_before, "after": rows_after})
+
+    def settings_direction(self, data: Path | None = None) -> None:
+        replay = Replay().intent("settings", "back").tap(200, 410).tap(236, 202)
+        changed = self.run("settings-pointer-direction", "settings", replay=replay, data=data, expected_route="settings")
+        self.expect(changed, "settings_section", "default-direction")
+        self.preference(changed, "reading_direction", "ltr")
+        self.expect(changed, "modal", "")
+        persisted = self.run("settings-restart", "settings", data=Path(changed["data_dir"]))
+        self.preference(persisted, "reading_direction", "ltr")
+
+    def settings_exit_cases(self, wanted: set[str]) -> None:
+        for name in SETTINGS_CASES:
+            if name not in wanted:
+                continue
+            section = name == "settings-exit-section"
+            for device in ("pw5", "scribe"):
+                large = device.startswith("scribe")
+                replay = Replay(start=1000).intent("settings", "back")
+                if section:
+                    replay.tap(*settings_storage_hit(device), wait=1000)
+                width, _ = PROFILES[device]
+                margin, touch, status = (36, 56, 36) if large else (22, 48, 28)
+                header = 88 if large else 56 if section else 72
+                replay.tap(width - margin - touch / 2, status + header / 2)
+                case = self.run(f"{name}-{device}", "settings", device=device, replay=replay, expected_route="settings", capture_delay=4000, record_performance=True)
+                self.expect(case, "settings_section", "storage" if section else "screen-refresh" if large else "")
+                path = Path(case["performance_trace"])
+                self.check(case, "The exit check retained its application lifecycle trace", path.is_file(), str(path))
+                if not path.is_file():
+                    continue
+                trace = json.loads(path.read_text(encoding="utf-8"))
+                events = trace.get("events", [])
+                exits = [event for event in events if event.get("name") == "exit_requested"]
+                self.check(case, "The real X pointer tap requested exit before the automatic capture deadline", len(exits) == 1 and exits[0].get("at_us", case["exit_after_ms"] * 1000) < case["exit_after_ms"] * 1000, exits)
+                self.check(case, "The application completed its owned shutdown successfully", trace.get("finished") is True and trace.get("success") is True and any(event.get("name") == "shutdown_complete" for event in events), {"finished": trace.get("finished"), "success": trace.get("success"), "shutdown_events": [event for event in events if event.get("name", "").startswith("shutdown_")]})
 
     def lists_and_search(self) -> None:
         previous = self.run("pagination-first-boundary", replay=Replay().tap(210, 728), expected_route="library")
@@ -749,7 +787,7 @@ class Suite:
         self.check(installed, "Simulated installation is explicitly marked as demo rather than a real WASM package", len(simulated) == 1 and simulated[0].get("options", {}).get("demo") is True, [{"id": source.get("id"), "kind": source.get("kind"), "demo": source.get("options", {}).get("demo")} for source in simulated])
 
     def new_ui_cases(self, requested: set[str] | None = None) -> None:
-        wanted = set(CHAPTER_CASES + BATCH_CASES + DOWNLOAD_CASES + CACHE_CASES + REVIEW_CASES + FEEDBACK_CASES) if requested is None else requested
+        wanted = set(CHAPTER_CASES + BATCH_CASES + DOWNLOAD_CASES + CACHE_CASES + REVIEW_CASES + FEEDBACK_CASES + SETTINGS_CASES) if requested is None else requested
         for name in CHAPTER_CASES:
             if name not in wanted:
                 continue
@@ -822,6 +860,7 @@ class Suite:
         self.cache_ui_cases(wanted & set(CACHE_CASES))
         self.review_regressions(wanted & set(REVIEW_CASES))
         self.feedback_regressions(wanted & set(FEEDBACK_CASES))
+        self.settings_exit_cases(wanted & set(SETTINGS_CASES))
 
     def download_pagination(self) -> None:
         replay = Replay().intent("detail", "batch-download").intent("panel", "choose", "batch:all", wait=1000).intent("downloads", "open", wait=700)
@@ -897,13 +936,23 @@ class Suite:
                     protected[path] = sha256(Path(path))
             self.check(imported, "The UI cache-clear fixture contains real imported comic pages", len(protected) == 3, sorted(protected))
         if "storage-cache-info" in wanted:
-            info = self.run("storage-cache-info", "settings", demo=False, data=data, replay=Replay().tap(200, 414).tap(309, 443), expected_route="settings")
+            info = self.run("storage-cache-info", "settings", demo=False, data=data, replay=Replay().intent("settings", "back").tap(*settings_storage_hit()).tap(309, 443), expected_route="settings")
             self.expect(info, "modal", "summary")
             self.check(info, "Cache information uses actual persisted cache statistics", info["state"].get("cache", {}).get("entries", 0) > 0, info["state"].get("cache"))
         if "storage-clear-cache" in wanted:
-            before = (imported or offline)["state"].get("cache", {})
-            cleared = self.run("storage-clear-cache", "settings", demo=False, data=data, replay=Replay().tap(200, 414).tap(309, 495, wait=1000), expected_route="settings", capture_delay=1500)
+            storage = self.run("storage-clear-cache-before", "settings", demo=False, data=data, replay=Replay().intent("settings", "back").tap(*settings_storage_hit(), wait=1500), expected_route="settings")
+            self.expect(storage, "settings_section", "storage")
+            self.expect(storage, "storage_ready", True)
+            state = storage["state"]
+            before = state.get("cache", {})
+            status_line = bool(state.get("storage_scale_known") and state.get("storage_status"))
+            ranking_top = 100 + (40 if status_line else 12) + 30
+            clear_y = 152 + ranking_top + max(1, len(state.get("storage_books", []))) * 54 + 12 + 24
+            cleared = self.run("storage-clear-cache", "settings", demo=False, data=data, replay=Replay().intent("settings", "back").tap(*settings_storage_hit(), wait=1500).tap(80, clear_y, wait=800), expected_route="settings")
+            cleared["clear_cache_pointer"] = [80, clear_y]
+            self.expect(cleared, "settings_section", "storage")
             self.expect(cleared, "modal", "")
+            self.expect(cleared, "message", ui_label("saved"))
             after = cleared["state"].get("cache", {})
             self.check(cleared, "The clear-cache UI does not increase unpinned cache usage", after.get("unpinned_bytes", 0) <= before.get("unpinned_bytes", 0), {"before": before, "after": after})
             self.check(cleared, "Clear-cache preserves protected imported image files byte for byte", len(protected) == 3 and all(Path(path).is_file() and sha256(Path(path)) == digest for path, digest in protected.items()), sorted(protected))
@@ -922,7 +971,7 @@ class Suite:
             if name == "summary-book-tags":
                 screen, replay = "detail", Replay().intent("detail", "summary")
             elif name == "summary-cache-info-tagged":
-                screen, replay = "settings", Replay().tap(200, 414).tap(309, 443)
+                screen, replay = "settings", Replay().intent("settings", "back").tap(*settings_storage_hit()).tap(309, 443)
             else:
                 screen, replay = "settings", Replay().intent("detail", "summary").intent("app", "back").intent("settings", "open", "about")
             case = self.run(name, screen, replay=replay, expected_route=screen)
@@ -1206,6 +1255,8 @@ class Suite:
 
     def run_selected(self, names: list[str]) -> None:
         requested = set(names)
+        if "settings-pointer-direction" in requested:
+            self.settings_direction()
         if "reader-bottom-right-vertical" in requested:
             case = self.run("reader-bottom-right-vertical", "reader", replay=Replay().intent("settings", "set", "reading_direction=vertical", wait=4000).tap(570, 792, wait=4000), expected_route="reader")
             self.check(case, "The bottom-right region advances vertical reading instead of changing a footer mode", case["state"].get("reader_page", 0) > 12 or case["state"].get("reader_offset", 0) > 0, {"page": case["state"].get("reader_page"), "offset": case["state"].get("reader_offset")})

@@ -3122,8 +3122,8 @@ impl App {
             _ => "",
         };
         if !context.is_empty() && !self.modal.is_empty() && self.modal_context == context {
-            self.modal.clear();
-            self.modal_context.clear();
+            // Repeated tab activation must retain the selected panel. Outside
+            // taps and explicit close actions own dismissal independently.
             return Ok(());
         }
         match panel {
