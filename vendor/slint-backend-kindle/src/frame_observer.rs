@@ -5,6 +5,7 @@ use std::rc::Rc;
 use std::time::Duration;
 
 use crate::PhysicalRect;
+use crate::framebuffer::FrameDitheringStatus;
 
 /// A fixed outcome code; neither device errors nor application content is exposed.
 #[derive(Debug, Clone, Copy, Eq, PartialEq)]
@@ -40,6 +41,9 @@ pub struct NativeFrameObservation {
     pub token: u64,
     /// The actual framebuffer-write counter; zero means no write occurred.
     pub frame_sequence: u64,
+    /// A fallback replacement links its accepted write to the first observed
+    /// raw write without reusing that write's physical identity.
+    pub replaces_frame_sequence: Option<u64>,
     pub phase: NativeFramePhase,
     /// Time spent in the observed write or submission call, excluding callbacks.
     pub elapsed: Duration,
@@ -47,6 +51,12 @@ pub struct NativeFrameObservation {
     pub region: Option<PhysicalRect>,
     pub full_frame: bool,
     pub marker: Option<u32>,
+    pub hardware_y4_available: bool,
+    pub hardware_y4_requested: bool,
+    /// True only when this observation's accepted marker carries MTK Y4.
+    pub hardware_y4_applied: bool,
+    pub software_dither_fallback: bool,
+    pub dithering_delivery_uncertain: bool,
 }
 
 type Observer = Rc<dyn Fn(NativeFrameObservation)>;
@@ -54,12 +64,14 @@ type Observer = Rc<dyn Fn(NativeFrameObservation)>;
 /// Initial scene allocation may require a full write of the first accepted
 /// Reader image. Later ownership, rotation or output-mode rewrites cannot be
 /// reused as page-turn completions; a resume is never an initial-start sample.
+/// `presentation_rewrite` excludes the dithering policy of the armed image:
+/// processing that same image may legitimately require its first full write.
 pub(crate) fn reader_output_eligible(
     frame_sequence: u64,
     resume_pending: bool,
-    rewrite: bool,
+    presentation_rewrite: bool,
 ) -> bool {
-    !resume_pending && (!rewrite || frame_sequence == 1)
+    !resume_pending && (!presentation_rewrite || frame_sequence == 1)
 }
 
 #[derive(Default)]
@@ -106,12 +118,18 @@ impl FrameObserverState {
             observation: NativeFrameObservation {
                 token,
                 frame_sequence: 0,
+                replaces_frame_sequence: None,
                 phase: NativeFramePhase::Unavailable(NativeFrameUnavailable::NoWrite),
                 elapsed: Duration::ZERO,
                 render_elapsed: Duration::ZERO,
                 region: None,
                 full_frame: false,
                 marker: None,
+                hardware_y4_available: false,
+                hardware_y4_requested: false,
+                hardware_y4_applied: false,
+                software_dither_fallback: false,
+                dithering_delivery_uncertain: false,
             },
             wrote: false,
             finished: false,
@@ -129,6 +147,25 @@ pub(crate) struct FrameAttempt {
 }
 
 impl FrameAttempt {
+    pub(crate) fn set_dithering_status(&mut self, status: FrameDitheringStatus) {
+        self.observation.hardware_y4_available = status.hardware_y4_available;
+        self.observation.hardware_y4_requested = status.hardware_y4_requested;
+        self.observation.hardware_y4_applied = status.hardware_y4_applied;
+        self.observation.software_dither_fallback = status.software_dither_fallback;
+        self.observation.dithering_delivery_uncertain = status.dithering_delivery_uncertain;
+    }
+
+    /// A definite hardware rejection may require one additional full write.
+    /// Preserve the first write event while binding acceptance to its replacement.
+    pub(crate) fn rewritten(&mut self, frame_sequence: u64, region: PhysicalRect) {
+        if self.current() && self.wrote {
+            self.observation.replaces_frame_sequence = Some(self.observation.frame_sequence);
+            self.observation.frame_sequence = frame_sequence;
+            self.observation.region = Some(region);
+            self.observation.full_frame = true;
+        }
+    }
+
     fn current(&mut self) -> bool {
         if self.finished {
             return false;
@@ -159,6 +196,7 @@ impl FrameAttempt {
         self.wrote = true;
         self.observation.frame_sequence = frame_sequence;
         self.observation.phase = NativeFramePhase::FramebufferWritten;
+        self.observation.hardware_y4_applied = false;
         self.observation.elapsed = elapsed;
         self.observation.render_elapsed = render_elapsed;
         self.observation.region = Some(region);
@@ -174,6 +212,10 @@ impl FrameAttempt {
         }
         if !self.wrote {
             self.unavailable(NativeFrameUnavailable::NoWrite);
+            return;
+        }
+        if self.observation.dithering_delivery_uncertain {
+            self.unavailable(NativeFrameUnavailable::SendRejected);
             return;
         }
         let Some(marker) = marker.filter(|marker| *marker != 0) else {
@@ -195,6 +237,7 @@ impl FrameAttempt {
         self.observation.phase = NativeFramePhase::Unavailable(reason);
         self.observation.elapsed = Duration::ZERO;
         self.observation.marker = None;
+        self.observation.hardware_y4_applied = false;
         (self.observer)(self.observation);
     }
 }
@@ -343,6 +386,69 @@ mod tests {
             events.borrow().last().unwrap().phase,
             NativeFramePhase::Unavailable(NativeFrameUnavailable::SendRejected)
         );
+    }
+
+    #[test]
+    fn dithering_is_bound_to_the_accepted_replacement_and_marker() {
+        let (state, events) = observed();
+        state.arm(11);
+        let mut attempt = state.begin().unwrap();
+        attempt.set_dithering_status(FrameDitheringStatus {
+            hardware_y4_available: true,
+            hardware_y4_requested: true,
+            ..FrameDitheringStatus::default()
+        });
+        write(&mut attempt);
+        attempt.rewritten(
+            8,
+            PhysicalRect {
+                x: 0,
+                y: 0,
+                width: 100,
+                height: 200,
+            },
+        );
+        attempt.set_dithering_status(FrameDitheringStatus {
+            hardware_y4_requested: true,
+            software_dither_fallback: true,
+            ..FrameDitheringStatus::default()
+        });
+        attempt.accepted(Some(3), Duration::from_micros(40));
+        let events = events.borrow();
+        assert_eq!(events.len(), 2);
+        assert_eq!((events[0].frame_sequence, events[0].marker), (7, None));
+        assert_eq!(events[0].replaces_frame_sequence, None);
+        assert!(events[0].hardware_y4_available && events[0].hardware_y4_requested);
+        assert!(!events[0].hardware_y4_applied);
+        assert_eq!((events[1].frame_sequence, events[1].marker), (8, Some(3)));
+        assert_eq!(events[1].replaces_frame_sequence, Some(7));
+        assert!(events[1].full_frame && events[1].software_dither_fallback);
+        assert!(!events[1].hardware_y4_available && !events[1].hardware_y4_applied);
+    }
+
+    #[test]
+    fn uncertain_or_missing_submissions_cannot_report_applied_hardware() {
+        for marker in [None, Some(0), Some(1)] {
+            let (state, events) = observed();
+            state.arm(11);
+            let mut attempt = state.begin().unwrap();
+            write(&mut attempt);
+            attempt.set_dithering_status(FrameDitheringStatus {
+                hardware_y4_available: true,
+                hardware_y4_requested: true,
+                hardware_y4_applied: true,
+                dithering_delivery_uncertain: true,
+                ..FrameDitheringStatus::default()
+            });
+            attempt.accepted(marker, Duration::ZERO);
+            let event = *events.borrow().last().unwrap();
+            assert_eq!(
+                event.phase,
+                NativeFramePhase::Unavailable(NativeFrameUnavailable::SendRejected)
+            );
+            assert!(!event.hardware_y4_applied && event.dithering_delivery_uncertain);
+            assert_eq!(event.marker, None);
+        }
     }
 
     #[test]

@@ -47,6 +47,10 @@ REQUEST_EVENTS = {
     "framebuffer_written", "send_accepted", "native_frame_unavailable",
 } | ABORT_EVENTS | STAGE_EVENTS
 NATIVE_EVENTS = {"framebuffer_written", "send_accepted", "native_frame_unavailable"}
+DITHERING_FIELDS = (
+    "hardware_y4_available", "hardware_y4_requested", "hardware_y4_applied",
+    "software_dither_fallback", "dithering_delivery_uncertain",
+)
 IDENTIFIER = re.compile(r"^[a-z][a-z0-9_]{0,63}$")
 HEX_SHA256 = re.compile(r"^[0-9a-f]{64}$")
 
@@ -261,7 +265,20 @@ def validate_trace(document: Any, expectation: dict[str, Any]) -> dict[str, Any]
                 used_frames[frame] = request_id
             elif name == "send_accepted":
                 require("framebuffer_written" in recorded, "SEND acceptance has no matching framebuffer write")
-                require(frame == recorded["framebuffer_written"]["frame_sequence"], "SEND acceptance belongs to another frame")
+                if any(field in event for field in DITHERING_FIELDS):
+                    require(all(isinstance(event.get(field), bool) for field in DITHERING_FIELDS), "SEND dithering observation is incomplete or not Boolean")
+                written_frame = recorded["framebuffer_written"]["frame_sequence"]
+                if "replaces_frame_sequence" in event:
+                    replaced = unsigned(event["replaces_frame_sequence"], "replaces_frame_sequence", positive=True)
+                    require(replaced == written_frame and frame != replaced, "A fallback does not replace its exact prior framebuffer write")
+                    require(event.get("full") is True and event.get("software_dither_fallback") is True
+                            and event.get("hardware_y4_requested") is True and event.get("hardware_y4_applied") is False
+                            and event.get("dithering_delivery_uncertain") is False,
+                            "A replacement SEND is not a definite full software-dither fallback")
+                    require(frame not in used_frames, "A replacement native frame was attributed to multiple requests")
+                    used_frames[frame] = request_id
+                else:
+                    require(frame == written_frame, "SEND acceptance belongs to another frame")
                 marker = unsigned(event.get("marker"), "marker", positive=True)
                 require(marker <= (1 << 32) - 1, "SEND marker is outside its ABI range")
             else:

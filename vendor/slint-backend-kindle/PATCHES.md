@@ -1,5 +1,46 @@
 # Project-owned Kindle backend patches
 
+## Explicit final-frame MTK Y4 policy
+
+`KindleBackend::dithering_handle()` exposes the cloneable `DitheringHandle`.
+`set_hardware_y4` must accompany publication of the matching image. Its result
+reports reviewed hardware eligibility; it does not report an accepted update.
+An explicit rejection disables hardware for the session while retaining the
+request so the still-current raw scene receives software dithering. Availability
+uses a fixed-width, read-only identity and actual grayscale metadata, never an
+application profile or resolution. Unsupported identities preserve software
+behavior.
+
+The event loop freezes the scene's request and bilevel policy before writing.
+A policy revision settles the preceding accepted update and rewrites the whole
+retained scene before GC16. Raw scenes promote even overlay DU/A2/Auto requests
+to GC16; Y4 regions expand outward to eight-pixel boundaries and clip to the
+panel. The MTK ioctl carries flag `0x4000`, zero `dither_mode` and `quant_bit`,
+and the reviewed histogram waveforms. Ordinary UI and bilevel waveforms retain
+their prior policy.
+
+Definite `EINVAL` or `ENOTTY` rejection settles the previous accepted marker,
+rebuilds the whole software output from the canonical retained scene with the
+same output mode, and submits a fresh full GC16 marker without Y4. Native Y8INV
+is encoded once after logical output processing. A rejected MTK ABI can probe
+other ABIs only after that canonical replacement. Every retry retains the
+existing `UpdateMarkers` ownership and never turns a rejected identity into a
+sleep receipt. Uncertain SEND or fallback-barrier results latch display
+admission closed across subsequent mode revisions: writes, fills, submissions,
+and old-marker completion cannot bypass the failure. The event loop returns
+through the existing native restoration path.
+
+`NativeFrameObservation` reports requested, available, applied, software fallback
+and uncertain-delivery booleans. Applied is true only on an accepted SEND whose
+matching marker actually carries Y4. A fallback's accepted event identifies the
+replacement full write and fresh marker. This reports kernel acceptance only,
+not physical panel completion. Fixture sources exercise identity transport,
+full Gray8 preservation, canonical Gray/RGB fallback, polarity, alignment,
+marker barriers and persistent uncertain delivery. Their execution belongs to
+the designated remote verification environment.
+
+See `AIDOKU_PROVENANCE.md` and `HARDWARE_Y4_NOTES.md` for source boundaries.
+
 ## Provenance
 
 The baseline is [`KindleTweaks/slint-kindle-backend-patch` at `03aa48d3531e9eae7b360bdc24e90a72e9f307a4`](https://github.com/KindleTweaks/slint-kindle-backend-patch/tree/03aa48d3531e9eae7b360bdc24e90a72e9f307a4). `UPSTREAM_REVISION` records the same identity. The original `LICENSE-MIT` and `LICENSE-APACHE` files are preserved without changes. This dependency's license metadata does not select the application's project license.

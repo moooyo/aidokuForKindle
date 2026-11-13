@@ -230,6 +230,9 @@ pub struct Platform {
     status_cache: RefCell<Option<(Option<Instant>, DeviceStatus)>>,
     applied_lighting: Cell<Option<(u8, u8)>>,
     scene_inverted: Cell<bool>,
+    reader_hardware_y4_requested: Cell<bool>,
+    #[cfg(test)]
+    hardware_y4_available_override: Cell<Option<bool>>,
     sleep_requested: Cell<bool>,
     pointer_observer: RefCell<Option<PointerObserver>>,
     device_policies: RefCell<Option<device_policy::DevicePolicyWorker>>,
@@ -265,6 +268,9 @@ impl Platform {
             status_cache: RefCell::new(None),
             applied_lighting: Cell::new(None),
             scene_inverted: Cell::new(false),
+            reader_hardware_y4_requested: Cell::new(false),
+            #[cfg(test)]
+            hardware_y4_available_override: Cell::new(None),
             sleep_requested: Cell::new(false),
             pointer_observer: RefCell::new(None),
             device_policies: RefCell::new(None),
@@ -288,6 +294,42 @@ impl Platform {
     /// The accepted software output transform, independent of hardware polarity.
     pub fn scene_is_inverted(&self) -> bool {
         self.scene_inverted.get()
+    }
+
+    /// Hardware identity and native framebuffer support are independent of the UI profile.
+    pub fn hardware_y4_available(&self) -> bool {
+        #[cfg(test)]
+        if let Some(available) = self.hardware_y4_available_override.get() {
+            return available;
+        }
+        #[cfg(all(feature = "kindle", target_os = "linux"))]
+        if self.kindle
+            && let Some(backend) = self.backend.borrow().as_ref()
+        {
+            return backend.dithering_handle().hardware_y4_available();
+        }
+        false
+    }
+
+    /// Bind processing to the pixels being presented, retaining raw intent after rejection.
+    pub fn set_reader_hardware_y4(&self, requested: bool) -> bool {
+        self.reader_hardware_y4_requested.set(requested);
+        #[cfg(all(feature = "kindle", target_os = "linux"))]
+        if self.kindle
+            && let Some(backend) = self.backend.borrow().as_ref()
+        {
+            return backend.dithering_handle().set_hardware_y4(requested);
+        }
+        false
+    }
+
+    pub fn reader_hardware_y4_requested(&self) -> bool {
+        self.reader_hardware_y4_requested.get()
+    }
+
+    #[cfg(test)]
+    pub(crate) fn set_test_hardware_y4_available(&self, available: bool) {
+        self.hardware_y4_available_override.set(Some(available));
     }
 
     /// Read a background snapshot without invoking device services on the UI thread.
@@ -624,6 +666,17 @@ impl Platform {
                                         marker,
                                         elapsed_us,
                                         observed.full_frame,
+                                        crate::reader_timing::NativeDitheringObservation {
+                                            replaces_frame_sequence: observed
+                                                .replaces_frame_sequence,
+                                            hardware_y4_available: observed.hardware_y4_available,
+                                            hardware_y4_requested: observed.hardware_y4_requested,
+                                            hardware_y4_applied: observed.hardware_y4_applied,
+                                            software_dither_fallback: observed
+                                                .software_dither_fallback,
+                                            dithering_delivery_uncertain: observed
+                                                .dithering_delivery_uncertain,
+                                        },
                                     );
                                 }
                             }
@@ -1543,6 +1596,19 @@ fn native_status(_preferences: &Preferences) -> DeviceStatus {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn desktop_design_profiles_never_claim_native_y4_support() {
+        for profile in DeviceProfile::value_variants() {
+            let platform = Platform::new(*profile, false).unwrap();
+            assert!(!platform.hardware_y4_available());
+            assert!(!platform.reader_hardware_y4_requested());
+            assert!(!platform.set_reader_hardware_y4(true));
+            assert!(platform.reader_hardware_y4_requested());
+            platform.set_reader_hardware_y4(false);
+            assert!(!platform.reader_hardware_y4_requested());
+        }
+    }
 
     #[test]
     fn display_rotation_accepts_only_the_four_supported_angles() {

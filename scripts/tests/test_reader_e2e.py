@@ -171,6 +171,44 @@ class TraceCausalityTests(unittest.TestCase):
         find(trace,"send_accepted")["marker"] = 0
         self.rejected(trace,expectation(True))
 
+    def test_definite_full_software_fallback_may_replace_its_exact_written_frame(self) -> None:
+        trace = document(native=True)
+        find(trace,"send_accepted").update(
+            frame_sequence=2, replaces_frame_sequence=1, full=True,
+            hardware_y4_available=False, hardware_y4_requested=True,
+            hardware_y4_applied=False, software_dither_fallback=True,
+            dithering_delivery_uncertain=False,
+        )
+        report = HARNESS.validate_trace(trace,expectation(True))
+        self.assertEqual(report["native_request_count"],1)
+        self.assertEqual(report["samples"]["rust_main_to_first_send_accepted_ms"],[0.180])
+        for field,value in (
+            ("replaces_frame_sequence",3), ("frame_sequence",1), ("full",False),
+            ("hardware_y4_requested",False), ("hardware_y4_applied",True),
+            ("software_dither_fallback",False), ("dithering_delivery_uncertain",True),
+            ("hardware_y4_available",0), ("marker",0),
+        ):
+            with self.subTest(field=field):
+                invalid = copy.deepcopy(trace)
+                find(invalid,"send_accepted")[field] = value
+                self.rejected(invalid,expectation(True))
+        for field in ("hardware_y4_available","hardware_y4_requested","hardware_y4_applied",
+                      "software_dither_fallback","dithering_delivery_uncertain"):
+            with self.subTest(missing=field):
+                invalid = copy.deepcopy(trace)
+                del find(invalid,"send_accepted")[field]
+                self.rejected(invalid,expectation(True))
+
+    def test_fallback_frame_identity_cannot_be_reused_by_another_request(self) -> None:
+        trace = document(native=True,action=True)
+        find(trace,"send_accepted").update(
+            frame_sequence=2, replaces_frame_sequence=1, full=True,
+            hardware_y4_available=False, hardware_y4_requested=True,
+            hardware_y4_applied=False, software_dither_fallback=True,
+            dithering_delivery_uncertain=False,
+        )
+        self.rejected(trace,expectation(True))
+
     def test_a_missing_worker_cannot_become_an_accepted_image(self) -> None:
         trace = document()
         trace["events"] = [value for value in trace["events"] if value["name"] not in {"worker_started","fetch_finished","render_finished","prepare_finished"}]

@@ -130,6 +130,7 @@ pub struct Preferences {
     pub flash_on_close: bool,
     pub crop_borders: bool,
     pub dither: bool,
+    pub dither_method: String,
     pub contrast: i32,
     pub brightness: u8,
     pub warmth: u8,
@@ -172,6 +173,7 @@ impl Default for Preferences {
             flash_on_close: true,
             crop_borders: true,
             dither: true,
+            dither_method: "software".into(),
             contrast: 0,
             brightness: 12,
             warmth: 8,
@@ -203,6 +205,20 @@ impl Default for Preferences {
             tracking_queue_offline: true,
             write_logs: false,
         }
+    }
+}
+
+impl Preferences {
+    pub fn normalized_dither_method(&self) -> &'static str {
+        if self.dither_method == "hardware" {
+            "hardware"
+        } else {
+            "software"
+        }
+    }
+
+    pub fn uses_hardware_dither(&self, available: bool) -> bool {
+        self.dither && self.normalized_dither_method() == "hardware" && available
     }
 }
 
@@ -335,6 +351,39 @@ pub fn compound_id(source_id: &str, remote_id: &str) -> String {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn legacy_dithering_preferences_keep_software_and_off_semantics() {
+        for enabled in [false, true] {
+            let preferences: Preferences =
+                serde_json::from_value(serde_json::json!({"dither": enabled})).unwrap();
+            assert_eq!(preferences.dither, enabled);
+            assert_eq!(preferences.normalized_dither_method(), "software");
+            assert!(!preferences.uses_hardware_dither(true));
+        }
+        let preferences: Preferences = serde_json::from_value(serde_json::json!({
+            "dither": true, "dither_method": "future-method"
+        }))
+        .unwrap();
+        assert_eq!(preferences.normalized_dither_method(), "software");
+        assert!(!preferences.uses_hardware_dither(true));
+    }
+
+    #[test]
+    fn hardware_dithering_preferences_need_both_enablement_and_actual_capability() {
+        let mut preferences = Preferences {
+            dither_method: "hardware".into(),
+            ..Preferences::default()
+        };
+        assert!(preferences.uses_hardware_dither(true));
+        assert!(!preferences.uses_hardware_dither(false));
+        let restored: Preferences =
+            serde_json::from_str(&serde_json::to_string(&preferences).unwrap()).unwrap();
+        assert_eq!(restored, preferences);
+        preferences.dither = false;
+        assert!(!preferences.uses_hardware_dither(true));
+        assert_eq!(preferences.normalized_dither_method(), "hardware");
+    }
 
     #[test]
     fn legacy_landscape_preferences_keep_the_standard_rotation() {

@@ -449,7 +449,7 @@ mod tests {
     }
 
     #[test]
-    fn next_half_retains_and_promotes_the_full_raster_key() {
+    fn next_raw_half_retains_and_promotes_the_full_raster_key() {
         let directory = tempfile::tempdir().unwrap();
         let raw = directory.path().join("wide-source.png");
         GrayImage::from_fn(7, 4, |x, y| image::Luma([(x + y * 17) as u8]))
@@ -478,6 +478,7 @@ mod tests {
             height: 4,
             crop_borders: false,
             dither: false,
+            hardware_dither: true,
             contrast: 0,
         };
         let cancellation = DecodeCancellation::new();
@@ -496,6 +497,14 @@ mod tests {
         .unwrap();
         assert!(prepared.wide);
         assert_eq!(prepared.rendered.image.dimensions(), (4, 4));
+        assert!(
+            prepared
+                .rendered
+                .image
+                .as_raw()
+                .iter()
+                .any(|sample| sample % 17 != 0)
+        );
         let retained = prepared.rendered.retained_raster.unwrap();
         assert_eq!(retained.retained_bytes(), 28);
         assert!(

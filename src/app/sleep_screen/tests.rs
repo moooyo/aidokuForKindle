@@ -36,6 +36,7 @@ fn select_book(app: &mut App, book: &Book) {
             ..ReaderSession::default()
         },
         preferences: app.effective_reader_preferences(),
+        hardware_dither: false,
         first_path: PathBuf::from("retained-reader.png"),
         second_path: None,
     });
@@ -269,6 +270,48 @@ fn the_sleep_entry_projects_prepared_memory_before_any_checkpoint() -> Result<()
         assert!(model.get_title().is_empty() && model.get_author().is_empty());
         let retained = ui.global::<State>().get_reader_image().size();
         assert_eq!((retained.width, retained.height), (2, 3));
+        Ok(())
+    })
+}
+
+#[test]
+fn sleep_cover_holds_software_mode_and_resume_restores_the_retained_raw_frame() -> Result<()> {
+    with_ui(|ui| {
+        let mut fixture =
+            super::super::tests::DemoRouteFixture::new("settings", DeviceProfile::Scribe, false);
+        let app = &mut fixture.app;
+        app.ui = ui.as_weak();
+        app.platform.set_test_hardware_y4_available(true);
+        app.prefs.dither = true;
+        app.prefs.dither_method = "hardware".into();
+        select_book(app, &book());
+        app.displayed_reader.as_mut().unwrap().hardware_dither = true;
+        let mut raw = SharedPixelBuffer::<Rgb8Pixel>::new(2, 1);
+        raw.make_mut_bytes()
+            .copy_from_slice(&[42, 42, 42, 216, 216, 216]);
+        ui.global::<State>().set_reader_image(Image::from_rgb8(raw));
+        app.sync_presented_reader_dithering();
+        assert!(app.platform.reader_hardware_y4_requested());
+
+        // A new software choice is pending while the retained image still owns
+        // raw samples. Neither the cover nor wake may substitute that target.
+        app.prefs.dither_method = "software".into();
+        app.reader_dirty = true;
+        assert!(app.reader_dither_pending());
+        assert!(app.begin_sleep_transition(true)?);
+        assert!(ui.global::<SleepScreenModel>().get_active());
+        assert!(!app.platform.reader_hardware_y4_requested());
+        app.sync_presented_reader_dithering();
+        assert!(!app.platform.reader_hardware_y4_requested());
+        assert!(app.resume_reader_repair);
+        app.resume_after_sleep()?;
+        assert!(!ui.global::<SleepScreenModel>().get_active());
+        assert!(app.resume_frame_pending);
+        assert!(app.platform.reader_hardware_y4_requested());
+        assert!(app.displayed_reader.as_ref().unwrap().hardware_dither);
+        assert_eq!(app.reader_image_jobs_started, 0);
+        let pixels = ui.global::<State>().get_reader_image().to_rgb8().unwrap();
+        assert_eq!(pixels.as_bytes(), &[42, 42, 42, 216, 216, 216]);
         Ok(())
     })
 }

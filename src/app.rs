@@ -84,6 +84,8 @@ pub struct AppOptions {
 pub(crate) struct DisplayedReader {
     pub session: ReaderSession,
     pub preferences: Preferences,
+    /// The actual retained samples are raw Gray8, regardless of current preferences.
+    pub hardware_dither: bool,
     pub first_path: PathBuf,
     pub second_path: Option<PathBuf>,
 }
@@ -126,6 +128,7 @@ enum JobResult {
         scaled_height: u32,
         viewport_height: u32,
         preferences: Preferences,
+        hardware_dither: bool,
         first_path: PathBuf,
         second_path: Option<PathBuf>,
         paths: Vec<CachedPage>,
@@ -567,6 +570,7 @@ impl App {
         if self.shutting_down || self.suspended || self.resume_frame_pending {
             return;
         }
+        self.poll_reader_dither_state();
         self.poll_network_resume();
         let network_pending = self.pending_user_network.is_some();
         if let Err(error) = self.poll_pending_user_network() {
@@ -1095,6 +1099,7 @@ impl App {
                 scaled_height,
                 viewport_height,
                 preferences,
+                hardware_dither,
                 first_path,
                 second_path,
                 paths,
@@ -1177,11 +1182,13 @@ impl App {
                                     viewport_height,
                                 },
                                 preferences,
+                                hardware_dither,
                                 first_path,
                                 second_path,
                             });
                             self.resume_reader_repair = false;
                         }
+                        self.sync_presented_reader_dithering();
                         if self.reader_recovery.is_some()
                             || self.modal_context == "reader-action-error"
                         {
@@ -1394,6 +1401,50 @@ impl App {
         )
     }
 
+    /// Change the backend only when the scene's retained image ownership changes.
+    pub(super) fn sync_presented_reader_dithering(&self) {
+        let sleep_cover = self
+            .ui
+            .upgrade()
+            .is_some_and(|ui| ui.global::<crate::ui::SleepScreenModel>().get_active());
+        let raw = self.route == "reader"
+            && !sleep_cover
+            && self
+                .displayed_reader
+                .as_ref()
+                .is_some_and(|frame| frame.hardware_dither);
+        // A failed hardware submission still needs this raw request so the
+        // backend can safely apply its software fallback to these exact pixels.
+        self.platform.set_reader_hardware_y4(raw);
+    }
+
+    /// Compare the requested processing with the last accepted image, not its worker.
+    pub(super) fn reader_dither_pending(&self) -> bool {
+        if self.route != "reader" || (!self.reader_dirty && self.reader_inflight.is_none()) {
+            return false;
+        }
+        let preferences = self.effective_reader_preferences();
+        let hardware = preferences.uses_hardware_dither(self.platform.hardware_y4_available());
+        self.displayed_reader.as_ref().is_none_or(|frame| {
+            frame.hardware_dither != hardware || frame.preferences.dither != preferences.dither
+        })
+    }
+
+    /// A native SEND can revoke availability after the frame's UI transaction.
+    /// Observe only in-memory policy here; the retained raw scene stays owned by
+    /// its existing backend request while the selector reports software fallback.
+    fn poll_reader_dither_state(&self) {
+        let Some(ui) = self.ui.upgrade() else {
+            return;
+        };
+        let state = ui.global::<State>();
+        if state.get_hardware_dither_available() != self.platform.hardware_y4_available()
+            || state.get_dither_pending() != self.reader_dither_pending()
+        {
+            self.sync_interaction_state();
+        }
+    }
+
     pub(crate) fn invalidate_reader_work(&mut self) {
         self.gate_reader_work_for_sleep();
         self.clear_reader_next_frame();
@@ -1547,6 +1598,14 @@ impl App {
             "selected": self.selected, "source_id": self.current_source, "cover_count": self.cover_paths.len(),
             "selected_chapters": self.selected_chapters,
         });
+        snapshot["hardware_y4_available"] = json!(self.platform.hardware_y4_available());
+        snapshot["reader_hardware_y4_requested"] =
+            json!(self.platform.reader_hardware_y4_requested());
+        snapshot["reader_hardware_y4_effective"] = json!(
+            self.effective_reader_preferences()
+                .uses_hardware_dither(self.platform.hardware_y4_available())
+        );
+        snapshot["dither_pending"] = json!(self.reader_dither_pending());
         snapshot["cache"] = json!(self.disk_cache.stats());
         snapshot["render_cache"] = json!(crate::render_cache::stats());
         snapshot["reader_next_frame"] = json!({

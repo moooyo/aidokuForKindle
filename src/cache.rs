@@ -51,10 +51,16 @@ pub struct RenderKey {
     pub height: u32,
     pub crop_borders: bool,
     pub dither: bool,
+    #[serde(default, skip_serializing_if = "is_false")]
+    pub hardware_dither: bool,
     pub contrast: i32,
     pub vertical: bool,
     pub offset: u32,
     pub zoom_milli: u32,
+}
+
+fn is_false(value: &bool) -> bool {
+    !*value
 }
 
 #[derive(Debug, Clone, Default, Serialize)]
@@ -2568,11 +2574,31 @@ mod tests {
             height: 200,
             crop_borders: true,
             dither: true,
+            hardware_dither: false,
             contrast: 0,
             vertical: false,
             offset: 0,
             zoom_milli: 1000,
         }
+    }
+
+    #[test]
+    fn hardware_render_keys_preserve_legacy_software_serialization() {
+        let legacy = r#"{"source_key":"legacy","width":100,"height":200,"crop_borders":true,"dither":true,"contrast":0,"vertical":false,"offset":0,"zoom_milli":1000}"#;
+        let software: RenderKey = serde_json::from_str(legacy).unwrap();
+        assert_eq!(software, render("legacy"));
+        assert!(!software.hardware_dither);
+        assert_eq!(serde_json::to_string(&software).unwrap(), legacy);
+        let mut hardware = software.clone();
+        hardware.hardware_dither = true;
+        assert_ne!(
+            render_key(&hardware).unwrap(),
+            render_key(&software).unwrap()
+        );
+        assert_eq!(
+            serde_json::from_str::<RenderKey>(&serde_json::to_string(&hardware).unwrap()).unwrap(),
+            hardware
+        );
     }
 
     fn image_bytes(marker: &str) -> Vec<u8> {

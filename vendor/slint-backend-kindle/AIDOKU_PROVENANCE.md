@@ -1,5 +1,32 @@
 # Aidoku adoption provenance
 
+## Explicit MTK Y4 adaptation
+
+The 2026-11-13 extension adapts selected policy, ABI and controlled-fixture
+behavior from [BiliComics revision
+`7241a85fac8aa032b79f4e7f2f6eb29aacdbebd3`](https://github.com/moooyo/bilicomics/tree/7241a85fac8aa032b79f4e7f2f6eb29aacdbebd3/vendor/slint-backend-kindle).
+The new `dithering` module preserves that implementation's bounded identity
+transport, reviewed Scribe code set, requested/available separation and physical
+Bayer phase. `framebuffer` adapts its MTK flag, eight-pixel alignment,
+explicit-rejection recovery and persistent uncertain-delivery stop policy.
+Existing upstream licenses and all earlier adoption attributions remain intact.
+
+This is a scoped adaptation, not replacement of Aidoku's backend files. Aidoku
+retains its neutral `GrayTarget` and RGB fallback, canonical scene, output-mode
+renderer, independent accepted markers, one-shot Reader observations, native
+portrait/input ownership and sleep-presentation receipts. In particular,
+explicit rejection rebuilds the complete software fallback from Aidoku's
+canonical scene and its frozen output mode after settling the preceding
+accepted update. It does not derive new output from a previously transformed
+mapping. Both normal and checked sleep updates use the same submission path.
+
+The identity and ABI references are pinned in `HARDWARE_Y4_NOTES.md`. Historical
+BiliComics device results, including the R68 Scribe 2022 / firmware 5.19.5
+acceptance, describe that source build only. They are not Aidoku verification,
+post-MDP readback, panel photography, a physical completion guarantee or evidence
+of native 256-level panel output. Aidoku's host and device results must retain
+their own executable and source identities.
+
 This directory is adopted from the operator's sibling WeRead project's
 `vendor/slint-backend-kindle` on 2026-11-04 (Asia/Shanghai). Its upstream identity
 is retained verbatim in `UPSTREAM_REVISION`, and its prior modifications and

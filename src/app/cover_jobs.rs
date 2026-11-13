@@ -117,6 +117,7 @@ impl App {
             height,
             crop_borders: false,
             dither: true,
+            hardware_dither: false,
             contrast: 0,
         }
     }
@@ -712,6 +713,7 @@ mod tests {
                 height: 12,
                 crop_borders: false,
                 dither: false,
+                hardware_dither: false,
                 contrast: 0,
             };
             // Seed exactly the C3 configuration serialization, including the

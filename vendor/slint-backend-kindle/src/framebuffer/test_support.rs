@@ -50,10 +50,17 @@ impl Framebuffer {
             height,
             stride,
             bytes_per_pixel,
+            native_gray8: bytes_per_pixel == 1,
             retained_layout: None,
             inverted_gray8: std::cell::Cell::new(false),
             update_variant: std::cell::Cell::new(None),
             update_markers: UpdateMarkers::default(),
+            dithering: crate::DitheringHandle::default(),
+            dithering_frame: std::cell::Cell::new(super::DitheringFrame::default()),
+            dithering_delivery_failure: std::cell::Cell::new(None),
+            last_accepted_dithering: std::cell::Cell::new(None),
+            canonical_rewrite_count: std::cell::Cell::new(0),
+            mapped_software_dithered: std::cell::Cell::new(false),
         })
     }
 

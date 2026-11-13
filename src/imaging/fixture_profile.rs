@@ -37,6 +37,7 @@ impl Case {
             height: self.target_height,
             crop_borders: self.crop_borders,
             dither: self.dither,
+            hardware_dither: false,
             contrast: self.contrast,
         }
     }

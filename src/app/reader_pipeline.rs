@@ -17,6 +17,7 @@ pub(super) struct NextFrameKey {
     lifecycle_generation: u64,
     source_revision: u64,
     preferences: Preferences,
+    hardware_dither: bool,
     viewport: (u32, u32),
 }
 
@@ -77,6 +78,7 @@ struct ReaderImageFrame {
     scaled_height: u32,
     viewport_height: u32,
     preferences: Preferences,
+    hardware_dither: bool,
     first_path: PathBuf,
     second_path: Option<PathBuf>,
     paths: Vec<CachedPage>,
@@ -102,6 +104,7 @@ impl ReaderImageFrame {
             scaled_height: self.scaled_height,
             viewport_height: self.viewport_height,
             preferences: self.preferences,
+            hardware_dither: self.hardware_dither,
             first_path: self.first_path,
             second_path: self.second_path,
             paths: self.paths,
@@ -127,6 +130,7 @@ struct RetainedPrefetchFrame {
     half: u8,
     scaled_height: u32,
     viewport_height: u32,
+    hardware_dither: bool,
 }
 
 impl NextFrameKey {
@@ -139,6 +143,10 @@ impl NextFrameKey {
             && app.reader_generation == self.generation
             && app.reader_target().as_ref() == Some(&self.origin)
             && app.effective_reader_preferences() == self.preferences
+            && self.hardware_dither
+                == self
+                    .preferences
+                    .uses_hardware_dither(app.platform.hardware_y4_available())
             && app
                 .platform
                 .runtime_logical_size(self.preferences.landscape)
@@ -164,6 +172,10 @@ impl NextFrameKey {
             && displayed.as_ref() == Some(&self.origin)
             && app.reader_target().as_ref() == Some(&self.target)
             && app.effective_reader_preferences() == self.preferences
+            && self.hardware_dither
+                == self
+                    .preferences
+                    .uses_hardware_dither(app.platform.hardware_y4_available())
             && app
                 .platform
                 .runtime_logical_size(self.preferences.landscape)
@@ -214,6 +226,7 @@ impl NextFrameBuilder {
             half: prepared.half,
             scaled_height: prepared.rendered.scaled_height,
             viewport_height: prepared.rendered.viewport_height,
+            hardware_dither: frame.options.hardware_dither,
         });
         Ok(())
     }
@@ -224,6 +237,7 @@ impl NextFrameBuilder {
             && frame.offset == self.key.target.vertical_offset
             && frame.zoom == self.key.target.zoom
             && frame.half == self.key.target.wide_half
+            && frame.options.hardware_dither == self.key.hardware_dither
     }
 
     fn finish(self, cache: &crate::cache::CacheManager) -> Option<PreparedNextFrame> {
@@ -249,6 +263,7 @@ impl NextFrameBuilder {
             scaled_height: first.scaled_height,
             viewport_height: first.viewport_height,
             preferences: self.key.preferences.clone(),
+            hardware_dither: first.hardware_dither,
             first_path: first.path,
             second_path: second.map(|frame| frame.path),
             paths,
@@ -375,7 +390,14 @@ impl App {
         }
         let spread = frame_page_count(&effective, index, window.total) == 2;
         let viewport = self.platform.runtime_logical_size(effective.landscape);
-        let options = reader_image_options(&effective, viewport, index, window.total);
+        let hardware_dither = effective.uses_hardware_dither(self.platform.hardware_y4_available());
+        let options = reader_image_options_for_mode(
+            &effective,
+            viewport,
+            index,
+            window.total,
+            hardware_dither,
+        );
         let offline =
             self.options.offline || self.options.demo || self.platform.network_policy_blocked();
         let cancellation = imaging::DecodeCancellation::new();
@@ -487,6 +509,7 @@ impl App {
                 scaled_height,
                 viewport_height,
                 preferences: effective,
+                hardware_dither,
                 first_path,
                 second_path,
                 paths,
@@ -599,6 +622,7 @@ impl App {
         let current_wide_remainder = wide_mode && reader.is_wide_page() && reader.wide_half == 0;
         let zoom = prefetch_zoom(&effective, reader.zoom);
         let viewport = self.platform.runtime_logical_size(effective.landscape);
+        let hardware_dither = effective.uses_hardware_dither(self.platform.hardware_y4_available());
         let targets = if vertical {
             strip_prefetch_offsets(
                 reader.vertical_offset,
@@ -619,7 +643,8 @@ impl App {
         let current_page = current_wide_remainder
             .then(|| window.pages.first().cloned())
             .flatten();
-        let (first, pages, options) = prefetch_pages(&effective, window, viewport);
+        let (first, pages, options) =
+            prefetch_pages_for_mode(&effective, window, viewport, hardware_dither);
         let mut frames = Vec::with_capacity(2);
         let mut chapter_end = first.saturating_add(pages.len()) >= total;
         if vertical {
@@ -633,7 +658,13 @@ impl App {
                     Some(PrefetchFrame {
                         index: next_index,
                         page,
-                        options: reader_image_options(&effective, viewport, next_index, total),
+                        options: reader_image_options_for_mode(
+                            &effective,
+                            viewport,
+                            next_index,
+                            total,
+                            hardware_dither,
+                        ),
                         vertical: true,
                         offset: 0,
                         zoom: 1.0,
@@ -653,7 +684,13 @@ impl App {
                 frames.push(PrefetchFrame {
                     index: current,
                     page,
-                    options: reader_image_options(&effective, viewport, current, total),
+                    options: reader_image_options_for_mode(
+                        &effective,
+                        viewport,
+                        current,
+                        total,
+                        hardware_dither,
+                    ),
                     vertical: false,
                     offset: 0,
                     zoom: 1.0,
@@ -721,7 +758,7 @@ impl App {
         if frames.is_empty() && next_chapter.is_none() {
             return Ok(());
         }
-        let mut next_frame = self.next_frame_builder(&effective, viewport);
+        let mut next_frame = self.next_frame_builder(&effective, viewport, hardware_dither);
         if let Some(builder) = next_frame.as_ref() {
             // Publish the nearest complete frame before spending another decode
             // on a farther page. The next accepted frame advances this slot.
@@ -761,7 +798,13 @@ impl App {
                     token.check()?;
                     let chapter_id = next.chapter.id.clone();
                     match prefetch_next_chapter(
-                        &manager, next, &effective, viewport, offline, token,
+                        &manager,
+                        next,
+                        &effective,
+                        viewport,
+                        hardware_dither,
+                        offline,
+                        token,
                     ) {
                         Ok(next) => chapters.push(next),
                         Err(error) if !token.is_cancelled() => {
@@ -797,6 +840,7 @@ impl App {
         &self,
         preferences: &Preferences,
         viewport: (u32, u32),
+        hardware_dither: bool,
     ) -> Option<NextFrameBuilder> {
         let reader = self.reader.as_ref()?;
         let displayed = self.displayed_reader.as_ref()?;
@@ -854,6 +898,7 @@ impl App {
                     lifecycle_generation: self.lifecycle_generation,
                     source_revision: self.source_revision,
                     preferences: preferences.clone(),
+                    hardware_dither,
                     viewport,
                 },
                 first,
@@ -938,6 +983,7 @@ fn prefetch_next_chapter(
     plan: NextChapterPrefetch,
     preferences: &Preferences,
     viewport: (u32, u32),
+    hardware_dither: bool,
     offline: bool,
     cancellation: &imaging::DecodeCancellation,
 ) -> Result<PrefetchedChapter> {
@@ -959,7 +1005,13 @@ fn prefetch_next_chapter(
     } else {
         (plan.window, None)
     };
-    let frames = chapter_head_frames(preferences, window, viewport, plan.capacity);
+    let frames = chapter_head_frames_for_mode(
+        preferences,
+        window,
+        viewport,
+        plan.capacity,
+        hardware_dither,
+    );
     prefetch_chapter_frames(
         manager,
         plan.chapter,
@@ -973,13 +1025,15 @@ fn prefetch_next_chapter(
     )
 }
 
-fn chapter_head_frames(
+fn chapter_head_frames_for_mode(
     preferences: &Preferences,
     window: crate::store::PageWindow,
     viewport: (u32, u32),
     capacity: usize,
+    hardware_dither: bool,
 ) -> Vec<PrefetchFrame> {
-    let options = reader_image_options(preferences, viewport, 0, window.total);
+    let options =
+        reader_image_options_for_mode(preferences, viewport, 0, window.total, hardware_dither);
     let count = frame_page_count(preferences, 0, window.total).min(capacity.min(2));
     window
         .pages
@@ -996,6 +1050,16 @@ fn chapter_head_frames(
             half: 0,
         })
         .collect()
+}
+
+#[cfg(test)]
+fn chapter_head_frames(
+    preferences: &Preferences,
+    window: crate::store::PageWindow,
+    viewport: (u32, u32),
+    capacity: usize,
+) -> Vec<PrefetchFrame> {
+    chapter_head_frames_for_mode(preferences, window, viewport, capacity, false)
 }
 
 fn strip_prefetch_frames(
@@ -1306,11 +1370,12 @@ fn frame_page_count(preferences: &Preferences, index: usize, total: usize) -> us
     PageLayout::from_preferences(preferences).page_count(index, total)
 }
 
-fn reader_image_options(
+fn reader_image_options_for_mode(
     preferences: &Preferences,
     viewport: (u32, u32),
     first_index: usize,
     total: usize,
+    hardware_dither: bool,
 ) -> ImageOptions {
     let (width, height) = viewport;
     ImageOptions {
@@ -1322,14 +1387,26 @@ fn reader_image_options(
         height: height.saturating_mul(2),
         crop_borders: preferences.crop_borders,
         dither: preferences.dither,
+        hardware_dither,
         contrast: preferences.contrast,
     }
 }
 
-fn prefetch_pages(
+#[cfg(test)]
+fn reader_image_options(
+    preferences: &Preferences,
+    viewport: (u32, u32),
+    first_index: usize,
+    total: usize,
+) -> ImageOptions {
+    reader_image_options_for_mode(preferences, viewport, first_index, total, false)
+}
+
+fn prefetch_pages_for_mode(
     preferences: &Preferences,
     window: crate::store::PageWindow,
     viewport: (u32, u32),
+    hardware_dither: bool,
 ) -> (usize, Vec<Page>, ImageOptions) {
     let vertical = is_strip(preferences);
     let skip = if vertical {
@@ -1341,7 +1418,8 @@ fn prefetch_pages(
     // Both pages of the next spread share its first index. A final unpaired
     // source page uses the same full width as its later foreground request,
     // including the parity change after an isolated cover.
-    let options = reader_image_options(preferences, viewport, first, window.total);
+    let options =
+        reader_image_options_for_mode(preferences, viewport, first, window.total, hardware_dither);
     let pages = window
         .pages
         .into_iter()
@@ -1349,6 +1427,15 @@ fn prefetch_pages(
         .take(if vertical { 1 } else { 2 })
         .collect();
     (first, pages, options)
+}
+
+#[cfg(test)]
+fn prefetch_pages(
+    preferences: &Preferences,
+    window: crate::store::PageWindow,
+    viewport: (u32, u32),
+) -> (usize, Vec<Page>, ImageOptions) {
+    prefetch_pages_for_mode(preferences, window, viewport, false)
 }
 
 fn strip_prefetch_offsets(offset: u32, viewport_height: u32, image_height: u32) -> Vec<u32> {
@@ -1461,11 +1548,14 @@ mod tests {
                     ..ReaderSession::default()
                 },
                 preferences: preferences.clone(),
+                hardware_dither: false,
                 first_path: PathBuf::new(),
                 second_path: None,
             });
             app.reader = Some(reader.clone());
-            let planned = app.next_frame_builder(&preferences, (930, 1_240)).unwrap();
+            let planned = app
+                .next_frame_builder(&preferences, (930, 1_240), false)
+                .unwrap();
             assert_eq!(reader.next_page().action, ReaderAction::PageChanged);
             let expected = ReaderTarget::new(
                 &reader.current_chapter().id,
@@ -1632,7 +1722,7 @@ mod tests {
     }
 
     #[test]
-    fn prepared_gray_and_rgb_survive_forward_and_previous_publication_with_one_budget() {
+    fn prepared_raw_gray_and_rgb_keep_dithering_through_forward_and_previous_publication() {
         let _publication = READER_PUBLICATION_TESTS.lock().unwrap();
         let ui = reader_test_window();
         let mut fixture = DemoRouteFixture::new("settings", DeviceProfile::Pw6, false);
@@ -1678,7 +1768,9 @@ mod tests {
         app.prefs.crop_borders = false;
         app.prefs.split_wide = false;
         app.prefs.spread = false;
-        app.prefs.dither = false;
+        app.prefs.dither = true;
+        app.prefs.dither_method = "hardware".into();
+        app.platform.set_test_hardware_y4_available(true);
         app.reader =
             Some(ReaderState::new(vec![chapter.clone()], &chapter.id, 1, &app.prefs).unwrap());
         app.request_reader_images().unwrap();
@@ -1692,6 +1784,8 @@ mod tests {
         };
         let assert_published = |app: &App, page: u32| {
             assert_eq!(app.displayed_reader.as_ref().unwrap().session.page, page);
+            assert!(app.displayed_reader.as_ref().unwrap().hardware_dither);
+            assert!(app.platform.reader_hardware_y4_requested());
             assert_eq!(app.committed_progress.as_ref().unwrap().page, page);
             assert_eq!(ui.global::<State>().get_reader_page(), page as i32);
             let displayed = ui.global::<State>().get_reader_image().to_rgb8().unwrap();
@@ -1708,6 +1802,7 @@ mod tests {
         let NextFrameSlot::Ready(frame) = &app.reader_next_frame else {
             panic!("The next complete frame must be retained after preparation");
         };
+        assert!(frame.key.hardware_dither && frame.image.hardware_dither);
         assert!(!frame.rasters.is_empty());
         assert!(frame.retained_bytes() > frame.image.byte_len());
         assert_eq!(
@@ -1730,6 +1825,224 @@ mod tests {
         let released = super::super::prepared_pixels::next_frame_stats();
         assert_eq!(released.bytes, 0);
         assert_eq!(released.reservations, 0);
+    }
+
+    #[test]
+    fn asynchronous_dither_targets_never_change_the_retained_frame_processing() {
+        let _publication = READER_PUBLICATION_TESTS.lock().unwrap();
+        let ui = reader_test_window();
+        let mut fixture = DemoRouteFixture::new("settings", DeviceProfile::Scribe, false);
+        let app = &mut fixture.app;
+        app.ui = ui.as_weak();
+        let book = Book {
+            id: crate::domain::compound_id("local", "dither-publication-book"),
+            source_id: "local".into(),
+            remote_id: "dither-publication-book".into(),
+            title: "Dither publication fixture".into(),
+            ..Book::default()
+        };
+        let chapter = Chapter {
+            id: crate::domain::compound_id("local", "dither-publication-chapter"),
+            book_id: book.id.clone(),
+            source_id: book.source_id.clone(),
+            remote_id: "dither-publication-chapter".into(),
+            page_count: 1,
+            ..Chapter::default()
+        };
+        let path = app.data_dir.join("dither-publication-ramp.png");
+        GrayImage::from_fn(256, 4, |x, _| image::Luma([x as u8]))
+            .save(&path)
+            .unwrap();
+        app.store.upsert_book(&book).unwrap();
+        app.store
+            .save_chapters(&book.id, &[chapter.clone()])
+            .unwrap();
+        app.store
+            .save_pages(
+                &chapter.id,
+                &[Page {
+                    local_path: Some(path),
+                    ..Page::default()
+                }],
+            )
+            .unwrap();
+        app.current_book_id = Some(book.id);
+        app.route = "reader".into();
+        app.prefs.crop_borders = false;
+        app.prefs.split_wide = false;
+        app.prefs.spread = false;
+        app.prefs.contrast = 0;
+        app.prefs.dither = true;
+        app.prefs.dither_method = "hardware".into();
+        app.reader =
+            Some(ReaderState::new(vec![chapter.clone()], &chapter.id, 1, &app.prefs).unwrap());
+
+        // A persisted hardware choice on an unsupported cold start prepares the
+        // original software pixels without sending a raw request to the backend.
+        assert!(!app.platform.hardware_y4_available());
+        app.request_reader_images().unwrap();
+        let cold = app.job_rx.recv_timeout(Duration::from_secs(10)).unwrap();
+        let JobResult::ReaderImage {
+            hardware_dither,
+            first,
+            ..
+        } = cold.result.as_ref().unwrap()
+        else {
+            panic!("The cold reader must produce a pixel frame");
+        };
+        assert!(!hardware_dither);
+        assert!(first.as_bytes().iter().all(|sample| sample % 17 == 0));
+        app.job_tx.send(cold).unwrap();
+        app.poll();
+        assert!(!app.platform.reader_hardware_y4_requested());
+        assert!(!app.displayed_reader.as_ref().unwrap().hardware_dither);
+
+        app.platform.set_test_hardware_y4_available(true);
+        app.request_reader_images().unwrap();
+        assert!(app.reader_dither_pending());
+        assert!(!app.platform.reader_hardware_y4_requested());
+        let raw = app.job_rx.recv_timeout(Duration::from_secs(10)).unwrap();
+        let JobResult::ReaderImage {
+            hardware_dither,
+            first,
+            ..
+        } = raw.result.as_ref().unwrap()
+        else {
+            panic!("The supported reader must produce raw samples");
+        };
+        assert!(*hardware_dither);
+        assert!(first.as_bytes().iter().any(|sample| sample % 17 != 0));
+        // Capability can be revoked while the worker is finishing. Publication
+        // must preserve its actual raw mode so native fallback owns those samples.
+        app.platform.set_test_hardware_y4_available(false);
+        app.job_tx.send(raw).unwrap();
+        app.poll();
+        assert!(app.displayed_reader.as_ref().unwrap().hardware_dither);
+        assert!(app.platform.reader_hardware_y4_requested());
+        assert!(!app.reader_dither_pending());
+
+        app.platform.set_test_hardware_y4_available(true);
+        app.route = "settings".into();
+        ui.global::<State>().set_route("settings".into());
+        app.sync_presented_reader_dithering();
+        assert!(!app.platform.reader_hardware_y4_requested());
+        app.route = "reader".into();
+        ui.global::<State>().set_route("reader".into());
+        app.sync_presented_reader_dithering();
+        assert!(app.platform.reader_hardware_y4_requested());
+
+        app.prefs.dither_method = "software".into();
+        app.request_reader_images().unwrap();
+        assert!(app.reader_dither_pending());
+        assert!(app.platform.reader_hardware_y4_requested());
+        let obsolete = app.job_rx.recv_timeout(Duration::from_secs(10)).unwrap();
+        assert!(matches!(
+            obsolete.result.as_ref().unwrap(),
+            JobResult::ReaderImage {
+                hardware_dither: false,
+                ..
+            }
+        ));
+        app.prefs.dither_method = "hardware".into();
+        app.request_reader_images().unwrap();
+        let old_generation = obsolete.context.reader_generation;
+        assert_ne!(old_generation, app.reader_generation);
+        app.job_tx.send(obsolete).unwrap();
+        app.poll();
+        assert!(app.displayed_reader.as_ref().unwrap().hardware_dither);
+        assert!(app.platform.reader_hardware_y4_requested());
+        let current = app.job_rx.recv_timeout(Duration::from_secs(10)).unwrap();
+        app.job_tx.send(current).unwrap();
+        app.poll();
+        assert!(app.displayed_reader.as_ref().unwrap().hardware_dither);
+
+        app.prefs.dither_method = "software".into();
+        app.request_reader_images().unwrap();
+        assert!(app.platform.reader_hardware_y4_requested());
+        let software = app.job_rx.recv_timeout(Duration::from_secs(10)).unwrap();
+        app.job_tx.send(software).unwrap();
+        app.poll();
+        assert!(!app.displayed_reader.as_ref().unwrap().hardware_dither);
+        assert!(!app.platform.reader_hardware_y4_requested());
+        assert!(!app.reader_dither_pending());
+        let pixels = ui.global::<State>().get_reader_image().to_rgb8().unwrap();
+        assert!(pixels.as_bytes().iter().all(|sample| sample % 17 == 0));
+    }
+
+    #[test]
+    fn poll_projects_post_send_hardware_rejection_without_rerendering_the_retained_frame() {
+        let _publication = READER_PUBLICATION_TESTS.lock().unwrap();
+        let ui = reader_test_window();
+        let mut fixture = DemoRouteFixture::new("settings", DeviceProfile::Scribe, false);
+        let app = &mut fixture.app;
+        app.ui = ui.as_weak();
+        app.route = "reader".into();
+        app.prefs.dither = true;
+        app.prefs.dither_method = "hardware".into();
+        app.platform.set_test_hardware_y4_available(true);
+        let book = Book {
+            id: crate::domain::compound_id("local", "post-send-book"),
+            source_id: "local".into(),
+            remote_id: "post-send-book".into(),
+            title: "Post-SEND fallback fixture".into(),
+            ..Book::default()
+        };
+        let chapter = Chapter {
+            id: crate::domain::compound_id("local", "post-send-chapter"),
+            book_id: book.id.clone(),
+            source_id: book.source_id.clone(),
+            remote_id: "post-send-chapter".into(),
+            page_count: 1,
+            ..Chapter::default()
+        };
+        app.store.upsert_book(&book).unwrap();
+        app.store
+            .save_chapters(&book.id, &[chapter.clone()])
+            .unwrap();
+        app.current_book_id = Some(book.id.clone());
+        app.reader =
+            Some(ReaderState::new(vec![chapter.clone()], &chapter.id, 1, &app.prefs).unwrap());
+        app.displayed_reader = Some(DisplayedReader {
+            session: ReaderSession {
+                book_id: book.id,
+                chapter_id: chapter.id,
+                page: 1,
+                total: 1,
+                ..ReaderSession::default()
+            },
+            preferences: app.effective_reader_preferences(),
+            hardware_dither: true,
+            first_path: PathBuf::from("post-send-retained.png"),
+            second_path: None,
+        });
+        let mut pixels = slint::SharedPixelBuffer::<slint::Rgb8Pixel>::new(2, 1);
+        pixels
+            .make_mut_bytes()
+            .copy_from_slice(&[42, 42, 42, 216, 216, 216]);
+        ui.global::<State>()
+            .set_reader_image(Image::from_rgb8(pixels));
+        ui.global::<State>().set_route("reader".into());
+        app.sync_interaction_state();
+        app.sync_presented_reader_dithering();
+        assert!(ui.global::<State>().get_hardware_dither_available());
+        assert!(app.platform.reader_hardware_y4_requested());
+        let generation = app.reader_generation;
+        let reader_jobs = app.reader_image_jobs_started;
+
+        // The native rejection happens after publication, independently of
+        // opt-in timing observers. The next ordinary poll refreshes only state.
+        app.platform.set_test_hardware_y4_available(false);
+        assert!(ui.global::<State>().get_hardware_dither_available());
+        app.poll();
+        assert!(!ui.global::<State>().get_hardware_dither_available());
+        assert!(!ui.global::<State>().get_dither_pending());
+        assert!(app.platform.reader_hardware_y4_requested());
+        assert!(app.displayed_reader.as_ref().unwrap().hardware_dither);
+        assert_eq!(app.reader_generation, generation);
+        assert_eq!(app.reader_image_jobs_started, reader_jobs);
+        assert!(app.reader_inflight.is_none());
+        let retained = ui.global::<State>().get_reader_image().to_rgb8().unwrap();
+        assert_eq!(retained.as_bytes(), &[42, 42, 42, 216, 216, 216]);
     }
 
     #[test]
@@ -2102,6 +2415,7 @@ mod tests {
                 height: self.options.height,
                 crop_borders: self.options.crop_borders,
                 dither: self.options.dither,
+                hardware_dither: self.options.hardware_dither,
                 contrast: self.options.contrast,
                 vertical: false,
                 offset: 0,
@@ -2519,6 +2833,7 @@ mod tests {
             height: options.height,
             crop_borders: options.crop_borders,
             dither: options.dither,
+            hardware_dither: options.hardware_dither,
             contrast: options.contrast,
             vertical: false,
             offset: 0,
@@ -2955,6 +3270,63 @@ mod tests {
         assert_eq!(
             fixture.cache.lookup_raw(&fixture.page).unwrap(),
             Some(fixture.original)
+        );
+    }
+
+    #[test]
+    fn raw_reader_frames_keep_the_eight_bit_download_accelerator() {
+        let fixture = OfflineReaderFixture::new();
+        let derivative = fixture.prepare_download();
+        let options =
+            reader_image_options_for_mode(&fixture.preferences, fixture.viewport, 0, 1, true);
+        let from_original = crate::render_cache::render_raster(
+            &fixture.cache,
+            &fixture.page,
+            &fixture.original,
+            &options,
+            false,
+            0,
+            1.0,
+        )
+        .unwrap();
+        let from_derivative = crate::render_cache::render_raster(
+            &fixture.cache,
+            &fixture.page,
+            &derivative,
+            &options,
+            false,
+            0,
+            1.0,
+        )
+        .unwrap();
+        assert_ne!(from_original.image, from_derivative.image);
+        let actual = render_reader_page(
+            &fixture.cache,
+            &fixture.page,
+            &fixture.original,
+            &options,
+            &fixture.preferences,
+            fixture.viewport,
+            false,
+            0,
+            1.0,
+            0,
+            None,
+        )
+        .unwrap();
+        assert_eq!(actual.rendered.image, from_derivative.image);
+        assert_eq!(actual.rendered.cache_path, from_derivative.cache_path);
+        assert!(
+            actual
+                .rendered
+                .image
+                .as_raw()
+                .iter()
+                .any(|sample| sample % 17 != 0)
+        );
+        assert_eq!(
+            actual.rendered.source_proof.unwrap().source_path(),
+            fs::canonicalize(&derivative).unwrap()
         );
     }
 

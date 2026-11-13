@@ -58,7 +58,7 @@ impl GrayMode {
         self.grayscale(255)
     }
 
-    fn pixel(self, pixel: Rgb8Pixel) -> u8 {
+    pub(crate) fn pixel(self, pixel: Rgb8Pixel) -> u8 {
         let value = ((77 * u32::from(pixel.r) + 150 * u32::from(pixel.g) + 29 * u32::from(pixel.b))
             >> 8) as u8;
         self.grayscale(value)

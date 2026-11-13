@@ -146,6 +146,7 @@ fn derivative_key(scope: &str, source_digest: &str) -> RenderKey {
         height: MAX_COVER_HEIGHT,
         crop_borders: false,
         dither: false,
+        hardware_dither: false,
         contrast: 0,
         vertical: false,
         offset: 0,
@@ -569,6 +570,7 @@ impl App {
             model.set_author(tr("sleep_neutral").into());
         }
         model.set_active(true);
+        self.sync_presented_reader_dithering();
         ui.window().request_redraw();
         Ok(())
     }
@@ -583,6 +585,7 @@ impl App {
             model.set_title("".into());
             model.set_author("".into());
         }
+        self.sync_presented_reader_dithering();
     }
 
     pub(super) fn sleep_screen_snapshot(&self) -> Value {

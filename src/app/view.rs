@@ -43,6 +43,7 @@ impl App {
         extended_preferences::sync(&state, &self.prefs);
         self.sync_tracking_accounts_state();
         self.sync_base_view(&state);
+        self.sync_presented_reader_dithering();
         if self.route == "reader" {
             let sleep_book = self.sync_reader_view(&state)?;
             self.observe_sleep_book(sleep_book);
@@ -1511,7 +1512,17 @@ impl App {
             "image_processing",
             [
                 self.prefs.crop_borders.then(|| tr("crop_borders")),
-                self.prefs.dither.then(|| tr("dither")),
+                self.prefs.dither.then(|| {
+                    tr(if self.prefs.normalized_dither_method() == "hardware" {
+                        if self.platform.hardware_y4_available() {
+                            "dither_hardware"
+                        } else {
+                            "dither_software_fallback"
+                        }
+                    } else {
+                        "dither_software"
+                    })
+                }),
             ]
             .into_iter()
             .flatten()

@@ -63,6 +63,8 @@ pub struct ImageOptions {
     pub height: u32,
     pub crop_borders: bool,
     pub dither: bool,
+    /// Keep the prepared pixels in Gray8 for device-side dithering.
+    pub hardware_dither: bool,
     pub contrast: i32,
 }
 
@@ -73,6 +75,7 @@ impl Default for ImageOptions {
             height: 1_648,
             crop_borders: true,
             dither: true,
+            hardware_dither: false,
             contrast: 0,
         }
     }
@@ -140,13 +143,20 @@ fn resize_raster(
     }
 }
 
-fn quantize_raster(image: &mut GrayImage, dither: bool, algorithm: RasterAlgorithm) -> Result<()> {
+fn quantize_raster(
+    image: &mut GrayImage,
+    options: &ImageOptions,
+    algorithm: RasterAlgorithm,
+) -> Result<()> {
+    if options.hardware_dither {
+        return Ok(());
+    }
     match algorithm {
         RasterAlgorithm::Lanczos3 => {
-            quantize(image, dither);
+            quantize(image, options.dither);
             Ok(())
         }
-        RasterAlgorithm::BiliTriangle => reader_raster::quantize_gray(image, dither),
+        RasterAlgorithm::BiliTriangle => reader_raster::quantize_gray(image, options.dither),
     }
 }
 
@@ -166,7 +176,7 @@ pub fn render_page(path: impl AsRef<Path>, options: &ImageOptions) -> Result<Gra
 }
 
 /// Decode with explicit allocation limits, composite transparency onto paper,
-/// resize, and produce exactly sixteen printable gray levels.
+/// resize, and prepare printable gray levels or device-side Gray8 input.
 pub fn decode_page(bytes: &[u8], options: &ImageOptions) -> Result<GrayImage> {
     decode_page_with_algorithm(bytes, options, RasterAlgorithm::Lanczos3)
 }
@@ -197,7 +207,7 @@ fn decode_page_with_algorithm(
         fit_dimensions(gray.width(), gray.height(), options.width, options.height);
     let mut output = resize_raster(&gray, width, height, algorithm)?;
     apply_contrast(&mut output, options.contrast);
-    quantize_raster(&mut output, options.dither, algorithm)?;
+    quantize_raster(&mut output, options, algorithm)?;
     Ok(output)
 }
 
@@ -325,7 +335,7 @@ fn render_vertical_gray(
     let strip = imageops::crop_imm(gray, 0, source_top, gray.width(), source_height).to_image();
     let mut output = resize_raster(&strip, options.width, output_height, algorithm)?;
     apply_contrast(&mut output, options.contrast);
-    quantize_raster(&mut output, options.dither, algorithm)?;
+    quantize_raster(&mut output, options, algorithm)?;
     Ok(VerticalWindow {
         image: output,
         scaled_height,
@@ -500,6 +510,19 @@ pub fn render_spread(
     height: u32,
     rtl: bool,
 ) -> GrayImage {
+    render_spread_with_dithering(first, second, width, height, rtl, false)
+}
+
+/// Compose a spread without reducing Gray8 input when the published frame uses
+/// device-side dithering. Software callers retain the legacy final quantizer.
+pub fn render_spread_with_dithering(
+    first: &GrayImage,
+    second: &GrayImage,
+    width: u32,
+    height: u32,
+    rtl: bool,
+    hardware_dither: bool,
+) -> GrayImage {
     let mut output = GrayImage::from_pixel(width, height, Luma([255]));
     if width < 4 || height == 0 {
         return output;
@@ -520,7 +543,9 @@ pub fn render_spread(
         second_slot_width,
         height,
     );
-    quantize(&mut output, false);
+    if !hardware_dither {
+        quantize(&mut output, false);
+    }
     output
 }
 
@@ -785,7 +810,7 @@ fn render_streaming_png_with_algorithm(
         work.set(current);
     });
     apply_contrast(&mut output, options.contrast);
-    quantize_raster(&mut output, options.dither, algorithm)?;
+    quantize_raster(&mut output, options, algorithm)?;
     Ok(VerticalWindow {
         image: output,
         scaled_height,
@@ -1070,6 +1095,7 @@ mod tests {
             height,
             crop_borders: false,
             dither: false,
+            hardware_dither: false,
             contrast: 0,
         }
     }
@@ -1299,6 +1325,103 @@ mod tests {
         })
     }
 
+    fn long_ramp_png() -> Vec<u8> {
+        let mut bytes = Vec::new();
+        let mut encoder = png::Encoder::new(&mut bytes, 1_024, 16_385);
+        encoder.set_color(png::ColorType::Grayscale);
+        encoder.set_depth(png::BitDepth::Eight);
+        {
+            let mut writer = encoder.write_header().unwrap();
+            {
+                let mut stream = writer.stream_writer().unwrap();
+                let row = (0..1_024).map(|x| (x % 256) as u8).collect::<Vec<_>>();
+                for _ in 0..16_385 {
+                    stream.write_all(&row).unwrap();
+                }
+                stream.finish().unwrap();
+            }
+            writer.finish().unwrap();
+        }
+        bytes
+    }
+
+    #[test]
+    fn hardware_gray8_preserves_every_input_level_for_both_raster_algorithms() {
+        let source = GrayImage::from_fn(256, 4, |x, _| Luma([x as u8]));
+        let bytes = png(source.clone());
+        assert!(!ImageOptions::default().hardware_dither);
+        for algorithm in [RasterAlgorithm::Lanczos3, RasterAlgorithm::BiliTriangle] {
+            for dither in [false, true] {
+                let settings = ImageOptions {
+                    dither,
+                    hardware_dither: true,
+                    ..options(256, 4)
+                };
+                let output = decode_page_with_algorithm(&bytes, &settings, algorithm).unwrap();
+                assert_eq!(output, source);
+                let window =
+                    render_vertical_window_with_algorithm(&bytes, &settings, 0, algorithm).unwrap();
+                assert_eq!(window.image, source);
+                assert_eq!(window.scaled_height, 4);
+            }
+        }
+    }
+
+    #[test]
+    fn hardware_gray8_keeps_crop_resize_and_contrast_processing() {
+        let source = GrayImage::from_fn(80, 48, |x, y| {
+            Luma([if (8..72).contains(&x) && (5..43).contains(&y) {
+                ((x * 7 + y * 13) % 247) as u8
+            } else {
+                255
+            }])
+        });
+        let bytes = png(source.clone());
+        let settings = ImageOptions {
+            crop_borders: true,
+            contrast: 19,
+            hardware_dither: true,
+            ..options(40, 24)
+        };
+        let cropped = reference_crop_white_borders(source);
+        let (width, height) = fit_dimensions(
+            cropped.width(),
+            cropped.height(),
+            settings.width,
+            settings.height,
+        );
+        for (algorithm, filter) in [
+            (RasterAlgorithm::Lanczos3, FilterType::Lanczos3),
+            (RasterAlgorithm::BiliTriangle, FilterType::Triangle),
+        ] {
+            let mut expected = imageops::resize(&cropped, width, height, filter);
+            reference_apply_contrast(&mut expected, settings.contrast);
+            let output = decode_page_with_algorithm(&bytes, &settings, algorithm).unwrap();
+            assert_eq!(output, expected);
+            assert!(output.pixels().any(|pixel| pixel[0] % 17 != 0));
+        }
+    }
+
+    #[test]
+    fn hardware_streaming_windows_preserve_all_gray8_levels() {
+        let bytes = long_ramp_png();
+        assert!(needs_png_streaming(&bytes).unwrap());
+        let settings = ImageOptions {
+            hardware_dither: true,
+            dither: true,
+            ..options(1_024, 4)
+        };
+        let expected = GrayImage::from_fn(1_024, 4, |x, _| Luma([(x % 256) as u8]));
+        for algorithm in [RasterAlgorithm::Lanczos3, RasterAlgorithm::BiliTriangle] {
+            let window =
+                render_vertical_window_with_algorithm(&bytes, &settings, 16_000, algorithm)
+                    .unwrap();
+            assert_eq!(window.image, expected);
+            assert_eq!(window.scaled_height, 16_385);
+            assert_eq!(window.viewport_height, 4);
+        }
+    }
+
     #[test]
     fn alpha_is_composited_onto_white_paper() {
         let source = RgbaImage::from_pixel(4, 4, Rgba([0, 0, 0, 0]));
@@ -1495,6 +1618,32 @@ mod tests {
         let output = render_spread(&first, &second, 82, 40, true);
         assert_eq!(output.get_pixel(20, 20)[0], 255);
         assert_eq!(output.get_pixel(62, 20)[0], 0);
+    }
+
+    #[test]
+    fn hardware_spreads_preserve_gray8_when_composing_both_directions() {
+        let first = GrayImage::from_fn(256, 4, |x, _| Luma([x as u8]));
+        let second = GrayImage::from_fn(256, 4, |x, _| Luma([255 - x as u8]));
+        for rtl in [false, true] {
+            let output = render_spread_with_dithering(&first, &second, 514, 4, rtl, true);
+            let (left, right) = if rtl {
+                (&second, &first)
+            } else {
+                (&first, &second)
+            };
+            assert_eq!(imageops::crop_imm(&output, 0, 0, 256, 4).to_image(), *left);
+            assert_eq!(
+                imageops::crop_imm(&output, 258, 0, 256, 4).to_image(),
+                *right
+            );
+            assert_eq!(output.get_pixel(256, 0)[0], 255);
+            let mut expected_software = output;
+            reference_quantize(&mut expected_software, false);
+            assert_eq!(
+                render_spread(&first, &second, 514, 4, rtl),
+                expected_software
+            );
+        }
     }
 
     #[test]

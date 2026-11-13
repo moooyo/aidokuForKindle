@@ -3,6 +3,7 @@ import { Theme } from "theme.slint";
 import { Strings } from "strings.slint";
 import { ActionButton, BodyText, Caption, GroupLabel, Icon, RadioCard, ToggleRow, TitleText } from "widgets.slint";
 import { SettingsChoice, SettingsSlider, SettingsValueRow } from "settings-controls.slint";
+import { DitherSelector } from "dither-controls.slint";
 import { TapLayoutCard } from "settings-tap-card.slint";
 import { StorageSettings, CategoriesSettings, DownloadSettings, SourceListsSettings } from "settings-data.slint";
 
@@ -183,8 +184,8 @@ export component SettingsBody inherits Rectangle {
             clicked => { if State.contrast != index - 2 { Commands.action("settings", "set", "contrast=" + (index - 2)); } }
         }
         ToggleRow { x: 0px; y: State.large-screen ? 105px : 84px; width: parent.width; text: Strings.crop-borders; value: State.crop-borders; toggled => { Commands.action("settings", "set", "crop-borders=" + (State.crop-borders ? "false" : "true")); } }
-        ToggleRow { x: 0px; y: (State.large-screen ? 105px : 84px) + root.row-height; width: parent.width; text: Strings.dither; value: State.dither; toggled => { Commands.action("settings", "set", "dither=" + (State.dither ? "false" : "true")); } }
-        ToggleRow { x: 0px; y: (State.large-screen ? 105px : 84px) + root.row-height * 2; width: parent.width; text: Strings.split-wide; value: State.split-wide; toggled => { Commands.action("settings", "set", "split-wide=" + (State.split-wide ? "false" : "true")); } }
+        dither-selector := DitherSelector { x: 0px; y: (State.large-screen ? 105px : 84px) + root.row-height + root.section-gap; width: parent.width; }
+        ToggleRow { x: 0px; y: dither-selector.y + dither-selector.height + root.section-gap; width: parent.width; text: Strings.split-wide; value: State.split-wide; toggled => { Commands.action("settings", "set", "split-wide=" + (State.split-wide ? "false" : "true")); } }
     }
 
     if root.section == "spread": Rectangle {

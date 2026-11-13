@@ -938,6 +938,9 @@ impl App {
             state.set_flash_on_close(self.prefs.flash_on_close);
             state.set_crop_borders(self.prefs.crop_borders);
             state.set_dither(self.prefs.dither);
+            state.set_dither_method(self.prefs.normalized_dither_method().into());
+            state.set_hardware_dither_available(self.platform.hardware_y4_available());
+            state.set_dither_pending(self.reader_dither_pending());
             state.set_contrast(self.prefs.contrast / 10);
             state.set_keep_awake(self.prefs.keep_awake);
             state.set_library_sort(self.interactions.library_sort.id().into());
@@ -4244,6 +4247,18 @@ impl App {
                 "night_mode" | "night-mode" => self.prefs.night_mode = value.parse()?,
                 "crop_borders" | "crop-borders" => self.prefs.crop_borders = value.parse()?,
                 "dither" => self.prefs.dither = value.parse()?,
+                "dither_method" | "dither-method" if matches!(value, "software" | "hardware") => {
+                    self.prefs.dither_method = value.into();
+                    self.prefs.dither = true;
+                }
+                "dither_mode" | "dither-mode"
+                    if matches!(value, "software" | "hardware" | "off") =>
+                {
+                    self.prefs.dither = value != "off";
+                    if self.prefs.dither {
+                        self.prefs.dither_method = value.into();
+                    }
+                }
                 "contrast" => {
                     let contrast: i32 = value.parse()?;
                     if !(-2..=2).contains(&contrast) {
@@ -4348,6 +4363,7 @@ impl App {
             || before.split_wide != after.split_wide
             || before.crop_borders != after.crop_borders
             || before.dither != after.dither
+            || before.normalized_dither_method() != after.normalized_dither_method()
             || before.contrast != after.contrast;
         self.save_preferences_with_render(render_images)
     }
@@ -4784,6 +4800,37 @@ mod followup_command_tests {
         assert!(preferences.resize_downloads && preferences.split_wide && preferences.write_logs);
         assert!(app.dispatch("settings", "set", "ahead-chapters=4").is_err());
         assert_eq!(app.store.preferences().unwrap(), preferences);
+    }
+
+    #[test]
+    fn dithering_method_selection_persists_without_inventing_desktop_capability() {
+        let mut fixture = DemoRouteFixture::new("settings", DeviceProfile::Scribe, false);
+        let app = &mut fixture.app;
+        app.dispatch("settings", "set", "dither-mode=hardware")
+            .unwrap();
+        assert!(app.prefs.dither);
+        assert_eq!(app.prefs.normalized_dither_method(), "hardware");
+        assert!(!app.platform.hardware_y4_available());
+        assert_eq!(app.store.preferences().unwrap(), app.prefs);
+        app.dispatch("settings", "set", "dither-mode=off").unwrap();
+        assert!(!app.prefs.dither);
+        assert_eq!(app.prefs.normalized_dither_method(), "hardware");
+        app.dispatch("settings", "set", "dither=true").unwrap();
+        assert_eq!(app.prefs.normalized_dither_method(), "hardware");
+        app.dispatch("settings", "set", "dither-method=software")
+            .unwrap();
+        assert!(app.prefs.dither);
+        assert_eq!(app.prefs.normalized_dither_method(), "software");
+        let saved = app.store.preferences().unwrap();
+        assert!(
+            app.dispatch("settings", "set", "dither-mode=invalid")
+                .is_err()
+        );
+        assert!(
+            app.dispatch("settings", "set", "dither-method=invalid")
+                .is_err()
+        );
+        assert_eq!(app.store.preferences().unwrap(), saved);
     }
 
     #[test]

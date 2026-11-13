@@ -18,6 +18,7 @@
 //! ```
 
 mod clipboard;
+mod dithering;
 mod frame_observer;
 mod framebuffer;
 mod gray_target;
@@ -35,6 +36,7 @@ mod splash;
 mod touch;
 mod wakeup;
 
+pub use dithering::DitheringHandle;
 pub use frame_observer::{NativeFrameObservation, NativeFramePhase, NativeFrameUnavailable};
 pub use framebuffer::{NativeFramebufferObservation, probe_native_framebuffer};
 pub use lifecycle::{LifecycleError, LifecycleHandle, LifecycleStatus};
@@ -101,6 +103,7 @@ pub struct KindleBackend<State = NoSchedule> {
     rotation: Arc<AtomicU32>,
     refresh_handle: RefreshHandle,
     render_handle: RenderHandle,
+    dithering_handle: DitheringHandle,
     lifecycle_handle: LifecycleHandle,
     _state: PhantomData<State>,
 }
@@ -154,6 +157,11 @@ impl<State> KindleBackend<State> {
         self.render_handle.clone()
     }
 
+    /// Bind hardware processing to the Gray8 image already in the scene.
+    pub fn dithering_handle(&self) -> DitheringHandle {
+        self.dithering_handle.clone()
+    }
+
     /// Add an extra font (TTF/OTF) from bytes.
     ///
     /// Call this **after** you've created your window (e.g. `AppWindow::new()`).
@@ -203,6 +211,7 @@ impl<State> KindleBackend<State> {
             rotation: self.rotation,
             refresh_handle: self.refresh_handle,
             render_handle: self.render_handle,
+            dithering_handle: self.dithering_handle,
             lifecycle_handle: self.lifecycle_handle,
             _state: PhantomData,
         }
@@ -302,6 +311,7 @@ pub fn install(font_data: &[u8]) -> Result<KindleBackend, slint::PlatformError> 
     let window = platform.window.clone();
     let refresh_handle = platform.refresh_handle();
     let render_handle = platform.render_handle();
+    let dithering_handle = platform.dithering_handle();
     let lifecycle_handle = platform.lifecycle_handle();
     slint::platform::set_platform(Box::new(platform))
         .map_err(|e| slint::PlatformError::Other(format!("{e}")))?;
@@ -316,6 +326,7 @@ pub fn install(font_data: &[u8]) -> Result<KindleBackend, slint::PlatformError> 
         rotation,
         refresh_handle,
         render_handle,
+        dithering_handle,
         lifecycle_handle,
         _state: PhantomData,
     })

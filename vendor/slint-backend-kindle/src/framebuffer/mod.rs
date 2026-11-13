@@ -2,13 +2,18 @@ mod ffi;
 mod markers;
 
 #[cfg(test)]
+mod dithering_tests;
+#[cfg(test)]
 mod polarity_tests;
 #[cfg(test)]
 mod sleep_fence_tests;
 #[cfg(test)]
 mod test_support;
 
+use crate::dithering::{DitheringHandle, software_gray};
+use crate::gray_target::ScenePixels;
 use crate::refresh::{RefreshWaveform, ResolvedRefresh};
+use crate::render_control::GrayMode;
 use std::cell::Cell;
 use std::io;
 use std::ops::Range;
@@ -18,11 +23,11 @@ use markers::UpdateMarkers;
 
 use ffi::{
     EPDC_FLAG_FORCE_MONOCHROME, FBIOGET_FSCREENINFO, FBIOGET_VSCREENINFO, FbFixScreeninfo,
-    FbVarScreeninfo, MXCFB_SEND_UPDATE, MXCFB_SEND_UPDATE_MTK, MXCFB_SEND_UPDATE_REX,
-    MXCFB_SEND_UPDATE_ZELDA, MXCFB_WAIT_FOR_UPDATE_COMPLETE, TEMP_USE_AMBIENT, UPDATE_MODE_FULL,
-    UPDATE_MODE_PARTIAL, UpdateMarkerData, UpdateRect, UpdateRequest, UpdateRequestMtk,
-    UpdateRequestRex, UpdateRequestZelda, WAVEFORM_MODE_A2_LEGACY, WAVEFORM_MODE_A2_MODERN,
-    WAVEFORM_MODE_AUTO, WAVEFORM_MODE_DU, WAVEFORM_MODE_GC16,
+    FbVarScreeninfo, MTK_EPDC_FLAG_USE_DITHERING_Y4, MXCFB_SEND_UPDATE, MXCFB_SEND_UPDATE_MTK,
+    MXCFB_SEND_UPDATE_REX, MXCFB_SEND_UPDATE_ZELDA, MXCFB_WAIT_FOR_UPDATE_COMPLETE,
+    TEMP_USE_AMBIENT, UPDATE_MODE_FULL, UPDATE_MODE_PARTIAL, UpdateMarkerData, UpdateRect,
+    UpdateRequest, UpdateRequestMtk, UpdateRequestRex, UpdateRequestZelda, WAVEFORM_MODE_A2_LEGACY,
+    WAVEFORM_MODE_A2_MODERN, WAVEFORM_MODE_AUTO, WAVEFORM_MODE_DU, WAVEFORM_MODE_GC16,
 };
 
 /// Read-only metadata from the descriptor used for this exact observation.
@@ -35,6 +40,10 @@ pub struct NativeFramebufferObservation {
 }
 
 impl NativeFramebufferObservation {
+    pub(crate) fn supports_hardware_y4(&self) -> bool {
+        self.layout.words[6] == 8 && matches!(self.layout.words[7], 1 | 2)
+    }
+
     /// A canonical numeric identity for a launcher's protected layout record.
     pub fn layout_token(&self) -> String {
         self.layout
@@ -247,6 +256,8 @@ pub(crate) struct Framebuffer {
     /// Bytes per pixel in the mmap: 1 (8-bit grayscale, most Kindles) or
     /// 4 (32-bit BGRA/RGBA, e.g. Kindle Colorsoft).
     bytes_per_pixel: usize,
+    /// Hardware processing additionally requires the checked native gray tag.
+    native_gray8: bool,
     retained_layout: Option<FramebufferLayout>,
     /// Derived only from this descriptor's checked native pixel format.
     inverted_gray8: Cell<bool>,
@@ -254,6 +265,44 @@ pub(crate) struct Framebuffer {
     /// successful refresh. `None` until then.
     update_variant: Cell<Option<UpdateVariant>>,
     update_markers: UpdateMarkers,
+    dithering: DitheringHandle,
+    dithering_frame: Cell<DitheringFrame>,
+    /// A failed SEND may have reached scanout. Never clear this within an owner.
+    dithering_delivery_failure: Cell<Option<Option<i32>>>,
+    last_accepted_dithering: Cell<Option<AcceptedDithering>>,
+    canonical_rewrite_count: Cell<u64>,
+    mapped_software_dithered: Cell<bool>,
+}
+
+#[derive(Clone, Copy, Default, Eq, PartialEq)]
+struct DitheringFrame {
+    available: bool,
+    requested: bool,
+    bilevel: bool,
+}
+
+/// A snapshot associated with one actual payload, never a queued preference.
+#[derive(Clone, Copy, Debug, Default, Eq, PartialEq)]
+pub(crate) struct FrameDitheringStatus {
+    pub(crate) hardware_y4_available: bool,
+    pub(crate) hardware_y4_requested: bool,
+    pub(crate) hardware_y4_applied: bool,
+    pub(crate) software_dither_fallback: bool,
+    pub(crate) dithering_delivery_uncertain: bool,
+}
+
+#[derive(Clone, Copy)]
+struct AcceptedDithering {
+    marker: u32,
+    status: FrameDitheringStatus,
+    rewritten: bool,
+    raw_scene: bool,
+}
+
+#[derive(Clone, Copy)]
+struct FallbackScene<'a> {
+    pixels: ScenePixels<'a>,
+    mode: GrayMode,
 }
 
 /// A checked full update accepted by this exact live framebuffer owner.
@@ -378,11 +427,139 @@ impl Framebuffer {
             height,
             stride,
             bytes_per_pixel,
+            native_gray8: vinfo.bits_per_pixel == 8
+                && matches!(vinfo.grayscale, 1 | 2)
+                && retained_layout.is_some(),
             retained_layout,
             inverted_gray8: Cell::new(gray8_is_inverted(&vinfo)),
             update_variant: Cell::new(None),
             update_markers: UpdateMarkers::default(),
+            dithering: DitheringHandle::default(),
+            dithering_frame: Cell::new(DitheringFrame::default()),
+            dithering_delivery_failure: Cell::new(None),
+            last_accepted_dithering: Cell::new(None),
+            canonical_rewrite_count: Cell::new(0),
+            mapped_software_dithered: Cell::new(false),
         })
+    }
+
+    /// Freeze processing with the scene that will be written in this frame.
+    /// Observer callbacks and producer revisions cannot reinterpret its pixels.
+    pub(crate) fn set_dithering(&mut self, handle: DitheringHandle, bilevel: bool) -> bool {
+        if !self.native_gray8
+            || matches!(
+                self.update_variant.get(),
+                Some(
+                    UpdateVariant::Legacy
+                        | UpdateVariant::Rex
+                        | UpdateVariant::Zelda
+                        | UpdateVariant::Unsupported
+                )
+            )
+        {
+            handle.reject_hardware();
+        }
+        let frame = DitheringFrame {
+            available: handle.hardware_y4_available(),
+            requested: handle.requested(),
+            bilevel,
+        };
+        let changed = self.dithering_frame.replace(frame) != frame;
+        self.dithering = handle;
+        changed
+    }
+
+    fn raw_scene(&self) -> bool {
+        let frame = self.dithering_frame.get();
+        frame.requested && !frame.bilevel
+    }
+
+    fn hardware_y4_active(&self) -> bool {
+        self.raw_scene() && self.dithering_frame.get().available && self.native_gray8
+    }
+
+    pub(crate) fn software_dither_active(&self) -> bool {
+        self.raw_scene() && !self.dithering_frame.get().available
+    }
+
+    pub(crate) fn current_dithering_status(&self) -> FrameDitheringStatus {
+        let frame = self.dithering_frame.get();
+        FrameDitheringStatus {
+            hardware_y4_available: frame.available,
+            hardware_y4_requested: frame.requested,
+            software_dither_fallback: self.mapped_software_dithered.get(),
+            dithering_delivery_uncertain: self.dithering_delivery_failure.get().is_some(),
+            ..FrameDitheringStatus::default()
+        }
+    }
+
+    pub(crate) fn accepted_dithering(&self, marker: u32) -> Option<FrameDitheringStatus> {
+        self.last_accepted_dithering
+            .get()
+            .filter(|accepted| accepted.marker == marker)
+            .map(|accepted| accepted.status)
+    }
+
+    pub(crate) fn accepted_frame_was_rewritten(&self, marker: u32) -> bool {
+        self.last_accepted_dithering
+            .get()
+            .is_some_and(|accepted| accepted.marker == marker && accepted.rewritten)
+    }
+
+    pub(crate) fn require_known_dithering_delivery(&self) -> io::Result<()> {
+        match self.dithering_delivery_failure.get() {
+            None => Ok(()),
+            Some(Some(errno)) => Err(io::Error::from_raw_os_error(errno)),
+            Some(None) => Err(io::Error::other(
+                "the display driver returned an unknown update outcome",
+            )),
+        }
+    }
+
+    pub(crate) fn settle_dithering_transition(&self) -> io::Result<()> {
+        if let Err(error) = self.wait_for_pending_update_complete_checked() {
+            self.block_uncertain_dithering_delivery(&error);
+            return Err(error);
+        }
+        Ok(())
+    }
+
+    pub(crate) fn canonical_rewrite_count(&self) -> u64 {
+        self.canonical_rewrite_count.get()
+    }
+
+    fn block_uncertain_dithering_delivery(&self, error: &io::Error) {
+        if self.dithering_delivery_failure.get().is_none() {
+            self.dithering_delivery_failure
+                .set(Some(error.raw_os_error()));
+        }
+        self.dithering.block_uncertain_delivery();
+    }
+
+    /// Raw retained pixels cannot receive DU/A2, even under a small UI overlay.
+    pub(crate) fn resolve_dithering(&self, mut refresh: ResolvedRefresh) -> ResolvedRefresh {
+        if self.raw_scene() {
+            refresh.waveform = RefreshWaveform::Gc16;
+            if self.hardware_y4_active() {
+                let region = aligned_dither_region(
+                    UpdateRect {
+                        left: refresh.region.x as u32,
+                        top: refresh.region.y as u32,
+                        width: refresh.region.width,
+                        height: refresh.region.height,
+                    },
+                    self.width,
+                    self.height,
+                );
+                refresh.region = crate::PhysicalRect {
+                    x: region.left as i32,
+                    y: region.top as i32,
+                    width: region.width,
+                    height: region.height,
+                };
+            }
+        }
+        refresh
     }
 
     /// Recheck the retained mmap contract on the owned descriptor before I/O.
@@ -413,8 +590,13 @@ impl Framebuffer {
 
     /// Encode a horizontal span of canonical grayscale into the mmap at row `y`.
     pub(crate) fn write_line(&mut self, y: usize, x_range: Range<usize>, pixels: &[u8]) {
+        if self.dithering_delivery_failure.get().is_some() {
+            return;
+        }
         let bpp = self.bytes_per_pixel;
         let inverted_gray8 = self.inverted_gray8.get();
+        let fallback = self.software_dither_active();
+        self.mapped_software_dithered.set(fallback);
         let row_span = unsafe {
             std::slice::from_raw_parts_mut(
                 self.map.add(y * self.stride + x_range.start * bpp),
@@ -422,14 +604,25 @@ impl Framebuffer {
             )
         };
         match bpp {
-            1 if inverted_gray8 => {
-                for (destination, &value) in row_span.iter_mut().zip(pixels) {
+            1 if inverted_gray8 || fallback => {
+                for (offset, (destination, &value)) in row_span.iter_mut().zip(pixels).enumerate() {
+                    let value = if fallback {
+                        software_gray(value, x_range.start + offset, y)
+                    } else {
+                        value
+                    };
                     *destination = encode_native_gray(value, inverted_gray8);
                 }
             }
             1 => row_span.copy_from_slice(pixels),
             _ => {
-                for (dst, &g) in row_span.chunks_exact_mut(4).zip(pixels) {
+                for (offset, (dst, &value)) in row_span.chunks_exact_mut(4).zip(pixels).enumerate()
+                {
+                    let g = if fallback {
+                        software_gray(value, x_range.start + offset, y)
+                    } else {
+                        value
+                    };
                     dst.copy_from_slice(&[g, g, g, 0xff]);
                 }
             }
@@ -439,8 +632,13 @@ impl Framebuffer {
     /// Fill visible pixels from canonical luma (0x00 = black, 0xff = white).
     /// Native scanout polarity is applied here, independently of software modes.
     pub(crate) fn fill(&mut self, value: u8) {
+        if self.dithering_delivery_failure.get().is_some() {
+            return;
+        }
         let bpp = self.bytes_per_pixel;
         let native_gray = encode_native_gray(value, self.inverted_gray8.get());
+        let fallback = self.software_dither_active();
+        self.mapped_software_dithered.set(fallback);
         for y in 0..self.height as usize {
             let row = unsafe {
                 std::slice::from_raw_parts_mut(
@@ -448,11 +646,22 @@ impl Framebuffer {
                     self.width as usize * bpp,
                 )
             };
-            match bpp {
-                1 => row.fill(native_gray),
-                _ => {
-                    for px in row.chunks_exact_mut(4) {
-                        px.copy_from_slice(&[value, value, value, 0xff]);
+            if fallback {
+                for (x, pixel) in row.chunks_exact_mut(bpp).enumerate() {
+                    let value = software_gray(value, x, y);
+                    if bpp == 1 {
+                        pixel[0] = encode_native_gray(value, self.inverted_gray8.get());
+                    } else {
+                        pixel.copy_from_slice(&[value, value, value, 0xff]);
+                    }
+                }
+            } else {
+                match bpp {
+                    1 => row.fill(native_gray),
+                    _ => {
+                        for px in row.chunks_exact_mut(4) {
+                            px.copy_from_slice(&[value, value, value, 0xff]);
+                        }
                     }
                 }
             }
@@ -465,24 +674,204 @@ impl Framebuffer {
     /// cache it, so later frames issue exactly one ioctl instead of retrying a
     /// known-failing one every refresh.
     fn send_update(&self, region: UpdateRect, waveform: u32, mode: u32) -> io::Result<()> {
-        self.update_markers.submit(|marker| {
-            submit_update(&self.update_variant, |variant| {
-                if self.send_update_variant(variant, region, waveform, mode, marker) {
+        self.send_update_scene(region, waveform, mode, None)
+            .map(|_| ())
+    }
+
+    fn send_update_scene(
+        &self,
+        region: UpdateRect,
+        waveform: u32,
+        mode: u32,
+        scene: Option<FallbackScene<'_>>,
+    ) -> io::Result<SubmittedUpdate<'_>> {
+        self.send_update_using(
+            region,
+            waveform,
+            mode,
+            scene,
+            |variant, region, waveform, mode, marker, y4| {
+                if self.send_update_variant(variant, region, waveform, mode, marker, y4) {
                     Ok(())
                 } else {
                     Err(io::Error::last_os_error())
                 }
-            })
-        })
+            },
+            |marker| self.wait_for_marker_ioctl(marker),
+        )
     }
 
+    fn send_update_using(
+        &self,
+        mut region: UpdateRect,
+        mut waveform: u32,
+        mode: u32,
+        scene: Option<FallbackScene<'_>>,
+        mut send: impl FnMut(UpdateVariant, UpdateRect, u32, u32, u32, bool) -> io::Result<()>,
+        wait: impl FnMut(u32) -> io::Result<()>,
+    ) -> io::Result<SubmittedUpdate<'_>> {
+        self.require_known_dithering_delivery()?;
+        let raw_scene = self.raw_scene();
+        let y4 = self.hardware_y4_active();
+        if raw_scene {
+            waveform = WAVEFORM_MODE_GC16;
+        }
+        if y4 {
+            region = aligned_dither_region(region, self.width, self.height);
+            // A reviewed Scribe uses the MTK ABI. Never probe another ABI with
+            // this raw mapping before a checked software replacement exists.
+            self.update_variant.set(Some(UpdateVariant::Mtk));
+        }
+        if region.width == 0 || region.height == 0 {
+            return Err(io::Error::new(
+                io::ErrorKind::InvalidInput,
+                "empty display update",
+            ));
+        }
+        let mut rewritten = false;
+        let receipt = match self.submit_update_checked_with_policy(raw_scene, |variant, marker| {
+            send(
+                variant,
+                region,
+                waveform,
+                mode,
+                marker,
+                y4 && variant == UpdateVariant::Mtk,
+            )
+        }) {
+            Ok(receipt) => receipt,
+            Err(error) if y4 && explicit_update_rejection(error.raw_os_error()) => {
+                self.dithering.reject_hardware();
+                let mut frame = self.dithering_frame.get();
+                frame.available = false;
+                self.dithering_frame.set(frame);
+                // A definite rejection does not replace the preceding accepted
+                // marker. Settle that exact update before touching mapped bytes.
+                if let Err(wait_error) = self.update_markers.wait_for_last_submitted(wait) {
+                    self.block_uncertain_dithering_delivery(&wait_error);
+                    return Err(wait_error);
+                }
+                let scene = scene.ok_or_else(|| {
+                    io::Error::new(
+                        io::ErrorKind::InvalidInput,
+                        "a raw display fallback requires its canonical scene",
+                    )
+                })?;
+                self.rewrite_software_scene(scene)?;
+                rewritten = true;
+                if error.raw_os_error() == Some(libc::ENOTTY) {
+                    self.update_variant.set(None);
+                }
+                let full = UpdateRect {
+                    top: 0,
+                    left: 0,
+                    width: self.width,
+                    height: self.height,
+                };
+                self.submit_update_checked_with_policy(true, |variant, marker| {
+                    send(
+                        variant,
+                        full,
+                        WAVEFORM_MODE_GC16,
+                        UPDATE_MODE_FULL,
+                        marker,
+                        false,
+                    )
+                })?
+            }
+            Err(error) => return Err(error),
+        };
+        let mut status = self.current_dithering_status();
+        status.hardware_y4_applied = y4 && !rewritten;
+        self.last_accepted_dithering.set(Some(AcceptedDithering {
+            marker: receipt.marker,
+            status,
+            rewritten,
+            raw_scene,
+        }));
+        Ok(receipt)
+    }
+
+    /// Rebuild from the canonical retained scene after the accepted-update
+    /// fence. Neither night mode nor native Y8INV is applied to an old output.
+    fn rewrite_software_scene(&self, scene: FallbackScene<'_>) -> io::Result<()> {
+        self.require_known_dithering_delivery()?;
+        let expected = self.width as usize * self.height as usize;
+        let actual = match scene.pixels {
+            ScenePixels::Gray(pixels) => pixels.len(),
+            ScenePixels::Rgb(pixels) => pixels.len(),
+        };
+        if actual != expected {
+            return Err(io::Error::new(
+                io::ErrorKind::InvalidInput,
+                "the canonical display scene has the wrong geometry",
+            ));
+        }
+        let width = self.width as usize;
+        for y in 0..self.height as usize {
+            for x in 0..width {
+                let index = y * width + x;
+                let gray = match scene.pixels {
+                    ScenePixels::Gray(pixels) => scene.mode.grayscale(pixels[index].value()),
+                    ScenePixels::Rgb(pixels) => scene.mode.pixel(pixels[index]),
+                };
+                let gray = software_gray(gray, x, y);
+                let offset = y * self.stride + x * self.bytes_per_pixel;
+                // SAFETY: Coordinates remain within the owned visible mapping.
+                // The preceding accepted scanout is settled; the event loop
+                // owns the mapping and no slice aliases these bounded writes.
+                unsafe {
+                    if self.bytes_per_pixel == 1 {
+                        *self.map.add(offset) = encode_native_gray(gray, self.inverted_gray8.get());
+                    } else {
+                        std::ptr::copy_nonoverlapping(
+                            [gray, gray, gray, 0xff].as_ptr(),
+                            self.map.add(offset),
+                            4,
+                        );
+                    }
+                }
+            }
+        }
+        self.canonical_rewrite_count
+            .set(self.canonical_rewrite_count.get().wrapping_add(1));
+        self.mapped_software_dithered.set(true);
+        Ok(())
+    }
+
+    #[cfg(test)]
     fn submit_update_checked_with(
         &self,
+        send: impl FnMut(UpdateVariant, u32) -> io::Result<()>,
+    ) -> io::Result<SubmittedUpdate<'_>> {
+        self.submit_update_checked_with_policy(self.raw_scene(), send)
+    }
+
+    fn submit_update_checked_with_policy(
+        &self,
+        stop_on_uncertain: bool,
         mut send: impl FnMut(UpdateVariant, u32) -> io::Result<()>,
     ) -> io::Result<SubmittedUpdate<'_>> {
-        let marker = self.update_markers.submit_checked(|marker| {
-            submit_update(&self.update_variant, |variant| send(variant, marker))
-        })?;
+        self.require_known_dithering_delivery()?;
+        let mut attempted = false;
+        let submission = self.update_markers.submit_checked(|marker| {
+            submit_update_with_policy(&self.update_variant, stop_on_uncertain, |variant| {
+                attempted = true;
+                send(variant, marker)
+            })
+        });
+        let marker = match submission {
+            Ok(marker) => marker,
+            Err(error) => {
+                if stop_on_uncertain
+                    && attempted
+                    && !explicit_update_rejection(error.raw_os_error())
+                {
+                    self.block_uncertain_dithering_delivery(&error);
+                }
+                return Err(error);
+            }
+        };
         Ok(SubmittedUpdate {
             framebuffer: self,
             marker,
@@ -497,12 +886,13 @@ impl Framebuffer {
         waveform: u32,
         mode: u32,
         marker: u32,
+        y4: bool,
     ) -> bool {
         match variant {
             UpdateVariant::Legacy => self.send_update_legacy(region, waveform, mode, marker),
             UpdateVariant::Rex => self.send_update_rex(region, waveform, mode, marker),
             UpdateVariant::Zelda => self.send_update_zelda(region, waveform, mode, marker),
-            UpdateVariant::Mtk => self.send_update_mtk(region, waveform, mode, marker),
+            UpdateVariant::Mtk => self.send_update_mtk(region, waveform, mode, marker, y4),
             UpdateVariant::Unsupported => false,
         }
     }
@@ -560,20 +950,15 @@ impl Framebuffer {
 
     /// Issue `MXCFB_SEND_UPDATE_MTK` (96-byte struct, MediaTek devices).
     /// Returns whether the ioctl succeeded.
-    fn send_update_mtk(&self, region: UpdateRect, waveform: u32, mode: u32, marker: u32) -> bool {
-        let update = UpdateRequestMtk {
-            update_region: region,
-            waveform_mode: waveform,
-            update_mode: mode,
-            update_marker: marker,
-            temperature: TEMP_USE_AMBIENT,
-            flags: if waveform == WAVEFORM_MODE_DU {
-                EPDC_FLAG_FORCE_MONOCHROME
-            } else {
-                0
-            },
-            ..Default::default()
-        };
+    fn send_update_mtk(
+        &self,
+        region: UpdateRect,
+        waveform: u32,
+        mode: u32,
+        marker: u32,
+        y4: bool,
+    ) -> bool {
+        let update = mtk_update(region, waveform, mode, marker, y4);
         self.send_update_ioctl(MXCFB_SEND_UPDATE_MTK, &update)
     }
 
@@ -598,14 +983,27 @@ impl Framebuffer {
 
     /// Apply a request resolved against the current framebuffer bounds.
     pub(crate) fn refresh_planned(&self, refresh: ResolvedRefresh) -> io::Result<()> {
-        if refresh.waveform == RefreshWaveform::Auto && !refresh.flashing {
-            return self.refresh_region(
-                slint::PhysicalPosition::new(refresh.region.x, refresh.region.y),
-                slint::PhysicalSize::new(refresh.region.width, refresh.region.height),
-            );
-        }
+        self.refresh_planned_inner(refresh, None).map(|_| ())
+    }
+
+    pub(crate) fn refresh_planned_scene(
+        &self,
+        refresh: ResolvedRefresh,
+        pixels: ScenePixels<'_>,
+        mode: GrayMode,
+    ) -> io::Result<()> {
+        self.refresh_planned_inner(refresh, Some(FallbackScene { pixels, mode }))
+            .map(|_| ())
+    }
+
+    fn refresh_planned_inner(
+        &self,
+        refresh: ResolvedRefresh,
+        scene: Option<FallbackScene<'_>>,
+    ) -> io::Result<SubmittedUpdate<'_>> {
+        let refresh = self.resolve_dithering(refresh);
         let waveform = waveform_for_driver(refresh.waveform, self.update_variant.get());
-        self.send_update(
+        self.send_update_scene(
             UpdateRect {
                 top: refresh.region.y as u32,
                 left: refresh.region.x as u32,
@@ -618,6 +1016,7 @@ impl Framebuffer {
             } else {
                 UPDATE_MODE_PARTIAL
             },
+            scene,
         )
     }
 
@@ -637,25 +1036,28 @@ impl Framebuffer {
 
     /// Submit a full frame and retain its independent accepted marker.
     pub(crate) fn refresh_full_checked(&self) -> io::Result<SubmittedUpdate<'_>> {
+        self.refresh_full_inner(None)
+    }
+
+    pub(crate) fn refresh_full_scene_checked(
+        &self,
+        pixels: ScenePixels<'_>,
+        mode: GrayMode,
+    ) -> io::Result<SubmittedUpdate<'_>> {
+        self.refresh_full_inner(Some(FallbackScene { pixels, mode }))
+    }
+
+    fn refresh_full_inner(
+        &self,
+        scene: Option<FallbackScene<'_>>,
+    ) -> io::Result<SubmittedUpdate<'_>> {
         let region = UpdateRect {
             top: 0,
             left: 0,
             width: self.width,
             height: self.height,
         };
-        self.submit_update_checked_with(|variant, marker| {
-            if self.send_update_variant(
-                variant,
-                region,
-                WAVEFORM_MODE_GC16,
-                UPDATE_MODE_FULL,
-                marker,
-            ) {
-                Ok(())
-            } else {
-                Err(io::Error::last_os_error())
-            }
-        })
+        self.send_update_scene(region, WAVEFORM_MODE_GC16, UPDATE_MODE_FULL, scene)
     }
 
     /// Observe the accepted SEND identity without issuing an ioctl or a wait.
@@ -663,31 +1065,39 @@ impl Framebuffer {
         self.update_markers.last_submitted()
     }
 
-    /// Ask the driver to wait for the last successfully submitted update.
-    ///
-    /// Used before suspending to RAM so the panel doesn't latch mid-refresh.
-    /// Best-effort: a failing ioctl is ignored, since this is purely defensive.
-    pub(crate) fn wait_for_update_complete(&self) {
-        let _ = self.wait_for_update_complete_checked();
+    /// Keep legacy best-effort handoff for ordinary scenes. Raw scene ownership
+    /// cannot advance past a failed completion barrier or an uncertain SEND.
+    pub(crate) fn wait_for_native_handoff(&self) -> io::Result<()> {
+        self.require_known_dithering_delivery()?;
+        let strict = self.raw_scene()
+            || self
+                .last_accepted_dithering
+                .get()
+                .is_some_and(|accepted| accepted.raw_scene);
+        let result = self.wait_for_update_complete_checked();
+        if strict { result } else { Ok(()) }
     }
 
     /// Settle preceding asynchronous reads before changing mapped pixels.
     /// No accepted update means there is no preceding scanout to settle.
     pub(crate) fn wait_for_pending_update_complete_checked(&self) -> io::Result<()> {
-        self.update_markers
-            .wait_for_last_submitted(|target| self.wait_for_marker_ioctl(target))
+        self.require_known_dithering_delivery()?;
+        let Some(marker) = self.update_markers.last_submitted() else {
+            return Ok(());
+        };
+        self.wait_for_accepted_with(marker, |target| self.wait_for_marker_ioctl(target))
     }
 
     /// Use the accepted update's identity, without waiting on a rejected frame.
     /// Some vendor kernels return success even when their internal wait times
     /// out; this acknowledges the ioctl, not independent panel completion.
     pub(crate) fn wait_for_update_complete_checked(&self) -> io::Result<()> {
+        self.require_known_dithering_delivery()?;
         let marker = self
             .update_markers
             .last_submitted()
             .ok_or_else(|| io::Error::other("no EPDC update was successfully submitted"))?;
-        self.update_markers
-            .wait_for_submitted(marker, |target| self.wait_for_marker_ioctl(target))
+        self.wait_for_accepted_with(marker, |target| self.wait_for_marker_ioctl(target))
     }
 
     /// Completion belongs to this receipt, never to a later frame or counter.
@@ -705,14 +1115,41 @@ impl Framebuffer {
         submission: &SubmittedUpdate<'_>,
         wait: impl FnMut(u32) -> io::Result<()>,
     ) -> io::Result<()> {
+        self.require_known_dithering_delivery()?;
         if !std::ptr::eq(self, submission.framebuffer) {
             return Err(io::Error::new(
                 io::ErrorKind::InvalidInput,
                 "the update receipt belongs to a different framebuffer owner",
             ));
         }
-        self.update_markers
-            .wait_for_submitted(submission.marker, wait)
+        self.wait_for_accepted_with(submission.marker, wait)
+    }
+
+    fn wait_for_accepted_with(
+        &self,
+        marker: u32,
+        mut wait: impl FnMut(u32) -> io::Result<()>,
+    ) -> io::Result<()> {
+        self.require_known_dithering_delivery()?;
+        let strict = self.raw_scene()
+            || self
+                .last_accepted_dithering
+                .get()
+                .is_some_and(|accepted| accepted.marker == marker && accepted.raw_scene);
+        let mut attempted = false;
+        let result = self.update_markers.wait_for_submitted(marker, |target| {
+            attempted = true;
+            wait(target)
+        });
+        // A foreign, superseded or absent receipt is a local input error, not
+        // evidence of an uncertain kernel outcome. Only actual failed waits latch.
+        if strict
+            && attempted
+            && let Err(error) = &result
+        {
+            self.block_uncertain_dithering_delivery(error);
+        }
+        result
     }
 
     fn wait_for_marker_ioctl(&self, target: u32) -> io::Result<()> {
@@ -757,8 +1194,17 @@ impl Framebuffer {
     }
 }
 
+#[cfg(test)]
 fn submit_update(
     selected: &Cell<Option<UpdateVariant>>,
+    send: impl FnMut(UpdateVariant) -> io::Result<()>,
+) -> io::Result<()> {
+    submit_update_with_policy(selected, false, send)
+}
+
+fn submit_update_with_policy(
+    selected: &Cell<Option<UpdateVariant>>,
+    stop_on_uncertain: bool,
     mut send: impl FnMut(UpdateVariant) -> io::Result<()>,
 ) -> io::Result<()> {
     match selected.get() {
@@ -775,10 +1221,18 @@ fn submit_update(
                         selected.set(Some(variant));
                         return Ok(());
                     }
-                    Err(error) => last_error = Some(error),
+                    Err(error) => {
+                        if stop_on_uncertain && !explicit_update_rejection(error.raw_os_error()) {
+                            return Err(error);
+                        }
+                        last_error = Some(error);
+                    }
                 }
             }
             selected.set(Some(UpdateVariant::Unsupported));
+            if stop_on_uncertain {
+                return Err(last_error.unwrap_or_else(|| io::Error::other("empty update probe")));
+            }
             Err(io::Error::new(
                 io::ErrorKind::Unsupported,
                 format!(
@@ -788,6 +1242,69 @@ fn submit_update(
             ))
         }
     }
+}
+
+fn aligned_dither_region(region: UpdateRect, width: u32, height: u32) -> UpdateRect {
+    if region.width == 0 || region.height == 0 {
+        return region;
+    }
+    let left = region.left.min(width);
+    let top = region.top.min(height);
+    if left == width || top == height {
+        return UpdateRect {
+            left,
+            top,
+            width: 0,
+            height: 0,
+        };
+    }
+    let right = (u64::from(region.left) + u64::from(region.width)).min(u64::from(width));
+    let bottom = (u64::from(region.top) + u64::from(region.height)).min(u64::from(height));
+    let left = left / 8 * 8;
+    let top = top / 8 * 8;
+    let right = right.div_ceil(8).saturating_mul(8).min(u64::from(width)) as u32;
+    let bottom = bottom.div_ceil(8).saturating_mul(8).min(u64::from(height)) as u32;
+    UpdateRect {
+        left,
+        top,
+        width: right - left,
+        height: bottom - top,
+    }
+}
+
+fn mtk_update(
+    region: UpdateRect,
+    waveform: u32,
+    mode: u32,
+    marker: u32,
+    y4: bool,
+) -> UpdateRequestMtk {
+    let y4 = y4 && waveform == WAVEFORM_MODE_GC16;
+    UpdateRequestMtk {
+        update_region: region,
+        waveform_mode: waveform,
+        update_mode: mode,
+        update_marker: marker,
+        temperature: TEMP_USE_AMBIENT,
+        flags: if y4 {
+            MTK_EPDC_FLAG_USE_DITHERING_Y4
+        } else if waveform == WAVEFORM_MODE_DU {
+            EPDC_FLAG_FORCE_MONOCHROME
+        } else {
+            0
+        },
+        // MTK chooses Y8-to-Y4 processing through flags. These EPDCv2 fields
+        // remain zero; quant_bit=7 is an i.MX convention, not this MTK ABI.
+        dither_mode: 0,
+        quant_bit: 0,
+        hist_bw_waveform_mode: if y4 { WAVEFORM_MODE_DU } else { 0 },
+        hist_gray_waveform_mode: if y4 { WAVEFORM_MODE_GC16 } else { 0 },
+        ..Default::default()
+    }
+}
+
+fn explicit_update_rejection(errno: Option<i32>) -> bool {
+    matches!(errno, Some(libc::EINVAL | libc::ENOTTY))
 }
 
 impl Drop for Framebuffer {

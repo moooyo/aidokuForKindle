@@ -1,0 +1,40 @@
+import { State, Commands } from "state.slint";
+import { Theme } from "theme.slint";
+import { Strings } from "strings.slint";
+import { BodyText, Caption, GroupLabel } from "widgets.slint";
+import { SettingsChoice } from "settings-controls.slint";
+
+export component DitherSelector inherits Rectangle {
+    in property <bool> reader: false;
+    property <bool> software-fallback: State.dither && State.dither-method == "hardware" && !State.hardware-dither-available;
+    property <bool> status-visible: root.software-fallback || State.dither-pending;
+    property <length> title-height: root.reader ? (State.large-screen ? 24px : 21px) : (State.large-screen ? 21px : 18px);
+    property <length> choices-y: root.title-height + 8px;
+    property <length> choice-height: State.large-screen ? 50px : 44px;
+    property <length> status-height: root.status-visible ? (State.large-screen ? 32px : 28px) : 0px;
+    x: 0px;
+    y: 0px;
+    height: root.choices-y + root.choice-height + root.status-height;
+    if root.reader: BodyText {
+        x: 0px; y: 0px; width: parent.width; height: root.title-height;
+        text: Strings.dither; font-size: State.large-screen ? 17px : 15px;
+    }
+    if !root.reader: GroupLabel {
+        x: 0px; y: 0px; width: parent.width; height: root.title-height;
+        text: Strings.dither; font-size: State.large-screen ? 14px : 12px;
+    }
+    for mode[index] in ["software", "hardware", "off"]: SettingsChoice {
+        x: index * (parent.width + 8px) / 3; y: root.choices-y;
+        width: (parent.width - 16px) / 3; height: root.choice-height;
+        text: mode == "software" ? Strings.dither-software : mode == "hardware" ? Strings.dither-hardware : Strings.off;
+        selected: mode == "off" ? !State.dither : State.dither && State.dither-method == mode;
+        accessible-label: Strings.dither + " " + self.text;
+        clicked => { if !self.selected { Commands.action("settings", "set", "dither-mode=" + mode); } }
+    }
+    if root.status-visible: Caption {
+        x: 0px; y: root.choices-y + root.choice-height + 8px;
+        width: parent.width; height: State.large-screen ? 24px : 20px;
+        text: root.software-fallback ? Strings.dither-software-fallback : Strings.dither-pending;
+        font-size: State.large-screen ? 15px : 13px;
+    }
+}

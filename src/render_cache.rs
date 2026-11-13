@@ -666,6 +666,7 @@ pub fn load_alias(
         || key.height != options.height
         || key.crop_borders != options.crop_borders
         || key.dither != options.dither
+        || key.hardware_dither != options.hardware_dither
         || key.contrast != options.contrast
         || key.vertical
         || key.offset != 0
@@ -981,6 +982,7 @@ fn render_for_purpose(
         height: options.height,
         crop_borders: options.crop_borders,
         dither: options.dither,
+        hardware_dither: options.hardware_dither,
         contrast: options.contrast,
         vertical,
         offset,
@@ -1693,6 +1695,7 @@ mod tests {
                 height: options.height,
                 crop_borders: options.crop_borders,
                 dither: options.dither,
+                hardware_dither: options.hardware_dither,
                 contrast: options.contrast,
                 vertical,
                 offset,
@@ -1713,6 +1716,7 @@ mod tests {
             height: 144,
             crop_borders: false,
             dither: false,
+            hardware_dither: false,
             contrast: 0,
         }
     }
@@ -1725,6 +1729,151 @@ mod tests {
                 ((x * 7 + y * 13) % 247) as u8
             }])
         })
+    }
+
+    #[test]
+    fn hardware_gray8_and_software_artifacts_have_independent_memory_and_disk_hits() {
+        let source = GrayImage::from_fn(256, 4, |x, _| Luma([x as u8]));
+        let fixture = Fixture::new(source.clone());
+        let mut variants = Vec::new();
+        for (dither, hardware_dither) in [(false, false), (true, false), (true, true)] {
+            let settings = ImageOptions {
+                width: 256,
+                height: 4,
+                dither,
+                hardware_dither,
+                ..options()
+            };
+            let cold = render(
+                &fixture.cache,
+                &fixture.page,
+                &fixture.raw,
+                &settings,
+                false,
+                0,
+                1.0,
+            )
+            .unwrap();
+            assert!(!cold.cache_hit && !cold.memory_hit);
+            assert!(
+                variants
+                    .iter()
+                    .all(|(_, previous): &(ImageOptions, RenderedPage)| {
+                        previous.cache_path != cold.cache_path
+                    })
+            );
+            if hardware_dither {
+                assert_eq!(*cold.image, source);
+            } else {
+                assert!(cold.image.pixels().all(|pixel| pixel[0] % 17 == 0));
+            }
+            let resident = render_with_source(
+                &fixture.cache,
+                &fixture.page,
+                &fixture.raw,
+                &settings,
+                false,
+                0,
+                1.0,
+                |_| panic!("A resident rendering mode must not reread its source"),
+            )
+            .unwrap();
+            assert!(resident.memory_hit);
+            assert!(Arc::ptr_eq(&resident.image, &cold.image));
+            variants.push((settings, cold));
+        }
+        clear_memory(&fixture.cache);
+        for (settings, cold) in variants {
+            let restored = render_with_source(
+                &fixture.cache,
+                &fixture.page,
+                &fixture.raw,
+                &settings,
+                false,
+                0,
+                1.0,
+                |_| panic!("A stored rendering mode must not reread its source"),
+            )
+            .unwrap();
+            assert!(restored.cache_hit && !restored.memory_hit);
+            assert_eq!(restored.image, cold.image);
+            assert_eq!(restored.cache_path, cold.cache_path);
+        }
+    }
+
+    #[test]
+    fn retained_hardware_viewports_keep_their_mode_while_sharing_unprocessed_sources() {
+        let fixture = Fixture::new(GrayImage::from_fn(256, 512, |x, _| Luma([x as u8])));
+        let hardware = ImageOptions {
+            width: 256,
+            height: 4,
+            dither: true,
+            hardware_dither: true,
+            ..options()
+        };
+        let cancellation = imaging::DecodeCancellation::new();
+        let prepared = prefetch_next_raster_cancellable(
+            &fixture.cache,
+            &fixture.page,
+            &fixture.raw,
+            &hardware,
+            true,
+            85,
+            1.0,
+            &cancellation,
+        )
+        .unwrap();
+        assert_eq!(
+            *prepared.image,
+            GrayImage::from_fn(256, 4, |x, _| Luma([x as u8]))
+        );
+        let retained = prepared.retained_raster.as_ref().unwrap();
+        retained.promote(&fixture.cache).unwrap();
+        let source_key = SourceKey {
+            namespace: fixture.cache.namespace().to_path_buf(),
+            checksum: fixture.cache.fingerprint(&fixture.raw).unwrap(),
+            encoded_bytes: fs::metadata(&fixture.raw).unwrap().len(),
+        };
+        let original_source =
+            decoded(|state| state.sources.get(&source_key).unwrap().source.clone());
+        let software = ImageOptions {
+            hardware_dither: false,
+            ..hardware.clone()
+        };
+        let quantized = render_raster(
+            &fixture.cache,
+            &fixture.page,
+            &fixture.raw,
+            &software,
+            true,
+            85,
+            1.0,
+        )
+        .unwrap();
+        assert!(!quantized.cache_hit);
+        assert!(quantized.image.pixels().all(|pixel| pixel[0] % 17 == 0));
+        assert!(!Arc::ptr_eq(&quantized.image, &prepared.image));
+        let reused_source = decoded(|state| state.sources.get(&source_key).unwrap().source.clone());
+        assert!(original_source.same_allocation(&reused_source));
+        retained.promote(&fixture.cache).unwrap();
+        for (settings, expected) in [(&hardware, &prepared), (&software, &quantized)] {
+            let resident = render_for_purpose(
+                &fixture.cache,
+                &fixture.page,
+                &fixture.raw,
+                settings,
+                true,
+                85,
+                1.0,
+                RenderPurpose::Foreground,
+                RenderMode::ReaderRaster,
+                |_| panic!("A promoted viewport must retain its original processing mode"),
+            )
+            .unwrap();
+            assert!(resident.memory_hit);
+            assert!(Arc::ptr_eq(&resident.image, &expected.image));
+        }
+        assert_eq!(fixture.cache.stats().commits, 0);
     }
 
     #[test]
@@ -2157,6 +2306,7 @@ mod tests {
                 height: case.target_height,
                 crop_borders: case.crop_borders,
                 dither: case.dither,
+                hardware_dither: false,
                 contrast: case.contrast,
                 vertical: false,
                 offset: 0,
@@ -2445,6 +2595,7 @@ mod tests {
             height: 1_696,
             crop_borders: false,
             dither: true,
+            hardware_dither: false,
             contrast: 0,
         };
         let before = stats();
@@ -2730,6 +2881,7 @@ mod tests {
                 height: image.height(),
                 crop_borders: false,
                 dither: false,
+                hardware_dither: false,
                 contrast: 0,
                 vertical: false,
                 offset: 0,
@@ -3098,6 +3250,9 @@ mod tests {
         changed.dither = !changed.dither;
         variants.push(changed);
         let mut changed = baseline.clone();
+        changed.hardware_dither = true;
+        variants.push(changed);
+        let mut changed = baseline.clone();
         changed.contrast += 1;
         variants.push(changed);
         for variant in variants {
@@ -3354,6 +3509,9 @@ mod tests {
         changed.dither = true;
         variants.push((changed, false, 0, 1.0));
         let mut changed = baseline.clone();
+        changed.hardware_dither = true;
+        variants.push((changed, false, 0, 1.0));
+        let mut changed = baseline.clone();
         changed.contrast = 20;
         variants.push((changed, false, 0, 1.0));
         variants.push((baseline.clone(), false, 0, 2.0));
@@ -3608,6 +3766,7 @@ mod tests {
             height: 512,
             crop_borders: true,
             dither: true,
+            hardware_dither: false,
             contrast: 0,
         };
         let first = render(

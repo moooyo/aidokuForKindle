@@ -65,6 +65,29 @@ struct Event {
     marker: Option<u32>,
     #[serde(skip_serializing_if = "Option::is_none")]
     full: Option<bool>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    replaces_frame_sequence: Option<u64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    hardware_y4_available: Option<bool>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    hardware_y4_requested: Option<bool>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    hardware_y4_applied: Option<bool>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    software_dither_fallback: Option<bool>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    dithering_delivery_uncertain: Option<bool>,
+}
+
+/// A checked native payload observation, never inferred from target preferences.
+#[derive(Clone, Copy)]
+pub(crate) struct NativeDitheringObservation {
+    pub replaces_frame_sequence: Option<u64>,
+    pub hardware_y4_available: bool,
+    pub hardware_y4_requested: bool,
+    pub hardware_y4_applied: bool,
+    pub software_dither_fallback: bool,
+    pub dithering_delivery_uncertain: bool,
 }
 
 impl Event {
@@ -85,6 +108,12 @@ impl Event {
             frame_sequence: None,
             marker: None,
             full: None,
+            replaces_frame_sequence: None,
+            hardware_y4_available: None,
+            hardware_y4_requested: None,
+            hardware_y4_applied: None,
+            software_dither_fallback: None,
+            dithering_delivery_uncertain: None,
         }
     }
 }
@@ -266,14 +295,52 @@ impl TraceState {
         marker: Option<u32>,
         at_us: u64,
     ) {
+        self.native_observed(
+            token_id,
+            frame_sequence,
+            duration_us,
+            full,
+            marker,
+            None,
+            at_us,
+        );
+    }
+
+    fn native_observed(
+        &mut self,
+        token_id: u64,
+        frame_sequence: u64,
+        duration_us: u64,
+        full: bool,
+        marker: Option<u32>,
+        dithering: Option<NativeDitheringObservation>,
+        at_us: u64,
+    ) {
         let Some((token, written_sequence)) = self.native_pending else {
             return;
         };
         if token.request_id != token_id || self.current != Some(token) {
             return;
         }
-        if marker.is_some() && written_sequence != Some(frame_sequence) {
-            return;
+        if marker.is_some() {
+            let valid_sequence =
+                match dithering.and_then(|observed| observed.replaces_frame_sequence) {
+                    Some(replaced) => {
+                        written_sequence == Some(replaced)
+                            && frame_sequence != replaced
+                            && full
+                            && dithering.is_some_and(|observed| {
+                                observed.software_dither_fallback
+                                    && observed.hardware_y4_requested
+                                    && !observed.hardware_y4_applied
+                                    && !observed.dithering_delivery_uncertain
+                            })
+                    }
+                    None => written_sequence == Some(frame_sequence),
+                };
+            if !valid_sequence {
+                return;
+            }
         }
         if marker.is_none() && written_sequence.is_some() {
             return;
@@ -290,6 +357,16 @@ impl TraceState {
         event.frame_sequence = Some(frame_sequence);
         event.marker = marker;
         event.full = Some(full);
+        if marker.is_some()
+            && let Some(dithering) = dithering
+        {
+            event.replaces_frame_sequence = dithering.replaces_frame_sequence;
+            event.hardware_y4_available = Some(dithering.hardware_y4_available);
+            event.hardware_y4_requested = Some(dithering.hardware_y4_requested);
+            event.hardware_y4_applied = Some(dithering.hardware_y4_applied);
+            event.software_dither_fallback = Some(dithering.software_dither_fallback);
+            event.dithering_delivery_uncertain = Some(dithering.dithering_delivery_uncertain);
+        }
         event.boundary = Some(if marker.is_some() {
             "driver_submission_accepted"
         } else {
@@ -539,15 +616,24 @@ pub fn native_frame_written(token: u64, frame_sequence: u64, elapsed_us: u64, fu
     update(|state, at_us| state.native(token, frame_sequence, elapsed_us, full, None, at_us));
 }
 
-pub fn native_send_accepted(
+pub(crate) fn native_send_accepted(
     token: u64,
     frame_sequence: u64,
     marker: u32,
     elapsed_us: u64,
     full: bool,
+    dithering: NativeDitheringObservation,
 ) {
     update(|state, at_us| {
-        state.native(token, frame_sequence, elapsed_us, full, Some(marker), at_us)
+        state.native_observed(
+            token,
+            frame_sequence,
+            elapsed_us,
+            full,
+            Some(marker),
+            Some(dithering),
+            at_us,
+        )
     });
 }
 
@@ -702,6 +788,146 @@ mod tests {
                 .all(|event| event.name != "framebuffer_written")
         );
         assert!(state.token(1, 1).is_none());
+    }
+
+    #[test]
+    fn dithering_observation_is_bound_to_the_matching_accepted_marker() {
+        let mut state = TraceState::new(16);
+        let token = state.request(1, 1, 1);
+        assert!(state.accept(token, true, 2));
+        let dithering = NativeDitheringObservation {
+            replaces_frame_sequence: None,
+            hardware_y4_available: true,
+            hardware_y4_requested: true,
+            hardware_y4_applied: true,
+            software_dither_fallback: false,
+            dithering_delivery_uncertain: false,
+        };
+        state.native_observed(token.request_id, 7, 1, false, Some(99), Some(dithering), 3);
+        assert!(
+            state
+                .events
+                .iter()
+                .all(|event| event.hardware_y4_applied.is_none())
+        );
+        state.native(token.request_id, 8, 1, false, None, 4);
+        state.native_observed(token.request_id, 7, 1, false, Some(99), Some(dithering), 5);
+        assert!(
+            state
+                .events
+                .iter()
+                .all(|event| event.hardware_y4_applied.is_none())
+        );
+        state.native_observed(token.request_id, 8, 1, false, Some(100), Some(dithering), 6);
+        let accepted = state.events.last().unwrap();
+        assert_eq!(accepted.name, "send_accepted");
+        assert_eq!(accepted.marker, Some(100));
+        assert_eq!(accepted.hardware_y4_available, Some(true));
+        assert_eq!(accepted.hardware_y4_requested, Some(true));
+        assert_eq!(accepted.hardware_y4_applied, Some(true));
+        assert_eq!(accepted.software_dither_fallback, Some(false));
+        assert_eq!(accepted.dithering_delivery_uncertain, Some(false));
+        assert!(
+            state
+                .events
+                .iter()
+                .filter(|event| event.name != "send_accepted")
+                .all(|event| event.hardware_y4_applied.is_none())
+        );
+    }
+
+    #[test]
+    fn software_fallback_replaces_only_its_exact_written_frame_with_a_new_full_payload() {
+        let fallback = NativeDitheringObservation {
+            replaces_frame_sequence: Some(40),
+            hardware_y4_available: false,
+            hardware_y4_requested: true,
+            hardware_y4_applied: false,
+            software_dither_fallback: true,
+            dithering_delivery_uncertain: false,
+        };
+        let invalid = [
+            (
+                41,
+                true,
+                NativeDitheringObservation {
+                    replaces_frame_sequence: Some(39),
+                    ..fallback
+                },
+            ),
+            (
+                41,
+                true,
+                NativeDitheringObservation {
+                    replaces_frame_sequence: None,
+                    ..fallback
+                },
+            ),
+            (
+                41,
+                true,
+                NativeDitheringObservation {
+                    hardware_y4_requested: false,
+                    ..fallback
+                },
+            ),
+            (
+                41,
+                true,
+                NativeDitheringObservation {
+                    hardware_y4_applied: true,
+                    ..fallback
+                },
+            ),
+            (
+                41,
+                true,
+                NativeDitheringObservation {
+                    software_dither_fallback: false,
+                    ..fallback
+                },
+            ),
+            (
+                41,
+                true,
+                NativeDitheringObservation {
+                    dithering_delivery_uncertain: true,
+                    ..fallback
+                },
+            ),
+            (41, false, fallback),
+            (40, true, fallback),
+        ];
+        for (sequence, full, observation) in invalid {
+            let mut state = TraceState::new(16);
+            let token = state.request(1, 1, 1);
+            assert!(state.accept(token, true, 2));
+            state.native(token.request_id, 40, 1, false, None, 3);
+            state.native_observed(
+                token.request_id,
+                sequence,
+                1,
+                full,
+                Some(88),
+                Some(observation),
+                4,
+            );
+            assert!(
+                state
+                    .events
+                    .iter()
+                    .all(|event| event.name != "send_accepted")
+            );
+            state.native_observed(token.request_id, 41, 1, true, Some(89), Some(fallback), 5);
+            let accepted = state.events.last().unwrap();
+            assert_eq!(accepted.name, "send_accepted");
+            assert_eq!(accepted.frame_sequence, Some(41));
+            assert_eq!(accepted.replaces_frame_sequence, Some(40));
+            assert_eq!(accepted.marker, Some(89));
+            assert_eq!(accepted.hardware_y4_applied, Some(false));
+            assert_eq!(accepted.software_dither_fallback, Some(true));
+            assert!(state.native_pending.is_none());
+        }
     }
 
     #[test]

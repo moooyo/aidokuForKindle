@@ -203,6 +203,9 @@ pub(super) const WAVEFORM_MODE_DU: u32 = 1;
 pub(super) const WAVEFORM_MODE_A2_LEGACY: u32 = 4;
 pub(super) const WAVEFORM_MODE_A2_MODERN: u32 = 6;
 pub(super) const EPDC_FLAG_FORCE_MONOCHROME: u32 = 2;
+// FBInk ded92fa510c957e0157c92ae83bd5c51af710c05 eink/mtk-kindle.h:
+// MTK MDP Y8-to-Y4 processing; 0x8000 is the distinct REGAL flag.
+pub(super) const MTK_EPDC_FLAG_USE_DITHERING_Y4: u32 = 0x4000;
 pub(super) const WAVEFORM_MODE_AUTO: u32 = 257; // Let the driver pick the best waveform
 pub(super) const UPDATE_MODE_PARTIAL: u32 = 0; // Only redraw the dirty region
 pub(super) const UPDATE_MODE_FULL: u32 = 1; // Flash the whole screen (clears ghosting)

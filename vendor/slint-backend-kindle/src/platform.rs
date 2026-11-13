@@ -14,6 +14,7 @@ use slint::platform::software_renderer::{
 use slint::platform::{Clipboard, EventLoopProxy, Platform, PlatformError, WindowAdapter};
 
 use crate::clipboard::{ClipboardKind, ClipboardStore};
+use crate::dithering::DitheringHandle;
 use crate::frame_observer::{FrameObserverState, NativeFrameUnavailable, reader_output_eligible};
 use crate::framebuffer::Framebuffer;
 use crate::gray_target::RetainedScene;
@@ -55,6 +56,36 @@ impl Drop for ScanoutRotation<'_> {
     }
 }
 
+/// A matching image may need a full write when its dithering policy changes.
+/// Native presentation barriers remain separate from that image processing.
+#[derive(Clone, Copy)]
+struct RepaintReason {
+    presentation: bool,
+    dithering: bool,
+    sleep: bool,
+}
+
+impl RepaintReason {
+    fn force_full(self) -> bool {
+        self.presentation || self.dithering || self.sleep
+    }
+
+    fn reader_sample_eligible(
+        self,
+        sequence: u64,
+        resume_pending: bool,
+        rotation_changed: bool,
+        output_mode_changed: bool,
+    ) -> bool {
+        !self.sleep
+            && reader_output_eligible(
+                sequence,
+                resume_pending,
+                self.presentation || rotation_changed || output_mode_changed,
+            )
+    }
+}
+
 pub(crate) struct KindlePlatform {
     pub(crate) window: Rc<MinimalSoftwareWindow>,
     start: Instant,
@@ -69,6 +100,7 @@ pub(crate) struct KindlePlatform {
     lifecycle: Arc<LifecycleState>,
     black_and_white: Arc<AtomicBool>,
     dark_mode: Arc<AtomicBool>,
+    dithering: DitheringHandle,
     rotation: Arc<AtomicU32>,
     refresh_pending: Arc<Mutex<PendingRefresh>>,
     clipboard: RefCell<ClipboardStore>,
@@ -214,6 +246,7 @@ impl KindlePlatform {
     ) -> std::io::Result<Self> {
         let window = MinimalSoftwareWindow::new(RepaintBufferType::ReusedBuffer);
         let wakeup = wakeup::make_wakeup()?;
+        let dithering = DitheringHandle::native(wakeup.write.clone());
         Ok(Self {
             window,
             start: Instant::now(),
@@ -228,6 +261,7 @@ impl KindlePlatform {
             lifecycle: Arc::new(LifecycleState::default()),
             black_and_white,
             dark_mode: Arc::new(AtomicBool::new(false)),
+            dithering,
             rotation,
             refresh_pending: Arc::new(Mutex::new(PendingRefresh::default())),
             clipboard: RefCell::new(ClipboardStore::default()),
@@ -249,6 +283,10 @@ impl KindlePlatform {
             wake: self.wakeup.write.clone(),
             quit: self.quit_flag.clone(),
         }
+    }
+
+    pub(crate) fn dithering_handle(&self) -> DitheringHandle {
+        self.dithering.clone()
     }
 
     pub(crate) fn lifecycle_handle(&self) -> LifecycleHandle {
@@ -360,7 +398,11 @@ impl KindlePlatform {
                     "release native touch for stock screensaver: {error}"
                 ))
             })?;
-            framebuffer.wait_for_update_complete();
+            framebuffer.wait_for_native_handoff().map_err(|error| {
+                PlatformError::Other(format!(
+                    "failed to settle raw display before native handoff: {error}"
+                ))
+            })?;
             self.lifecycle.input_released.store(true, Ordering::Release);
             self.lifecycle.applied_paused.store(true, Ordering::Release);
             self.lifecycle.pause_count.fetch_add(1, Ordering::AcqRel);
@@ -436,7 +478,11 @@ impl KindlePlatform {
             return Ok(false);
         }
 
-        frame_buffer.wait_for_update_complete();
+        frame_buffer.wait_for_native_handoff().map_err(|error| {
+            PlatformError::Other(format!(
+                "failed to settle raw display before suspend: {error}"
+            ))
+        })?;
         self.begin_input_boundary(touch, epoch)?;
         portrait.set_paused(true);
 
@@ -579,6 +625,7 @@ impl Platform for KindlePlatform {
             frame_buffer.supports_gray8_target(),
         );
         let mut gray_renderer = GrayRenderer::new(width, initial_mode);
+        let mut applied_dithering = self.dithering.revision();
         // The old launch query remains only for callers without an authenticated
         // native calibration. A calibrated startup or resume never probes LIPC
         // from the rendering path while the native WM is paused.
@@ -625,6 +672,7 @@ impl Platform for KindlePlatform {
                 && !portrait.is_blocked()
                 && !input_epoch.is_blocked()
                 && sleep_token.is_none()
+                && self.dithering.revision() == applied_dithering
                 && self.suspend_if_idle(
                     &frame_buffer,
                     &mut touch_input,
@@ -837,6 +885,17 @@ impl Platform for KindlePlatform {
             }
 
             let output_mode = self.output_mode();
+            frame_buffer
+                .require_known_dithering_delivery()
+                .map_err(|error| {
+                    PlatformError::Other(format!(
+                        "display delivery is uncertain; native rendering stopped: {error}"
+                    ))
+                })?;
+            let processing_changed =
+                frame_buffer.set_dithering(self.dithering.clone(), output_mode.black_and_white);
+            let dithering_revision = self.dithering.revision();
+            let dithering_changed = dithering_revision != applied_dithering || processing_changed;
             if output_mode != gray_renderer.mode() {
                 self.window.request_redraw();
             }
@@ -852,25 +911,32 @@ impl Platform for KindlePlatform {
                 .lock()
                 .expect("refresh queue poisoned")
                 .take();
-            let force_full = self
-                .lifecycle
-                .full_repaint_requested
-                .swap(false, Ordering::AcqRel)
-                || input_epoch.is_blocked()
-                || sleep_token.is_some();
+            let repaint = RepaintReason {
+                presentation: self
+                    .lifecycle
+                    .full_repaint_requested
+                    .swap(false, Ordering::AcqRel)
+                    || input_epoch.is_blocked(),
+                dithering: dithering_changed,
+                sleep: sleep_token.is_some(),
+            };
+            let force_full = repaint.force_full();
             if !pending.is_empty() || force_full {
                 self.window.request_redraw();
             }
             // An earlier accepted update may still scan this same mapping.
             // Sleep presentation must settle it before changing mapped bytes.
-            if sleep_token.is_some() {
-                frame_buffer
-                    .wait_for_pending_update_complete_checked()
-                    .map_err(|error| {
-                        PlatformError::Other(format!(
-                            "failed to settle preceding display update: {error}"
-                        ))
-                    })?;
+            if sleep_token.is_some() || dithering_changed {
+                let settled = if dithering_changed {
+                    frame_buffer.settle_dithering_transition()
+                } else {
+                    frame_buffer.wait_for_pending_update_complete_checked()
+                };
+                settled.map_err(|error| {
+                    PlatformError::Other(format!(
+                        "failed to settle preceding display update: {error}"
+                    ))
+                })?;
             }
             // An armed image belongs to this single output attempt. Snapshot
             // rendering and later menu/wake redraws cannot consume it again.
@@ -940,15 +1006,15 @@ impl Platform for KindlePlatform {
                     .wrapping_add(1)
             });
             if let Some(observed) = observed_frame.as_mut() {
+                observed.set_dithering_status(frame_buffer.current_dithering_status());
                 if let Some(region) = written.region {
                     let sequence = frame_sequence.expect("written output has a sequence");
-                    if sleep_token.is_none()
-                        && reader_output_eligible(
-                            sequence,
-                            self.lifecycle.resume_frame_pending.load(Ordering::Acquire),
-                            rotation_changed || written.mode_changed || force_full,
-                        )
-                    {
+                    if repaint.reader_sample_eligible(
+                        sequence,
+                        self.lifecycle.resume_frame_pending.load(Ordering::Acquire),
+                        rotation_changed,
+                        written.mode_changed,
+                    ) {
                         let full = region.x == 0
                             && region.y == 0
                             && region.width == panel_width
@@ -964,11 +1030,12 @@ impl Platform for KindlePlatform {
                 }
             }
             let submission_started = observed_frame.as_ref().map(|_| Instant::now());
+            let fallback_writes_before = frame_buffer.canonical_rewrite_count();
             let mut sleep_submission = None;
             let submission = if sleep_token.is_some() {
                 Some(
                     frame_buffer
-                        .refresh_full_checked()
+                        .refresh_full_scene_checked(scene.pixels(), output_mode)
                         .map(|receipt| {
                             sleep_submission = Some(receipt);
                         })
@@ -979,9 +1046,16 @@ impl Platform for KindlePlatform {
                         }),
                 )
             } else if rotation_changed || written.mode_changed || force_full {
-                Some(frame_buffer.refresh_full().map_err(|error| {
-                    PlatformError::Other(format!("full framebuffer refresh was rejected: {error}"))
-                }))
+                Some(
+                    frame_buffer
+                        .refresh_full_scene_checked(scene.pixels(), output_mode)
+                        .map(|_| ())
+                        .map_err(|error| {
+                            PlatformError::Other(format!(
+                                "full framebuffer refresh was rejected: {error}"
+                            ))
+                        }),
+                )
             } else if let Some(refresh) = crate::refresh::resolve(
                 pending,
                 written.region,
@@ -989,14 +1063,29 @@ impl Platform for KindlePlatform {
                 panel_height,
                 render_rotation,
             ) {
-                Some(frame_buffer.refresh_planned(refresh).map_err(|error| {
-                    PlatformError::Other(format!("framebuffer refresh was rejected: {error}"))
-                }))
+                Some(
+                    frame_buffer
+                        .refresh_planned_scene(refresh, scene.pixels(), output_mode)
+                        .map_err(|error| {
+                            PlatformError::Other(format!(
+                                "framebuffer refresh was rejected: {error}"
+                            ))
+                        }),
+                )
             } else {
                 None
             };
             let submission_elapsed =
                 submission_started.map_or(Duration::ZERO, |start| start.elapsed());
+            let fallback_writes = frame_buffer
+                .canonical_rewrite_count()
+                .wrapping_sub(fallback_writes_before);
+            let rewritten_sequence = (fallback_writes != 0).then(|| {
+                self.lifecycle
+                    .frame_write_count
+                    .fetch_add(fallback_writes, Ordering::AcqRel)
+                    .wrapping_add(fallback_writes)
+            });
             if matches!(&submission, Some(Ok(()))) {
                 self.lifecycle
                     .frame_send_count
@@ -1005,15 +1094,37 @@ impl Platform for KindlePlatform {
             if let Some(observed) = observed_frame.as_mut() {
                 match &submission {
                     Some(Ok(())) => {
+                        if let Some(marker) = frame_buffer.last_submitted_marker() {
+                            if let Some(status) = frame_buffer.accepted_dithering(marker) {
+                                observed.set_dithering_status(status);
+                            }
+                            if frame_buffer.accepted_frame_was_rewritten(marker)
+                                && let Some(sequence) = rewritten_sequence
+                            {
+                                observed.rewritten(
+                                    sequence,
+                                    PhysicalRect {
+                                        x: 0,
+                                        y: 0,
+                                        width: panel_width,
+                                        height: panel_height,
+                                    },
+                                );
+                            }
+                        }
                         observed.accepted(frame_buffer.last_submitted_marker(), submission_elapsed)
                     }
-                    Some(Err(_)) => observed.unavailable(NativeFrameUnavailable::SendRejected),
+                    Some(Err(_)) => {
+                        observed.set_dithering_status(frame_buffer.current_dithering_status());
+                        observed.unavailable(NativeFrameUnavailable::SendRejected)
+                    }
                     None => observed.unavailable(NativeFrameUnavailable::NoWrite),
                 }
             }
             if let Some(submission) = submission {
                 submission?;
             }
+            applied_dithering = dithering_revision;
             drawn_rotation = applied_rotation;
             drawn_render_rotation = render_rotation;
             if let Some(token) = sleep_token {
@@ -1195,6 +1306,127 @@ fn set_orientation_pipe_nonblocking(descriptor: RawFd) -> io::Result<()> {
 fn retire_orientation_child(mut child: Child) {
     let _ = child.kill();
     let _ = child.wait();
+}
+
+#[cfg(test)]
+mod reader_repaint_tests {
+    use super::*;
+    use crate::framebuffer::FrameDitheringStatus;
+    use crate::{NativeFrameObservation, NativeFramePhase};
+
+    fn observed() -> (
+        Rc<FrameObserverState>,
+        Rc<RefCell<Vec<NativeFrameObservation>>>,
+    ) {
+        let state = Rc::new(FrameObserverState::default());
+        let events = Rc::new(RefCell::new(Vec::new()));
+        let recorded = events.clone();
+        state.set_observer(move |event| recorded.borrow_mut().push(event));
+        (state, events)
+    }
+
+    #[test]
+    fn an_armed_image_keeps_its_write_and_marker_when_dithering_requires_a_full_frame() {
+        for requested in [true, false] {
+            let (state, events) = observed();
+            let repaint = RepaintReason {
+                presentation: false,
+                dithering: true,
+                sleep: false,
+            };
+            assert!(repaint.force_full());
+            state.arm(12);
+            let mut attempt = state.begin().unwrap();
+            assert!(repaint.reader_sample_eligible(7, false, false, false));
+            attempt.set_dithering_status(FrameDitheringStatus {
+                hardware_y4_available: true,
+                hardware_y4_requested: requested,
+                ..FrameDitheringStatus::default()
+            });
+            attempt.written(
+                7,
+                PhysicalRect {
+                    x: 0,
+                    y: 0,
+                    width: 100,
+                    height: 200,
+                },
+                true,
+                Duration::from_micros(20),
+                Duration::from_micros(30),
+            );
+            attempt.set_dithering_status(FrameDitheringStatus {
+                hardware_y4_available: true,
+                hardware_y4_requested: requested,
+                hardware_y4_applied: requested,
+                ..FrameDitheringStatus::default()
+            });
+            attempt.accepted(Some(8), Duration::from_micros(40));
+            let events = events.borrow();
+            assert_eq!(events.len(), 2);
+            assert_eq!(events[0].phase, NativeFramePhase::FramebufferWritten);
+            assert!(!events[0].hardware_y4_applied);
+            assert_eq!(events[1].phase, NativeFramePhase::SendAccepted);
+            assert_eq!(events[1].marker, Some(8));
+            assert_eq!(events[1].hardware_y4_requested, requested);
+            assert_eq!(events[1].hardware_y4_applied, requested);
+            assert!(
+                events
+                    .iter()
+                    .all(|event| event.token == 12 && event.frame_sequence == 7)
+            );
+            assert!(state.begin().is_none());
+        }
+    }
+
+    #[test]
+    fn a_control_revision_without_an_armed_image_cannot_create_a_reader_observation() {
+        let (state, events) = observed();
+        let repaint = RepaintReason {
+            presentation: false,
+            dithering: true,
+            sleep: false,
+        };
+        for sequence in [7, 8] {
+            assert!(repaint.force_full());
+            assert!(repaint.reader_sample_eligible(sequence, false, false, false));
+            assert!(state.begin().is_none());
+        }
+        assert!(events.borrow().is_empty());
+    }
+
+    #[test]
+    fn dithering_does_not_override_native_presentation_cancellation() {
+        // A sleep presentation remains ineligible even at the first write.
+        for (sequence, presentation, sleep, resume, rotation, output_mode) in [
+            (7, true, false, false, false, false),
+            (7, false, false, true, false, false),
+            (7, false, false, false, true, false),
+            (7, false, false, false, false, true),
+            (7, false, true, false, false, false),
+            (1, false, true, false, false, false),
+        ] {
+            let (state, events) = observed();
+            let repaint = RepaintReason {
+                presentation,
+                dithering: true,
+                sleep,
+            };
+            state.arm(12);
+            let mut attempt = state.begin().unwrap();
+            assert!(!repaint.reader_sample_eligible(sequence, resume, rotation, output_mode));
+            attempt.unavailable(NativeFrameUnavailable::Cancelled);
+            attempt.accepted(Some(8), Duration::ZERO);
+            let events = events.borrow();
+            assert_eq!(events.len(), 1);
+            assert_eq!(
+                events[0].phase,
+                NativeFramePhase::Unavailable(NativeFrameUnavailable::Cancelled)
+            );
+            assert_eq!(events[0].marker, None);
+            assert!(!events[0].hardware_y4_applied);
+        }
+    }
 }
 
 #[cfg(test)]

@@ -35,6 +35,10 @@ impl App {
         self.resume_reader_repair = self.route == "reader"
             && self.displayed_reader.as_ref().is_none_or(|frame| {
                 !same_reader_render(&frame.preferences, &self.effective_reader_preferences())
+                    || frame.hardware_dither
+                        != self
+                            .effective_reader_preferences()
+                            .uses_hardware_dither(self.platform.hardware_y4_available())
             });
         self.suspended = true;
         self.cancel_sleep_cover_preparation();
@@ -627,6 +631,7 @@ fn same_reader_render(first: &Preferences, second: &Preferences) -> bool {
         && first.reading_direction == second.reading_direction
         && first.crop_borders == second.crop_borders
         && first.dither == second.dither
+        && first.normalized_dither_method() == second.normalized_dither_method()
         && first.contrast == second.contrast
 }
 
@@ -680,6 +685,7 @@ mod tests {
                     ..ReaderSession::default()
                 },
                 preferences: fixture.app.effective_reader_preferences(),
+                hardware_dither: false,
                 first_path: PathBuf::from("retained-artwork.png"),
                 second_path: None,
             });
@@ -704,5 +710,20 @@ mod tests {
             ..before.clone()
         };
         assert!(!same_reader_render(&before, &after));
+    }
+
+    #[test]
+    fn changing_dither_method_requires_repair_without_replacing_retained_metadata() {
+        let before = Preferences::default();
+        let after = Preferences {
+            dither_method: "hardware".into(),
+            ..before.clone()
+        };
+        assert!(!same_reader_render(&before, &after));
+        let unknown = Preferences {
+            dither_method: "future-method".into(),
+            ..before.clone()
+        };
+        assert!(same_reader_render(&before, &unknown));
     }
 }

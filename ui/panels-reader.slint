@@ -2,6 +2,7 @@ import { State, Commands } from "state.slint";
 import { Theme } from "theme.slint";
 import { Strings } from "strings.slint";
 import { BodyText, TitleText, Caption, Icon, DottedRule, PageBar } from "widgets.slint";
+import { DitherSelector } from "dither-controls.slint";
 
 component ReaderPanelTitle inherits TitleText {
     x: 0px;
@@ -364,7 +365,7 @@ export component ReaderPanel inherits Rectangle {
     y: 0px;
     in property <string> context: State.modal-context;
     out property <length> content-height: root.context == "reader-mode" ? (State.large-screen ? 242.5px : 316.5px) :
-        root.context == "reader-picture" ? (State.large-screen ? 254px : 343.5px) :
+        root.context == "reader-picture" ? (root.wide-picture ? 254px : 378.5px + (root.dither-status-visible ? 28px : 0px)) :
         root.context == "reader-brightness" ? (!State.has-frontlight ? 0px : State.large-screen ? 156px : State.has-warmth ? 215.5px : 137.5px) :
         root.context == "reader-orientation" ? (State.large-screen ? 186px : 163.5px) :
         root.context == "reader-layout" ? (State.large-screen ? 180px : 163.5px) :
@@ -383,6 +384,8 @@ export component ReaderPanel inherits Rectangle {
     property <length> toc-body-height: root.empty-bookmarks ? root.toc-empty-height : root.toc-rows * root.toc-row-height;
     property <length> toc-column-gap: State.large-screen ? 48px : 0px;
     property <length> toc-column-width: State.large-screen ? (root.inner-width - root.toc-column-gap) / 2 : root.inner-width;
+    property <bool> wide-picture: State.large-screen || State.landscape;
+    property <bool> dither-status-visible: (State.dither && State.dither-method == "hardware" && !State.hardware-dither-available) || State.dither-pending;
     height: root.content-height;
     background: Theme.paper;
     TouchArea { x: 0px; y: 0px; width: parent.width; height: parent.height; }
@@ -444,33 +447,33 @@ export component ReaderPanel inherits Rectangle {
     if root.context == "reader-picture": Rectangle {
         x: root.inset; y: root.top; width: root.inner-width; height: parent.height - root.top;
         property <length> preview-size: State.large-screen ? 131px : 95px;
-        property <length> column-width: State.large-screen ? (self.width - self.preview-size - 72px) / 2 : self.width;
-        if !State.large-screen: ReaderPanelTitle { x: 0px; y: 0px; width: parent.width; height: root.title-height; text: Strings.picture; }
+        property <length> column-width: root.wide-picture ? (self.width - self.preview-size - 72px) / 2 : self.width;
+        if !root.wide-picture: ReaderPanelTitle { x: 0px; y: 0px; width: parent.width; height: root.title-height; text: Strings.picture; }
         Rectangle {
-            x: 0px; y: State.large-screen ? 0px : root.title-height + 12px;
+            x: 0px; y: root.wide-picture ? 0px : root.title-height + 12px;
             width: parent.preview-size; height: self.width;
             border-width: 1.5px; border-color: Theme.ink; background: State.night-mode ? Theme.ink : Theme.paper; clip: true;
             Image { x: 1.5px; y: 1.5px; width: parent.width - 3px; height: parent.height - 3px; source: State.reader-image; image-fit: cover; }
         }
         Rectangle {
-            x: State.large-screen ? parent.preview-size + 36px : parent.preview-size + 16px;
-            y: State.large-screen ? 0px : root.title-height + 12px + (parent.preview-size - 69px) / 2;
-            width: State.large-screen ? parent.column-width : parent.width - parent.preview-size - 16px;
-            height: State.large-screen ? 237.5px : 69px;
-            if State.large-screen: ReaderPanelTitle { x: 0px; y: 0px; width: parent.width; height: root.title-height; text: Strings.picture; }
-            ReaderContrast { x: 0px; y: State.large-screen ? root.title-height + 12px : 0px; width: parent.width; height: State.large-screen ? 80px : 69px; }
-            if State.large-screen: BodyText { x: 0px; y: 139.5px; width: parent.width; height: 24px; text: Strings.full-refresh; font-size: 16px; }
-            if State.large-screen: ReaderRefreshChoices { x: 0px; y: 175.5px; width: parent.width; height: 44px; }
+            x: root.wide-picture ? parent.preview-size + 36px : parent.preview-size + 16px;
+            y: root.wide-picture ? 0px : root.title-height + 12px + (parent.preview-size - 69px) / 2;
+            width: root.wide-picture ? parent.column-width : parent.width - parent.preview-size - 16px;
+            height: root.wide-picture ? parent.height : 69px;
+            if root.wide-picture: ReaderPanelTitle { x: 0px; y: 0px; width: parent.width; height: root.title-height; text: Strings.picture; }
+            ReaderContrast { x: 0px; y: root.wide-picture ? root.title-height + 12px : 0px; width: parent.width; height: State.large-screen ? 80px : 69px; }
+            if root.wide-picture: BodyText { x: 0px; y: 139.5px; width: parent.width; height: State.large-screen ? 24px : 21px; text: Strings.full-refresh; font-size: State.large-screen ? 16px : 14px; }
+            if root.wide-picture: ReaderRefreshChoices { x: 0px; y: 175.5px; width: parent.width; height: State.large-screen ? 44px : 40px; }
         }
-        if !State.large-screen: BodyText { x: 0px; y: 146px; width: parent.width; height: 21px; text: Strings.full-refresh; font-size: 14px; }
-        if !State.large-screen: ReaderRefreshChoices { x: 0px; y: 173px; width: parent.width; height: 40px; }
+        if !root.wide-picture: BodyText { x: 0px; y: 146px; width: parent.width; height: 21px; text: Strings.full-refresh; font-size: 14px; }
+        if !root.wide-picture: ReaderRefreshChoices { x: 0px; y: 173px; width: parent.width; height: 40px; }
         Rectangle {
-            x: State.large-screen ? parent.preview-size + 72px + parent.column-width : 0px;
-            y: State.large-screen ? 40px : 225px;
-            width: State.large-screen ? parent.column-width : parent.width;
-            height: State.large-screen ? 112px : 92px;
-            ReaderSwitch { x: 0px; y: 0px; width: parent.width; height: State.large-screen ? 56px : 46px; text: Strings.dither; value: State.dither; toggled => { Commands.action("settings", "set", State.dither ? "dither=false" : "dither=true"); } }
-            ReaderSwitch { x: 0px; y: State.large-screen ? 56px : 46px; width: parent.width; height: State.large-screen ? 56px : 46px; text: Strings.night-mode; value: State.night-mode; toggled => { Commands.action("settings", "set", State.night-mode ? "night-mode=false" : "night-mode=true"); } }
+            x: root.wide-picture ? parent.preview-size + 72px + parent.column-width : 0px;
+            y: root.wide-picture ? 40px : 225px;
+            width: root.wide-picture ? parent.column-width : parent.width;
+            height: dither-selector.height + 8px + (State.large-screen ? 56px : root.wide-picture ? 48px : 46px);
+            dither-selector := DitherSelector { x: 0px; y: 0px; width: parent.width; reader: true; }
+            ReaderSwitch { x: 0px; y: dither-selector.height + 8px; width: parent.width; height: State.large-screen ? 56px : root.wide-picture ? 48px : 46px; text: Strings.night-mode; value: State.night-mode; toggled => { Commands.action("settings", "set", State.night-mode ? "night-mode=false" : "night-mode=true"); } }
         }
     }
 
