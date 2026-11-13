@@ -154,9 +154,37 @@ intact 256-value input and accepted Y4 requests for the hardware cases; they do
 not establish post-MDP pixels, physical panel completion, optical measurements,
 or 256 stable panel grayscale levels.
 
-Full Kindle-feature library test builds exceeded the remote worker's available
+Initial Kindle-feature library test builds exceeded the remote worker's available
 memory in two configurations and did not complete. The standard ThinLTO release
 build also exceeded the available memory budget and was stopped. Neither is
 counted as passed. The completed all-target type check, bounded ARM build and
 isolated native acceptance above retain their stated scope. Original failed
 build and observation logs are preserved separately from the successful runs.
+
+## Follow-up verification after resource recovery
+
+After freeing worker disk space and increasing swap from 8 GiB to 16 GiB on
+2026-11-13, the following checks completed on source commit
+`26c006144b242cfb0961ff3a69ebd955294a9499`. Its 304 runtime inputs matched the
+inventory above. Build output, temporary files and private cache overlays used
+the worker's ext4 filesystem. The checks ran sequentially with six Cargo jobs.
+
+| Check | Result |
+| --- | --- |
+| Library with `--no-default-features --features kindle` | 766 passed, 5 ignored |
+| Library with default desktop features and `--features kindle` | 766 passed, 5 ignored |
+| Standard ARM release with ThinLTO | Passed |
+
+The standard release build used `armv7-unknown-linux-musleabihf`. The live
+compiler arguments confirmed optimization level 3, `lto=thin`,
+`codegen-units=1`, and symbol stripping. The resulting statically linked,
+stripped ARM EABI5 executable has SHA-256
+`c0136daca7ad6a316cc48aac682644ced7c65a8b052219224ae1343109116fc1`.
+
+Worker-wide sampling during these checks showed additional swap usage of about
+6.42 GiB, leaving at least 1.58 GiB free. No new kernel OOM kill occurred, no
+resource guard stopped a phase, and all owned process groups were reaped.
+The original incomplete runs remain preserved as separate evidence.
+
+Physical batch `b02` qualifies the earlier bounded-profile candidate identified
+above. The new standard ThinLTO binary has host build acceptance only.
