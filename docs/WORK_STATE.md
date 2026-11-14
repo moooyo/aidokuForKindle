@@ -1,6 +1,16 @@
 # Work state
 
-Updated: 2026-11-12.
+Updated: 2026-11-14.
+
+## Current approved portrait UI
+
+The approved single-footer design is implemented in Slint, including shared
+reader/application controls, four source-aware fitting modes, UI-only night
+colors, chapter filters and persistent bookmark management. Remote software
+checks and actual application captures are recorded in the
+[dated implementation review](APPROVED_UI_IMPLEMENTATION_20261114.md).
+Physical-device acceptance remains separate; this UI work does not claim a
+Kindle installation or optical refresh validation.
 
 ## Current BiliComics follow-up
 

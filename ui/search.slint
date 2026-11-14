@@ -1,7 +1,8 @@
+import { CompactPager } from "native-controls.slint";
 import { State, Commands, SearchGroup } from "state.slint";
 import { Theme } from "theme.slint";
 import { Strings } from "strings.slint";
-import { Icon, ActionButton, EmptyState, PageBar, Cover } from "widgets.slint";
+import { BodyText, Caption, Icon, ActionButton, EmptyState, PageBar, Cover } from "widgets.slint";
 
 component ScopeLabel inherits Rectangle {
     in property <string> text;
@@ -21,7 +22,7 @@ component ScopeLabel inherits Rectangle {
     preferred-width: measurement.preferred-width;
     clip: true;
     // Measure the real name without wrapping or assigned geometry.
-    measurement := Text {
+    measurement := Text { x: 0px; y: 0px;
         text: root.text; font-family: Theme.sans; font-size: root.text-size; font-weight: root.text-weight;
         letter-spacing: root.text-tracking; wrap: no-wrap; opacity: 0; accessible-role: none;
     }
@@ -38,7 +39,7 @@ component ScopeLabel inherits Rectangle {
         // The owning label viewport is already inside the control's frame.
         x: 0px; y: 0px; width: min(parent.width, ellipsis.preferred-width + 2px); height: parent.height;
         background: root.mask-color;
-        ellipsis := Text {
+        ellipsis := Text { x: 0px; y: 0px;
             width: self.preferred-width; height: parent.height; text: "…";
             font-family: Theme.sans; font-size: root.text-size; font-weight: root.text-weight;
             color: root.foreground; vertical-alignment: center;
@@ -75,141 +76,32 @@ component ScopeChip inherits Rectangle {
         text-size: State.large-screen ? 16px : 14px; text-weight: root.selected ? 700 : 500;
         foreground: root.inverted ? Theme.paper : Theme.ink; mask-color: root.inverted ? Theme.ink : Theme.paper;
     }
-    touch := TouchArea {
+    touch := TouchArea { x: 0px; y: 0px;
         clicked => { root.clicked(); }
         pointer-event(event) => { if event.kind == PointerEventKind.down { Commands.refresh("fast"); } else if event.kind == PointerEventKind.up { Commands.refresh("ui"); } }
-    }
-}
-
-component ResultMetadata inherits Rectangle {
-    in property <string> author;
-    in property <string> subtitle;
-    in property <color> foreground: Theme.secondary;
-    in property <length> text-size: 14px;
-    property <bool> paired: root.author != "" && root.subtitle != "";
-    property <length> available-width: max(0px, root.width);
-    property <length> separator-width: min(separator-measurement.preferred-width, root.available-width);
-    property <length> subtitle-width: min(ceil(subtitle-measurement.preferred-width / 1px) * 1px, max(0px, root.available-width - root.separator-width));
-    property <length> author-width: min(author-measurement.preferred-width, max(0px, root.available-width - root.separator-width - root.subtitle-width));
-    background: transparent;
-    author-measurement := Text {
-        text: root.author; font-family: Theme.sans; font-size: root.text-size;
-        wrap: no-wrap; opacity: 0; accessible-role: none;
-    }
-    separator-measurement := Text {
-        text: " · "; font-family: Theme.sans; font-size: root.text-size;
-        wrap: no-wrap; opacity: 0; accessible-role: none;
-    }
-    subtitle-measurement := Text {
-        text: root.subtitle; font-family: Theme.sans; font-size: root.text-size;
-        wrap: no-wrap; opacity: 0; accessible-role: none;
-    }
-    if !root.paired: Text {
-        x: 0px; y: 0px; width: root.width; height: root.height;
-        text: root.author == "" ? root.subtitle : root.author + (root.subtitle == "" ? "" : " · " + root.subtitle);
-        font-family: Theme.sans; font-size: root.text-size; color: root.foreground; vertical-alignment: center;
-        wrap: no-wrap; overflow: elide;
-    }
-    if root.paired: Text {
-        x: 0px; y: 0px; width: root.author-width; height: root.height;
-        text: root.author; font-family: Theme.sans; font-size: root.text-size; color: root.foreground; vertical-alignment: center;
-        wrap: no-wrap; overflow: elide;
-    }
-    if root.paired: Text {
-        x: root.author-width; y: 0px; width: root.separator-width; height: root.height;
-        text: " · "; font-family: Theme.sans; font-size: root.text-size; color: root.foreground; vertical-alignment: center;
-        wrap: no-wrap; overflow: elide;
-    }
-    if root.paired: Text {
-        x: root.author-width + root.separator-width; y: 0px; width: root.subtitle-width; height: root.height;
-        text: root.subtitle; font-family: Theme.sans; font-size: root.text-size; color: root.foreground; vertical-alignment: center;
-        wrap: no-wrap; overflow: elide;
     }
 }
 
 component ResultGroup inherits Rectangle {
     in property <SearchGroup> group;
     property <length> heading-height: State.large-screen ? 48px : 40px;
-    property <length> card-width: State.large-screen ? (root.width - 22px * 5) / 6 : 104px;
-    property <length> cover-width: State.large-screen ? 126px : 104px;
-    property <length> cover-height: State.large-screen ? 166px : 122px;
-    property <length> group-height: root.group.books.length > 0 ? (State.large-screen ? 286px : 217px) : (State.large-screen ? 68px : 52px);
-    min-height: root.group-height;
-    preferred-height: root.group-height;
-    max-height: root.group-height;
-    clip: false;
-    HorizontalLayout {
-        x: 0px; y: 0px; width: max(0px, parent.width - (root.group.books.length > 0 ? (State.large-screen ? 134px : 116px) : root.group.error ? (State.large-screen ? 90px : 72px) : 0px)); height: root.heading-height;
-        alignment: start; spacing: State.large-screen ? 16px : 12px;
-        Text { text: root.group.title; font-family: Theme.sans; font-size: State.large-screen ? 20px : 16px; font-weight: 700; color: Theme.ink; vertical-alignment: center; overflow: elide; horizontal-stretch: 0; }
-        Text { text: root.group.pending ? (root.group.error ? Strings.retrying : Strings.searching) : root.group.books.length > 0 ? root.group.count + " " + Strings.books-unit : root.group.status == "" ? Strings.no-results : root.group.status; font-family: Theme.sans; font-size: State.large-screen ? 15px : 13px; font-weight: 400; color: Theme.secondary; vertical-alignment: center; overflow: elide; }
+    property <length> row-height: State.large-screen ? 112px : 98px;
+    property <length> extent: root.heading-height + min(2, root.group.books.length) * root.row-height + 16px;
+    min-height: root.extent; max-height: root.extent;
+    BodyText { x: 0px; y: 0px; width: parent.width - 130px; height: root.heading-height; text: root.group.title; font-size: State.large-screen ? 20px : 18px; font-weight: 700; }
+    if root.group.count > 2 || root.group.error: ActionButton { x: parent.width - 128px; y: (root.heading-height - Theme.touch) / 2; width: 128px; text: root.group.error ? Strings.retry : Strings.view-all; quiet: true; enabled: !root.group.pending; clicked => { Commands.action("search", root.group.error ? "retry" : "all", root.group.id); } }
+    if root.group.books.length == 0: Caption { y: 0px; x: parent.width / 2; width: parent.width / 2 - 130px; height: root.heading-height; text: root.group.status; horizontal-alignment: right; }
+    for book[index] in root.group.books: Rectangle { x: 0px;
+        visible: index < 2; y: root.heading-height + index * root.row-height; width: parent.width; height: root.row-height;
+        background: hit.pressed ? Theme.fill : Theme.paper;
+        Cover { x: 0px; y: 4px; width: State.large-screen ? 72px : 62px; height: parent.height - 16px; book: book; show-badge: false; show-progress: false; opened => { Commands.action("search", "open", book.id); } }
+        BodyText { y: 0px; x: State.large-screen ? 92px : 80px; width: parent.width - self.x - Theme.touch; height: parent.height / 2; text: book.title; font-size: State.large-screen ? 22px : 20px; font-weight: 700; }
+        Caption { x: State.large-screen ? 92px : 80px; y: parent.height / 2; width: parent.width - self.x - Theme.touch; height: 26px; text: book.author + (book.subtitle == "" ? "" : " · " + book.subtitle); }
+        Icon { x: parent.width - 24px; y: (parent.height - 20px) / 2; width: 20px; height: 20px; kind: "chevron-right"; }
+        hit := TouchArea { y: 0px; x: State.large-screen ? 82px : 72px; width: parent.width - self.x; clicked => { Commands.action("search", "open", book.id); } }
     }
-    if root.group.books.length > 0 && !root.group.error: Rectangle {
-        x: parent.width - self.width; y: (root.heading-height - Theme.touch) / 2; width: State.large-screen ? 128px : 108px; height: Theme.touch;
-        background: State.large-screen ? transparent : (all-touch.pressed ? Theme.ink : Theme.paper);
-        accessible-role: button; accessible-label: Strings.view-all + " " + root.group.title;
-        // Keep Scribe's paint and hit area inside the heading without moving its label.
-        if State.large-screen: Rectangle {
-            x: 0px; y: (parent.height - root.heading-height) / 2; width: parent.width; height: root.heading-height;
-            background: all-touch.pressed ? Theme.ink : Theme.paper;
-        }
-        Text { x: 0px; y: 0px; width: parent.width - (State.large-screen ? 24px : 20px); height: parent.height; text: Strings.view-all; font-family: Theme.sans; font-size: State.large-screen ? 16px : 14px; font-weight: 500; color: all-touch.pressed ? Theme.paper : Theme.ink; horizontal-alignment: right; vertical-alignment: center; }
-        Icon { x: parent.width - self.width; y: (parent.height - self.height) / 2; width: State.large-screen ? 18px : 16px; height: self.width; kind: "chevron-right"; inverted: all-touch.pressed; }
-        all-touch := TouchArea {
-            x: 0px; y: State.large-screen ? (parent.height - root.heading-height) / 2 : 0px; width: parent.width; height: State.large-screen ? root.heading-height : parent.height;
-            clicked => { Commands.action("search", "all", root.group.id); }
-            pointer-event(event) => { if event.kind == PointerEventKind.down { Commands.refresh("fast"); } else if event.kind == PointerEventKind.up { Commands.refresh("ui"); } }
-        }
-    }
-    if root.group.error: Rectangle {
-        x: parent.width - self.width; y: (root.heading-height - Theme.touch) / 2; width: State.large-screen ? 74px : 60px; height: Theme.touch;
-        accessible-role: button; accessible-label: Strings.retry + " " + root.group.title; accessible-enabled: !root.group.pending;
-        Rectangle {
-            x: 0px; y: (parent.height - self.height) / 2; width: parent.width; height: State.large-screen ? 44px : 36px;
-            background: retry-touch.pressed ? Theme.paper : Theme.ink; border-width: State.large-screen ? Theme.control-border : 0px; border-color: Theme.ink; border-radius: Theme.control-radius;
-            Text { text: root.group.pending ? Strings.retrying : Strings.retry; font-family: Theme.sans; font-size: State.large-screen ? 16px : 14px; font-weight: 700; color: retry-touch.pressed ? Theme.ink : Theme.paper; horizontal-alignment: center; vertical-alignment: center; overflow: elide; }
-        }
-        retry-touch := TouchArea {
-            enabled: !root.group.pending;
-            clicked => { Commands.action("search", "retry", root.group.id); }
-            pointer-event(event) => { if event.kind == PointerEventKind.down { Commands.refresh("fast"); } else if event.kind == PointerEventKind.up { Commands.refresh("ui"); } }
-        }
-    }
-    for book[index] in root.group.books: Rectangle {
-        property <length> title-width: max(0px, self.width - (book.in-library ? (State.large-screen ? 22px : 18px) : 0px));
-        property <bool> title-overflowed: State.large-screen && title-measurement.preferred-width > self.title-width;
-        property <length> title-line-height: title-measurement.preferred-height;
-        // Height-based elision must have room for two complete native line boxes.
-        property <length> title-two-line-height: ceil(self.title-line-height * 2 / 1px) * 1px;
-        visible: index < (State.large-screen ? 6 : 3);
-        x: index * (root.card-width + (State.large-screen ? 22px : 18px)); y: root.heading-height; width: root.card-width; height: State.large-screen ? (self.title-overflowed ? root.cover-height + 3px + self.title-two-line-height + 3px + 18px : 218px) : 165px;
-        background: touch.pressed ? Theme.ink : Theme.paper;
-        accessible-role: button; accessible-label: book.title;
-        Cover { x: 0px; y: 0px; width: root.cover-width; height: root.cover-height; book: book; opened => { Commands.action("search", "open", book.id); } }
-        // Keep the overflow decision independent of the wrapped title's width.
-        title-measurement := Text {
-            text: book.title; font-family: State.large-screen ? Theme.sans : Theme.serif;
-            font-size: State.large-screen ? 16px : 14px; font-weight: State.large-screen ? 500 : 900;
-            wrap: no-wrap; opacity: 0; accessible-role: none;
-        }
-        Text {
-            x: 0px; y: root.cover-height + (State.large-screen ? (parent.title-overflowed ? 3px : 8px) : 6px); width: parent.title-width; height: State.large-screen ? (parent.title-overflowed ? parent.title-two-line-height : 22px) : 19px;
-            text: book.title; font-family: State.large-screen ? Theme.sans : Theme.serif; font-size: State.large-screen ? 16px : 14px; font-weight: State.large-screen ? 500 : 900; color: touch.pressed ? Theme.paper : Theme.ink; vertical-alignment: center; overflow: elide;
-            wrap: parent.title-overflowed ? word-wrap : no-wrap;
-        }
-        if book.in-library: Icon { x: parent.width - self.width; y: root.cover-height + (State.large-screen ? (parent.title-overflowed ? 3px + parent.title-line-height / 2 - self.height / 2 : 11px) : 8px); width: State.large-screen ? 16px : 14px; height: self.width; kind: "bookmark-filled"; inverted: touch.pressed; }
-        ResultMetadata {
-            x: 0px; y: root.cover-height + (State.large-screen ? (parent.title-overflowed ? 6px + parent.title-two-line-height : 34px) : 27px); width: parent.width; height: State.large-screen ? 18px : 16px;
-            author: book.author; subtitle: book.subtitle; foreground: touch.pressed ? Theme.paper : Theme.secondary;
-            text-size: State.large-screen ? 14px : 12px;
-        }
-        touch := TouchArea {
-            clicked => { Commands.action("search", "open", book.id); }
-            pointer-event(event) => { if event.kind == PointerEventKind.down { Commands.refresh("fast"); } else if event.kind == PointerEventKind.up { Commands.refresh("ui"); } }
-        }
-    }
+    Rectangle { x: 0px; y: parent.height - 1px; width: parent.width; height: 1px; background: Theme.line; }
 }
-
 export component SearchPage inherits Rectangle {
     property <bool> typing: (State.modal == "keyboard" && State.keyboard-target == "search") || (State.modal == "choices" && State.modal-context == "search-scope:typing");
     property <bool> scope-in-shortcuts: (State.search-sources.length > 0 && State.search-scope == State.search-sources[0].id) || (State.search-sources.length > 1 && State.search-scope == State.search-sources[1].id) || (State.large-screen && State.search-sources.length > 2 && State.search-scope == State.search-sources[2].id);
@@ -226,7 +118,7 @@ export component SearchPage inherits Rectangle {
         width: parent.width - self.x - (State.large-screen ? 96px : 57px); height: State.large-screen ? 60px : 52px;
         border-width: Theme.control-border; border-color: Theme.ink; border-radius: Theme.control-radius; background: edit-touch.pressed ? Theme.ink : Theme.paper;
         accessible-role: button; accessible-label: Strings.search-hint;
-        edit-touch := TouchArea {
+        edit-touch := TouchArea { x: 0px; y: 0px;
             clicked => { Commands.action("search", "edit", ""); }
             pointer-event(event) => { if event.kind == PointerEventKind.down { Commands.refresh("fast"); } else if event.kind == PointerEventKind.up { Commands.refresh("ui"); } }
         }
@@ -241,7 +133,7 @@ export component SearchPage inherits Rectangle {
             background: clear-touch.pressed ? Theme.ink : Theme.paper; border-radius: Theme.control-radius;
             accessible-role: button; accessible-label: Strings.clear;
             Icon { x: (parent.width - self.width) / 2; y: (parent.height - self.height) / 2; width: State.large-screen ? 18px : 15px; height: self.width; kind: "close"; inverted: clear-touch.pressed; }
-            clear-touch := TouchArea {
+            clear-touch := TouchArea { x: 0px; y: 0px;
                 clicked => { Commands.action("search", "clear", ""); }
                 pointer-event(event) => { if event.kind == PointerEventKind.down { Commands.refresh("fast"); } else if event.kind == PointerEventKind.up { Commands.refresh("ui"); } }
             }
@@ -249,14 +141,14 @@ export component SearchPage inherits Rectangle {
     }
     ActionButton { x: parent.width - (State.large-screen ? 84px : 51px); y: State.large-screen ? 16px : 10px; width: State.large-screen ? 60px : 48px; height: State.large-screen ? 60px : 48px; text: Strings.cancel; quiet: true; clicked => { Commands.action(root.typing ? "keyboard" : "search", "cancel", ""); } }
     HorizontalLayout {
-        x: State.large-screen ? 36px : 16px; y: State.large-screen ? 90px : 63px; width: parent.width - (State.large-screen ? 72px : 32px); height: Theme.touch;
+        x: State.large-screen ? 36px : 16px; y: State.large-screen ? 90px : 63px; width: parent.width - (State.large-screen ? 72px : 32px) - (State.page-count > 1 ? Theme.touch * 2 + 56px : 0px); height: Theme.touch;
         alignment: start; spacing: State.large-screen ? 10px : 8px;
         ScopeChip { text: Strings.all-sources + " · " + State.search-source-count; width-limit: State.large-screen ? 180px : 144px; selected: State.search-scope == "" || State.search-scope == "all"; clicked => { Commands.action("search", "source", "all"); } }
         if State.large-screen: ScopeChip { text: Strings.library; width-limit: 80px; selected: State.search-scope == "library"; clicked => { Commands.action("search", "source", "library"); } }
         if State.search-sources.length > 0: ScopeChip { text: State.search-sources[0].name; compact-text: State.search-sources[0].display-name; preserve-suffix: true; width-limit: State.large-screen ? 150px : 168px; selected: State.search-scope == State.search-sources[0].id; clicked => { Commands.action("search", "source", State.search-sources[0].id); } }
-        if State.search-sources.length > 1: ScopeChip { text: State.search-sources[1].name; compact-text: State.search-sources[1].display-name; preserve-suffix: true; width-limit: State.large-screen ? 150px : 168px; selected: State.search-scope == State.search-sources[1].id; clicked => { Commands.action("search", "source", State.search-sources[1].id); } }
-        if State.large-screen && State.search-sources.length > 2: ScopeChip { text: State.search-sources[2].name; compact-text: State.search-sources[2].display-name; preserve-suffix: true; width-limit: 150px; selected: State.search-scope == State.search-sources[2].id; clicked => { Commands.action("search", "source", State.search-sources[2].id); } }
-        if State.search-sources.length > (State.large-screen ? 3 : 2): ScopeChip { text: Strings.more; width-limit: State.large-screen ? 72px : 60px; selected: root.more-scope-selected; clicked => { Commands.action("search", "source-picker", ""); } }
+        if State.page-count <= 1 && State.search-sources.length > 1: ScopeChip { text: State.search-sources[1].name; compact-text: State.search-sources[1].display-name; preserve-suffix: true; width-limit: State.large-screen ? 150px : 168px; selected: State.search-scope == State.search-sources[1].id; clicked => { Commands.action("search", "source", State.search-sources[1].id); } }
+        if State.large-screen && State.page-count <= 1 && State.search-sources.length > 2: ScopeChip { text: State.search-sources[2].name; compact-text: State.search-sources[2].display-name; preserve-suffix: true; width-limit: 150px; selected: State.search-scope == State.search-sources[2].id; clicked => { Commands.action("search", "source", State.search-sources[2].id); } }
+        if State.search-sources.length > (State.page-count > 1 ? 1 : State.large-screen ? 3 : 2): ScopeChip { text: Strings.more; width-limit: State.large-screen ? 72px : 60px; selected: root.more-scope-selected; clicked => { Commands.action("search", "source-picker", ""); } }
     }
     Rectangle { x: 0px; y: root.content-top - 1px; width: parent.width; height: 1px; background: Theme.line; }
     if root.typing && !State.large-screen: Rectangle {
@@ -299,7 +191,7 @@ export component SearchPage inherits Rectangle {
             Cover { x: 0px; y: 0px; width: 74px; height: 100px; book: book; opened => { Commands.action("search", "open", book.id); } }
             Text { x: 90px; y: 23px; width: parent.width - 90px; height: 30px; text: book.title; font-family: Theme.serif; font-size: 20px; font-weight: 900; letter-spacing: 1px; color: touch.pressed ? Theme.paper : Theme.ink; vertical-alignment: center; overflow: elide; }
             Text { x: 90px; y: 57px; width: parent.width - 90px; height: 23px; text: book.subtitle; font-family: Theme.sans; font-size: 15px; color: touch.pressed ? Theme.paper : Theme.secondary; vertical-alignment: center; overflow: elide; }
-            touch := TouchArea {
+            touch := TouchArea { x: 0px; y: 0px;
                 clicked => { Commands.action("search", "open", book.id); }
                 pointer-event(event) => { if event.kind == PointerEventKind.down { Commands.refresh("fast"); } else if event.kind == PointerEventKind.up { Commands.refresh("ui"); } }
             }
@@ -307,7 +199,7 @@ export component SearchPage inherits Rectangle {
         if State.search-local-matches.length == 0: Text { x: 0px; y: 37px; width: parent.width; height: 32px; text: Strings.no-library-match; font-family: Theme.sans; font-size: 17px; color: Theme.secondary; vertical-alignment: center; }
     }
     if !root.typing && State.query != "" && State.search-groups.length > 0: Rectangle {
-        x: 0px; y: root.content-top; width: parent.width; height: max(0px, parent.height - self.y - (State.page-count > 1 ? Theme.pager-height : 0px)); clip: true;
+        x: 0px; y: root.content-top; width: parent.width; height: max(0px, parent.height - self.y); clip: true;
         Text { x: Theme.margin; y: 0px; width: parent.width - Theme.margin * 2; height: root.summary-height; text: State.search-status; font-family: Theme.sans; font-size: State.large-screen ? 15px : 13px; color: Theme.secondary; vertical-alignment: center; overflow: elide; }
         VerticalLayout { x: Theme.margin; y: root.summary-height; width: parent.width - Theme.margin * 2; height: max(0px, parent.height - self.y); alignment: start; spacing: 0px; for group in State.search-groups: ResultGroup { group: group; } }
     }
@@ -317,5 +209,5 @@ export component SearchPage inherits Rectangle {
         action: State.busy ? "" : State.query == "" ? Strings.search : Strings.retry;
         clicked => { Commands.action("search", State.query == "" ? "edit" : "query", State.query); }
     }
-    if !root.typing && State.page-count > 1: PageBar { x: 0px; y: parent.height - self.height; width: parent.width; page: State.page; count: State.page-count; turn(delta) => { Commands.action("page", "turn", delta); } }
+    if !root.typing && State.page-count > 1: CompactPager { x: parent.width - self.width - Theme.margin; y: State.large-screen ? 90px : 63px; page: State.page; count: State.page-count; turn(delta) => { Commands.action("page", "turn", delta); } }
 }

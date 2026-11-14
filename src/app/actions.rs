@@ -271,6 +271,26 @@ impl App {
             },
             "detail" => match action {
                 "back" => self.back()?,
+                "filter" => {
+                    let filter = value.parse::<i32>()?.clamp(0, 3);
+                    if let Some(ui) = self.ui.upgrade() {
+                        ui.global::<State>().set_detail_filter(filter);
+                        ui.global::<State>().set_bookmark_edit(false);
+                    }
+                    self.page = 1;
+                }
+                "bookmark-edit" => {
+                    if let Some(ui) = self.ui.upgrade() {
+                        let state = ui.global::<State>();
+                        state.set_bookmark_edit(!state.get_bookmark_edit());
+                    }
+                }
+                "bookmark-remove" => {
+                    let (chapter, page) = value.rsplit_once('|').context("Invalid bookmark")?;
+                    self.store
+                        .remove_bookmark(&self.current_book()?.id, chapter, page.parse()?)?;
+                }
+                "locate" => self.locate_detail_current()?,
                 "continue" => self.resume_reader()?,
                 "favorite" => {
                     let book = self.current_book()?;
@@ -348,7 +368,7 @@ impl App {
                 }
                 "manage" => {
                     self.route = "sources".into();
-                    self.source_filter = i32::from(self.platform.profile().is_scribe());
+                    self.source_filter = 0;
                     self.page = 1;
                     self.modal.clear();
                     self.modal_context.clear();
@@ -376,6 +396,10 @@ impl App {
                     self.page = 1;
                 }
                 "open" => self.open_source(value)?,
+                "preferences" => {
+                    self.open_source(value)?;
+                    self.dispatch("catalog", "settings", "")?;
+                }
                 "migrate" => self.open_source_migration(value)?,
                 "add" => {
                     self.open_pairing()?;
@@ -583,7 +607,7 @@ impl App {
                 }
                 "manage-sources" => {
                     self.route = "sources".into();
-                    self.source_filter = i32::from(self.platform.profile().is_scribe());
+                    self.source_filter = 0;
                     self.page = 1;
                     self.modal.clear();
                     self.modal_context.clear();
@@ -608,7 +632,7 @@ impl App {
                     "add-repository" => self.open_keyboard("repository", "")?,
                     "manage-sources" => {
                         self.route = "sources".into();
-                        self.source_filter = i32::from(self.platform.profile().is_scribe());
+                        self.source_filter = 0;
                         self.page = 1;
                     }
                     _ => {}
@@ -981,7 +1005,7 @@ impl App {
                 if self.platform.profile().is_scribe()
                     && self.interactions.settings_section.is_empty()
                 {
-                    "screen-refresh".into()
+                    "default-direction".into()
                 } else {
                     self.interactions.settings_section.clone().into()
                 },
@@ -1278,6 +1302,37 @@ impl App {
         self.open_downloads()
     }
 
+    fn locate_detail_current(&mut self) -> Result<()> {
+        let book = self.current_book()?;
+        if let Some(progress) = self.store.progress(&book.id)? {
+            let mut chapters = self.store.chapters(&book.id)?;
+            chapters.sort_by(|first, second| {
+                first
+                    .number
+                    .total_cmp(&second.number)
+                    .then_with(|| first.id.cmp(&second.id))
+            });
+            if let Some(ui) = self.ui.upgrade() {
+                let state = ui.global::<State>();
+                state.set_detail_filter(0);
+                if state.get_newest_first() {
+                    chapters.reverse();
+                }
+            }
+            self.page = chapters
+                .iter()
+                .position(|chapter| chapter.id == progress.chapter_id)
+                .unwrap_or(0)
+                / if self.platform.profile().is_scribe() {
+                    11
+                } else {
+                    5
+                }
+                + 1;
+        }
+        Ok(())
+    }
+
     fn open_book(&mut self, id: &str) -> Result<()> {
         if self.selection_mode {
             if !self.selected.insert(id.into()) {
@@ -1294,12 +1349,17 @@ impl App {
             .context("The selected manga is missing")?;
         self.return_route = self.route.clone();
         self.current_book_id = Some(id.into());
+        if let Some(ui) = self.ui.upgrade() {
+            ui.global::<State>().set_detail_filter(0);
+            ui.global::<State>().set_bookmark_edit(false);
+        }
         if !self.prefs.incognito {
             self.store
                 .record_book_open(id, chrono::Utc::now().timestamp())?;
         }
         self.page = 1;
         self.route = "detail".into();
+        self.locate_detail_current()?;
         if !self.options.demo && !self.options.offline && book.source_id != "local" {
             self.spawn_job(true, move |manager| {
                 let details = manager.details(&book)?;
@@ -1479,9 +1539,23 @@ impl App {
             self.invalidate_reader_work();
             self.displayed_image_leases.clear();
             self.save_reader_progress()?;
-            self.route = "detail".into();
+            self.route = "library".into();
             self.modal.clear();
             self.platform.refresh(RefreshKind::Full);
+            return Ok(());
+        }
+        if action == "toc" {
+            self.invalidate_reader_work();
+            self.save_reader_progress()?;
+            self.return_route = "reader".into();
+            self.route = "detail".into();
+            self.modal.clear();
+            self.modal_context.clear();
+            self.page = 1;
+            if let Some(ui) = self.ui.upgrade() {
+                ui.global::<State>().set_detail_filter(0);
+            }
+            self.locate_detail_current()?;
             return Ok(());
         }
         if matches!(
@@ -2075,7 +2149,16 @@ impl App {
                         false,
                     ),
                     item("license", "license", "GPL-3.0-or-later".into(), true),
-                    item("", "project_home", "—".into(), false),
+                    item(
+                        "",
+                        "dither",
+                        if self.platform.hardware_y4_available() {
+                            "Y4".into()
+                        } else {
+                            tr("dither_software")
+                        },
+                        false,
+                    ),
                 ],
                 String::new(),
             ),
@@ -3125,8 +3208,8 @@ impl App {
             _ => "",
         };
         if !context.is_empty() && !self.modal.is_empty() && self.modal_context == context {
-            // Repeated tab activation must retain the selected panel. Outside
-            // taps and explicit close actions own dismissal independently.
+            self.modal.clear();
+            self.modal_context.clear();
             return Ok(());
         }
         match panel {
@@ -3162,7 +3245,7 @@ impl App {
                 Ok(())
             }
             "brightness" => {
-                if self.platform.profile().has_frontlight() {
+                {
                     self.modal = "brightness".into();
                     self.modal_context = "reader-brightness".into();
                     if let Some(ui) = self.ui.upgrade() {
@@ -3365,6 +3448,12 @@ impl App {
 
     pub(crate) fn open_setting(&mut self, id: &str) -> Result<()> {
         self.close_page_jump();
+        if id == "manage-sources" {
+            self.route = "sources".into();
+            self.source_filter = 0;
+            self.page = 1;
+            return Ok(());
+        }
         if self.route == "settings"
             && matches!(
                 id,
@@ -4182,9 +4271,6 @@ impl App {
         let effective = self.effective_reader_preferences();
         if let Some(reader) = &mut self.reader {
             reader.apply_preferences(&effective);
-            if self.route == "reader" && self.modal.is_empty() {
-                reader.menu_open = false;
-            }
         }
         if self.route == "reader" && render_images {
             self.request_reader_images()?;
@@ -4265,6 +4351,14 @@ impl App {
                         bail!("Unsupported contrast step");
                     }
                     self.prefs.contrast = contrast * 10;
+                }
+                "reader-fit" | "reader_fit"
+                    if matches!(value, "original" | "page" | "height" | "width") =>
+                {
+                    self.prefs.reader_fit = value.into();
+                    if let Some(reader) = self.reader.as_mut() {
+                        reader.zoom = 1.0;
+                    }
                 }
                 "flash_on_close" | "flash-on-close" => self.prefs.flash_on_close = value.parse()?,
                 "landscape" => {
@@ -4364,7 +4458,8 @@ impl App {
             || before.crop_borders != after.crop_borders
             || before.dither != after.dither
             || before.normalized_dither_method() != after.normalized_dither_method()
-            || before.contrast != after.contrast;
+            || before.contrast != after.contrast
+            || before.reader_fit != after.reader_fit;
         self.save_preferences_with_render(render_images)
     }
 }
@@ -4740,7 +4835,7 @@ mod followup_command_tests {
         });
         fixture.app.dispatch("reader", "back", "").unwrap();
         assert!(fixture.app.pending_user_network.is_none());
-        assert_eq!(fixture.app.route, "detail");
+        assert_eq!(fixture.app.route, "library");
     }
 
     #[test]

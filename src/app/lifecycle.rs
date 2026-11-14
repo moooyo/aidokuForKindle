@@ -633,6 +633,7 @@ fn same_reader_render(first: &Preferences, second: &Preferences) -> bool {
         && first.dither == second.dither
         && first.normalized_dither_method() == second.normalized_dither_method()
         && first.contrast == second.contrast
+        && first.reader_fit == second.reader_fit
 }
 
 #[cfg(test)]

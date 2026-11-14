@@ -1,0 +1,108 @@
+import { State, Commands } from "state.slint";
+import { Theme } from "theme.slint";
+import { Strings } from "strings.slint";
+import { BodyText, IconButton, ActionButton, ToggleRow } from "widgets.slint";
+
+export component CompactPager inherits Rectangle {
+    in property <int> page: 1;
+    in property <int> count: 1;
+    callback turn(int);
+    width: Theme.touch * 2 + 44px;
+    height: Theme.touch;
+    visible: root.count > 1;
+    IconButton { y: 0px; x: 0px; icon: "chevron-left"; label: Strings.previous; enabled: root.page > 1; clicked => { root.turn(-1); } }
+    BodyText { y: 0px; x: Theme.touch; width: 44px; height: parent.height; text: root.page + " / " + root.count; horizontal-alignment: center; font-size: Theme.caption; }
+    IconButton { y: 0px; x: parent.width - Theme.touch; icon: "chevron-right"; label: Strings.next; enabled: root.page < root.count; clicked => { root.turn(1); } }
+}
+
+export component NativeSlider inherits Rectangle {
+    in property <string> label;
+    in property <int> value;
+    in property <int> minimum: 0;
+    in property <int> maximum: 24;
+    in property <bool> contrast: false;
+    in property <bool> presets: false;
+    in property <bool> enabled: true;
+    in property <bool> show-value: true;
+    in property <bool> show-label: true;
+    in property <bool> show-buttons: true;
+    callback committed(int);
+    property <bool> dragging: false;
+    property <int> preview: root.value;
+    property <int> shown: root.dragging ? root.preview : root.value;
+    property <length> inset: root.presets || !root.show-buttons ? 12px : Theme.touch + 16px;
+    property <length> track-width: max(1px, root.width - root.inset * 2);
+    property <float> fraction: (root.shown - root.minimum) / max(1.0, root.maximum - root.minimum);
+    property <int> epoch: State.reader-input-epoch;
+    height: root.presets ? (State.large-screen ? 128px : 112px) : (State.large-screen ? 86px : 74px);
+    changed epoch => { root.dragging = false; }
+    function at(x: length) -> int { return clamp(round(x / root.track-width * (root.maximum - root.minimum)) + root.minimum, root.minimum, root.maximum); }
+    if root.show-label: BodyText { x: 0px; y: 0px; width: parent.width - 90px; height: 28px; text: root.label; font-size: State.large-screen ? 22px : 18px; }
+    if !root.presets && root.show-value: BodyText { y: 0px; x: parent.width - 80px; width: 80px; height: 28px; text: root.contrast ? (root.shown == 0 ? Strings.standard : root.shown > 0 ? "+" + root.shown : "" + root.shown) : "" + root.shown; horizontal-alignment: right; font-size: State.large-screen ? 22px : 18px; }
+    if !root.presets && root.show-buttons: ActionButton { x: 0px; y: 28px; width: Theme.touch; height: Theme.touch; text: "−"; quiet: true; enabled: root.enabled && root.value > root.minimum; clicked => { root.committed(root.value - 1); } }
+    if !root.presets && root.show-buttons: ActionButton { x: parent.width - Theme.touch; y: 28px; width: Theme.touch; height: Theme.touch; text: "+"; quiet: true; enabled: root.enabled && root.value < root.maximum; clicked => { root.committed(root.value + 1); } }
+    Rectangle { x: root.inset; y: 28px + Theme.touch / 2; width: root.track-width; height: 1px; background: Theme.ink; }
+    Rectangle { x: root.inset; y: 26.5px + Theme.touch / 2; width: root.track-width * root.fraction; height: 4px; background: root.enabled ? Theme.ink : Theme.disabled; }
+    for index in 5: Rectangle {
+        visible: root.presets;
+        x: root.inset + root.track-width * index / 4; y: 23px + Theme.touch / 2; width: 1px; height: 10px; background: Theme.ink;
+    }
+    Rectangle { x: root.inset + root.track-width * root.fraction - 12px; y: 16px + Theme.touch / 2; width: 24px; height: 24px; border-width: 1.5px; border-color: root.enabled ? Theme.ink : Theme.disabled; border-radius: 12px; background: Theme.paper; }
+    for label[index] in [Strings.refresh-each, "3" + Strings.pages-unit, "6" + Strings.pages-unit, "10" + Strings.pages-unit, Strings.refresh-chapter]: BodyText {
+        visible: root.presets;
+        x: root.inset + root.track-width * index / 4 - 28px; y: 32px + Theme.touch; width: 56px; height: 24px; text: label; horizontal-alignment: center; font-size: Theme.caption; font-weight: root.shown == index ? 700 : 400; color: root.shown == index ? Theme.ink : Theme.secondary;
+    }
+    slider-keys := FocusScope { x: 0px; y: 0px;
+        enabled: root.enabled;
+        key-pressed(event) => {
+            if event.text == Key.LeftArrow || event.text == Key.DownArrow { root.committed(max(root.minimum, root.value - 1)); return accept; }
+            if event.text == Key.RightArrow || event.text == Key.UpArrow { root.committed(min(root.maximum, root.value + 1)); return accept; }
+            if event.text == Key.Home { root.committed(root.minimum); return accept; }
+            if event.text == Key.End { root.committed(root.maximum); return accept; }
+            return reject;
+        }
+    }
+    hit := TouchArea {
+        x: root.inset; y: 28px; width: root.track-width; height: root.presets ? parent.height - 28px : Theme.touch; enabled: root.enabled;
+        accessible-role: slider; accessible-label: root.label + " " + root.shown;
+        pointer-event(event) => {
+            if event.kind == PointerEventKind.down { slider-keys.focus(); root.preview = root.at(self.mouse-x); root.dragging = true; Commands.refresh("fast"); }
+            else if event.kind == PointerEventKind.up { if root.dragging { root.preview = root.at(self.mouse-x); root.dragging = false; root.committed(root.preview); } Commands.refresh("ui"); }
+            else if event.kind == PointerEventKind.cancel { root.dragging = false; Commands.refresh("ui"); }
+        }
+        moved => { if root.dragging { root.preview = root.at(self.mouse-x); } }
+    }
+
+}
+
+export component ReadingOptions inherits Rectangle {
+    height: State.large-screen ? 300px : 268px;
+    ToggleRow { x: 0px; y: 0px; width: parent.width; height: Theme.touch; text: Strings.read-rtl; value: State.reading-direction == "rtl"; toggled => { Commands.action("settings", "set", "reading-direction=" + (State.reading-direction == "rtl" ? "ltr" : "rtl")); } }
+    ToggleRow { x: 0px; y: Theme.touch; width: parent.width; height: Theme.touch; text: Strings.crop-borders; value: State.crop-borders; toggled => { Commands.action("settings", "set", "crop-borders=" + (State.crop-borders ? "false" : "true")); } }
+    BodyText { x: 0px; y: Theme.touch * 2 + 16px; height: 28px; text: Strings.fit-mode; font-size: Theme.body; }
+    for label[index] in [Strings.fit-original, Strings.fit-screen, Strings.fit-height, Strings.fit-width]: ActionButton {
+        x: mod(index, 2) * (parent.width + 8px) / 2; y: Theme.touch * 2 + 52px + floor(index / 2) * (Theme.touch + 8px);
+        width: (parent.width - 8px) / 2; height: Theme.touch; text: label;
+        property <string> key: index == 0 ? "original" : index == 1 ? "page" : index == 2 ? "height" : "width";
+        primary: State.reader-fit == self.key;
+        clicked => { Commands.action("settings", "set", "reader-fit=" + self.key); }
+    }
+}
+
+export component LightOptions inherits Rectangle {
+    height: State.large-screen ? 346px : 302px;
+    NativeSlider { x: 0px; y: 0px; width: parent.width; label: Strings.brightness; value: State.brightness; enabled: State.has-frontlight; committed(value) => { Commands.action("settings", "set", "brightness=" + value); } }
+    NativeSlider { x: 0px; y: State.large-screen ? 96px : 82px; width: parent.width; label: Strings.warmth; value: State.warmth; enabled: State.has-warmth; committed(value) => { Commands.action("settings", "set", "warmth=" + value); } }
+    NativeSlider { x: 0px; y: State.large-screen ? 192px : 164px; width: parent.width; label: Strings.contrast; value: State.contrast; minimum: -2; maximum: 2; contrast: true; committed(value) => { Commands.action("settings", "set", "contrast=" + value); } }
+    ToggleRow { x: 0px; y: State.large-screen ? 288px : 246px; width: parent.width; height: Theme.touch; text: Strings.night-mode; value: State.night-mode; toggled => { Commands.action("settings", "set", "night-mode=" + (State.night-mode ? "false" : "true")); } }
+}
+
+export component RefreshOptions inherits Rectangle {
+    height: State.large-screen ? 128px : 112px;
+    NativeSlider { x: 0px; y: 0px;
+        width: parent.width; label: Strings.refresh-interval; presets: true; maximum: 4;
+        value: State.refresh-every == 1 ? 0 : State.refresh-every == 3 ? 1 : State.refresh-every == 6 ? 2 : State.refresh-every == 10 ? 3 : 4;
+        committed(value) => { Commands.action("settings", "set", "refresh-every=" + (value == 0 ? 1 : value == 1 ? 3 : value == 2 ? 6 : value == 3 ? 10 : 0)); }
+    }
+    ActionButton { x: parent.width - 140px; y: -8px; width: 140px; height: Theme.touch; text: Strings.refresh-now; quiet: true; clicked => { Commands.refresh("full"); } }
+}

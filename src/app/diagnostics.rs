@@ -155,6 +155,10 @@ impl App {
         snapshot["last_book_removal"] = json!(self.last_book_removal);
         snapshot["large_screen"] = json!(state.get_large_screen());
         snapshot["settings_section"] = json!(state.get_settings_section().to_string());
+        snapshot["detail_filter"] = json!(state.get_detail_filter());
+        snapshot["bookmark_edit"] = json!(state.get_bookmark_edit());
+        snapshot["detail_bookmarks"] =
+            projected_rows(state.get_detail_bookmarks(), projected_setting);
         snapshot["settings_details"] =
             projected_rows(state.get_settings_details(), projected_setting);
         snapshot["settings_details_page"] = json!(state.get_settings_details_page());

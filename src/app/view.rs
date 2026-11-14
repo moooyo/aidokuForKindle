@@ -2,9 +2,7 @@ use super::storage_details::StorageDetailsSnapshot;
 use super::*;
 
 use crate::domain::DownloadJob;
-use crate::store::view_queries::{
-    BookViewMetadata, LibraryCounts, LibraryQuery, detail_chapter_page_count,
-};
+use crate::store::view_queries::{BookViewMetadata, LibraryCounts, LibraryQuery};
 use crate::ui::{BookItem, ChapterItem, HistoryItem, SearchGroup, SettingItem, SourceItem};
 use chrono::{Datelike, TimeZone};
 use slint::Model;
@@ -187,7 +185,7 @@ impl App {
         };
         let mut library_page_count = 1;
         if show_library {
-            let library_page_size = if large { 18 } else { 8 };
+            let library_page_size = if large { 15 } else { 8 };
             let visible = self.store.library_view_page(
                 LibraryQuery {
                     category: self.library_filter,
@@ -285,7 +283,7 @@ impl App {
                 .collect::<Vec<_>>();
             source_page_count = update_rows.len().div_ceil(7).max(1);
             state.set_sources(model(
-                if !large && self.route == "sources" && self.source_filter == 2 {
+                if self.route == "sources" && self.source_filter == 2 {
                     page_window(&update_rows, self.page.clamp(1, source_page_count), 7).to_vec()
                 } else {
                     installed_rows
@@ -433,7 +431,7 @@ impl App {
             }
             state.set_catalog_active_filter_count(active_filters as i32);
             state.set_catalog_result_count(catalog.len() as i32);
-            let catalog_page_size = if large { 15 } else { 5 };
+            let catalog_page_size = if large { 15 } else { 6 };
             catalog_page_count = catalog.len().div_ceil(catalog_page_size).max(1)
                 + usize::from(self.catalog_has_more);
             let catalog_page = if self.route == "catalog"
@@ -784,7 +782,7 @@ impl App {
             state.set_search_groups(model(visible_groups));
         }
 
-        let settings_page_count = if large { 1 } else { 2 };
+        let settings_page_count = 1;
         if show_settings {
             if self.interactions.settings_section == "storage" {
                 self.sync_storage_details_view(&state);
@@ -801,7 +799,6 @@ impl App {
             "library" => library_page_count,
             "detail" => detail_page_count,
             "sources" if self.source_filter == 1 => available_page_count,
-            "sources" if self.source_filter == 2 && large => available_page_count,
             "sources" if self.source_filter == 2 => source_page_count,
             "sources" if large => available_page_count,
             "sources" => 1,
@@ -879,6 +876,7 @@ impl App {
         state.set_cover_alone(self.prefs.cover_alone);
         state.set_incognito(self.prefs.incognito);
         state.set_night_mode(self.prefs.night_mode);
+        state.set_reader_fit(self.prefs.reader_fit.clone().into());
         state.set_native_scene_inverted(self.platform.scene_is_inverted());
         state.set_brightness(self.prefs.brightness as i32);
         state.set_warmth(self.prefs.warmth as i32);
@@ -1061,12 +1059,48 @@ impl App {
                 format!("{} {} · —", summary.downloaded, tr("chapters_unit")),
             ),
         ]));
-        let visible = self.store.detail_chapters_view_page(
+        let page_size = if large { 11 } else { 5 };
+        if state.get_detail_filter() == 3 {
+            let bookmarks = self.store.bookmarks(&book.id)?;
+            let count = bookmarks.len().div_ceil(page_size).max(1);
+            self.page = self.page.clamp(1, count);
+            let mut rows = Vec::new();
+            for bookmark in bookmarks
+                .iter()
+                .skip((self.page - 1) * page_size)
+                .take(page_size)
+            {
+                let chapter = self.store.chapter(&bookmark.chapter_id)?;
+                rows.push(SettingItem {
+                    id: format!("{}|{}", bookmark.chapter_id, bookmark.page).into(),
+                    title: chapter
+                        .map(|chapter| {
+                            format!(
+                                "{}{}{}  {}",
+                                tr("chapter_prefix"),
+                                number(chapter.number),
+                                tr("chapter_suffix"),
+                                chapter.title
+                            )
+                        })
+                        .unwrap_or_else(|| tr("bookmark"))
+                        .into(),
+                    value: format!("{} {}", bookmark.page, tr("pages_unit")).into(),
+                    group: String::new().into(),
+                    enabled: true,
+                });
+            }
+            state.set_detail_bookmarks(model(rows));
+            state.set_chapters(model(Vec::<ChapterItem>::new()));
+            return Ok(count);
+        }
+        state.set_detail_bookmarks(model(Vec::<SettingItem>::new()));
+        let visible = self.store.filtered_chapters_view_page(
             &book.id,
             state.get_newest_first(),
-            summary.total,
+            state.get_detail_filter(),
             self.page,
-            large,
+            page_size,
         )?;
         self.page = visible.page;
         let mut rows = Vec::with_capacity(visible.items.len());
@@ -1096,7 +1130,7 @@ impl App {
             });
         }
         state.set_chapters(model(rows));
-        Ok(detail_chapter_page_count(visible.total, large))
+        Ok(visible.total.div_ceil(page_size).max(1))
     }
 
     fn sync_reader_view(&self, state: &State<'_>) -> Result<Option<Book>> {
@@ -1402,13 +1436,12 @@ impl App {
     }
 
     fn view_settings(&self) -> Result<(Vec<SettingItem>, Vec<SettingItem>)> {
-        let large = self.platform.profile().is_scribe();
-        let item = |id: &str, title: &str, value: String, group: &str, enabled: bool| SettingItem {
+        let item = |id: &str, title: &str, value: String, group: &str| SettingItem {
             id: id.into(),
             title: tr(title).into(),
             value: value.into(),
             group: group.into(),
-            enabled,
+            enabled: true,
         };
         let refresh = if self.prefs.refresh_every == 0 {
             tr("only_chapter")
@@ -1420,202 +1453,40 @@ impl App {
                 tr("pages_unit")
             )
         };
-        let mut first = vec![item(
-            "screen-refresh",
-            "screen_refresh",
-            refresh,
-            "device",
-            true,
-        )];
-        if self.platform.profile().has_frontlight() {
-            first.push(item(
-                "frontlight-warmth",
-                "frontlight_warmth",
-                if self.platform.profile().has_warmth() {
-                    format!(
-                        "{} {} · {} {}",
-                        tr("brightness"),
-                        self.prefs.brightness,
-                        tr("warmth"),
-                        self.prefs.warmth
-                    )
-                } else {
-                    format!("{} {}", tr("brightness"), self.prefs.brightness)
-                },
-                "device",
-                true,
-            ));
-        }
-        first.push(item(
-            "wifi-sleep-exit",
-            "wifi_sleep_exit",
-            if self.prefs.keep_awake {
-                tr("keep_awake")
-            } else {
-                tr("allow_sleep")
-            },
-            "device",
-            true,
-        ));
-        first.push(item(
-            "storage",
-            "storage",
-            format!(
-                "{} {}",
-                tr("used"),
-                if self.options.demo {
-                    "2.1 GB".into()
-                } else {
-                    self.view_download_size_label()
-                }
-            ),
-            "device",
-            true,
-        ));
-        first.push(item(
-            "default-direction",
-            if large {
-                "settings_reading_direction"
-            } else {
-                "default_direction"
-            },
-            tr(match self.prefs.reading_direction.as_str() {
-                "vertical-pages" => "vertical_pages",
-                "vertical" => "webtoon_scroll",
-                direction => direction,
-            }),
-            "reading",
-            true,
-        ));
-        first.push(item(
-            "tap-regions",
-            "tap_regions",
-            {
-                let base = tr(match self.prefs.tap_layout.as_str() {
-                    "l-shaped" => "tap_l_shape",
-                    "swipe-only" => "swipe_only",
-                    _ => "thirds",
-                });
-                if self.prefs.reverse_taps
-                    || matches!(self.prefs.tap_layout.as_str(), "reverse" | "reversed")
-                {
-                    format!("{} · {}", base, tr("reverse"))
-                } else {
-                    base
-                }
-            },
-            "reading",
-            true,
-        ));
-        first.push(item(
-            "image-processing",
-            "image_processing",
-            [
-                self.prefs.crop_borders.then(|| tr("crop_borders")),
-                self.prefs.dither.then(|| {
-                    tr(if self.prefs.normalized_dither_method() == "hardware" {
-                        if self.platform.hardware_y4_available() {
-                            "dither_hardware"
-                        } else {
-                            "dither_software_fallback"
-                        }
-                    } else {
-                        "dither_software"
-                    })
-                }),
-            ]
-            .into_iter()
-            .flatten()
-            .collect::<Vec<_>>()
-            .join(" · "),
-            "reading",
-            true,
-        ));
-        if large {
-            first.push(item(
-                "spread",
-                "spread_and_landscape",
-                tr(if self.prefs.spread {
-                    "auto_spread"
-                } else {
-                    "keep_single"
-                }),
-                "reading",
-                true,
-            ));
-        }
-        // Pen navigation needs a runtime capability instead of a device-name guess.
-        let mut second = vec![
-            item("categories", "category", String::new(), "library", true),
-            item(
-                "auto-update",
-                "automatic_updates",
-                tr("unavailable"),
-                "library",
-                false,
-            ),
-            item(
-                "source-lists",
-                "source_list",
-                self.interactions.repositories.len().to_string(),
-                "sources-data",
-                true,
-            ),
-            item(
-                "downloads",
-                "download",
-                self.store.download_count()?.to_string(),
-                "sources-data",
-                true,
-            ),
-            item(
-                "tracking",
-                "track",
-                tr("not_configured"),
-                "sources-data",
-                false,
-            ),
-            item(
-                "backup",
-                "backup_restore",
-                tr("unavailable"),
-                "sources-data",
-                false,
-            ),
-            item(
-                "language",
-                "interface_language",
-                tr("chinese"),
-                "general",
-                true,
-            ),
-            item(
-                "logs",
-                "logs_diagnostics",
-                tr("unavailable"),
-                "general",
-                false,
-            ),
-            item(
-                "about",
-                "about",
-                env!("CARGO_PKG_VERSION").into(),
-                "general",
-                true,
-            ),
-        ];
-        if large {
-            for row in &mut second {
-                row.group = if row.id.as_str() == "backup" || row.group.as_str() == "general" {
-                    "general".into()
-                } else {
-                    "library-sources".into()
-                };
-            }
-            first.extend(second);
-            return Ok((first, Vec::new()));
-        }
-        Ok((first, second))
+        Ok((
+            vec![
+                item(
+                    "default-direction",
+                    "turn_and_zoom",
+                    String::new(),
+                    "reading",
+                ),
+                item(
+                    "frontlight-warmth",
+                    "frontlight_warmth",
+                    String::new(),
+                    "device",
+                ),
+                item("screen-refresh", "screen_refresh", refresh, "device"),
+                item("manage-sources", "manage_sources", String::new(), "library"),
+                item("storage", "download_management", String::new(), "library"),
+                item("categories", "category", String::new(), "library"),
+                item("backup", "backup_restore", String::new(), "general"),
+                item(
+                    "language",
+                    "interface_language",
+                    tr(match self.prefs.language.as_str() {
+                        "en" => "english",
+                        "ja" => "japanese",
+                        "zh-TW" => "traditional_chinese",
+                        _ => "chinese",
+                    }),
+                    "general",
+                ),
+                item("about", "about", String::new(), "general"),
+            ],
+            Vec::new(),
+        ))
     }
 }
 
@@ -2668,7 +2539,11 @@ fn search_pages(groups: &[SearchGroup], height: u32, large: bool) -> Vec<Vec<Sea
         };
     let cost = |group: &SearchGroup| {
         if group.books.row_count() > 0 {
-            if large { 286.0 } else { 217.0 }
+            if large {
+                64.0 + group.books.row_count().min(2) as f32 * 112.0
+            } else {
+                56.0 + group.books.row_count().min(2) as f32 * 98.0
+            }
         } else {
             if large { 68.0 } else { 52.0 }
         }
@@ -2879,10 +2754,7 @@ mod localization_tests {
             })
             .collect::<Vec<_>>();
         let paperwhite = search_pages(&groups, 824, false);
-        assert_eq!(
-            paperwhite.iter().map(Vec::len).collect::<Vec<_>>(),
-            vec![2, 1]
-        );
+        assert_eq!(paperwhite.iter().map(Vec::len).collect::<Vec<_>>(), vec![3]);
         assert_eq!(
             paperwhite
                 .iter()

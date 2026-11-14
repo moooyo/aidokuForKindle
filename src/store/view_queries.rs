@@ -627,6 +627,42 @@ impl Store {
         Ok(ViewPage { total, page, items })
     }
 
+    pub(crate) fn filtered_chapters_view_page(
+        &self,
+        book_id: &str,
+        newest_first: bool,
+        filter: i32,
+        page: usize,
+        page_size: usize,
+    ) -> Result<ViewPage<Chapter>> {
+        let predicate = match filter {
+            1 => "AND COALESCE(json_extract(document, '$.read'), 0) = 0",
+            2 => "AND json_extract(document, '$.downloaded') = 1",
+            _ => "",
+        };
+        let total: usize = self.connection.query_row(
+            &format!("SELECT COUNT(*) FROM chapters WHERE book_id = ?1 {predicate}"),
+            [book_id],
+            |row| row.get(0),
+        )?;
+        let (page, offset) = page_bounds(total, page, page_size)?;
+        let order = if newest_first {
+            "number DESC, id DESC"
+        } else {
+            "number, id"
+        };
+        let mut statement = self.connection.prepare(&format!(
+            "SELECT document FROM chapters WHERE book_id = ?1 {predicate} ORDER BY {order} LIMIT ?2 OFFSET ?3"
+        ))?;
+        let items = statement
+            .query_map(params![book_id, page_size, offset], |row| {
+                row.get::<_, String>(0)
+            })?
+            .map(|row| decode(row?))
+            .collect::<Result<Vec<Chapter>>>()?;
+        Ok(ViewPage { total, page, items })
+    }
+
     fn chapter_view_window(
         &self,
         book_id: &str,

@@ -99,7 +99,7 @@ export component ActionButton inherits Rectangle {
     accessible-role: button;
     accessible-label: root.text;
     accessible-enabled: root.enabled;
-    label := BodyText {
+    label := BodyText { x: 0px; y: 0px;
         width: parent.width;
         height: parent.height;
         text: root.text;
@@ -107,7 +107,7 @@ export component ActionButton inherits Rectangle {
         font-weight: root.quiet ? 500 : 700;
         color: !root.enabled ? Theme.disabled : root.inverted ? Theme.paper : Theme.ink;
     }
-    touch := TouchArea {
+    touch := TouchArea { x: 0px; y: 0px;
         enabled: root.enabled;
         pointer-event(event) => { if event.kind == PointerEventKind.down { Commands.refresh("fast"); } else if event.kind == PointerEventKind.up { Commands.refresh("ui"); } }
         clicked => { root.clicked(); }
@@ -134,8 +134,8 @@ export component IconButton inherits Rectangle {
     accessible-label: root.label == "" ? root.text : root.label;
     accessible-enabled: root.enabled;
     Icon { x: root.text == "" ? (parent.width - self.width) / 2 : 12px; y: (parent.height - self.height) / 2; width: State.large-screen ? 27px : 24px; height: self.width; kind: root.icon; inverted: root.inverted; enabled: root.enabled; }
-    caption := BodyText { x: root.text == "" ? 0px : 44px; width: root.text == "" ? 0px : max(0px, parent.width - 50px); height: parent.height; text: root.text; color: !root.enabled ? Theme.disabled : root.inverted ? Theme.paper : Theme.ink; }
-    touch := TouchArea {
+    caption := BodyText { y: 0px; x: root.text == "" ? 0px : 44px; width: root.text == "" ? 0px : max(0px, parent.width - 50px); height: parent.height; text: root.text; color: !root.enabled ? Theme.disabled : root.inverted ? Theme.paper : Theme.ink; }
+    touch := TouchArea { x: 0px; y: 0px;
         enabled: root.enabled;
         pointer-event(event) => { if event.kind == PointerEventKind.down { Commands.refresh("fast"); } else if event.kind == PointerEventKind.up { Commands.refresh("ui"); } }
         clicked => { root.clicked(); }
@@ -155,7 +155,7 @@ export component Tab inherits Rectangle {
     accessible-label: root.text;
     caption := BodyText { x: 0px; y: 0px; width: parent.width; height: root.visual-height - 3px; text: root.text; color: touch.pressed ? Theme.paper : root.selected ? Theme.ink : Theme.secondary; font-size: State.large-screen ? 19px : 17px; font-weight: root.selected ? 700 : 400; }
     if root.selected: Rectangle { x: 0px; y: root.visual-height - (State.large-screen ? 4px : 3px); width: parent.width; height: State.large-screen ? 4px : 3px; background: touch.pressed ? Theme.paper : Theme.ink; }
-    touch := TouchArea {
+    touch := TouchArea { x: 0px; y: 0px;
         pointer-event(event) => { if event.kind == PointerEventKind.down { Commands.refresh("fast"); } else if event.kind == PointerEventKind.up { Commands.refresh("ui"); } }
         clicked => { root.clicked(); }
     }
@@ -184,9 +184,9 @@ export component ToggleRow inherits Rectangle {
     accessible-enabled: root.enabled;
     accessible-checkable: true;
     accessible-checked: root.value;
-    BodyText {
+    BodyText { y: 0px;
         x: 0px; width: max(0px, parent.width - track.width - 12px); height: parent.height;
-        text: root.text; font-size: State.large-screen ? 17px : 16px;
+        text: root.text; font-size: Theme.body;
         color: !root.enabled ? Theme.disabled : touch.pressed ? Theme.paper : Theme.ink;
     }
     track := Rectangle {
@@ -200,12 +200,12 @@ export component ToggleRow inherits Rectangle {
             width: State.large-screen ? 22px : 21px; height: self.width;
             x: root.value ? (State.large-screen ? 27px : 22px) : (State.large-screen ? 3.5px : 3px);
             y: State.large-screen ? 3.5px : 3px;
-            border-radius: 3px;
+            border-radius: 0px;
             background: !root.enabled ? Theme.disabled : root.value ? (touch.pressed ? Theme.ink : Theme.paper) : (touch.pressed ? Theme.paper : Theme.ink);
         }
     }
-    Rectangle { y: parent.height - 1px; width: parent.width; height: 1px; background: Theme.line; }
-    touch := TouchArea {
+    Rectangle { x: 0px; y: parent.height - 1px; width: parent.width; height: 1px; background: Theme.line; }
+    touch := TouchArea { x: 0px; y: 0px;
         enabled: root.enabled;
         pointer-event(event) => { if event.kind == PointerEventKind.down { Commands.refresh("fast"); } else if event.kind == PointerEventKind.up { Commands.refresh("ui"); } }
         clicked => { root.toggled(); }
@@ -235,8 +235,8 @@ export component RadioCard inherits Rectangle {
         background: transparent; border-width: 2px; border-color: root.foreground; border-radius: 3px;
         if root.selected: Rectangle { x: (parent.width - 10px) / 2; y: (parent.height - 10px) / 2; width: 10px; height: 10px; background: root.foreground; }
     }
-    BodyText { x: State.large-screen ? 58px : 52px; width: max(0px, parent.width - self.x - (State.large-screen ? 18px : 16px)); height: parent.height; text: root.text; font-size: State.large-screen ? 17px : 16px; font-weight: 700; color: root.foreground; }
-    touch := TouchArea {
+    BodyText { y: 0px; x: State.large-screen ? 58px : 52px; width: max(0px, parent.width - self.x - (State.large-screen ? 18px : 16px)); height: parent.height; text: root.text; font-size: State.large-screen ? 17px : 16px; font-weight: 700; color: root.foreground; }
+    touch := TouchArea { x: 0px; y: 0px;
         enabled: root.enabled;
         pointer-event(event) => { if event.kind == PointerEventKind.down { Commands.refresh("fast"); } else if event.kind == PointerEventKind.up { Commands.refresh("ui"); } }
         clicked => { root.clicked(); }
@@ -260,7 +260,7 @@ export component FilterChip inherits Rectangle {
     accessible-label: root.text;
     accessible-checkable: true;
     accessible-checked: root.state != 0;
-    if root.state == -1: Rectangle {
+    if root.state == -1: Rectangle { x: 0px; y: 0px;
         background: transparent;
         clip: true;
         for index in ceil(max(0px, root.width - 8px) / 6px): Rectangle {
@@ -281,9 +281,9 @@ export component FilterChip inherits Rectangle {
         }
     }
     if root.state != 0: Icon { x: 12px; y: (parent.height - self.height) / 2; width: 16px; height: self.width; kind: root.state == 1 ? "check" : "close"; inverted: root.inverted; }
-    label := BodyText { x: root.horizontal-padding + (root.state == 0 ? 0px : 16px); width: max(0px, parent.width - self.x - root.horizontal-padding); height: parent.height; text: root.text; font-size: root.text-size; color: root.inverted ? Theme.paper : Theme.ink; horizontal-alignment: TextHorizontalAlignment.center; }
+    label := BodyText { y: 0px; x: root.horizontal-padding + (root.state == 0 ? 0px : 16px); width: max(0px, parent.width - self.x - root.horizontal-padding); height: parent.height; text: root.text; font-size: root.text-size; color: root.inverted ? Theme.paper : Theme.ink; horizontal-alignment: TextHorizontalAlignment.center; }
     if root.state == -1: Rectangle { width: min(label.width, label.preferred-width); height: 1px; x: label.x + (label.width - self.width) / 2; y: root.height / 2; background: root.inverted ? Theme.paper : Theme.ink; }
-    touch := TouchArea {
+    touch := TouchArea { x: 0px;
         y: (parent.height - Theme.touch) / 2; height: Theme.touch;
         pointer-event(event) => { if event.kind == PointerEventKind.down { Commands.refresh("fast"); } else if event.kind == PointerEventKind.up { Commands.refresh("ui"); } }
         clicked => { root.clicked(); }
@@ -447,7 +447,7 @@ export component Cover inherits Rectangle {
         x: parent.width - (State.large-screen ? 34px : 32px); y: 6px;
         width: State.large-screen ? 28px : 25px; height: State.large-screen ? 28px : 25px;
         background: Theme.ink; border-width: 1px; border-color: Theme.paper;
-        Text { width: parent.width; height: parent.height; text: root.book.unread; color: Theme.paper; font-family: Theme.numbers; font-size: 15px; font-weight: 700; horizontal-alignment: TextHorizontalAlignment.center; vertical-alignment: TextVerticalAlignment.center; }
+        Text { x: 0px; y: 0px; width: parent.width; height: parent.height; text: root.book.unread; color: Theme.paper; font-family: Theme.numbers; font-size: 15px; font-weight: 700; horizontal-alignment: TextHorizontalAlignment.center; vertical-alignment: TextVerticalAlignment.center; }
     }
     if root.book.progress > 0 && root.show-progress: Rectangle { x: 0px; y: parent.height - 6px; width: parent.width * root.book.progress; height: 6px; background: Theme.ink; }
     if root.selection-mode || root.selected: Rectangle {
@@ -457,7 +457,7 @@ export component Cover inherits Rectangle {
         background: root.selected ? Theme.ink : Theme.paper;
         if root.selected: Icon { width: State.large-screen ? 20px : 16px; height: self.width; x: (parent.width - self.width) / 2; y: (parent.height - self.height) / 2; kind: "check"; inverted: true; }
     }
-    touch := TouchArea {
+    touch := TouchArea { x: 0px; y: 0px;
         property <bool> long-fired: false;
         pointer-event(event) => { if event.kind == PointerEventKind.down { self.long-fired = false; hold.running = true; } else if event.kind == PointerEventKind.up || event.kind == PointerEventKind.cancel { hold.running = false; } }
         clicked => { if !self.long-fired { root.opened(); } }
@@ -509,26 +509,6 @@ export component StatusBar inherits Rectangle {
     }
 }
 
-component NavigationIcon inherits Path {
-    in property <int> index;
-    in property <color> color;
-    in property <bool> active;
-    width: State.large-screen ? 27px : 24px;
-    height: self.width;
-    viewbox-width: 24;
-    viewbox-height: 24;
-    fill: transparent;
-    stroke: root.color;
-    stroke-width: State.large-screen ? (root.active ? 2.2px : 1.6px) : (root.active ? 2.3px : 1.7px);
-    stroke-line-cap: round;
-    stroke-line-join: round;
-    commands: root.index == 0 ? "M4 4h4v16H4zM10 4h4v16h-4zM15.6 5.2l3.9-1 3.6 14.6-3.9 1z" :
-        root.index == 1 ? "M12 2.5a9.5 9.5 0 1 0 0 19a9.5 9.5 0 1 0 0-19zM15.8 8.2l-2.2 5.4-5.4 2.2 2.2-5.4z" :
-        root.index == 2 ? "M10.5 4a6.5 6.5 0 1 0 0 13a6.5 6.5 0 1 0 0-13zM15.5 15.5L21 21" :
-        root.index == 3 ? "M12 2.5a9.5 9.5 0 1 0 0 19a9.5 9.5 0 1 0 0-19zM12 6.5V12l3.5 2.5" :
-        "M12 9a3 3 0 1 0 0 6a3 3 0 1 0 0-6zM19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.6 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.6a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z";
-}
-
 export component Navigation inherits Rectangle {
     background: Theme.paper;
     height: Theme.nav-height;
@@ -544,9 +524,8 @@ export component Navigation inherits Rectangle {
             background: touch.pressed ? Theme.ink : Theme.paper;
             accessible-role: tab;
             accessible-label: label;
-            NavigationIcon { x: (parent.width - self.width) / 2; y: State.large-screen ? 10.75px : 10.25px; index: index; color: touch.pressed ? Theme.paper : State.active-tab == index ? Theme.ink : Theme.secondary; active: State.active-tab == index; }
-            BodyText { x: 0px; y: State.large-screen ? 43.75px : 39.25px; width: parent.width; height: State.large-screen ? 24px : 21px; text: label; font-size: State.large-screen ? 16px : 14px; letter-spacing: State.large-screen ? 2px : 1px; font-weight: State.active-tab == index ? 700 : 400; color: touch.pressed ? Theme.paper : State.active-tab == index ? Theme.ink : Theme.secondary; horizontal-alignment: TextHorizontalAlignment.center; }
-            touch := TouchArea {
+            BodyText { x: 0px; y: 0px; width: parent.width; height: parent.height; text: label; font-size: State.large-screen ? 22px : 20px; font-weight: State.active-tab == index ? 700 : 400; color: touch.pressed ? Theme.paper : Theme.ink; horizontal-alignment: center; }
+            if index > 0: Rectangle { x: 0px; y: 16px; height: parent.height - 32px; width: 1px; background: Theme.ink; }            touch := TouchArea {
                 x: 0px; y: 0px; width: parent.width; height: parent.height;
                 pointer-event(event) => { if event.kind == PointerEventKind.down { root.pressed-tab = index; Commands.refresh("fast"); } else if event.kind == PointerEventKind.up || event.kind == PointerEventKind.cancel { root.pressed-tab = -1; Commands.refresh("ui"); } }
                 clicked => { Commands.action("navigation", "open", index); }
@@ -554,7 +533,7 @@ export component Navigation inherits Rectangle {
         }
         Rectangle {
             x: State.active-tab * root.tab-width + root.tab-width * (State.large-screen ? 0.30 : 0.24);
-            y: 1.5px;
+            y: root.height - 11px;
             width: root.tab-width * (State.large-screen ? 0.40 : 0.52);
             height: State.large-screen ? 5px : 4px;
             visible: State.active-tab >= 0 && State.active-tab < 5;

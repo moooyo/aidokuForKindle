@@ -31,7 +31,7 @@ export component AppWindow inherits Window {
     background: Theme.paper;
     default-font-family: Theme.sans;
     default-font-size: Theme.body;
-    property <bool> has-navigation: State.route != "reader" && State.route != "detail" && (State.route != "catalog" || State.large-screen) && State.modal != "keyboard";
+    property <bool> has-navigation: State.route != "reader" && State.route != "detail" && State.modal != "keyboard";
     if !State.booting && State.route != "reader": StatusBar { y: 0px; width: root.width; }
     content := Rectangle {
         x: 0px; y: State.route == "reader" ? 0px : Theme.status-height;

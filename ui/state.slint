@@ -249,7 +249,10 @@ export global State {
     in-out property <int> chapter-count: 0;
     in-out property <int> unread-count: 0;
     in-out property <int> downloaded-count: 0;
-    in-out property <bool> newest-first: true;
+    in-out property <bool> newest-first: false;
+    in-out property <int> detail-filter: 0;
+    in-out property <bool> bookmark-edit: false;
+    in-out property <[SettingItem]> detail-bookmarks;
     in-out property <bool> chapter-selection-mode: false;
     in-out property <int> selected-chapter-count: 0;
     in-out property <[BookItem]> migration-candidates;
@@ -305,6 +308,7 @@ export global State {
     in-out property <bool> hardware-dither-available: false;
     in-out property <bool> dither-pending: false;
     in-out property <int> contrast: 0;
+    in-out property <string> reader-fit: "page";
     in-out property <bool> keep-awake: true;
     in-out property <int> ahead-chapters: 0;
     in-out property <bool> resize-downloads: false;

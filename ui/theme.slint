@@ -1,29 +1,29 @@
 import { State } from "state.slint";
 
 export global Theme {
-    out property <color> ink: #000;
-    out property <color> secondary: #555;
-    out property <color> muted: #666;
-    out property <color> disabled: #999;
-    out property <color> dotted: #bbb;
-    out property <color> line: #ddd;
-    out property <color> fill: #eee;
-    out property <color> paper: #fff;
+    out property <color> ink: State.night-mode ? #eee : #111;
+    out property <color> secondary: State.night-mode ? #bbb : #555;
+    out property <color> muted: State.night-mode ? #aaa : #666;
+    out property <color> disabled: State.night-mode ? #777 : #999;
+    out property <color> dotted: State.night-mode ? #666 : #bbb;
+    out property <color> line: State.night-mode ? #555 : #bbb;
+    out property <color> fill: State.night-mode ? #222 : #eee;
+    out property <color> paper: State.night-mode ? #111 : #fff;
     in-out property <string> sans: "Noto Sans CJK SC";
     in-out property <string> serif: "Noto Serif CJK SC";
     in-out property <string> numbers: "Literata";
-    out property <length> margin: State.large-screen ? 36px : 22px;
+    out property <length> margin: State.large-screen ? 40px : 28px;
     out property <length> touch: State.large-screen ? 56px : 48px;
     out property <length> status-height: State.large-screen ? 36px : 28px;
-    out property <length> nav-height: State.large-screen ? 80px : 72px;
+    out property <length> nav-height: State.large-screen ? 72px : 64px;
     out property <length> pager-height: State.large-screen ? 68px : 52px;
     out property <length> title: State.large-screen ? 46px : 34px;
     out property <length> title-line: State.large-screen ? 56px : 42px;
     out property <length> title-tracking: State.large-screen ? 6px : 4px;
-    out property <length> body: State.large-screen ? 18px : 16px;
-    out property <length> caption: State.large-screen ? 15px : 13px;
+    out property <length> body: State.large-screen ? 22px : 18px;
+    out property <length> caption: State.large-screen ? 18px : 16px;
     out property <length> book-title: State.large-screen ? 20px : 17px;
     out property <length> control-border: 1.5px;
     out property <length> popup-border: 2px;
-    out property <length> control-radius: 4px;
+    out property <length> control-radius: 0px;
 }

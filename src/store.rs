@@ -691,6 +691,14 @@ impl Store {
         Ok(records)
     }
 
+    pub fn remove_bookmark(&self, book_id: &str, chapter_id: &str, page: u32) -> Result<()> {
+        self.connection.execute(
+            "DELETE FROM bookmarks WHERE book_id = ?1 AND chapter_id = ?2 AND page = ?3",
+            params![book_id, chapter_id, page],
+        )?;
+        Ok(())
+    }
+
     pub fn preferences(&self) -> Result<Preferences> {
         Ok(query_document(
             &self.connection,
@@ -772,6 +780,13 @@ impl Store {
         ensure!(
             (-100..=100).contains(&preferences.contrast),
             "Contrast is outside its supported range"
+        );
+        ensure!(
+            matches!(
+                preferences.reader_fit.as_str(),
+                "original" | "page" | "height" | "width"
+            ),
+            "Unknown reader fit"
         );
         self.connection.execute("INSERT INTO preferences (key, document) VALUES ('application', ?1) ON CONFLICT(key) DO UPDATE SET document = excluded.document WHERE preferences.document<>excluded.document", [encode(preferences)?])?;
         Ok(())

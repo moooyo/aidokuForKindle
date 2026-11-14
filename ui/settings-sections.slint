@@ -1,3 +1,4 @@
+import { ReadingOptions, LightOptions, RefreshOptions } from "native-controls.slint";
 import { State, Commands } from "state.slint";
 import { Theme } from "theme.slint";
 import { Strings } from "strings.slint";
@@ -46,58 +47,8 @@ export component SettingsBody inherits Rectangle {
     property <length> group-height: State.large-screen ? 21px : 18px;
     property <length> section-gap: State.large-screen ? 12px : 10px;
 
-    if root.section == "screen-refresh": Rectangle {
-        x: 0px; y: 0px; width: parent.width; height: parent.height;
-        GroupLabel { x: 0px; y: State.large-screen ? 10px : 0px; width: parent.width; height: root.group-height; text: Strings.refresh-interval; font-size: State.large-screen ? 14px : 12px; }
-        for value[index] in [1, 3, 6, 10, 0]: SettingsChoice {
-            x: index * (parent.width + 8px) / 5;
-            y: State.large-screen ? 43px : 28px;
-            width: (parent.width - 32px) / 5;
-            text: value == 0 ? Strings.refresh-chapter : State.large-screen ? value == 1 ? Strings.refresh-each : value + " " + Strings.pages-unit : value;
-            selected: State.refresh-every == value;
-            clicked => { if State.refresh-every != value { Commands.action("settings", "set", "refresh-every=" + value); } }
-        }
-        GroupLabel { x: 0px; y: State.large-screen ? 115px : 90px; width: parent.width - 110px; height: root.group-height; text: Strings.page-quality; font-size: State.large-screen ? 14px : 12px; }
-        Caption { x: parent.width - 110px; y: State.large-screen ? 115px : 90px; width: 110px; height: root.group-height; text: Strings.unavailable; horizontal-alignment: right; }
-        for label[index] in [Strings.quality-first, Strings.balanced, Strings.speed-first]: RadioCard {
-            x: 0px;
-            y: (State.large-screen ? 148px : 118px) + index * (State.large-screen ? 68px : 60px);
-            width: parent.width;
-            text: label;
-            selected: false;
-            enabled: false;
-        }
-        ToggleRow { x: 0px; y: State.large-screen ? 356px : 304px; width: parent.width; text: Strings.chapter-full-refresh; value: true; enabled: false; }
-        ToggleRow { x: 0px; y: (State.large-screen ? 356px : 304px) + root.row-height; width: parent.width; text: Strings.flash-close; value: State.flash-on-close; toggled => { Commands.action("settings", "set", "flash-on-close=" + (State.flash-on-close ? "false" : "true")); } }
-        ToggleRow { x: 0px; y: (State.large-screen ? 356px : 304px) + root.row-height * 2; width: parent.width; text: Strings.night-mode; value: State.night-mode; toggled => { Commands.action("settings", "set", "night-mode=" + (State.night-mode ? "false" : "true")); } }
-        GroupLabel { x: 0px; y: State.large-screen ? 558px : 482px; width: parent.width; height: root.group-height; text: Strings.grayscale-test; font-size: State.large-screen ? 14px : 12px; }
-        Rectangle {
-            x: 0px;
-            y: State.large-screen ? 591px : 510px;
-            width: parent.width; height: State.large-screen ? 38px : 34px;
-            border-width: 1px; border-color: Theme.secondary; border-radius: Theme.control-radius; background: Theme.paper; clip: true;
-            Rectangle {
-                x: 1px; y: 1px; width: parent.width - 2px; height: parent.height - 2px;
-                border-radius: 3px; clip: true;
-                for index in 16: Rectangle { x: index * parent.width / 16; y: 0px; width: parent.width / 16 + 1px; height: parent.height; background: rgb(index * 17, index * 17, index * 17); }
-            }
-        }
-    }
-
-    if root.section == "frontlight-warmth": Rectangle {
-        x: 0px; y: 0px; width: parent.width; height: parent.height;
-        if State.has-frontlight: SettingsSlider { x: 0px; y: 6px; width: parent.width; text: Strings.brightness; preference: "brightness"; value: State.brightness; }
-        if State.has-warmth: SettingsSlider { x: 0px; y: State.large-screen ? 114px : 102px; width: parent.width; text: Strings.warmth; preference: "warmth"; value: State.warmth; }
-        if !State.has-frontlight: Caption { x: 0px; y: 0px; width: parent.width; height: 32px; text: Strings.unavailable; }
-    }
-
-    if root.section == "pen": Rectangle {
-        x: 0px; y: 0px; width: parent.width; height: parent.height;
-        ToggleRow { x: 0px; y: 0px; width: parent.width; text: Strings.pen-tap; value: State.stylus-navigation; enabled: State.pen-supported; toggled => { Commands.action("settings", "set", "stylus-navigation=" + (State.stylus-navigation ? "false" : "true")); } }
-        ToggleRow { x: 0px; y: root.row-height; width: parent.width; text: Strings.palm-rejection; value: State.palm-rejection; enabled: State.pen-supported; toggled => { Commands.action("settings", "set", "palm-rejection=" + (State.palm-rejection ? "false" : "true")); } }
-        if !State.pen-supported: Caption { x: 0px; y: root.row-height * 2 + 12px; width: parent.width; height: 26px; text: Strings.unavailable; }
-    }
-
+    if root.section == "screen-refresh": RefreshOptions { x: 0px; y: 0px; width: parent.width; }
+    if root.section == "frontlight-warmth": LightOptions { x: 0px; y: 0px; width: parent.width; }
     if root.section == "wifi-sleep-exit": Rectangle {
         x: 0px; y: 0px; width: parent.width; height: parent.height;
         property <length> saver-label-top: State.large-screen ? 202px : root.row-height * 3 + root.section-gap + 8px;
@@ -145,68 +96,7 @@ export component SettingsBody inherits Rectangle {
         }
     }
 
-    if root.section == "default-direction": Rectangle {
-        x: 0px; y: 0px; width: parent.width; height: parent.height;
-        GroupLabel { x: 0px; y: State.large-screen ? 10px : 0px; width: parent.width; height: root.group-height; text: Strings.default-direction; font-size: State.large-screen ? 14px : 12px; }
-        for label[index] in [Strings.rtl, Strings.ltr, Strings.vertical-paging, Strings.webtoon]: SettingsChoice {
-            property <string> direction: index == 0 ? "rtl" : index == 1 ? "ltr" : index == 2 ? "vertical-pages" : "vertical";
-            x: index * (parent.width + 8px) / 4; y: State.large-screen ? 43px : 28px;
-            width: (parent.width - 24px) / 4;
-            text: label; selected: State.reading-direction == self.direction;
-            clicked => { if State.reading-direction != self.direction { Commands.action("settings", "set", "reading-direction=" + self.direction); } }
-        }
-        ToggleRow { x: 0px; y: State.large-screen ? 105px : 84px; width: parent.width; text: Strings.per-book-direction; value: State.remember-book-direction; toggled => { Commands.action("settings", "set", "remember-book-direction=" + (State.remember-book-direction ? "false" : "true")); } }
-        ToggleRow { x: 0px; y: (State.large-screen ? 105px : 84px) + root.row-height; width: parent.width; text: Strings.double-tap-zoom; value: State.double-tap-zoom; toggled => { Commands.action("settings", "set", "double-tap-zoom=" + (State.double-tap-zoom ? "false" : "true")); } }
-    }
-
-    if root.section == "tap-regions": Rectangle {
-        x: 0px; y: 0px; width: parent.width; height: parent.height;
-        for label[index] in [Strings.thirds, Strings.tap-l-shape, Strings.swipe-only]: TapLayoutCard {
-            property <string> target-layout: index == 0 ? "thirds" : index == 1 ? "l-shaped" : "swipe-only";
-            property <string> current-layout: State.tap-layout == "reverse" || State.tap-layout == "reversed" ? "thirds" : State.tap-layout;
-            x: 0px;
-            y: index * (State.large-screen ? 71px : 60px); width: parent.width; height: State.large-screen ? 63px : 52px;
-            text: label;
-            layout: self.target-layout;
-            selected: self.current-layout == self.target-layout;
-            clicked => { if self.current-layout != self.target-layout { Commands.action("settings", "set", "tap-layout=" + self.target-layout); } }
-        }
-        ToggleRow { x: 0px; y: State.large-screen ? 217px : 184px; width: parent.width; text: Strings.reverse; value: State.reverse-taps; toggled => { Commands.action("settings", "set", "reverse-taps=" + (State.reverse-taps ? "false" : "true")); } }
-        ToggleRow { x: 0px; y: (State.large-screen ? 217px : 184px) + root.row-height; width: parent.width; text: Strings.show-tap-zones; value: State.show-tap-zones; toggled => { Commands.action("settings", "set", "show-tap-zones=" + (State.show-tap-zones ? "false" : "true")); } }
-    }
-
-    if root.section == "image-processing": Rectangle {
-        x: 0px; y: 0px; width: parent.width; height: parent.height;
-        GroupLabel { x: 0px; y: State.large-screen ? 10px : 0px; width: parent.width; height: root.group-height; text: Strings.contrast; font-size: State.large-screen ? 14px : 12px; }
-        for label[index] in ["−2", "−1", Strings.standard, "+1", "+2"]: SettingsChoice {
-            x: index * (parent.width + 8px) / 5; y: State.large-screen ? 43px : 28px;
-            width: (parent.width - 32px) / 5; text: label; selected: State.contrast == index - 2;
-            clicked => { if State.contrast != index - 2 { Commands.action("settings", "set", "contrast=" + (index - 2)); } }
-        }
-        ToggleRow { x: 0px; y: State.large-screen ? 105px : 84px; width: parent.width; text: Strings.crop-borders; value: State.crop-borders; toggled => { Commands.action("settings", "set", "crop-borders=" + (State.crop-borders ? "false" : "true")); } }
-        dither-selector := DitherSelector { x: 0px; y: (State.large-screen ? 105px : 84px) + root.row-height + root.section-gap; width: parent.width; }
-        ToggleRow { x: 0px; y: dither-selector.y + dither-selector.height + root.section-gap; width: parent.width; text: Strings.split-wide; value: State.split-wide; toggled => { Commands.action("settings", "set", "split-wide=" + (State.split-wide ? "false" : "true")); } }
-    }
-
-    if root.section == "spread": Rectangle {
-        x: 0px; y: 0px; width: parent.width; height: parent.height;
-        GroupLabel { x: 0px; y: State.large-screen ? 10px : 0px; width: parent.width; height: root.group-height; text: Strings.when-landscape; font-size: State.large-screen ? 14px : 12px; }
-        for label[index] in [Strings.auto-spread, Strings.always-spread, Strings.keep-single]: SettingsChoice {
-            property <string> layout: index == 0 ? "automatic" : index == 1 ? "double" : "single";
-            x: index * (parent.width + 8px) / 3; y: State.large-screen ? 43px : 28px;
-            width: (parent.width - 16px) / 3; text: label;
-            selected: State.page-layout-mode == self.layout;
-            clicked => { if State.page-layout-mode != self.layout { Commands.action("settings", "set", "page-layout-mode=" + self.layout); } }
-        }
-        GroupLabel { x: 0px; y: State.large-screen ? 115px : 90px; width: parent.width - 110px; height: root.group-height; text: Strings.wide-images; font-size: State.large-screen ? 14px : 12px; }
-        for label[index] in [Strings.whole-page, Strings.split-two-pages]: SettingsChoice {
-            x: index * (parent.width + 8px) / 2; y: State.large-screen ? 148px : 118px; width: (parent.width - 8px) / 2; text: label;
-            selected: State.split-wide == (index == 1);
-            clicked => { Commands.action("settings", "set", "split-wide=" + (index == 1 ? "true" : "false")); }
-        }
-        ToggleRow { x: 0px; y: State.large-screen ? 210px : 174px; width: parent.width; text: Strings.cover-alone; value: State.cover-alone; toggled => { Commands.action("settings", "set", "cover-alone=" + (State.cover-alone ? "false" : "true")); } }
-    }
-
+    if root.section == "default-direction": ReadingOptions { x: 0px; y: 0px; width: parent.width; }
     if root.section == "auto-update": Rectangle {
         x: 0px; y: 0px; width: parent.width; height: parent.height;
         GroupLabel { x: 0px; y: State.large-screen ? 10px : 0px; width: parent.width - 110px; height: root.group-height; text: Strings.update-frequency; font-size: State.large-screen ? 14px : 12px; }

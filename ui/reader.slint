@@ -2,31 +2,28 @@ import { State, Commands } from "state.slint";
 import { Theme } from "theme.slint";
 import { Strings } from "strings.slint";
 import { BodyText, Caption, Icon } from "widgets.slint";
+import { NativeReaderTool, NativeReaderProgress } from "reader-chrome.slint";
 
 export global ReaderMetrics {
-    out property <length> header-height: State.large-screen ? 78px : 89.5px;
-    out property <length> controls-height: State.large-screen ? 133px : 119px;
-    out property <length> toolbar-height: State.large-screen ? 77px : 69px;
-    out property <length> bottom-height: State.large-screen ? 210px : 188px;
-    out property <length> content-inset: State.large-screen ? (State.landscape ? 120px : 48px) : 20px;
-    out property <length> tools-inset: State.large-screen ? (State.landscape ? 120px : 24px) : 0px;
-    out property <length> range-top: State.large-screen ? 45px : 39px;
-    out property <length> range-height: State.large-screen ? 40px : 36px;
-    out property <length> chapter-top: State.large-screen ? 87px : 77px;
-    out property <length> chapter-height: State.large-screen ? 44px : 40px;
+    out property <length> header-height: State.large-screen ? 80px : 72px;
+    out property <length> controls-height: State.reader-panel == "" ? (State.large-screen ? 144px : 128px) : 0px;
+    out property <length> toolbar-height: Theme.nav-height;
+    out property <length> bottom-height: ReaderMetrics.controls-height + Theme.nav-height;
+    out property <length> content-inset: Theme.margin;
+    out property <length> tools-inset: 0px;
+    out property <length> range-top: 40px;
+    out property <length> range-height: Theme.touch;
+    out property <length> chapter-top: 12px;
+    out property <length> chapter-height: Theme.touch;
 }
-
 export global ReaderControlPalette {
-    // Keep controls on light paper after the native full-scene night inversion.
-    // Comic pixels continue to use the user's ordinary night-mode path.
-    out property <color> paper: State.native-scene-inverted ? #000 : #fff;
-    out property <color> ink: State.native-scene-inverted ? #fff : #000;
-    out property <color> secondary: State.native-scene-inverted ? #eee : #111;
-    out property <color> disabled: State.native-scene-inverted ? #999 : #666;
-    out property <color> line: State.native-scene-inverted ? #777 : #888;
-    out property <color> dotted: State.native-scene-inverted ? #777 : #888;
+    out property <color> paper: Theme.paper;
+    out property <color> ink: Theme.ink;
+    out property <color> secondary: Theme.secondary;
+    out property <color> disabled: Theme.disabled;
+    out property <color> line: Theme.line;
+    out property <color> dotted: Theme.dotted;
 }
-
 component ReaderGlyph inherits Path {
     in property <string> kind;
     in property <color> color: Theme.ink;
@@ -63,52 +60,6 @@ component ReaderGlyph inherits Path {
         "M6.5 12a1.5 1.5 0 1 1-3 0a1.5 1.5 0 1 1 3 0zM13.5 12a1.5 1.5 0 1 1-3 0a1.5 1.5 0 1 1 3 0zM20.5 12a1.5 1.5 0 1 1-3 0a1.5 1.5 0 1 1 3 0z";
 }
 
-component ReaderTool inherits Rectangle {
-    in property <string> action;
-    in property <string> text;
-    in property <bool> active;
-    background: touch.pressed ? ReaderControlPalette.ink : ReaderControlPalette.paper;
-    accessible-role: button;
-    accessible-label: root.text;
-    accessible-checkable: true;
-    accessible-checked: root.active;
-    if root.active: Rectangle {
-        x: parent.width * (State.large-screen ? 0.30 : 0.26);
-        y: 0px;
-        width: parent.width * (State.large-screen ? 0.40 : 0.48);
-        height: 4px;
-        background: touch.pressed ? ReaderControlPalette.paper : ReaderControlPalette.ink;
-    }
-    ReaderGlyph {
-        x: (parent.width - self.width) / 2;
-        y: (parent.height - (State.large-screen ? 53px : 46.5px)) / 2;
-        width: State.large-screen ? 26px : 23px;
-        height: self.width;
-        kind: root.action;
-        color: touch.pressed ? ReaderControlPalette.paper : root.active ? ReaderControlPalette.ink : ReaderControlPalette.secondary;
-        active: root.active;
-    }
-    BodyText {
-        x: 0px;
-        y: (parent.height - (State.large-screen ? 53px : 46.5px)) / 2 + (State.large-screen ? 31px : 27px);
-        width: parent.width;
-        height: State.large-screen ? 22px : 19.5px;
-        text: root.text;
-        font-size: State.large-screen ? 15px : 13px;
-        font-weight: root.active ? 700 : 600;
-        letter-spacing: State.large-screen ? 2px : 1px;
-        color: touch.pressed ? ReaderControlPalette.paper : root.active ? ReaderControlPalette.ink : ReaderControlPalette.secondary;
-        horizontal-alignment: center;
-    }
-    touch := TouchArea {
-        pointer-event(event) => {
-            if event.kind == PointerEventKind.down { Commands.refresh("fast"); }
-            else if event.kind == PointerEventKind.up || event.kind == PointerEventKind.cancel { Commands.refresh("ui"); }
-        }
-        clicked => { Commands.action("reader", root.action, ""); }
-    }
-}
-
 component ReaderHeaderAction inherits Rectangle {
     in property <string> action;
     in property <string> label;
@@ -138,46 +89,7 @@ component ReaderHeaderAction inherits Rectangle {
         height: 3px;
         background: touch.pressed ? ReaderControlPalette.paper : ReaderControlPalette.ink;
     }
-    touch := TouchArea {
-        pointer-event(event) => {
-            if event.kind == PointerEventKind.down { Commands.refresh("fast"); }
-            else if event.kind == PointerEventKind.up || event.kind == PointerEventKind.cancel { Commands.refresh("ui"); }
-        }
-        clicked => { Commands.action("reader", root.action, ""); }
-    }
-}
-
-component ReaderChapterAction inherits Rectangle {
-    in property <string> text;
-    in property <string> action;
-    in property <bool> trailing;
-    in property <bool> enabled: true;
-    width: State.large-screen ? 180px : 150px;
-    height: ReaderMetrics.chapter-height;
-    background: touch.pressed && root.enabled ? ReaderControlPalette.ink : ReaderControlPalette.paper;
-    accessible-role: button;
-    accessible-label: root.text;
-    accessible-enabled: root.enabled;
-    ReaderGlyph {
-        x: root.trailing ? parent.width - (State.large-screen ? 28px : 24px) : (State.large-screen ? 10px : 8px);
-        y: (parent.height - self.height) / 2;
-        width: State.large-screen ? 18px : 16px;
-        height: self.width;
-        kind: root.trailing ? "chevron-right" : "chevron-left";
-        color: !root.enabled ? ReaderControlPalette.disabled : touch.pressed ? ReaderControlPalette.paper : ReaderControlPalette.ink;
-        active: true;
-    }
-    BodyText {
-        x: root.trailing ? (State.large-screen ? 10px : 8px) : (State.large-screen ? 32px : 26px);
-        width: parent.width - (State.large-screen ? 42px : 34px);
-        height: parent.height;
-        text: root.text;
-        font-size: State.large-screen ? 16px : 14px;
-        color: !root.enabled ? ReaderControlPalette.disabled : touch.pressed ? ReaderControlPalette.paper : ReaderControlPalette.ink;
-        horizontal-alignment: root.trailing ? right : left;
-    }
-    touch := TouchArea {
-        enabled: root.enabled;
+    touch := TouchArea { x: 0px; y: 0px;
         pointer-event(event) => {
             if event.kind == PointerEventKind.down { Commands.refresh("fast"); }
             else if event.kind == PointerEventKind.up || event.kind == PointerEventKind.cancel { Commands.refresh("ui"); }
@@ -194,7 +106,7 @@ component ReaderZoneLabel inherits Rectangle {
     border-width: root.next ? 0px : 1.5px;
     border-color: Theme.ink;
     background: root.next ? Theme.ink : Theme.paper;
-    caption := BodyText {
+    caption := BodyText { x: 0px; y: 0px;
         width: parent.width;
         height: parent.height;
         text: root.text;
@@ -317,7 +229,7 @@ export component ReaderPage inherits Rectangle {
         horizontal-alignment: center;
     }
 
-    page-touch := TouchArea {
+    page-touch := TouchArea { x: 0px;
         y: State.reader-menu ? root.top-height : 0px;
         width: root.width;
         height: State.reader-menu ? max(0px, root.height - root.top-height - root.bottom-height) : root.height;
@@ -397,30 +309,30 @@ export component ReaderPage inherits Rectangle {
 
     // Tap-zone guidance is an explicit menu aid. Closed-menu frames retain only
     // the contained artwork, including the complete lower-right page-turn area.
-    if State.show-tap-zones && State.reader-menu && State.reader-panel == "": Rectangle {
+    if State.show-tap-zones && State.reader-menu && State.reader-panel == "": Rectangle { x: 0px; y: 0px;
         width: root.width;
         height: root.height;
         background: transparent;
-        if !root.vertical: Rectangle {
+        if !root.vertical: Rectangle { x: 0px; y: 0px;
             width: parent.width;
             height: parent.height;
-            for boundary in [root.side-fraction, 1 - root.side-fraction]: Rectangle {
+            for boundary in [root.side-fraction, 1 - root.side-fraction]: Rectangle { y: 0px;
                 x: root.width * boundary - 1px;
                 width: 2px;
                 height: State.tap-layout == "l-shaped" ? root.height * 2 / 3 : root.height;
                 clip: true;
-                for dash in ceil((State.tap-layout == "l-shaped" ? root.height * 2 / 3 : root.height) / 12px): Rectangle {
+                for dash in ceil((State.tap-layout == "l-shaped" ? root.height * 2 / 3 : root.height) / 12px): Rectangle { x: 0px;
                     y: dash * 12px;
                     width: 2px;
                     height: 6px;
                     background: Theme.ink;
                 }
             }
-            if State.tap-layout == "l-shaped": Rectangle {
+            if State.tap-layout == "l-shaped": Rectangle { x: 0px;
                 y: root.height * 2 / 3 - 1px;
                 width: root.width;
                 height: 2px;
-                for dash in ceil(root.width / 12px): Rectangle {
+                for dash in ceil(root.width / 12px): Rectangle { y: 0px;
                     x: dash * 12px;
                     width: 6px;
                     height: 2px;
@@ -451,14 +363,14 @@ export component ReaderPage inherits Rectangle {
                 next: !root.reverse-taps;
             }
         }
-        if root.vertical: Rectangle {
+        if root.vertical: Rectangle { x: 0px; y: 0px;
             width: parent.width;
             height: parent.height;
-            for boundary in [1.0 / 3.0, 2.0 / 3.0]: Rectangle {
+            for boundary in [1.0 / 3.0, 2.0 / 3.0]: Rectangle { x: 0px;
                 y: root.height * boundary - 1px;
                 width: root.width;
                 height: 2px;
-                for dash in ceil(root.width / 12px): Rectangle {
+                for dash in ceil(root.width / 12px): Rectangle { y: 0px;
                     x: dash * 12px;
                     width: 6px;
                     height: 2px;
@@ -485,343 +397,22 @@ export component ReaderPage inherits Rectangle {
         }
     }
 
-    if State.reader-menu: Rectangle {
-        x: 0px;
-        y: 0px;
-        width: root.width;
-        height: root.top-height;
-        background: ReaderControlPalette.paper;
-        if !State.large-screen: Rectangle {
-            x: 0px;
-            y: 0px;
-            width: parent.width;
-            height: 26px;
-            background: State.incognito ? ReaderControlPalette.ink : ReaderControlPalette.paper;
-            property <color> foreground: State.incognito ? ReaderControlPalette.paper : ReaderControlPalette.ink;
-            Text {
-                x: 20px;
-                y: 0px;
-                width: 90px;
-                height: parent.height;
-                text: State.time;
-                font-family: Theme.numbers;
-                font-size: 13px;
-                font-weight: 600;
-                color: parent.foreground;
-                vertical-alignment: center;
-            }
-            Icon {
-                x: reader-battery.x - 24px;
-                y: (parent.height - 16px) / 2;
-                width: 16px;
-                height: 16px;
-                kind: "wifi";
-                enabled: State.wifi;
-                inverted: State.incognito;
-                colorize: State.wifi ? parent.foreground : ReaderControlPalette.disabled;
-            }
-            reader-battery := Text {
-                x: parent.width - 51px - self.preferred-width;
-                y: 0px;
-                width: self.preferred-width;
-                height: parent.height;
-                text: State.battery + "%";
-                font-family: Theme.numbers;
-                font-size: 13px;
-                font-weight: 600;
-                color: parent.foreground;
-                vertical-alignment: center;
-            }
-            Rectangle {
-                x: parent.width - 43px;
-                y: (parent.height - 12px) / 2;
-                width: 23px;
-                height: 12px;
-                background: transparent;
-                Rectangle {
-                    x: parent.width / 26;
-                    y: parent.height / 14;
-                    width: parent.width / 26 * 21;
-                    height: parent.height / 14 * 12;
-                    background: transparent;
-                    border-width: 1.5px;
-                    border-color: State.incognito ? ReaderControlPalette.paper : ReaderControlPalette.ink;
-                    border-radius: 3px;
-                }
-                Rectangle {
-                    x: parent.width / 26 * 3.5;
-                    y: parent.height / 14 * 3.5;
-                    width: parent.width / 26 * 16.5 * clamp(State.battery / 100.0, 0, 1);
-                    height: parent.height / 14 * 7;
-                    background: State.incognito ? ReaderControlPalette.paper : ReaderControlPalette.ink;
-                    border-radius: 1px;
-                }
-                Rectangle {
-                    x: parent.width / 26 * 23.2;
-                    y: parent.height / 14 * 4.5;
-                    width: parent.width / 26 * 2;
-                    height: parent.height / 14 * 5;
-                    background: State.incognito ? ReaderControlPalette.paper : ReaderControlPalette.ink;
-                    border-radius: 1px;
-                }
-            }
-        }
-        ReaderHeaderAction {
-            x: State.large-screen ? 14px : 6px;
-            y: State.large-screen ? 11px : 31px;
-            action: "back";
-            label: Strings.back;
-        }
-        Caption {
-            x: State.large-screen ? 82px : 60px;
-            y: State.large-screen ? 14px : 33.5px;
-            width: max(0px, (root.wide ? rotation.x : bookmark.x) - self.x - (State.large-screen ? 6px : 2px));
-            height: State.large-screen ? 18px : 17px;
-            text: State.current-book.title;
-            color: ReaderControlPalette.secondary;
-            font-size: State.large-screen ? 13px : 12px;
-            letter-spacing: State.large-screen ? 4px : 3px;
-        }
-        Text {
-            x: State.large-screen ? 82px : 60px;
-            y: State.large-screen ? 32px : 50.5px;
-            width: max(0px, (root.wide ? rotation.x : bookmark.x) - self.x - (State.large-screen ? 6px : 2px));
-            height: State.large-screen ? 32px : 26px;
-            text: Strings.chapter-prefix + State.current-chapter-number + Strings.chapter-suffix + (State.large-screen ? "　" : "  ") + State.current-chapter;
-            font-family: Theme.serif;
-            font-size: State.large-screen ? 23px : 19px;
-            font-weight: 900;
-            letter-spacing: State.large-screen ? 2px : 1px;
-            color: ReaderControlPalette.ink;
-            vertical-alignment: center;
-            overflow: elide;
-        }
-        rotation := Rectangle {
-            x: bookmark.x - self.width - 6px;
-            y: 15px;
-            width: max(124px, rotation-caption.preferred-width + 56px);
-            height: 48px;
-            visible: root.wide;
-            background: rotation-touch.pressed ? ReaderControlPalette.ink : ReaderControlPalette.paper;
-            border-width: 1.5px;
-            border-color: ReaderControlPalette.ink;
-            border-radius: Theme.control-radius;
-            accessible-role: button;
-            accessible-label: Strings.manual-rotation;
-            ReaderGlyph {
-                x: 12px;
-                y: 14px;
-                width: 20px;
-                height: 20px;
-                kind: "lock";
-                color: rotation-touch.pressed ? ReaderControlPalette.paper : ReaderControlPalette.ink;
-            }
-            rotation-caption := BodyText {
-                x: 40px;
-                width: parent.width - 56px;
-                height: parent.height;
-                text: Strings.manual-rotation;
-                font-size: 16px;
-                font-weight: 700;
-                color: rotation-touch.pressed ? ReaderControlPalette.paper : ReaderControlPalette.ink;
-            }
-            // This action opens supported manual orientations without implying
-            // that an automatic sensor subscription or lock toggle exists.
-            rotation-touch := TouchArea {
-                pointer-event(event) => {
-                    if event.kind == PointerEventKind.down { Commands.refresh("fast"); }
-                    else if event.kind == PointerEventKind.up || event.kind == PointerEventKind.cancel { Commands.refresh("ui"); }
-                }
-                clicked => { Commands.action("reader", "orientation", ""); }
-            }
-        }
-        bookmark := ReaderHeaderAction {
-            x: toc.x - (State.large-screen ? 62px : 50px);
-            y: State.large-screen ? 11px : 31px;
-            action: "bookmark";
-            label: Strings.bookmark;
-            marked: State.reader-bookmarked;
-        }
-        toc := ReaderHeaderAction {
-            x: State.large-screen ? reader-status.x - 85px : parent.width - 56px;
-            y: State.large-screen ? 11px : 31px;
-            action: "toc";
-            label: Strings.table-of-contents;
-            active: State.reader-panel == "toc";
-        }
-        Rectangle {
-            x: reader-status.x - 17px;
-            y: 22px;
-            width: 1px;
-            height: 34px;
-            visible: State.large-screen;
-            background: ReaderControlPalette.dotted;
-        }
-        reader-status := Text {
-            x: parent.width - 24px - self.preferred-width;
-            y: 22px;
-            width: self.preferred-width;
-            height: 34px;
-            visible: State.large-screen;
-            text: State.time + " · " + State.battery + "%";
-            font-family: Theme.numbers;
-            font-size: 16px;
-            font-weight: 600;
-            color: ReaderControlPalette.ink;
-            vertical-alignment: center;
-        }
-        Rectangle {
-            x: 0px;
-            y: parent.height - 1.5px;
-            width: parent.width;
-            height: 1.5px;
-            background: ReaderControlPalette.ink;
-        }
+    if State.reader-menu: Rectangle { x: 0px; y: 0px;
+        width: root.width; height: root.top-height; background: Theme.paper;
+        ReaderHeaderAction { x: Theme.margin - 8px; y: (parent.height - Theme.touch) / 2; action: "back"; label: Strings.library; }
+        BodyText { y: 0px; x: Theme.margin + Theme.touch + 8px; width: parent.width - self.x - Theme.margin - Theme.touch; height: parent.height; text: Strings.chapter-prefix + State.current-chapter-number + Strings.chapter-suffix + "  " + State.current-chapter; font-size: State.large-screen ? 22px : 18px; }
+        ReaderHeaderAction { x: parent.width - Theme.margin - Theme.touch; y: (parent.height - Theme.touch) / 2; action: "bookmark"; label: Strings.bookmark; marked: State.reader-bookmarked; }
+        Rectangle { x: 0px; y: parent.height - 1px; width: parent.width; height: 1px; background: Theme.ink; }
     }
-
-    if State.reader-menu: Rectangle {
-        x: 0px;
-        y: root.height - root.bottom-height;
-        width: root.width;
-        height: root.bottom-height;
-        background: ReaderControlPalette.paper;
-        Rectangle {
-            x: 0px;
-            y: 0px;
-            width: parent.width;
-            height: State.reader-panel == "" ? 1.5px : 1px;
-            background: State.reader-panel == "" ? ReaderControlPalette.ink : ReaderControlPalette.line;
-        }
-        Caption {
-            x: root.track-inset;
-            y: State.large-screen ? 15.5px : 13.5px;
-            width: max(0px, page-number.x - self.x - 12px);
-            height: State.large-screen ? 27.5px : 23.5px;
-            color: ReaderControlPalette.secondary;
-            text: Strings.chapter-remaining + " " + max(0, State.reader-total - root.shown-page) + " " + Strings.pages-unit + (State.next-downloaded ? " · " + Strings.next-chapter-downloaded : "");
-            font-size: State.large-screen ? 15px : 13px;
-        }
-        page-number := Text {
-            x: page-total.x - self.preferred-width;
-            y: State.large-screen ? 15.5px : 13.5px;
-            width: self.preferred-width;
-            height: State.large-screen ? 27.5px : 23.5px;
-            text: root.page-label;
-            font-family: Theme.numbers;
-            font-size: State.large-screen ? 20px : 17px;
-            font-weight: 700;
-            color: ReaderControlPalette.ink;
-            vertical-alignment: center;
-        }
-        page-total := Text {
-            x: parent.width - root.track-inset - self.preferred-width;
-            y: State.large-screen ? 19.5px : 16.5px;
-            width: self.preferred-width;
-            height: State.large-screen ? 23.5px : 20.5px;
-            text: " / " + State.reader-total;
-            font-family: Theme.numbers;
-            font-size: State.large-screen ? 16px : 14px;
-            color: ReaderControlPalette.secondary;
-            vertical-alignment: center;
-        }
-        Rectangle {
-            x: root.track-inset;
-            y: ReaderMetrics.range-top + (State.large-screen ? 18px : 16px);
-            width: root.track-width;
-            height: 4px;
-            background: ReaderControlPalette.line;
-            border-radius: 2px;
-            Rectangle {
-                x: State.reading-direction == "rtl" ? parent.width * (1 - root.progress) : 0px;
-                width: parent.width * root.progress;
-                height: parent.height;
-                background: ReaderControlPalette.ink;
-                border-radius: 2px;
-            }
-            Rectangle {
-                x: parent.width * (State.reading-direction == "rtl" ? 1 - root.progress : root.progress) - self.width / 2;
-                y: State.large-screen ? -11.5px : -10.5px;
-                width: State.large-screen ? 27px : 25px;
-                height: self.width;
-                border-width: 1.5px;
-                border-color: ReaderControlPalette.ink;
-                border-radius: 4.5px;
-                background: ReaderControlPalette.paper;
-                Rectangle {
-                    x: 4.5px;
-                    y: 4.5px;
-                    width: parent.width - 9px;
-                    height: parent.height - 9px;
-                    background: ReaderControlPalette.ink;
-                }
-            }
-        }
-        seek-touch := TouchArea {
-            x: root.track-inset;
-            y: ReaderMetrics.range-top;
-            width: root.track-width;
-            height: ReaderMetrics.range-height;
-            accessible-role: slider;
-            accessible-label: Strings.footer-pages + " " + root.shown-page + " / " + State.reader-total;
-            moved => {
-                if self.pressed && root.seeking && root.seek-input-epoch == State.reader-input-epoch {
-                    root.preview-page = root.page-at(self.mouse-x);
-                    Commands.refresh("fast");
-                }
-            }
-            pointer-event(event) => {
-                if event.kind == PointerEventKind.down {
-                    root.seek-input-epoch = State.reader-input-epoch;
-                    root.preview-page = root.page-at(self.mouse-x);
-                    root.seeking = true;
-                    Commands.refresh("fast");
-                } else if event.kind == PointerEventKind.up {
-                    if root.seeking && root.seek-input-epoch == State.reader-input-epoch {
-                        root.preview-page = root.page-at(self.mouse-x);
-                        root.seeking = false;
-                        Commands.action("reader", "seek", "" + root.preview-page);
-                    }
-                    root.seeking = false;
-                } else if event.kind == PointerEventKind.cancel {
-                    root.seeking = false;
-                    Commands.refresh("ui");
-                }
-            }
-        }
-        ReaderChapterAction {
-            x: root.track-inset - (State.large-screen ? 10px : 8px);
-            y: ReaderMetrics.chapter-top;
-            action: State.reading-direction == "rtl" ? "next-chapter" : "previous-chapter";
-            text: State.reading-direction == "rtl" ?
-                (State.reader-has-next-chapter ? Strings.chapter-prefix + State.reader-next-chapter-number + Strings.chapter-suffix : Strings.next-chapter) :
-                (State.reader-has-previous-chapter ? Strings.chapter-prefix + State.reader-previous-chapter-number + Strings.chapter-suffix : Strings.previous-chapter);
-            enabled: State.reading-direction == "rtl" ? State.reader-has-next-chapter : State.reader-has-previous-chapter;
-        }
-        ReaderChapterAction {
-            x: parent.width - root.track-inset + (State.large-screen ? 10px : 8px) - self.width;
-            y: ReaderMetrics.chapter-top;
-            trailing: true;
-            action: State.reading-direction == "rtl" ? "previous-chapter" : "next-chapter";
-            text: State.reading-direction == "rtl" ?
-                (State.reader-has-previous-chapter ? Strings.chapter-prefix + State.reader-previous-chapter-number + Strings.chapter-suffix : Strings.previous-chapter) :
-                (State.reader-has-next-chapter ? Strings.chapter-prefix + State.reader-next-chapter-number + Strings.chapter-suffix : Strings.next-chapter);
-            enabled: State.reading-direction == "rtl" ? State.reader-has-previous-chapter : State.reader-has-next-chapter;
-        }
-        Rectangle {
-            x: 0px;
-            y: root.controls-height;
-            width: parent.width;
-            height: 1px;
-            background: ReaderControlPalette.ink;
-        }
-        for action[index] in root.tool-actions: ReaderTool {
-            x: ReaderMetrics.tools-inset + index * (root.width - ReaderMetrics.tools-inset * 2) / root.tool-actions.length;
-            y: root.controls-height + 1px;
-            width: (root.width - ReaderMetrics.tools-inset * 2) / root.tool-actions.length;
-            height: root.toolbar-height - 1px;
-            action: action;
-            text: action == "mode" ? Strings.reader-mode : action == "picture" ? Strings.picture : action == "brightness" ? Strings.brightness : action == "orientation" ? Strings.orientation : action == "layout" ? Strings.layout : Strings.more;
+    if State.reader-menu: Rectangle { x: 0px;
+        y: root.height - root.bottom-height; width: root.width; height: root.bottom-height; background: Theme.paper; clip: true;
+        if State.reader-panel == "": NativeReaderProgress { x: 0px; y: 0px; width: parent.width; height: root.controls-height; }
+        Rectangle { x: 0px; y: root.controls-height; width: parent.width; height: 1.5px; background: Theme.ink; }
+        for action[index] in ["toc", "mode", "picture", "brightness"]: NativeReaderTool {
+            x: index * root.width / 4; y: root.controls-height + 1.5px; width: root.width / 4; height: root.toolbar-height - 1.5px;
+            action: action; text: index == 0 ? Strings.chapters : index == 1 ? Strings.reading-group : index == 2 ? Strings.picture : Strings.brightness;
             active: State.reader-panel == action;
         }
+        for index in 3: Rectangle { x: (index + 1) * root.width / 4; y: root.controls-height + 16px; height: root.toolbar-height - 32px; width: 1px; background: Theme.ink; }
     }
 }

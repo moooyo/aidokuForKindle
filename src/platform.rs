@@ -910,13 +910,13 @@ impl Platform {
         }
         #[cfg(all(feature = "kindle", target_os = "linux"))]
         if let Some(backend) = self.backend.borrow().as_ref() {
-            // Hardware inversion is not exposed by the reviewed backend. Its
-            // software conversion is an explicit fallback, not a hardware claim.
+            // The application theme owns UI colors. Full-scene inversion would
+            // also alter comic and cover pixels, so it must remain disabled.
             backend
                 .render_handle()
-                .set_dark_mode(preferences.night_mode)
-                .context("Apply the native software night-mode fallback")?;
-            self.scene_inverted.set(preferences.night_mode);
+                .set_dark_mode(false)
+                .context("Keep native content pixels uninverted")?;
+            self.scene_inverted.set(false);
         }
         let brightness = preferences.brightness.min(24);
         let warmth = preferences.warmth.min(24);

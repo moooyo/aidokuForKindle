@@ -1,3 +1,4 @@
+import { CompactPager } from "native-controls.slint";
 import { State, Commands, HistoryItem } from "state.slint";
 import { Theme } from "theme.slint";
 import { Strings } from "strings.slint";
@@ -15,13 +16,13 @@ component HistoryTab inherits Rectangle {
     accessible-label: root.text + (root.count > 0 ? " " + root.count : "");
     accessible-checkable: true;
     accessible-checked: root.selected;
-    label := BodyText {
+    label := BodyText { y: 0px;
         x: 2px; width: self.preferred-width; height: parent.height;
         text: root.text; font-size: State.large-screen ? 20px : 17px;
         font-weight: root.selected ? 700 : 500;
         color: touch.pressed ? Theme.paper : root.selected ? Theme.ink : Theme.secondary;
     }
-    count-label := Text {
+    count-label := Text { y: 0px;
         x: label.x + label.width + (State.large-screen ? 8px : 6px);
         width: root.count > 0 ? self.preferred-width : 0px; height: parent.height;
         text: root.count > 0 ? "" + root.count : "";
@@ -35,7 +36,7 @@ component HistoryTab inherits Rectangle {
         border-radius: State.large-screen ? 2px : 0px;
         background: touch.pressed ? Theme.paper : Theme.ink;
     }
-    touch := TouchArea {
+    touch := TouchArea { x: 0px; y: 0px;
         pointer-event(event) => {
             if event.kind == PointerEventKind.down { Commands.refresh("fast"); }
             else if event.kind == PointerEventKind.up || event.kind == PointerEventKind.cancel { Commands.refresh("ui"); }
@@ -62,7 +63,7 @@ component HistoryDownload inherits Rectangle {
         border-width: root.queued ? 0px : Theme.control-border;
         border-color: touch.pressed ? Theme.paper : root.completed || root.active ? Theme.ink : Theme.disabled;
         border-radius: Theme.control-radius; clip: true;
-        if root.queued: Rectangle {
+        if root.queued: Rectangle { x: 0px; y: 0px;
             width: parent.width; height: parent.height; background: transparent;
             for step in ceil(root.state-size / 6px): Rectangle {
                 x: step * 6px; y: 0px; width: 4px; height: 1.5px;
@@ -107,7 +108,7 @@ component HistoryDownload inherits Rectangle {
             height: 2px; background: touch.pressed ? Theme.paper : Theme.ink;
         }
     }
-    touch := TouchArea {
+    touch := TouchArea { x: 0px; y: 0px;
         pointer-event(event) => {
             if event.kind == PointerEventKind.down { Commands.refresh("fast"); }
             else if event.kind == PointerEventKind.up || event.kind == PointerEventKind.cancel { Commands.refresh("ui"); }
@@ -186,7 +187,7 @@ component HistoryEntry inherits Rectangle {
             font-size: State.large-screen ? 14px : 13px; overflow: elide;
             vertical-alignment: center; color: open-touch.pressed ? Theme.paper : Theme.secondary;
         }
-        open-touch := TouchArea {
+        open-touch := TouchArea { x: 0px; y: 0px;
             pointer-event(event) => {
                 if event.kind == PointerEventKind.down { Commands.refresh("fast"); }
                 else if event.kind == PointerEventKind.up || event.kind == PointerEventKind.cancel { Commands.refresh("ui"); }
@@ -211,7 +212,7 @@ component HistoryEntry inherits Rectangle {
             width: State.large-screen ? 18px : 16px; height: self.width;
             kind: "close"; secondary: !remove-touch.pressed; inverted: remove-touch.pressed;
         }
-        remove-touch := TouchArea {
+        remove-touch := TouchArea { x: 0px; y: 0px;
             pointer-event(event) => {
                 if event.kind == PointerEventKind.down { Commands.refresh("fast"); }
                 else if event.kind == PointerEventKind.up || event.kind == PointerEventKind.cancel { Commands.refresh("ui"); }
@@ -227,117 +228,26 @@ component HistoryEntry inherits Rectangle {
 
 export component HistoryPage inherits Rectangle {
     background: Theme.paper;
-    property <length> header-height: State.large-screen ? 106.5px : 75.5px;
-    property <length> tabs-height: State.large-screen ? 64px : 48px;
     property <length> group-height: State.large-screen ? 60px : 44px;
     property <length> row-height: State.large-screen ? 124px : 76px;
-    property <length> content-top: root.header-height + root.tabs-height + 1px + (State.large-screen ? 6px : 0px);
-    property <length> action-right: State.large-screen ? 24px : 10px;
-    property <length> trailing-width: State.history-filter == 1 ? (State.large-screen ? 112px : 88px) : Theme.touch;
-    property <length> incognito-width: State.large-screen ? 103px : 79px;
-    property <length> header-bottom: State.large-screen ? 16px : 8px;
-    property <length> header-action-height: State.large-screen ? 52px : 40px;
-    property <length> header-gap: State.large-screen ? 10px : 6px;
-    Caption {
-        x: Theme.margin; y: State.large-screen ? 8px : 4px;
-        width: parent.width - Theme.margin * 2; height: State.large-screen ? 22.5px : 19.5px;
-        text: State.history-filter == 0 ? Strings.last-seven-days + " · " + Strings.chapters-read + " " + State.weekly-read-count + " " + Strings.chapters-unit : Strings.chapter-updates + " " + State.chapter-update-count + " " + Strings.chapters-unit;
-        font-size: State.large-screen ? 15px : 13px; letter-spacing: State.large-screen ? 3px : 2px;
-    }
-    TitleText {
-        x: Theme.margin; y: State.large-screen ? 34.5px : 25.5px;
-        width: parent.width - self.x - root.action-right - root.trailing-width - root.incognito-width - root.header-gap - 12px;
-        height: Theme.title-line; text: State.history-filter == 0 ? Strings.history : Strings.update;
-        letter-spacing: Theme.title-tracking;
-    }
-    incognito-action := Rectangle {
-        x: parent.width - root.action-right - root.trailing-width - root.header-gap - root.incognito-width;
-        y: root.header-height - root.header-bottom - root.header-action-height - (Theme.touch - root.header-action-height) / 2;
-        width: root.incognito-width; height: Theme.touch;
-        property <bool> inverted: State.incognito != incognito-touch.pressed;
-        accessible-role: button; accessible-label: Strings.incognito;
-        accessible-checkable: true; accessible-checked: State.incognito;
-        Rectangle {
-            y: (parent.height - root.header-action-height) / 2;
-            width: parent.width; height: root.header-action-height;
-            background: incognito-action.inverted ? Theme.ink : Theme.paper;
-            border-width: Theme.control-border; border-color: Theme.ink; border-radius: Theme.control-radius;
-            Icon {
-                x: State.large-screen ? 17.5px : 11.5px; y: (parent.height - self.height) / 2;
-                width: State.large-screen ? 22px : 18px; height: self.width;
-                kind: "eye-off"; inverted: incognito-action.inverted;
-            }
-            BodyText {
-                x: State.large-screen ? 47.5px : 35.5px; width: parent.width - self.x - (State.large-screen ? 20px : 14px);
-                height: parent.height; text: Strings.incognito; font-size: State.large-screen ? 17px : 14px;
-                font-weight: 700; color: incognito-action.inverted ? Theme.paper : Theme.ink;
-            }
+    property <length> content-top: Theme.touch + 16px;
+    Rectangle { x: 0px; y: 0px;
+        width: parent.width; height: root.content-top;
+        HorizontalLayout { y: 0px;
+            x: Theme.margin; width: max(0px, pager.x - self.x - 12px); height: Theme.touch; spacing: 16px; alignment: start;
+            HistoryTab { text: Strings.reading-history; selected: State.history-filter == 0; picked => { Commands.action("history", "filter", "0"); } }
+            HistoryTab { text: Strings.chapter-updates; selected: State.history-filter == 1; picked => { Commands.action("history", "filter", "1"); } }
         }
-        incognito-touch := TouchArea {
-            pointer-event(event) => {
-                if event.kind == PointerEventKind.down { Commands.refresh("fast"); }
-                else if event.kind == PointerEventKind.up || event.kind == PointerEventKind.cancel { Commands.refresh("ui"); }
-            }
-            clicked => { Commands.action("history", "incognito", ""); }
-        }
-    }
-    if State.history-filter == 0: IconButton {
-        x: parent.width - root.action-right - self.width;
-        y: root.header-height - root.header-bottom - Theme.touch;
-        icon: "trash"; label: Strings.clear-history; enabled: State.history.length > 0;
-        clicked => { Commands.action("history", "clear", ""); }
-    }
-    if State.history-filter == 1: Rectangle {
-        x: parent.width - root.action-right - root.trailing-width;
-        y: root.header-height - root.header-bottom - root.header-action-height - (Theme.touch - root.header-action-height) / 2;
-        width: root.trailing-width; height: Theme.touch;
-        accessible-role: button; accessible-label: Strings.history-download-all;
-        accessible-enabled: State.chapter-update-count > 0;
-        Rectangle {
-            y: (parent.height - root.header-action-height) / 2;
-            width: parent.width; height: root.header-action-height;
-            background: download-all-touch.pressed || State.chapter-update-count == 0 ? Theme.paper : Theme.ink;
-            border-width: State.chapter-update-count == 0 ? Theme.control-border : 0px;
-            border-color: Theme.dotted; border-radius: Theme.control-radius;
-            BodyText {
-                width: parent.width; height: parent.height; text: Strings.history-download-all;
-                font-size: State.large-screen ? 17px : 14px; font-weight: 700;
-                horizontal-alignment: center;
-                color: State.chapter-update-count == 0 ? Theme.disabled : download-all-touch.pressed ? Theme.ink : Theme.paper;
-            }
-        }
-        download-all-touch := TouchArea {
-            enabled: State.chapter-update-count > 0;
-            pointer-event(event) => {
-                if event.kind == PointerEventKind.down { Commands.refresh("fast"); }
-                else if event.kind == PointerEventKind.up || event.kind == PointerEventKind.cancel { Commands.refresh("ui"); }
-            }
-            clicked => { Commands.action("history", "download-all", ""); }
-        }
-    }
-    Rectangle {
-        y: root.header-height; width: parent.width; height: root.tabs-height + 1px;
-        Rectangle { y: root.tabs-height; width: parent.width; height: 1px; background: Theme.line; }
-        HorizontalLayout {
-            x: Theme.margin; width: parent.width - Theme.margin * 2; height: root.tabs-height;
-            spacing: State.large-screen ? 30px : 24px; alignment: start;
-            HistoryTab {
-                text: Strings.reading-history; selected: State.history-filter == 0;
-                picked => { Commands.action("history", "filter", "0"); }
-            }
-            HistoryTab {
-                text: Strings.chapter-updates; count: State.chapter-update-count;
-                selected: State.history-filter == 1;
-                picked => { Commands.action("history", "filter", "1"); }
-            }
-        }
-    }
-    Rectangle {
+        pager := CompactPager { y: 0px; x: parent.width - Theme.margin - Theme.touch * 2 - self.width; page: State.page; count: State.page-count; turn(delta) => { Commands.action("page", "turn", delta); } }
+        IconButton { y: 0px; x: parent.width - Theme.margin - Theme.touch * 2; icon: "eye-off"; label: Strings.incognito; clicked => { Commands.action("history", "incognito", ""); } }
+        IconButton { y: 0px; x: parent.width - Theme.margin - Theme.touch; icon: State.history-filter == 0 ? "trash" : "download"; label: State.history-filter == 0 ? Strings.clear-history : Strings.history-download-all; clicked => { Commands.action("history", State.history-filter == 0 ? "clear" : "download-all", ""); } }
+        Rectangle { x: 0px; y: parent.height - 1px; width: parent.width; height: 1px; background: Theme.line; }
+    }    Rectangle {
         x: Theme.margin; y: root.content-top;
         width: parent.width - self.x - (State.large-screen ? Theme.margin : 10px);
-        height: max(0px, parent.height - self.y - Theme.pager-height); clip: true;
+        height: max(0px, parent.height - self.y); clip: true;
         property <length> column-width: State.large-screen ? (self.width - 32px) / 2 : self.width;
-        for entry in State.history: Rectangle {
+        for entry in State.history: Rectangle { x: 0px;
             visible: entry.group-start; y: entry.group-offset * 1px;
             width: parent.width; height: root.group-height; background: Theme.paper;
             date-label := TitleText {
@@ -359,7 +269,7 @@ export component HistoryPage inherits Rectangle {
             y: entry.group-offset * 1px + root.group-height + entry.row-index * root.row-height;
             width: parent.column-width; entry: entry;
         }
-        if State.history.length == 0: Rectangle {
+        if State.history.length == 0: Rectangle { x: 0px; y: 0px;
             width: parent.width; height: parent.height;
             property <length> content-height: State.history-filter == 0 ? (State.large-screen ? 202px : 178px) : 150px;
             property <length> empty-top: max(0px, (self.height - self.content-height) / 2);
@@ -393,10 +303,5 @@ export component HistoryPage inherits Rectangle {
                 }
             }
         }
-    }
-    PageBar {
-        x: 0px; y: parent.height - self.height; width: parent.width;
-        page: State.page; count: State.page-count;
-        turn(direction) => { Commands.action("page", "turn", direction); }
     }
 }

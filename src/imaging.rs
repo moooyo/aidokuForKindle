@@ -1,6 +1,9 @@
 mod decode_scheduler;
 mod grayscale;
+mod reader_fit;
 mod reader_raster;
+pub use reader_fit::ReaderFit;
+pub use reader_fit::decode as decode_fitted_reader_raster;
 mod row_resize;
 
 #[cfg(test)]

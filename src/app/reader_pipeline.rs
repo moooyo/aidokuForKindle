@@ -1180,6 +1180,16 @@ fn prefetch_chapter_frames(
 }
 
 fn prepared_source_is_eligible(preferences: &Preferences, vertical: bool, zoom: f32) -> bool {
+    if !vertical
+        && !preferences.spread
+        && !preferences.split_wide
+        && matches!(
+            preferences.reader_fit.as_str(),
+            "original" | "page" | "height" | "width"
+        )
+    {
+        return false;
+    }
     if zoom != 1.0 || !(preferences.resize_downloads || preferences.grayscale_downloads) {
         return false;
     }
@@ -3274,7 +3284,7 @@ mod tests {
     }
 
     #[test]
-    fn raw_reader_frames_keep_the_eight_bit_download_accelerator() {
+    fn named_fit_keeps_original_geometry_instead_of_resized_download_geometry() {
         let fixture = OfflineReaderFixture::new();
         let derivative = fixture.prepare_download();
         let options =
@@ -3314,8 +3324,17 @@ mod tests {
             None,
         )
         .unwrap();
-        assert_eq!(actual.rendered.image, from_derivative.image);
-        assert_eq!(actual.rendered.cache_path, from_derivative.cache_path);
+        let expected = imaging::decode_fitted_reader_raster(
+            &fs::read(&fixture.original).unwrap(),
+            &options,
+            imaging::ReaderFit::Page,
+        )
+        .unwrap();
+        assert_eq!(*actual.rendered.image, expected);
+        assert_eq!(
+            actual.rendered.image.dimensions(),
+            (options.width, options.height)
+        );
         assert!(
             actual
                 .rendered
@@ -3326,7 +3345,7 @@ mod tests {
         );
         assert_eq!(
             actual.rendered.source_proof.unwrap().source_path(),
-            fs::canonicalize(&derivative).unwrap()
+            fs::canonicalize(&fixture.original).unwrap()
         );
     }
 
@@ -3362,30 +3381,25 @@ mod tests {
                 .verify(&fixture.cache)
                 .unwrap()
         );
-        assert!(prefetched.rendered.retained_raster.is_none());
-        // Rotation reuses the same download copy, while each frame retains its
-        // actual foreground target geometry and its normal render-cache key.
+        assert!(prefetched.rendered.retained_raster.is_some());
         let foreground = fixture.render(&fixture.preferences, fixture.viewport, false, 1.0, None);
-        let expected = crate::render_cache::render_raster(
-            &fixture.cache,
-            &fixture.page,
-            &prepared,
-            &options,
-            false,
-            0,
-            1.0,
-        )
-        .unwrap();
-        assert!(Arc::ptr_eq(
-            &prefetched.rendered.image,
-            &foreground.rendered.image
-        ));
-        assert!(Arc::ptr_eq(&expected.image, &foreground.rendered.image));
-        assert_eq!(foreground.rendered.image.dimensions(), (16, 8));
-        assert_eq!(foreground.rendered.cache_path, expected.cache_path);
-        assert_eq!(foreground.rendered.cache_path, prepared);
+        assert_eq!(prefetched.rendered.image, foreground.rendered.image);
+        assert_eq!(
+            foreground.rendered.image.dimensions(),
+            (options.width, options.height)
+        );
+        assert_eq!(
+            foreground
+                .rendered
+                .source_proof
+                .as_ref()
+                .unwrap()
+                .source_path(),
+            fs::canonicalize(&fixture.original).unwrap()
+        );
+        assert_ne!(foreground.rendered.cache_path, prepared);
         let rotated = fixture.render(&fixture.preferences, (12, 8), false, 1.0, None);
-        assert_eq!(rotated.rendered.image.dimensions(), (24, 12));
+        assert_eq!(rotated.rendered.image.dimensions(), (24, 16));
         assert_eq!(fixture.cache.stats().commits, commits_before_reader);
         assert!(!prepared_source_is_eligible(
             &fixture.preferences,
@@ -3486,16 +3500,29 @@ mod tests {
             different_geometry.image.dimensions()
         );
         for vertical in [false, true] {
-            let expected = crate::render_cache::render_raster(
-                &fixture.cache,
-                &fixture.page,
-                &fixture.original,
-                &options,
-                vertical,
-                0,
-                1.0,
-            )
-            .unwrap();
+            let expected = if !vertical {
+                crate::render_cache::render_fitted_reader(
+                    &fixture.cache,
+                    &fixture.page,
+                    &fixture.original,
+                    &options,
+                    imaging::ReaderFit::Page,
+                    None,
+                    false,
+                )
+                .unwrap()
+            } else {
+                crate::render_cache::render_raster(
+                    &fixture.cache,
+                    &fixture.page,
+                    &fixture.original,
+                    &options,
+                    vertical,
+                    0,
+                    1.0,
+                )
+                .unwrap()
+            };
             let actual =
                 fixture.render(&fixture.preferences, fixture.viewport, vertical, 1.0, None);
             assert_eq!(actual.rendered.cache_path, expected.cache_path);

@@ -327,11 +327,56 @@ enum RenderMode {
     Persistent,
     ReaderRaster,
     ReaderNextFrame,
+    FittedReader(imaging::ReaderFit, bool),
 }
 
 impl RenderMode {
     fn is_reader(self) -> bool {
         self != Self::Persistent
+    }
+    fn is_next(self) -> bool {
+        matches!(self, Self::ReaderNextFrame | Self::FittedReader(_, true))
+    }
+    fn fit(self) -> Option<imaging::ReaderFit> {
+        match self {
+            Self::FittedReader(fit, _) => Some(fit),
+            _ => None,
+        }
+    }
+}
+
+/// Prepare the final viewport frame before publishing any named-fit change.
+pub fn render_fitted_reader(
+    cache: &CacheManager,
+    page: &Page,
+    raw: &Path,
+    options: &ImageOptions,
+    fit: imaging::ReaderFit,
+    cancellation: Option<&imaging::DecodeCancellation>,
+    next: bool,
+) -> Result<RenderedPage> {
+    let render = || {
+        render_for_purpose(
+            cache,
+            page,
+            raw,
+            options,
+            false,
+            0,
+            1.0,
+            if cancellation.is_some() {
+                RenderPurpose::Prefetch
+            } else {
+                RenderPurpose::Foreground
+            },
+            RenderMode::FittedReader(fit, next),
+            read_source,
+        )
+    };
+    if cancellation.is_some() {
+        imaging::with_background_decode(cancellation, render)
+    } else {
+        render()
     }
 }
 
@@ -973,7 +1018,9 @@ fn render_for_purpose(
     let source_proof = SourceProof::for_source(page, raw, &source_checksum, metadata.len())?;
     let source_key = format!("{}:{source_checksum}", CacheManager::page_key(page));
     let key = RenderKey {
-        source_key: if mode.is_reader() {
+        source_key: if let Some(fit) = mode.fit() {
+            format!("{READER_RASTER_VERSION}:fit-v1:{}:{source_key}", fit.key())
+        } else if mode.is_reader() {
             format!("{READER_RASTER_VERSION}:{source_key}")
         } else {
             source_key
@@ -995,7 +1042,7 @@ fn render_for_purpose(
     let lookup_frame = || -> Result<Option<RenderedPage>> {
         if mode.is_reader() {
             let frame = decoded(|state| {
-                if mode == RenderMode::ReaderNextFrame {
+                if mode.is_next() {
                     state.peek(&decoded_key, raw, &source_checksum)
                 } else {
                     state.lookup(&decoded_key, raw, &source_checksum, purpose)
@@ -1013,7 +1060,7 @@ fn render_for_purpose(
         if rendered.source_proof.is_none() {
             rendered.source_proof = Some(source_proof);
         }
-        if mode == RenderMode::ReaderNextFrame {
+        if mode.is_next() {
             attach_retained_raster(&decoded_key, &mut rendered, None);
         }
         return Ok(rendered);
@@ -1025,7 +1072,7 @@ fn render_for_purpose(
         if rendered.source_proof.is_none() {
             rendered.source_proof = Some(source_proof);
         }
-        if mode == RenderMode::ReaderNextFrame {
+        if mode.is_next() {
             attach_retained_raster(&decoded_key, &mut rendered, None);
         }
         return Ok(rendered);
@@ -1057,7 +1104,7 @@ fn render_for_purpose(
                 encoded_bytes: bytes.len() as u64,
             };
             let source = decoded(|state| {
-                if mode == RenderMode::ReaderNextFrame {
+                if mode.is_next() {
                     state.peek_source(&source_key)
                 } else {
                     state.lookup_source(&source_key)
@@ -1079,7 +1126,11 @@ fn render_for_purpose(
         (window.image, window.scaled_height, window.viewport_height)
     } else {
         let image = if mode.is_reader() {
-            imaging::decode_reader_raster(&bytes, options)?
+            if let Some(fit) = mode.fit() {
+                imaging::decode_fitted_reader_raster(&bytes, options, fit)?
+            } else {
+                imaging::decode_reader_raster(&bytes, options)?
+            }
         } else {
             imaging::decode_page(&bytes, options)?
         };
@@ -1106,7 +1157,7 @@ fn render_for_purpose(
             state.stats.raster_cold_renders += 1;
             state.stats.raster_persistence_skips += 1;
         });
-        if mode == RenderMode::ReaderNextFrame {
+        if mode.is_next() {
             attach_retained_raster(&decoded_key, &mut rendered, retained_source);
             return Ok(rendered);
         }

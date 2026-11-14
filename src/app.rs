@@ -368,12 +368,19 @@ impl App {
             store,
             disk_cache,
             network_control,
-            prefs,
+            mut prefs,
             current_book_id,
             interactions,
             data_management,
             downloads,
         } = prepared;
+        prefs.dither = true;
+        prefs.dither_method = if platform.hardware_y4_available() {
+            "hardware"
+        } else {
+            "software"
+        }
+        .into();
         let initial_rotation = orientation::reader_display_rotation_degrees(
             normalize_route(&options.initial_screen),
             &prefs,

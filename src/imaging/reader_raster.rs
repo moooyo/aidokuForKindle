@@ -30,12 +30,42 @@ fn resize_with_plan_budget(
     height: u32,
     plan_budget: usize,
 ) -> Result<GrayImage> {
+    resize_region_with_plan_budget(source, width, height, plan_budget, None)
+}
+
+pub(super) fn resize_region_gray(
+    source: &GrayImage,
+    width: u32,
+    height: u32,
+    left: f64,
+    top: f64,
+    region_width: f64,
+    region_height: f64,
+) -> Result<GrayImage> {
+    resize_region_with_plan_budget(
+        source,
+        width,
+        height,
+        HORIZONTAL_PLAN_BYTES,
+        Some((left, top, region_width, region_height)),
+    )
+}
+
+fn resize_region_with_plan_budget(
+    source: &GrayImage,
+    width: u32,
+    height: u32,
+    plan_budget: usize,
+    region: Option<(f64, f64, f64, f64)>,
+) -> Result<GrayImage> {
     check_decode_cancelled()?;
     let (source_width, source_height) = source.dimensions();
     if source_width == 0 || source_height == 0 || width == 0 || height == 0 {
         return Ok(source.buffer_with_dimensions(width, height));
     }
-    if source.dimensions() == (width, height) {
+    if source.dimensions() == (width, height)
+        && region.is_none_or(|r| r == (0.0, 0.0, f64::from(source_width), f64::from(source_height)))
+    {
         let mut output = source.buffer_with_dimensions(width, height);
         let length = width as usize * height as usize;
         let output_pixels: &mut [u8] = output.as_mut();
@@ -48,8 +78,10 @@ fn resize_with_plan_budget(
         return Ok(output);
     }
 
-    let vertical = Axis::new(source_height, height);
-    let horizontal = Axis::new(source_width, width);
+    let (left, top, rw, rh) =
+        region.unwrap_or((0.0, 0.0, f64::from(source_width), f64::from(source_height)));
+    let vertical = Axis::region(source_height, height, top, rh);
+    let horizontal = Axis::region(source_width, width, left, rw);
     let plan = HorizontalPlan::build(&horizontal, width, plan_budget)?;
     let mut row = Vec::new();
     row.try_reserve_exact(source_width as usize)
@@ -234,6 +266,7 @@ struct AxisRange {
 
 struct Axis {
     source_length: u32,
+    offset: f32,
     ratio: f32,
     sampling_ratio: f32,
     support: f32,
@@ -241,10 +274,14 @@ struct Axis {
 
 impl Axis {
     fn new(source_length: u32, target_length: u32) -> Self {
-        let ratio = source_length as f32 / target_length as f32;
+        Self::region(source_length, target_length, 0.0, f64::from(source_length))
+    }
+    fn region(source_length: u32, target_length: u32, offset: f64, length: f64) -> Self {
+        let ratio = length as f32 / target_length as f32;
         let sampling_ratio = if ratio < 1.0 { 1.0 } else { ratio };
         Self {
             source_length,
+            offset: offset as f32,
             ratio,
             sampling_ratio,
             support: 1.0 * sampling_ratio,
@@ -252,7 +289,7 @@ impl Axis {
     }
 
     fn range(&self, position: u32) -> AxisRange {
-        let center = (position as f32 + 0.5) * self.ratio;
+        let center = self.offset + (position as f32 + 0.5) * self.ratio;
         let first = (center - self.support).floor() as i64;
         let first = first.clamp(0, i64::from(self.source_length) - 1) as u32;
         let end = (center + self.support).ceil() as i64;

@@ -44,6 +44,10 @@ pub(super) fn render(
     preferences: &Preferences,
     half: u8,
 ) -> Result<WidePage> {
+    ensure!(
+        zoom.is_finite() && (1.0..=4.0).contains(&zoom),
+        "The rendered zoom must be between one and four"
+    );
     render_page(
         cache,
         page,
@@ -130,6 +134,29 @@ fn render_page(
         zoom.is_finite() && (1.0..=4.0).contains(&zoom),
         "The rendered zoom must be between one and four"
     );
+    if matches!(
+        preferences.reader_fit.as_str(),
+        "original" | "page" | "height" | "width"
+    ) && !vertical
+        && !preferences.spread
+        && !preferences.split_wide
+        && zoom == 1.0
+    {
+        let rendered = render_cache::render_fitted_reader(
+            cache,
+            page,
+            raw,
+            options,
+            crate::imaging::ReaderFit::from_key(&preferences.reader_fit),
+            cancellation,
+            private_next,
+        )?;
+        return Ok(WidePage {
+            rendered,
+            wide: false,
+            half: 0,
+        });
+    }
     if let Some(cancellation) = cancellation {
         cancellation.check()?;
     }

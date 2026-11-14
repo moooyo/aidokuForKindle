@@ -1,0 +1,24 @@
+import { State, Commands } from "state.slint";
+import { Theme } from "theme.slint";
+import { Strings } from "strings.slint";
+import { BodyText, ActionButton } from "widgets.slint";
+import { NativeSlider } from "native-controls.slint";
+
+export component NativeReaderTool inherits Rectangle {
+    in property <string> action;
+    in property <string> text;
+    in property <bool> active;
+    background: touch.pressed ? Theme.fill : Theme.paper;
+    accessible-role: button;
+    accessible-label: root.text;
+    BodyText { x: 0px; y: 0px; width: parent.width; height: parent.height; text: root.text; horizontal-alignment: center; font-size: State.large-screen ? 22px : 20px; font-weight: root.active ? 700 : 500; }
+    if root.active: Rectangle { x: (parent.width - 42px) / 2; y: parent.height - 11px; width: 42px; height: 3px; background: Theme.ink; }
+    touch := TouchArea { x: 0px; y: 0px; clicked => { Commands.action("reader", root.action, ""); } }
+}
+
+export component NativeReaderProgress inherits Rectangle {
+    ActionButton { x: Theme.margin; y: 12px; width: 124px; height: Theme.touch; text: Strings.previous-chapter; quiet: true; enabled: State.reader-has-previous-chapter; clicked => { Commands.action("reader", "previous-chapter", ""); } }
+    BodyText { x: 152px; y: 12px; width: parent.width - 304px; height: Theme.touch; text: State.reader-page + " / " + State.reader-total + " " + Strings.pages-unit; horizontal-alignment: center; font-size: Theme.body; }
+    ActionButton { x: parent.width - Theme.margin - 124px; y: 12px; width: 124px; height: Theme.touch; text: Strings.next-chapter; quiet: true; enabled: State.reader-has-next-chapter; clicked => { Commands.action("reader", "next-chapter", ""); } }
+    NativeSlider { x: Theme.margin; y: State.large-screen ? 48px : 40px; width: parent.width - Theme.margin * 2; label: Strings.pages-unit; show-label: false; show-value: false; show-buttons: false; minimum: 1; maximum: max(1, State.reader-total); value: State.reader-page; committed(value) => { Commands.action("reader", "seek", "" + value); } }
+}
