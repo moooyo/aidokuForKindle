@@ -6,6 +6,15 @@ WeRead project's software-rendered UI, native Kindle backend, remote build, and
 firmware-emulator workflow. It is not an official Aidoku release or a KOReader
 plugin and does not require the WeRead application.
 
+## UI/UX baseline
+
+The [versioned UI/UX baseline](docs/uiux-baselines/README.md) preserves 31 paired
+states and 62 original Scribe / Paperwhite 5 screenshots from source `433a1f6`.
+Open the [interactive comparison](docs/uiux-baselines/2026-11-14-433a1f6/index.html)
+from a local checkout to switch states and inspect original pixels. The baseline
+includes device comparison boards, contact sheets, input replays and capture
+evidence. Use its stable scene IDs when planning interface changes.
+
 ## Current development follow-up
 
 Version 0.1.3 uses one BiliComics-style startup scene, removes the exit animation,

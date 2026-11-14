@@ -6,6 +6,15 @@ Run builds, tests, validation and runtime probes through `ssh test-env`.
 Do not run them on the Windows workstation without explicit authorization for
 the current task. Keep Cargo build concurrency at six.
 
+## UI/UX baseline
+
+Before UI/UX iteration, read `docs/uiux-baselines/README.md` and inspect the
+relevant scene IDs for both device profiles. The baseline directories are frozen
+source-bound records. Save later captures under a new date-and-commit directory
+and update the index when adopting a new baseline. Preserve existing screenshots,
+state sidecars, input replays and checksums. Run capture and verification on
+`ssh test-env`.
+
 ## Shared physical Kindle
 
 Acquire the shared Kindle lease only immediately before executing actual device

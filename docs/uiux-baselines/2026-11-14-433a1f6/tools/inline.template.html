@@ -1,0 +1,31 @@
+<div id="kindle-baseline-inline">
+  <div class="viz-controls">
+    <label class="form-label" for="kindle-baseline-scene">当前界面<select class="form-select" id="kindle-baseline-scene"><option value="library">书架</option><option value="detail">漫画详情与章节</option><option value="reader-controls">阅读控制栏</option><option value="settings">设置</option></select></label>
+  </div>
+  <div class="kindle-preview-pair">
+    <figure><figcaption>Kindle Scribe <span class="text-small text-muted">930 × 1240</span></figcaption><div class="kindle-device kindle-scribe"><img id="kindle-inline-scribe" width="930" height="1240" alt="Kindle Scribe 实际模拟界面"></div></figure>
+    <figure><figcaption>Paperwhite 5 <span class="text-small text-muted">618 × 824</span></figcaption><div class="kindle-device kindle-paperwhite"><img id="kindle-inline-pw5" width="618" height="824" alt="Paperwhite 5 实际模拟界面"></div></figure>
+  </div>
+  <div class="text-small text-muted" id="kindle-inline-caption" aria-live="polite">书架 · 原始模拟截图 · 外框示意</div>
+</div>
+<style>
+  #kindle-baseline-inline .kindle-preview-pair{display:grid;grid-template-columns:minmax(0,1.559fr) minmax(0,1fr);align-items:end;gap:calc(var(--font-size-base)*2);margin:calc(var(--font-size-base)*1.4) 0 calc(var(--font-size-base)*.8)}
+  #kindle-baseline-inline figure{margin:0;min-width:0}
+  #kindle-baseline-inline figcaption{display:flex;flex-wrap:wrap;align-items:baseline;gap:calc(var(--font-size-base)*.6);margin-bottom:calc(var(--font-size-base)*.7)}
+  #kindle-baseline-inline .kindle-device{background:#272a28;border-radius:12px;overflow:hidden}
+  #kindle-baseline-inline .kindle-scribe{padding:3.6% 3.5% 4.6% 10%}
+  #kindle-baseline-inline .kindle-paperwhite{padding:7% 5.2% 12%}
+  #kindle-baseline-inline img{display:block;width:100%;height:auto}
+  @media(max-width:620px){#kindle-baseline-inline .kindle-preview-pair{grid-template-columns:minmax(0,1fr);gap:calc(var(--font-size-base)*1.4)}#kindle-baseline-inline figure{width:100%;max-width:440px;justify-self:center}#kindle-baseline-inline figure+figure{width:64.15%}}
+</style>
+<script id="kindle-inline-data" type="application/json">__INLINE_DATA__</script>
+<script>
+  const kindleRoot=document.getElementById('kindle-baseline-inline');
+  const kindleScenes=JSON.parse(document.getElementById('kindle-inline-data').textContent);
+  const kindleSelector=kindleRoot.querySelector('#kindle-baseline-scene');
+  function renderKindleScene(id){const scene=kindleScenes[id]||kindleScenes.library;const chosen=kindleScenes[id]?id:'library';kindleSelector.value=chosen;for(const profile of ['scribe','pw5']){const image=kindleRoot.querySelector('#kindle-inline-'+profile);image.src=scene[profile];image.alt=(profile==='scribe'?'Kindle Scribe':'Paperwhite 5')+' · '+scene.title+'，实际模拟截图';}kindleRoot.querySelector('#kindle-inline-caption').textContent=scene.title+' · 原始模拟截图 · 外框示意';}
+  const remembered=window.openai?.widgetState?.modelContent?.scene;
+  renderKindleScene(remembered||'library');
+  kindleSelector.addEventListener('change',()=>{renderKindleScene(kindleSelector.value);window.openai?.setWidgetState?.({modelContent:{scene:kindleSelector.value,baseline:'433a1f6'},privateContent:null}).catch(()=>{});});
+  window.addEventListener('openai:set_globals',event=>{const state=event.detail?.globals?.widgetState;if(state){renderKindleScene(state.modelContent?.scene||'library');}});
+</script>

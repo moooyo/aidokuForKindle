@@ -4,6 +4,10 @@ This change implements the approved single-footer design from November 14,
 2026 in the Rust and Slint application. The HTML design remains a reference;
 application captures are produced by the actual desktop software renderer.
 
+The [frozen UI/UX baseline](uiux-baselines/README.md) records the resulting
+interface at source `433a1f6`, with 31 paired states, original screenshots and
+an interactive comparison for subsequent UI/UX iteration.
+
 ## Interface and navigation
 
 - Library, catalog, search and history use compact pagination in their existing
