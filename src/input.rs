@@ -299,7 +299,20 @@ impl PinyinInput {
     }
 
     pub fn all_candidates(&self) -> Vec<Candidate> {
-        Dictionary::bundled().suggestions(&self.composition)
+        self.lookup_candidates(|composition| Dictionary::bundled().suggestions(composition))
+    }
+
+    fn lookup_candidates(&self, lookup: impl FnOnce(&str) -> Vec<Candidate>) -> Vec<Candidate> {
+        // Empty and punctuation-only compositions cannot produce suggestions.
+        // Do not initialize the dictionary merely to render a hidden keyboard.
+        if !self
+            .composition
+            .bytes()
+            .any(|byte| byte.is_ascii_alphabetic())
+        {
+            return Vec::new();
+        }
+        lookup(&self.composition)
     }
 
     pub fn candidates(&self) -> Vec<String> {
@@ -523,6 +536,47 @@ impl KeyboardInput {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn compositions_without_letters_do_not_access_the_dictionary() {
+        for composition in [
+            "",
+            "'",
+            "123",
+            " -\t",
+            "\u{4e2d}\u{6587}",
+            "\u{ff4e}\u{ff49}",
+        ] {
+            let input = PinyinInput {
+                composition: composition.into(),
+                ..PinyinInput::default()
+            };
+            assert!(
+                input
+                    .lookup_candidates(|_| panic!("dictionary was accessed"))
+                    .is_empty()
+            );
+            assert_eq!(input.candidate_page_count(), 1);
+        }
+    }
+
+    #[test]
+    fn letter_compositions_keep_the_existing_lookup_and_normalization() {
+        for composition in ["Ni'Hao", "tushuguan", "123ni", "'n'"] {
+            let input = PinyinInput {
+                composition: composition.into(),
+                ..PinyinInput::default()
+            };
+            let mut observed = false;
+            let candidates = input.lookup_candidates(|value| {
+                observed = true;
+                assert_eq!(value, composition);
+                Dictionary::bundled().suggestions(value)
+            });
+            assert!(observed);
+            assert_eq!(candidates, Dictionary::bundled().suggestions(composition));
+        }
+    }
 
     fn type_pinyin(value: &str) -> PinyinInput {
         let mut input = PinyinInput::default();

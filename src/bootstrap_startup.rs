@@ -243,7 +243,8 @@ impl Startup {
                 self.update_activity(ui, platform);
                 return Ok(false);
             };
-            ui.global::<State>().set_startup_stage(2);
+            // Keep the current loading scene until the business view is ready.
+            // A separate attachment label would add an update just before it.
             aidoku_kindle::reader_timing::mark("startup_attachment_started");
             let app = App::attach_prepared(ui, prepared, platform.clone())?;
             *application.borrow_mut() = Some(app);
