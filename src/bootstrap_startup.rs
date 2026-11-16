@@ -196,17 +196,8 @@ impl Startup {
         if self.ready || self.failed || self.cancelled.load(Ordering::Acquire) {
             return Ok(self.ready);
         }
-        let now = Instant::now();
-        if now.saturating_duration_since(self.activity_at)
-            >= crate::bootstrap_presentation::ACTIVITY_INTERVAL
-        {
-            self.activity_at = now;
-            self.activity_frame = (self.activity_frame + 1) % 4;
-            ui.global::<State>().set_startup_frame(self.activity_frame);
-            ui.window().request_redraw();
-            platform.refresh(RefreshKind::Fast);
-        }
         if !self.started {
+            self.update_activity(ui, platform);
             if !self.first_scene.submitted(
                 platform.is_kindle(),
                 platform.sleep_status().frame_send_count,
@@ -238,6 +229,7 @@ impl Startup {
                 }
             }
             if !self.fonts_registered {
+                self.update_activity(ui, platform);
                 if self.fonts.can_register_next() {
                     self.schedule();
                 }
@@ -248,6 +240,7 @@ impl Startup {
         if attached.is_none() {
             let Some(prepared) = self.prepared.take() else {
                 ui.global::<State>().set_startup_stage(1);
+                self.update_activity(ui, platform);
                 return Ok(false);
             };
             ui.global::<State>().set_startup_stage(2);
@@ -291,6 +284,21 @@ impl Startup {
             ui.window().scale_factor()
         );
         Ok(true)
+    }
+
+    /// Animate resource waits without adding display work to final attachment.
+    fn update_activity(&mut self, ui: &AppWindow, platform: &Platform) {
+        let now = Instant::now();
+        if now.saturating_duration_since(self.activity_at)
+            >= crate::bootstrap_presentation::ACTIVITY_INTERVAL
+        {
+            self.activity_at = now;
+            self.activity_frame = (self.activity_frame + 1) % 4;
+            ui.global::<State>().set_startup_frame(self.activity_frame);
+            ui.window().request_redraw();
+            platform.refresh(RefreshKind::Fast);
+            aidoku_kindle::reader_timing::mark("startup_activity_pulse");
+        }
     }
 
     pub fn fail(&mut self, ui: &AppWindow, platform: &Platform) {

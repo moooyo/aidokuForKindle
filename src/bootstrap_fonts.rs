@@ -1,76 +1,73 @@
-//! Incremental font preparation adapted from the sibling BiliComics loader.
+//! Incremental registration of build-expanded, immutable bundled fonts.
 
-use std::{
-    io::Read,
-    sync::{
-        Arc,
-        atomic::{AtomicBool, Ordering},
-    },
+use std::sync::{
+    Arc,
+    atomic::{AtomicBool, Ordering},
 };
 
 use aidoku_kindle::ui::{AppWindow, Theme};
-use anyhow::{Context, Result, bail, ensure};
-use flate2::read::GzDecoder;
+use anyhow::{Result, ensure};
 use slint::{ComponentHandle, fontique_010::fontique};
 
-const MAX_FONT_BYTES: u64 = 64 * 1024 * 1024;
 const STARTUP_FAMILY: &str = "BiliComics Startup";
-const BUNDLED_FONTS: &[(&str, f32, &[u8])] = &[
+static BUNDLED_FONTS: &[(&str, f32, &[u8])] = &[
     (
         "Noto Sans CJK SC",
         400.0,
-        include_bytes!("../assets/fonts/NotoSansSC-Regular.otf.gz"),
+        include_bytes!(concat!(env!("OUT_DIR"), "/fonts/NotoSansSC-Regular.otf")),
     ),
     (
         "Noto Sans CJK SC",
         500.0,
-        include_bytes!("../assets/fonts/NotoSansSC-Medium.otf.gz"),
+        include_bytes!(concat!(env!("OUT_DIR"), "/fonts/NotoSansSC-Medium.otf")),
     ),
     (
         "Noto Sans CJK SC",
         700.0,
-        include_bytes!("../assets/fonts/NotoSansSC-Bold.otf.gz"),
+        include_bytes!(concat!(env!("OUT_DIR"), "/fonts/NotoSansSC-Bold.otf")),
     ),
     (
         "Noto Serif CJK SC",
         400.0,
-        include_bytes!("../assets/fonts/NotoSerifSC-Regular.otf.gz"),
+        include_bytes!(concat!(env!("OUT_DIR"), "/fonts/NotoSerifSC-Regular.otf")),
     ),
     (
         "Noto Serif CJK SC",
         700.0,
-        include_bytes!("../assets/fonts/NotoSerifSC-Bold.otf.gz"),
+        include_bytes!(concat!(env!("OUT_DIR"), "/fonts/NotoSerifSC-Bold.otf")),
     ),
     (
         "Noto Serif CJK SC",
         900.0,
-        include_bytes!("../assets/fonts/NotoSerifSC-Black.otf.gz"),
+        include_bytes!(concat!(env!("OUT_DIR"), "/fonts/NotoSerifSC-Black.otf")),
     ),
     (
         "Literata",
         400.0,
-        include_bytes!("../assets/fonts/Literata-Regular.ttf.gz"),
+        include_bytes!(concat!(env!("OUT_DIR"), "/fonts/Literata-Regular.ttf")),
     ),
     (
         "Literata",
         600.0,
-        include_bytes!("../assets/fonts/Literata-SemiBold.ttf.gz"),
+        include_bytes!(concat!(env!("OUT_DIR"), "/fonts/Literata-SemiBold.ttf")),
     ),
     (
         "Literata",
         700.0,
-        include_bytes!("../assets/fonts/Literata-Bold.ttf.gz"),
+        include_bytes!(concat!(env!("OUT_DIR"), "/fonts/Literata-Bold.ttf")),
     ),
 ];
 
+type FontBytes = Arc<dyn AsRef<[u8]> + Send + Sync>;
+
 pub struct PreparedFont {
     index: usize,
-    bytes: Arc<Vec<u8>>,
+    bytes: FontBytes,
 }
 
 #[derive(Default)]
 pub struct Fonts {
-    faces: Vec<Arc<Vec<u8>>>,
+    faces: Vec<FontBytes>,
     registered: usize,
 }
 
@@ -81,40 +78,25 @@ impl Fonts {
     }
 
     pub fn register_bootstrap(ui: &AppWindow) -> Result<()> {
-        register_face(
-            Arc::new(Self::bootstrap_bytes().to_vec()),
-            STARTUP_FAMILY,
-            400.0,
-        )?;
+        register_face(Arc::new(Self::bootstrap_bytes()), STARTUP_FAMILY, 400.0)?;
         ui.global::<Theme>().set_sans(STARTUP_FAMILY.into());
         ui.global::<Theme>().set_serif(STARTUP_FAMILY.into());
         ui.global::<Theme>().set_numbers(STARTUP_FAMILY.into());
         Ok(())
     }
 
-    /// Deliver immutable faces in order while the UI registers earlier ones.
+    /// Share static ELF-backed bytes without runtime expansion or full copies.
     pub fn prepare_faces(
         cancelled: &AtomicBool,
         mut deliver: impl FnMut(PreparedFont) -> Result<()>,
     ) -> Result<()> {
-        for (index, (family, weight, compressed)) in BUNDLED_FONTS.iter().enumerate() {
-            if cancelled.load(Ordering::Acquire) {
-                return Ok(());
-            }
-            let mut decoded = Vec::new();
-            GzDecoder::new(*compressed)
-                .take(MAX_FONT_BYTES + 1)
-                .read_to_end(&mut decoded)
-                .with_context(|| format!("Load bundled {family} weight {weight}"))?;
-            if decoded.len() as u64 > MAX_FONT_BYTES {
-                bail!("A bundled font exceeds the decompression limit");
-            }
+        for (index, (_, _, bytes)) in BUNDLED_FONTS.iter().enumerate() {
             if cancelled.load(Ordering::Acquire) {
                 return Ok(());
             }
             deliver(PreparedFont {
                 index,
-                bytes: Arc::new(decoded),
+                bytes: Arc::new(*bytes),
             })?;
         }
         aidoku_kindle::reader_timing::mark("fonts_loaded");
@@ -160,7 +142,7 @@ impl Fonts {
     }
 }
 
-fn register_face(bytes: Arc<Vec<u8>>, family: &str, weight: f32) -> Result<()> {
+fn register_face(bytes: FontBytes, family: &str, weight: f32) -> Result<()> {
     let mut collection = slint::fontique_010::shared_collection();
     let registered = collection.register_fonts(fontique::Blob::new(bytes), None);
     ensure!(
@@ -217,11 +199,11 @@ mod tests {
                 })
                 .is_err()
         );
-        assert_eq!(fonts.faces[0].as_slice(), &[1]);
+        assert_eq!(fonts.faces[0].as_ref().as_ref(), &[1]);
     }
 
     #[test]
-    fn cancellation_before_work_does_not_decode_a_face() {
+    fn cancellation_before_work_does_not_publish_a_face() {
         let mut deliveries = 0;
         Fonts::prepare_faces(&AtomicBool::new(true), |_| {
             deliveries += 1;
@@ -229,5 +211,45 @@ mod tests {
         })
         .unwrap();
         assert_eq!(deliveries, 0);
+    }
+
+    #[test]
+    fn expanded_fonts_match_the_existing_published_payloads() {
+        use sha2::{Digest, Sha256};
+        use std::collections::BTreeSet;
+
+        let manifest: serde_json::Value =
+            serde_json::from_str(include_str!("../assets/fonts/manifest.json")).unwrap();
+        let expected = manifest["fonts"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .map(|font| {
+                (
+                    font["uncompressed_sha256"].as_str().unwrap().to_owned(),
+                    font["uncompressed_bytes"].as_u64().unwrap(),
+                )
+            })
+            .collect::<BTreeSet<_>>();
+        let observed = BUNDLED_FONTS
+            .iter()
+            .map(|(_, _, bytes)| (format!("{:x}", Sha256::digest(bytes)), bytes.len() as u64))
+            .collect::<BTreeSet<_>>();
+        assert_eq!(observed.len(), BUNDLED_FONTS.len());
+        assert_eq!(observed, expected);
+    }
+
+    #[test]
+    fn prepared_faces_borrow_the_embedded_payloads() {
+        let mut delivered = 0;
+        Fonts::prepare_faces(&AtomicBool::new(false), |face| {
+            let bytes = face.bytes.as_ref().as_ref();
+            assert_eq!(bytes.as_ptr(), BUNDLED_FONTS[face.index].2.as_ptr());
+            assert_eq!(bytes.len(), BUNDLED_FONTS[face.index].2.len());
+            delivered += 1;
+            Ok(())
+        })
+        .unwrap();
+        assert_eq!(delivered, BUNDLED_FONTS.len());
     }
 }

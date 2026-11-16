@@ -2,7 +2,7 @@
 # Name: Aidoku
 # DontUseFBInk
 # Author: Aidoku
-# Icon: /mnt/us/aidoku/assets/aidoku-cover.png
+# Icon: /mnt/us/aidoku/assets/aidoku-cover-v2.png
 set -eu
 umask 077
 LOG_DIR=/mnt/us/aidoku/data/logs

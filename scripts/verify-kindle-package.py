@@ -47,7 +47,10 @@ def expected_inputs(root: Path) -> dict[str, Path]:
         "aidoku/launch.sh": root / "packaging/kindle/launch.sh",
         "documents/Aidoku.sh": root / "packaging/kindle/document-launcher.sh",
         "aidoku/assets/aidoku-cover.png": root / "assets/launcher/aidoku-cover.png",
+        "aidoku/assets/aidoku-cover-v2.png": root / "assets/launcher/aidoku-cover-v2.png",
         "aidoku/licenses/launcher/README.md": root / "assets/launcher/README.md",
+        "aidoku/licenses/launcher/AIDOKU-LOGO-LICENSE.txt": root / "assets/launcher/AIDOKU-LOGO-LICENSE.txt",
+        "aidoku/licenses/launcher/official-logo-provenance.json": root / "assets/launcher/official-logo-provenance.json",
         "aidoku/README.md": root / "packaging/kindle/README.md",
         "aidoku/LICENSE": root / "LICENSE",
         "aidoku/THIRD_PARTY_NOTICES.md": root / "THIRD_PARTY_NOTICES.md",
@@ -201,8 +204,10 @@ def main() -> int:
                         and font["uncompressed_bytes"] == len(unpacked) and font["uncompressed_sha256"] == sha256(unpacked)
                         and license_name in expected_names and bool(archive.read(license_name).strip()),
                         f"The embedded font record and complete license are current: {font['file']}")
-                require(payload in application, f"The declared compressed font is embedded in the native executable: {font['file']}")
-                font_results.append({"file": font["file"], "sha256": font["sha256"], "license": font["license_file"]})
+                require(unpacked in application, f"The build-expanded font is embedded unchanged in the native executable: {font['file']}")
+                font_results.append({"file": font["file"], "sha256": font["sha256"],
+                                     "embedded_format": "raw", "embedded_sha256": sha256(unpacked),
+                                     "license": font["license_file"]})
         after = source_manifest(root)
         require(before == after, "Production source remains unchanged throughout package verification", after["sha256"])
         require(sha256(arguments.archive.read_bytes()) == sha256(package_bytes)

@@ -116,8 +116,9 @@ duplicated as loose runtime assets in the package.
    alternatively execute `documents/Aidoku.sh`; the stock document reader alone
    does not execute shell scripts.
 
-The document entry declares an original monochrome Library cover through its
-`# Icon:` header. Keep `aidoku/assets/aidoku-cover.png` with the installation;
+The document entry declares a grayscale Library cover using the official
+Aidoku website logomark through its `# Icon:` header. Keep
+`aidoku/assets/aidoku-cover-v2.png` with the installation;
 copy it before updating `documents/Aidoku.sh`. The Scriptlet scanner reads this
 header when it indexes the document. An existing entry must be rescanned to
 replace its default book placeholder. The PNG is independent of Reader sleep

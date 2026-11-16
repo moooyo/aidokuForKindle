@@ -1,8 +1,9 @@
 # Interface font assets
 
-These are real font outlines, compressed with deterministic gzip headers. The
-application decompresses them and registers the raw OpenType/TrueType data at
-startup.
+These are real font outlines, stored in the repository with deterministic gzip
+headers. The build expands them into generated OpenType/TrueType payloads under
+`OUT_DIR/fonts`. The application shares those immutable embedded bytes with the
+font registry at startup without runtime gzip expansion or full font copies.
 
 | Asset | Family to request | Weight |
 | --- | --- | --- |
@@ -30,8 +31,9 @@ digest, original family, transformation, and retained OFL terms. Normal UI
 families switch only after all nine full faces have been registered.
 
 The regular serif asset adds 3,342,333 compressed bytes and 4,140,532 bytes of raw
-font data. Startup decompresses and registers it; parser allocations, raster
-caches, and temporary decompression storage are additional runtime costs.
+font data. Startup registers the build-expanded payload; parser allocations and
+raster caches are additional runtime costs. The original source gzip files and
+the manifest's uncompressed hashes remain the canonical font inputs.
 The Bold asset adds 3,455,674 compressed bytes and 4,228,248 bytes of raw font
 data. It covers 8,112 codepoints, including the complete 8,110-codepoint union of
 the existing Regular and Black faces. Their outlines and assets remain intact.
