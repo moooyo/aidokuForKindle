@@ -1,0 +1,186 @@
+--- a/src/input.rs
++++ b/src/input.rs
+@@ -299,7 +299,20 @@
+     }
+ 
+     pub fn all_candidates(&self) -> Vec<Candidate> {
+-        Dictionary::bundled().suggestions(&self.composition)
++        self.lookup_candidates(|composition| Dictionary::bundled().suggestions(composition))
++    }
++
++    fn lookup_candidates(&self, lookup: impl FnOnce(&str) -> Vec<Candidate>) -> Vec<Candidate> {
++        // Empty and punctuation-only compositions cannot produce suggestions.
++        // Do not initialize the dictionary merely to render a hidden keyboard.
++        if !self
++            .composition
++            .bytes()
++            .any(|byte| byte.is_ascii_alphabetic())
++        {
++            return Vec::new();
++        }
++        lookup(&self.composition)
+     }
+ 
+     pub fn candidates(&self) -> Vec<String> {
+@@ -523,6 +536,47 @@
+ #[cfg(test)]
+ mod tests {
+     use super::*;
++
++    #[test]
++    fn compositions_without_letters_do_not_access_the_dictionary() {
++        for composition in [
++            "",
++            "'",
++            "123",
++            " -\t",
++            "\u{4e2d}\u{6587}",
++            "\u{ff4e}\u{ff49}",
++        ] {
++            let input = PinyinInput {
++                composition: composition.into(),
++                ..PinyinInput::default()
++            };
++            assert!(
++                input
++                    .lookup_candidates(|_| panic!("dictionary was accessed"))
++                    .is_empty()
++            );
++            assert_eq!(input.candidate_page_count(), 1);
++        }
++    }
++
++    #[test]
++    fn letter_compositions_keep_the_existing_lookup_and_normalization() {
++        for composition in ["Ni'Hao", "tushuguan", "123ni", "'n'"] {
++            let input = PinyinInput {
++                composition: composition.into(),
++                ..PinyinInput::default()
++            };
++            let mut observed = false;
++            let candidates = input.lookup_candidates(|value| {
++                observed = true;
++                assert_eq!(value, composition);
++                Dictionary::bundled().suggestions(value)
++            });
++            assert!(observed);
++            assert_eq!(candidates, Dictionary::bundled().suggestions(composition));
++        }
++    }
+ 
+     fn type_pinyin(value: &str) -> PinyinInput {
+         let mut input = PinyinInput::default();
+--- a/src/bootstrap_fonts.rs
++++ b/src/bootstrap_fonts.rs
+@@ -127,17 +127,27 @@
+         Ok(self.registered == BUNDLED_FONTS.len())
+     }
+ 
+-    /// Publish the complete family set only after every requested weight exists.
+-    pub fn finish(&self, ui: &AppWindow) -> Result<()> {
++    /// Complete registration without invalidating the bitmap loading scene.
++    pub fn finish_registration(&self) -> Result<()> {
+         ensure!(
+             self.registered == BUNDLED_FONTS.len(),
+             "Bundled font registration is not complete"
+         );
++        crate::FONT_INITIALIZATIONS.fetch_add(1, Ordering::AcqRel);
++        aidoku_kindle::reader_timing::mark("fonts_registered");
++        Ok(())
++    }
++
++    /// Switch all families in the same event-loop turn as the business scene.
++    pub fn activate(&self, ui: &AppWindow) -> Result<()> {
++        ensure!(
++            self.registered == BUNDLED_FONTS.len(),
++            "Bundled font registration is not complete"
++        );
+         ui.global::<Theme>().set_sans("Noto Sans CJK SC".into());
+         ui.global::<Theme>().set_serif("Noto Serif CJK SC".into());
+         ui.global::<Theme>().set_numbers("Literata".into());
+-        crate::FONT_INITIALIZATIONS.fetch_add(1, Ordering::AcqRel);
+-        aidoku_kindle::reader_timing::mark("fonts_registered");
++        aidoku_kindle::reader_timing::mark("fonts_activated");
+         Ok(())
+     }
+ }
+@@ -164,6 +174,7 @@
+         let mut fonts = Fonts::default();
+         assert!(!fonts.can_register_next());
+         assert!(!fonts.register_next().unwrap());
++        assert!(fonts.finish_registration().is_err());
+         fonts
+             .accept(PreparedFont {
+                 index: 0,
+--- a/src/bootstrap_startup.rs
++++ b/src/bootstrap_startup.rs
+@@ -197,7 +197,6 @@
+             return Ok(self.ready);
+         }
+         if !self.started {
+-            self.update_activity(ui, platform);
+             if !self.first_scene.submitted(
+                 platform.is_kindle(),
+                 platform.sleep_status().frame_send_count,
+@@ -211,6 +210,9 @@
+             if platform.is_kindle() {
+                 aidoku_kindle::reader_timing::mark("startup_feedback_submitted");
+             }
++            // The checked first frame already supplies immediate feedback.
++            // Count resource waiting from here, not from before that frame.
++            self.activity_at = Instant::now();
+             self.start_workers()?;
+             self.started = true;
+         }
+@@ -225,11 +227,11 @@
+             if self.fonts.can_register_next() {
+                 self.fonts_registered = self.fonts.register_next()?;
+                 if self.fonts_registered {
+-                    self.fonts.finish(ui)?;
++                    self.fonts.finish_registration()?;
+                 }
+             }
+             if !self.fonts_registered {
+-                self.update_activity(ui, platform);
++                self.update_activity(ui, platform, 0);
+                 if self.fonts.can_register_next() {
+                     self.schedule();
+                 }
+@@ -239,11 +241,9 @@
+         let attached = application.borrow().clone();
+         if attached.is_none() {
+             let Some(prepared) = self.prepared.take() else {
+-                ui.global::<State>().set_startup_stage(1);
+-                self.update_activity(ui, platform);
++                self.update_activity(ui, platform, 1);
+                 return Ok(false);
+             };
+-            ui.global::<State>().set_startup_stage(2);
+             aidoku_kindle::reader_timing::mark("startup_attachment_started");
+             let app = App::attach_prepared(ui, prepared, platform.clone())?;
+             *application.borrow_mut() = Some(app);
+@@ -264,6 +264,7 @@
+                     .context("The import path must be valid Unicode")?,
+             )?;
+         }
++        self.fonts.activate(ui)?;
+         self.ready = true;
+         self.wake.gate.stop();
+         ui.global::<State>().set_booting(false);
+@@ -287,13 +288,15 @@
+     }
+ 
+     /// Animate resource waits without adding display work to final attachment.
+-    fn update_activity(&mut self, ui: &AppWindow, platform: &Platform) {
++    fn update_activity(&mut self, ui: &AppWindow, platform: &Platform, stage: i32) {
+         let now = Instant::now();
+         if now.saturating_duration_since(self.activity_at)
+             >= crate::bootstrap_presentation::ACTIVITY_INTERVAL
+         {
+             self.activity_at = now;
+             self.activity_frame = (self.activity_frame + 1) % 4;
++            // A brief phase does not need its own display submission.
++            ui.global::<State>().set_startup_stage(stage);
+             ui.global::<State>().set_startup_frame(self.activity_frame);
+             ui.window().request_redraw();
+             platform.refresh(RefreshKind::Fast);

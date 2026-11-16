@@ -1,0 +1,2624 @@
+{
+  "schema_version": 1,
+  "date": "2026-11-17",
+  "base_commit": "4ce1fd156a7a4a75ca2fda5f4324991d6b02ce92",
+  "protocol": "Two variants; one warmup each; five measured AB/BA rounds; same Scribe boot; shared offline library snapshot; warm process launches without cache eviction.",
+  "scope": "Native launch request to software readiness and first Library SEND acceptance, not optical panel completion or physical-tap latency.",
+  "variants": {
+    "baseline": {
+      "application_sha256": "625ca3c1148c3c9dd99e90dc6762575acac27442f55305f4f00cec2d8efca352",
+      "application_bytes": 53343424,
+      "launcher_sha256": "02b20bc6c1f10f0afff5fc4c9802288ee43ac72f1647024bc316dc13b8c3a2c0"
+    },
+    "candidate": {
+      "application_sha256": "7b369333b6374f15ec33fac63a8e0ac8ac01a01dad7449e4461d0facc7782611",
+      "application_bytes": 53362784,
+      "launcher_sha256": "02b20bc6c1f10f0afff5fc4c9802288ee43ac72f1647024bc316dc13b8c3a2c0"
+    }
+  },
+  "cases": [
+    {
+      "case": "baseline-warmup",
+      "variant": "baseline",
+      "warmup": true,
+      "metrics": {
+        "software_ready_ms": 3260.0,
+        "content_send_ms": 3650.0,
+        "pre_exec_ms": 1940.0,
+        "portrait_calibration_ms": 690.0,
+        "display_takeover_ms": 140.0,
+        "rust_ready_ms": 1305.33,
+        "backend_install_ms": 62.748,
+        "startup_scene_ms": 554.057,
+        "event_loop_to_scene_ms": 412.866,
+        "fonts_gate_ms": 51.56,
+        "metadata_preparation_ms": 157.877,
+        "view_to_ready_ms": 12.973,
+        "rss_kib": 41244,
+        "hwm_kib": 41244,
+        "view_sync_ms": 417.535,
+        "prepared_to_attach_ms": 82.027
+      },
+      "input_devices": [
+        "/dev/input/event2",
+        "/dev/input/event4"
+      ],
+      "memory": {
+        "VmHWM": 41244,
+        "VmRSS": 41244,
+        "RssAnon": 16108,
+        "RssFile": 25136,
+        "RssShmem": 0
+      },
+      "rust_events": [
+        {
+          "at_us": 0,
+          "name": "process_entry"
+        },
+        {
+          "at_us": 30442,
+          "name": "platform_initialized"
+        },
+        {
+          "at_us": 93190,
+          "name": "startup_backend_installed"
+        },
+        {
+          "at_us": 108751,
+          "name": "startup_window_constructed"
+        },
+        {
+          "at_us": 109868,
+          "name": "startup_bootstrap_font_registered"
+        },
+        {
+          "at_us": 140704,
+          "name": "window_shown"
+        },
+        {
+          "at_us": 140707,
+          "name": "startup_window_shown"
+        },
+        {
+          "at_us": 141191,
+          "name": "event_loop_started"
+        },
+        {
+          "at_us": 553921,
+          "name": "startup_activity_pulse"
+        },
+        {
+          "at_us": 554057,
+          "name": "startup_scene_submitted"
+        },
+        {
+          "at_us": 554059,
+          "name": "startup_feedback_submitted"
+        },
+        {
+          "at_us": 554530,
+          "name": "startup_workers_started"
+        },
+        {
+          "at_us": 554598,
+          "name": "fonts_loaded"
+        },
+        {
+          "at_us": 606090,
+          "name": "fonts_registered"
+        },
+        {
+          "at_us": 712407,
+          "name": "application_prepared"
+        },
+        {
+          "at_us": 794434,
+          "name": "startup_attachment_started"
+        },
+        {
+          "at_us": 874078,
+          "name": "application_attached"
+        },
+        {
+          "at_us": 874195,
+          "name": "startup_route_started"
+        },
+        {
+          "at_us": 874203,
+          "name": "startup_route_attached"
+        },
+        {
+          "at_us": 874817,
+          "name": "startup_catalog_attached"
+        },
+        {
+          "at_us": 874822,
+          "name": "startup_view_started"
+        },
+        {
+          "at_us": 1292357,
+          "name": "startup_view_attached"
+        },
+        {
+          "at_us": 1305328,
+          "name": "application_ready"
+        },
+        {
+          "at_us": 1305330,
+          "name": "startup_ready"
+        },
+        {
+          "at_us": 11962428,
+          "name": "shutdown_started"
+        },
+        {
+          "at_us": 11986221,
+          "name": "shutdown_complete"
+        },
+        {
+          "at_us": 12010275,
+          "name": "process_finished"
+        }
+      ],
+      "native_refreshes": [
+        {
+          "at_ms": 2150.0,
+          "message": "aidoku: native-refresh accepted marker=1 waveform=2 mode=1 flags=0x0 region=0,0,1860,2480 swipe=0,0"
+        },
+        {
+          "at_ms": 2540.0,
+          "message": "aidoku: native-refresh accepted marker=2 waveform=1 mode=0 flags=0x2 region=0,0,1860,2480 swipe=0,0"
+        },
+        {
+          "at_ms": 2750.0,
+          "message": "aidoku: native-refresh accepted marker=3 waveform=257 mode=0 flags=0x0 region=798,1204,264,39 swipe=0,0"
+        },
+        {
+          "at_ms": 3260.0,
+          "message": "aidoku: native-refresh accepted marker=4 waveform=257 mode=0 flags=0x0 region=798,1204,264,38 swipe=0,0"
+        },
+        {
+          "at_ms": 3650.0,
+          "message": "aidoku: native-refresh accepted marker=5 waveform=257 mode=0 flags=0x0 region=0,0,1860,2480 swipe=0,0"
+        },
+        {
+          "at_ms": 4030.0,
+          "message": "aidoku: native-refresh accepted marker=6 waveform=257 mode=0 flags=0x0 region=0,0,1860,2480 swipe=0,0"
+        },
+        {
+          "at_ms": 4870.0,
+          "message": "aidoku: native-refresh accepted marker=7 waveform=257 mode=0 flags=0x0 region=0,0,1860,2480 swipe=0,0"
+        },
+        {
+          "at_ms": 9150.0,
+          "message": "aidoku: native-refresh accepted marker=8 waveform=257 mode=0 flags=0x0 region=0,0,1860,2480 swipe=0,0"
+        },
+        {
+          "at_ms": 10270.0,
+          "message": "aidoku: native-refresh accepted marker=9 waveform=257 mode=0 flags=0x0 region=0,0,1860,2480 swipe=0,0"
+        },
+        {
+          "at_ms": 11120.0,
+          "message": "aidoku: native-refresh accepted marker=10 waveform=257 mode=0 flags=0x0 region=0,0,1860,2480 swipe=0,0"
+        },
+        {
+          "at_ms": 12170.0,
+          "message": "aidoku: native-refresh accepted marker=11 waveform=257 mode=0 flags=0x0 region=0,0,1860,2480 swipe=0,0"
+        },
+        {
+          "at_ms": 13710.0,
+          "message": "aidoku: native-refresh accepted marker=12 waveform=257 mode=0 flags=0x0 region=0,0,1860,2480 swipe=0,0"
+        }
+      ],
+      "hashes": {
+        "application.json": "ac3c125f3fd06af6e0ae721ed8fc4e134e1962a33412327333a8e75d02e0471b",
+        "shell.tsv": "0e00d477bd00beadf84b6a0d896ad18029928085da22a6203846c2bff5601f91",
+        "native.tsv": "b82782560b210da8c8c5a2f8a2480fe55a1b15ad335c7f9fcd03a3653004dcdc",
+        "input-fds-at-content.txt": "19020f143c2927ab4f1e96fa7d5d0d6db520bf629a0a3fcb48e6437a5b110004",
+        "memory-at-content.txt": "3d40fdd56a98aa01c1e5208c9f31f0a46dd3e66e0672e83e9da4ed9b7e0a3c1b",
+        "final.png": "d60c2e38c87fd8d66bcc2e496cd4a996b6509ff31117e4fdeaf0301641e414df"
+      },
+      "pre_ready_refreshes": 4
+    },
+    {
+      "case": "candidate-warmup",
+      "variant": "candidate",
+      "warmup": true,
+      "metrics": {
+        "software_ready_ms": 2870.0,
+        "content_send_ms": 3340.0,
+        "pre_exec_ms": 1650.0,
+        "portrait_calibration_ms": 700.0,
+        "display_takeover_ms": 90.0,
+        "rust_ready_ms": 1199.853,
+        "backend_install_ms": 89.602,
+        "startup_scene_ms": 696.059,
+        "event_loop_to_scene_ms": 455.697,
+        "fonts_gate_ms": 31.594,
+        "metadata_preparation_ms": 71.033,
+        "view_to_ready_ms": 15.627,
+        "rss_kib": 30788,
+        "hwm_kib": 37960,
+        "view_sync_ms": 308.292,
+        "prepared_to_attach_ms": 0.087
+      },
+      "input_devices": [
+        "/dev/input/event2",
+        "/dev/input/event4"
+      ],
+      "memory": {
+        "VmHWM": 37960,
+        "VmRSS": 30788,
+        "RssAnon": 7248,
+        "RssFile": 23540,
+        "RssShmem": 0
+      },
+      "rust_events": [
+        {
+          "at_us": 0,
+          "name": "process_entry"
+        },
+        {
+          "at_us": 48368,
+          "name": "platform_initialized"
+        },
+        {
+          "at_us": 137970,
+          "name": "startup_backend_installed"
+        },
+        {
+          "at_us": 187522,
+          "name": "startup_window_constructed"
+        },
+        {
+          "at_us": 188134,
+          "name": "startup_bootstrap_font_registered"
+        },
+        {
+          "at_us": 240063,
+          "name": "window_shown"
+        },
+        {
+          "at_us": 240064,
+          "name": "startup_window_shown"
+        },
+        {
+          "at_us": 240362,
+          "name": "event_loop_started"
+        },
+        {
+          "at_us": 696059,
+          "name": "startup_scene_submitted"
+        },
+        {
+          "at_us": 696064,
+          "name": "startup_feedback_submitted"
+        },
+        {
+          "at_us": 696558,
+          "name": "startup_workers_started"
+        },
+        {
+          "at_us": 698675,
+          "name": "fonts_loaded"
+        },
+        {
+          "at_us": 728152,
+          "name": "fonts_registered"
+        },
+        {
+          "at_us": 767591,
+          "name": "application_prepared"
+        },
+        {
+          "at_us": 767678,
+          "name": "startup_attachment_started"
+        },
+        {
+          "at_us": 874629,
+          "name": "application_attached"
+        },
+        {
+          "at_us": 874753,
+          "name": "startup_route_started"
+        },
+        {
+          "at_us": 874767,
+          "name": "startup_route_attached"
+        },
+        {
+          "at_us": 875927,
+          "name": "startup_catalog_attached"
+        },
+        {
+          "at_us": 875934,
+          "name": "startup_view_started"
+        },
+        {
+          "at_us": 1184226,
+          "name": "startup_view_attached"
+        },
+        {
+          "at_us": 1199687,
+          "name": "fonts_activated"
+        },
+        {
+          "at_us": 1199852,
+          "name": "application_ready"
+        },
+        {
+          "at_us": 1199853,
+          "name": "startup_ready"
+        },
+        {
+          "at_us": 6157317,
+          "name": "shutdown_started"
+        },
+        {
+          "at_us": 6181367,
+          "name": "shutdown_complete"
+        },
+        {
+          "at_us": 6205608,
+          "name": "process_finished"
+        }
+      ],
+      "native_refreshes": [
+        {
+          "at_ms": 2000.0,
+          "message": "aidoku: native-refresh accepted marker=1 waveform=2 mode=1 flags=0x0 region=0,0,1860,2480 swipe=0,0"
+        },
+        {
+          "at_ms": 3340.0,
+          "message": "aidoku: native-refresh accepted marker=2 waveform=257 mode=0 flags=0x0 region=0,0,1860,2480 swipe=0,0"
+        },
+        {
+          "at_ms": 3790.0,
+          "message": "aidoku: native-refresh accepted marker=3 waveform=257 mode=0 flags=0x0 region=0,0,1860,2480 swipe=0,0"
+        },
+        {
+          "at_ms": 3970.0,
+          "message": "aidoku: native-refresh accepted marker=4 waveform=257 mode=0 flags=0x0 region=0,0,1860,2480 swipe=0,0"
+        },
+        {
+          "at_ms": 5540.0,
+          "message": "aidoku: native-refresh accepted marker=5 waveform=257 mode=0 flags=0x0 region=0,0,1860,2480 swipe=0,0"
+        },
+        {
+          "at_ms": 5900.0,
+          "message": "aidoku: native-refresh accepted marker=6 waveform=257 mode=0 flags=0x0 region=0,0,1860,2480 swipe=0,0"
+        },
+        {
+          "at_ms": 6270.0,
+          "message": "aidoku: native-refresh accepted marker=7 waveform=257 mode=0 flags=0x0 region=0,0,1860,2480 swipe=0,0"
+        },
+        {
+          "at_ms": 7640.0,
+          "message": "aidoku: native-refresh accepted marker=8 waveform=257 mode=0 flags=0x0 region=0,0,1860,2480 swipe=0,0"
+        }
+      ],
+      "hashes": {
+        "application.json": "1c6ff75c621e0c20e8b503092a4fe46e4e999dbc9ac5ffe96378c0aab33d9087",
+        "shell.tsv": "757390ba78e3d19477e7c379870693bcedcb6147da117c207c3d4f2ba5ad0b91",
+        "native.tsv": "3da8d2eb59753449e21718c01f0ff41eefb4d668639c53926b85b19872b4b09a",
+        "input-fds-at-content.txt": "19020f143c2927ab4f1e96fa7d5d0d6db520bf629a0a3fcb48e6437a5b110004",
+        "memory-at-content.txt": "2c0d4d7bf8b0503db7a8bddf3e88c9b56b0011bae0b8d0467bdfad15429f95c8",
+        "final.png": "9e6eb092ae84bf78647ab36dcec2262c7601584fa8f6222b3849c348a55629ff"
+      },
+      "pre_ready_refreshes": 1
+    },
+    {
+      "case": "baseline-01",
+      "variant": "baseline",
+      "warmup": false,
+      "metrics": {
+        "software_ready_ms": 2830.0,
+        "content_send_ms": 3210.0,
+        "pre_exec_ms": 1420.0,
+        "portrait_calibration_ms": 480.0,
+        "display_takeover_ms": 270.0,
+        "rust_ready_ms": 1312.349,
+        "backend_install_ms": 61.971,
+        "startup_scene_ms": 685.592,
+        "event_loop_to_scene_ms": 437.452,
+        "fonts_gate_ms": 46.46,
+        "metadata_preparation_ms": 82.605,
+        "view_to_ready_ms": 11.113,
+        "rss_kib": 36456,
+        "hwm_kib": 44276,
+        "view_sync_ms": 303.15,
+        "prepared_to_attach_ms": 157.671
+      },
+      "input_devices": [
+        "/dev/input/event2",
+        "/dev/input/event4"
+      ],
+      "memory": {
+        "VmHWM": 44276,
+        "VmRSS": 36456,
+        "RssAnon": 11732,
+        "RssFile": 24724,
+        "RssShmem": 0
+      },
+      "rust_events": [
+        {
+          "at_us": 0,
+          "name": "process_entry"
+        },
+        {
+          "at_us": 77974,
+          "name": "platform_initialized"
+        },
+        {
+          "at_us": 139945,
+          "name": "startup_backend_installed"
+        },
+        {
+          "at_us": 181715,
+          "name": "startup_window_constructed"
+        },
+        {
+          "at_us": 183628,
+          "name": "startup_bootstrap_font_registered"
+        },
+        {
+          "at_us": 247570,
+          "name": "window_shown"
+        },
+        {
+          "at_us": 247573,
+          "name": "startup_window_shown"
+        },
+        {
+          "at_us": 248140,
+          "name": "event_loop_started"
+        },
+        {
+          "at_us": 685456,
+          "name": "startup_activity_pulse"
+        },
+        {
+          "at_us": 685592,
+          "name": "startup_scene_submitted"
+        },
+        {
+          "at_us": 685595,
+          "name": "startup_feedback_submitted"
+        },
+        {
+          "at_us": 686066,
+          "name": "startup_workers_started"
+        },
+        {
+          "at_us": 695642,
+          "name": "fonts_loaded"
+        },
+        {
+          "at_us": 732526,
+          "name": "fonts_registered"
+        },
+        {
+          "at_us": 768671,
+          "name": "application_prepared"
+        },
+        {
+          "at_us": 926342,
+          "name": "startup_attachment_started"
+        },
+        {
+          "at_us": 997355,
+          "name": "application_attached"
+        },
+        {
+          "at_us": 997459,
+          "name": "startup_route_started"
+        },
+        {
+          "at_us": 997466,
+          "name": "startup_route_attached"
+        },
+        {
+          "at_us": 998080,
+          "name": "startup_catalog_attached"
+        },
+        {
+          "at_us": 998086,
+          "name": "startup_view_started"
+        },
+        {
+          "at_us": 1301236,
+          "name": "startup_view_attached"
+        },
+        {
+          "at_us": 1312348,
+          "name": "application_ready"
+        },
+        {
+          "at_us": 1312349,
+          "name": "startup_ready"
+        },
+        {
+          "at_us": 5871768,
+          "name": "shutdown_started"
+        },
+        {
+          "at_us": 5895609,
+          "name": "shutdown_complete"
+        },
+        {
+          "at_us": 5915020,
+          "name": "process_finished"
+        }
+      ],
+      "native_refreshes": [
+        {
+          "at_ms": 1840.0,
+          "message": "aidoku: native-refresh accepted marker=1 waveform=2 mode=1 flags=0x0 region=0,0,1860,2480 swipe=0,0"
+        },
+        {
+          "at_ms": 2230.0,
+          "message": "aidoku: native-refresh accepted marker=2 waveform=1 mode=0 flags=0x2 region=0,0,1860,2480 swipe=0,0"
+        },
+        {
+          "at_ms": 2450.0,
+          "message": "aidoku: native-refresh accepted marker=3 waveform=257 mode=0 flags=0x0 region=798,1204,264,39 swipe=0,0"
+        },
+        {
+          "at_ms": 2820.0,
+          "message": "aidoku: native-refresh accepted marker=4 waveform=257 mode=0 flags=0x0 region=798,1204,264,38 swipe=0,0"
+        },
+        {
+          "at_ms": 3210.0,
+          "message": "aidoku: native-refresh accepted marker=5 waveform=257 mode=0 flags=0x0 region=0,0,1860,2480 swipe=0,0"
+        },
+        {
+          "at_ms": 3730.0,
+          "message": "aidoku: native-refresh accepted marker=6 waveform=257 mode=0 flags=0x0 region=0,0,1860,2480 swipe=0,0"
+        },
+        {
+          "at_ms": 5220.0,
+          "message": "aidoku: native-refresh accepted marker=7 waveform=257 mode=0 flags=0x0 region=0,0,1860,2480 swipe=0,0"
+        },
+        {
+          "at_ms": 5570.0,
+          "message": "aidoku: native-refresh accepted marker=8 waveform=257 mode=0 flags=0x0 region=0,0,1860,2480 swipe=0,0"
+        },
+        {
+          "at_ms": 5920.0,
+          "message": "aidoku: native-refresh accepted marker=9 waveform=257 mode=0 flags=0x0 region=0,0,1860,2480 swipe=0,0"
+        },
+        {
+          "at_ms": 7230.0,
+          "message": "aidoku: native-refresh accepted marker=10 waveform=257 mode=0 flags=0x0 region=0,0,1860,2480 swipe=0,0"
+        }
+      ],
+      "hashes": {
+        "application.json": "f88204cf59db6e4232b20eabe819238d413bee860467348cbe55c82bd6dbb7d9",
+        "shell.tsv": "a2cae11430cca3557070167c81e444b3f0c980c5b99038172074f68e0eab0159",
+        "native.tsv": "657acb0d56caac7928bb233495d365be88c0feb10046dc93cc86a85a75f2369d",
+        "input-fds-at-content.txt": "19020f143c2927ab4f1e96fa7d5d0d6db520bf629a0a3fcb48e6437a5b110004",
+        "memory-at-content.txt": "894eea3d1ddd2bb308cc91cf603dc98185b9cdd968ea4b597f81214fc1fc759c",
+        "final.png": "9e6eb092ae84bf78647ab36dcec2262c7601584fa8f6222b3849c348a55629ff"
+      },
+      "pre_ready_refreshes": 4
+    },
+    {
+      "case": "candidate-01",
+      "variant": "candidate",
+      "warmup": false,
+      "metrics": {
+        "software_ready_ms": 2460.0,
+        "content_send_ms": 2830.0,
+        "pre_exec_ms": 1330.0,
+        "portrait_calibration_ms": 460.0,
+        "display_takeover_ms": 250.0,
+        "rust_ready_ms": 1090.707,
+        "backend_install_ms": 62.338,
+        "startup_scene_ms": 656.529,
+        "event_loop_to_scene_ms": 467.972,
+        "fonts_gate_ms": 21.978,
+        "metadata_preparation_ms": 75.822,
+        "view_to_ready_ms": 11.317,
+        "rss_kib": 29660,
+        "hwm_kib": 38280,
+        "view_sync_ms": 246.618,
+        "prepared_to_attach_ms": 0.081
+      },
+      "input_devices": [
+        "/dev/input/event2",
+        "/dev/input/event4"
+      ],
+      "memory": {
+        "VmHWM": 38280,
+        "VmRSS": 29660,
+        "RssAnon": 6524,
+        "RssFile": 23136,
+        "RssShmem": 0
+      },
+      "rust_events": [
+        {
+          "at_us": 0,
+          "name": "process_entry"
+        },
+        {
+          "at_us": 55933,
+          "name": "platform_initialized"
+        },
+        {
+          "at_us": 118271,
+          "name": "startup_backend_installed"
+        },
+        {
+          "at_us": 139425,
+          "name": "startup_window_constructed"
+        },
+        {
+          "at_us": 140388,
+          "name": "startup_bootstrap_font_registered"
+        },
+        {
+          "at_us": 186041,
+          "name": "window_shown"
+        },
+        {
+          "at_us": 186045,
+          "name": "startup_window_shown"
+        },
+        {
+          "at_us": 188557,
+          "name": "event_loop_started"
+        },
+        {
+          "at_us": 656529,
+          "name": "startup_scene_submitted"
+        },
+        {
+          "at_us": 656535,
+          "name": "startup_feedback_submitted"
+        },
+        {
+          "at_us": 656915,
+          "name": "startup_workers_started"
+        },
+        {
+          "at_us": 659137,
+          "name": "fonts_loaded"
+        },
+        {
+          "at_us": 678893,
+          "name": "fonts_registered"
+        },
+        {
+          "at_us": 732737,
+          "name": "application_prepared"
+        },
+        {
+          "at_us": 732818,
+          "name": "startup_attachment_started"
+        },
+        {
+          "at_us": 831841,
+          "name": "application_attached"
+        },
+        {
+          "at_us": 832041,
+          "name": "startup_route_started"
+        },
+        {
+          "at_us": 832054,
+          "name": "startup_route_attached"
+        },
+        {
+          "at_us": 832765,
+          "name": "startup_catalog_attached"
+        },
+        {
+          "at_us": 832772,
+          "name": "startup_view_started"
+        },
+        {
+          "at_us": 1079390,
+          "name": "startup_view_attached"
+        },
+        {
+          "at_us": 1090636,
+          "name": "fonts_activated"
+        },
+        {
+          "at_us": 1090706,
+          "name": "application_ready"
+        },
+        {
+          "at_us": 1090707,
+          "name": "startup_ready"
+        },
+        {
+          "at_us": 5958546,
+          "name": "shutdown_started"
+        },
+        {
+          "at_us": 5982356,
+          "name": "shutdown_complete"
+        },
+        {
+          "at_us": 6002634,
+          "name": "process_finished"
+        }
+      ],
+      "native_refreshes": [
+        {
+          "at_ms": 1660.0,
+          "message": "aidoku: native-refresh accepted marker=1 waveform=2 mode=1 flags=0x0 region=0,0,1860,2480 swipe=0,0"
+        },
+        {
+          "at_ms": 2830.0,
+          "message": "aidoku: native-refresh accepted marker=2 waveform=257 mode=0 flags=0x0 region=0,0,1860,2480 swipe=0,0"
+        },
+        {
+          "at_ms": 3610.0,
+          "message": "aidoku: native-refresh accepted marker=3 waveform=257 mode=0 flags=0x0 region=0,0,1860,2480 swipe=0,0"
+        },
+        {
+          "at_ms": 3610.0,
+          "message": "aidoku: native-refresh accepted marker=4 waveform=257 mode=0 flags=0x0 region=0,0,1860,2480 swipe=0,0"
+        },
+        {
+          "at_ms": 5160.0,
+          "message": "aidoku: native-refresh accepted marker=5 waveform=257 mode=0 flags=0x0 region=0,0,1860,2480 swipe=0,0"
+        },
+        {
+          "at_ms": 5520.0,
+          "message": "aidoku: native-refresh accepted marker=6 waveform=257 mode=0 flags=0x0 region=0,0,1860,2480 swipe=0,0"
+        },
+        {
+          "at_ms": 5860.0,
+          "message": "aidoku: native-refresh accepted marker=7 waveform=257 mode=0 flags=0x0 region=0,0,1860,2480 swipe=0,0"
+        },
+        {
+          "at_ms": 7150.0,
+          "message": "aidoku: native-refresh accepted marker=8 waveform=257 mode=0 flags=0x0 region=0,0,1860,2480 swipe=0,0"
+        }
+      ],
+      "hashes": {
+        "application.json": "ae6cd44ecd5f5c28dd5c6e005a3a549bde9904bc4b3b5e067ffbccdec01293b3",
+        "shell.tsv": "55498ea2874ac3dd756bbd690787fff2e2cf4146d3ba7731828e94415e931c7f",
+        "native.tsv": "fd3a3e32157dab4f3c46eb9437ddd36679b1efc30654b17c12e0896d55cc1523",
+        "input-fds-at-content.txt": "19020f143c2927ab4f1e96fa7d5d0d6db520bf629a0a3fcb48e6437a5b110004",
+        "memory-at-content.txt": "1be1038992dadad4a539dff83f82c4bd88632065a5d91b4d855cda6a6abce805",
+        "final.png": "9e6eb092ae84bf78647ab36dcec2262c7601584fa8f6222b3849c348a55629ff"
+      },
+      "pre_ready_refreshes": 1
+    },
+    {
+      "case": "candidate-02",
+      "variant": "candidate",
+      "warmup": false,
+      "metrics": {
+        "software_ready_ms": 2750.0,
+        "content_send_ms": 3310.0,
+        "pre_exec_ms": 1520.0,
+        "portrait_calibration_ms": 650.0,
+        "display_takeover_ms": 210.0,
+        "rust_ready_ms": 1206.053,
+        "backend_install_ms": 81.753,
+        "startup_scene_ms": 697.276,
+        "event_loop_to_scene_ms": 429.934,
+        "fonts_gate_ms": 24.003,
+        "metadata_preparation_ms": 83.34,
+        "view_to_ready_ms": 14.759,
+        "rss_kib": 30564,
+        "hwm_kib": 37624,
+        "view_sync_ms": 304.413,
+        "prepared_to_attach_ms": 0.085
+      },
+      "input_devices": [
+        "/dev/input/event2",
+        "/dev/input/event4"
+      ],
+      "memory": {
+        "VmHWM": 37624,
+        "VmRSS": 30564,
+        "RssAnon": 7180,
+        "RssFile": 23384,
+        "RssShmem": 0
+      },
+      "rust_events": [
+        {
+          "at_us": 0,
+          "name": "process_entry"
+        },
+        {
+          "at_us": 38875,
+          "name": "platform_initialized"
+        },
+        {
+          "at_us": 120628,
+          "name": "startup_backend_installed"
+        },
+        {
+          "at_us": 143060,
+          "name": "startup_window_constructed"
+        },
+        {
+          "at_us": 144014,
+          "name": "startup_bootstrap_font_registered"
+        },
+        {
+          "at_us": 266832,
+          "name": "window_shown"
+        },
+        {
+          "at_us": 266836,
+          "name": "startup_window_shown"
+        },
+        {
+          "at_us": 267342,
+          "name": "event_loop_started"
+        },
+        {
+          "at_us": 697276,
+          "name": "startup_scene_submitted"
+        },
+        {
+          "at_us": 697279,
+          "name": "startup_feedback_submitted"
+        },
+        {
+          "at_us": 697772,
+          "name": "startup_workers_started"
+        },
+        {
+          "at_us": 700297,
+          "name": "fonts_loaded"
+        },
+        {
+          "at_us": 721775,
+          "name": "fonts_registered"
+        },
+        {
+          "at_us": 781112,
+          "name": "application_prepared"
+        },
+        {
+          "at_us": 781197,
+          "name": "startup_attachment_started"
+        },
+        {
+          "at_us": 885490,
+          "name": "application_attached"
+        },
+        {
+          "at_us": 885623,
+          "name": "startup_route_started"
+        },
+        {
+          "at_us": 885636,
+          "name": "startup_route_attached"
+        },
+        {
+          "at_us": 886870,
+          "name": "startup_catalog_attached"
+        },
+        {
+          "at_us": 886881,
+          "name": "startup_view_started"
+        },
+        {
+          "at_us": 1191294,
+          "name": "startup_view_attached"
+        },
+        {
+          "at_us": 1205959,
+          "name": "fonts_activated"
+        },
+        {
+          "at_us": 1206052,
+          "name": "application_ready"
+        },
+        {
+          "at_us": 1206053,
+          "name": "startup_ready"
+        },
+        {
+          "at_us": 6382458,
+          "name": "shutdown_started"
+        },
+        {
+          "at_us": 6406685,
+          "name": "shutdown_complete"
+        },
+        {
+          "at_us": 6427289,
+          "name": "process_finished"
+        }
+      ],
+      "native_refreshes": [
+        {
+          "at_ms": 1870.0,
+          "message": "aidoku: native-refresh accepted marker=1 waveform=2 mode=1 flags=0x0 region=0,0,1860,2480 swipe=0,0"
+        },
+        {
+          "at_ms": 3310.0,
+          "message": "aidoku: native-refresh accepted marker=2 waveform=257 mode=0 flags=0x0 region=0,0,1860,2480 swipe=0,0"
+        },
+        {
+          "at_ms": 3630.0,
+          "message": "aidoku: native-refresh accepted marker=3 waveform=257 mode=0 flags=0x0 region=0,0,1860,2480 swipe=0,0"
+        },
+        {
+          "at_ms": 3820.0,
+          "message": "aidoku: native-refresh accepted marker=4 waveform=257 mode=0 flags=0x0 region=0,0,1860,2480 swipe=0,0"
+        },
+        {
+          "at_ms": 5660.0,
+          "message": "aidoku: native-refresh accepted marker=5 waveform=257 mode=0 flags=0x0 region=0,0,1860,2480 swipe=0,0"
+        },
+        {
+          "at_ms": 6090.0,
+          "message": "aidoku: native-refresh accepted marker=6 waveform=257 mode=0 flags=0x0 region=0,0,1860,2480 swipe=0,0"
+        },
+        {
+          "at_ms": 6430.0,
+          "message": "aidoku: native-refresh accepted marker=7 waveform=257 mode=0 flags=0x0 region=0,0,1860,2480 swipe=0,0"
+        },
+        {
+          "at_ms": 7760.0,
+          "message": "aidoku: native-refresh accepted marker=8 waveform=257 mode=0 flags=0x0 region=0,0,1860,2480 swipe=0,0"
+        }
+      ],
+      "hashes": {
+        "application.json": "3931196a13784c02d672947271835c878f9102aa1059c310b9f7ce8e7eadca48",
+        "shell.tsv": "b903c7576fd7244b06506110f444919fa365651c2ac2dddca23519235887de38",
+        "native.tsv": "7963e560c46bf0a97b9ccc1fa87aa91d913901291a4477cead187a1a354246b4",
+        "input-fds-at-content.txt": "19020f143c2927ab4f1e96fa7d5d0d6db520bf629a0a3fcb48e6437a5b110004",
+        "memory-at-content.txt": "120b9c20e737930fe78f71c8fb44414e84c71d5ca4e46a0ce0b55833a19afeda",
+        "final.png": "9e6eb092ae84bf78647ab36dcec2262c7601584fa8f6222b3849c348a55629ff"
+      },
+      "pre_ready_refreshes": 1
+    },
+    {
+      "case": "baseline-02",
+      "variant": "baseline",
+      "warmup": false,
+      "metrics": {
+        "software_ready_ms": 2700.0,
+        "content_send_ms": 3080.0,
+        "pre_exec_ms": 1470.0,
+        "portrait_calibration_ms": 590.0,
+        "display_takeover_ms": 270.0,
+        "rust_ready_ms": 1215.049,
+        "backend_install_ms": 77.059,
+        "startup_scene_ms": 587.301,
+        "event_loop_to_scene_ms": 422.748,
+        "fonts_gate_ms": 46.395,
+        "metadata_preparation_ms": 91.867,
+        "view_to_ready_ms": 10.247,
+        "rss_kib": 36776,
+        "hwm_kib": 44600,
+        "view_sync_ms": 305.938,
+        "prepared_to_attach_ms": 147.036
+      },
+      "input_devices": [
+        "/dev/input/event2",
+        "/dev/input/event4"
+      ],
+      "memory": {
+        "VmHWM": 44600,
+        "VmRSS": 36776,
+        "RssAnon": 11728,
+        "RssFile": 25048,
+        "RssShmem": 0
+      },
+      "rust_events": [
+        {
+          "at_us": 0,
+          "name": "process_entry"
+        },
+        {
+          "at_us": 41860,
+          "name": "platform_initialized"
+        },
+        {
+          "at_us": 118919,
+          "name": "startup_backend_installed"
+        },
+        {
+          "at_us": 137848,
+          "name": "startup_window_constructed"
+        },
+        {
+          "at_us": 138961,
+          "name": "startup_bootstrap_font_registered"
+        },
+        {
+          "at_us": 164226,
+          "name": "window_shown"
+        },
+        {
+          "at_us": 164228,
+          "name": "startup_window_shown"
+        },
+        {
+          "at_us": 164553,
+          "name": "event_loop_started"
+        },
+        {
+          "at_us": 587162,
+          "name": "startup_activity_pulse"
+        },
+        {
+          "at_us": 587301,
+          "name": "startup_scene_submitted"
+        },
+        {
+          "at_us": 587303,
+          "name": "startup_feedback_submitted"
+        },
+        {
+          "at_us": 587766,
+          "name": "startup_workers_started"
+        },
+        {
+          "at_us": 588087,
+          "name": "fonts_loaded"
+        },
+        {
+          "at_us": 634161,
+          "name": "fonts_registered"
+        },
+        {
+          "at_us": 679633,
+          "name": "application_prepared"
+        },
+        {
+          "at_us": 826669,
+          "name": "startup_attachment_started"
+        },
+        {
+          "at_us": 898249,
+          "name": "application_attached"
+        },
+        {
+          "at_us": 898385,
+          "name": "startup_route_started"
+        },
+        {
+          "at_us": 898394,
+          "name": "startup_route_attached"
+        },
+        {
+          "at_us": 898860,
+          "name": "startup_catalog_attached"
+        },
+        {
+          "at_us": 898864,
+          "name": "startup_view_started"
+        },
+        {
+          "at_us": 1204802,
+          "name": "startup_view_attached"
+        },
+        {
+          "at_us": 1215048,
+          "name": "application_ready"
+        },
+        {
+          "at_us": 1215049,
+          "name": "startup_ready"
+        },
+        {
+          "at_us": 5846352,
+          "name": "shutdown_started"
+        },
+        {
+          "at_us": 5869744,
+          "name": "shutdown_complete"
+        },
+        {
+          "at_us": 5888190,
+          "name": "process_finished"
+        }
+      ],
+      "native_refreshes": [
+        {
+          "at_ms": 1710.0,
+          "message": "aidoku: native-refresh accepted marker=1 waveform=2 mode=1 flags=0x0 region=0,0,1860,2480 swipe=0,0"
+        },
+        {
+          "at_ms": 2100.0,
+          "message": "aidoku: native-refresh accepted marker=2 waveform=1 mode=0 flags=0x2 region=0,0,1860,2480 swipe=0,0"
+        },
+        {
+          "at_ms": 2310.0,
+          "message": "aidoku: native-refresh accepted marker=3 waveform=257 mode=0 flags=0x0 region=798,1204,264,39 swipe=0,0"
+        },
+        {
+          "at_ms": 2690.0,
+          "message": "aidoku: native-refresh accepted marker=4 waveform=257 mode=0 flags=0x0 region=798,1204,264,38 swipe=0,0"
+        },
+        {
+          "at_ms": 3080.0,
+          "message": "aidoku: native-refresh accepted marker=5 waveform=257 mode=0 flags=0x0 region=0,0,1860,2480 swipe=0,0"
+        },
+        {
+          "at_ms": 3630.0,
+          "message": "aidoku: native-refresh accepted marker=6 waveform=257 mode=0 flags=0x0 region=0,0,1860,2480 swipe=0,0"
+        },
+        {
+          "at_ms": 5070.0,
+          "message": "aidoku: native-refresh accepted marker=7 waveform=257 mode=0 flags=0x0 region=0,0,1860,2480 swipe=0,0"
+        },
+        {
+          "at_ms": 5490.0,
+          "message": "aidoku: native-refresh accepted marker=8 waveform=257 mode=0 flags=0x0 region=0,0,1860,2480 swipe=0,0"
+        },
+        {
+          "at_ms": 5840.0,
+          "message": "aidoku: native-refresh accepted marker=9 waveform=257 mode=0 flags=0x0 region=0,0,1860,2480 swipe=0,0"
+        },
+        {
+          "at_ms": 7180.0,
+          "message": "aidoku: native-refresh accepted marker=10 waveform=257 mode=0 flags=0x0 region=0,0,1860,2480 swipe=0,0"
+        }
+      ],
+      "hashes": {
+        "application.json": "7c9aa5ff1a828cab1bb7fae3c35d65a3b696ef3a85e0c075573cd6053419cd19",
+        "shell.tsv": "bad587bbe49ac45d309f053789bd518ebb6b2828930b025f7a8ee8b1c2aeb26c",
+        "native.tsv": "6dff5c886805b680dc1e73521f6abf4ed3b07d749b62a000b8e534e5d3edbac4",
+        "input-fds-at-content.txt": "19020f143c2927ab4f1e96fa7d5d0d6db520bf629a0a3fcb48e6437a5b110004",
+        "memory-at-content.txt": "81535c718fb127bab52f6859cf6ab00b9462e91e89a02971124c5a77a632259a",
+        "final.png": "9e6eb092ae84bf78647ab36dcec2262c7601584fa8f6222b3849c348a55629ff"
+      },
+      "pre_ready_refreshes": 4
+    },
+    {
+      "case": "baseline-03",
+      "variant": "baseline",
+      "warmup": false,
+      "metrics": {
+        "software_ready_ms": 2750.0,
+        "content_send_ms": 3130.0,
+        "pre_exec_ms": 1450.0,
+        "portrait_calibration_ms": 580.0,
+        "display_takeover_ms": 210.0,
+        "rust_ready_ms": 1237.545,
+        "backend_install_ms": 63.037,
+        "startup_scene_ms": 598.08,
+        "event_loop_to_scene_ms": 438.235,
+        "fonts_gate_ms": 58.029,
+        "metadata_preparation_ms": 99.975,
+        "view_to_ready_ms": 11.718,
+        "rss_kib": 36648,
+        "hwm_kib": 44460,
+        "view_sync_ms": 308.583,
+        "prepared_to_attach_ms": 140.757
+      },
+      "input_devices": [
+        "/dev/input/event2",
+        "/dev/input/event4"
+      ],
+      "memory": {
+        "VmHWM": 44460,
+        "VmRSS": 36648,
+        "RssAnon": 11736,
+        "RssFile": 24912,
+        "RssShmem": 0
+      },
+      "rust_events": [
+        {
+          "at_us": 0,
+          "name": "process_entry"
+        },
+        {
+          "at_us": 51485,
+          "name": "platform_initialized"
+        },
+        {
+          "at_us": 114522,
+          "name": "startup_backend_installed"
+        },
+        {
+          "at_us": 138284,
+          "name": "startup_window_constructed"
+        },
+        {
+          "at_us": 139468,
+          "name": "startup_bootstrap_font_registered"
+        },
+        {
+          "at_us": 159477,
+          "name": "window_shown"
+        },
+        {
+          "at_us": 159478,
+          "name": "startup_window_shown"
+        },
+        {
+          "at_us": 159845,
+          "name": "event_loop_started"
+        },
+        {
+          "at_us": 597946,
+          "name": "startup_activity_pulse"
+        },
+        {
+          "at_us": 598080,
+          "name": "startup_scene_submitted"
+        },
+        {
+          "at_us": 598082,
+          "name": "startup_feedback_submitted"
+        },
+        {
+          "at_us": 598637,
+          "name": "startup_workers_started"
+        },
+        {
+          "at_us": 613157,
+          "name": "fonts_loaded"
+        },
+        {
+          "at_us": 656666,
+          "name": "fonts_registered"
+        },
+        {
+          "at_us": 698612,
+          "name": "application_prepared"
+        },
+        {
+          "at_us": 839369,
+          "name": "startup_attachment_started"
+        },
+        {
+          "at_us": 916121,
+          "name": "application_attached"
+        },
+        {
+          "at_us": 916197,
+          "name": "startup_route_started"
+        },
+        {
+          "at_us": 916205,
+          "name": "startup_route_attached"
+        },
+        {
+          "at_us": 917239,
+          "name": "startup_catalog_attached"
+        },
+        {
+          "at_us": 917244,
+          "name": "startup_view_started"
+        },
+        {
+          "at_us": 1225827,
+          "name": "startup_view_attached"
+        },
+        {
+          "at_us": 1237543,
+          "name": "application_ready"
+        },
+        {
+          "at_us": 1237545,
+          "name": "startup_ready"
+        },
+        {
+          "at_us": 5857030,
+          "name": "shutdown_started"
+        },
+        {
+          "at_us": 5880582,
+          "name": "shutdown_complete"
+        },
+        {
+          "at_us": 5903604,
+          "name": "process_finished"
+        }
+      ],
+      "native_refreshes": [
+        {
+          "at_ms": 1750.0,
+          "message": "aidoku: native-refresh accepted marker=1 waveform=2 mode=1 flags=0x0 region=0,0,1860,2480 swipe=0,0"
+        },
+        {
+          "at_ms": 2140.0,
+          "message": "aidoku: native-refresh accepted marker=2 waveform=1 mode=0 flags=0x2 region=0,0,1860,2480 swipe=0,0"
+        },
+        {
+          "at_ms": 2350.0,
+          "message": "aidoku: native-refresh accepted marker=3 waveform=257 mode=0 flags=0x0 region=798,1204,264,39 swipe=0,0"
+        },
+        {
+          "at_ms": 2740.0,
+          "message": "aidoku: native-refresh accepted marker=4 waveform=257 mode=0 flags=0x0 region=798,1204,264,38 swipe=0,0"
+        },
+        {
+          "at_ms": 3130.0,
+          "message": "aidoku: native-refresh accepted marker=5 waveform=257 mode=0 flags=0x0 region=0,0,1860,2480 swipe=0,0"
+        },
+        {
+          "at_ms": 3820.0,
+          "message": "aidoku: native-refresh accepted marker=6 waveform=257 mode=0 flags=0x0 region=0,0,1860,2480 swipe=0,0"
+        },
+        {
+          "at_ms": 5100.0,
+          "message": "aidoku: native-refresh accepted marker=7 waveform=257 mode=0 flags=0x0 region=0,0,1860,2480 swipe=0,0"
+        },
+        {
+          "at_ms": 5530.0,
+          "message": "aidoku: native-refresh accepted marker=8 waveform=257 mode=0 flags=0x0 region=0,0,1860,2480 swipe=0,0"
+        },
+        {
+          "at_ms": 5870.0,
+          "message": "aidoku: native-refresh accepted marker=9 waveform=257 mode=0 flags=0x0 region=0,0,1860,2480 swipe=0,0"
+        },
+        {
+          "at_ms": 7210.0,
+          "message": "aidoku: native-refresh accepted marker=10 waveform=257 mode=0 flags=0x0 region=0,0,1860,2480 swipe=0,0"
+        }
+      ],
+      "hashes": {
+        "application.json": "d6b5a9eca90f2f128a777bdc9640fff5e3014e5f4320d106a14aecb140234c05",
+        "shell.tsv": "28f7975f54d798ec2e05650c63e64e53e5a4738c05bb267237cce9138e4b8ef6",
+        "native.tsv": "56fb837dba0b490fc956003fa6d319198b3850a60c9ee220bd48d55b39843413",
+        "input-fds-at-content.txt": "19020f143c2927ab4f1e96fa7d5d0d6db520bf629a0a3fcb48e6437a5b110004",
+        "memory-at-content.txt": "a52fcfc134f0ae12a8519e7cc3ed9d4b8377e610cc7eac50e2f5e0ab6d96627a",
+        "final.png": "9e6eb092ae84bf78647ab36dcec2262c7601584fa8f6222b3849c348a55629ff"
+      },
+      "pre_ready_refreshes": 4
+    },
+    {
+      "case": "candidate-03",
+      "variant": "candidate",
+      "warmup": false,
+      "metrics": {
+        "software_ready_ms": 2430.0,
+        "content_send_ms": 2750.0,
+        "pre_exec_ms": 1300.0,
+        "portrait_calibration_ms": 470.0,
+        "display_takeover_ms": 230.0,
+        "rust_ready_ms": 1069.458,
+        "backend_install_ms": 83.764,
+        "startup_scene_ms": 645.098,
+        "event_loop_to_scene_ms": 424.281,
+        "fonts_gate_ms": 21.892,
+        "metadata_preparation_ms": 74.53,
+        "view_to_ready_ms": 12.276,
+        "rss_kib": 29224,
+        "hwm_kib": 37080,
+        "view_sync_ms": 246.273,
+        "prepared_to_attach_ms": 0.089
+      },
+      "input_devices": [
+        "/dev/input/event2",
+        "/dev/input/event4"
+      ],
+      "memory": {
+        "VmHWM": 37080,
+        "VmRSS": 29224,
+        "RssAnon": 6560,
+        "RssFile": 22664,
+        "RssShmem": 0
+      },
+      "rust_events": [
+        {
+          "at_us": 0,
+          "name": "process_entry"
+        },
+        {
+          "at_us": 60098,
+          "name": "platform_initialized"
+        },
+        {
+          "at_us": 143862,
+          "name": "startup_backend_installed"
+        },
+        {
+          "at_us": 177445,
+          "name": "startup_window_constructed"
+        },
+        {
+          "at_us": 181948,
+          "name": "startup_bootstrap_font_registered"
+        },
+        {
+          "at_us": 220247,
+          "name": "window_shown"
+        },
+        {
+          "at_us": 220250,
+          "name": "startup_window_shown"
+        },
+        {
+          "at_us": 220817,
+          "name": "event_loop_started"
+        },
+        {
+          "at_us": 645098,
+          "name": "startup_scene_submitted"
+        },
+        {
+          "at_us": 645101,
+          "name": "startup_feedback_submitted"
+        },
+        {
+          "at_us": 645494,
+          "name": "startup_workers_started"
+        },
+        {
+          "at_us": 647395,
+          "name": "fonts_loaded"
+        },
+        {
+          "at_us": 667386,
+          "name": "fonts_registered"
+        },
+        {
+          "at_us": 720024,
+          "name": "application_prepared"
+        },
+        {
+          "at_us": 720113,
+          "name": "startup_attachment_started"
+        },
+        {
+          "at_us": 809883,
+          "name": "application_attached"
+        },
+        {
+          "at_us": 810050,
+          "name": "startup_route_started"
+        },
+        {
+          "at_us": 810061,
+          "name": "startup_route_attached"
+        },
+        {
+          "at_us": 810904,
+          "name": "startup_catalog_attached"
+        },
+        {
+          "at_us": 810909,
+          "name": "startup_view_started"
+        },
+        {
+          "at_us": 1057182,
+          "name": "startup_view_attached"
+        },
+        {
+          "at_us": 1069404,
+          "name": "fonts_activated"
+        },
+        {
+          "at_us": 1069457,
+          "name": "application_ready"
+        },
+        {
+          "at_us": 1069458,
+          "name": "startup_ready"
+        },
+        {
+          "at_us": 5605020,
+          "name": "shutdown_started"
+        },
+        {
+          "at_us": 5628733,
+          "name": "shutdown_complete"
+        },
+        {
+          "at_us": 5649231,
+          "name": "process_finished"
+        }
+      ],
+      "native_refreshes": [
+        {
+          "at_ms": 1640.0,
+          "message": "aidoku: native-refresh accepted marker=1 waveform=2 mode=1 flags=0x0 region=0,0,1860,2480 swipe=0,0"
+        },
+        {
+          "at_ms": 2750.0,
+          "message": "aidoku: native-refresh accepted marker=2 waveform=257 mode=0 flags=0x0 region=0,0,1860,2480 swipe=0,0"
+        },
+        {
+          "at_ms": 3070.0,
+          "message": "aidoku: native-refresh accepted marker=3 waveform=257 mode=0 flags=0x0 region=0,0,1860,2480 swipe=0,0"
+        },
+        {
+          "at_ms": 3330.0,
+          "message": "aidoku: native-refresh accepted marker=4 waveform=257 mode=0 flags=0x0 region=0,0,1860,2480 swipe=0,0"
+        },
+        {
+          "at_ms": 4780.0,
+          "message": "aidoku: native-refresh accepted marker=5 waveform=257 mode=0 flags=0x0 region=0,0,1860,2480 swipe=0,0"
+        },
+        {
+          "at_ms": 5140.0,
+          "message": "aidoku: native-refresh accepted marker=6 waveform=257 mode=0 flags=0x0 region=0,0,1860,2480 swipe=0,0"
+        },
+        {
+          "at_ms": 5490.0,
+          "message": "aidoku: native-refresh accepted marker=7 waveform=257 mode=0 flags=0x0 region=0,0,1860,2480 swipe=0,0"
+        },
+        {
+          "at_ms": 6800.0,
+          "message": "aidoku: native-refresh accepted marker=8 waveform=257 mode=0 flags=0x0 region=0,0,1860,2480 swipe=0,0"
+        }
+      ],
+      "hashes": {
+        "application.json": "faf1e550f3133cbb14a5f6fe055bf745143488f4ba7acce9d05e31dfaa3d8499",
+        "shell.tsv": "d21e2b571fbf30c4cacc04003abb8d0b9b5e1e2ccaeb329190dede87e8472e13",
+        "native.tsv": "4fac229cee8f20e1eb5aa946f58f5d55fd301ae0a7deb7d0df8aadcd7d320f03",
+        "input-fds-at-content.txt": "19020f143c2927ab4f1e96fa7d5d0d6db520bf629a0a3fcb48e6437a5b110004",
+        "memory-at-content.txt": "29d1999d00225903d5a05b0f05ca5fa30fa956ae0b7c913b834e31d5ec84db93",
+        "final.png": "44c5cb58ac41551e69f516dec9f27d0bcf7572773220912503af70507738f8fe"
+      },
+      "pre_ready_refreshes": 1
+    },
+    {
+      "case": "candidate-04",
+      "variant": "candidate",
+      "warmup": false,
+      "metrics": {
+        "software_ready_ms": 3110.0,
+        "content_send_ms": 3730.0,
+        "pre_exec_ms": 1710.0,
+        "portrait_calibration_ms": 820.0,
+        "display_takeover_ms": 170.0,
+        "rust_ready_ms": 1378.511,
+        "backend_install_ms": 82.274,
+        "startup_scene_ms": 791.467,
+        "event_loop_to_scene_ms": 525.271,
+        "fonts_gate_ms": 17.822,
+        "metadata_preparation_ms": 65.374,
+        "view_to_ready_ms": 20.914,
+        "rss_kib": 29424,
+        "hwm_kib": 36304,
+        "view_sync_ms": 395.365,
+        "prepared_to_attach_ms": 0.089
+      },
+      "input_devices": [
+        "/dev/input/event2",
+        "/dev/input/event4"
+      ],
+      "memory": {
+        "VmHWM": 36304,
+        "VmRSS": 29424,
+        "RssAnon": 6716,
+        "RssFile": 22708,
+        "RssShmem": 0
+      },
+      "rust_events": [
+        {
+          "at_us": 0,
+          "name": "process_entry"
+        },
+        {
+          "at_us": 45180,
+          "name": "platform_initialized"
+        },
+        {
+          "at_us": 127454,
+          "name": "startup_backend_installed"
+        },
+        {
+          "at_us": 163177,
+          "name": "startup_window_constructed"
+        },
+        {
+          "at_us": 165294,
+          "name": "startup_bootstrap_font_registered"
+        },
+        {
+          "at_us": 265479,
+          "name": "window_shown"
+        },
+        {
+          "at_us": 265482,
+          "name": "startup_window_shown"
+        },
+        {
+          "at_us": 266196,
+          "name": "event_loop_started"
+        },
+        {
+          "at_us": 791467,
+          "name": "startup_scene_submitted"
+        },
+        {
+          "at_us": 791472,
+          "name": "startup_feedback_submitted"
+        },
+        {
+          "at_us": 791853,
+          "name": "startup_workers_started"
+        },
+        {
+          "at_us": 794147,
+          "name": "fonts_loaded"
+        },
+        {
+          "at_us": 809675,
+          "name": "fonts_registered"
+        },
+        {
+          "at_us": 857227,
+          "name": "application_prepared"
+        },
+        {
+          "at_us": 857316,
+          "name": "startup_attachment_started"
+        },
+        {
+          "at_us": 960822,
+          "name": "application_attached"
+        },
+        {
+          "at_us": 961032,
+          "name": "startup_route_started"
+        },
+        {
+          "at_us": 961050,
+          "name": "startup_route_attached"
+        },
+        {
+          "at_us": 962221,
+          "name": "startup_catalog_attached"
+        },
+        {
+          "at_us": 962232,
+          "name": "startup_view_started"
+        },
+        {
+          "at_us": 1357597,
+          "name": "startup_view_attached"
+        },
+        {
+          "at_us": 1378361,
+          "name": "fonts_activated"
+        },
+        {
+          "at_us": 1378510,
+          "name": "application_ready"
+        },
+        {
+          "at_us": 1378511,
+          "name": "startup_ready"
+        },
+        {
+          "at_us": 6402204,
+          "name": "shutdown_started"
+        },
+        {
+          "at_us": 6425642,
+          "name": "shutdown_complete"
+        },
+        {
+          "at_us": 6448300,
+          "name": "process_finished"
+        }
+      ],
+      "native_refreshes": [
+        {
+          "at_ms": 2160.0,
+          "message": "aidoku: native-refresh accepted marker=1 waveform=2 mode=1 flags=0x0 region=0,0,1860,2480 swipe=0,0"
+        },
+        {
+          "at_ms": 3730.0,
+          "message": "aidoku: native-refresh accepted marker=2 waveform=257 mode=0 flags=0x0 region=0,0,1860,2480 swipe=0,0"
+        },
+        {
+          "at_ms": 4190.0,
+          "message": "aidoku: native-refresh accepted marker=3 waveform=257 mode=0 flags=0x0 region=0,0,1860,2480 swipe=0,0"
+        },
+        {
+          "at_ms": 4260.0,
+          "message": "aidoku: native-refresh accepted marker=4 waveform=257 mode=0 flags=0x0 region=0,0,1860,2480 swipe=0,0"
+        },
+        {
+          "at_ms": 5870.0,
+          "message": "aidoku: native-refresh accepted marker=5 waveform=257 mode=0 flags=0x0 region=0,0,1860,2480 swipe=0,0"
+        },
+        {
+          "at_ms": 6250.0,
+          "message": "aidoku: native-refresh accepted marker=6 waveform=257 mode=0 flags=0x0 region=0,0,1860,2480 swipe=0,0"
+        },
+        {
+          "at_ms": 6600.0,
+          "message": "aidoku: native-refresh accepted marker=7 waveform=257 mode=0 flags=0x0 region=0,0,1860,2480 swipe=0,0"
+        },
+        {
+          "at_ms": 7980.0,
+          "message": "aidoku: native-refresh accepted marker=8 waveform=257 mode=0 flags=0x0 region=0,0,1860,2480 swipe=0,0"
+        }
+      ],
+      "hashes": {
+        "application.json": "b1bdc25ab2a18a943b62c2bfafa7fd62db15b9e620efac391cb8c5e4be6faf1e",
+        "shell.tsv": "0226a45318065f51ef4befcc5cdefe111bb524ad6d7c7abc4802df48381d4535",
+        "native.tsv": "d5c397259f0b6abc56d8a3c8abf9d99fec84f15935d821fb258ee337cf9ff033",
+        "input-fds-at-content.txt": "19020f143c2927ab4f1e96fa7d5d0d6db520bf629a0a3fcb48e6437a5b110004",
+        "memory-at-content.txt": "a722d3e31939d4665ed780888b1dfc908cad8f982a9ab332c58514ac915a3522",
+        "final.png": "44c5cb58ac41551e69f516dec9f27d0bcf7572773220912503af70507738f8fe"
+      },
+      "pre_ready_refreshes": 1
+    },
+    {
+      "case": "baseline-04",
+      "variant": "baseline",
+      "warmup": false,
+      "metrics": {
+        "software_ready_ms": 2840.0,
+        "content_send_ms": 3210.0,
+        "pre_exec_ms": 1480.0,
+        "portrait_calibration_ms": 570.0,
+        "display_takeover_ms": 270.0,
+        "rust_ready_ms": 1325.25,
+        "backend_install_ms": 100.339,
+        "startup_scene_ms": 681.148,
+        "event_loop_to_scene_ms": 424.135,
+        "fonts_gate_ms": 61.925,
+        "metadata_preparation_ms": 99.454,
+        "view_to_ready_ms": 13.14,
+        "rss_kib": 36228,
+        "hwm_kib": 44036,
+        "view_sync_ms": 306.652,
+        "prepared_to_attach_ms": 156.109
+      },
+      "input_devices": [
+        "/dev/input/event2",
+        "/dev/input/event4"
+      ],
+      "memory": {
+        "VmHWM": 44036,
+        "VmRSS": 36228,
+        "RssAnon": 11632,
+        "RssFile": 24596,
+        "RssShmem": 0
+      },
+      "rust_events": [
+        {
+          "at_us": 0,
+          "name": "process_entry"
+        },
+        {
+          "at_us": 76019,
+          "name": "platform_initialized"
+        },
+        {
+          "at_us": 176358,
+          "name": "startup_backend_installed"
+        },
+        {
+          "at_us": 217755,
+          "name": "startup_window_constructed"
+        },
+        {
+          "at_us": 220058,
+          "name": "startup_bootstrap_font_registered"
+        },
+        {
+          "at_us": 256461,
+          "name": "window_shown"
+        },
+        {
+          "at_us": 256464,
+          "name": "startup_window_shown"
+        },
+        {
+          "at_us": 257013,
+          "name": "event_loop_started"
+        },
+        {
+          "at_us": 680989,
+          "name": "startup_activity_pulse"
+        },
+        {
+          "at_us": 681148,
+          "name": "startup_scene_submitted"
+        },
+        {
+          "at_us": 681151,
+          "name": "startup_feedback_submitted"
+        },
+        {
+          "at_us": 681660,
+          "name": "startup_workers_started"
+        },
+        {
+          "at_us": 690394,
+          "name": "fonts_loaded"
+        },
+        {
+          "at_us": 743585,
+          "name": "fonts_registered"
+        },
+        {
+          "at_us": 781114,
+          "name": "application_prepared"
+        },
+        {
+          "at_us": 937223,
+          "name": "startup_attachment_started"
+        },
+        {
+          "at_us": 1004911,
+          "name": "application_attached"
+        },
+        {
+          "at_us": 1005005,
+          "name": "startup_route_started"
+        },
+        {
+          "at_us": 1005013,
+          "name": "startup_route_attached"
+        },
+        {
+          "at_us": 1005454,
+          "name": "startup_catalog_attached"
+        },
+        {
+          "at_us": 1005458,
+          "name": "startup_view_started"
+        },
+        {
+          "at_us": 1312110,
+          "name": "startup_view_attached"
+        },
+        {
+          "at_us": 1325248,
+          "name": "application_ready"
+        },
+        {
+          "at_us": 1325250,
+          "name": "startup_ready"
+        },
+        {
+          "at_us": 6130622,
+          "name": "shutdown_started"
+        },
+        {
+          "at_us": 6154345,
+          "name": "shutdown_complete"
+        },
+        {
+          "at_us": 6175552,
+          "name": "process_finished"
+        }
+      ],
+      "native_refreshes": [
+        {
+          "at_ms": 1820.0,
+          "message": "aidoku: native-refresh accepted marker=1 waveform=2 mode=1 flags=0x0 region=0,0,1860,2480 swipe=0,0"
+        },
+        {
+          "at_ms": 2240.0,
+          "message": "aidoku: native-refresh accepted marker=2 waveform=1 mode=0 flags=0x2 region=0,0,1860,2480 swipe=0,0"
+        },
+        {
+          "at_ms": 2450.0,
+          "message": "aidoku: native-refresh accepted marker=3 waveform=257 mode=0 flags=0x0 region=798,1204,264,39 swipe=0,0"
+        },
+        {
+          "at_ms": 2820.0,
+          "message": "aidoku: native-refresh accepted marker=4 waveform=257 mode=0 flags=0x0 region=798,1204,264,38 swipe=0,0"
+        },
+        {
+          "at_ms": 3210.0,
+          "message": "aidoku: native-refresh accepted marker=5 waveform=257 mode=0 flags=0x0 region=0,0,1860,2480 swipe=0,0"
+        },
+        {
+          "at_ms": 3560.0,
+          "message": "aidoku: native-refresh accepted marker=6 waveform=257 mode=0 flags=0x0 region=0,0,1860,2480 swipe=0,0"
+        },
+        {
+          "at_ms": 3760.0,
+          "message": "aidoku: native-refresh accepted marker=7 waveform=257 mode=0 flags=0x0 region=0,0,1860,2480 swipe=0,0"
+        },
+        {
+          "at_ms": 5400.0,
+          "message": "aidoku: native-refresh accepted marker=8 waveform=257 mode=0 flags=0x0 region=0,0,1860,2480 swipe=0,0"
+        },
+        {
+          "at_ms": 5770.0,
+          "message": "aidoku: native-refresh accepted marker=9 waveform=257 mode=0 flags=0x0 region=0,0,1860,2480 swipe=0,0"
+        },
+        {
+          "at_ms": 6120.0,
+          "message": "aidoku: native-refresh accepted marker=10 waveform=257 mode=0 flags=0x0 region=0,0,1860,2480 swipe=0,0"
+        },
+        {
+          "at_ms": 7460.0,
+          "message": "aidoku: native-refresh accepted marker=11 waveform=257 mode=0 flags=0x0 region=0,0,1860,2480 swipe=0,0"
+        }
+      ],
+      "hashes": {
+        "application.json": "5cc0bc05e695a881915728b2ce4d8c95580441540b2f01356df70ace1f0f1527",
+        "shell.tsv": "06221bb21c6490ba44a59acf1bd47e13e397d8802ebc19cb8cadcea899944dfb",
+        "native.tsv": "0c01fe39d00c0861817bc4c4b71eff9fd54c35163ef5f8446b6f63ce963a10f9",
+        "input-fds-at-content.txt": "19020f143c2927ab4f1e96fa7d5d0d6db520bf629a0a3fcb48e6437a5b110004",
+        "memory-at-content.txt": "cbcff6afea2d723834a298930cbb98941cb314c50f2782bb8c82d37c44df7b6b",
+        "final.png": "44c5cb58ac41551e69f516dec9f27d0bcf7572773220912503af70507738f8fe"
+      },
+      "pre_ready_refreshes": 4
+    },
+    {
+      "case": "baseline-05",
+      "variant": "baseline",
+      "warmup": false,
+      "metrics": {
+        "software_ready_ms": 3210.0,
+        "content_send_ms": 3610.0,
+        "pre_exec_ms": 1820.0,
+        "portrait_calibration_ms": 1030.0,
+        "display_takeover_ms": 100.0,
+        "rust_ready_ms": 1370.438,
+        "backend_install_ms": 102.58,
+        "startup_scene_ms": 678.089,
+        "event_loop_to_scene_ms": 427.803,
+        "fonts_gate_ms": 63.999,
+        "metadata_preparation_ms": 112.165,
+        "view_to_ready_ms": 15.827,
+        "rss_kib": 36108,
+        "hwm_kib": 44716,
+        "view_sync_ms": 346.197,
+        "prepared_to_attach_ms": 142.227
+      },
+      "input_devices": [
+        "/dev/input/event2",
+        "/dev/input/event4"
+      ],
+      "memory": {
+        "VmHWM": 44716,
+        "VmRSS": 36108,
+        "RssAnon": 10992,
+        "RssFile": 25116,
+        "RssShmem": 0
+      },
+      "rust_events": [
+        {
+          "at_us": 0,
+          "name": "process_entry"
+        },
+        {
+          "at_us": 44726,
+          "name": "platform_initialized"
+        },
+        {
+          "at_us": 147306,
+          "name": "startup_backend_installed"
+        },
+        {
+          "at_us": 209582,
+          "name": "startup_window_constructed"
+        },
+        {
+          "at_us": 211029,
+          "name": "startup_bootstrap_font_registered"
+        },
+        {
+          "at_us": 250010,
+          "name": "window_shown"
+        },
+        {
+          "at_us": 250012,
+          "name": "startup_window_shown"
+        },
+        {
+          "at_us": 250286,
+          "name": "event_loop_started"
+        },
+        {
+          "at_us": 677928,
+          "name": "startup_activity_pulse"
+        },
+        {
+          "at_us": 678089,
+          "name": "startup_scene_submitted"
+        },
+        {
+          "at_us": 678092,
+          "name": "startup_feedback_submitted"
+        },
+        {
+          "at_us": 678663,
+          "name": "startup_workers_started"
+        },
+        {
+          "at_us": 679199,
+          "name": "fonts_loaded"
+        },
+        {
+          "at_us": 742662,
+          "name": "fonts_registered"
+        },
+        {
+          "at_us": 790828,
+          "name": "application_prepared"
+        },
+        {
+          "at_us": 933055,
+          "name": "startup_attachment_started"
+        },
+        {
+          "at_us": 1007712,
+          "name": "application_attached"
+        },
+        {
+          "at_us": 1007823,
+          "name": "startup_route_started"
+        },
+        {
+          "at_us": 1007831,
+          "name": "startup_route_attached"
+        },
+        {
+          "at_us": 1008410,
+          "name": "startup_catalog_attached"
+        },
+        {
+          "at_us": 1008414,
+          "name": "startup_view_started"
+        },
+        {
+          "at_us": 1354611,
+          "name": "startup_view_attached"
+        },
+        {
+          "at_us": 1370437,
+          "name": "application_ready"
+        },
+        {
+          "at_us": 1370438,
+          "name": "startup_ready"
+        },
+        {
+          "at_us": 6456512,
+          "name": "shutdown_started"
+        },
+        {
+          "at_us": 6480286,
+          "name": "shutdown_complete"
+        },
+        {
+          "at_us": 6894317,
+          "name": "process_finished"
+        }
+      ],
+      "native_refreshes": [
+        {
+          "at_ms": 2130.0,
+          "message": "aidoku: native-refresh accepted marker=1 waveform=2 mode=1 flags=0x0 region=0,0,1860,2480 swipe=0,0"
+        },
+        {
+          "at_ms": 2540.0,
+          "message": "aidoku: native-refresh accepted marker=2 waveform=1 mode=0 flags=0x2 region=0,0,1860,2480 swipe=0,0"
+        },
+        {
+          "at_ms": 2770.0,
+          "message": "aidoku: native-refresh accepted marker=3 waveform=257 mode=0 flags=0x0 region=798,1204,264,39 swipe=0,0"
+        },
+        {
+          "at_ms": 3200.0,
+          "message": "aidoku: native-refresh accepted marker=4 waveform=257 mode=0 flags=0x0 region=798,1204,264,38 swipe=0,0"
+        },
+        {
+          "at_ms": 3610.0,
+          "message": "aidoku: native-refresh accepted marker=5 waveform=257 mode=0 flags=0x0 region=0,0,1860,2480 swipe=0,0"
+        },
+        {
+          "at_ms": 5500.0,
+          "message": "aidoku: native-refresh accepted marker=6 waveform=257 mode=0 flags=0x0 region=0,0,1860,2480 swipe=0,0"
+        },
+        {
+          "at_ms": 5500.0,
+          "message": "aidoku: native-refresh accepted marker=7 waveform=257 mode=0 flags=0x0 region=0,0,1860,2480 swipe=0,0"
+        },
+        {
+          "at_ms": 6030.0,
+          "message": "aidoku: native-refresh accepted marker=8 waveform=257 mode=0 flags=0x0 region=0,0,1860,2480 swipe=0,0"
+        },
+        {
+          "at_ms": 6400.0,
+          "message": "aidoku: native-refresh accepted marker=9 waveform=257 mode=0 flags=0x0 region=0,0,1860,2480 swipe=0,0"
+        },
+        {
+          "at_ms": 6750.0,
+          "message": "aidoku: native-refresh accepted marker=10 waveform=257 mode=0 flags=0x0 region=0,0,1860,2480 swipe=0,0"
+        },
+        {
+          "at_ms": 8130.0,
+          "message": "aidoku: native-refresh accepted marker=11 waveform=257 mode=0 flags=0x0 region=0,0,1860,2480 swipe=0,0"
+        }
+      ],
+      "hashes": {
+        "application.json": "6263f629b75ffb5980fdb5c1b6bee80c576494599f664419a9e39b2bc9642814",
+        "shell.tsv": "8fa6a28a7b79388e6827f2b6c95401f3e7597d88c9e611e25e59f84f9eb03fca",
+        "native.tsv": "ac6d1fbc1bb55dd6c940a6fe62fd2e3607ea1fb6e2896b636eae67c8a5eee925",
+        "input-fds-at-content.txt": "19020f143c2927ab4f1e96fa7d5d0d6db520bf629a0a3fcb48e6437a5b110004",
+        "memory-at-content.txt": "849cb8338239292b9c08c4cc9030bd9e879fb267934f2040411bfb8fd2f1db37",
+        "final.png": "44c5cb58ac41551e69f516dec9f27d0bcf7572773220912503af70507738f8fe"
+      },
+      "pre_ready_refreshes": 4
+    },
+    {
+      "case": "candidate-05",
+      "variant": "candidate",
+      "warmup": false,
+      "metrics": {
+        "software_ready_ms": 3130.0,
+        "content_send_ms": 3540.0,
+        "pre_exec_ms": 1950.0,
+        "portrait_calibration_ms": 920.0,
+        "display_takeover_ms": 290.0,
+        "rust_ready_ms": 1138.587,
+        "backend_install_ms": 93.514,
+        "startup_scene_ms": 674.373,
+        "event_loop_to_scene_ms": 427.484,
+        "fonts_gate_ms": 24.3,
+        "metadata_preparation_ms": 73.265,
+        "view_to_ready_ms": 12.683,
+        "rss_kib": 37904,
+        "hwm_kib": 37904,
+        "view_sync_ms": 283.127,
+        "prepared_to_attach_ms": 0.089
+      },
+      "input_devices": [
+        "/dev/input/event2",
+        "/dev/input/event4"
+      ],
+      "memory": {
+        "VmHWM": 37904,
+        "VmRSS": 37904,
+        "RssAnon": 14936,
+        "RssFile": 22968,
+        "RssShmem": 0
+      },
+      "rust_events": [
+        {
+          "at_us": 0,
+          "name": "process_entry"
+        },
+        {
+          "at_us": 65142,
+          "name": "platform_initialized"
+        },
+        {
+          "at_us": 158656,
+          "name": "startup_backend_installed"
+        },
+        {
+          "at_us": 191387,
+          "name": "startup_window_constructed"
+        },
+        {
+          "at_us": 192602,
+          "name": "startup_bootstrap_font_registered"
+        },
+        {
+          "at_us": 246342,
+          "name": "window_shown"
+        },
+        {
+          "at_us": 246344,
+          "name": "startup_window_shown"
+        },
+        {
+          "at_us": 246889,
+          "name": "event_loop_started"
+        },
+        {
+          "at_us": 674373,
+          "name": "startup_scene_submitted"
+        },
+        {
+          "at_us": 674376,
+          "name": "startup_feedback_submitted"
+        },
+        {
+          "at_us": 674849,
+          "name": "startup_workers_started"
+        },
+        {
+          "at_us": 676437,
+          "name": "fonts_loaded"
+        },
+        {
+          "at_us": 699149,
+          "name": "fonts_registered"
+        },
+        {
+          "at_us": 748114,
+          "name": "application_prepared"
+        },
+        {
+          "at_us": 748203,
+          "name": "startup_attachment_started"
+        },
+        {
+          "at_us": 841771,
+          "name": "application_attached"
+        },
+        {
+          "at_us": 841891,
+          "name": "startup_route_started"
+        },
+        {
+          "at_us": 841903,
+          "name": "startup_route_attached"
+        },
+        {
+          "at_us": 842766,
+          "name": "startup_catalog_attached"
+        },
+        {
+          "at_us": 842777,
+          "name": "startup_view_started"
+        },
+        {
+          "at_us": 1125904,
+          "name": "startup_view_attached"
+        },
+        {
+          "at_us": 1138532,
+          "name": "fonts_activated"
+        },
+        {
+          "at_us": 1138586,
+          "name": "application_ready"
+        },
+        {
+          "at_us": 1138587,
+          "name": "startup_ready"
+        },
+        {
+          "at_us": 6238237,
+          "name": "shutdown_started"
+        },
+        {
+          "at_us": 6262287,
+          "name": "shutdown_complete"
+        },
+        {
+          "at_us": 6283202,
+          "name": "process_finished"
+        }
+      ],
+      "native_refreshes": [
+        {
+          "at_ms": 2300.0,
+          "message": "aidoku: native-refresh accepted marker=1 waveform=2 mode=1 flags=0x0 region=0,0,1860,2480 swipe=0,0"
+        },
+        {
+          "at_ms": 3540.0,
+          "message": "aidoku: native-refresh accepted marker=2 waveform=257 mode=0 flags=0x0 region=0,0,1860,2480 swipe=0,0"
+        },
+        {
+          "at_ms": 5260.0,
+          "message": "aidoku: native-refresh accepted marker=3 waveform=257 mode=0 flags=0x0 region=0,0,1860,2480 swipe=0,0"
+        },
+        {
+          "at_ms": 5270.0,
+          "message": "aidoku: native-refresh accepted marker=4 waveform=257 mode=0 flags=0x0 region=0,0,1860,2480 swipe=0,0"
+        },
+        {
+          "at_ms": 6040.0,
+          "message": "aidoku: native-refresh accepted marker=5 waveform=257 mode=0 flags=0x0 region=0,0,1860,2480 swipe=0,0"
+        },
+        {
+          "at_ms": 6390.0,
+          "message": "aidoku: native-refresh accepted marker=6 waveform=257 mode=0 flags=0x0 region=0,0,1860,2480 swipe=0,0"
+        },
+        {
+          "at_ms": 6740.0,
+          "message": "aidoku: native-refresh accepted marker=7 waveform=257 mode=0 flags=0x0 region=0,0,1860,2480 swipe=0,0"
+        },
+        {
+          "at_ms": 8050.0,
+          "message": "aidoku: native-refresh accepted marker=8 waveform=257 mode=0 flags=0x0 region=0,0,1860,2480 swipe=0,0"
+        }
+      ],
+      "hashes": {
+        "application.json": "ee18606e6af2c9c5f8755f668e3de16af5a53757aaf5be062d68e178a160367b",
+        "shell.tsv": "2da8fa9badbc557034d362a1073bb8d2c8b7c9b167ef153fdf533b66f10ec7fd",
+        "native.tsv": "acb559b3661084036358560ab28e744ae61c02edf19258a06f51ca18959eee53",
+        "input-fds-at-content.txt": "19020f143c2927ab4f1e96fa7d5d0d6db520bf629a0a3fcb48e6437a5b110004",
+        "memory-at-content.txt": "26fb67d32d980d51768417e0a816eb49653f32603a1129f711b229b036627233",
+        "final.png": "44c5cb58ac41551e69f516dec9f27d0bcf7572773220912503af70507738f8fe"
+      },
+      "pre_ready_refreshes": 1
+    }
+  ],
+  "summary": {
+    "baseline": {
+      "software_ready_ms": {
+        "n": 5,
+        "median": 2830.0,
+        "mean": 2866.0,
+        "minimum": 2700.0,
+        "maximum": 3210.0
+      },
+      "content_send_ms": {
+        "n": 5,
+        "median": 3210.0,
+        "mean": 3248.0,
+        "minimum": 3080.0,
+        "maximum": 3610.0
+      },
+      "pre_exec_ms": {
+        "n": 5,
+        "median": 1470.0,
+        "mean": 1528.0,
+        "minimum": 1420.0,
+        "maximum": 1820.0
+      },
+      "portrait_calibration_ms": {
+        "n": 5,
+        "median": 580.0,
+        "mean": 650.0,
+        "minimum": 480.0,
+        "maximum": 1030.0
+      },
+      "display_takeover_ms": {
+        "n": 5,
+        "median": 270.0,
+        "mean": 224.0,
+        "minimum": 100.0,
+        "maximum": 270.0
+      },
+      "rust_ready_ms": {
+        "n": 5,
+        "median": 1312.349,
+        "mean": 1292.126,
+        "minimum": 1215.049,
+        "maximum": 1370.438
+      },
+      "backend_install_ms": {
+        "n": 5,
+        "median": 77.059,
+        "mean": 80.997,
+        "minimum": 61.971,
+        "maximum": 102.58
+      },
+      "startup_scene_ms": {
+        "n": 5,
+        "median": 678.089,
+        "mean": 646.042,
+        "minimum": 587.301,
+        "maximum": 685.592
+      },
+      "event_loop_to_scene_ms": {
+        "n": 5,
+        "median": 427.803,
+        "mean": 430.075,
+        "minimum": 422.748,
+        "maximum": 438.235
+      },
+      "fonts_gate_ms": {
+        "n": 5,
+        "median": 58.029,
+        "mean": 55.362,
+        "minimum": 46.395,
+        "maximum": 63.999
+      },
+      "metadata_preparation_ms": {
+        "n": 5,
+        "median": 99.454,
+        "mean": 97.213,
+        "minimum": 82.605,
+        "maximum": 112.165
+      },
+      "view_to_ready_ms": {
+        "n": 5,
+        "median": 11.718,
+        "mean": 12.409,
+        "minimum": 10.247,
+        "maximum": 15.827
+      },
+      "rss_kib": {
+        "n": 5,
+        "median": 36456,
+        "mean": 36443.2,
+        "minimum": 36108,
+        "maximum": 36776
+      },
+      "hwm_kib": {
+        "n": 5,
+        "median": 44460,
+        "mean": 44417.6,
+        "minimum": 44036,
+        "maximum": 44716
+      }
+    },
+    "candidate": {
+      "software_ready_ms": {
+        "n": 5,
+        "median": 2750.0,
+        "mean": 2776.0,
+        "minimum": 2430.0,
+        "maximum": 3130.0
+      },
+      "content_send_ms": {
+        "n": 5,
+        "median": 3310.0,
+        "mean": 3232.0,
+        "minimum": 2750.0,
+        "maximum": 3730.0
+      },
+      "pre_exec_ms": {
+        "n": 5,
+        "median": 1520.0,
+        "mean": 1562.0,
+        "minimum": 1300.0,
+        "maximum": 1950.0
+      },
+      "portrait_calibration_ms": {
+        "n": 5,
+        "median": 650.0,
+        "mean": 664.0,
+        "minimum": 460.0,
+        "maximum": 920.0
+      },
+      "display_takeover_ms": {
+        "n": 5,
+        "median": 230.0,
+        "mean": 230.0,
+        "minimum": 170.0,
+        "maximum": 290.0
+      },
+      "rust_ready_ms": {
+        "n": 5,
+        "median": 1138.587,
+        "mean": 1176.663,
+        "minimum": 1069.458,
+        "maximum": 1378.511
+      },
+      "backend_install_ms": {
+        "n": 5,
+        "median": 82.274,
+        "mean": 80.729,
+        "minimum": 62.338,
+        "maximum": 93.514
+      },
+      "startup_scene_ms": {
+        "n": 5,
+        "median": 674.373,
+        "mean": 692.949,
+        "minimum": 645.098,
+        "maximum": 791.467
+      },
+      "event_loop_to_scene_ms": {
+        "n": 5,
+        "median": 429.934,
+        "mean": 454.988,
+        "minimum": 424.281,
+        "maximum": 525.271
+      },
+      "fonts_gate_ms": {
+        "n": 5,
+        "median": 21.978,
+        "mean": 21.999,
+        "minimum": 17.822,
+        "maximum": 24.3
+      },
+      "metadata_preparation_ms": {
+        "n": 5,
+        "median": 74.53,
+        "mean": 74.466,
+        "minimum": 65.374,
+        "maximum": 83.34
+      },
+      "view_to_ready_ms": {
+        "n": 5,
+        "median": 12.683,
+        "mean": 14.39,
+        "minimum": 11.317,
+        "maximum": 20.914
+      },
+      "rss_kib": {
+        "n": 5,
+        "median": 29660,
+        "mean": 31355.2,
+        "minimum": 29224,
+        "maximum": 37904
+      },
+      "hwm_kib": {
+        "n": 5,
+        "median": 37624,
+        "mean": 37438.4,
+        "minimum": 36304,
+        "maximum": 38280
+      }
+    }
+  },
+  "paired_rounds": [
+    {
+      "round": 1,
+      "software_ready_ms": {
+        "baseline": 2830.0,
+        "candidate": 2460.0,
+        "reduction_ms": 370.0
+      },
+      "content_send_ms": {
+        "baseline": 3210.0,
+        "candidate": 2830.0,
+        "reduction_ms": 380.0
+      }
+    },
+    {
+      "round": 2,
+      "software_ready_ms": {
+        "baseline": 2700.0,
+        "candidate": 2750.0,
+        "reduction_ms": -50.0
+      },
+      "content_send_ms": {
+        "baseline": 3080.0,
+        "candidate": 3310.0,
+        "reduction_ms": -230.0
+      }
+    },
+    {
+      "round": 3,
+      "software_ready_ms": {
+        "baseline": 2750.0,
+        "candidate": 2430.0,
+        "reduction_ms": 320.0
+      },
+      "content_send_ms": {
+        "baseline": 3130.0,
+        "candidate": 2750.0,
+        "reduction_ms": 380.0
+      }
+    },
+    {
+      "round": 4,
+      "software_ready_ms": {
+        "baseline": 2840.0,
+        "candidate": 3110.0,
+        "reduction_ms": -270.0
+      },
+      "content_send_ms": {
+        "baseline": 3210.0,
+        "candidate": 3730.0,
+        "reduction_ms": -520.0
+      }
+    },
+    {
+      "round": 5,
+      "software_ready_ms": {
+        "baseline": 3210.0,
+        "candidate": 3130.0,
+        "reduction_ms": 80.0
+      },
+      "content_send_ms": {
+        "baseline": 3610.0,
+        "candidate": 3540.0,
+        "reduction_ms": 70.0
+      }
+    }
+  ],
+  "restoration": {
+    "installed_program_cover_and_user_library_unchanged": true,
+    "same_boot": true,
+    "input_roster_unchanged": true,
+    "lighting_restored": true,
+    "temporary_stage_removed": true,
+    "native_restored": true,
+    "lease_released": true
+  },
+  "limitations": [
+    "Five measured launches per variant in one warm-cache Scribe boot.",
+    "No new physical-touch, rotation, sleep/wake, cold-boot or other-model qualification.",
+    "First Library SEND does not imply completion of every background cover image.",
+    "Device uptime logger has 10 ms resolution and scheduling delay."
+  ],
+  "selected_input_devices_match": true,
+  "median_reductions": {
+    "software_ready_ms": {
+      "milliseconds": 80.0,
+      "percent": 2.83
+    },
+    "content_send_ms": {
+      "milliseconds": -100.0,
+      "percent": -3.12
+    }
+  }
+}

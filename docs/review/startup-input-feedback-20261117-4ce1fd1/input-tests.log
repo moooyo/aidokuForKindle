@@ -1,0 +1,135 @@
+   Compiling aidoku-kindle v0.1.3 (/root/aidoku-input-feedback-v3-20261117/source)
+warning: method `marker` is never used
+   --> vendor/slint-backend-kindle/src/framebuffer/mod.rs:320:19
+    |
+319 | impl SubmittedUpdate<'_> {
+    | ------------------------ method in this implementation
+320 |     pub(crate) fn marker(&self) -> u32 {
+    |                   ^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: methods `refresh_planned` and `refresh_full_checked` are never used
+    --> vendor/slint-backend-kindle/src/framebuffer/mod.rs:1111:19
+     |
+ 337 | impl Framebuffer {
+     | ---------------- methods in this implementation
+...
+1111 |     pub(crate) fn refresh_planned(&self, refresh: ResolvedRefresh) -> io::Result<()> {
+     |                   ^^^^^^^^^^^^^^^
+...
+1165 |     pub(crate) fn refresh_full_checked(&self) -> io::Result<SubmittedUpdate<'_>> {
+     |                   ^^^^^^^^^^^^^^^^^^^^
+
+warning: method `submit` is never used
+  --> vendor/slint-backend-kindle/src/framebuffer/markers.rs:20:19
+   |
+15 | impl UpdateMarkers {
+   | ------------------ method in this implementation
+...
+20 |     pub(super) fn submit(&self, send: impl FnOnce(u32) -> io::Result<()>) -> io::Result<()> {
+   |                   ^^^^^^
+
+warning: method `pending_sleep_presentation` is never used
+   --> vendor/slint-backend-kindle/src/lifecycle.rs:129:19
+    |
+ 80 | impl LifecycleHandle {
+    | -------------------- method in this implementation
+...
+129 |     pub(crate) fn pending_sleep_presentation(&self) -> std::io::Result<Option<u64>> {
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: method `write_frame` is never used
+   --> vendor/slint-backend-kindle/src/render_control.rs:101:19
+    |
+ 89 | impl GrayRenderer {
+    | ----------------- method in this implementation
+...
+101 |     pub(crate) fn write_frame(
+    |                   ^^^^^^^^^^^
+
+warning: method `snapshot_required` is never used
+   --> vendor/slint-backend-kindle/src/touch.rs:492:19
+    |
+164 | impl TouchInput {
+    | --------------- method in this implementation
+...
+492 |     pub(crate) fn snapshot_required(&self) -> bool {
+    |                   ^^^^^^^^^^^^^^^^^
+
+warning: `slint-backend-kindle` (lib) generated 6 warnings
+warning: aidoku-kindle@0.1.3: warning: Component is neither used nor exported
+warning: aidoku-kindle@0.1.3:   --> /root/aidoku-input-feedback-v3-20261117/source/ui/sources.slint:18:1
+warning: aidoku-kindle@0.1.3:    |
+warning: aidoku-kindle@0.1.3: 18 | / component SourceMark inherits Rectangle {
+warning: aidoku-kindle@0.1.3: 19 | |     in property <string> initial;
+warning: aidoku-kindle@0.1.3: 20 | |     in property <bool> builtin: false;
+warning: aidoku-kindle@0.1.3: 21 | |     in property <bool> available: true;
+warning: aidoku-kindle@0.1.3: ...  |
+warning: aidoku-kindle@0.1.3: 35 | |     if !root.available && root.show-warning: Icon { x: (parent.width - self.width) / 2; y: (parent.height - self.height) / 2; widt...
+warning: aidoku-kindle@0.1.3: 36 | | }
+warning: aidoku-kindle@0.1.3:    | |_^
+warning: use of deprecated method `std::sync::atomic::Atomic::<usize>::fetch_update`: renamed to `try_update` for consistency
+    --> src/downloads.rs:3972:18
+     |
+3972 |                 .fetch_update(Ordering::AcqRel, Ordering::Acquire, |count| {
+     |                  ^^^^^^^^^^^^
+     |
+     = note: `#[warn(deprecated)]` on by default
+help: replace the use of the deprecated method
+     |
+3972 -                 .fetch_update(Ordering::AcqRel, Ordering::Acquire, |count| {
+3972 +                 .try_update(Ordering::AcqRel, Ordering::Acquire, |count| {
+     |
+
+warning: function `cover_alias` is never used
+    --> src/app.rs:1815:4
+     |
+1815 | fn cover_alias(id: &str, uri: &str) -> String {
+     |    ^^^^^^^^^^^
+     |
+     = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: method `enter_reader` is never used
+    --> src/app/actions.rs:1462:19
+     |
+  22 | impl App {
+     | -------- method in this implementation
+...
+1462 |     pub(crate) fn enter_reader(&mut self, chapter_id: &str, page: u32) -> Result<()> {
+     |                   ^^^^^^^^^^^^
+
+warning: variants `Cancelled` and `Unavailable` are never constructed
+  --> src/app/logging.rs:45:5
+   |
+42 | pub(super) enum LogOutcome {
+   |                 ---------- variants in this enum
+...
+45 |     Cancelled,
+   |     ^^^^^^^^^
+46 |     Unavailable,
+   |     ^^^^^^^^^^^
+   |
+   = note: `LogOutcome` has derived impls for the traits `Debug` and `Clone`, but these are intentionally ignored during dead code analysis
+
+warning: `aidoku-kindle` (lib test) generated 4 warnings (run `cargo fix --lib -p aidoku-kindle --tests` to apply 1 suggestion)
+    Finished `test` profile [unoptimized] target(s) in 41.49s
+     Running unittests src/lib.rs (/root/aidoku-input-discovery-20261116/target/debug/deps/aidoku_kindle-c71366fa3bc418ba)
+
+running 13 tests
+test input::tests::backspace_removes_composition_before_committed_unicode ... ok
+test input::tests::compositions_without_letters_do_not_access_the_dictionary ... ok
+test input::tests::english_numeric_and_caps_keys_have_real_effects ... ok
+test input::tests::facade_switches_modes_without_losing_an_unconvertible_suffix ... ok
+test input::tests::choosing_a_candidate_preserves_a_continuous_unconverted_suffix ... ok
+test input::tests::bundled_dictionary_is_substantive_and_candidates_are_not_a_mock_table ... ok
+test input::tests::facade_preserves_existing_text_and_converts_a_continuous_phrase ... ok
+test input::tests::submission_commits_candidates_and_retains_unknown_spelling ... ok
+test input::tests::letter_compositions_keep_the_existing_lookup_and_normalization ... ok
+test input::tests::incomplete_syllables_produce_completion_candidates_and_can_page ... ok
+test input::tests::space_commits_the_ninth_candidate_after_advancing_to_the_second_page ... ok
+test input::tests::eight_candidate_pages_preserve_dictionary_order_and_navigation_bounds ... ok
+test input::tests::facade_candidate_paging_is_bounded_and_backspace_is_unicode_safe ... ok
+
+test result: ok. 13 passed; 0 failed; 0 ignored; 0 measured; 791 filtered out; finished in 0.08s
+
