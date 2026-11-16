@@ -1,6 +1,8 @@
 #!/bin/sh
 # Name: Aidoku
 # DontUseFBInk
+# Author: Aidoku
+# Icon: /mnt/us/aidoku/assets/aidoku-cover.png
 set -eu
 umask 077
 LOG_DIR=/mnt/us/aidoku/data/logs

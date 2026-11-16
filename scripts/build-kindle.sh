@@ -20,7 +20,8 @@ export CARGO_TARGET_DIR CARGO_BUILD_JOBS
 cd "$REPO_ROOT"
 cargo zigbuild --locked --release --no-default-features --features kindle --target "$TARGET"
 
-mkdir -p "$STAGING_ROOT/aidoku/app" "$STAGING_ROOT/aidoku/licenses/backend" \
+mkdir -p "$STAGING_ROOT/aidoku/app" "$STAGING_ROOT/aidoku/assets" \
+    "$STAGING_ROOT/aidoku/licenses/launcher" "$STAGING_ROOT/aidoku/licenses/backend" \
     "$STAGING_ROOT/aidoku/licenses/image-triangle" \
     "$STAGING_ROOT/aidoku/licenses/pinyin" "$STAGING_ROOT/aidoku/licenses/sources" \
     "$STAGING_ROOT/aidoku/licenses/icons" "$STAGING_ROOT/aidoku/licenses/demo" \
@@ -28,6 +29,8 @@ mkdir -p "$STAGING_ROOT/aidoku/app" "$STAGING_ROOT/aidoku/licenses/backend" \
 install -m 755 "$CARGO_TARGET_DIR/$TARGET/release/aidoku" "$STAGING_ROOT/aidoku/app/aidoku"
 install -m 755 "$CARGO_TARGET_DIR/$TARGET/release/kindle-jpeg-worker" "$STAGING_ROOT/aidoku/app/kindle-jpeg-worker"
 install -m 755 packaging/kindle/launch.sh "$STAGING_ROOT/aidoku/launch.sh"
+install -m 644 assets/launcher/aidoku-cover.png "$STAGING_ROOT/aidoku/assets/aidoku-cover.png"
+install -m 644 assets/launcher/README.md "$STAGING_ROOT/aidoku/licenses/launcher/README.md"
 install -m 755 packaging/kindle/document-launcher.sh "$STAGING_ROOT/documents/Aidoku.sh"
 install -m 644 packaging/kindle/README.md "$STAGING_ROOT/aidoku/README.md"
 install -m 644 LICENSE "$STAGING_ROOT/aidoku/LICENSE"

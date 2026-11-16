@@ -46,6 +46,8 @@ def expected_inputs(root: Path) -> dict[str, Path]:
     inputs = {
         "aidoku/launch.sh": root / "packaging/kindle/launch.sh",
         "documents/Aidoku.sh": root / "packaging/kindle/document-launcher.sh",
+        "aidoku/assets/aidoku-cover.png": root / "assets/launcher/aidoku-cover.png",
+        "aidoku/licenses/launcher/README.md": root / "assets/launcher/README.md",
         "aidoku/README.md": root / "packaging/kindle/README.md",
         "aidoku/LICENSE": root / "LICENSE",
         "aidoku/THIRD_PARTY_NOTICES.md": root / "THIRD_PARTY_NOTICES.md",

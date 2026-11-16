@@ -1,0 +1,341 @@
+{
+  "schema_version": 1,
+  "date": "2026-11-16",
+  "source_base_commit": "d64dd5d928e53a26147dc1dc0827d355950aba36",
+  "application_sha256": "ba3053fe764a31424f18d0f0836e5e6f616948ee0978a6f1fc8cab0b56d0757a",
+  "launcher_sha256": "2369a9ffd8c62ac43717f3528be96662055013418aeb834e9ecfea247ace3e69",
+  "scope": "Installed ARM binary and launcher; isolated copy of real library metadata; offline; no reboot or cache eviction.",
+  "limitations": [
+    "An appmgr open of an unindexed equivalent Scriptlet reproduces the native handler; it is not a physical touch measurement.",
+    "The initial request marker precedes a powerd keep-awake call, which is included in the shell interval.",
+    "The combined estimate adds pre-exec shell elapsed time to Rust-main elapsed time; ELF load before main is not measured.",
+    "startup_ready is a software state publication, not final e-ink completion or fully settled thumbnails.",
+    "Three native samples in one boot, offline real metadata copy, warm caches; no cold-reboot or network timing claim."
+  ],
+  "restoration": {
+    "success": true,
+    "user_library_unchanged": true,
+    "same_boot": true,
+    "native_restored": true,
+    "lease_released": true,
+    "temporary_stage_removed": true
+  },
+  "cases": [
+    {
+      "case": "direct-1",
+      "metadata_library_count": 6,
+      "shell_clock": "device uptime, centisecond resolution",
+      "shell_marks_ms": {
+        "native_open_requested": 0.0,
+        "document_entry": 60.0,
+        "launcher_entry": 60.0,
+        "launcher_worker": 90.0,
+        "observer_start": 130.0,
+        "observer_ready": 320.0,
+        "sleep_capability_start": 320.0,
+        "sleep_capability_done": 590.0,
+        "portrait_start": 600.0,
+        "portrait_done": 1590.0,
+        "display_takeover_start": 1590.0,
+        "display_takeover_done": 1690.0,
+        "application_exec_requested": 1690.0,
+        "native_restored": 9130.0
+      },
+      "rust_marks_ms": {
+        "process_entry": 0.0,
+        "platform_initialized": 22.881,
+        "window_shown": 455.659,
+        "startup_window_shown": 455.661,
+        "event_loop_started": 456.026,
+        "startup_scene_submitted": 1872.119,
+        "startup_feedback_submitted": 1872.122,
+        "startup_workers_started": 1872.32,
+        "fonts_loaded": 2333.066,
+        "fonts_registered": 2333.493,
+        "application_prepared": 2493.138,
+        "application_attached": 2562.736,
+        "startup_route_attached": 2562.869,
+        "startup_catalog_attached": 2856.495,
+        "startup_view_attached": 3563.553,
+        "application_ready": 3573.594,
+        "startup_ready": 3573.596,
+        "shutdown_started": 5016.962,
+        "shutdown_complete": 5039.238,
+        "process_finished": 5039.973
+      },
+      "timing_sha256": "8a11a8f10dbeb0a6b9ace742b660b87a22d3a3649affe349942dae3ffa18fad3",
+      "shell_trace_sha256": "de8a4d447f357cab89d1690bbb760a116b59c428893608545626ef79784b0c3b",
+      "derived_ms": {
+        "native_request_to_entry": 60.0,
+        "document_entry_to_exec_request": 1630.0,
+        "native_request_to_exec_request": 1690.0,
+        "sleep_capability_query": 270.0,
+        "portrait_calibration": 990.0,
+        "display_takeover": 100.0,
+        "rust_to_startup_scene": 1872.119,
+        "event_loop_to_startup_scene": 1416.093,
+        "font_preparation_registration": 461.173,
+        "metadata_preparation_parallel": 620.818,
+        "fonts_ready_to_application_ready": 1240.103,
+        "rust_to_application_ready": 3573.596,
+        "estimated_native_request_to_feedback": 3562.119,
+        "estimated_native_request_to_application_ready": 5263.596
+      }
+    },
+    {
+      "case": "native-1",
+      "metadata_library_count": 6,
+      "shell_clock": "device uptime, centisecond resolution",
+      "shell_marks_ms": {
+        "native_open_requested": 0.0,
+        "document_entry": 330.0,
+        "launcher_entry": 330.0,
+        "launcher_worker": 490.0,
+        "observer_start": 570.0,
+        "observer_ready": 720.0,
+        "sleep_capability_start": 720.0,
+        "sleep_capability_done": 1610.0,
+        "portrait_start": 1620.0,
+        "portrait_done": 3700.0,
+        "display_takeover_start": 3700.0,
+        "display_takeover_done": 3980.0,
+        "application_exec_requested": 4000.0,
+        "native_restored": 11600.0
+      },
+      "rust_marks_ms": {
+        "process_entry": 0.0,
+        "platform_initialized": 31.496,
+        "window_shown": 514.85,
+        "startup_window_shown": 514.852,
+        "event_loop_started": 515.075,
+        "startup_scene_submitted": 1871.686,
+        "startup_feedback_submitted": 1871.691,
+        "startup_workers_started": 1872.119,
+        "application_prepared": 1955.587,
+        "fonts_loaded": 2371.083,
+        "fonts_registered": 2371.326,
+        "application_attached": 2578.945,
+        "startup_route_attached": 2855.442,
+        "startup_catalog_attached": 2858.51,
+        "startup_view_attached": 3567.92,
+        "application_ready": 3579.221,
+        "startup_ready": 3579.222,
+        "shutdown_started": 4982.048,
+        "shutdown_complete": 4986.709,
+        "process_finished": 4989.784
+      },
+      "timing_sha256": "121f2fe88bdca5c4197400e15ceafb33037e72ffb2f5530de0ce9b9b50a671b5",
+      "shell_trace_sha256": "0ef21d1b11bb4e1f0a77a3287bf8904ee3723213ddfa89aabd193063d6aa0a38",
+      "derived_ms": {
+        "native_request_to_entry": 330.0,
+        "document_entry_to_exec_request": 3670.0,
+        "native_request_to_exec_request": 4000.0,
+        "sleep_capability_query": 890.0,
+        "portrait_calibration": 2080.0,
+        "display_takeover": 280.0,
+        "rust_to_startup_scene": 1871.686,
+        "event_loop_to_startup_scene": 1356.611,
+        "font_preparation_registration": 499.207,
+        "metadata_preparation_parallel": 83.468,
+        "fonts_ready_to_application_ready": 1207.896,
+        "rust_to_application_ready": 3579.222,
+        "estimated_native_request_to_feedback": 5871.686,
+        "estimated_native_request_to_application_ready": 7579.222
+      }
+    },
+    {
+      "case": "native-2",
+      "metadata_library_count": 6,
+      "shell_clock": "device uptime, centisecond resolution",
+      "shell_marks_ms": {
+        "native_open_requested": 0.0,
+        "document_entry": 290.0,
+        "launcher_entry": 300.0,
+        "launcher_worker": 400.0,
+        "observer_start": 460.0,
+        "observer_ready": 510.0,
+        "sleep_capability_start": 510.0,
+        "sleep_capability_done": 920.0,
+        "portrait_start": 940.0,
+        "portrait_done": 2400.0,
+        "display_takeover_start": 2400.0,
+        "display_takeover_done": 2520.0,
+        "application_exec_requested": 2520.0,
+        "native_restored": 9980.0
+      },
+      "rust_marks_ms": {
+        "process_entry": 0.0,
+        "platform_initialized": 24.15,
+        "window_shown": 574.931,
+        "startup_window_shown": 574.934,
+        "event_loop_started": 575.325,
+        "startup_scene_submitted": 1965.744,
+        "startup_feedback_submitted": 1965.749,
+        "startup_workers_started": 1966.204,
+        "application_prepared": 2049.752,
+        "fonts_loaded": 2471.266,
+        "fonts_registered": 2471.574,
+        "application_attached": 2650.083,
+        "startup_route_attached": 2948.835,
+        "startup_catalog_attached": 2949.59,
+        "startup_view_attached": 3659.606,
+        "application_ready": 3672.301,
+        "startup_ready": 3672.303,
+        "shutdown_started": 5072.286,
+        "shutdown_complete": 5076.074,
+        "process_finished": 5077.473
+      },
+      "timing_sha256": "d51fa3b006847df3f0d7fde8948046b5e78ada564990c23d0028ddd2b8a50f58",
+      "shell_trace_sha256": "fa43a2b11827ee05a0c766309746dee2f144dadce01ddab3e2dda7ea299af4ee",
+      "derived_ms": {
+        "native_request_to_entry": 290.0,
+        "document_entry_to_exec_request": 2230.0,
+        "native_request_to_exec_request": 2520.0,
+        "sleep_capability_query": 410.0,
+        "portrait_calibration": 1460.0,
+        "display_takeover": 120.0,
+        "rust_to_startup_scene": 1965.744,
+        "event_loop_to_startup_scene": 1390.419,
+        "font_preparation_registration": 505.37,
+        "metadata_preparation_parallel": 83.548,
+        "fonts_ready_to_application_ready": 1200.729,
+        "rust_to_application_ready": 3672.303,
+        "estimated_native_request_to_feedback": 4485.744,
+        "estimated_native_request_to_application_ready": 6192.303
+      }
+    },
+    {
+      "case": "native-3",
+      "metadata_library_count": 6,
+      "shell_clock": "device uptime, centisecond resolution",
+      "shell_marks_ms": {
+        "native_open_requested": 0.0,
+        "document_entry": 340.0,
+        "launcher_entry": 340.0,
+        "launcher_worker": 360.0,
+        "observer_start": 470.0,
+        "observer_ready": 650.0,
+        "sleep_capability_start": 650.0,
+        "sleep_capability_done": 980.0,
+        "portrait_start": 1000.0,
+        "portrait_done": 2290.0,
+        "display_takeover_start": 2300.0,
+        "display_takeover_done": 2420.0,
+        "application_exec_requested": 2420.0,
+        "native_restored": 9670.0
+      },
+      "rust_marks_ms": {
+        "process_entry": 0.0,
+        "platform_initialized": 27.24,
+        "window_shown": 460.997,
+        "startup_window_shown": 461.0,
+        "event_loop_started": 461.392,
+        "startup_scene_submitted": 1816.681,
+        "startup_feedback_submitted": 1816.684,
+        "startup_workers_started": 1817.053,
+        "application_prepared": 1897.111,
+        "fonts_loaded": 2313.248,
+        "fonts_registered": 2313.384,
+        "application_attached": 2503.979,
+        "startup_route_attached": 2800.565,
+        "startup_catalog_attached": 2801.955,
+        "startup_view_attached": 3511.325,
+        "application_ready": 3523.383,
+        "startup_ready": 3523.384,
+        "shutdown_started": 4925.139,
+        "shutdown_complete": 4929.241,
+        "process_finished": 4930.762
+      },
+      "timing_sha256": "3cce16a3b3cae7cdc98b04d495d4021d6c59e8904542f1c7b60f80ed400c21ab",
+      "shell_trace_sha256": "b580099427937eeb85655d1ba7379a1aa90206d29acbf7af8703d8b1e8357680",
+      "derived_ms": {
+        "native_request_to_entry": 340.0,
+        "document_entry_to_exec_request": 2080.0,
+        "native_request_to_exec_request": 2420.0,
+        "sleep_capability_query": 330.0,
+        "portrait_calibration": 1290.0,
+        "display_takeover": 120.0,
+        "rust_to_startup_scene": 1816.681,
+        "event_loop_to_startup_scene": 1355.289,
+        "font_preparation_registration": 496.331,
+        "metadata_preparation_parallel": 80.058,
+        "fonts_ready_to_application_ready": 1210.0,
+        "rust_to_application_ready": 3523.384,
+        "estimated_native_request_to_feedback": 4236.681,
+        "estimated_native_request_to_application_ready": 5943.384
+      }
+    }
+  ],
+  "native_summary_ms": {
+    "native_request_to_entry": {
+      "minimum": 290.0,
+      "median": 330.0,
+      "maximum": 340.0
+    },
+    "document_entry_to_exec_request": {
+      "minimum": 2080.0,
+      "median": 2230.0,
+      "maximum": 3670.0
+    },
+    "native_request_to_exec_request": {
+      "minimum": 2420.0,
+      "median": 2520.0,
+      "maximum": 4000.0
+    },
+    "sleep_capability_query": {
+      "minimum": 330.0,
+      "median": 410.0,
+      "maximum": 890.0
+    },
+    "portrait_calibration": {
+      "minimum": 1290.0,
+      "median": 1460.0,
+      "maximum": 2080.0
+    },
+    "display_takeover": {
+      "minimum": 120.0,
+      "median": 120.0,
+      "maximum": 280.0
+    },
+    "rust_to_startup_scene": {
+      "minimum": 1816.681,
+      "median": 1871.686,
+      "maximum": 1965.744
+    },
+    "event_loop_to_startup_scene": {
+      "minimum": 1355.289,
+      "median": 1356.611,
+      "maximum": 1390.419
+    },
+    "font_preparation_registration": {
+      "minimum": 496.331,
+      "median": 499.207,
+      "maximum": 505.37
+    },
+    "metadata_preparation_parallel": {
+      "minimum": 80.058,
+      "median": 83.468,
+      "maximum": 83.548
+    },
+    "fonts_ready_to_application_ready": {
+      "minimum": 1200.729,
+      "median": 1207.896,
+      "maximum": 1210.0
+    },
+    "rust_to_application_ready": {
+      "minimum": 3523.384,
+      "median": 3579.222,
+      "maximum": 3672.303
+    },
+    "estimated_native_request_to_feedback": {
+      "minimum": 4236.681,
+      "median": 4485.744,
+      "maximum": 5871.686
+    },
+    "estimated_native_request_to_application_ready": {
+      "minimum": 5943.384,
+      "median": 6192.303,
+      "maximum": 7579.222
+    }
+  }
+}

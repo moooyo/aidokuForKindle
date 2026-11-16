@@ -78,6 +78,16 @@ class KpmPackageTests(unittest.TestCase):
                              [b"#!/bin/sh", b"# Name: Aidoku", b"# DontUseFBInk"])
             self.assertEqual(files["payload/documents/Aidoku.sh"][0],
                              (REPOSITORY / "packaging/kpm/document-launcher.sh").read_bytes().replace(b"\r\n", b"\n"))
+            header = files["payload/documents/Aidoku.sh"][0].splitlines()[:6]
+            icon = next(line.removeprefix(b"# Icon: ").decode("ascii")
+                        for line in header if line.startswith(b"# Icon: "))
+            self.assertTrue(icon.startswith("/mnt/us/"))
+            cover = files["payload/" + icon.removeprefix("/mnt/us/")][0]
+            self.assertEqual(cover, (REPOSITORY / "assets/launcher/aidoku-cover.png").read_bytes())
+            self.assertEqual(cover[:8], b"\x89PNG\r\n\x1a\n")
+            self.assertEqual(int.from_bytes(cover[16:20], "big"), 600)
+            self.assertEqual(int.from_bytes(cover[20:24], "big"), 800)
+            self.assertIn("payload/aidoku/licenses/launcher/README.md", files)
             self.assertIn("payload/aidoku/licenses/fonts/manifest.json", files)
             self.assertIn("payload/aidoku/licenses/icons/README.md", files)
             self.assertIn("payload/aidoku/licenses/demo/manifest.json", files)

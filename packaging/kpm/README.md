@@ -102,10 +102,18 @@ The installed `documents/Aidoku.sh` starts with these Scriptlet declarations:
 #!/bin/sh
 # Name: Aidoku
 # DontUseFBInk
+# Author: Aidoku
+# Icon: /mnt/us/aidoku/assets/aidoku-cover.png
 ```
 
 The legacy ZIP uses a separate direct document entry and does not require KPM
 package registration.
+
+The cover is packaged at `aidoku/assets/aidoku-cover.png`, before the document
+entry in the installation allowlist. It is an opaque monochrome PNG, with
+artwork provenance in `aidoku/licenses/launcher/README.md`. Updating an existing
+entry requires a scanner refresh for the new `# Icon:` metadata to appear.
+The declaration stays within the first six lines read by Scriptlet integration.
 
 The documented `DontUseFBInk` declaration suppresses Scriptlet stdout/stderr
 rendering when it appears in the first six lines. See the

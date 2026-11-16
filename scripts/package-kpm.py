@@ -51,6 +51,8 @@ def production_inputs(root: Path, application: Path) -> dict[str, Path]:
         "aidoku/app/aidoku": application,
         "aidoku/launch.sh": root / "packaging/kindle/launch.sh",
         "documents/Aidoku.sh": root / "packaging/kpm/document-launcher.sh",
+        "aidoku/assets/aidoku-cover.png": root / "assets/launcher/aidoku-cover.png",
+        "aidoku/licenses/launcher/README.md": root / "assets/launcher/README.md",
         "aidoku/README.md": root / "packaging/kpm/README.md",
         "aidoku/LICENSE": root / "LICENSE",
         "aidoku/THIRD_PARTY_NOTICES.md": root / "THIRD_PARTY_NOTICES.md",

@@ -116,6 +116,13 @@ duplicated as loose runtime assets in the package.
    alternatively execute `documents/Aidoku.sh`; the stock document reader alone
    does not execute shell scripts.
 
+The document entry declares an original monochrome Library cover through its
+`# Icon:` header. Keep `aidoku/assets/aidoku-cover.png` with the installation;
+copy it before updating `documents/Aidoku.sh`. The Scriptlet scanner reads this
+header when it indexes the document. An existing entry must be rescanned to
+replace its default book placeholder. The PNG is independent of Reader sleep
+covers and does not change application startup behavior.
+
 The profiles are `pw5`, `pw6`, `scribe`, `scribe2`, `scribe3`, and
 `scribe3-nofrontlight`. Without a saved selection, the initial design profile
 is `pw5`. Native dimensions are read from the visible framebuffer, rather than
