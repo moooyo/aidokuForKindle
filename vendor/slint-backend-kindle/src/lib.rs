@@ -22,6 +22,7 @@ mod dithering;
 mod frame_observer;
 mod framebuffer;
 mod gray_target;
+mod input_discovery;
 mod lifecycle;
 mod platform;
 mod portrait;

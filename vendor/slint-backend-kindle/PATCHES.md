@@ -1,5 +1,18 @@
 # Project-owned Kindle backend patches
 
+## Kernel-assisted input discovery, 2026-11-16
+
+Portrait and touch discovery use a bounded sysfs hint roster, bound to the
+character nodes' device numbers and identities. Selected descriptors retain
+the existing evdev capability/name checks. A second complete roster observation
+detects changed or replaced nodes. Missing, malformed, incomplete or changed
+hints, and an empty shortlist result, retain descriptor-based fallback scanning.
+Multiple recognized portrait sources still fail as ambiguous. The selected
+touch descriptor is transferred to its owner instead of being closed and reopened.
+Input grabs, snapshots, coordinate handling and full-frame ownership barriers
+are unchanged. Device performance and qualification belong to the source-bound
+input-discovery report.
+
 ## First meaningful startup frame, 2026-11-16
 
 The initial Slint scene supplies the startup full refresh instead of following

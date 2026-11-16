@@ -3,6 +3,11 @@ use slint::platform::software_renderer::MinimalSoftwareWindow;
 use slint::platform::{PointerEventButton, WindowEvent};
 
 use crate::InputObserver;
+use crate::input_discovery::{EventSnapshot, MetadataKind};
+use std::os::{
+    fd::{AsRawFd, IntoRawFd},
+    unix::fs::OpenOptionsExt,
+};
 
 // Touchscreen driver event. Layout has to match exactly what the kernel writes.
 #[repr(C)]
@@ -158,22 +163,14 @@ pub(crate) struct TouchInput {
 
 impl TouchInput {
     pub(crate) fn open(screen_width: u32, screen_height: u32) -> std::io::Result<Self> {
-        let path = Self::find_touch_device().ok_or_else(|| {
+        let file = Self::find_touch_device().ok_or_else(|| {
             std::io::Error::new(
                 std::io::ErrorKind::NotFound,
                 "no touch input device found (looked for ABS_MT_POSITION_X in /dev/input/event*)",
             )
         })?;
-        let c_path = std::ffi::CString::new(path).unwrap();
-        let fd = unsafe {
-            libc::open(
-                c_path.as_ptr(),
-                libc::O_RDONLY | libc::O_NONBLOCK | libc::O_CLOEXEC,
-            )
-        };
-        if fd < 0 {
-            return Err(std::io::Error::last_os_error());
-        }
+        // Keep the descriptor whose capabilities were checked during discovery.
+        let fd = file.into_raw_fd();
 
         // Exclusively grab the device so X/framework doesn't consume our events.
         let ret = unsafe { libc::ioctl(fd, EVIOCGRAB as _, 1 as libc::c_int) };
@@ -358,19 +355,56 @@ impl TouchInput {
         ))
     }
 
-    /// Scan /dev/input/event* for a device that reports ABS_MT_POSITION_X (0x35).
-    fn find_touch_device() -> Option<String> {
-        for n in 0..10 {
-            let path = format!("/dev/input/event{n}");
-            let c_path = std::ffi::CString::new(path.as_str()).unwrap();
-            let fd = unsafe { libc::open(c_path.as_ptr(), libc::O_RDONLY | libc::O_NONBLOCK) };
-            if fd < 0 {
-                continue;
+    /// Discover a checked owner without closing and reopening the selected node.
+    fn find_touch_device() -> Option<std::fs::File> {
+        if let Some(snapshot) = EventSnapshot::capture(MetadataKind::AbsoluteAxes, 9) {
+            let mut found = None;
+            let mut current = true;
+            for candidate in snapshot.entries().filter(|entry| {
+                entry
+                    .axes()
+                    .is_some_and(|axes| axes & (1u64 << TOUCH_POSITION_X) != 0)
+            }) {
+                let file = match candidate.open_checked() {
+                    Ok(Some(file)) => file,
+                    _ => {
+                        current = false;
+                        break;
+                    }
+                };
+                let bits = match Self::query_abs_bits(file.as_raw_fd()) {
+                    Ok(bits) => bits,
+                    Err(_) => {
+                        current = false;
+                        break;
+                    }
+                };
+                let actual = (0..64).fold(0u64, |axes, axis| {
+                    axes | (u64::from(Self::has_axis(&bits, axis)) << axis)
+                });
+                if candidate.axes() != Some(actual) {
+                    current = false;
+                    break;
+                }
+                found = Some(file);
+                break;
             }
-            let bits = Self::query_abs_bits(fd);
-            unsafe { libc::close(fd) };
+            if current && found.is_some() && snapshot.is_current() {
+                return found;
+            }
+        }
+        for n in 0..10 {
+            // Preserve the legacy fallback's handling of linked event nodes.
+            let Ok(file) = std::fs::OpenOptions::new()
+                .read(true)
+                .custom_flags(libc::O_NONBLOCK | libc::O_CLOEXEC)
+                .open(format!("/dev/input/event{n}"))
+            else {
+                continue;
+            };
+            let bits = Self::query_abs_bits(file.as_raw_fd());
             if bits.is_ok_and(|bits| Self::has_axis(&bits, TOUCH_POSITION_X)) {
-                return Some(path);
+                return Some(file);
             }
         }
         None
