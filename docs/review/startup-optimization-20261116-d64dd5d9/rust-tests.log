@@ -1,0 +1,1073 @@
+   Compiling postcard v1.1.3
+   Compiling aidoku-kindle v0.1.3 (/root/aidoku-startup-opt-20261116/source)
+warning: method `marker` is never used
+   --> vendor/slint-backend-kindle/src/framebuffer/mod.rs:320:19
+    |
+319 | impl SubmittedUpdate<'_> {
+    | ------------------------ method in this implementation
+320 |     pub(crate) fn marker(&self) -> u32 {
+    |                   ^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: methods `refresh_planned` and `refresh_full_checked` are never used
+    --> vendor/slint-backend-kindle/src/framebuffer/mod.rs:1111:19
+     |
+ 337 | impl Framebuffer {
+     | ---------------- methods in this implementation
+...
+1111 |     pub(crate) fn refresh_planned(&self, refresh: ResolvedRefresh) -> io::Result<()> {
+     |                   ^^^^^^^^^^^^^^^
+...
+1165 |     pub(crate) fn refresh_full_checked(&self) -> io::Result<SubmittedUpdate<'_>> {
+     |                   ^^^^^^^^^^^^^^^^^^^^
+
+warning: method `submit` is never used
+  --> vendor/slint-backend-kindle/src/framebuffer/markers.rs:20:19
+   |
+15 | impl UpdateMarkers {
+   | ------------------ method in this implementation
+...
+20 |     pub(super) fn submit(&self, send: impl FnOnce(u32) -> io::Result<()>) -> io::Result<()> {
+   |                   ^^^^^^
+
+warning: method `pending_sleep_presentation` is never used
+   --> vendor/slint-backend-kindle/src/lifecycle.rs:129:19
+    |
+ 80 | impl LifecycleHandle {
+    | -------------------- method in this implementation
+...
+129 |     pub(crate) fn pending_sleep_presentation(&self) -> std::io::Result<Option<u64>> {
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: method `write_frame` is never used
+   --> vendor/slint-backend-kindle/src/render_control.rs:101:19
+    |
+ 89 | impl GrayRenderer {
+    | ----------------- method in this implementation
+...
+101 |     pub(crate) fn write_frame(
+    |                   ^^^^^^^^^^^
+
+warning: method `snapshot_required` is never used
+   --> vendor/slint-backend-kindle/src/touch.rs:458:19
+    |
+159 | impl TouchInput {
+    | --------------- method in this implementation
+...
+458 |     pub(crate) fn snapshot_required(&self) -> bool {
+    |                   ^^^^^^^^^^^^^^^^^
+
+warning: `slint-backend-kindle` (lib) generated 6 warnings
+warning: aidoku-kindle@0.1.3: warning: Component is neither used nor exported
+warning: aidoku-kindle@0.1.3:   --> /root/aidoku-startup-opt-20261116/source/ui/sources.slint:18:1
+warning: aidoku-kindle@0.1.3:    |
+warning: aidoku-kindle@0.1.3: 18 | / component SourceMark inherits Rectangle {
+warning: aidoku-kindle@0.1.3: 19 | |     in property <string> initial;
+warning: aidoku-kindle@0.1.3: 20 | |     in property <bool> builtin: false;
+warning: aidoku-kindle@0.1.3: 21 | |     in property <bool> available: true;
+warning: aidoku-kindle@0.1.3: ...  |
+warning: aidoku-kindle@0.1.3: 35 | |     if !root.available && root.show-warning: Icon { x: (parent.width - self.width) / 2; y: (parent.height - self.height) / 2; widt...
+warning: aidoku-kindle@0.1.3: 36 | | }
+warning: aidoku-kindle@0.1.3:    | |_^
+warning: use of deprecated method `std::sync::atomic::Atomic::<usize>::fetch_update`: renamed to `try_update` for consistency
+    --> src/downloads.rs:3972:18
+     |
+3972 |                 .fetch_update(Ordering::AcqRel, Ordering::Acquire, |count| {
+     |                  ^^^^^^^^^^^^
+     |
+     = note: `#[warn(deprecated)]` on by default
+help: replace the use of the deprecated method
+     |
+3972 -                 .fetch_update(Ordering::AcqRel, Ordering::Acquire, |count| {
+3972 +                 .try_update(Ordering::AcqRel, Ordering::Acquire, |count| {
+     |
+
+warning: function `cover_alias` is never used
+    --> src/app.rs:1815:4
+     |
+1815 | fn cover_alias(id: &str, uri: &str) -> String {
+     |    ^^^^^^^^^^^
+     |
+     = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: method `enter_reader` is never used
+    --> src/app/actions.rs:1462:19
+     |
+  22 | impl App {
+     | -------- method in this implementation
+...
+1462 |     pub(crate) fn enter_reader(&mut self, chapter_id: &str, page: u32) -> Result<()> {
+     |                   ^^^^^^^^^^^^
+
+warning: field `stats` is never read
+  --> src/app/download_usage.rs:73:9
+   |
+67 | pub(super) struct UsageResult {
+   |                   ----------- field in this struct
+...
+73 |     pub stats: UsageScanStats,
+   |         ^^^^^
+   |
+   = note: `UsageResult` has a derived impl for the trait `Debug`, but this is intentionally ignored during dead code analysis
+
+warning: variants `Cancelled` and `Unavailable` are never constructed
+  --> src/app/logging.rs:45:5
+   |
+42 | pub(super) enum LogOutcome {
+   |                 ---------- variants in this enum
+...
+45 |     Cancelled,
+   |     ^^^^^^^^^
+46 |     Unavailable,
+   |     ^^^^^^^^^^^
+   |
+   = note: `LogOutcome` has derived impls for the traits `Debug` and `Clone`, but these are intentionally ignored during dead code analysis
+
+warning: struct `LogSummary` is never constructed
+  --> src/app/logging.rs:50:19
+   |
+50 | pub(super) struct LogSummary {
+   |                   ^^^^^^^^^^
+
+warning: method `summary` is never used
+   --> src/app/logging.rs:131:12
+    |
+ 67 | impl LogManager {
+    | --------------- method in this implementation
+...
+131 |     pub fn summary(&self) -> Result<LogSummary> {
+    |            ^^^^^^^
+
+warning: method `same_allocation` is never used
+   --> src/app/prepared_pixels.rs:169:19
+    |
+109 | impl PreparedPixels {
+    | ------------------- method in this implementation
+...
+169 |     pub(super) fn same_allocation(&self, other: &Self) -> bool {
+    |                   ^^^^^^^^^^^^^^^
+
+warning: field `stats` is never read
+  --> src/app/storage_details.rs:88:9
+   |
+84 | pub(super) struct StorageDetailsResult {
+   |                   -------------------- field in this struct
+...
+88 |     pub stats: StorageScanStats,
+   |         ^^^^^
+   |
+   = note: `StorageDetailsResult` has a derived impl for the trait `Debug`, but this is intentionally ignored during dead code analysis
+
+warning: associated function `new` is never used
+   --> src/imaging/reader_raster.rs:277:8
+    |
+276 | impl Axis {
+    | --------- associated function in this implementation
+277 |     fn new(source_length: u32, target_length: u32) -> Self {
+    |        ^^^
+
+warning: method `reconcile` is never used
+  --> src/device_policy.rs:89:8
+   |
+80 | impl WifiPolicy {
+   | --------------- method in this implementation
+...
+89 |     fn reconcile(&mut self, services: &mut impl DeviceServices, disable: bool) -> Result<()> {
+   |        ^^^^^^^^^
+
+warning: method `run` is never used
+   --> src/sources/transfer.rs:627:19
+    |
+584 | impl TransferCoordinator {
+    | ------------------------ method in this implementation
+...
+627 |     pub(super) fn run(
+    |                   ^^^
+
+warning: field `total` is never read
+  --> src/store/view_queries.rs:63:9
+   |
+62 | pub(crate) struct HistoryLayoutPage {
+   |                   ----------------- field in this struct
+63 |     pub total: usize,
+   |         ^^^^^
+   |
+   = note: `HistoryLayoutPage` has a derived impl for the trait `Debug`, but this is intentionally ignored during dead code analysis
+
+warning: function `detail_chapter_page_count` is never used
+   --> src/store/view_queries.rs:201:15
+    |
+201 | pub(crate) fn detail_chapter_page_count(total: usize, large: bool) -> usize {
+    |               ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: methods `chapters_view_page`, `detail_chapters_view_page`, `chapter_view_window`, and `history_view_page` are never used
+   --> src/store/view_queries.rs:597:19
+    |
+235 | impl Store {
+    | ---------- methods in this implementation
+...
+597 |     pub(crate) fn chapters_view_page(
+    |                   ^^^^^^^^^^^^^^^^^^
+...
+610 |     pub(crate) fn detail_chapters_view_page(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+666 |     fn chapter_view_window(
+    |        ^^^^^^^^^^^^^^^^^^^
+...
+776 |     pub(crate) fn history_view_page(
+    |                   ^^^^^^^^^^^^^^^^^
+
+warning: `aidoku-kindle` (lib) generated 14 warnings
+warning: function `display_activity_allowed` is never used
+   --> src/bootstrap_lifecycle.rs:662:8
+    |
+662 | pub fn display_activity_allowed() -> bool {
+    |        ^^^^^^^^^^^^^^^^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: `aidoku-kindle` (bin "aidoku" test) generated 1 warning
+warning: `aidoku-kindle` (lib test) generated 4 warnings (3 duplicates) (run `cargo fix --lib -p aidoku-kindle --tests` to apply 1 suggestion)
+    Finished `test` profile [unoptimized] target(s) in 46.95s
+     Running unittests src/lib.rs (/root/aidoku-startup-opt-20261116/target/debug/deps/aidoku_kindle-6a50346882f20cae)
+
+running 802 tests
+test app::actions::followup_command_tests::a_turn_before_wide_geometry_is_ready_enters_the_second_half ... ok
+test app::actions::followup_command_tests::leaving_the_reader_cancels_a_deferred_network_destination ... ok
+test app::actions::followup_command_tests::jpeg_acceleration_requires_capability_and_persists_the_automatic_policy ... ok
+test app::actions::license_tests::license_view_pages_cover_the_complete_project_license ... ok
+test app::actions::offline_listing_tests::offline_catalog_preserves_provider_defined_listing_ids_and_names ... ok
+test app::actions::followup_command_tests::extended_settings_commands_persist_and_reject_invalid_values ... ok
+test app::actions::followup_command_tests::dithering_method_selection_persists_without_inventing_desktop_capability ... ok
+test app::actions::followup_command_tests::backup_and_log_buttons_complete_real_background_file_operations ... ok
+test app::actions::text_pagination::tests::an_unbounded_budget_does_not_overflow ... ok
+test app::actions::text_pagination::tests::empty_text_keeps_one_page ... ok
+test app::actions::text_pagination::tests::keeps_a_normal_word_intact_after_leading_whitespace ... ok
+test app::actions::text_pagination::tests::keeps_words_that_end_exactly_at_the_budget ... ok
+test app::actions::text_pagination::tests::prefers_a_paragraph_boundary_in_the_latter_half ... ok
+test app::actions::text_pagination::tests::preserves_unicode_whitespace_and_line_endings ... ok
+test app::actions::text_pagination::tests::skips_an_early_paragraph_boundary_for_a_fuller_page ... ok
+test app::actions::text_pagination::tests::splits_only_oversized_words_at_scalar_boundaries ... ok
+test app::actions::text_pagination::tests::zero_budget_still_makes_progress ... ok
+test app::automatic_updates::tests::a_completed_checkpoint_ack_cannot_consume_a_later_charging_edge ... ok
+test app::automatic_updates::tests::ahead_download_selection_rejects_changed_or_foreign_chapter_identity ... ok
+test app::automatic_updates::tests::ahead_downloads_preserve_user_pause_cancel_and_existing_jobs ... ok
+test app::automatic_updates::tests::an_early_checkpoint_parse_failure_waits_before_retrying_any_io ... ok
+test app::automatic_updates::tests::background_checkpoint_helpers_reject_cancelled_writes_and_merge_dirty_reload ... ok
+test app::automatic_updates::tests::charging_triggers_are_edges_with_a_persistent_debounce ... ok
+test app::automatic_updates::tests::daily_and_weekly_schedules_use_persisted_success_and_retry_timestamps ... ok
+test app::automatic_updates::tests::failed_checkpoint_workers_do_not_start_network_work_or_advance_success ... ok
+test app::automatic_updates::tests::failed_checkpoint_writes_keep_charging_edges_in_ram_during_cooldown ... ok
+test app::automatic_updates::tests::failed_collection_does_not_advance_the_success_checkpoint ... ok
+test app::automatic_updates::tests::invalidation_rejects_old_results_but_keeps_an_occupied_worker_slot ... ok
+test app::automatic_updates::tests::restarting_while_still_charging_does_not_invent_another_edge ... ok
+test app::automatic_updates::tests::target_selection_respects_library_membership_source_setup_and_completed_status ... ok
+test app::automatic_updates::tests::unknown_wifi_or_charging_never_bypasses_a_requested_restriction ... ok
+test app::categories::tests::builtin_display_names_are_localized_until_overridden ... ok
+test app::actions::followup_command_tests::settings_keyboard_and_category_choices_edit_the_actual_book ... ok
+test app::actions::followup_command_tests::pending_wide_turns_are_bounded_and_opposite_input_cancels ... ok
+test app::cover_jobs::tests::a_larger_detail_cover_requires_more_pixels_than_a_grid_cover ... ok
+test app::cover_jobs::tests::absolute_local_and_demo_paths_never_need_a_source_request ... ok
+test app::actions::reader_timing_entry_tests::leaving_an_actual_pending_manifest_records_the_cancelled_open_action ... ok
+test app::cover_jobs::tests::book_identity_and_render_geometry_cannot_share_an_alias ... ok
+test app::cover_jobs::tests::cached_listing_labels_do_not_discard_offline_covers_after_restart ... ok
+test app::cover_jobs::tests::connection_verification_metadata_keeps_the_same_persistent_alias ... ok
+test app::cover_jobs::tests::disabling_a_source_reuses_cached_covers_without_network_admission ... ok
+test app::actions::reader_timing_entry_tests::actual_manifest_failure_and_retry_keep_distinct_open_actions ... ok
+test app::cover_jobs::tests::any_legacy_raw_source_precedes_an_older_processed_metadata_variant ... ok
+test app::categories::tests::category_creation_and_custom_rename_use_the_existing_keyboard_route ... ok
+test app::cover_jobs::tests::only_persisted_local_derivatives_receive_a_cover_alias ... ok
+test app::cover_jobs::tests::source_credentials_and_options_isolate_persistent_cover_aliases ... ok
+test app::cover_jobs::tests::unsupported_source_kinds_never_admit_cover_network_requests ... ok
+test app::download_usage::tests::a_completion_arriving_during_rebuild_remains_pending ... ok
+test app::cover_jobs::tests::legacy_metadata_fallback_never_probes_another_request_configuration ... ok
+test app::download_usage::tests::benchmark_completed_download_usage_production ... ignored, Requires an exclusive remote performance window and real filesystem fixtures
+test app::download_usage::tests::cancellation_is_checked_before_opening_a_database ... ok
+test app::download_usage::tests::completed_chapters_append_without_double_counting_shared_paths ... ok
+test app::download_usage::tests::full_scan_deduplicates_canonical_aliases_and_excludes_missing_files ... ok
+test app::download_usage::tests::only_a_matching_job_releases_the_slot_and_failures_keep_the_request ... ok
+test app::download_usage::tests::an_incremental_completion_reads_only_its_new_manifest ... ok
+test app::download_usage::tests::rebuild_keeps_the_last_value_and_rejects_a_stale_generation ... ok
+test app::extended_preferences::tests::constrained_preferences_accept_only_supported_values ... ok
+test app::extended_preferences::tests::every_switch_accepts_both_command_key_spellings ... ok
+test app::extended_preferences::tests::rejected_values_and_unknown_keys_preserve_the_entire_preferences ... ok
+test app::extended_preferences::tests::sleep_cover_switch_and_screensaver_mode_stay_consistent ... ok
+test app::interaction_models::tests::catalog_sort_preserves_provider_order_and_latest_ties_for_owned_and_borrowed_books ... ok
+test app::interaction_models::tests::catalog_status_filters_accept_provider_aliases_and_localized_records ... ok
+test app::interaction_models::tests::catalog_tag_exclusion_composes_with_series_status ... ok
+test app::lifecycle::tests::changing_dither_method_requires_repair_without_replacing_retained_metadata ... ok
+test app::lifecycle::tests::changing_wide_split_requires_repair_after_retained_resume ... ok
+test app::categories::tests::localized_duplicate_and_invalid_names_leave_the_keyboard_open ... ok
+test app::cover_jobs::tests::legacy_processed_only_covers_keep_renderer_validation_during_promotion ... ok
+test app::logging::tests::arbitrary_event_text_is_never_exported ... ok
+test app::logging::tests::cloned_managers_share_opt_in_state ... ok
+test app::logging::tests::disabled_events_do_not_create_log_files ... ok
+test app::logging::tests::oversized_external_logs_are_rejected_without_exporting_them ... ok
+test app::logging::tests::clear_preserves_exports_and_unrelated_files ... ok
+test app::logging::tests::symlinked_directories_and_files_are_rejected ... ok
+test app::migration::tests::title_hints_accept_only_one_edit_in_long_titles ... ok
+test app::migration::tests::title_hints_do_not_match_empty_or_symbol_only_metadata ... ok
+test app::migration::tests::title_hints_do_not_match_truncated_overlong_titles ... ok
+test app::migration::tests::title_hints_normalize_case_whitespace_and_punctuation ... ok
+test app::migration::tests::title_hints_preserve_unicode_text_during_normalization ... ok
+test app::migration::tests::title_hints_require_review_for_short_or_different_titles ... ok
+test app::orientation::tests::reader_landscape_uses_the_selected_manual_direction ... ok
+test app::orientation::tests::routes_outside_the_reader_always_use_portrait ... ok
+test app::prepared_pixels::tests::cache_does_not_keep_grayscale_sources_alive ... ok
+test app::prepared_pixels::tests::cancellable_reader_pixels_match_the_existing_expansion ... ok
+test app::prepared_pixels::tests::cancelled_fast_preparation_stays_inside_the_reader_cancellation_scope ... ok
+test app::prepared_pixels::tests::distinct_inputs_do_not_share_pixels_even_with_equal_dimensions ... ok
+test app::prepared_pixels::tests::fast_preparation_does_not_replace_cached_grayscale_pixels ... ok
+test app::prepared_pixels::tests::grayscale_expansion_preserves_dimensions_and_pixel_values ... ok
+test app::prepared_pixels::tests::least_recently_used_pixels_are_evicted_without_affecting_live_output ... ok
+test app::prepared_pixels::tests::making_a_uniquely_owned_source_mutable_cannot_reuse_stale_pixels ... ok
+test app::logging::tests::rotation_keeps_two_bounded_owned_files ... ok
+test app::prepared_pixels::tests::next_frame_reservation_covers_scribe_and_releases_on_drop ... ok
+test app::prepared_pixels::tests::oversized_output_is_returned_without_becoming_resident ... ok
+test app::prepared_pixels::tests::payload_budget_is_enforced_separately_from_entry_budget ... ok
+test app::prepared_pixels::tests::preparing_the_same_immutable_input_reuses_the_rgb_allocation ... ok
+test app::prepared_pixels::tests::simultaneous_preparations_publish_one_cached_allocation ... ok
+test app::prepared_pixels::tests::unique_rgb_payload_bytes_count_equal_but_distinct_allocations ... ok
+test app::prepared_pixels::tests::unique_rgb_payload_bytes_count_shared_clones_once ... ok
+test app::prepared_pixels::tests::worker_fast_pixels_match_legacy_output_and_publish_without_copying ... ok
+test app::prepared_pixels::tests::worker_pixels_are_send_and_sync ... ok
+test app::reader_pipeline::tests::all_directions_keep_manifest_windows_bounded ... ok
+test app::prepared_pixels::tests::next_frame_reservation_counts_scribe_rgb_and_gray_payloads_together ... ok
+test app::reader_pipeline::tests::changed_chapter_state_is_allowed_but_reused_identities_are_not ... ok
+test app::reader_pipeline::tests::cover_option_does_not_change_single_or_vertical_frame_and_prefetch_geometry ... ok
+test app::reader_pipeline::tests::cover_prefetch_keys_match_future_foreground_frames_at_both_parities ... ok
+test app::download_usage::tests::owned_prepared_copies_are_counted_once_with_options_disabled ... ok
+test app::cover_jobs::tests::legacy_verification_raw_aliases_are_promoted_without_network ... ok
+test app::lifecycle::tests::retained_wide_halves_restore_navigation_without_decoding_again ... ok
+test app::reader_pipeline::tests::future_spread_keeps_its_even_final_page_at_half_width ... ok
+test app::reader_pipeline::tests::invalidating_reader_work_cancels_the_private_render_and_keeps_worker_ownership ... ok
+test app::reader_pipeline::tests::isolated_cover_uses_a_full_width_frame_and_half_width_following_pair ... ok
+test app::actions::reader_timing_entry_tests::actual_reader_entry_commands_bind_open_actions_to_image_requests ... ok
+test app::reader_pipeline::tests::next_chapter_head_keeps_foreground_geometry_and_the_global_budget ... ok
+test app::reader_pipeline::tests::odd_final_page_prefetch_matches_full_width_foreground ... ok
+test app::reader_pipeline::tests::named_fit_keeps_original_geometry_instead_of_resized_download_geometry ... ok
+test app::reader_pipeline::tests::prefetch_zoom_matches_page_resets_and_retained_strip_sections ... ok
+test app::reader_pipeline::tests::prepared_frame_targets_follow_real_navigation_for_every_frame_shape ... ok
+test app::reader_pipeline::tests::asynchronous_dither_targets_never_change_the_retained_frame_processing ... ok
+test app::reader_pipeline::tests::prepared_reader_lookup_never_generates_a_copy_and_invalid_copies_fall_back ... ok
+test app::reader_pipeline::tests::prepared_reader_prefetch_and_foreground_share_pixels_and_native_geometry ... ok
+test app::reader_pipeline::tests::read_ahead_follows_the_real_ordered_chapter_successor ... ok
+test app::reader_pipeline::tests::reader_cache_empty_and_oversized_sources_fail_before_hashing ... ok
+test app::reader_pipeline::tests::reader_cache_external_source_replacement_changes_the_render_key ... ok
+test app::reader_pipeline::tests::reader_cache_invalid_originals_never_publish_prefetch_paths ... ok
+test app::reader_pipeline::tests::reader_cache_managed_checksum_mismatch_cannot_reuse_old_pixels ... ok
+test app::reader_pipeline::tests::reader_cache_missing_source_does_not_restore_its_processed_png ... ok
+test app::reader_pipeline::tests::fast_frame_stays_binary_after_idle_and_pointer_release ... ok
+test app::reader_pipeline::tests::reader_cache_prefetch_only_publishes_successful_source_pages ... ok
+test app::reader_pipeline::tests::reader_cache_preserves_page_identity_when_headers_change ... ok
+test app::reader_pipeline::tests::fast_spreads_keep_both_pages_until_a_normal_frame_replaces_them ... ok
+test app::reader_pipeline::tests::retained_source_page_uses_its_visible_cover_frame_for_all_windows ... ok
+test app::reader_pipeline::tests::strip_prefetch_offsets_match_reader_rounding_and_bottom_clamping ... ok
+test app::reader_pipeline::tests::strip_read_ahead_crosses_source_images_at_the_actual_turn_boundary ... ok
+test app::reader_pipeline::tests::reader_raster_cold_reopen_checks_source_hash_without_duplicate_codec_validation ... ok
+test app::reader_pipeline::tests::vertical_pages_use_full_page_geometry_and_future_pages ... ok
+test app::reader_recovery::reason_tests::typed_io_causes_survive_unrelated_context_and_remain_safe_codes ... ok
+test app::retained_scene::tests::missing_metadata_never_falls_back_to_another_chapters_title ... ok
+test app::retained_scene::tests::no_frame_keeps_requested_position_and_requires_the_static_loader ... ok
+test app::retained_scene::tests::retained_pixels_win_over_pending_chapter_preview_and_preferences ... ok
+test app::reader_pipeline::tests::transparent_gray_copies_cannot_change_reader_crop_or_strip_geometry ... ok
+test app::runtime_restore::tests::a_failed_restart_retains_the_fence_and_shutdown_does_not_save_old_preferences ... ok
+test app::runtime_restore::tests::a_checkpoint_failure_keeps_the_checked_restore_for_review ... ok
+test app::runtime_restore::tests::missing_restored_images_downgrade_completed_downloads_without_fetching ... ok
+test app::reader_pipeline::tests::reader_raster_ignores_corrupt_pngs_while_persistent_consumers_rebuild ... ok
+test app::runtime_restore::tests::restoration_waits_for_every_detached_job_before_writing ... ok
+test app::sleep_screen::tests::encoded_and_decoded_source_budgets_are_enforced ... ok
+test app::sleep_screen::tests::identity_separates_sources_revisions_books_and_cover_urls ... ok
+test app::sleep_screen::tests::active_reading_defers_optional_cover_work_and_keeps_its_ready_preview ... ok
+test app::sleep_screen::tests::replacing_a_candidate_rejects_late_pixels_and_retains_only_one_worker_slot ... ok
+test app::sleep_screen::tests::sleep_cover_holds_software_mode_and_resume_restores_the_retained_raw_frame ... ok
+test app::sleep_screen::tests::source_retirement_clears_prepared_memory_and_late_results ... ok
+test app::sleep_screen::tests::stock_checkpoint_runs_only_after_the_memory_gate_and_is_idempotent ... ok
+test app::sleep_screen::tests::text_fallback_and_non_reader_neutral_screen_never_use_residual_reader_cover ... ok
+test app::sleep_screen::tests::the_sleep_entry_projects_prepared_memory_before_any_checkpoint ... ok
+test app::sleep_screen::tests::transparency_uses_white_paper_and_exact_sixteen_level_grayscale ... ok
+test app::sleep_screen::tests::managed_derivatives_refill_after_corruption_and_bind_actual_source_bytes ... ok
+test app::source_jobs::tests::a_job_dispatched_before_sleep_cannot_build_after_wake ... ok
+test app::source_jobs::tests::a_warm_generation_reuses_one_manager ... ok
+test app::source_jobs::tests::an_old_configuration_cannot_replace_the_current_manager ... ok
+test app::source_jobs::tests::concurrent_workers_share_the_same_generation_build ... ok
+test app::startup::tests::preparation_keeps_download_and_source_work_dormant ... ok
+test app::startup::tests::prepared_metadata_can_move_from_the_worker_to_the_ui_thread ... ok
+test app::storage_details::tests::a_large_manifest_is_read_in_bounded_windows_without_recounting_a_path ... ok
+test app::storage_details::tests::cache_candidates_reject_symbolic_links_and_replaced_parent_directories ... ok
+test app::storage_details::tests::cache_categories_exclude_downloads_pins_and_duplicate_alias_targets ... ok
+test app::storage_details::tests::cancellation_is_checked_before_opening_the_database ... ok
+test app::storage_details::tests::failures_leave_the_request_dirty_and_delay_only_the_matching_generation ... ok
+test app::startup::tests::early_boot_exit_or_sleep_preserves_the_existing_navigation_checkpoint ... ok
+test app::storage_details::tests::owned_prepared_copies_contribute_to_each_book_and_one_global_total ... ok
+test app::storage_details::tests::refresh_state_is_projected_from_ram_during_initial_work_failures_and_retries ... ok
+test app::storage_details::tests::section_and_generation_changes_reject_old_results_and_keep_last_good_data ... ok
+test app::storage_details::tests::the_bar_scale_requires_known_categories_and_includes_available_space ... ok
+test app::tests::automatic_paperwhite_layout_keeps_single_page_stepping ... ok
+test app::tests::coalescing_page_turns_preserves_the_required_full_refresh ... ok
+test app::storage_details::tests::ranking_uses_actual_bytes_and_deduplicates_shared_and_missing_paths ... ok
+test app::reader_pipeline::tests::foreground_turns_cancel_old_work_before_starting_the_latest_frame ... ok
+test app::reader_pipeline::tests::poll_projects_post_send_hardware_rejection_without_rerendering_the_retained_frame ... ok
+test app::sleep_screen::tests::complete_covers_preserve_aspect_ratio_without_enlarging_small_sources ... ok
+test app::reader_pipeline::tests::prepared_raw_gray_and_rgb_keep_dithering_through_forward_and_previous_publication ... ok
+test app::tests::demo_disabled_sources_and_real_search_results_are_not_replaced_by_a_catalog ... ok
+test app::tests::non_demo_catalog_route_preparation_does_not_create_demo_records ... ok
+test app::tests::vertical_reading_temporarily_disables_spreads ... ok
+test app::tests::demo_reader_and_management_routes_do_not_create_hidden_catalog_records ... ok
+test app::view::demo_unread_projection_tests::demo_mark_read_projects_current_metadata_over_a_stale_book ... ok
+test app::tests::demo_direct_catalog_source_picker_and_tabs_keep_the_persisted_catalog ... ok
+test app::view::localization_tests::book_fallback_collisions_use_real_words_and_do_not_invent_duplicate_title_ids ... ok
+test app::view::localization_tests::book_fallbacks_expose_complete_actual_series_numbers_on_visible_pages ... ok
+test app::view::localization_tests::colliding_search_shortcuts_expose_real_middle_words ... ok
+test app::view::localization_tests::collision_tokens_preserve_utf8_boundaries_inside_long_shared_words ... ok
+test app::view::localization_tests::compact_source_names_keep_middle_numbers_and_unicode_tail_identifiers ... ok
+test app::view::localization_tests::compact_source_status_distinguishes_configuration_from_verified_connections ... ok
+test app::view::localization_tests::cover_progress_starts_after_the_first_page_and_preserves_completion ... ok
+test app::view::localization_tests::detail_description_preview_bounds_unicode_and_preserves_the_full_summary_source ... ok
+test app::view::localization_tests::history_date_groups_restart_columns_after_an_odd_group ... ok
+test app::view::localization_tests::installed_source_pagers_appear_only_when_the_real_groups_overflow ... ok
+test app::view::localization_tests::provider_status_enums_are_localized_without_case_leaks ... ok
+test app::view::localization_tests::search_groups_fit_each_profile_and_keep_their_source_order ... ok
+test app::view::localization_tests::search_shortcut_names_keep_middle_tokens_and_unicode_suffixes ... ok
+test app::view::localization_tests::shortcut_collision_refinement_keeps_noncolliding_numeric_and_unicode_baselines ... ok
+test app::view::localization_tests::source_collision_refinement_reserves_noncolliding_baselines ... ok
+test app::view::localization_tests::source_language_filters_match_provider_language_codes ... ok
+test app::view::localization_tests::source_update_versions_follow_the_first_selected_repository_candidate ... ok
+test app::view::localization_tests::storage_labels_keep_unknown_zero_and_sparse_file_sizes_distinct ... ok
+test app::view::reader_metadata_tests::non_reader_routes_do_not_scale_with_unrelated_library_or_history ... ok
+test app::view::reader_metadata_tests::reader_metadata_follows_displayed_frame_while_another_page_or_chapter_loads ... ok
+test app::view::reader_metadata_tests::reader_metadata_observes_download_changes_without_reloading_session ... ok
+test app::view::reader_metadata_tests::reader_metadata_scaling_benchmark ... ignored, Run only on the designated remote worker with --release --ignored --nocapture
+test app::view::reader_metadata_tests::reader_metadata_uses_current_chapter_and_committed_image_for_bookmarks ... ok
+test app::view::reader_metadata_tests::reader_metadata_uses_the_actual_successor_when_chapter_numbers_match ... ok
+test app::view::reader_metadata_tests::visible_chapter_download_states_do_not_read_unrelated_queue_documents ... ok
+test app::wide_pages::tests::an_oversized_half_is_returned_without_resident_retention ... ok
+test app::wide_pages::tests::both_halves_cover_every_column_of_an_odd_width_page ... ok
+test app::wide_pages::tests::half_cache_obeys_byte_budget_and_releases_dead_sources ... ok
+test app::wide_pages::tests::next_raw_half_retains_and_promotes_the_full_raster_key ... ok
+test app::wide_pages::tests::repeated_half_preparation_reuses_pixels_and_separates_side_and_zoom ... ok
+test app::wide_pages::tests::split_mode_does_not_change_spreads_or_continuous_strips ... ok
+test app::wide_pages::tests::zoom_is_centered_in_each_half_rather_than_the_whole_spread ... ok
+test backup::tests::a_backup_with_missing_new_tables_cannot_erase_them ... ok
+test backup::tests::a_cleanup_retry_finishes_before_publishing_another_rollback ... ok
+test app::tests::demo_restored_catalog_routes_preserve_empty_searches_and_existing_results ... ok
+test backup::tests::an_insert_failure_rolls_back_deleted_books_progress_and_page_counters ... ok
+test app::view::localization_tests::book_display_projection_retains_the_complete_actual_title ... ok
+test backup::tests::a_full_manual_quota_still_allows_restore_and_preserves_a_usable_rollback ... ok
+test backup::tests::backup_symlinks_are_rejected ... ok
+test backup::tests::corrupt_snapshot_is_rejected_before_live_writes ... ok
+test backup::tests::inconsistent_foreign_keys_are_rejected_before_restore_writes ... ok
+test backup::tests::prepared_copy_is_independent_and_removed_after_review_is_cancelled ... ok
+test backup::tests::replaced_backup_parent_is_rejected_before_publication ... ok
+test backup::tests::rollback_retention_uses_creation_sequence_when_the_clock_moves_backwards ... ok
+test backup::tests::snapshot_restores_metadata_without_replacing_live_connection ... ok
+test backup::tests::automatic_retention_replaces_only_older_automatic_snapshots ... ok
+test backup::tests::valid_json_with_an_invalid_document_is_rejected ... ok
+test cache::tests::a_failed_delete_batch_does_not_apply_uncommitted_counter_deltas ... ok
+test backup::tests::traversal_and_foreign_restore_managers_are_rejected ... ok
+test cache::tests::a_linked_index_cannot_modify_a_database_outside_the_cache ... ok
+test app::tests::demo_source_management_and_detail_back_prepare_an_unloaded_catalog ... ok
+test cache::tests::a_requeued_maintenance_owner_cannot_overtake_waiting_callers ... ok
+test cache::tests::a_publication_can_finish_between_repeated_maintenance_turns ... ok
+test cache::tests::a_failed_download_pin_rolls_back_publication_and_pending_access ... ok
+test cache::tests::a_rejected_commit_retains_access_hints_for_the_next_publication ... ok
+test cache::tests::aliases_follow_lru_and_clear_without_retaining_or_deleting_external_files ... ok
+test cache::tests::an_existing_pin_is_a_true_sql_noop ... ok
+test cache::tests::cancelled_active_writes_do_not_recreate_download_pins ... ok
+test cache::tests::changed_temp_bytes_cannot_inherit_a_matching_metadata_proof ... ok
+test cache::tests::clones_and_reopens_share_reservations_without_resetting_policy ... ok
+test cache::tests::clear_batches_preserve_new_versions_pins_leases_and_reservations ... ok
+test cache::tests::committing_a_validated_image_preserves_the_validation_proof ... ok
+test cache::tests::hardware_render_keys_preserve_legacy_software_serialization ... ok
+test cache::tests::external_fingerprints_rehash_bytes_when_metadata_collides ... ok
+test cache::tests::external_validation_rechecks_changed_bytes_when_metadata_collides ... ok
+test cache::tests::external_validation_rejects_bad_bytes_when_metadata_collides ... ok
+test cache::tests::impossible_space_policy_does_not_evict_committed_files_first ... ok
+test cache::tests::hashed_aliases_survive_reopen_without_persisting_cover_credentials ... ok
+test cache::tests::local_keys_include_the_complete_canonical_identity ... ok
+test cache::tests::invalidation_accepts_a_verified_but_not_yet_persisted_fingerprint ... ok
+test cache::tests::incremental_totals_follow_replacements_and_the_last_pin_owner ... ok
+test cache::tests::historical_alias_schema_migrates_without_guessing_cover_names ... ok
+test cache::tests::low_space_and_clear_preserve_pinned_and_leased_files ... ok
+test cache::tests::lru_uses_recent_hits_before_evicting_a_page ... ok
+test cache::tests::opaque_checksums_do_not_become_image_validation_proofs ... ok
+test cache::tests::pending_replacement_cannot_lend_uncommitted_shrinking_quota ... ok
+test cache::tests::pinned_corruption_is_missed_and_atomic_refetch_keeps_owners ... ok
+test cache::tests::processed_artifacts_have_complete_render_identity ... ok
+test cache::tests::remote_keys_canonicalize_header_names_and_ignore_local_hints ... ok
+test cache::tests::processed_fingerprints_share_a_validated_snapshot_and_isolate_namespaces ... ok
+test cache::tests::publication_persists_pending_access_and_pins_with_one_commit ... ok
+test cache::tests::spatial_dithering_has_versioned_distinct_render_keys ... ok
+test cache::tests::public_stats_pins_and_guard_drops_share_the_fair_queue ... ok
+test cache::tests::same_content_replacement_does_not_restore_an_old_access_fingerprint ... ok
+test cache::tests::restart_reclaims_process_temporaries_and_retains_download_pins ... ok
+test app::view::demo_unread_projection_tests::demo_unread_filters_and_sorting_project_persisted_counts ... ok
+test cache::tests::storage_pages_are_bounded_keyset_reads_without_access_or_sql_writes ... ok
+test cache::tests::storage_alias_classes_preserve_unknowns_and_follow_cover_reassignments ... ok
+test cache::tests::storage_snapshots_do_not_validate_artifact_directories_or_files ... ok
+test cache::tests::storage_snapshots_reject_invalid_index_paths_before_joining ... ok
+test demo::tests::unrelated_titles_and_volume_editions_do_not_reuse_another_printed_title ... ok
+test display::tests::legacy_preferences_default_to_normal_and_fast_keeps_one_software_owner ... ok
+test display::tests::presets_have_stable_persisted_names ... ok
+test domain::tests::explicit_legacy_screensaver_modes_survive_missing_sleep_cover ... ok
+test domain::tests::explicit_sleep_cover_opt_out_survives_a_preferences_round_trip ... ok
+test domain::tests::extended_preferences_survive_a_persistent_round_trip ... ok
+test domain::tests::isolated_cover_and_independent_tap_reversal_survive_a_round_trip ... ok
+test domain::tests::jpeg_acceleration_defaults_off_and_selects_the_automatic_combination ... ok
+test domain::tests::legacy_dithering_preferences_migrate_without_enabling_an_off_choice ... ok
+test domain::tests::legacy_landscape_preferences_keep_the_standard_rotation ... ok
+test domain::tests::legacy_preferences_keep_reader_and_network_defaults ... ok
+test domain::tests::legacy_reader_preferences_keep_the_original_layout_defaults ... ok
+test domain::tests::research_hardware_dithering_is_capability_gated_and_migrates_on_load ... ok
+test domain::tests::reverse_landscape_survives_a_preferences_round_trip ... ok
+test domain::tests::spatial_dithering_choices_survive_a_preferences_round_trip ... ok
+test downloads::processing::tests::alpha_is_composited_onto_paper_before_grayscale_conversion ... ok
+test cache::tests::unchanged_external_bytes_keep_codec_proofs_while_rehashing ... ok
+test downloads::processing::tests::cancelled_preparation_keeps_only_the_original_pin_and_artifact ... ok
+test demo::tests::library_snapshot_orders_real_progress_and_validates_its_offline_chapters ... ok
+test demo::tests::history_entrypoint_preserves_the_public_history_fixture_and_custom_covers ... ok
+test downloads::processing::tests::resize_preserves_color_and_raw_identity_without_upscaling ... ok
+test downloads::processing::tests::grayscale_preserves_geometry_and_survives_cache_reopen ... ok
+test downloads::processing::tests::settings_and_header_identities_cannot_reuse_different_output ... ok
+test downloads::tests::a_runtime_failure_preserves_its_event_and_later_command_diagnostics ... ok
+test downloads::tests::automatic_enqueue_cannot_replace_uncommitted_user_controls ... ok
+test downloads::tests::book_removal_preserves_local_imports_and_has_an_idempotent_noop_result ... ok
+test downloads::tests::batch_acceptance_reports_deduplicated_persisted_states_without_claiming_new_work ... ok
+test downloads::tests::book_removal_continues_after_primary_failures_and_restores_the_original_raw_pin_key ... ok
+test downloads::tests::bulk_cancel_event_commits_state_while_active_pins_survive_until_drain ... ok
+test downloads::tests::book_removal_waits_for_active_drain_and_obeys_the_strict_suspend_barrier ... ok
+test downloads::tests::book_removal_cleans_all_managed_states_and_legacy_flags_preserving_shared_owners ... ok
+test downloads::tests::cancelling_a_paused_job_preserves_the_original_local_image ... ok
+test downloads::tests::bulk_enqueue_events_report_mixed_noop_selection_without_individual_payloads ... ok
+test downloads::tests::cancelling_drains_inflight_images_without_dispatching_more_or_blocking_shutdown ... ok
+test downloads::tests::completed_replay_keeps_valid_jobs_complete_without_http_or_managed_image_decode ... ok
+test downloads::tests::completed_replay_relinks_a_wrong_managed_raw_identity_without_http ... ok
+test downloads::tests::completed_replay_mixed_selection_deduplicates_valid_repair_and_new_work ... ok
+test downloads::tests::corrupt_saved_images_never_become_completed_downloads ... ok
+test downloads::tests::completed_replay_repairs_missing_and_corrupted_raw_images ... ok
+test downloads::tests::duplicate_page_identity_uses_one_http_request_and_one_raw_file ... ok
+test downloads::tests::enabling_offline_preparation_requeues_existing_originals_without_http ... ok
+test downloads::tests::downloaded_metadata_events_cover_only_real_replay_changes_and_partial_failures ... ok
+test downloads::tests::invalid_download_concurrency_is_rejected_before_spawning_a_worker ... ok
+test downloads::tests::initialized_startup_preserves_a_live_queue_and_loads_sleep_ownership ... ok
+test demo::tests::completed_seed_marker_preserves_user_changes_across_routes_and_database_reopen ... ok
+test downloads::tests::failed_primary_database_removal_restores_download_pins_before_releasing_leases ... ok
+test downloads::tests::failed_startup_acknowledgements_join_threads_before_returning ... ok
+test downloads::tests::offline_worker_persists_commands_without_constructing_sources_or_using_http ... ok
+test app::tests::demo_offline_browse_creates_the_real_catalog_only_after_its_route_is_opened ... ok
+test downloads::tests::paused_queue_survives_startup_and_resumes_explicitly ... ok
+test downloads::tests::offline_bulk_actions_preserve_finished_jobs_and_other_cache_pin_owners ... ok
+test downloads::tests::recovered_queue_finishes_only_after_validating_saved_pages ... ok
+test downloads::tests::removal_rejects_unfinished_jobs_and_preserves_a_completed_local_import ... ok
+test downloads::tests::prepared_downloads_keep_canonical_manifests_and_reuse_after_restart ... ok
+test downloads::tests::remove_or_cancel_cancels_pending_and_failed_jobs_preserving_other_pin_owners ... ok
+test downloads::tests::remove_or_cancel_rejects_a_wrong_book_without_touching_completed_data_or_pins ... ok
+test downloads::tests::remove_or_cancel_uses_completed_controller_state_instead_of_an_old_pending_snapshot ... ok
+test downloads::tests::removing_completed_download_keeps_other_owners_and_active_reader_leases ... ok
+test downloads::tests::shutdown_acknowledges_after_the_sqlite_connection_is_closed ... ok
+test downloads::tests::sleep_gate_accepts_a_wake_without_checkpointing_a_locked_database ... ok
+test downloads::tests::resume_reuses_the_saved_manifest_and_shared_raw_without_new_http ... ok
+test downloads::tests::repeating_a_bulk_selection_does_not_resume_a_paused_active_chapter ... ok
+test downloads::tests::sleep_checkpoint_does_not_wait_for_http_and_defers_user_commands_fifo ... ok
+test downloads::tests::network_page_concurrency_is_bounded_at_two_or_the_selected_baseline ... ok
+test downloads::tests::sleep_gate_authorizes_its_existing_epoch_only_after_explicit_checkpoint ... ok
+test downloads::tests::sleep_gate_defers_ordinary_commands_and_stops_without_a_database_checkpoint ... ok
+test downloads::tests::sleep_stale_queued_wake_never_releases_a_new_suspend_epoch ... ok
+test downloads::tests::sleep_old_http_failures_retry_with_a_current_manager_without_marking_failed ... ok
+test downloads::tests::sleep_start_suspended_and_wifi_wake_restore_only_automatic_pause_ownership ... ok
+test downloads::tests::repeated_bulk_selection_queues_six_chapters_once_and_batches_their_pages ... ok
+test downloads::tests::sqlite_contention_idle_retry_preserves_a_batch_and_pause_all ... ok
+test downloads::tests::sqlite_contention_old_wake_cannot_release_a_new_suspend_epoch ... ok
+test downloads::tests::sqlite_contention_ready_wake_retries_ownership_and_preserves_command_order ... ok
+test downloads::tests::startup_failures_are_returned_synchronously_and_can_be_retried ... ok
+test gestures::tests::cancellation_and_orphan_events_do_not_page ... ok
+test gestures::tests::captured_swipe_expiration_never_becomes_a_child_click ... ok
+test gestures::tests::disabling_pagination_clears_observation ... ok
+test gestures::tests::distance_and_time_limits_are_inclusive ... ok
+test gestures::tests::invalid_coordinates_and_clock_order_do_not_page ... ok
+test gestures::tests::left_swipe_cancels_child_once_and_advances_on_release ... ok
+test gestures::tests::normal_child_taps_pass_through ... ok
+test gestures::tests::release_without_a_move_still_cancels_child_before_paging ... ok
+test gestures::tests::returning_to_the_origin_consumes_release_without_paging ... ok
+test gestures::tests::right_swipe_goes_to_the_previous_list_page ... ok
+test gestures::tests::stationary_long_holds_preserve_child_callbacks ... ok
+test gestures::tests::vertical_and_diagonal_drags_do_not_activate_children_or_page ... ok
+test downloads::tests::waiting_for_a_running_worker_obeys_the_timeout_without_stopping_it ... ok
+test imaging::decode_scheduler::tests::continuous_foreground_work_does_not_starve_background ... ok
+test imaging::decode_scheduler::tests::finished_work_can_publish_after_its_original_reader_is_cancelled ... ok
+test imaging::decode_scheduler::tests::foreground_overtakes_queued_background_without_parallel_decoding ... ok
+test imaging::decode_scheduler::tests::nested_scopes_keep_cancellation_and_restore_after_unwind ... ok
+test imaging::decode_scheduler::tests::private_cancellation_preserves_priority_and_restores_the_previous_scope ... ok
+test imaging::decode_scheduler::tests::private_cancellation_rejects_output_after_uncancelled_publication ... ok
+test imaging::fixture_profile::real_reader_bili_raster_profile ... ignored, Run only on the remote worker with a release build and real fixture manifest
+test imaging::fixture_profile::real_reader_raster_profile ... ignored, Run only on the remote worker with a release build and real fixture manifest
+test imaging::decode_scheduler::tests::cancelled_waiter_releases_its_queue_position_without_entering_decoder ... ok
+test imaging::grayscale::tests::empty_images_keep_their_dimensions ... ok
+test imaging::grayscale::tests::floating_point_formats_retain_channel_clamping_and_reduction ... ok
+test imaging::grayscale::tests::all_eight_bit_gray_alpha_pairs_match_the_original_order ... ok
+test imaging::grayscale::tests::luma8_ignores_storage_outside_the_image_dimensions ... ok
+test imaging::grayscale::tests::luma8_reuses_the_decoded_allocation ... ok
+test imaging::grayscale::tests::high_depth_formats_retain_rgba8_reduction_before_luma ... ok
+test imaging::grayscale::tests::reader_conversion_ignores_trailing_storage_and_preserves_empty_geometry ... ok
+test imaging::grayscale::tests::reader_conversion_observes_the_decode_cancellation_scope ... ok
+test imaging::grayscale::tests::reader_alpha_matches_bili_for_every_gray_alpha_pair_and_rgb_edges ... ok
+test imaging::grayscale::tests::reader_luma8_reuses_the_native_allocation ... ok
+test imaging::grayscale::tests::reader_high_depth_and_float_sources_reduce_to_rgba8_before_luma ... ok
+test imaging::grayscale::tests::rgb8_preserves_luma_rounding_and_the_crop_threshold ... ok
+test imaging::grayscale::tests::rgba8_preserves_transparent_and_nearly_opaque_edges ... ok
+test imaging::reader_fit::tests::original_never_enlarges_small_artwork_and_tall_width_is_center_cropped ... ok
+test imaging::reader_fit::tests::small_original_is_centered_without_changing_content_pixels ... ok
+test imaging::reader_fit::tests::wide_source_uses_the_named_axis_and_centered_overflow ... ok
+test imaging::reader_raster::tests::bayer_quantization_matches_bili_reference_for_every_phase_and_level ... ok
+test imaging::reader_raster::tests::exact_conversion_matches_reference_at_byte_boundaries_and_special_values ... ok
+test imaging::reader_raster::tests::horizontal_plan_never_exceeds_its_element_capacity_budget ... ok
+test imaging::reader_raster::tests::raster_preparation_observes_the_decode_cancellation_scope ... ok
+test imaging::grayscale::tests::reader_rgb_matches_bili_coefficients_and_all_red_green_pairs ... ok
+test downloads::tests::standalone_startup_waits_for_the_cache_and_recovers_before_returning ... ok
+test imaging::reader_raster::tests::triangle_matches_bili_reference_for_deterministic_random_images ... ok
+test imaging::reader_raster::tests::triangle_matches_bili_reference_for_edges_empty_identity_and_fallback ... ok
+test imaging::row_resize::tests::matches_every_adjacent_eight_bit_value_pair ... ok
+test imaging::row_resize::tests::observes_the_callers_decode_cancellation_scope ... ok
+test imaging::row_resize::tests::preserves_empty_images_and_identity ... ok
+test imaging::spatial_dither::tests::all_modes_preserve_native_levels_and_do_not_touch_tail_storage ... ok
+test imaging::spatial_dither::tests::bayer_phase_uses_xy_even_with_odd_widths_and_chunk_boundaries ... ok
+test imaging::spatial_dither::tests::both_dithers_resolve_all_input_tones_with_native_output_levels ... ok
+test imaging::spatial_dither::tests::cancellation_is_checked_inside_wide_rows ... ok
+test imaging::spatial_dither::tests::off_has_sixteen_uniform_bands ... ok
+test imaging::tests::alpha_is_composited_onto_white_paper ... ok
+test imaging::tests::blank_page_remains_valid_when_cropping ... ok
+test imaging::row_resize::tests::matches_deterministic_random_images_and_dimensions ... ok
+test imaging::tests::combined_streaming_geometry_does_not_skip_truncated_final_chunks ... ok
+test imaging::tests::contrast_lookup_preserves_every_level_and_clamped_setting ... ok
+test imaging::row_resize::tests::matches_gradients_edges_and_extreme_aspect_ratios ... ok
+test imaging::tests::edge_strip_crop_matches_full_pixel_bounds_and_thresholds ... ok
+test imaging::tests::combined_streaming_window_reuses_its_crop_pass_for_geometry ... ok
+test imaging::tests::fit_preserves_aspect_ratio_and_emits_only_native_gray_levels ... ok
+test imaging::tests::file_validation_streams_long_pngs_and_rejects_truncated_files ... ok
+test imaging::tests::hardware_spreads_preserve_gray8_when_composing_both_directions ... ok
+test imaging::tests::hardware_gray8_keeps_crop_resize_and_contrast_processing ... ok
+test imaging::tests::invalid_target_dimensions_are_rejected ... ok
+test imaging::tests::long_png_is_validated_and_rendered_without_a_source_sized_bitmap ... ok
+test imaging::tests::hardware_gray8_preserves_every_input_level_for_both_raster_algorithms ... ok
+test imaging::tests::long_png_validation_rejects_missing_final_chunks ... ok
+test imaging::tests::oversized_interlaced_png_is_rejected_before_bitmap_allocation ... ok
+test imaging::tests::preload_never_exceeds_two_pages_or_the_chapter ... ok
+test imaging::tests::hardware_streaming_windows_preserve_all_gray8_levels ... ok
+test imaging::tests::oversized_page_metadata_is_rejected_before_full_decode ... ok
+test imaging::tests::row_quantization_preserves_serpentine_diffusion_and_trailing_storage ... ok
+test imaging::tests::rtl_spreads_place_the_first_page_on_the_right ... ok
+test imaging::tests::uncropped_streaming_window_measures_geometry_in_one_complete_row_pass ... ok
+test imaging::tests::reader_raster_adjacent_vertical_windows_share_one_source_decode ... ok
+test imaging::tests::vertical_steps_keep_overlap_and_reach_the_bottom ... ok
+test imaging::tests::vertical_geometry_uses_the_same_crop_as_the_rendered_windows ... ok
+test input::tests::backspace_removes_composition_before_committed_unicode ... ok
+test input::tests::bundled_dictionary_is_substantive_and_candidates_are_not_a_mock_table ... ok
+test input::tests::choosing_a_candidate_preserves_a_continuous_unconverted_suffix ... ok
+test imaging::tests::vertical_render_and_geometry_share_one_cropped_bitmap_decode ... ok
+test input::tests::english_numeric_and_caps_keys_have_real_effects ... ok
+test imaging::tests::vertical_window_uses_scaled_offsets ... ok
+test input::tests::facade_preserves_existing_text_and_converts_a_continuous_phrase ... ok
+test input::tests::facade_switches_modes_without_losing_an_unconvertible_suffix ... ok
+test input::tests::incomplete_syllables_produce_completion_candidates_and_can_page ... ok
+test downloads::tests::sqlite_contention_checkpoint_stop_does_not_process_a_deferred_batch ... ok
+test input::tests::submission_commits_candidates_and_retains_unknown_spelling ... ok
+test input::tests::space_commits_the_ninth_candidate_after_advancing_to_the_second_page ... ok
+test local::tests::archive_import_rejects_traversal_and_decodes_real_images ... ok
+test local::tests::archive_metadata_and_page_order_are_preserved ... ok
+test local::tests::directory_import_is_natural_stable_and_immutable ... ok
+test local::tests::natural_comparison_does_not_overflow_large_numbers ... ok
+test localization::tests::every_supported_catalog_covers_the_bundled_interface ... ok
+test localization::tests::main_navigation_is_translated_for_every_locale ... ok
+test localization::tests::supported_codes_round_trip_and_unknown_codes_are_rejected ... ok
+test localization::tests::translated_templates_preserve_named_placeholders ... ok
+test localization::tests::unknown_labels_can_fall_back_without_changing_user_text ... ok
+test native_media::jpeg::tests::entropy_damage_is_rejected_even_when_headers_and_eoi_remain ... ok
+test input::tests::eight_candidate_pages_preserve_dictionary_order_and_navigation_bounds ... ok
+test native_media::jpeg::tests::truncated_and_non_jpeg_inputs_never_reach_the_worker ... ok
+test input::tests::facade_candidate_paging_is_bounded_and_backspace_is_unicode_safe ... ok
+test native_media::jpeg::tests::real_baseline_entropy_is_complete_including_edge_blocks ... ok
+test native_media::tests::retired_or_unknown_worker_status_cannot_enable_acceleration ... ok
+test native_media::worker::tests::supported_models_do_not_require_system_version_metadata ... ok
+test native_media::worker::tests::other_models_and_malformed_identities_remain_unavailable ... ok
+test native_presentation::portrait_writer::tests::only_the_reviewed_scribe_profile_normalizes_landscape_native_tokens ... ok
+test native_presentation::tests::a_resume_record_cannot_smuggle_a_cached_pose_or_native_mode ... ok
+test native_presentation::tests::a_valid_holding_sample_remains_independent_and_a_missing_sensor_is_rejected ... ok
+test native_presentation::tests::native_records_require_exact_single_line_framing ... ok
+test native_presentation::tests::a_replaced_private_directory_cannot_redirect_the_pinned_reader ... ok
+test native_presentation::tests::private_readers_reject_links_fifos_and_overlong_records ... ok
+test native_presentation::tests::recognized_flat_resume_uses_current_scanout_instead_of_the_old_anchor_pose ... ok
+test native_presentation::tests::recognized_flat_startup_uses_the_fresh_calibrated_scanout ... ok
+test native_presentation::tests::scanout_uses_only_this_runs_relative_half_turns ... ok
+test pairing::tests::archive_names_and_server_urls_are_validated ... ok
+test pairing::tests::blocked_attempts_do_not_exhaust_other_devices_pairing_budget ... ok
+test downloads::tests::sqlite_contention_idle_retry_stops_while_the_lock_is_held ... ok
+test native_media::tests::caller_deadline_preserves_and_reaps_the_independent_worker ... ok
+test pairing::tests::drop_closes_listener_and_interrupts_an_incomplete_request ... ok
+test local::tests::a_tall_noninterlaced_png_can_be_imported_for_streaming_reading ... ok
+test pairing::tests::source_configuration_rejects_cross_origin_and_unauthenticated_writes ... ok
+test platform::activity::tests::download_activity_needs_the_explicit_keep_awake_preference ... ok
+test pairing::tests::upload_is_confined_and_rejects_traversal ... ok
+test platform::device_policy::tests::a_manual_change_retires_ownership_without_fighting_the_user ... ok
+test platform::device_policy::tests::a_partial_setter_failure_restores_instead_of_losing_ownership ... ok
+test platform::device_policy::tests::a_request_revoked_between_setters_restores_before_returning ... ok
+test platform::device_policy::tests::a_request_revoked_during_observation_never_disables_wifi ... ok
+test platform::device_policy::tests::a_restore_failure_before_a_write_keeps_the_confirmed_owned_state ... ok
+test platform::device_policy::tests::a_setter_failure_before_the_second_write_restores_the_first_write ... ok
+test platform::device_policy::tests::a_user_network_request_does_not_enable_a_radio_that_the_policy_did_not_disable ... ok
+test platform::device_policy::tests::an_already_disabled_radio_is_never_enabled_by_cleanup ... ok
+test platform::device_policy::tests::connection_observations_do_not_invent_a_false_value_for_unknown_states ... ok
+test platform::device_policy::tests::reading_lease_restores_the_original_pair_in_the_correct_order ... ok
+test platform::device_policy::tests::reconnect_readiness_rejects_an_old_sample_published_after_the_request ... ok
+test platform::device_policy::tests::unavailable_cleanup_keeps_ownership_for_a_later_retry ... ok
+test platform::device_policy::tests::user_network_demand_releases_policy_and_requires_a_fresh_connected_observation ... ok
+test platform::tests::bounded_query_cancels_and_reaps_its_owned_child ... ok
+test pairing::tests::tracking_credentials_require_pairing_and_emit_only_a_redacted_event ... ok
+test platform::tests::bounded_query_returns_completed_output_without_a_fixed_second_delay ... ok
+test platform::tests::chapter_only_refresh_never_adds_a_periodic_flash ... ok
+test platform::tests::design_profiles_preserve_physical_scale_and_no_frontlight_capabilities ... ok
+test platform::tests::desktop_design_profiles_never_claim_native_y4_support ... ok
+test platform::tests::display_rotation_accepts_only_the_four_supported_angles ... ok
+test platform::tests::fast_pages_skip_periodic_clearing_but_keep_explicit_full_refresh ... ok
+test platform::tests::public_status_reobserves_after_invalidation_and_preference_changes ... ok
+test platform::tests::ready_device_output_does_not_wait_for_an_inherited_writer_to_close ... ok
+test platform::tests::refresh_counter_counts_pages_without_consuming_ui_changes ... ok
+test platform::tests::reverse_landscape_preserves_logical_geometry_for_every_profile ... ok
+test platform::tests::sleep_cancellation_prevents_a_shared_old_drag_from_turning_a_page ... ok
+test platform::tests::stale_status_keeps_last_observation_until_an_explicit_refresh ... ok
+test platform::tests::suspend_tcp_abort_preserves_listener_accepted_connections_and_unix_streams ... ok
+test reader::tests::backward_navigation_resolves_wide_and_narrow_destination_pages ... ok
+test reader::tests::both_vertical_modes_keep_thirds_and_apply_tap_and_swipe_reversal ... ok
+test reader::tests::changing_effective_spread_updates_turn_steps_and_tap_regions ... ok
+test reader::tests::changing_reading_modes_discards_strip_offsets_and_pending_bottom_alignment ... ok
+test reader::tests::changing_split_layout_resets_the_half_without_rewriting_source_progress ... ok
+test reader::tests::chapter_boundaries_use_full_refresh_and_stay_bounded ... ok
+test reader::tests::cover_and_tap_preferences_preserve_retained_page_zoom_and_strip_offset ... ok
+test reader::tests::cover_preference_keeps_single_pages_and_both_vertical_modes_single ... ok
+test reader::tests::cover_seek_and_preview_resolve_to_the_frame_containing_the_source_page ... ok
+test reader::tests::default_tap_regions_use_thirds_and_reversal_also_applies_to_swipes ... ok
+test reader::tests::effective_spread_uses_wide_center_zone_and_two_page_steps_in_both_orientations ... ok
+test reader::tests::fast_navigation_ignores_saved_clearing_interval_across_chapters ... ok
+test reader::tests::fullscreen_has_no_reserved_corner_for_legacy_footer_modes ... ok
+test reader::tests::fullscreen_menu_is_explicit_and_close_preserves_the_visible_page ... ok
+test reader::tests::isolated_cover_never_adds_a_phantom_source_page_at_either_parity ... ok
+test reader::tests::isolated_cover_previous_chapter_uses_its_last_real_frame ... ok
+test reader::tests::isolated_cover_turns_are_reversible_in_portrait_and_landscape_spreads ... ok
+test reader::tests::l_shaped_taps_follow_horizontal_direction_and_independent_reversal ... ok
+test reader::tests::new_tap_layouts_reject_invalid_coordinates_before_classification ... ok
+test reader::tests::refresh_interval_and_physical_gesture_thresholds_are_respected ... ok
+test reader::tests::restoring_a_wide_half_preserves_the_next_source_page_boundary ... ok
+test reader::tests::selecting_the_displayed_source_page_returns_to_its_first_half ... ok
+test reader::tests::slider_preview_does_not_change_decoded_page ... ok
+test reader::tests::spread_and_continuous_strip_preferences_disable_wide_halves ... ok
+test reader::tests::swipe_only_blocks_page_taps_and_preserves_menu_swipe_zoom_and_hold_actions ... ok
+test reader::tests::tap_page_delta_excludes_menus_and_disabled_tap_regions ... ok
+test reader::tests::tap_page_delta_follows_both_axes_and_independent_reversal ... ok
+test reader::tests::tap_page_delta_rejects_nonfinite_and_out_of_viewport_coordinates ... ok
+test reader::tests::tap_page_delta_reuses_l_shaped_and_legacy_reverse_layouts ... ok
+test reader::tests::tap_regions_use_actual_spreads_and_exact_thirds_at_unpaired_pages ... ok
+test reader::tests::taps_follow_direction_and_menus_block_turns ... ok
+test reader::tests::the_first_half_of_the_last_source_page_does_not_finish_the_chapter ... ok
+test reader::tests::vertical_page_progress_and_chapter_boundaries_do_not_wait_for_strip_offsets ... ok
+test reader::tests::vertical_page_taps_and_swipes_turn_whole_pages_without_strip_geometry ... ok
+test reader::tests::vertical_turns_keep_fifteen_percent_overlap ... ok
+test reader::tests::wide_halves_advance_before_the_source_page_in_both_reading_directions ... ok
+test reader::tests::wide_halves_do_not_skip_the_last_frame_at_chapter_boundaries ... ok
+test reader_timing::tests::action_scope_clears_unused_menu_but_keeps_explicit_manifest_wait ... ok
+test reader_timing::tests::bounded_records_report_loss_without_replacing_earlier_evidence ... ok
+test reader_timing::tests::completed_turn_cannot_lend_its_action_to_an_unrelated_rerender ... ok
+test reader_timing::tests::cross_chapter_wait_preserves_the_received_action_identity ... ok
+test reader_timing::tests::desktop_publication_does_not_invent_a_native_failure ... ok
+test reader_timing::tests::dithering_observation_is_bound_to_the_matching_accepted_marker ... ok
+test reader_timing::tests::lifecycle_invalidation_clears_an_accepted_native_arm ... ok
+test reader_timing::tests::same_generation_retry_has_a_new_identity_and_discards_late_failure ... ok
+test reader_timing::tests::schema_contains_only_controlled_labels_and_numeric_identities ... ok
+test reader_timing::tests::software_fallback_replaces_only_its_exact_written_frame_with_a_new_full_payload ... ok
+test reader_timing::tests::stale_request_and_wrong_frame_cannot_complete_current_submission ... ok
+test reader_timing::tests::unpublished_geometry_resolution_retains_its_causal_turn ... ok
+test platform::tests::bounded_query_times_out_without_waiting_for_the_service ... ok
+test pairing::tests::pairing_requires_correct_code_and_limits_guessing ... ok
+test render_cache::tests::a_corrupt_derivative_is_rebuilt_without_modifying_the_original ... ok
+test downloads::tests::sqlite_contention_suspend_checkpoint_retries_and_retains_a_queued_wake ... ok
+test platform::activity::tests::pause_ack_stops_activity_and_resume_does_not_replay_stale_download_flags ... ok
+test render_cache::tests::cache_write_fallback_never_accepts_a_damaged_original ... ok
+test render_cache::tests::cancelled_alias_decode_propagates_without_invalidating_its_png ... ok
+test platform::activity::tests::user_events_coalesce_and_idle_observation_does_not_keep_awake ... ok
+test render_cache::tests::cancelled_prefetch_does_not_remove_a_valid_processed_page ... ok
+test render_cache::tests::cleared_and_missing_derivatives_invalidate_resident_pixels ... ok
+test render_cache::tests::decoded_lru_bounds_retained_bytes_and_reports_live_evicted_outputs ... ok
+test render_cache::tests::cleared_missing_or_corrupt_cover_aliases_never_return_resident_pixels ... ok
+test render_cache::tests::coherent_but_missing_geometry_metadata_is_a_disposable_old_artifact ... ok
+test render_cache::tests::concurrent_cold_renders_share_one_source_decode_and_publication ... ok
+test render_cache::tests::cover_alias_requires_matching_options_and_a_real_processed_artifact ... ok
+test render_cache::tests::cover_aliases_cannot_cross_data_namespaces ... ok
+test render_cache::tests::digest_only_legacy_metadata_needs_the_source_supplied_render_key ... ok
+test render_cache::tests::every_visual_option_and_vertical_offset_has_an_independent_artifact ... ok
+test render_cache::tests::hardware_gray8_and_software_artifacts_have_independent_memory_and_disk_hits ... ok
+test render_cache::tests::oversized_and_tiny_outputs_cannot_make_decoded_retention_unbounded ... ok
+test render_cache::tests::identical_render_keys_in_distinct_data_directories_do_not_share_pixels ... ok
+test render_cache::tests::indexed_cover_alias_still_validates_embedded_key_and_final_png_chunks ... ok
+test render_cache::tests::insufficient_processed_quota_returns_readable_pixels_without_a_partial_artifact ... ok
+test render_cache::tests::jpeg_acceleration_policies_have_separate_rendered_and_retained_sources ... ok
+test render_cache::tests::private_native_next_frame_preserves_previous_history_until_consumption ... ok
+test render_cache::tests::low_free_space_preserves_pinned_sources_and_existing_leased_derivatives ... ok
+test render_cache::tests::prefetch_retains_the_exact_pixels_for_foreground_display ... ok
+test render_cache::tests::private_next_raster_stays_out_of_history_until_promoted ... ok
+test render_cache::tests::real_reader_processed_png_profile ... ignored, Run only on the remote worker with a release build and real fixture manifest
+test render_cache::tests::processed_cover_alias_survives_raw_eviction_and_reuses_resident_pixels ... ok
+test render_cache::tests::reader_raster_proof_rejects_retargeted_raw_alias ... ok
+test render_cache::tests::retained_full_raster_key_cannot_be_replaced_by_a_display_half ... ok
+test render_cache::tests::retained_gray_accounting_deduplicates_output_and_vertical_source_allocations ... ok
+test render_cache::tests::reader_raster_proof_rejects_source_changes_and_removal ... ok
+test render_cache::tests::source_and_viewport_arcs_share_one_existing_decoded_budget ... ok
+test render_cache::tests::reader_raster_reuses_prefetched_pixels_without_processed_publication ... ok
+test render_cache::tests::reader_raster_version_isolated_from_persistent_rendering ... ok
+test render_cache::tests::speculative_resident_peek_does_not_reorder_foreground_history ... ok
+test render_cache::tests::releasing_resident_pixels_still_allows_a_validated_disk_hit ... ok
+test render_cache::tests::replacement_artifact_checksum_prevents_reusing_an_old_pixel_arc ... ok
+test render_cache::tests::retained_hardware_viewports_keep_their_mode_while_sharing_unprocessed_sources ... ok
+test render_cache::tests::source_bytes_and_authenticated_page_identity_do_not_reuse_stale_pixels ... ok
+test render_cache::tests::spatial_dither_switches_separate_prefetched_resident_and_disk_pixels ... ok
+test render_cache::tests::staged_row_validation_rejects_missing_final_chunks ... ok
+test render_cache::tests::vertical_raster_cache_reuses_sources_and_rejects_changed_encoded_identity ... ok
+test render_cache::tests::warm_external_render_rehashes_the_source_without_loading_its_pixels ... ok
+test sources::fetch_tests::oversized_content_length_is_rejected_before_body_or_cache_allocation ... ok
+test render_cache::tests::warm_managed_render_preserves_pixels_without_loading_or_hashing_the_original ... ok
+test sources::fetch_tests::truncated_stream_is_not_published_and_the_same_request_can_retry ... ok
+test sources::fetch_tests::url_less_external_pages_keep_distinct_canonical_paths_without_cache_copies ... ok
+test sources::fetch_tests::independent_managers_coalesce_header_case_variants_and_keep_both_pin_owners ... ok
+test sources::http_body::tests::blocking_std_threads_have_a_live_body_timer_without_caller_runtime ... ok
+test sources::fetch_tests::explicit_source_context_preserves_parallel_limits_across_cdn_origins ... ok
+test sources::network::tests::catalogs_without_pagination_metadata_stop_after_an_empty_page ... ok
+test sources::network::tests::chapter_identity_preserves_book_boundaries_for_keys_with_slashes ... ok
+test sources::network::tests::cover_credentials_are_scoped_to_the_configured_origin_and_port ... ok
+test sources::lifecycle_tests::old_managers_read_cached_and_local_pages_but_cannot_restart_missing_transfers ... ok
+test sources::network::tests::kavita_search_uses_real_paged_name_filters_and_pagination_headers ... ok
+test sources::network::tests::komga_catalog_and_pages_keep_api_key_authentication ... ok
+test sources::network::tests::komga_catalog_preserves_zero_based_page_parameters_and_terminal_metadata ... ok
+test sources::network::tests::nested_metadata_sessions_unwind_without_polluting_the_worker_thread ... ok
+test sources::network::tests::mangadex_search_preserves_total_and_offset_pagination ... ok
+test sources::network::tests::old_metadata_sessions_cannot_send_after_suspend_and_resume ... ok
+test sources::network::tests::pagination_and_dates_are_stable ... ok
+test sources::network::tests::source_identifiers_are_required ... ok
+test sources::network::tests::server_endpoints_preserve_reverse_proxy_paths_and_encode_identifiers ... ok
+test sources::network::tests::suwayomi_page_resolution_preserves_proxy_path_without_leaking_server_token ... ok
+test sources::network::tests::suwayomi_catalog_uses_the_graphql_next_page_flag_even_for_a_full_last_page ... ok
+test sources::repository::tests::keeps_only_the_latest_duplicate_repository_entry ... ok
+test sources::repository::tests::reads_current_and_legacy_source_indexes ... ok
+test sources::repository::tests::rejects_a_package_that_substitutes_another_source ... ok
+test sources::repository::tests::publishes_the_verified_payload_and_returns_its_directory ... ok
+test sources::repository::tests::rejects_unsafe_identifiers_and_non_http_downloads ... ok
+test sources::repository::tests::rejects_zip_paths_outside_payload_before_writing ... ok
+test sources::settings::tests::incompatible_postcard_preferences_do_not_block_recovery ... ok
+test sources::settings::tests::removed_source_choices_fall_back_and_can_be_reset_or_replaced ... ok
+test sources::settings::tests::settings_round_trip_overrides_host_defaults_with_typed_values ... ok
+test sources::settings::tests::source_controls_reject_invalid_values_and_unsupported_actions ... ok
+test sources::lifecycle_tests::image_request_deadline_aborts_a_trickle_and_leaves_the_same_url_retryable ... ok
+test sources::tests::authenticated_api_redirects_cannot_expose_custom_api_keys ... ok
+test sources::transfer::tests::a_panicking_leader_releases_its_flight_and_wakes_followers ... ok
+test sources::transfer::tests::a_reader_promotes_an_outer_page_and_its_queued_archive_dependency ... ok
+test sources::transfer::tests::a_single_request_origin_finishes_active_work_before_admitting_queued_foreground ... ok
+test sources::tests::image_redirects_remove_all_source_secrets_and_cache_valid_images ... ok
+test sources::transfer::tests::a_source_preserves_a_foreground_slot_across_multiple_cdns ... ok
+test sources::transfer::tests::a_stale_parent_cannot_create_a_new_epoch_archive_flight ... ok
+test sources::transfer::tests::an_origin_also_keeps_one_slot_available_for_foreground_requests ... ok
+test sources::transfer::tests::a_source_interval_applies_between_different_cdns_and_can_relax ... ok
+test sources::transfer::tests::eligible_requests_use_foreground_first_order_and_fifo_within_one_priority ... ok
+test sources::transfer::tests::followers_share_one_running_work_and_the_canonical_result_without_a_permanent_flight_cache ... ok
+test sources::transfer::tests::failed_flights_wake_followers_and_can_be_retried ... ok
+test sources::transfer::tests::lifecycle_calls_are_idempotent_and_stale_manager_epochs_cannot_start_work ... ok
+test sources::transfer::tests::managers_share_one_canonical_root_and_reject_conflicting_limits ... ok
+test sources::transfer::tests::one_source_cannot_bypass_its_parallel_limit_by_using_another_cdn ... ok
+test sources::transfer::tests::origin_capacity_does_not_block_an_eligible_request_to_another_origin ... ok
+test sources::transfer::tests::priority_parent_cycles_return_errors_instead_of_waiting_for_their_own_flights ... ok
+test sources::transfer::tests::resumed_same_key_work_is_not_removed_or_overwritten_by_an_old_leader ... ok
+test sources::transfer::tests::origin_intervals_are_respected_and_can_relax_after_the_previous_cooldown ... ok
+test sources::transfer::tests::suspension_cancels_queued_leaders_and_followers_but_keeps_live_permits ... ok
+test sources::transfer::tests::suspension_fences_existing_commits_without_holding_the_admission_mutex ... ok
+test sources::wasm::tests::a_guest_trap_from_a_closed_epoch_reports_a_typed_interruption ... ok
+test sources::wasm::tests::a_waiting_constructor_cannot_start_a_guest_from_an_old_network_epoch ... ok
+test sources::wasm::tests::an_interrupted_guest_result_is_freed_before_its_inputs_are_released ... ok
+test sources::wasm::tests::argument_cleanup_preserves_guest_resources_with_the_same_integer_as_flags ... ok
+test sources::wasm::tests::dynamic_listings_drive_the_listing_export_instead_of_search ... ok
+test sources::wasm::tests::executes_chapter_and_page_exports_with_real_wire_arguments ... ok
+test sources::wasm::tests::executes_guest_search_and_decodes_the_postcard_result ... ok
+test sources::wasm::tests::failed_image_exports_release_both_input_descriptors ... ok
+test sources::lifecycle_tests::blocking_client_timeout_alone_allows_a_continuously_trickled_longer_body ... ok
+test sources::settings::tests::legal_binary_preferences_survive_json_expansion_and_option_edits ... ok
+test sources::transfer::tests::suspend_gate_avoids_publication_and_transition_waits_but_suspend_still_fences ... ok
+test sources::http_body::tests::body_idle_deadline_still_precedes_the_longer_total_request_budget ... ok
+test sources::wasm::tests::lazy_zip_descriptors_preserve_encoded_paths_and_archive_headers ... ok
+test sources::wasm::tests::lazy_zip_descriptors_reject_unsafe_paths_and_ambiguous_protocol_fields ... ok
+test sources::wasm::tests::fuel_budget_stops_an_untrusted_infinite_loop ... ok
+test sources::wasm::tests::guest_html_imports_parse_select_and_read_attribute_and_text_buffers ... ok
+test sources::wasm::tests::guest_network_imports_send_a_real_request_and_read_the_response ... ok
+test sources::wasm::tests::long_chapter_image_requests_use_postcard_arguments_and_bounded_host_resources ... ok
+test sources::wasm::tests::page_results_preserve_the_guest_continuation_flag_and_the_terminal_page ... ok
+test sources::wasm::tests::guest_defaults_use_f32_schema_defaults_and_survive_a_new_source_instance ... ok
+test sources::wasm::tests::rejects_a_guest_result_pointer_outside_linear_memory ... ok
+test sources::wasm::tests::reports_unsupported_javascript_when_the_guest_calls_it ... ok
+test sources::wasm::tests::sends_query_bytes_to_guest_through_std_buffers ... ok
+test sources::wasm_host::tests::guest_defaults_setter_rejects_an_oversized_raw_map_before_serializing_it ... ok
+test sources::wasm_host::tests::guest_header_setter_enforces_the_complete_header_map_budget ... ok
+test sources::wasm::tests::sparse_catalog_entries_preserve_previously_loaded_chapter_context ... ok
+test sources::wasm_host::tests::guest_request_body_setter_cannot_bypass_the_aggregate_host_budget ... ok
+test sources::wasm_host::tests::guest_setting_an_existing_preference_to_the_same_value_does_not_write_it ... ok
+test sources::wasm_host::tests::invalid_urls_and_operation_limits_remain_host_errors ... ok
+test sources::wasm_host::tests::swift_date_formats_preserve_fractional_seconds_offsets_and_quoted_literals ... ok
+test sources::wasm_host::tests::guest_send_all_receives_each_failure_status_without_a_wasm_trap ... ok
+test sources::wasm_host::tests::transport_failure_returns_the_recoverable_abi_error_and_clears_previous_data ... ok
+test sources::wasm_html::tests::chapter_lists_preserve_order_and_distinguish_no_matches ... ok
+test sources::wasm_html::tests::html_budget_counts_unique_documents_and_all_selected_references ... ok
+test sources::wasm_html::tests::output_budget_checks_each_append_before_growing_the_string ... ok
+test sources::wasm_host::tests::unchanged_preferences_skip_synchronous_file_replacement ... ok
+test sources::wasm_html::tests::selected_nodes_keep_their_document_and_resolve_base_urls ... ok
+test sources::wasm_html::tests::text_separates_blocks_and_keeps_script_data_out_of_descriptions ... ok
+test sources::wasm_html::tests::unsupported_mutation_is_an_error_and_invalid_selectors_are_reported ... ok
+test store::automatic_updates::tests::a_generation_change_inside_the_transaction_rolls_back_before_commit ... ok
+test store::automatic_updates::tests::a_refresh_cannot_reinsert_a_deleted_or_removed_library_book ... ok
+test store::automatic_updates::tests::cancellation_rolls_back_a_checkpoint_before_commit ... ok
+test store::automatic_updates::tests::invalid_chapters_roll_back_the_book_and_every_preceding_chapter_write ... ok
+test store::categories::tests::builtin_rename_keeps_filter_semantics_and_custom_names_are_not_hidden ... ok
+test store::automatic_updates::tests::local_category_read_state_progress_and_preferences_survive_remote_metadata ... ok
+test store::categories::tests::custom_rename_updates_all_indexed_and_serialized_references_atomically ... ok
+test store::categories::tests::failed_membership_update_rolls_back_category_and_all_references ... ok
+test store::categories::tests::invalid_or_duplicate_names_do_not_change_membership ... ok
+test store::categories::tests::empty_categories_and_renamed_builtin_labels_survive_reopening ... ok
+test store::download_management::tests::live_guards_and_unfinished_states_reject_removal_without_writes ... ok
+test store::download_management::tests::removal_preserves_local_manifests_and_rolls_back_cancelled_job_cleanup_atomically ... ok
+test store::categories::tests::legacy_membership_is_imported_without_losing_empty_categories ... ok
+test store::migration::matcher::tests::absent_candidates_and_invalid_numeric_placeholders_remain_unmatched ... ok
+test store::migration::matcher::tests::bare_generic_source_titles_cannot_match_different_or_unknown_numbers ... ok
+test store::migration::matcher::tests::decimal_numeric_wrappers_still_require_the_actual_unique_number ... ok
+test store::migration::matcher::tests::generic_wrappers_allow_numbers_but_meaningful_suffixes_are_retained ... ok
+test sources::wasm::tests::unchanged_merged_metadata_keeps_the_existing_file ... ok
+test store::migration::matcher::tests::global_title_matching_claims_a_target_before_weak_number_matching ... ok
+test store::migration::matcher::tests::meaningful_title_conflicts_are_ambiguous_even_with_equal_numbers ... ok
+test store::download_management::tests::scalar_count_and_binary_keysets_include_terminal_jobs_without_decoding_documents ... ok
+test store::migration::matcher::tests::reversed_order_uses_evidence_and_unicode_titles_instead_of_position ... ok
+test store::migration::matcher::tests::numeric_separators_and_adjacent_spaces_cannot_collapse_into_digits ... ok
+test store::migration::matcher::tests::unique_meaningful_titles_allow_renumbering_and_invalid_old_numbers ... ok
+test store::migration::matcher::tests::unique_titles_disambiguate_duplicate_numbers_without_resolving_duplicate_titles ... ok
+test store::migration::tests::chapter_identity_collisions_cannot_overwrite_the_origin ... ok
+test sources::wasm::tests::the_global_permit_serializes_complete_wasm_instance_lifetimes ... ok
+test store::migration::tests::committed_target_manifest_count_takes_precedence_over_stale_source_metadata ... ok
+test store::migration::tests::existing_destination_progress_category_and_read_flags_are_not_overwritten ... ok
+test store::migration::tests::failure_after_destination_writes_rolls_back_the_entire_migration ... ok
+test store::migration::tests::incoming_metadata_cannot_claim_unverified_local_downloads_or_reads ... ok
+test store::migration::tests::unknown_page_count_and_ambiguous_resume_roll_back_instead_of_guessing ... ok
+test store::page_queries::tests::an_incomplete_trigger_marker_rebuilds_counts_before_becoming_ready ... ok
+test store::page_queries::tests::cached_path_updates_are_incremental_and_preserve_book_and_download_flags ... ok
+test store::page_queries::tests::counters_and_pages_roll_back_together ... ok
+test store::page_queries::tests::gaps_fail_instead_of_shifting_the_visible_page ... ok
+test store::page_queries::tests::migration_backfills_a_legacy_manifest_once ... ok
+test store::page_queries::tests::only_a_changed_path_in_a_downloaded_chapter_invalidates_download_usage ... ok
+test store::page_queries::tests::prefetched_manifest_only_fills_a_missing_chapter_without_changing_reading_state ... ok
+test store::page_queries::tests::prefetched_manifest_rejects_reused_identity_and_invalid_pages ... ok
+test store::migration::tests::commit_rechecks_identity_and_mapping_after_a_preview_on_another_connection ... ok
+test store::page_queries::tests::recursive_replace_and_update_replace_keep_row_contributions_correct ... ok
+test store::page_queries::tests::stale_missing_and_evicted_updates_have_distinct_outcomes ... ok
+test store::page_queries::tests::an_already_open_legacy_writer_maintains_counts_after_migration ... ok
+test store::page_queries::tests::windows_decode_only_the_requested_indexed_range ... ok
+test store::source_management::tests::bad_documents_outside_the_selected_window_are_never_decoded ... ok
+test store::page_queries::tests::racing_prefetch_publishers_keep_one_whole_manifest ... ok
+test store::source_management::tests::source_scope_disabled_configuration_and_page_bounds_use_real_library_rows ... ok
+test store::migration::tests::migration_matches_reordered_chapters_and_retains_origin_downloads_and_history ... ok
+test store::storage_queries::tests::returning_a_batch_releases_its_source_read_lock ... ok
+test store::tests::a_batch_is_atomic_deduplicated_and_keeps_paused_work_paused ... ok
+test store::tests::a_corrupt_database_is_reported_without_replacing_its_original_bytes ... ok
+test store::storage_queries::tests::windows_are_bounded_and_keep_unmapped_positions_and_undownloaded_headers ... ok
+test store::tests::bulk_read_changes_are_atomic_and_do_not_rewrite_progress_or_downloads ... ok
+test store::source_management::tests::read_only_connections_and_existing_transactions_support_the_indexed_page ... ok
+test store::tests::completed_batches_keep_their_state_until_a_verified_repair_is_requested ... ok
+test store::tests::completed_download_requires_real_files ... ok
+test store::tests::deleting_one_history_entry_keeps_read_state_pages_and_other_visits ... ok
+test store::tests::download_state_counts_are_grouped_without_loading_job_documents ... ok
+test store::tests::late_manifests_keep_only_cache_entries_with_the_same_url_and_headers ... ok
+test store::tests::local_interaction_dates_are_explicit_and_never_derived_from_remote_dates ... ok
+test store::tests::existing_write_connections_do_not_create_schema_or_recover_live_downloads ... ok
+test store::tests::navigation_defaults_and_public_panels_do_not_persist_secret_inputs ... ok
+test store::tests::navigation_checkpoints_round_trip_non_reader_routes_and_reader_geometry ... ok
+test store::tests::persistent_databases_use_durable_rollback_journals_without_mapped_io ... ok
+test store::tests::fixed_download_paths_are_keyset_paged_without_double_counting_shared_files ... ok
+test store::tests::progress_resumes_the_last_visit_even_with_equal_timestamps ... ok
+test store::tests::progress_writes_only_changed_pages_and_rejects_stale_page_identities ... ok
+test store::tests::opening_a_healthy_wal_database_preserves_its_committed_data ... ok
+test store::tests::refresh_preserves_local_state_and_changes_are_transactional ... ok
+test store::tests::repeated_page_progress_only_recalculates_unread_when_the_chapter_first_completes ... ok
+test store::tests::repeating_an_unchanged_paused_batch_has_no_data_writes ... ok
+test store::page_queries::tests::two_connections_initialize_the_same_counter_version_without_double_counting ... ok
+test store::tests::source_identity_and_progress_remain_separate ... ok
+test store::tests::preferences_bookmarks_and_queue_survive_restart ... ok
+test store::tests::the_last_image_is_not_completed_until_the_reader_reaches_its_bottom ... ok
+test store::tests::transient_reading_files_are_not_reported_as_pinned_offline_downloads ... ok
+test store::tests::source_books_keep_catalog_order_and_cached_entries_without_decoding_other_sources ... ok
+test store::tests::unchanged_preferences_skip_writes_and_vertical_pages_remains_a_valid_direction ... ok
+test store::view_queries::tests::continuation_selects_the_first_unread_then_falls_back_to_the_first_chapter ... ok
+test store::view_queries::tests::demo_history_layout_groups_the_fixed_local_day_at_the_utc_boundary ... ok
+test store::tests::ui_settings_are_bounded_namespaced_and_skip_unchanged_values ... ok
+test store::tests::suspend_ownership_survives_restart_and_manual_pause_is_not_auto_resumed ... ok
+test store::view_queries::tests::detail_chapter_pages_cover_all_chapters_with_device_specific_capacity ... ok
+test store::view_queries::tests::history_updates_and_chapter_summaries_only_return_the_requested_window ... ok
+test store::view_queries::tests::history_layout_accounts_for_date_headers_and_resets_scribe_columns ... ok
+test store::view_queries::tests::library_sort_choices_use_independent_metrics_in_both_directions ... ok
+test store::view_queries::tests::local_library_search_treats_wildcards_literally_and_bounds_decoding ... ok
+test store::view_queries::tests::local_source_search_includes_author_matches_and_isolates_the_source ... ok
+test store::view_queries::tests::library_three_state_filters_use_chapters_status_and_real_tracking ... ok
+test render_cache::tests::warm_second_external_long_png_viewport_rehashes_source_without_decoding_the_strip ... ok
+test sources::wasm::tests::zip_pages_are_lazy_and_extract_two_pngs_through_the_shared_cache ... ok
+test store::view_queries::tests::update_cards_select_one_latest_chapter_per_book_before_limiting ... ok
+test store::view_queries::tests::normal_library_pages_preserve_filters_sorting_and_real_counts ... ok
+test store::tests::reading_progress_and_download_updates_do_not_erase_each_other ... ok
+test tracking::tests::authorization_blocks_until_reconnected_and_rate_limits_back_off ... ok
+test tracking::tests::cancellation_after_the_progress_read_prevents_the_following_remote_write ... ok
+test tracking::tests::clamped_remote_total_finishes_the_sent_item_and_account_changes_discard_old_work ... ok
+test tracking::tests::graphql_errors_and_unconfirmed_mutations_are_not_accepted_as_success ... ok
+test tracking::tests::anilist_validates_searches_and_preserves_remote_progress_before_mutating ... ok
+test store::view_queries::tests::visible_queries_do_not_deserialize_unrelated_documents ... ok
+test tracking::tests::malformed_tokens_verifiers_and_oauth_state_are_rejected ... ok
+test tracking::tests::incomplete_existing_list_entries_never_trigger_a_progress_write ... ok
+test tracking::tests::only_integral_positive_chapter_numbers_are_automatically_mapped ... ok
+test tracking::tests::queue_coalesces_progress_preserves_newer_work_and_does_not_repeat_synced_work ... ok
+test store::view_queries::tests::new_library_sort_queries_decode_only_the_visible_window ... ok
+test store::view_queries::tests::unknown_interaction_times_keep_zero_and_rowid_ties_across_pages ... ok
+test tracking::tests::rotated_refresh_credentials_are_retained_even_when_the_following_operation_fails ... ok
+test tracking::tests::mal_uses_native_pkce_refresh_rotation_and_patch_without_overwriting_status ... ok
+test tracking::tests::mappings_queue_and_credentials_survive_restart_without_debug_leaks ... ok
+test store::view_queries::tests::large_single_date_history_decodes_only_its_requested_layout_window ... ok
+
+test result: ok. 797 passed; 0 failed; 5 ignored; 0 measured; 0 filtered out; finished in 35.32s
+
+     Running unittests src/main.rs (/root/aidoku-startup-opt-20261116/target/debug/deps/aidoku-292706ce6c6c6eea)
+
+running 20 tests
+test bootstrap_fonts::tests::cancellation_before_work_does_not_decode_a_face ... ok
+test bootstrap_fonts::tests::out_of_order_or_repeated_faces_preserve_existing_bytes ... ok
+test bootstrap_lifecycle::tests::post_loop_cover_cleanup_requires_no_live_native_control ... ok
+test bootstrap_fonts::tests::incomplete_font_delivery_cannot_finish_the_family_switch ... ok
+test bootstrap_lifecycle::tests::request_from_another_process_or_nonce_is_never_accepted ... ok
+test bootstrap_lifecycle::tests::resume_request_is_bound_to_the_current_sleep_epoch ... ok
+test bootstrap_lifecycle::tests::unfinished_resume_blocks_bootstrap_work_until_the_retained_frame ... ok
+test bootstrap_lifecycle::tests::current_fallback_termination_does_not_publish_a_stale_ordinary_exit ... ok
+test bootstrap_presentation::tests::localized_label_masks_preserve_coverage_for_light_and_dark_ink ... ok
+test bootstrap_lifecycle::tests::the_boot_lifecycle_snapshot_has_no_fabricated_application_state ... ok
+test bootstrap_lifecycle::tests::cover_intent_matches_the_current_generation_process_nonce_and_sleep_epoch ... ok
+test bootstrap_startup::tests::startup_workers_require_a_new_native_send_and_a_yielded_turn ... ok
+test sleep_cover_protocol::tests::the_cover_request_binds_all_six_fields_and_one_exact_line ... ok
+test sleep_cover_runtime::tests::a_cover_must_yield_then_observe_its_own_completion_before_checkpoint_work ... ok
+test sleep_cover_runtime::tests::a_new_request_never_accepts_the_old_token ... ok
+test sleep_cover_runtime::tests::timeout_missing_intent_and_renderer_errors_return_without_cover_success ... ok
+test bootstrap_startup::tests::a_startup_wake_burst_owns_one_slot_until_dispatch ... ok
+test sleep_cover_protocol::tests::private_records_reject_links_fifos_and_replaced_directories ... ok
+test sleep_cover_protocol::tests::private_ready_publication_revalidates_before_the_atomic_commit ... ok
+test bootstrap_presentation::tests::startup_style_reads_only_the_existing_database_and_keeps_demo_isolation ... ok
+
+test result: ok. 20 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running unittests src/bin/jpeg_worker.rs (/root/aidoku-startup-opt-20261116/target/debug/deps/kindle_jpeg_worker-2fd02900666151b3)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+

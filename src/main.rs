@@ -212,9 +212,12 @@ fn run(arguments: Arguments) -> Result<()> {
     // The Kindle backend changes its default-font environment variable. Install
     // it before Tokio or any other background worker is started.
     platform.install_backend(Fonts::bootstrap_bytes())?;
+    aidoku_kindle::reader_timing::mark("startup_backend_installed");
     bootstrap_lifecycle::install_signal_wakeup(platform.signal_wakeup_fd())?;
     let ui = AppWindow::new().context("Create the application window")?;
+    aidoku_kindle::reader_timing::mark("startup_window_constructed");
     Fonts::register_bootstrap(&ui)?;
+    aidoku_kindle::reader_timing::mark("startup_bootstrap_font_registered");
     ui.global::<State>()
         .set_large_screen(arguments.device.is_scribe());
     ui.global::<State>().set_landscape(arguments.landscape);

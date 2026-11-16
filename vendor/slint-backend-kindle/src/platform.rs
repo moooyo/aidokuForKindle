@@ -607,16 +607,13 @@ impl Platform for KindlePlatform {
             &mut portrait,
             &mut input_epoch,
         )?;
-        if (binding.is_some() || touch_input.snapshot_required()) && !input_epoch.is_blocked() {
+        // The first meaningful scene owns the initial full update. Keep input
+        // behind its completion barrier even without a portrait calibration.
+        if !input_epoch.is_blocked() {
             self.begin_input_boundary(&mut touch_input, &mut input_epoch)?;
         }
         let initial_mode = self.output_mode();
-        if !self.lifecycle.applied_paused.load(Ordering::Acquire) && !portrait.is_blocked() {
-            frame_buffer.fill(initial_mode.paper());
-            frame_buffer.refresh_full().map_err(|error| {
-                PlatformError::Other(format!("initial framebuffer refresh was rejected: {error}"))
-            })?;
-        }
+        let mut initial_scene_pending = true;
 
         let width = frame_buffer.width as usize;
         let (panel_width, panel_height) = (frame_buffer.width, frame_buffer.height);
@@ -690,7 +687,7 @@ impl Platform for KindlePlatform {
             // Idle orientation observation itself adds no periodic timeout.
             let timeout_ms: libc::c_int = if !ownership_paused
                 && !portrait.is_blocked()
-                && (input_epoch.needs_frame() || sleep_token.is_some())
+                && (initial_scene_pending || input_epoch.needs_frame() || sleep_token.is_some())
             {
                 0
             } else if self.lifecycle.parked.load(Ordering::Acquire) {
@@ -916,7 +913,8 @@ impl Platform for KindlePlatform {
                     .lifecycle
                     .full_repaint_requested
                     .swap(false, Ordering::AcqRel)
-                    || input_epoch.is_blocked(),
+                    || input_epoch.is_blocked()
+                    || initial_scene_pending,
                 dithering: dithering_changed,
                 sleep: sleep_token.is_some(),
             };
@@ -957,11 +955,11 @@ impl Platform for KindlePlatform {
                 );
                 // Rotation changes require a complete retained scene; Slint
                 // does not invalidate its dirty cache for output rotation alone.
-                if rotation_changed || sleep_token.is_some() {
+                if initial_scene_pending || rotation_changed || sleep_token.is_some() {
                     renderer.set_repaint_buffer_type(RepaintBufferType::NewBuffer);
                 }
                 let dirty = scene.render(renderer, width);
-                if rotation_changed || sleep_token.is_some() {
+                if initial_scene_pending || rotation_changed || sleep_token.is_some() {
                     renderer.set_repaint_buffer_type(RepaintBufferType::ReusedBuffer);
                 }
                 let origin = dirty.bounding_box_origin();
@@ -973,9 +971,9 @@ impl Platform for KindlePlatform {
                     height: size.height,
                 });
             });
-            if sleep_token.is_some() && !did_draw {
-                // A redraw request is not evidence that a complete sleep scene
-                // was rendered. Keep the token pending until a visible draw.
+            if (initial_scene_pending || sleep_token.is_some()) && !did_draw {
+                // A redraw request cannot certify initialized scene pixels.
+                // Keep startup or sleep pending until a complete visible draw.
                 if let Some(observed) = observed_frame.as_mut() {
                     observed.unavailable(NativeFrameUnavailable::NoWrite);
                 }
@@ -1096,6 +1094,7 @@ impl Platform for KindlePlatform {
                     .wrapping_add(fallback_writes)
             });
             if matches!(&submission, Some(Ok(()))) {
+                initial_scene_pending = false;
                 self.lifecycle
                     .frame_send_count
                     .fetch_add(1, Ordering::AcqRel);

@@ -235,18 +235,23 @@ impl Startup {
                 self.fonts_registered = self.fonts.register_next()?;
                 if self.fonts_registered {
                     self.fonts.finish(ui)?;
-                    ui.global::<State>().set_startup_stage(1);
                 }
-                self.schedule();
             }
-            return Ok(false);
+            if !self.fonts_registered {
+                if self.fonts.can_register_next() {
+                    self.schedule();
+                }
+                return Ok(false);
+            }
         }
         let attached = application.borrow().clone();
         if attached.is_none() {
             let Some(prepared) = self.prepared.take() else {
+                ui.global::<State>().set_startup_stage(1);
                 return Ok(false);
             };
             ui.global::<State>().set_startup_stage(2);
+            aidoku_kindle::reader_timing::mark("startup_attachment_started");
             let app = App::attach_prepared(ui, prepared, platform.clone())?;
             *application.borrow_mut() = Some(app);
             aidoku_kindle::reader_timing::mark("application_attached");

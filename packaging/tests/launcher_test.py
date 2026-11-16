@@ -37,6 +37,11 @@ import time
 root = Path(os.environ["AIDOKU_TEST_ROOT"])
 pid = os.getpid()
 started = time.monotonic()
+if "AIDOKU_FAKE_COMM" in os.environ:
+    import ctypes
+    name = os.environ["AIDOKU_FAKE_COMM"].encode("ascii")
+    if ctypes.CDLL(None).prctl(15, ctypes.c_char_p(name), 0, 0, 0) != 0:
+        raise RuntimeError("Set the fixture process name")
 if "--native-power-state" in sys.argv:
     # This early branch models the native CLI contract without initializing an
     # application generation, checkpoint, font lifetime or launcher App record.
@@ -619,6 +624,16 @@ cat "$AIDOKU_TEST_ROOT/power-state"
         self.environment.update(AIDOKU_FAKE_EXIT_AFTER="0.2", AIDOKU_FAKE_EXIT_CODE="7")
         self.start_launcher()
         self.assertEqual(self.complete(), 7)
+        self.assert_recovered()
+
+    def test_process_names_with_spaces_and_parentheses_preserve_owned_lifecycle(self) -> None:
+        self.environment["AIDOKU_FAKE_COMM"] = "aidoku) (x)"
+        pid = self.start_launcher()
+        self.assertEqual(Path(f"/proc/{pid}/comm").read_text().strip(), "aidoku) (x)")
+        self.park(pid)
+        self.wake()
+        self.assertEqual(self.traces("resumed")[-1]["pid"], pid)
+        self.stop_launcher()
         self.assert_recovered()
 
     def test_startup_portrait_failure_does_not_repaint_untaken_display(self) -> None:

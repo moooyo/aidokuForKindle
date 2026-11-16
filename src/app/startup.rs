@@ -31,7 +31,7 @@ impl PreparedApp {
     }
 }
 
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, PartialEq, Eq)]
 pub(super) enum AttachStage {
     Route,
     Catalog,
@@ -115,8 +115,22 @@ impl App {
         self.startup_stage.is_some()
     }
 
-    /// Complete one bounded attachment stage, then return to rendering/input.
+    /// Coalesce cheap stages, yielding after a slow stage or blocked lifecycle.
+    /// The budget is checked between stages; an individual stage is not preempted.
     pub fn advance_startup(&mut self) -> Result<bool> {
+        let started = Instant::now();
+        loop {
+            let previous = self.startup_stage;
+            if self.advance_startup_stage()? {
+                return Ok(true);
+            }
+            if self.startup_stage == previous || started.elapsed() >= Duration::from_millis(4) {
+                return Ok(false);
+            }
+        }
+    }
+
+    fn advance_startup_stage(&mut self) -> Result<bool> {
         let Some(stage) = self.startup_stage else {
             return Ok(true);
         };
@@ -125,6 +139,7 @@ impl App {
         }
         match stage {
             AttachStage::Route => {
+                crate::reader_timing::mark("startup_route_started");
                 if !self.options.resume {
                     self.network_control.resume();
                 }
@@ -152,6 +167,7 @@ impl App {
                 crate::reader_timing::mark("startup_catalog_attached");
             }
             AttachStage::View => {
+                crate::reader_timing::mark("startup_view_started");
                 self.sync_view()?;
                 self.startup_stage = Some(AttachStage::Settings);
                 crate::reader_timing::mark("startup_view_attached");

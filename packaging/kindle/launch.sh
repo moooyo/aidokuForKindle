@@ -13,13 +13,30 @@ ROOT_PID=$$
 
 fail() { printf '%s\n' "aidoku: $*" >&2; exit 1; }
 valid_pid() { case "$1" in ''|*[!0-9]*) return 1 ;; *) [ "$1" -gt 1 ] ;; esac; }
-parent_pid() { sed -n 's/^PPid:[[:space:]]*//p' "/proc/$1/status" 2>/dev/null || :; }
-process_state() { sed -n 's/^State:[[:space:]]*//p' "/proc/$1/status" 2>/dev/null || :; }
+process_stat_fields() {
+    process_stat_record=''
+    { IFS= read -r process_stat_record <"/proc/$1/stat"; } 2>/dev/null || return 1
+    case "$process_stat_record" in "$1 ("*) ;; *) return 1 ;; esac
+    # comm can contain spaces and parentheses. Numeric fields follow its final ).
+    process_fields=${process_stat_record##*) }
+    [ "$process_fields" != "$process_stat_record" ]
+}
+parent_pid() {
+    process_stat_fields "$1" || return 0
+    set -- $process_fields
+    [ "$#" -ge 2 ] || return 0
+    case "$2" in ''|*[!0-9]*) return 0 ;; esac
+    printf '%s\n' "$2"
+}
+process_state() {
+    process_stat_fields "$1" || return 0
+    set -- $process_fields
+    [ "$#" -ge 1 ] || return 0
+    printf '%s\n' "$1"
+}
 process_birth() {
-    birth_stat=$(cat "/proc/$1/stat" 2>/dev/null || :)
-    birth_tail=${birth_stat##*) }
-    [ "$birth_tail" != "$birth_stat" ] || return 1
-    set -- $birth_tail
+    process_stat_fields "$1" || return 1
+    set -- $process_fields
     [ "$#" -ge 20 ] || return 1
     shift 19
     case "$1" in ''|*[!0-9]*) return 1 ;; esac
@@ -78,16 +95,17 @@ COVER_SEQUENCE=0; SLEEP_COVER_SEQUENCE=0; SLEEP_APP_BIRTH=''; SLEEP_RUNNER_BIRTH
 
 native_read_is_owned() {
     [ -n "$NATIVE_READ_PID" ] && [ -n "$NATIVE_READ_BIRTH" ] || return 1
-    [ "$(parent_pid "$NATIVE_READ_PID" 2>/dev/null || :)" = "$ROOT_PID" ] &&
-        [ "$(process_birth "$NATIVE_READ_PID" 2>/dev/null || :)" = "$NATIVE_READ_BIRTH" ]
+    process_stat_fields "$NATIVE_READ_PID" || return 1
+    set -- $process_fields
+    [ "$#" -ge 20 ] && [ "$2" = "$ROOT_PID" ] || return 1
+    NATIVE_READ_GROUP=$3; NATIVE_READ_SESSION=$4
+    shift 19
+    [ "$1" = "$NATIVE_READ_BIRTH" ]
 }
 
 native_read_group_is_owned() {
     native_read_is_owned || return 1
-    native_read_stat=$(cat "/proc/$NATIVE_READ_PID/stat" 2>/dev/null || :)
-    native_read_tail=${native_read_stat##*) }
-    set -- $native_read_tail
-    [ "$#" -ge 4 ] && [ "$3:$4" = "$NATIVE_READ_PID:$NATIVE_READ_PID" ]
+    [ "$NATIVE_READ_GROUP:$NATIVE_READ_SESSION" = "$NATIVE_READ_PID:$NATIVE_READ_PID" ]
 }
 
 stop_native_read() {
@@ -99,16 +117,16 @@ stop_native_read() {
         # Before setsid completes the gated wrapper has not started an IPC.
         kill -KILL "$NATIVE_READ_PID" 2>/dev/null || :
     fi
-    native_read_reap=10
+    native_read_reap=50
     while native_read_is_owned && [ "$native_read_reap" -gt 0 ]; do
-        case "$(sed -n 's/^State:[[:space:]]*//p' "/proc/$NATIVE_READ_PID/status" 2>/dev/null || :)" in
+        case "$(process_state "$NATIVE_READ_PID")" in
             Z*|X*|'') break ;;
         esac
-        usleep 100000
+        usleep 20000
         native_read_reap=$((native_read_reap - 1))
     done
     if [ -n "$NATIVE_READ_PID" ]; then
-        case "$(sed -n 's/^State:[[:space:]]*//p' "/proc/$NATIVE_READ_PID/status" 2>/dev/null || :)" in
+        case "$(process_state "$NATIVE_READ_PID")" in
             Z*|X*|'') wait "$NATIVE_READ_PID" 2>/dev/null || : ;;
         esac
     fi
@@ -169,14 +187,15 @@ native_read_command() {
     ' sh "$LOCK_DIR/native-read-done" "$LOCK_DIR/native-read-go" "$NATIVE_READ_SEQUENCE" "$NONCE" "$LOCK_DIR/native-read-command" "$@" >"$LOCK_DIR/native-read-output" 2>/dev/null 3>&- 4>&- &
     NATIVE_READ_PID=$!
     NATIVE_READ_BIRTH=$(process_birth "$NATIVE_READ_PID" 2>/dev/null || :)
-    native_read_checks=20
+    # Keep the same two-second sleep budget, with earlier completion detection.
+    native_read_checks=100
     native_read_status=1
     native_read_released=0
     while [ "$native_read_checks" -gt 0 ]; do
         if [ -z "$NATIVE_READ_BIRTH" ] && [ "$(parent_pid "$NATIVE_READ_PID" 2>/dev/null || :)" = "$ROOT_PID" ]; then
             NATIVE_READ_BIRTH=$(process_birth "$NATIVE_READ_PID" 2>/dev/null || :)
         fi
-        case "$(sed -n 's/^State:[[:space:]]*//p' "/proc/$NATIVE_READ_PID/status" 2>/dev/null || :)" in
+        case "$(process_state "$NATIVE_READ_PID")" in
             Z*|X*|'') break ;;
         esac
         if native_read_group_is_owned; then
@@ -193,7 +212,7 @@ native_read_command() {
             fi
         fi
         native_read_checks=$((native_read_checks - 1))
-        usleep 100000
+        usleep 20000
     done
     stop_native_read
     return "$native_read_status"
@@ -442,13 +461,13 @@ run_observer() {
 start_observer() {
     run_observer & OBSERVER_PID=$!
     # Admit native observation as soon as the current observer owns its source.
-    observer_checks=20
+    observer_checks=100
     while [ "$observer_checks" -gt 0 ]; do
         observer_command=$(cat "$LOCK_DIR/observer-command" 2>/dev/null || :)
         if owned_pid "$OBSERVER_PID" "$ROOT_PID" && owned_pid "$observer_command" "$OBSERVER_PID"; then return 0; fi
         owned_pid "$OBSERVER_PID" "$ROOT_PID" || fail 'Power event observation ended before startup.'
         observer_checks=$((observer_checks - 1))
-        usleep 100000
+        usleep 20000
     done
     fail 'Power event observer ownership was not established before startup.'
 }

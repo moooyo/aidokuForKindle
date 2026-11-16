@@ -1,5 +1,16 @@
 # Project-owned Kindle backend patches
 
+## First meaningful startup frame, 2026-11-16
+
+The initial Slint scene supplies the startup full refresh instead of following
+a separate blank framebuffer clear. The first draw forces a new renderer buffer
+and a full-panel write; an absent draw cannot consume the initial scene request.
+Input remains behind the existing checked full-update completion and touch
+synchronization boundary, including callers without a portrait calibration.
+Paused ownership, portrait changes, sleep presentation, and resume still retain
+their independent gates. Startup sampling and qualification are recorded in the
+source-bound startup optimization report.
+
 ## Reader presets and exact-source follow-up, 2026-11-15
 
 `RefreshWaveform` now includes GL16 and REAGL, with an independent one-shot
