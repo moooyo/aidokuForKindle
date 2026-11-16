@@ -103,6 +103,7 @@ pub(super) fn next_frame_stats() -> NextFrameStats {
 #[derive(Clone, Debug)]
 pub(super) struct PreparedPixels {
     pixels: SharedPixelBuffer<Rgb8Pixel>,
+    fast_ready: bool,
 }
 
 impl PreparedPixels {
@@ -124,6 +125,30 @@ impl PreparedPixels {
         Image::from_rgb8(self.pixels)
     }
 
+    /// Publish a binary fast-mode frame without altering shared source pixels.
+    pub(super) fn into_fast_image(self) -> Image {
+        if self.fast_ready {
+            return self.into_image();
+        }
+        const BAYER: [[u16; 4]; 4] = [[0, 8, 2, 10], [12, 4, 14, 6], [3, 11, 1, 9], [15, 7, 13, 5]];
+        let width = self.width() as usize;
+        let mut preview = SharedPixelBuffer::<Rgb8Pixel>::new(self.width(), self.height());
+        for (index, (output, input)) in preview
+            .make_mut_bytes()
+            .chunks_exact_mut(3)
+            .zip(self.pixels.as_bytes().chunks_exact(3))
+            .enumerate()
+        {
+            let threshold = (BAYER[(index / width) % 4][index % 4] * 256 + 128) / 16;
+            output.fill(if u16::from(input[0]) > threshold {
+                255
+            } else {
+                0
+            });
+        }
+        Image::from_rgb8(preview)
+    }
+
     fn from_grayscale(image: &GrayImage) -> Self {
         let mut pixels = SharedPixelBuffer::<Rgb8Pixel>::new(image.width(), image.height());
         for (rgb, gray) in pixels
@@ -133,7 +158,7 @@ impl PreparedPixels {
         {
             rgb.fill(*gray);
         }
-        Self { pixels }
+        Self { pixels, fast_ready: false }
     }
 
     pub(super) fn byte_len(&self) -> usize {
@@ -294,13 +319,49 @@ pub(super) fn prepare_cancellable(image: Arc<GrayImage>) -> anyhow::Result<Prepa
         }
     }
     crate::imaging::check_decode_cancelled()?;
-    let prepared = PreparedPixels { pixels };
+    let prepared = PreparedPixels { pixels, fast_ready: false };
     let mut state = cache.lock().expect("Prepared pixel cache lock");
     if let Some(existing) = state.lookup(&image) {
         return Ok(existing);
     }
     state.remember(&image, prepared.clone());
     Ok(prepared)
+}
+
+/// Prepare the complete Fast payload on its image worker, including read-ahead.
+/// The source stays immutable, and the grayscale RGB cache retains only its
+/// original representation. The private next-frame slot owns this binary RGB.
+pub(super) fn prepare_reader_cancellable(
+    image: Arc<GrayImage>,
+    fast: bool,
+) -> anyhow::Result<PreparedPixels> {
+    if !fast {
+        return prepare_cancellable(image);
+    }
+    crate::imaging::check_decode_cancelled()?;
+    const BAYER: [[u16; 4]; 4] = [[0, 8, 2, 10], [12, 4, 14, 6], [3, 11, 1, 9], [15, 7, 13, 5]];
+    let width = image.width() as usize;
+    let length = width * image.height() as usize;
+    let mut pixels = SharedPixelBuffer::<Rgb8Pixel>::new(image.width(), image.height());
+    // Row iteration avoids a runtime integer division for every source pixel.
+    for (y, (source, output)) in image.as_raw()[..length].chunks(width.max(1))
+        .zip(pixels.make_mut_bytes().chunks_mut((width * 3).max(1))).enumerate()
+    {
+        let thresholds = BAYER[y % 4].map(|rank| (rank * 256 + 128) / 16);
+        // Preserve the established Fast phase even for widths not divisible by four.
+        let phase = (y * width) % 4;
+        for (block, values) in source.chunks(256).enumerate() {
+            crate::imaging::check_decode_cancelled()?;
+            let first = block * 256 * 3;
+            for (offset, (rgb, value)) in output[first..first + values.len() * 3]
+                .chunks_exact_mut(3).zip(values).enumerate()
+            {
+                rgb.fill(if u16::from(*value) > thresholds[(phase + offset) % 4] { 255 } else { 0 });
+            }
+        }
+    }
+    crate::imaging::check_decode_cancelled()?;
+    Ok(PreparedPixels { pixels, fast_ready: true })
 }
 
 fn prepare_with_cache(cache: &Mutex<PreparedCache>, image: Arc<GrayImage>) -> PreparedPixels {
@@ -339,6 +400,48 @@ mod tests {
         fn require_send_sync<T: Send + Sync>() {}
         require_send_sync::<PreparedPixels>();
         require_send_sync::<PreparedReservation>();
+    }
+
+    #[test]
+    fn worker_fast_pixels_match_legacy_output_and_publish_without_copying() {
+        for (width, height) in [(0, 0), (1, 11), (3, 9), (257, 17), (930, 23), (1860, 13)] {
+            let source = Arc::new(GrayImage::from_fn(width, height, |x, y| {
+                image::Luma([((x * 29 + y * 43) % 256) as u8])
+            }));
+            let legacy = PreparedPixels::from_grayscale(&source).into_fast_image().to_rgb8().unwrap();
+            let prepared = prepare_reader_cancellable(source.clone(), true).unwrap();
+            let allocation = prepared.as_bytes().as_ptr();
+            let actual = prepared.into_fast_image().to_rgb8().unwrap();
+            assert_eq!(actual.as_bytes(), legacy.as_bytes());
+            assert_eq!(actual.as_bytes().as_ptr(), allocation);
+            assert!(actual.as_bytes().iter().all(|value| matches!(*value, 0 | 255)));
+            for (x, y, pixel) in source.enumerate_pixels() {
+                assert_eq!(pixel.0[0], ((x * 29 + y * 43) % 256) as u8);
+            }
+        }
+    }
+
+    #[test]
+    fn fast_preparation_does_not_replace_cached_grayscale_pixels() {
+        let source = input(&[17, 77, 136, 204]);
+        let original = prepare_reader_cancellable(source.clone(), false).unwrap();
+        let binary = prepare_reader_cancellable(source.clone(), true).unwrap();
+        let restored = prepare_reader_cancellable(source, false).unwrap();
+        assert!(original.same_allocation(&restored));
+        assert_eq!(original.as_bytes(), &[17, 17, 17, 77, 77, 77, 136, 136, 136, 204, 204, 204]);
+        assert_ne!(binary.as_bytes(), restored.as_bytes());
+    }
+
+    #[test]
+    fn cancelled_fast_preparation_stays_inside_the_reader_cancellation_scope() {
+        let source = input(&[77, 136]);
+        let cancelled = crate::imaging::DecodeCancellation::new();
+        cancelled.cancel();
+        let error = crate::imaging::with_background_decode(Some(&cancelled), || {
+            prepare_reader_cancellable(source.clone(), true)
+        }).unwrap_err();
+        assert!(crate::imaging::is_decode_cancelled(&error));
+        assert_eq!(source.as_raw(), &[77, 136]);
     }
 
     #[test]

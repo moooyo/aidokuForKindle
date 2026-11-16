@@ -91,7 +91,7 @@ component ReaderHeaderAction inherits Rectangle {
     }
     touch := TouchArea { x: 0px; y: 0px;
         pointer-event(event) => {
-            if event.kind == PointerEventKind.down { Commands.refresh("fast"); }
+            if event.kind == PointerEventKind.down { Commands.refresh("ui"); }
             else if event.kind == PointerEventKind.up || event.kind == PointerEventKind.cancel { Commands.refresh("ui"); }
         }
         clicked => { Commands.action("reader", root.action, ""); }
@@ -171,7 +171,7 @@ export component ReaderPage inherits Rectangle {
     // Reset retained timers and drag previews before a suspended input sequence
     // can resume. Timer handlers also check the epoch in case this callback has
     // not yet been evaluated when the event loop handles an expired timer.
-    changed input-epoch => { root.reset-input-state(); }
+    changed input-epoch => { State.reader-interacting = false; root.reset-input-state(); }
 
     function frame-page(page: int) -> int {
         if State.cover-alone && State.spread && !root.vertical && page > 1 { return floor(page / 2) * 2; }
@@ -245,6 +245,7 @@ export component ReaderPage inherits Rectangle {
         pointer-event(event) => {
             if event.kind == PointerEventKind.down {
                 root.gesture-input-epoch = State.reader-input-epoch;
+                State.reader-interacting = true;
                 root.gesture-start-x = self.mouse-x;
                 root.gesture-start-y = self.mouse-y;
                 root.suppress-click = false;
@@ -253,8 +254,10 @@ export component ReaderPage inherits Rectangle {
                 hold.running = !State.reader-menu;
                 swipe-limit.running = true;
             } else if event.kind == PointerEventKind.cancel {
+                State.reader-interacting = false;
                 root.reset-input-state();
             } else if event.kind == PointerEventKind.up {
+                State.reader-interacting = false;
                 hold.running = false;
                 swipe-limit.running = false;
                 if root.gesture-input-epoch == State.reader-input-epoch && !root.gesture-consumed && !root.gesture-expired && !State.reader-menu {

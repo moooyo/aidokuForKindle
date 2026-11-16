@@ -41,6 +41,7 @@ impl App {
         extended_preferences::sync(&state, &self.prefs);
         self.sync_tracking_accounts_state();
         self.sync_base_view(&state);
+        self.sync_dither_preview(&ui)?;
         self.sync_presented_reader_dithering();
         if self.route == "reader" {
             let sleep_book = self.sync_reader_view(&state)?;
@@ -1468,6 +1469,12 @@ impl App {
                     "device",
                 ),
                 item("screen-refresh", "screen_refresh", refresh, "device"),
+                item(
+                    "hardware-acceleration",
+                    "hardware_acceleration",
+                    String::new(),
+                    "device",
+                ),
                 item("manage-sources", "manage_sources", String::new(), "library"),
                 item("storage", "download_management", String::new(), "library"),
                 item("categories", "category", String::new(), "library"),

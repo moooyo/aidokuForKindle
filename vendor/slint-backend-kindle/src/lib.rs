@@ -46,6 +46,7 @@ pub use portrait_pose::{
 };
 pub use refresh::{
     PhysicalRect, RefreshArea, RefreshError, RefreshHandle, RefreshRequest, RefreshWaveform,
+    SwipeDirection,
 };
 pub use render_control::{RenderError, RenderHandle};
 pub use splash::{StartupImage, StartupImages, StartupSplash};

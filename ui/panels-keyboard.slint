@@ -17,7 +17,7 @@ component KeyboardKey inherits Rectangle {
     in property <bool> ui-font: false;
     in property <length> text-size: State.large-screen ? 24px : 20px;
     callback clicked();
-    property <bool> inverted: (root.selected || root.primary) != key-touch.pressed;
+    property <bool> inverted: root.selected || root.primary || key-touch.pressed;
     height: State.large-screen ? 62px : 52px;
     background: root.inverted ? Theme.ink : Theme.paper;
     border-color: root.strong || root.selected || root.primary ? Theme.ink : Theme.disabled;
@@ -52,7 +52,7 @@ component KeyboardKey inherits Rectangle {
     key-touch := TouchArea {
         x: 0px; y: 0px; width: parent.width; height: parent.height;
         pointer-event(event) => {
-            if event.kind == PointerEventKind.down { Commands.refresh("fast"); }
+            if event.kind == PointerEventKind.down { Commands.refresh("ui"); }
             else if event.kind == PointerEventKind.up || event.kind == PointerEventKind.cancel { Commands.refresh("ui"); }
         }
         clicked => { root.clicked(); }
@@ -83,7 +83,7 @@ component CandidateKey inherits Rectangle {
     candidate-touch := TouchArea {
         x: 0px; y: 0px; width: parent.width; height: parent.height;
         pointer-event(event) => {
-            if event.kind == PointerEventKind.down { Commands.refresh("fast"); }
+            if event.kind == PointerEventKind.down { Commands.refresh("ui"); }
             else if event.kind == PointerEventKind.up || event.kind == PointerEventKind.cancel { Commands.refresh("ui"); }
         }
         clicked => { root.clicked(); }
@@ -148,7 +148,7 @@ export component KeyboardPanel inherits Rectangle {
                 x: 0px; y: 0px; width: parent.width; height: parent.height;
                 clicked => { Commands.action("keyboard", "cancel", ""); }
                 pointer-event(event) => {
-                    if event.kind == PointerEventKind.down { Commands.refresh("fast"); }
+                    if event.kind == PointerEventKind.down { Commands.refresh("ui"); }
                     else if event.kind == PointerEventKind.up || event.kind == PointerEventKind.cancel { Commands.refresh("ui"); }
                 }
             }
@@ -217,7 +217,7 @@ export component KeyboardPanel inherits Rectangle {
                     x: 0px; y: 0px; width: parent.width; height: parent.height;
                     clicked => { Commands.action("keyboard", "candidate-page", delta); }
                     pointer-event(event) => {
-                        if event.kind == PointerEventKind.down { Commands.refresh("fast"); }
+                        if event.kind == PointerEventKind.down { Commands.refresh("ui"); }
                         else if event.kind == PointerEventKind.up || event.kind == PointerEventKind.cancel { Commands.refresh("ui"); }
                     }
                 }

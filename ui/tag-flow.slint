@@ -13,7 +13,7 @@ component TagFlowChip inherits Rectangle {
     in property <length> marker-width;
     callback chosen();
     property <bool> interaction-pressed: false;
-    property <bool> inverted: root.interactive && ((root.state == 1) != root.interaction-pressed);
+    property <bool> inverted: root.interactive && (root.state == 1 || root.interaction-pressed);
     property <color> foreground: root.inverted ? Theme.paper : root.state == -1 ? Theme.secondary : Theme.ink;
     // Keep the flow's capacity budget separate from each chip's visible marker.
     property <length> effective-marker-width: root.interactive && root.state != 0 ? root.marker-width : 0px;
@@ -75,7 +75,7 @@ component TagFlowChip inherits Rectangle {
             y: (parent.height - max(parent.height, Theme.touch)) / 2; height: max(parent.height, Theme.touch);
             changed pressed => { root.interaction-pressed = self.pressed; }
             pointer-event(event) => {
-                if event.kind == PointerEventKind.down { Commands.refresh("fast"); }
+                if event.kind == PointerEventKind.down { Commands.refresh("ui"); }
                 else if event.kind == PointerEventKind.up || event.kind == PointerEventKind.cancel { Commands.refresh("ui"); }
             }
             clicked => { root.chosen(); }

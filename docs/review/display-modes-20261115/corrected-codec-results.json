@@ -1,0 +1,2087 @@
+{
+  "schema": 1,
+  "device_scope": "The tested monochrome Scribe, Amazon build 4794320058",
+  "application_integration": false,
+  "trials": [
+    {
+      "run_id": "display-codec-20261115-067afbc7",
+      "case": "jpeg-scale-logical",
+      "codec": "jpeg",
+      "source_sha256": "077da9a93105dbd573039970dab983b1bee3876e3b20ab49a1f6a9e6b9521a65",
+      "probe_sha256": "ee33184efba670e9d8b8a2439b7a5244d43d57724feb6019ab62e74c8067cb35",
+      "fixture": {
+        "name": "benchmark-scene.jpg",
+        "width": 1920,
+        "height": 2560,
+        "mode": "L",
+        "bytes": 288237,
+        "sha256": "376ec78abb2c33477cbaf83fac6b5a3f940fc515e10a97a75cf80cdde90bf34b"
+      },
+      "probe": {
+        "schema": 1,
+        "codec": "jpeg",
+        "ioctl_completed": true,
+        "pixel_validated": false,
+        "stage": "complete",
+        "errno": 0,
+        "cleanup_errno": 0,
+        "header_before_capture_allocation": true,
+        "source_change_events": 1,
+        "coded_file_bytes": 288237,
+        "submitted_bytes": 288320,
+        "header_capture_fourcc": 842094158,
+        "header_capture_planes": 2,
+        "capture_fourcc": 1497715271,
+        "capture_planes": 1,
+        "width": 930,
+        "height": 1240,
+        "source_width": 1920,
+        "source_height": 2560,
+        "hardware_resize_requested": true,
+        "capture_flags": 16384,
+        "source_flags": 16384,
+        "allocator": "page_aligned_userptr",
+        "decode_ms": 18.379,
+        "compute_ms": 27.575,
+        "cleanup_ms": 0.864,
+        "normalized_checksum": 2166136261,
+        "benchmark_no_output": false,
+        "total_ms": 79.319,
+        "planes": [
+          {
+            "index": 0,
+            "stride": 944,
+            "sizeimage": 1170560,
+            "capacity": 1175552,
+            "payload": 1170560
+          }
+        ]
+      },
+      "same_boot": true,
+      "native_state_intact": true,
+      "owned_process_closed": true,
+      "staging_removed": true,
+      "lease_released": true,
+      "pixel_analysis": {
+        "run_id": "display-codec-20261115-067afbc7",
+        "hardware_resize": true,
+        "source_size": [
+          1920,
+          2560
+        ],
+        "target_size": [
+          930,
+          1240
+        ],
+        "bilinear_mae": 0.05862729795352064,
+        "bilinear_max_error": 59,
+        "bilinear_psnr_db": 50.97508147831758,
+        "distinct_values": 256,
+        "new_critical_kernel_lines": 0,
+        "output_sha256": "7d3c8faf7abeed7302b61e2331a196b353f2ef55f151b765414b173002f6cb9b",
+        "scope": "Initial scale qualification; final performance comparison uses production Triangle outputs.",
+        "initial_max_error_gate_passed": false,
+        "difference_pixels_over_4": 1395,
+        "difference_pixels_over_32": 13,
+        "assessment": "Correct target geometry and all 256 gray codes; localized differences between the hardware filter and bilinear require explicit quality reporting rather than a bit-exact claim."
+      },
+      "final_benchmark_output_match": {
+        "matched": true,
+        "normalized_sha256": "ca792e870f3fdc2ece1bdaea85cdaeeae6282d7e34c840ce09c3bb8126527c49",
+        "quality": {
+          "benchmark_eligible": true,
+          "cpu_output_sha256": "1e342adf9c995c2445801b4d5734bb842edcf5508a25dfe0b508c86af7b1fa6f",
+          "hardware_checksum": 314218002,
+          "hardware_output_sha256": "ca792e870f3fdc2ece1bdaea85cdaeeae6282d7e34c840ce09c3bb8126527c49",
+          "mae": 0.060815990287894556,
+          "max_error": 58,
+          "pixel_count": 1153200,
+          "pixels_over_4": 1394,
+          "psnr_db": 50.95514770075773,
+          "threshold": "This scene only: MAE <= 1 and PSNR >= 40 dB; different filters are not bit-exact."
+        }
+      }
+    },
+    {
+      "run_id": "display-codec-20261115-06fa2307",
+      "case": "png-rgb-64",
+      "codec": "png",
+      "source_sha256": "835130d684acef23ed00abe798ed80e13611e251fbcf652ecfd09291333a07fa",
+      "probe_sha256": "f99e529263a9dd8618a1ac5e4ba03fedcf684c39f34befe0b3343a523c422a12",
+      "fixture": {
+        "name": "png-rgb-64.png",
+        "width": 64,
+        "height": 64,
+        "mode": "RGB",
+        "bytes": 149,
+        "sha256": "2beead7d55be4dd7b227ed122f6f557acf4ceb621c956bd946ec6f48bde8ee50"
+      },
+      "probe": {
+        "schema": 1,
+        "codec": "png",
+        "ioctl_completed": true,
+        "pixel_validated": false,
+        "stage": "complete",
+        "errno": 0,
+        "cleanup_errno": 0,
+        "header_before_capture_allocation": true,
+        "source_change_events": 0,
+        "header_capture_fourcc": 875708738,
+        "header_capture_planes": 1,
+        "capture_fourcc": 875708738,
+        "capture_planes": 1,
+        "width": 64,
+        "height": 64,
+        "capture_flags": 16384,
+        "source_flags": 16384,
+        "allocator": "page_aligned_userptr",
+        "decode_ms": 1.028,
+        "total_ms": 6.304,
+        "planes": [
+          {
+            "index": 0,
+            "stride": 256,
+            "sizeimage": 16384,
+            "capacity": 20480,
+            "payload": 16384
+          }
+        ]
+      },
+      "same_boot": true,
+      "native_state_intact": true,
+      "owned_process_closed": true,
+      "staging_removed": true,
+      "lease_released": true,
+      "pixel_analysis": {
+        "schema": 1,
+        "run_id": "display-codec-20261115-06fa2307",
+        "case": "png-rgb-64",
+        "lease_released": true,
+        "same_boot": true,
+        "probe_sha256": "f99e529263a9dd8618a1ac5e4ba03fedcf684c39f34befe0b3343a523c422a12",
+        "source_sha256": "835130d684acef23ed00abe798ed80e13611e251fbcf652ecfd09291333a07fa",
+        "fixture": {
+          "name": "png-rgb-64.png",
+          "width": 64,
+          "height": 64,
+          "mode": "RGB",
+          "bytes": 149,
+          "sha256": "2beead7d55be4dd7b227ed122f6f557acf4ceb621c956bd946ec6f48bde8ee50"
+        },
+        "probe": {
+          "schema": 1,
+          "codec": "png",
+          "ioctl_completed": true,
+          "pixel_validated": false,
+          "stage": "complete",
+          "errno": 0,
+          "cleanup_errno": 0,
+          "header_before_capture_allocation": true,
+          "source_change_events": 0,
+          "header_capture_fourcc": 875708738,
+          "header_capture_planes": 1,
+          "capture_fourcc": 875708738,
+          "capture_planes": 1,
+          "width": 64,
+          "height": 64,
+          "capture_flags": 16384,
+          "source_flags": 16384,
+          "allocator": "page_aligned_userptr",
+          "decode_ms": 1.028,
+          "total_ms": 6.304,
+          "planes": [
+            {
+              "index": 0,
+              "stride": 256,
+              "sizeimage": 16384,
+              "capacity": 20480,
+              "payload": 16384
+            }
+          ]
+        },
+        "pixel_reference_passed": true,
+        "outputs": [
+          {
+            "plane": 0,
+            "bytes": 16384,
+            "sha256": "b03c8cc75fb858f6b08f2f020661ddc14123b00cb27982ba1ad3876a798dae07"
+          }
+        ],
+        "channel_orders": {
+          "RGBA": {
+            "mae": [
+              42.65625,
+              0.0,
+              42.65625,
+              0.0
+            ],
+            "max_error": [
+              126,
+              0,
+              126,
+              0
+            ],
+            "exact": false
+          },
+          "BGRA": {
+            "mae": [
+              0.0,
+              0.0,
+              0.0,
+              0.0
+            ],
+            "max_error": [
+              0,
+              0,
+              0,
+              0
+            ],
+            "exact": true
+          },
+          "ARGB": {
+            "mae": [
+              85.3125,
+              85.3125,
+              129.0,
+              129.0
+            ],
+            "max_error": [
+              252,
+              252,
+              255,
+              255
+            ],
+            "exact": false
+          },
+          "ABGR": {
+            "mae": [
+              129.0,
+              85.3125,
+              42.65625,
+              129.0
+            ],
+            "max_error": [
+              255,
+              252,
+              126,
+              255
+            ],
+            "exact": false
+          }
+        },
+        "matching_channel_order": [
+          "BGRA"
+        ],
+        "new_critical_kernel_lines": 0,
+        "status": "pixel_reference_passed"
+      }
+    },
+    {
+      "run_id": "display-codec-20261115-1e704fb8",
+      "case": "jpeg-nv12-64",
+      "codec": "jpeg",
+      "source_sha256": "835130d684acef23ed00abe798ed80e13611e251fbcf652ecfd09291333a07fa",
+      "probe_sha256": "f99e529263a9dd8618a1ac5e4ba03fedcf684c39f34befe0b3343a523c422a12",
+      "fixture": {
+        "name": "jpeg-nv12-64.jpg",
+        "width": 64,
+        "height": 64,
+        "mode": "RGB",
+        "bytes": 1318,
+        "sha256": "13949ad2a15e07d495b06d62d698636217ef49fcd3645768101e2174786a6490"
+      },
+      "probe": {
+        "schema": 1,
+        "codec": "jpeg",
+        "ioctl_completed": true,
+        "pixel_validated": false,
+        "stage": "complete",
+        "errno": 0,
+        "cleanup_errno": 0,
+        "header_before_capture_allocation": true,
+        "source_change_events": 1,
+        "header_capture_fourcc": 842094158,
+        "header_capture_planes": 2,
+        "capture_fourcc": 842094158,
+        "capture_planes": 2,
+        "width": 64,
+        "height": 64,
+        "capture_flags": 16384,
+        "source_flags": 16384,
+        "allocator": "page_aligned_userptr",
+        "decode_ms": 2086.414,
+        "total_ms": 2097.338,
+        "planes": [
+          {
+            "index": 0,
+            "stride": 64,
+            "sizeimage": 4096,
+            "capacity": 8192,
+            "payload": 4096
+          },
+          {
+            "index": 1,
+            "stride": 32,
+            "sizeimage": 2048,
+            "capacity": 8192,
+            "payload": 2048
+          }
+        ]
+      },
+      "same_boot": true,
+      "native_state_intact": true,
+      "owned_process_closed": true,
+      "staging_removed": true,
+      "lease_released": true,
+      "pixel_analysis": {
+        "schema": 1,
+        "run_id": "display-codec-20261115-1e704fb8",
+        "case": "jpeg-nv12-64",
+        "lease_released": true,
+        "same_boot": true,
+        "probe_sha256": "f99e529263a9dd8618a1ac5e4ba03fedcf684c39f34befe0b3343a523c422a12",
+        "source_sha256": "835130d684acef23ed00abe798ed80e13611e251fbcf652ecfd09291333a07fa",
+        "fixture": {
+          "name": "jpeg-nv12-64.jpg",
+          "width": 64,
+          "height": 64,
+          "mode": "RGB",
+          "bytes": 1318,
+          "sha256": "13949ad2a15e07d495b06d62d698636217ef49fcd3645768101e2174786a6490"
+        },
+        "probe": {
+          "schema": 1,
+          "codec": "jpeg",
+          "ioctl_completed": true,
+          "pixel_validated": false,
+          "stage": "complete",
+          "errno": 0,
+          "cleanup_errno": 0,
+          "header_before_capture_allocation": true,
+          "source_change_events": 1,
+          "header_capture_fourcc": 842094158,
+          "header_capture_planes": 2,
+          "capture_fourcc": 842094158,
+          "capture_planes": 2,
+          "width": 64,
+          "height": 64,
+          "capture_flags": 16384,
+          "source_flags": 16384,
+          "allocator": "page_aligned_userptr",
+          "decode_ms": 2086.414,
+          "total_ms": 2097.338,
+          "planes": [
+            {
+              "index": 0,
+              "stride": 64,
+              "sizeimage": 4096,
+              "capacity": 8192,
+              "payload": 4096
+            },
+            {
+              "index": 1,
+              "stride": 32,
+              "sizeimage": 2048,
+              "capacity": 8192,
+              "payload": 2048
+            }
+          ]
+        },
+        "pixel_reference_passed": false,
+        "outputs": [
+          {
+            "plane": 0,
+            "bytes": 4096,
+            "sha256": "5a2dda04aece49d04d99cb560be64aafcc621d47c9f0b3ca12c2450fd216091a"
+          },
+          {
+            "plane": 1,
+            "bytes": 2048,
+            "sha256": "e2be19d28e22d9f479ffe9f4eb504682e300927a4cef80b15b95091d95398f62"
+          }
+        ],
+        "rgb_roundtrip_luma_comparison": {
+          "mae": [
+            8.51416015625
+          ],
+          "max_error": 87,
+          "exact": false
+        },
+        "luma_comparison": {
+          "mae": [
+            8.22705078125
+          ],
+          "max_error": 87,
+          "exact": false
+        },
+        "jpeg_tolerance": {
+          "mae_at_most": 1.0,
+          "max_code_error_at_most": 4,
+          "reference": "Direct JPEG grayscale decoding through Pillow/libjpeg luminance draft mode; bypass RGB conversion and clipping. RGB-roundtrip differences are retained separately."
+        },
+        "chroma_comparison": {
+          "Cb": {
+            "mae": [
+              29.111328125
+            ],
+            "max_error": 57,
+            "exact": false
+          },
+          "Cr": {
+            "mae": [
+              56.3037109375
+            ],
+            "max_error": 150,
+            "exact": false
+          },
+          "reference_scope": "Approximate chroma reference after RGB decoding and BOX downsampling, not raw libjpeg planar output."
+        },
+        "new_critical_kernel_lines": 2,
+        "status": "pixel_reference_mismatch"
+      }
+    },
+    {
+      "run_id": "display-codec-20261115-2640e12e",
+      "case": "png-rgb-scribe",
+      "codec": "png",
+      "source_sha256": "5978d17129f3777001b760c2d6f2a1d547260826059c2af4aef509d6f4a1cd27",
+      "probe_sha256": "8a138f5aa0509af1b22d1bdc35d23f94ccbbad05e9ff1f30178a2ab68a3654cb",
+      "fixture": {
+        "name": "png-rgb-scribe.png",
+        "width": 1860,
+        "height": 2480,
+        "mode": "RGB",
+        "bytes": 31431,
+        "sha256": "0140e1e1e195312d663d2e281409e3a3b65550884fe527b119c4f22197a8e19e"
+      },
+      "probe": {
+        "schema": 1,
+        "codec": "png",
+        "ioctl_completed": true,
+        "pixel_validated": false,
+        "stage": "complete",
+        "errno": 0,
+        "cleanup_errno": 0,
+        "header_before_capture_allocation": true,
+        "source_change_events": 0,
+        "coded_file_bytes": 31431,
+        "submitted_bytes": 31431,
+        "header_capture_fourcc": 875708738,
+        "header_capture_planes": 1,
+        "capture_fourcc": 875708738,
+        "capture_planes": 1,
+        "width": 1860,
+        "height": 2480,
+        "capture_flags": 16384,
+        "source_flags": 16384,
+        "allocator": "page_aligned_userptr",
+        "decode_ms": 168.695,
+        "total_ms": 874.389,
+        "planes": [
+          {
+            "index": 0,
+            "stride": 7440,
+            "sizeimage": 18451200,
+            "capacity": 18456576,
+            "payload": 18451200
+          }
+        ]
+      },
+      "same_boot": true,
+      "native_state_intact": true,
+      "owned_process_closed": true,
+      "staging_removed": true,
+      "lease_released": true,
+      "pixel_analysis": {
+        "schema": 1,
+        "run_id": "display-codec-20261115-2640e12e",
+        "case": "png-rgb-scribe",
+        "lease_released": true,
+        "same_boot": true,
+        "probe_sha256": "8a138f5aa0509af1b22d1bdc35d23f94ccbbad05e9ff1f30178a2ab68a3654cb",
+        "source_sha256": "5978d17129f3777001b760c2d6f2a1d547260826059c2af4aef509d6f4a1cd27",
+        "fixture": {
+          "name": "png-rgb-scribe.png",
+          "width": 1860,
+          "height": 2480,
+          "mode": "RGB",
+          "bytes": 31431,
+          "sha256": "0140e1e1e195312d663d2e281409e3a3b65550884fe527b119c4f22197a8e19e"
+        },
+        "probe": {
+          "schema": 1,
+          "codec": "png",
+          "ioctl_completed": true,
+          "pixel_validated": false,
+          "stage": "complete",
+          "errno": 0,
+          "cleanup_errno": 0,
+          "header_before_capture_allocation": true,
+          "source_change_events": 0,
+          "coded_file_bytes": 31431,
+          "submitted_bytes": 31431,
+          "header_capture_fourcc": 875708738,
+          "header_capture_planes": 1,
+          "capture_fourcc": 875708738,
+          "capture_planes": 1,
+          "width": 1860,
+          "height": 2480,
+          "capture_flags": 16384,
+          "source_flags": 16384,
+          "allocator": "page_aligned_userptr",
+          "decode_ms": 168.695,
+          "total_ms": 874.389,
+          "planes": [
+            {
+              "index": 0,
+              "stride": 7440,
+              "sizeimage": 18451200,
+              "capacity": 18456576,
+              "payload": 18451200
+            }
+          ]
+        },
+        "pixel_reference_passed": true,
+        "outputs": [
+          {
+            "plane": 0,
+            "bytes": 18451200,
+            "sha256": "0bf1e75aea9348fb6067fad077b6547fdf1cbcfd6ac1674e4d87befee100f0f9"
+          }
+        ],
+        "channel_orders": {
+          "RGBA": {
+            "mae": [
+              76.05236212278876,
+              0.0,
+              76.05236212278876,
+              0.0
+            ],
+            "max_error": [
+              255,
+              0,
+              255,
+              0
+            ],
+            "exact": false
+          },
+          "BGRA": {
+            "mae": [
+              0.0,
+              0.0,
+              0.0,
+              0.0
+            ],
+            "max_error": [
+              0,
+              0,
+              0,
+              0
+            ],
+            "exact": true
+          },
+          "ARGB": {
+            "mae": [
+              78.51165452653485,
+              78.51165452653485,
+              170.08041623309052,
+              170.08041623309052
+            ],
+            "max_error": [
+              255,
+              255,
+              255,
+              255
+            ],
+            "exact": false
+          },
+          "ABGR": {
+            "mae": [
+              121.33222337842525,
+              78.51165452653485,
+              86.41002428026361,
+              170.08041623309052
+            ],
+            "max_error": [
+              255,
+              255,
+              255,
+              255
+            ],
+            "exact": false
+          }
+        },
+        "matching_channel_order": [
+          "BGRA"
+        ],
+        "new_critical_kernel_lines": 0,
+        "status": "pixel_reference_passed"
+      }
+    },
+    {
+      "run_id": "display-codec-20261115-3d87c849",
+      "case": "png-gray-128",
+      "codec": "png",
+      "source_sha256": "5978d17129f3777001b760c2d6f2a1d547260826059c2af4aef509d6f4a1cd27",
+      "probe_sha256": "8a138f5aa0509af1b22d1bdc35d23f94ccbbad05e9ff1f30178a2ab68a3654cb",
+      "fixture": {
+        "name": "png-gray-128.png",
+        "width": 128,
+        "height": 96,
+        "mode": "L",
+        "bytes": 1874,
+        "sha256": "a65de96fb4edc2ab8ec5e2e36a72fec35675bdad47595ac476729b6d8df51c55"
+      },
+      "probe": {
+        "schema": 1,
+        "codec": "png",
+        "ioctl_completed": true,
+        "pixel_validated": false,
+        "stage": "complete",
+        "errno": 0,
+        "cleanup_errno": 0,
+        "header_before_capture_allocation": true,
+        "source_change_events": 0,
+        "coded_file_bytes": 1874,
+        "submitted_bytes": 1874,
+        "header_capture_fourcc": 875708738,
+        "header_capture_planes": 1,
+        "capture_fourcc": 875708738,
+        "capture_planes": 1,
+        "width": 128,
+        "height": 96,
+        "capture_flags": 16384,
+        "source_flags": 16384,
+        "allocator": "page_aligned_userptr",
+        "decode_ms": 0.972,
+        "total_ms": 7.709,
+        "planes": [
+          {
+            "index": 0,
+            "stride": 512,
+            "sizeimage": 49152,
+            "capacity": 53248,
+            "payload": 49152
+          }
+        ]
+      },
+      "same_boot": true,
+      "native_state_intact": true,
+      "owned_process_closed": true,
+      "staging_removed": true,
+      "lease_released": true,
+      "pixel_analysis": {
+        "schema": 1,
+        "run_id": "display-codec-20261115-3d87c849",
+        "case": "png-gray-128",
+        "lease_released": true,
+        "same_boot": true,
+        "probe_sha256": "8a138f5aa0509af1b22d1bdc35d23f94ccbbad05e9ff1f30178a2ab68a3654cb",
+        "source_sha256": "5978d17129f3777001b760c2d6f2a1d547260826059c2af4aef509d6f4a1cd27",
+        "fixture": {
+          "name": "png-gray-128.png",
+          "width": 128,
+          "height": 96,
+          "mode": "L",
+          "bytes": 1874,
+          "sha256": "a65de96fb4edc2ab8ec5e2e36a72fec35675bdad47595ac476729b6d8df51c55"
+        },
+        "probe": {
+          "schema": 1,
+          "codec": "png",
+          "ioctl_completed": true,
+          "pixel_validated": false,
+          "stage": "complete",
+          "errno": 0,
+          "cleanup_errno": 0,
+          "header_before_capture_allocation": true,
+          "source_change_events": 0,
+          "coded_file_bytes": 1874,
+          "submitted_bytes": 1874,
+          "header_capture_fourcc": 875708738,
+          "header_capture_planes": 1,
+          "capture_fourcc": 875708738,
+          "capture_planes": 1,
+          "width": 128,
+          "height": 96,
+          "capture_flags": 16384,
+          "source_flags": 16384,
+          "allocator": "page_aligned_userptr",
+          "decode_ms": 0.972,
+          "total_ms": 7.709,
+          "planes": [
+            {
+              "index": 0,
+              "stride": 512,
+              "sizeimage": 49152,
+              "capacity": 53248,
+              "payload": 49152
+            }
+          ]
+        },
+        "pixel_reference_passed": true,
+        "outputs": [
+          {
+            "plane": 0,
+            "bytes": 49152,
+            "sha256": "fc5a37887b7e34fdbbd804abe2dc873555bdcf1bf3d5f34f08d2891fc0c791aa"
+          }
+        ],
+        "channel_orders": {
+          "RGBA": {
+            "mae": [
+              0.0,
+              0.0,
+              0.0,
+              0.0
+            ],
+            "max_error": [
+              0,
+              0,
+              0,
+              0
+            ],
+            "exact": true
+          },
+          "BGRA": {
+            "mae": [
+              0.0,
+              0.0,
+              0.0,
+              0.0
+            ],
+            "max_error": [
+              0,
+              0,
+              0,
+              0
+            ],
+            "exact": true
+          },
+          "ARGB": {
+            "mae": [
+              0.0,
+              0.0,
+              127.50431315104167,
+              127.50431315104167
+            ],
+            "max_error": [
+              0,
+              0,
+              255,
+              255
+            ],
+            "exact": false
+          },
+          "ABGR": {
+            "mae": [
+              127.50431315104167,
+              0.0,
+              0.0,
+              127.50431315104167
+            ],
+            "max_error": [
+              255,
+              0,
+              0,
+              255
+            ],
+            "exact": false
+          }
+        },
+        "matching_channel_order": [
+          "RGBA",
+          "BGRA"
+        ],
+        "new_critical_kernel_lines": 0,
+        "status": "pixel_reference_passed"
+      }
+    },
+    {
+      "run_id": "display-codec-20261115-64da2756",
+      "case": "jpeg-rgb-gray-scribe",
+      "codec": "jpeg",
+      "source_sha256": "5978d17129f3777001b760c2d6f2a1d547260826059c2af4aef509d6f4a1cd27",
+      "probe_sha256": "8a138f5aa0509af1b22d1bdc35d23f94ccbbad05e9ff1f30178a2ab68a3654cb",
+      "fixture": {
+        "name": "jpeg-nv12-scribe.jpg",
+        "width": 1860,
+        "height": 2480,
+        "mode": "RGB",
+        "bytes": 136240,
+        "sha256": "61d1e5c018b175cb55dfe28802ca4b902d2b26826e6232bcb0500053dcff6408"
+      },
+      "probe": {
+        "schema": 1,
+        "codec": "jpeg",
+        "ioctl_completed": true,
+        "pixel_validated": false,
+        "stage": "complete",
+        "errno": 0,
+        "cleanup_errno": 0,
+        "header_before_capture_allocation": true,
+        "source_change_events": 1,
+        "coded_file_bytes": 136240,
+        "submitted_bytes": 136320,
+        "header_capture_fourcc": 842094158,
+        "header_capture_planes": 2,
+        "capture_fourcc": 1497715271,
+        "capture_planes": 1,
+        "width": 1860,
+        "height": 2480,
+        "capture_flags": 16384,
+        "source_flags": 16384,
+        "allocator": "page_aligned_userptr",
+        "decode_ms": 39.703,
+        "total_ms": 222.49,
+        "planes": [
+          {
+            "index": 0,
+            "stride": 1872,
+            "sizeimage": 4642560,
+            "capacity": 4648960,
+            "payload": 4642560
+          }
+        ]
+      },
+      "same_boot": true,
+      "native_state_intact": true,
+      "owned_process_closed": true,
+      "staging_removed": true,
+      "lease_released": true,
+      "pixel_analysis": {
+        "schema": 1,
+        "run_id": "display-codec-20261115-64da2756",
+        "case": "jpeg-rgb-gray-scribe",
+        "lease_released": true,
+        "same_boot": true,
+        "probe_sha256": "8a138f5aa0509af1b22d1bdc35d23f94ccbbad05e9ff1f30178a2ab68a3654cb",
+        "source_sha256": "5978d17129f3777001b760c2d6f2a1d547260826059c2af4aef509d6f4a1cd27",
+        "fixture": {
+          "name": "jpeg-nv12-scribe.jpg",
+          "width": 1860,
+          "height": 2480,
+          "mode": "RGB",
+          "bytes": 136240,
+          "sha256": "61d1e5c018b175cb55dfe28802ca4b902d2b26826e6232bcb0500053dcff6408"
+        },
+        "probe": {
+          "schema": 1,
+          "codec": "jpeg",
+          "ioctl_completed": true,
+          "pixel_validated": false,
+          "stage": "complete",
+          "errno": 0,
+          "cleanup_errno": 0,
+          "header_before_capture_allocation": true,
+          "source_change_events": 1,
+          "coded_file_bytes": 136240,
+          "submitted_bytes": 136320,
+          "header_capture_fourcc": 842094158,
+          "header_capture_planes": 2,
+          "capture_fourcc": 1497715271,
+          "capture_planes": 1,
+          "width": 1860,
+          "height": 2480,
+          "capture_flags": 16384,
+          "source_flags": 16384,
+          "allocator": "page_aligned_userptr",
+          "decode_ms": 39.703,
+          "total_ms": 222.49,
+          "planes": [
+            {
+              "index": 0,
+              "stride": 1872,
+              "sizeimage": 4642560,
+              "capacity": 4648960,
+              "payload": 4642560
+            }
+          ]
+        },
+        "pixel_reference_passed": true,
+        "outputs": [
+          {
+            "plane": 0,
+            "bytes": 4642560,
+            "sha256": "842f73b027547b8d19ffeb26dab31af43eec660086515c7ecc84ca5c377fa440"
+          }
+        ],
+        "rgb_roundtrip_luma_comparison": {
+          "mae": [
+            0.4864193114810961
+          ],
+          "max_error": 25,
+          "exact": false
+        },
+        "luma_comparison": {
+          "mae": [
+            0.0
+          ],
+          "max_error": 0,
+          "exact": true
+        },
+        "jpeg_tolerance": {
+          "mae_at_most": 1.0,
+          "max_code_error_at_most": 4,
+          "reference": "Direct JPEG grayscale decoding through Pillow/libjpeg luminance draft mode; bypass RGB conversion and clipping. RGB-roundtrip differences are retained separately."
+        },
+        "new_critical_kernel_lines": 0,
+        "status": "pixel_reference_passed"
+      }
+    },
+    {
+      "run_id": "display-codec-20261115-6832db62",
+      "case": "jpeg-gray-scribe",
+      "codec": "jpeg",
+      "source_sha256": "5978d17129f3777001b760c2d6f2a1d547260826059c2af4aef509d6f4a1cd27",
+      "probe_sha256": "8a138f5aa0509af1b22d1bdc35d23f94ccbbad05e9ff1f30178a2ab68a3654cb",
+      "fixture": {
+        "name": "jpeg-gray-scribe.jpg",
+        "width": 1860,
+        "height": 2480,
+        "mode": "L",
+        "bytes": 71248,
+        "sha256": "aed2530210abcfc7a99d7006eaca1a19ad8ce8eca6b4ce32a154125c06ed5cf0"
+      },
+      "probe": {
+        "schema": 1,
+        "codec": "jpeg",
+        "ioctl_completed": true,
+        "pixel_validated": false,
+        "stage": "complete",
+        "errno": 0,
+        "cleanup_errno": 0,
+        "header_before_capture_allocation": true,
+        "source_change_events": 1,
+        "coded_file_bytes": 71248,
+        "submitted_bytes": 71360,
+        "header_capture_fourcc": 842094158,
+        "header_capture_planes": 2,
+        "capture_fourcc": 1497715271,
+        "capture_planes": 1,
+        "width": 1860,
+        "height": 2480,
+        "capture_flags": 16384,
+        "source_flags": 16384,
+        "allocator": "page_aligned_userptr",
+        "decode_ms": 46.19,
+        "total_ms": 276.916,
+        "planes": [
+          {
+            "index": 0,
+            "stride": 1872,
+            "sizeimage": 4642560,
+            "capacity": 4648960,
+            "payload": 4642560
+          }
+        ]
+      },
+      "same_boot": true,
+      "native_state_intact": true,
+      "owned_process_closed": true,
+      "staging_removed": true,
+      "lease_released": true,
+      "pixel_analysis": {
+        "schema": 1,
+        "run_id": "display-codec-20261115-6832db62",
+        "case": "jpeg-gray-scribe",
+        "lease_released": true,
+        "same_boot": true,
+        "probe_sha256": "8a138f5aa0509af1b22d1bdc35d23f94ccbbad05e9ff1f30178a2ab68a3654cb",
+        "source_sha256": "5978d17129f3777001b760c2d6f2a1d547260826059c2af4aef509d6f4a1cd27",
+        "fixture": {
+          "name": "jpeg-gray-scribe.jpg",
+          "width": 1860,
+          "height": 2480,
+          "mode": "L",
+          "bytes": 71248,
+          "sha256": "aed2530210abcfc7a99d7006eaca1a19ad8ce8eca6b4ce32a154125c06ed5cf0"
+        },
+        "probe": {
+          "schema": 1,
+          "codec": "jpeg",
+          "ioctl_completed": true,
+          "pixel_validated": false,
+          "stage": "complete",
+          "errno": 0,
+          "cleanup_errno": 0,
+          "header_before_capture_allocation": true,
+          "source_change_events": 1,
+          "coded_file_bytes": 71248,
+          "submitted_bytes": 71360,
+          "header_capture_fourcc": 842094158,
+          "header_capture_planes": 2,
+          "capture_fourcc": 1497715271,
+          "capture_planes": 1,
+          "width": 1860,
+          "height": 2480,
+          "capture_flags": 16384,
+          "source_flags": 16384,
+          "allocator": "page_aligned_userptr",
+          "decode_ms": 46.19,
+          "total_ms": 276.916,
+          "planes": [
+            {
+              "index": 0,
+              "stride": 1872,
+              "sizeimage": 4642560,
+              "capacity": 4648960,
+              "payload": 4642560
+            }
+          ]
+        },
+        "pixel_reference_passed": true,
+        "outputs": [
+          {
+            "plane": 0,
+            "bytes": 4642560,
+            "sha256": "842f73b027547b8d19ffeb26dab31af43eec660086515c7ecc84ca5c377fa440"
+          }
+        ],
+        "rgb_roundtrip_luma_comparison": {
+          "mae": [
+            0.0
+          ],
+          "max_error": 0,
+          "exact": true
+        },
+        "luma_comparison": {
+          "mae": [
+            0.0
+          ],
+          "max_error": 0,
+          "exact": true
+        },
+        "jpeg_tolerance": {
+          "mae_at_most": 1.0,
+          "max_code_error_at_most": 4,
+          "reference": "Direct JPEG grayscale decoding through Pillow/libjpeg luminance draft mode; bypass RGB conversion and clipping. RGB-roundtrip differences are retained separately."
+        },
+        "new_critical_kernel_lines": 0,
+        "status": "pixel_reference_passed"
+      }
+    },
+    {
+      "run_id": "display-codec-20261115-84f68bec",
+      "case": "jpeg-padded-nv12-64",
+      "codec": "jpeg",
+      "source_sha256": "835130d684acef23ed00abe798ed80e13611e251fbcf652ecfd09291333a07fa",
+      "probe_sha256": "f99e529263a9dd8618a1ac5e4ba03fedcf684c39f34befe0b3343a523c422a12",
+      "fixture": {
+        "name": "jpeg-padded-64.jpg",
+        "width": 64,
+        "height": 64,
+        "mode": "RGB",
+        "bytes": 1408,
+        "sha256": "2730a8c5890674cc2c64a6820eaad12ce5157ad3721c4e83aa0f1cd035da1456",
+        "original_coded_bytes": 1318,
+        "zero_padding_bytes": 90,
+        "decoded_reference_identical": true
+      },
+      "probe": {
+        "schema": 1,
+        "codec": "jpeg",
+        "ioctl_completed": true,
+        "pixel_validated": false,
+        "stage": "complete",
+        "errno": 0,
+        "cleanup_errno": 0,
+        "header_before_capture_allocation": true,
+        "source_change_events": 1,
+        "header_capture_fourcc": 842094158,
+        "header_capture_planes": 2,
+        "capture_fourcc": 842094158,
+        "capture_planes": 2,
+        "width": 64,
+        "height": 64,
+        "capture_flags": 16384,
+        "source_flags": 16384,
+        "allocator": "page_aligned_userptr",
+        "decode_ms": 0.847,
+        "total_ms": 7.82,
+        "planes": [
+          {
+            "index": 0,
+            "stride": 64,
+            "sizeimage": 4096,
+            "capacity": 8192,
+            "payload": 4096
+          },
+          {
+            "index": 1,
+            "stride": 32,
+            "sizeimage": 2048,
+            "capacity": 8192,
+            "payload": 2048
+          }
+        ]
+      },
+      "same_boot": true,
+      "native_state_intact": true,
+      "owned_process_closed": true,
+      "staging_removed": true,
+      "lease_released": true,
+      "pixel_analysis": {
+        "schema": 1,
+        "run_id": "display-codec-20261115-84f68bec",
+        "case": "jpeg-padded-nv12-64",
+        "lease_released": true,
+        "same_boot": true,
+        "probe_sha256": "f99e529263a9dd8618a1ac5e4ba03fedcf684c39f34befe0b3343a523c422a12",
+        "source_sha256": "835130d684acef23ed00abe798ed80e13611e251fbcf652ecfd09291333a07fa",
+        "fixture": {
+          "name": "jpeg-padded-64.jpg",
+          "width": 64,
+          "height": 64,
+          "mode": "RGB",
+          "bytes": 1408,
+          "sha256": "2730a8c5890674cc2c64a6820eaad12ce5157ad3721c4e83aa0f1cd035da1456",
+          "original_coded_bytes": 1318,
+          "zero_padding_bytes": 90,
+          "decoded_reference_identical": true
+        },
+        "probe": {
+          "schema": 1,
+          "codec": "jpeg",
+          "ioctl_completed": true,
+          "pixel_validated": false,
+          "stage": "complete",
+          "errno": 0,
+          "cleanup_errno": 0,
+          "header_before_capture_allocation": true,
+          "source_change_events": 1,
+          "header_capture_fourcc": 842094158,
+          "header_capture_planes": 2,
+          "capture_fourcc": 842094158,
+          "capture_planes": 2,
+          "width": 64,
+          "height": 64,
+          "capture_flags": 16384,
+          "source_flags": 16384,
+          "allocator": "page_aligned_userptr",
+          "decode_ms": 0.847,
+          "total_ms": 7.82,
+          "planes": [
+            {
+              "index": 0,
+              "stride": 64,
+              "sizeimage": 4096,
+              "capacity": 8192,
+              "payload": 4096
+            },
+            {
+              "index": 1,
+              "stride": 32,
+              "sizeimage": 2048,
+              "capacity": 8192,
+              "payload": 2048
+            }
+          ]
+        },
+        "pixel_reference_passed": false,
+        "outputs": [
+          {
+            "plane": 0,
+            "bytes": 4096,
+            "sha256": "1d62ac77e6a0ec3fdf6e5c272a50c5fae48823cf0afe651c0f895b0827991fa2"
+          },
+          {
+            "plane": 1,
+            "bytes": 2048,
+            "sha256": "96516485e5070e169feb22500ee35e4dcf624af38020bf3014809a23e2c029e8"
+          }
+        ],
+        "rgb_roundtrip_luma_comparison": {
+          "mae": [
+            1.335693359375
+          ],
+          "max_error": 77,
+          "exact": false
+        },
+        "luma_comparison": {
+          "mae": [
+            0.874267578125
+          ],
+          "max_error": 78,
+          "exact": false
+        },
+        "jpeg_tolerance": {
+          "mae_at_most": 1.0,
+          "max_code_error_at_most": 4,
+          "reference": "Direct JPEG grayscale decoding through Pillow/libjpeg luminance draft mode; bypass RGB conversion and clipping. RGB-roundtrip differences are retained separately."
+        },
+        "chroma_comparison": {
+          "Cb": {
+            "mae": [
+              25.8818359375
+            ],
+            "max_error": 57,
+            "exact": false
+          },
+          "Cr": {
+            "mae": [
+              61.7578125
+            ],
+            "max_error": 150,
+            "exact": false
+          },
+          "reference_scope": "Approximate chroma reference after RGB decoding and BOX downsampling, not raw libjpeg planar output."
+        },
+        "new_critical_kernel_lines": 0,
+        "status": "pixel_reference_mismatch"
+      }
+    },
+    {
+      "run_id": "display-codec-20261115-9dbbe225",
+      "case": "jpeg-padded-gray-64",
+      "codec": "jpeg",
+      "source_sha256": "835130d684acef23ed00abe798ed80e13611e251fbcf652ecfd09291333a07fa",
+      "probe_sha256": "f99e529263a9dd8618a1ac5e4ba03fedcf684c39f34befe0b3343a523c422a12",
+      "fixture": {
+        "name": "jpeg-padded-64.jpg",
+        "width": 64,
+        "height": 64,
+        "mode": "RGB",
+        "bytes": 1408,
+        "sha256": "2730a8c5890674cc2c64a6820eaad12ce5157ad3721c4e83aa0f1cd035da1456",
+        "original_coded_bytes": 1318,
+        "zero_padding_bytes": 90,
+        "decoded_reference_identical": true
+      },
+      "probe": {
+        "schema": 1,
+        "codec": "jpeg",
+        "ioctl_completed": true,
+        "pixel_validated": false,
+        "stage": "complete",
+        "errno": 0,
+        "cleanup_errno": 0,
+        "header_before_capture_allocation": true,
+        "source_change_events": 1,
+        "header_capture_fourcc": 842094158,
+        "header_capture_planes": 2,
+        "capture_fourcc": 1497715271,
+        "capture_planes": 1,
+        "width": 64,
+        "height": 64,
+        "capture_flags": 16384,
+        "source_flags": 16384,
+        "allocator": "page_aligned_userptr",
+        "decode_ms": 0.93,
+        "total_ms": 6.514,
+        "planes": [
+          {
+            "index": 0,
+            "stride": 64,
+            "sizeimage": 4096,
+            "capacity": 8192,
+            "payload": 4096
+          }
+        ]
+      },
+      "same_boot": true,
+      "native_state_intact": true,
+      "owned_process_closed": true,
+      "staging_removed": true,
+      "lease_released": true,
+      "pixel_analysis": {
+        "schema": 1,
+        "run_id": "display-codec-20261115-9dbbe225",
+        "case": "jpeg-padded-gray-64",
+        "lease_released": true,
+        "same_boot": true,
+        "probe_sha256": "f99e529263a9dd8618a1ac5e4ba03fedcf684c39f34befe0b3343a523c422a12",
+        "source_sha256": "835130d684acef23ed00abe798ed80e13611e251fbcf652ecfd09291333a07fa",
+        "fixture": {
+          "name": "jpeg-padded-64.jpg",
+          "width": 64,
+          "height": 64,
+          "mode": "RGB",
+          "bytes": 1408,
+          "sha256": "2730a8c5890674cc2c64a6820eaad12ce5157ad3721c4e83aa0f1cd035da1456",
+          "original_coded_bytes": 1318,
+          "zero_padding_bytes": 90,
+          "decoded_reference_identical": true
+        },
+        "probe": {
+          "schema": 1,
+          "codec": "jpeg",
+          "ioctl_completed": true,
+          "pixel_validated": false,
+          "stage": "complete",
+          "errno": 0,
+          "cleanup_errno": 0,
+          "header_before_capture_allocation": true,
+          "source_change_events": 1,
+          "header_capture_fourcc": 842094158,
+          "header_capture_planes": 2,
+          "capture_fourcc": 1497715271,
+          "capture_planes": 1,
+          "width": 64,
+          "height": 64,
+          "capture_flags": 16384,
+          "source_flags": 16384,
+          "allocator": "page_aligned_userptr",
+          "decode_ms": 0.93,
+          "total_ms": 6.514,
+          "planes": [
+            {
+              "index": 0,
+              "stride": 64,
+              "sizeimage": 4096,
+              "capacity": 8192,
+              "payload": 4096
+            }
+          ]
+        },
+        "pixel_reference_passed": true,
+        "outputs": [
+          {
+            "plane": 0,
+            "bytes": 4096,
+            "sha256": "9e9d50ab9bff8669b6ebb2df8d6102a53e323fa2e996574cca5524ad534e555c"
+          }
+        ],
+        "rgb_roundtrip_luma_comparison": {
+          "mae": [
+            0.47705078125
+          ],
+          "max_error": 1,
+          "exact": false
+        },
+        "luma_comparison": {
+          "mae": [
+            0.0
+          ],
+          "max_error": 0,
+          "exact": true
+        },
+        "jpeg_tolerance": {
+          "mae_at_most": 1.0,
+          "max_code_error_at_most": 4,
+          "reference": "Direct JPEG grayscale decoding through Pillow/libjpeg luminance draft mode; bypass RGB conversion and clipping. RGB-roundtrip differences are retained separately."
+        },
+        "new_critical_kernel_lines": 0,
+        "status": "pixel_reference_passed"
+      }
+    },
+    {
+      "run_id": "display-codec-20261115-b67bff9d",
+      "case": "jpeg-gray-128",
+      "codec": "jpeg",
+      "source_sha256": "835130d684acef23ed00abe798ed80e13611e251fbcf652ecfd09291333a07fa",
+      "probe_sha256": "f99e529263a9dd8618a1ac5e4ba03fedcf684c39f34befe0b3343a523c422a12",
+      "fixture": {
+        "name": "jpeg-gray-128.jpg",
+        "width": 128,
+        "height": 96,
+        "mode": "L",
+        "bytes": 11959,
+        "sha256": "03244cd1b0d506e6aea4234079ee7b2644aa5181576405e102e24c79493211b1"
+      },
+      "probe": {
+        "schema": 1,
+        "codec": "jpeg",
+        "ioctl_completed": true,
+        "pixel_validated": false,
+        "stage": "complete",
+        "errno": 0,
+        "cleanup_errno": 0,
+        "header_before_capture_allocation": true,
+        "source_change_events": 1,
+        "header_capture_fourcc": 842094158,
+        "header_capture_planes": 2,
+        "capture_fourcc": 1497715271,
+        "capture_planes": 1,
+        "width": 128,
+        "height": 96,
+        "capture_flags": 16384,
+        "source_flags": 16384,
+        "allocator": "page_aligned_userptr",
+        "decode_ms": 1.628,
+        "total_ms": 8.15,
+        "planes": [
+          {
+            "index": 0,
+            "stride": 128,
+            "sizeimage": 12288,
+            "capacity": 16384,
+            "payload": 12288
+          }
+        ]
+      },
+      "same_boot": true,
+      "native_state_intact": true,
+      "owned_process_closed": true,
+      "staging_removed": true,
+      "lease_released": true,
+      "pixel_analysis": {
+        "schema": 1,
+        "run_id": "display-codec-20261115-b67bff9d",
+        "case": "jpeg-gray-128",
+        "lease_released": true,
+        "same_boot": true,
+        "probe_sha256": "f99e529263a9dd8618a1ac5e4ba03fedcf684c39f34befe0b3343a523c422a12",
+        "source_sha256": "835130d684acef23ed00abe798ed80e13611e251fbcf652ecfd09291333a07fa",
+        "fixture": {
+          "name": "jpeg-gray-128.jpg",
+          "width": 128,
+          "height": 96,
+          "mode": "L",
+          "bytes": 11959,
+          "sha256": "03244cd1b0d506e6aea4234079ee7b2644aa5181576405e102e24c79493211b1"
+        },
+        "probe": {
+          "schema": 1,
+          "codec": "jpeg",
+          "ioctl_completed": true,
+          "pixel_validated": false,
+          "stage": "complete",
+          "errno": 0,
+          "cleanup_errno": 0,
+          "header_before_capture_allocation": true,
+          "source_change_events": 1,
+          "header_capture_fourcc": 842094158,
+          "header_capture_planes": 2,
+          "capture_fourcc": 1497715271,
+          "capture_planes": 1,
+          "width": 128,
+          "height": 96,
+          "capture_flags": 16384,
+          "source_flags": 16384,
+          "allocator": "page_aligned_userptr",
+          "decode_ms": 1.628,
+          "total_ms": 8.15,
+          "planes": [
+            {
+              "index": 0,
+              "stride": 128,
+              "sizeimage": 12288,
+              "capacity": 16384,
+              "payload": 12288
+            }
+          ]
+        },
+        "pixel_reference_passed": true,
+        "outputs": [
+          {
+            "plane": 0,
+            "bytes": 12288,
+            "sha256": "60533a7d27d2a710986c4d420a5b085e82ea9176bfed1affc956b336109efbca"
+          }
+        ],
+        "rgb_roundtrip_luma_comparison": {
+          "mae": [
+            0.02490234375
+          ],
+          "max_error": 1,
+          "exact": false
+        },
+        "luma_comparison": {
+          "mae": [
+            0.02490234375
+          ],
+          "max_error": 1,
+          "exact": false
+        },
+        "jpeg_tolerance": {
+          "mae_at_most": 1.0,
+          "max_code_error_at_most": 4,
+          "reference": "Direct JPEG grayscale decoding through Pillow/libjpeg luminance draft mode; bypass RGB conversion and clipping. RGB-roundtrip differences are retained separately."
+        },
+        "new_critical_kernel_lines": 0,
+        "status": "pixel_reference_passed"
+      }
+    },
+    {
+      "run_id": "display-codec-20261115-c6bc0d40",
+      "case": "png-rgba-64",
+      "codec": "png",
+      "source_sha256": "835130d684acef23ed00abe798ed80e13611e251fbcf652ecfd09291333a07fa",
+      "probe_sha256": "f99e529263a9dd8618a1ac5e4ba03fedcf684c39f34befe0b3343a523c422a12",
+      "fixture": {
+        "name": "png-rgba-64.png",
+        "width": 64,
+        "height": 64,
+        "mode": "RGBA",
+        "bytes": 404,
+        "sha256": "d11e641a9805e8d1aff3f5a79579ab6146c4953bce5769563f4b667df183c839"
+      },
+      "probe": {
+        "schema": 1,
+        "codec": "png",
+        "ioctl_completed": true,
+        "pixel_validated": false,
+        "stage": "complete",
+        "errno": 0,
+        "cleanup_errno": 0,
+        "header_before_capture_allocation": true,
+        "source_change_events": 0,
+        "header_capture_fourcc": 875708738,
+        "header_capture_planes": 1,
+        "capture_fourcc": 875708738,
+        "capture_planes": 1,
+        "width": 64,
+        "height": 64,
+        "capture_flags": 16384,
+        "source_flags": 16384,
+        "allocator": "page_aligned_userptr",
+        "decode_ms": 1.075,
+        "total_ms": 6.882,
+        "planes": [
+          {
+            "index": 0,
+            "stride": 256,
+            "sizeimage": 16384,
+            "capacity": 20480,
+            "payload": 16384
+          }
+        ]
+      },
+      "same_boot": true,
+      "native_state_intact": true,
+      "owned_process_closed": true,
+      "staging_removed": true,
+      "lease_released": true,
+      "pixel_analysis": {
+        "schema": 1,
+        "run_id": "display-codec-20261115-c6bc0d40",
+        "case": "png-rgba-64",
+        "lease_released": true,
+        "same_boot": true,
+        "probe_sha256": "f99e529263a9dd8618a1ac5e4ba03fedcf684c39f34befe0b3343a523c422a12",
+        "source_sha256": "835130d684acef23ed00abe798ed80e13611e251fbcf652ecfd09291333a07fa",
+        "fixture": {
+          "name": "png-rgba-64.png",
+          "width": 64,
+          "height": 64,
+          "mode": "RGBA",
+          "bytes": 404,
+          "sha256": "d11e641a9805e8d1aff3f5a79579ab6146c4953bce5769563f4b667df183c839"
+        },
+        "probe": {
+          "schema": 1,
+          "codec": "png",
+          "ioctl_completed": true,
+          "pixel_validated": false,
+          "stage": "complete",
+          "errno": 0,
+          "cleanup_errno": 0,
+          "header_before_capture_allocation": true,
+          "source_change_events": 0,
+          "header_capture_fourcc": 875708738,
+          "header_capture_planes": 1,
+          "capture_fourcc": 875708738,
+          "capture_planes": 1,
+          "width": 64,
+          "height": 64,
+          "capture_flags": 16384,
+          "source_flags": 16384,
+          "allocator": "page_aligned_userptr",
+          "decode_ms": 1.075,
+          "total_ms": 6.882,
+          "planes": [
+            {
+              "index": 0,
+              "stride": 256,
+              "sizeimage": 16384,
+              "capacity": 20480,
+              "payload": 16384
+            }
+          ]
+        },
+        "pixel_reference_passed": true,
+        "outputs": [
+          {
+            "plane": 0,
+            "bytes": 16384,
+            "sha256": "dbf238fa8f30df0f8c8f169d9f13e3d061e47631b7428a1d1f5fb7b40c6e2702"
+          }
+        ],
+        "channel_orders": {
+          "RGBA": {
+            "mae": [
+              42.65625,
+              0.0,
+              42.65625,
+              0.0
+            ],
+            "max_error": [
+              126,
+              0,
+              126,
+              0
+            ],
+            "exact": false
+          },
+          "BGRA": {
+            "mae": [
+              0.0,
+              0.0,
+              0.0,
+              0.0
+            ],
+            "max_error": [
+              0,
+              0,
+              0,
+              0
+            ],
+            "exact": true
+          },
+          "ARGB": {
+            "mae": [
+              85.3125,
+              85.3125,
+              74.71337890625,
+              74.71337890625
+            ],
+            "max_error": [
+              252,
+              252,
+              214,
+              214
+            ],
+            "exact": false
+          },
+          "ABGR": {
+            "mae": [
+              86.0322265625,
+              85.3125,
+              42.65625,
+              74.71337890625
+            ],
+            "max_error": [
+              252,
+              252,
+              126,
+              214
+            ],
+            "exact": false
+          }
+        },
+        "matching_channel_order": [
+          "BGRA"
+        ],
+        "new_critical_kernel_lines": 0,
+        "status": "pixel_reference_passed"
+      }
+    },
+    {
+      "run_id": "display-codec-20261115-d7eb0a8f",
+      "case": "jpeg-rgb-gray-64",
+      "codec": "jpeg",
+      "source_sha256": "5978d17129f3777001b760c2d6f2a1d547260826059c2af4aef509d6f4a1cd27",
+      "probe_sha256": "8a138f5aa0509af1b22d1bdc35d23f94ccbbad05e9ff1f30178a2ab68a3654cb",
+      "fixture": {
+        "name": "jpeg-nv12-64.jpg",
+        "width": 64,
+        "height": 64,
+        "mode": "RGB",
+        "bytes": 1318,
+        "sha256": "13949ad2a15e07d495b06d62d698636217ef49fcd3645768101e2174786a6490"
+      },
+      "probe": {
+        "schema": 1,
+        "codec": "jpeg",
+        "ioctl_completed": true,
+        "pixel_validated": false,
+        "stage": "complete",
+        "errno": 0,
+        "cleanup_errno": 0,
+        "header_before_capture_allocation": true,
+        "source_change_events": 1,
+        "coded_file_bytes": 1318,
+        "submitted_bytes": 1408,
+        "header_capture_fourcc": 842094158,
+        "header_capture_planes": 2,
+        "capture_fourcc": 1497715271,
+        "capture_planes": 1,
+        "width": 64,
+        "height": 64,
+        "capture_flags": 16384,
+        "source_flags": 16384,
+        "allocator": "page_aligned_userptr",
+        "decode_ms": 0.965,
+        "total_ms": 7.141,
+        "planes": [
+          {
+            "index": 0,
+            "stride": 64,
+            "sizeimage": 4096,
+            "capacity": 8192,
+            "payload": 4096
+          }
+        ]
+      },
+      "same_boot": true,
+      "native_state_intact": true,
+      "owned_process_closed": true,
+      "staging_removed": true,
+      "lease_released": true,
+      "pixel_analysis": {
+        "schema": 1,
+        "run_id": "display-codec-20261115-d7eb0a8f",
+        "case": "jpeg-rgb-gray-64",
+        "lease_released": true,
+        "same_boot": true,
+        "probe_sha256": "8a138f5aa0509af1b22d1bdc35d23f94ccbbad05e9ff1f30178a2ab68a3654cb",
+        "source_sha256": "5978d17129f3777001b760c2d6f2a1d547260826059c2af4aef509d6f4a1cd27",
+        "fixture": {
+          "name": "jpeg-nv12-64.jpg",
+          "width": 64,
+          "height": 64,
+          "mode": "RGB",
+          "bytes": 1318,
+          "sha256": "13949ad2a15e07d495b06d62d698636217ef49fcd3645768101e2174786a6490"
+        },
+        "probe": {
+          "schema": 1,
+          "codec": "jpeg",
+          "ioctl_completed": true,
+          "pixel_validated": false,
+          "stage": "complete",
+          "errno": 0,
+          "cleanup_errno": 0,
+          "header_before_capture_allocation": true,
+          "source_change_events": 1,
+          "coded_file_bytes": 1318,
+          "submitted_bytes": 1408,
+          "header_capture_fourcc": 842094158,
+          "header_capture_planes": 2,
+          "capture_fourcc": 1497715271,
+          "capture_planes": 1,
+          "width": 64,
+          "height": 64,
+          "capture_flags": 16384,
+          "source_flags": 16384,
+          "allocator": "page_aligned_userptr",
+          "decode_ms": 0.965,
+          "total_ms": 7.141,
+          "planes": [
+            {
+              "index": 0,
+              "stride": 64,
+              "sizeimage": 4096,
+              "capacity": 8192,
+              "payload": 4096
+            }
+          ]
+        },
+        "pixel_reference_passed": true,
+        "outputs": [
+          {
+            "plane": 0,
+            "bytes": 4096,
+            "sha256": "9e9d50ab9bff8669b6ebb2df8d6102a53e323fa2e996574cca5524ad534e555c"
+          }
+        ],
+        "rgb_roundtrip_luma_comparison": {
+          "mae": [
+            0.47705078125
+          ],
+          "max_error": 1,
+          "exact": false
+        },
+        "luma_comparison": {
+          "mae": [
+            0.0
+          ],
+          "max_error": 0,
+          "exact": true
+        },
+        "jpeg_tolerance": {
+          "mae_at_most": 1.0,
+          "max_code_error_at_most": 4,
+          "reference": "Direct JPEG grayscale decoding through Pillow/libjpeg luminance draft mode; bypass RGB conversion and clipping. RGB-roundtrip differences are retained separately."
+        },
+        "new_critical_kernel_lines": 0,
+        "status": "pixel_reference_passed"
+      }
+    },
+    {
+      "run_id": "display-codec-20261115-e539ee8b",
+      "case": "jpeg-rgb-gray-64",
+      "codec": "jpeg",
+      "source_sha256": "835130d684acef23ed00abe798ed80e13611e251fbcf652ecfd09291333a07fa",
+      "probe_sha256": "f99e529263a9dd8618a1ac5e4ba03fedcf684c39f34befe0b3343a523c422a12",
+      "fixture": {
+        "name": "jpeg-nv12-64.jpg",
+        "width": 64,
+        "height": 64,
+        "mode": "RGB",
+        "bytes": 1318,
+        "sha256": "13949ad2a15e07d495b06d62d698636217ef49fcd3645768101e2174786a6490"
+      },
+      "probe": {
+        "schema": 1,
+        "codec": "jpeg",
+        "ioctl_completed": true,
+        "pixel_validated": false,
+        "stage": "complete",
+        "errno": 0,
+        "cleanup_errno": 0,
+        "header_before_capture_allocation": true,
+        "source_change_events": 1,
+        "header_capture_fourcc": 842094158,
+        "header_capture_planes": 2,
+        "capture_fourcc": 1497715271,
+        "capture_planes": 1,
+        "width": 64,
+        "height": 64,
+        "capture_flags": 16384,
+        "source_flags": 16384,
+        "allocator": "page_aligned_userptr",
+        "decode_ms": 2117.051,
+        "total_ms": 2126.659,
+        "planes": [
+          {
+            "index": 0,
+            "stride": 64,
+            "sizeimage": 4096,
+            "capacity": 8192,
+            "payload": 4096
+          }
+        ]
+      },
+      "same_boot": true,
+      "native_state_intact": true,
+      "owned_process_closed": true,
+      "staging_removed": true,
+      "lease_released": true,
+      "pixel_analysis": {
+        "schema": 1,
+        "run_id": "display-codec-20261115-e539ee8b",
+        "case": "jpeg-rgb-gray-64",
+        "lease_released": true,
+        "same_boot": true,
+        "probe_sha256": "f99e529263a9dd8618a1ac5e4ba03fedcf684c39f34befe0b3343a523c422a12",
+        "source_sha256": "835130d684acef23ed00abe798ed80e13611e251fbcf652ecfd09291333a07fa",
+        "fixture": {
+          "name": "jpeg-nv12-64.jpg",
+          "width": 64,
+          "height": 64,
+          "mode": "RGB",
+          "bytes": 1318,
+          "sha256": "13949ad2a15e07d495b06d62d698636217ef49fcd3645768101e2174786a6490"
+        },
+        "probe": {
+          "schema": 1,
+          "codec": "jpeg",
+          "ioctl_completed": true,
+          "pixel_validated": false,
+          "stage": "complete",
+          "errno": 0,
+          "cleanup_errno": 0,
+          "header_before_capture_allocation": true,
+          "source_change_events": 1,
+          "header_capture_fourcc": 842094158,
+          "header_capture_planes": 2,
+          "capture_fourcc": 1497715271,
+          "capture_planes": 1,
+          "width": 64,
+          "height": 64,
+          "capture_flags": 16384,
+          "source_flags": 16384,
+          "allocator": "page_aligned_userptr",
+          "decode_ms": 2117.051,
+          "total_ms": 2126.659,
+          "planes": [
+            {
+              "index": 0,
+              "stride": 64,
+              "sizeimage": 4096,
+              "capacity": 8192,
+              "payload": 4096
+            }
+          ]
+        },
+        "pixel_reference_passed": false,
+        "outputs": [
+          {
+            "plane": 0,
+            "bytes": 4096,
+            "sha256": "5fc5f75eead0bea041d289133d6e68835b61c6bea54158746a4a0cfd24072dae"
+          }
+        ],
+        "rgb_roundtrip_luma_comparison": {
+          "mae": [
+            8.1591796875
+          ],
+          "max_error": 87,
+          "exact": false
+        },
+        "luma_comparison": {
+          "mae": [
+            7.8642578125
+          ],
+          "max_error": 87,
+          "exact": false
+        },
+        "jpeg_tolerance": {
+          "mae_at_most": 1.0,
+          "max_code_error_at_most": 4,
+          "reference": "Direct JPEG grayscale decoding through Pillow/libjpeg luminance draft mode; bypass RGB conversion and clipping. RGB-roundtrip differences are retained separately."
+        },
+        "new_critical_kernel_lines": 2,
+        "status": "pixel_reference_mismatch"
+      }
+    },
+    {
+      "run_id": "display-codec-20261115-e7ac2812",
+      "case": "jpeg-scale-scribe",
+      "codec": "jpeg",
+      "source_sha256": "077da9a93105dbd573039970dab983b1bee3876e3b20ab49a1f6a9e6b9521a65",
+      "probe_sha256": "ee33184efba670e9d8b8a2439b7a5244d43d57724feb6019ab62e74c8067cb35",
+      "fixture": {
+        "name": "benchmark-scene.jpg",
+        "width": 1920,
+        "height": 2560,
+        "mode": "L",
+        "bytes": 288237,
+        "sha256": "376ec78abb2c33477cbaf83fac6b5a3f940fc515e10a97a75cf80cdde90bf34b"
+      },
+      "probe": {
+        "schema": 1,
+        "codec": "jpeg",
+        "ioctl_completed": true,
+        "pixel_validated": false,
+        "stage": "complete",
+        "errno": 0,
+        "cleanup_errno": 0,
+        "header_before_capture_allocation": true,
+        "source_change_events": 1,
+        "coded_file_bytes": 288237,
+        "submitted_bytes": 288320,
+        "header_capture_fourcc": 842094158,
+        "header_capture_planes": 2,
+        "capture_fourcc": 1497715271,
+        "capture_planes": 1,
+        "width": 1860,
+        "height": 2480,
+        "source_width": 1920,
+        "source_height": 2560,
+        "hardware_resize_requested": true,
+        "capture_flags": 16384,
+        "source_flags": 16384,
+        "allocator": "page_aligned_userptr",
+        "decode_ms": 48.481,
+        "compute_ms": 81.283,
+        "cleanup_ms": 2.752,
+        "normalized_checksum": 2166136261,
+        "benchmark_no_output": false,
+        "total_ms": 283.646,
+        "planes": [
+          {
+            "index": 0,
+            "stride": 1872,
+            "sizeimage": 4642560,
+            "capacity": 4648960,
+            "payload": 4642560
+          }
+        ]
+      },
+      "same_boot": true,
+      "native_state_intact": true,
+      "owned_process_closed": true,
+      "staging_removed": true,
+      "lease_released": true,
+      "final_benchmark_output_match": {
+        "matched": true,
+        "normalized_sha256": "87f0c9aacd8cf08a32179392200d6d8e7e2635a42dff30b47c7083724caace72",
+        "quality": {
+          "benchmark_eligible": true,
+          "cpu_output_sha256": "69ffa1f19314937ccec64fe47cb21d15f55bf26d62866b2e16237de38b1349cc",
+          "hardware_checksum": 2258971954,
+          "hardware_output_sha256": "87f0c9aacd8cf08a32179392200d6d8e7e2635a42dff30b47c7083724caace72",
+          "mae": 0.003922346514047867,
+          "max_error": 7,
+          "pixel_count": 4612800,
+          "pixels_over_4": 2,
+          "psnr_db": 70.5929105150791,
+          "threshold": "This scene only: MAE <= 1 and PSNR >= 40 dB; different filters are not bit-exact."
+        }
+      }
+    },
+    {
+      "run_id": "display-codec-20261115-f94d3447",
+      "case": "jpeg-scale-32",
+      "codec": "jpeg",
+      "source_sha256": "077da9a93105dbd573039970dab983b1bee3876e3b20ab49a1f6a9e6b9521a65",
+      "probe_sha256": "ee33184efba670e9d8b8a2439b7a5244d43d57724feb6019ab62e74c8067cb35",
+      "fixture": {
+        "name": "jpeg-nv12-64.jpg",
+        "width": 64,
+        "height": 64,
+        "mode": "RGB",
+        "bytes": 1318,
+        "sha256": "13949ad2a15e07d495b06d62d698636217ef49fcd3645768101e2174786a6490"
+      },
+      "probe": {
+        "schema": 1,
+        "codec": "jpeg",
+        "ioctl_completed": true,
+        "pixel_validated": false,
+        "stage": "complete",
+        "errno": 0,
+        "cleanup_errno": 0,
+        "header_before_capture_allocation": true,
+        "source_change_events": 1,
+        "coded_file_bytes": 1318,
+        "submitted_bytes": 1408,
+        "header_capture_fourcc": 842094158,
+        "header_capture_planes": 2,
+        "capture_fourcc": 1497715271,
+        "capture_planes": 1,
+        "width": 32,
+        "height": 32,
+        "source_width": 64,
+        "source_height": 64,
+        "hardware_resize_requested": true,
+        "capture_flags": 16384,
+        "source_flags": 16384,
+        "allocator": "page_aligned_userptr",
+        "decode_ms": 0.986,
+        "compute_ms": 4.425,
+        "cleanup_ms": 0.3,
+        "normalized_checksum": 2166136261,
+        "benchmark_no_output": false,
+        "total_ms": 7.059,
+        "planes": [
+          {
+            "index": 0,
+            "stride": 32,
+            "sizeimage": 1024,
+            "capacity": 8192,
+            "payload": 1024
+          }
+        ]
+      },
+      "same_boot": true,
+      "native_state_intact": true,
+      "owned_process_closed": true,
+      "staging_removed": true,
+      "lease_released": true,
+      "pixel_analysis": {
+        "run_id": "display-codec-20261115-f94d3447",
+        "hardware_resize": true,
+        "source_size": [
+          64,
+          64
+        ],
+        "target_size": [
+          32,
+          32
+        ],
+        "bilinear_mae": 0.35546875,
+        "bilinear_max_error": 2,
+        "new_critical_kernel_lines": 0,
+        "pixel_reference_consistent": true,
+        "output_sha256": "1273af605b75fbf729676c1400833546fb09933f54380e198b18a897f7dee9f3",
+        "scope": "Initial scale qualification versus direct JPEG luma plus bilinear; performance comparison will use the production Triangle output."
+      }
+    }
+  ],
+  "recommended_tested_output": "Post-header GREY for baseline JPEG; advertised zero packet tail. Measured BGRA for tested 8-bit PNG formats.",
+  "limits": "Default JPEG NV12 output failed. Progressive JPEG is rejected by source. Other PNG bit depths/interlace/palette and general failure recovery are not qualified."
+}

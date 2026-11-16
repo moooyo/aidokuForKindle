@@ -5,6 +5,8 @@ mod cover_jobs;
 mod data_management;
 mod device_policies;
 mod diagnostics;
+mod display_modes;
+mod dither_preview;
 mod download_usage;
 mod extended_preferences;
 mod interaction_models;
@@ -256,6 +258,7 @@ pub struct App {
     pub(crate) search_results: Vec<SearchResult>,
     pub(crate) reader: Option<ReaderState>,
     pub(crate) displayed_reader: Option<DisplayedReader>,
+    dither_preview_key: Option<(u32, u32, imaging::SpatialDither)>,
     reader_recovery: Option<ReaderRecovery>,
     displayed_image_leases: Vec<crate::cache::CacheLease>,
     resume_reader_repair: bool,
@@ -368,19 +371,12 @@ impl App {
             store,
             disk_cache,
             network_control,
-            mut prefs,
+            prefs,
             current_book_id,
             interactions,
             data_management,
             downloads,
         } = prepared;
-        prefs.dither = true;
-        prefs.dither_method = if platform.hardware_y4_available() {
-            "hardware"
-        } else {
-            "software"
-        }
-        .into();
         let initial_rotation = orientation::reader_display_rotation_degrees(
             normalize_route(&options.initial_screen),
             &prefs,
@@ -447,6 +443,7 @@ impl App {
             search_results: Vec::new(),
             reader: None,
             displayed_reader: None,
+            dither_preview_key: None,
             reader_recovery: None,
             displayed_image_leases: Vec::new(),
             resume_reader_repair: false,
@@ -1093,7 +1090,7 @@ impl App {
                     .reader_target
                     .clone()
                     .unwrap_or_else(|| ReaderTarget::new(&chapter_id, page, 0, 1.0));
-                self.load_reader_target(target)?;
+                self.load_reader_target_with_refresh(target, context.reader_refresh)?;
             }
             JobResult::ReaderImage {
                 chapter_id,
@@ -1162,15 +1159,12 @@ impl App {
                             }
                         }
                         self.displayed_image_leases = leases;
-                        ui.global::<State>().set_reader_image(first.into_image());
-                        ui.global::<State>().set_reader_image_next(
-                            second
-                                .map(prepared_pixels::PreparedPixels::into_image)
-                                .unwrap_or_default(),
-                        );
                         if let Some(reader) = self.reader.as_mut() {
                             reader.set_wide_page(wide, wide_half);
                         }
+                        let animation = self.page_animation_direction(&preferences);
+                        let fast = self.publish_display_pixels(&ui, first, second, &preferences);
+                        self.platform.arm_reader_animation(animation);
                         if let Some(reader) = self.reader.as_ref() {
                             self.displayed_reader = Some(DisplayedReader {
                                 session: ReaderSession {
@@ -1189,7 +1183,7 @@ impl App {
                                     viewport_height,
                                 },
                                 preferences,
-                                hardware_dither,
+                                hardware_dither: hardware_dither && !fast,
                                 first_path,
                                 second_path,
                             });
@@ -1392,6 +1386,9 @@ impl App {
 
     pub(crate) fn effective_reader_preferences(&self) -> Preferences {
         let mut preferences = self.prefs.clone();
+        if !self.platform.hardware_media_availability().available() {
+            preferences.hardware_acceleration = false;
+        }
         if self.interactions.remember_book_direction {
             if let Some(direction) = self
                 .current_book_id
@@ -1423,6 +1420,16 @@ impl App {
         // A failed hardware submission still needs this raw request so the
         // backend can safely apply its software fallback to these exact pixels.
         self.platform.set_reader_hardware_y4(raw);
+        let display = if self.route == "reader" && !sleep_cover {
+            self.displayed_reader
+                .as_ref()
+                .map(|frame| frame.preferences.display_mode)
+        } else {
+            None
+        };
+        let content_only =
+            self.modal.is_empty() && self.reader.as_ref().is_some_and(|reader| !reader.menu_open);
+        self.platform.set_reader_display(display, content_only);
     }
 
     /// Compare the requested processing with the last accepted image, not its worker.
@@ -1433,22 +1440,33 @@ impl App {
         let preferences = self.effective_reader_preferences();
         let hardware = preferences.uses_hardware_dither(self.platform.hardware_y4_available());
         self.displayed_reader.as_ref().is_none_or(|frame| {
-            frame.hardware_dither != hardware || frame.preferences.dither != preferences.dither
+            frame.hardware_dither != hardware
+                || frame.preferences.spatial_dither() != preferences.spatial_dither()
         })
     }
 
     /// A native SEND can revoke availability after the frame's UI transaction.
     /// Observe only in-memory policy here; the retained raw scene stays owned by
     /// its existing backend request while the selector reports software fallback.
-    fn poll_reader_dither_state(&self) {
+    fn poll_reader_dither_state(&mut self) {
         let Some(ui) = self.ui.upgrade() else {
             return;
         };
         let state = ui.global::<State>();
+        let media = self.platform.hardware_media_availability();
+        let media_changed = state.get_hardware_media_available() != media.available();
         if state.get_hardware_dither_available() != self.platform.hardware_y4_available()
             || state.get_dither_pending() != self.reader_dither_pending()
+            || media_changed
+            || state.get_hardware_media_reason() != media.reason()
         {
             self.sync_interaction_state();
+        }
+        if media_changed && self.prefs.hardware_acceleration && self.route == "reader" {
+            self.invalidate_reader_work();
+            if let Err(error) = self.request_reader_images() {
+                self.show_error(error);
+            }
         }
     }
 
@@ -1543,7 +1561,7 @@ impl App {
             let target = self.reader_target().context("No reader")?;
             let result = (|| {
                 if !self.store.has_pages(&target.chapter_id)? {
-                    self.load_reader_target(target.clone())
+                    self.load_reader_target_with_refresh(target.clone(), update.refresh)
                 } else {
                     self.request_reader_images_with_refresh(update.refresh)
                 }
@@ -1606,6 +1624,15 @@ impl App {
             "selected_chapters": self.selected_chapters,
         });
         snapshot["hardware_y4_available"] = json!(self.platform.hardware_y4_available());
+        snapshot["display_mode"] = json!(self.prefs.display_mode);
+        snapshot["reader_fast_frame"] = json!(self.displayed_reader.as_ref().is_some_and(
+            |frame| frame.preferences.display_mode == crate::display::DisplayMode::Fast
+        ));
+        snapshot["display_mode_presented"] = json!(
+            self.displayed_reader
+                .as_ref()
+                .map(|frame| frame.preferences.display_mode)
+        );
         snapshot["reader_hardware_y4_requested"] =
             json!(self.platform.reader_hardware_y4_requested());
         snapshot["reader_hardware_y4_effective"] = json!(
@@ -1613,6 +1640,13 @@ impl App {
                 .uses_hardware_dither(self.platform.hardware_y4_available())
         );
         snapshot["dither_pending"] = json!(self.reader_dither_pending());
+        snapshot["hardware_media_available"] =
+            json!(self.platform.hardware_media_availability().available());
+        snapshot["hardware_media_reason"] =
+            json!(self.platform.hardware_media_availability().reason());
+        snapshot["hardware_acceleration"] =
+            json!(self.effective_reader_preferences().hardware_acceleration);
+        snapshot["native_media"] = json!(crate::native_media::statistics());
         snapshot["cache"] = json!(self.disk_cache.stats());
         snapshot["render_cache"] = json!(crate::render_cache::stats());
         snapshot["reader_next_frame"] = json!({
@@ -1923,6 +1957,7 @@ mod tests {
                 search_results: Vec::new(),
                 reader: None,
                 displayed_reader: None,
+                dither_preview_key: None,
                 reader_recovery: None,
                 displayed_image_leases: Vec::new(),
                 resume_reader_repair: false,

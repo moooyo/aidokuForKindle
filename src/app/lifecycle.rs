@@ -632,6 +632,7 @@ fn same_reader_render(first: &Preferences, second: &Preferences) -> bool {
         && first.crop_borders == second.crop_borders
         && first.dither == second.dither
         && first.normalized_dither_method() == second.normalized_dither_method()
+        && first.hardware_acceleration == second.hardware_acceleration
         && first.contrast == second.contrast
         && first.reader_fit == second.reader_fit
 }

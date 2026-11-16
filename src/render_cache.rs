@@ -308,6 +308,7 @@ struct SourceKey {
     namespace: PathBuf,
     checksum: String,
     encoded_bytes: u64,
+    media_acceleration: crate::native_media::Acceleration,
 }
 
 struct SourceEntry {
@@ -712,6 +713,8 @@ pub fn load_alias(
         || key.crop_borders != options.crop_borders
         || key.dither != options.dither
         || key.hardware_dither != options.hardware_dither
+        || key.spatial_dither != options.spatial_dither
+        || key.media_acceleration != options.media_acceleration
         || key.contrast != options.contrast
         || key.vertical
         || key.offset != 0
@@ -1018,6 +1021,7 @@ fn render_for_purpose(
     let source_proof = SourceProof::for_source(page, raw, &source_checksum, metadata.len())?;
     let source_key = format!("{}:{source_checksum}", CacheManager::page_key(page));
     let key = RenderKey {
+        media_acceleration: options.media_acceleration,
         source_key: if let Some(fit) = mode.fit() {
             format!("{READER_RASTER_VERSION}:fit-v1:{}:{source_key}", fit.key())
         } else if mode.is_reader() {
@@ -1030,6 +1034,7 @@ fn render_for_purpose(
         crop_borders: options.crop_borders,
         dither: options.dither,
         hardware_dither: options.hardware_dither,
+        spatial_dither: options.spatial_dither,
         contrast: options.contrast,
         vertical,
         offset,
@@ -1099,6 +1104,7 @@ fn render_for_purpose(
             // adjacent windows. Share this module's existing 12 MiB pool: an
             // ordinary page never inserts its much larger source bitmap.
             let source_key = SourceKey {
+                media_acceleration: options.media_acceleration,
                 namespace: cache.namespace().to_path_buf(),
                 checksum: source_checksum.clone(),
                 encoded_bytes: bytes.len() as u64,
@@ -1220,6 +1226,7 @@ fn attach_retained_raster(
             return None;
         }
         let source_key = SourceKey {
+            media_acceleration: key.render.media_acceleration,
             namespace: key.namespace.clone(),
             checksum: proof.checksum.clone(),
             encoded_bytes: proof.bytes,
@@ -1737,6 +1744,7 @@ mod tests {
 
         fn key(&self, options: &ImageOptions, vertical: bool, offset: u32, zoom: f32) -> RenderKey {
             RenderKey {
+                media_acceleration: options.media_acceleration,
                 source_key: format!(
                     "{}:{}",
                     CacheManager::page_key(&self.page),
@@ -1747,6 +1755,7 @@ mod tests {
                 crop_borders: options.crop_borders,
                 dither: options.dither,
                 hardware_dither: options.hardware_dither,
+                spatial_dither: options.spatial_dither,
                 contrast: options.contrast,
                 vertical,
                 offset,
@@ -1763,11 +1772,13 @@ mod tests {
 
     fn options() -> ImageOptions {
         ImageOptions {
+            media_acceleration: Default::default(),
             width: 96,
             height: 144,
             crop_borders: false,
             dither: false,
             hardware_dither: false,
+            spatial_dither: None,
             contrast: 0,
         }
     }
@@ -1780,6 +1791,103 @@ mod tests {
                 ((x * 7 + y * 13) % 247) as u8
             }])
         })
+    }
+
+    #[test]
+    fn spatial_dither_switches_separate_prefetched_resident_and_disk_pixels() {
+        use crate::imaging::SpatialDither;
+        let fixture = Fixture::new(GrayImage::from_fn(96, 144, |x, y| {
+            Luma([((x * 5 + y * 3) % 256) as u8])
+        }));
+        let input = fs::read(&fixture.raw).unwrap();
+        let mut outputs = Vec::new();
+        for algorithm in [SpatialDither::Off, SpatialDither::Bayer8, SpatialDither::FloydSteinberg] {
+            let options = ImageOptions {
+                dither: true,
+                spatial_dither: Some(algorithm),
+                ..options()
+            };
+            let expected = imaging::decode_reader_raster(&input, &options).unwrap();
+            let prefetched = prefetch_raster(&fixture.cache, &fixture.page, &fixture.raw,
+                &options, false, 0, 1.0).unwrap();
+            let foreground = render_raster(&fixture.cache, &fixture.page, &fixture.raw,
+                &options, false, 0, 1.0).unwrap();
+            assert_eq!(*foreground.image, expected);
+            assert!(Arc::ptr_eq(&foreground.image, &prefetched.image));
+            let disk = render(&fixture.cache, &fixture.page, &fixture.raw,
+                &options, false, 0, 1.0).unwrap();
+            fixture.cache.set_alias("spatial-choice", &disk.cache_path).unwrap();
+            clear_memory(&fixture.cache);
+            let loaded = load_alias(&fixture.cache, "spatial-choice", &options).unwrap().unwrap();
+            assert_eq!(*loaded.image, expected);
+            for other in [SpatialDither::Off, SpatialDither::Bayer8, SpatialDither::FloydSteinberg] {
+                if other != algorithm {
+                    let other_options = ImageOptions { spatial_dither: Some(other), ..options.clone() };
+                    assert!(load_alias(&fixture.cache, "spatial-choice", &other_options).unwrap().is_none());
+                }
+            }
+            outputs.push((options, disk.cache_path, expected));
+        }
+        for first in 0..outputs.len() {
+            for second in first + 1..outputs.len() {
+                assert_ne!(outputs[first].1, outputs[second].1);
+                assert_ne!(outputs[first].2, outputs[second].2);
+            }
+            let (options, _, expected) = &outputs[first];
+            let returned = render_raster(&fixture.cache, &fixture.page, &fixture.raw,
+                options, false, 0, 1.0).unwrap();
+            assert_eq!(returned.image.as_ref(), expected);
+        }
+    }
+
+    #[test]
+    fn jpeg_acceleration_policies_have_separate_rendered_and_retained_sources() {
+        use crate::native_media::Acceleration;
+        let fixture = Fixture::new(artwork());
+        let mut variants = Vec::new();
+        for policy in [
+            Acceleration::Off,
+            Acceleration::Decode,
+            Acceleration::DecodeAndResize,
+        ] {
+            let options = ImageOptions {
+                media_acceleration: policy,
+                ..options()
+            };
+            let frame = render_raster(
+                &fixture.cache,
+                &fixture.page,
+                &fixture.raw,
+                &options,
+                true,
+                0,
+                1.0,
+            )
+            .unwrap();
+            let repeated = render_raster(
+                &fixture.cache,
+                &fixture.page,
+                &fixture.raw,
+                &options,
+                true,
+                0,
+                1.0,
+            )
+            .unwrap();
+            assert!(repeated.memory_hit);
+            assert!(Arc::ptr_eq(&frame.image, &repeated.image));
+            for previous in &variants {
+                assert!(!Arc::ptr_eq(previous, &frame.image));
+            }
+            variants.push(frame.image);
+            let source = SourceKey {
+                namespace: fixture.cache.namespace().to_path_buf(),
+                checksum: fixture.cache.fingerprint(&fixture.raw).unwrap(),
+                encoded_bytes: fs::metadata(&fixture.raw).unwrap().len(),
+                media_acceleration: policy,
+            };
+            assert!(decoded(|state| state.sources.contains_key(&source)));
+        }
     }
 
     #[test]
@@ -1881,6 +1989,7 @@ mod tests {
         let retained = prepared.retained_raster.as_ref().unwrap();
         retained.promote(&fixture.cache).unwrap();
         let source_key = SourceKey {
+            media_acceleration: Default::default(),
             namespace: fixture.cache.namespace().to_path_buf(),
             checksum: fixture.cache.fingerprint(&fixture.raw).unwrap(),
             encoded_bytes: fs::metadata(&fixture.raw).unwrap().len(),
@@ -2176,6 +2285,7 @@ mod tests {
         )
         .unwrap();
         let source_key = SourceKey {
+            media_acceleration: Default::default(),
             namespace: fixture.cache.namespace().to_path_buf(),
             checksum: fixture.cache.fingerprint(&fixture.raw).unwrap(),
             encoded_bytes: fs::metadata(&fixture.raw).unwrap().len(),
@@ -2249,6 +2359,7 @@ mod tests {
         let source =
             imaging::ReaderSource::from_test_image(GrayImage::from_raw(1, 1, allocation).unwrap());
         let source_key = SourceKey {
+            media_acceleration: Default::default(),
             namespace: PathBuf::from("memory-test"),
             checksum: "sealed-source".into(),
             encoded_bytes: 1,
@@ -2282,6 +2393,7 @@ mod tests {
             imaging::ReaderSource::from_test_image(GrayImage::from_raw(1, 1, allocation).unwrap());
         memory.remember_source(
             SourceKey {
+                media_acceleration: Default::default(),
                 checksum: "oversized".into(),
                 ..source_key
             },
@@ -2352,12 +2464,14 @@ mod tests {
                 ..Page::default()
             };
             let key = RenderKey {
+                media_acceleration: Default::default(),
                 source_key: format!("{}:{}", CacheManager::page_key(&page), digest(&bytes)),
                 width: case.target_width,
                 height: case.target_height,
                 crop_borders: case.crop_borders,
                 dither: case.dither,
                 hardware_dither: false,
+                spatial_dither: None,
                 contrast: case.contrast,
                 vertical: false,
                 offset: 0,
@@ -2642,11 +2756,13 @@ mod tests {
             Luma([((x * 7 + y * 13) % 247) as u8])
         }));
         let options = ImageOptions {
+            media_acceleration: Default::default(),
             width: 1_272,
             height: 1_696,
             crop_borders: false,
             dither: true,
             hardware_dither: false,
+            spatial_dither: None,
             contrast: 0,
         };
         let before = stats();
@@ -2927,12 +3043,14 @@ mod tests {
         let key = DecodedKey {
             namespace: PathBuf::from("memory-test"),
             render: RenderKey {
+                media_acceleration: Default::default(),
                 source_key: name.into(),
                 width: image.width(),
                 height: image.height(),
                 crop_borders: false,
                 dither: false,
                 hardware_dither: false,
+                spatial_dither: None,
                 contrast: 0,
                 vertical: false,
                 offset: 0,
@@ -3068,6 +3186,7 @@ mod tests {
         let (key2, page2, second) = retained_fixture("vertical-two", GrayImage::new(2, 2));
         let source = imaging::ReaderSource::from_test_image(GrayImage::new(4, 4));
         let source_key = SourceKey {
+            media_acceleration: Default::default(),
             namespace: PathBuf::from("memory-test"),
             checksum: "shared-vertical-source".into(),
             encoded_bytes: 1,
@@ -3121,6 +3240,7 @@ mod tests {
         assert_eq!(history.entries[&key1].access, before);
         assert!(history.entries[&key1].access < history.entries[&second.key].access);
         let source_key = SourceKey {
+            media_acceleration: Default::default(),
             namespace: PathBuf::from("memory-test"),
             checksum: "peek-source".into(),
             encoded_bytes: 1,
@@ -3813,11 +3933,13 @@ mod tests {
         let fixture = Fixture::empty();
         write_long_png(&fixture.raw);
         let options = ImageOptions {
+            media_acceleration: Default::default(),
             width: 256,
             height: 512,
             crop_borders: true,
             dither: true,
             hardware_dither: false,
+            spatial_dither: None,
             contrast: 0,
         };
         let first = render(

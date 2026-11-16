@@ -1,0 +1,91 @@
+{
+  "schema": 1,
+  "scope": "Host analysis of already captured physical YUV planes; production Reader CPU oracle with native video opens/ioctls intercepted. No new physical operations or physical timings.",
+  "conversion": "Bilinear centered chroma upsampling, full-range JPEG YCbCr to RGB, then Reader weights 54/183/19.",
+  "results": [
+    {
+      "run_id": "display-followup-20261115-4211014b",
+      "case": "jpeg-explicit-nv12-small",
+      "width": 64,
+      "height": 64,
+      "layout": "qualified_nv_pixel_layout",
+      "mae": 0.477294921875,
+      "max_error": 1,
+      "psnr_db": 51.34293547103799,
+      "pixel_count": 4096,
+      "pixels_over_4": 0,
+      "hardware_converted_gray_sha256": "9679a470f106de8c4fd8bb5639a779c302f4d526b187aa690fc818d769049636",
+      "cpu_reference_sha256": "6d0f83566bbff6eee18e48dc03a0943d7facc57b23a7ff078e4c349fa38b1031"
+    },
+    {
+      "run_id": "display-followup-20261115-cf240444",
+      "case": "jpeg-explicit-nv16-small",
+      "width": 128,
+      "height": 96,
+      "layout": "qualified_nv_pixel_layout",
+      "mae": 0.4937337239583333,
+      "max_error": 2,
+      "psnr_db": 51.085617625708764,
+      "pixel_count": 12288,
+      "pixels_over_4": 0,
+      "hardware_converted_gray_sha256": "f30ae6f77cdbc45556e6916118caea86f0d402827684b96301b35a2a375f7b8f",
+      "cpu_reference_sha256": "fc2555cf9d9df7b6f3d8135a9285ef52272822778cdebe4c25767f9e8979e84c"
+    },
+    {
+      "run_id": "display-followup-20261115-f4e5fac2",
+      "case": "jpeg-explicit-nv12-scribe",
+      "width": 1860,
+      "height": 2480,
+      "layout": "qualified_nv_pixel_layout",
+      "mae": 0.4728509798820673,
+      "max_error": 2,
+      "psnr_db": 51.38146255140796,
+      "pixel_count": 4612800,
+      "pixels_over_4": 0,
+      "hardware_converted_gray_sha256": "67b1fa17efad33e360c88e3391f34c446ad30ead2b3df6f4460c229d1a890629",
+      "cpu_reference_sha256": "b59f015c651b4e826d729399a1631c72300886043847047b0f72b8dcf30ebd16"
+    },
+    {
+      "run_id": "display-followup-20261115-bedd747f",
+      "case": "jpeg-explicit-nv16-scribe",
+      "width": 1860,
+      "height": 2480,
+      "layout": "qualified_nv_pixel_layout",
+      "mae": 0.47271071800208114,
+      "max_error": 1,
+      "psnr_db": 51.38484911481454,
+      "pixel_count": 4612800,
+      "pixels_over_4": 0,
+      "hardware_converted_gray_sha256": "890a0ae27a325030c7f589b38a9a4a8053ae42df8d3634bb1ba71268d325b7df",
+      "cpu_reference_sha256": "c0e036925e14fd930ea7c6f067a24735a7a6e6d4b41fb64cba2420732b94760a"
+    },
+    {
+      "run_id": "display-followup-20261115-6fde7714",
+      "case": "jpeg-explicit-ayuv-small",
+      "width": 128,
+      "height": 96,
+      "layout": "observed_nonstandard_ayuv_split_luma; analysis_only",
+      "mae": 0.484375,
+      "max_error": 2,
+      "psnr_db": 51.15952090906688,
+      "pixel_count": 12288,
+      "pixels_over_4": 0,
+      "hardware_converted_gray_sha256": "f9f189c037463f0ae71e3b73f1e6dea92e0b271d991db4a792d0f32f19c4c888",
+      "cpu_reference_sha256": "acc7ef3684316e4b9cc2abef6040636fb14a7b94eb9ab33b86613941f4e26879"
+    },
+    {
+      "run_id": "display-followup-20261115-604620ae",
+      "case": "jpeg-explicit-ayuv-scribe",
+      "width": 1860,
+      "height": 2480,
+      "layout": "observed_nonstandard_ayuv_split_luma; analysis_only",
+      "mae": 0.47279223031564344,
+      "max_error": 1,
+      "psnr_db": 51.38410029963342,
+      "pixel_count": 4612800,
+      "pixels_over_4": 0,
+      "hardware_converted_gray_sha256": "0102184f7ac5b4770d10906e651742d8240644160d748527a3d249662240c707",
+      "cpu_reference_sha256": "0152b69f052a5328aece59970baf76a6347c1acd6ba3bc14deb74319ad3bb517"
+    }
+  ]
+}

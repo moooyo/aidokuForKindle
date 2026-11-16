@@ -33,11 +33,13 @@ pub(crate) struct Case {
 impl Case {
     pub(crate) fn options(&self) -> ImageOptions {
         ImageOptions {
+            media_acceleration: Default::default(),
             width: self.target_width,
             height: self.target_height,
             crop_borders: self.crop_borders,
             dither: self.dither,
             hardware_dither: false,
+            spatial_dither: None,
             contrast: self.contrast,
         }
     }

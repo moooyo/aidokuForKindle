@@ -2,6 +2,7 @@ pub mod app;
 pub mod backup;
 pub mod cache;
 pub mod demo;
+pub mod display;
 pub mod domain;
 pub mod downloads;
 pub mod gestures;
@@ -9,6 +10,7 @@ pub mod imaging;
 pub mod input;
 pub mod local;
 pub mod localization;
+pub mod native_media;
 #[cfg(all(feature = "kindle", target_os = "linux"))]
 pub mod native_presentation;
 pub mod pairing;

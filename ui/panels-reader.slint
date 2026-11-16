@@ -4,7 +4,7 @@ import { ReadingOptions, LightOptions, RefreshOptions } from "native-controls.sl
 
 export component ReaderPanel inherits Rectangle {
     in property <string> context: State.modal-context;
-    out property <length> content-height: context == "reader-mode" ? (State.large-screen ? 300px : 268px) : context == "reader-brightness" ? (State.large-screen ? 346px : 302px) : (State.large-screen ? 128px : 112px);
+    out property <length> content-height: context == "reader-mode" ? (State.large-screen ? 300px : 268px) : context == "reader-brightness" ? (State.large-screen ? 346px : 302px) : (State.large-screen ? 368px : 336px);
     height: root.content-height + 48px;
     background: Theme.paper;
     Rectangle { x: 0px; y: 0px; width: parent.width; height: 1px; background: Theme.ink; }

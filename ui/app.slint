@@ -36,7 +36,7 @@ export component AppWindow inherits Window {
     content := Rectangle {
         x: 0px; y: State.route == "reader" ? 0px : Theme.status-height;
         width: root.width;
-        height: root.height - (State.route == "reader" ? 0px : Theme.status-height) - (root.has-navigation ? Theme.nav-height : 0px);
+        height: root.height - (State.route == "reader" ? 0px : Theme.status-height) - (root.has-navigation ? Theme.tab-bar-height : 0px);
         if !State.booting && State.route == "library": LibraryPage {}
         if !State.booting && State.route == "detail": DetailPage {}
         if !State.booting && State.route == "sources": SourcesPage {}
@@ -46,7 +46,7 @@ export component AppWindow inherits Window {
         if !State.booting && State.route == "settings": SettingsPage {}
         if !State.booting && State.route == "reader": ReaderPage {}
     }
-    if !State.booting && root.has-navigation: Navigation { y: root.height - Theme.nav-height; width: root.width; }
+    if !State.booting && root.has-navigation: Navigation { y: root.height - Theme.tab-bar-height; width: root.width; }
     if !State.booting && State.modal != "": Panels { width: root.width; height: root.height; }
     if !State.booting && (State.message != "" || State.busy) && State.modal == "" && (State.route != "reader" || State.reader-menu): Rectangle {
         x: (root.width - self.width) / 2;

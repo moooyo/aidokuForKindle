@@ -43,6 +43,41 @@ fn select_book(app: &mut App, book: &Book) {
     app.observe_sleep_book(Some(book.clone()));
 }
 
+#[test]
+fn active_reading_defers_optional_cover_work_and_keeps_its_ready_preview() -> Result<()> {
+    with_ui(|ui| {
+        let mut fixture = super::super::tests::DemoRouteFixture::new("settings", DeviceProfile::Scribe, true);
+        let app = &mut fixture.app;
+        app.ui = ui.as_weak();
+        select_book(app, &book());
+        let preview = Image::from_rgb8(SharedPixelBuffer::<Rgb8Pixel>::new(16, 24));
+        app.sleep_screen.cover = Some(preview);
+        app.sleep_screen.cover_bytes = 16 * 24 * 3;
+        let identity = app.sleep_screen.identity.clone().unwrap();
+        let cancellation = imaging::DecodeCancellation::new();
+        app.sleep_screen.job = Some(CoverJob { id: 99, identity, cancellation: cancellation.clone() });
+        app.defer_sleep_cover_for_reader();
+        assert!(cancellation.is_cancelled());
+        assert!(app.sleep_screen.job.is_some());
+        assert!(app.sleep_screen.cover.is_some());
+        assert!(!app.sleep_screen.full_resolution);
+        let deadline = app.sleep_screen.reader_idle_until.unwrap();
+        assert!(deadline > Instant::now());
+        let cancelled = cancellation.check().unwrap_err();
+        app.finish_sleep_cover_job(99, Some(&cancelled));
+        assert!(app.sleep_screen.job.is_none());
+        assert_eq!(app.sleep_screen.reader_idle_until, Some(deadline));
+        let next_job = app.next_job;
+        app.prepare_sleep_screen()?;
+        assert_eq!(app.next_job, next_job);
+        assert!(app.sleep_screen.cover.is_some());
+        app.show_sleep_cover()?;
+        assert!(ui.global::<SleepScreenModel>().get_has_cover());
+        assert_eq!(ui.global::<SleepScreenModel>().get_cover().size().width, 16);
+        Ok(())
+    })
+}
+
 struct HeadlessPlatform {
     window: Rc<slint::platform::software_renderer::MinimalSoftwareWindow>,
 }

@@ -7,7 +7,7 @@ export component TapLayoutCard inherits Rectangle {
     in property <string> layout;
     in property <bool> selected;
     callback clicked();
-    property <bool> inverted: root.selected != hit.pressed;
+    property <bool> inverted: root.selected || hit.pressed;
     property <color> foreground: root.inverted ? Theme.paper : Theme.ink;
     x: 0px;
     y: 0px;
@@ -70,8 +70,8 @@ export component TapLayoutCard inherits Rectangle {
         width: parent.width;
         height: parent.height;
         pointer-event(event) => {
-            if event.kind == PointerEventKind.down { Commands.refresh("fast"); }
-            else if event.kind == PointerEventKind.up { Commands.refresh("ui"); }
+            if event.kind == PointerEventKind.down { Commands.refresh("ui"); }
+            else if event.kind == PointerEventKind.up || event.kind == PointerEventKind.cancel { Commands.refresh("ui"); }
         }
         clicked => { root.clicked(); }
     }

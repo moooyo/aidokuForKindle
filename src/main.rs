@@ -89,6 +89,10 @@ struct Arguments {
     #[arg(long)]
     capture: Option<PathBuf>,
 
+    /// Save application state without rendering an additional screenshot.
+    #[arg(long)]
+    state_output: Option<PathBuf>,
+
     /// Save bounded software timing after exit, relative to the first Rust main entry.
     #[arg(long)]
     performance_trace: Option<PathBuf>,
@@ -265,6 +269,8 @@ fn run(arguments: Arguments) -> Result<()> {
     let capture_attempted = Rc::new(Cell::new(false));
     let capture_settle_covers = arguments.capture_settle_covers;
     let capture_path = arguments.capture;
+    let state_path = arguments.state_output;
+    let state_attempted = Rc::new(Cell::new(false));
     let started = Instant::now();
     let startup_ready_elapsed = Rc::new(Cell::new(None::<Duration>));
     let lifecycle = Rc::new(RefCell::new(bootstrap_lifecycle::Coordinator::new(
@@ -460,6 +466,8 @@ fn run(arguments: Arguments) -> Result<()> {
         let quitting = quitting.clone();
         let capture_attempted = capture_attempted.clone();
         let capture_path = capture_path.clone();
+        let state_path = state_path.clone();
+        let state_attempted = state_attempted.clone();
         let pointer_observer = pointer_observer.clone();
         let lifecycle = lifecycle.clone();
         let advance_startup = advance_startup.clone();
@@ -549,7 +557,7 @@ fn run(arguments: Arguments) -> Result<()> {
                     || deadline.is_some_and(|deadline| elapsed >= deadline)
                 {
                     if capture_settle_covers
-                        && capture_path.is_some()
+                        && (capture_path.is_some() || state_path.is_some())
                         && !STOP_REQUESTED.load(Ordering::Acquire)
                         && deadline.is_some_and(|deadline| {
                             elapsed.saturating_sub(deadline) < Duration::from_secs(15)
@@ -566,6 +574,14 @@ fn run(arguments: Arguments) -> Result<()> {
                             failures
                                 .borrow_mut()
                                 .push(format!("Capture failed: {error:#}"));
+                        }
+                    }
+                    if let Some(path) = state_path.as_deref() {
+                        state_attempted.set(true);
+                        if let Err(error) = save_state(&app.borrow(), path) {
+                            failures
+                                .borrow_mut()
+                                .push(format!("State capture failed: {error:#}"));
                         }
                     }
                     request_quit(&quitting, &failures);
@@ -598,6 +614,14 @@ fn run(arguments: Arguments) -> Result<()> {
         failures
             .borrow_mut()
             .push(format!("Final capture failed: {error:#}"));
+    }
+    if let (Some(path), Some(app)) = (state_path.as_deref(), capture_app.as_deref())
+        && !state_attempted.replace(true)
+        && let Err(error) = save_state(app, path)
+    {
+        failures
+            .borrow_mut()
+            .push(format!("Final state capture failed: {error:#}"));
     }
     drop(capture_app);
     aidoku_kindle::reader_timing::mark("shutdown_started");
@@ -778,7 +802,7 @@ fn automatic_deadline(arguments: &Arguments, actions: &[ScriptAction]) -> Result
                 .context("The final scripted action time is too large")?
                 .max(1200),
         ),
-        None if arguments.capture.is_some() => Some(1200),
+        None if arguments.capture.is_some() || arguments.state_output.is_some() => Some(1200),
         None => None,
     };
     Ok(milliseconds.map(Duration::from_millis))
@@ -866,6 +890,16 @@ fn dispatch_observed_pointer(
         window.try_dispatch_event(event)?;
     }
     Ok(())
+}
+
+fn save_state(app: &App, path: &Path) -> Result<()> {
+    if let Some(parent) = path
+        .parent()
+        .filter(|parent| !parent.as_os_str().is_empty())
+    {
+        fs::create_dir_all(parent)?;
+    }
+    fs::write(path, serde_json::to_vec_pretty(&app.snapshot())?).context("Write application state")
 }
 
 fn capture_window(

@@ -127,10 +127,13 @@ pub struct Preferences {
     pub tap_layout: String,
     pub reverse_taps: bool,
     pub refresh_every: u32,
+    pub display_mode: crate::display::DisplayMode,
     pub flash_on_close: bool,
     pub crop_borders: bool,
     pub dither: bool,
+    #[serde(deserialize_with = "deserialize_dither_method")]
     pub dither_method: String,
+    pub hardware_acceleration: bool,
     pub contrast: i32,
     pub reader_fit: String,
     pub brightness: u8,
@@ -171,10 +174,12 @@ impl Default for Preferences {
             tap_layout: "thirds".into(),
             reverse_taps: false,
             refresh_every: 6,
+            display_mode: crate::display::DisplayMode::Normal,
             flash_on_close: true,
             crop_borders: true,
             dither: true,
-            dither_method: "software".into(),
+            dither_method: "bayer8".into(),
+            hardware_acceleration: false,
             contrast: 0,
             reader_fit: "page".into(),
             brightness: 12,
@@ -211,17 +216,50 @@ impl Default for Preferences {
 }
 
 impl Preferences {
-    pub fn normalized_dither_method(&self) -> &'static str {
-        if self.dither_method == "hardware" {
-            "hardware"
+    pub fn media_acceleration(&self) -> crate::native_media::Acceleration {
+        if !self.hardware_acceleration {
+            crate::native_media::Acceleration::Off
         } else {
-            "software"
+            crate::native_media::Acceleration::DecodeAndResize
+        }
+    }
+
+    pub fn normalized_dither_method(&self) -> &'static str {
+        match self.dither_method.as_str() {
+            "hardware" => "hardware",
+            "floyd" | "floyd_steinberg" => "floyd_steinberg",
+            _ => "bayer8",
+        }
+    }
+
+    pub fn spatial_dither(&self) -> crate::imaging::SpatialDither {
+        use crate::imaging::SpatialDither;
+        if !self.dither {
+            SpatialDither::Off
+        } else if self.normalized_dither_method() == "floyd_steinberg" {
+            SpatialDither::FloydSteinberg
+        } else {
+            SpatialDither::Bayer8
         }
     }
 
     pub fn uses_hardware_dither(&self, available: bool) -> bool {
-        self.dither && self.normalized_dither_method() == "hardware" && available
+        self.dither
+            && self.normalized_dither_method() == "hardware"
+            && available
+            && self.display_mode != crate::display::DisplayMode::Fast
     }
+}
+
+fn deserialize_dither_method<'de, D: serde::Deserializer<'de>>(
+    deserializer: D,
+) -> Result<String, D::Error> {
+    let value = String::deserialize(deserializer)?;
+    Ok(match value.as_str() {
+        "floyd" | "floyd_steinberg" => "floyd_steinberg",
+        // Persisted Y4/software choices migrate to the requested software menu.
+        _ => "bayer8",
+    }.into())
 }
 
 /// A durable navigation checkpoint deliberately excludes credentials, keyboard
@@ -355,24 +393,42 @@ mod tests {
     use super::*;
 
     #[test]
-    fn legacy_dithering_preferences_keep_software_and_off_semantics() {
+    fn jpeg_acceleration_defaults_off_and_selects_the_automatic_combination() {
+        let mut preferences: Preferences = serde_json::from_str("{}").unwrap();
+        assert!(!preferences.hardware_acceleration);
+        assert_eq!(
+            preferences.media_acceleration(),
+            crate::native_media::Acceleration::Off
+        );
+        preferences.hardware_acceleration = true;
+        assert_eq!(
+            preferences.media_acceleration(),
+            crate::native_media::Acceleration::DecodeAndResize
+        );
+        let restored: Preferences =
+            serde_json::from_str(&serde_json::to_string(&preferences).unwrap()).unwrap();
+        assert_eq!(restored, preferences);
+    }
+
+    #[test]
+    fn legacy_dithering_preferences_migrate_without_enabling_an_off_choice() {
         for enabled in [false, true] {
             let preferences: Preferences =
                 serde_json::from_value(serde_json::json!({"dither": enabled})).unwrap();
             assert_eq!(preferences.dither, enabled);
-            assert_eq!(preferences.normalized_dither_method(), "software");
+            assert_eq!(preferences.normalized_dither_method(), "bayer8");
             assert!(!preferences.uses_hardware_dither(true));
+            for legacy in ["software", "hardware", "future-method"] {
+                let migrated: Preferences = serde_json::from_value(serde_json::json!({
+                    "dither": enabled, "dither_method": legacy
+                })).unwrap();
+                assert_eq!(migrated, preferences);
+            }
         }
-        let preferences: Preferences = serde_json::from_value(serde_json::json!({
-            "dither": true, "dither_method": "future-method"
-        }))
-        .unwrap();
-        assert_eq!(preferences.normalized_dither_method(), "software");
-        assert!(!preferences.uses_hardware_dither(true));
     }
 
     #[test]
-    fn hardware_dithering_preferences_need_both_enablement_and_actual_capability() {
+    fn research_hardware_dithering_is_capability_gated_and_migrates_on_load() {
         let mut preferences = Preferences {
             dither_method: "hardware".into(),
             ..Preferences::default()
@@ -381,10 +437,33 @@ mod tests {
         assert!(!preferences.uses_hardware_dither(false));
         let restored: Preferences =
             serde_json::from_str(&serde_json::to_string(&preferences).unwrap()).unwrap();
-        assert_eq!(restored, preferences);
+        assert_eq!(restored.normalized_dither_method(), "bayer8");
+        assert!(!restored.uses_hardware_dither(true));
         preferences.dither = false;
         assert!(!preferences.uses_hardware_dither(true));
         assert_eq!(preferences.normalized_dither_method(), "hardware");
+    }
+
+    #[test]
+    fn spatial_dithering_choices_survive_a_preferences_round_trip() {
+        use crate::imaging::SpatialDither;
+        for (enabled, method, expected) in [
+            (true, "bayer8", SpatialDither::Bayer8),
+            (true, "floyd_steinberg", SpatialDither::FloydSteinberg),
+            (false, "bayer8", SpatialDither::Off),
+            (false, "floyd_steinberg", SpatialDither::Off),
+        ] {
+            let preferences = Preferences {
+                dither: enabled,
+                dither_method: method.into(),
+                ..Preferences::default()
+            };
+            let restored: Preferences = serde_json::from_slice(
+                &serde_json::to_vec(&preferences).unwrap()).unwrap();
+            assert_eq!(restored, preferences);
+            assert_eq!(restored.spatial_dither(), expected);
+            assert!(!restored.uses_hardware_dither(true));
+        }
     }
 
     #[test]

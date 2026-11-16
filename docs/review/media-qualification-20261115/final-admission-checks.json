@@ -1,0 +1,149 @@
+{
+  "schema": 1,
+  "source_sha256": "c3db241275529da4f613d853efc5fc3a41669aa69f58c612e2dcce20e36da10d",
+  "physical_device_opened": false,
+  "ioctl_executed": false,
+  "passed": 28,
+  "checks": [
+    {
+      "case": "baseline_422_rgb_admitted",
+      "passed": true,
+      "stage": "admitted_video_open_intercepted"
+    },
+    {
+      "case": "baseline_444_rgb_admitted",
+      "passed": true,
+      "stage": "admitted_video_open_intercepted"
+    },
+    {
+      "case": "baseline_gray_admitted",
+      "passed": true,
+      "stage": "admitted_video_open_intercepted"
+    },
+    {
+      "case": "baseline_420_rgb_rejected",
+      "passed": true,
+      "stage": "unsupported_jpeg_sampling"
+    },
+    {
+      "case": "progressive_rgb_rejected",
+      "passed": true,
+      "stage": "unsupported_progressive_jpeg"
+    },
+    {
+      "case": "progressive_gray_rejected",
+      "passed": true,
+      "stage": "unsupported_progressive_jpeg"
+    },
+    {
+      "case": "metadata_marker_is_not_progressive",
+      "passed": true,
+      "stage": "admitted_video_open_intercepted"
+    },
+    {
+      "case": "truncated_frame_header",
+      "passed": true,
+      "stage": "invalid_jpeg_header"
+    },
+    {
+      "case": "short_segment_length",
+      "passed": true,
+      "stage": "invalid_jpeg_header"
+    },
+    {
+      "case": "segment_exceeds_input",
+      "passed": true,
+      "stage": "invalid_jpeg_header"
+    },
+    {
+      "case": "missing_frame",
+      "passed": true,
+      "stage": "invalid_jpeg_header"
+    },
+    {
+      "case": "wrong_dimensions",
+      "passed": true,
+      "stage": "jpeg_dimensions_mismatch"
+    },
+    {
+      "case": "unqualified_sequential_coding",
+      "passed": true,
+      "stage": "unsupported_jpeg_coding"
+    },
+    {
+      "case": "duplicate_frame_header",
+      "passed": true,
+      "stage": "invalid_jpeg_header"
+    },
+    {
+      "case": "progressive_marker_c6",
+      "passed": true,
+      "stage": "unsupported_progressive_jpeg"
+    },
+    {
+      "case": "progressive_marker_ca",
+      "passed": true,
+      "stage": "unsupported_progressive_jpeg"
+    },
+    {
+      "case": "progressive_marker_ce",
+      "passed": true,
+      "stage": "unsupported_progressive_jpeg"
+    },
+    {
+      "case": "unqualified_sampling_411",
+      "passed": true,
+      "stage": "unsupported_jpeg_sampling"
+    },
+    {
+      "case": "unqualified_sampling_440",
+      "passed": true,
+      "stage": "unsupported_jpeg_sampling"
+    },
+    {
+      "case": "unqualified_sampling_410",
+      "passed": true,
+      "stage": "unsupported_jpeg_sampling"
+    },
+    {
+      "case": "png_rgb_admitted",
+      "passed": true,
+      "stage": "admitted_video_open_intercepted"
+    },
+    {
+      "case": "png_gray_admitted",
+      "passed": true,
+      "stage": "admitted_video_open_intercepted"
+    },
+    {
+      "case": "png_palette_trns_admitted",
+      "passed": true,
+      "stage": "admitted_video_open_intercepted"
+    },
+    {
+      "case": "png_gray_key_rejected",
+      "passed": true,
+      "stage": "unsupported_png_color_key_transparency"
+    },
+    {
+      "case": "png_rgb_key_rejected",
+      "passed": true,
+      "stage": "unsupported_png_color_key_transparency"
+    },
+    {
+      "case": "png_embedded_trns_is_not_chunk",
+      "passed": true,
+      "stage": "admitted_video_open_intercepted"
+    },
+    {
+      "case": "png_truncated_chunk_rejected",
+      "passed": true,
+      "stage": "invalid_png_header"
+    },
+    {
+      "case": "png_wrong_dimensions_rejected",
+      "passed": true,
+      "stage": "invalid_png_header"
+    }
+  ]
+}

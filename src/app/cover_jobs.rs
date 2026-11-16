@@ -113,11 +113,13 @@ impl App {
             && self.current_book_id.as_deref() == Some(id);
         let (width, height) = if large_detail { (612, 840) } else { (376, 514) };
         ImageOptions {
+            media_acceleration: Default::default(),
             width,
             height,
             crop_borders: false,
             dither: true,
             hardware_dither: false,
+            spatial_dither: None,
             contrast: 0,
         }
     }
@@ -709,11 +711,13 @@ mod tests {
             let cache = manager.cache();
             let raw = Self::store_raw(cache, &book, 170);
             let options = ImageOptions {
+                media_acceleration: Default::default(),
                 width: 8,
                 height: 12,
                 crop_borders: false,
                 dither: false,
                 hardware_dither: false,
+                spatial_dither: None,
                 contrast: 0,
             };
             // Seed exactly the C3 configuration serialization, including the

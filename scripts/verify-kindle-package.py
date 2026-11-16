@@ -17,7 +17,8 @@ import sys
 import zipfile
 
 
-SOURCE_FILES = ("Cargo.toml", "Cargo.lock", "build.rs", "rust-toolchain.toml", ".cargo/config.toml")
+SOURCE_FILES = ("Cargo.toml", "Cargo.lock", "build.rs", "rust-toolchain.toml", ".cargo/config.toml",
+                "scripts/native-codec-probe.c", "scripts/native-codec-bench.h")
 SOURCE_DIRECTORIES = ("src", "ui", "assets", "vendor", "examples")
 SOURCE_ALGORITHM = "sha256-of-canonical-sorted-relative-file-records-v1"
 
@@ -99,6 +100,7 @@ def main() -> int:
     parser.add_argument("--source-manifest", type=Path, required=True)
     parser.add_argument("--expected-source-sha256", required=True)
     parser.add_argument("--expected-application-sha256", required=True)
+    parser.add_argument("--expected-helper-sha256", required=True)
     parser.add_argument("--output", type=Path, required=True)
     arguments = parser.parse_args()
     if os.name == "nt" or platform.system() != "Linux":
@@ -135,7 +137,7 @@ def main() -> int:
                 and manifest.get("source_manifest_algorithm") == stored.get("algorithm"),
                 "The package manifest binds the exact verified production source", manifest.get("source_sha256"))
         inputs = expected_inputs(root)
-        expected_names = set(inputs) | {"aidoku/app/aidoku"}
+        expected_names = set(inputs) | {"aidoku/app/aidoku", "aidoku/app/kindle-jpeg-worker"}
         records = manifest.get("files")
         require(isinstance(records, list) and all(isinstance(item, dict) for item in records),
                 "The package manifest contains explicit file records")
@@ -156,7 +158,7 @@ def main() -> int:
                         and "\\" not in name and not info.is_dir(),
                         f"The package member has a safe runtime-free path: {name}")
                 mode = info.external_attr >> 16
-                expected_mode = 0o755 if name.endswith(".sh") or name == "aidoku/app/aidoku" else 0o644
+                expected_mode = 0o755 if name.endswith(".sh") or name in ("aidoku/app/aidoku", "aidoku/app/kindle-jpeg-worker") else 0o644
                 require(info.create_system == 3 and stat.S_ISREG(mode) and stat.S_IMODE(mode) == expected_mode,
                         f"The member has correct Unix file permissions: {name}", oct(mode))
                 content = archive.read(info)
@@ -173,6 +175,10 @@ def main() -> int:
                     "The archived application matches the frozen native executable", sha256(application))
             identity = elf_identity(application)
             require(identity["static"] is True, "The archived application is a static ARM ELF32", identity)
+            helper = archive.read("aidoku/app/kindle-jpeg-worker")
+            require(sha256(helper) == arguments.expected_helper_sha256,
+                    "The JPEG worker matches the frozen native executable", sha256(helper))
+            require(elf_identity(helper)["static"] is True, "The JPEG worker is a static ARM ELF32")
             license_payload = None
             license_asset = root / "assets/licenses/GPL-3.0-or-later.txt"
             if license_asset.is_file():

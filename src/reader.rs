@@ -172,6 +172,7 @@ pub struct ReaderState {
     pub zoom: f32,
     pub pending_page: Option<u32>,
     refresh_every: u32,
+    display_mode: crate::display::DisplayMode,
     turns_since_full: u32,
     flash_on_close: bool,
     tap_layout: TapLayout,
@@ -219,6 +220,7 @@ impl ReaderState {
             zoom: 1.0,
             pending_page: None,
             refresh_every: preferences.refresh_every,
+            display_mode: preferences.display_mode,
             turns_since_full: 0,
             flash_on_close: preferences.flash_on_close,
             tap_layout: TapLayout::from_preference(&preferences.tap_layout),
@@ -304,6 +306,10 @@ impl ReaderState {
             self.wide_page = false;
         }
         self.refresh_every = preferences.refresh_every;
+        if self.display_mode != preferences.display_mode {
+            self.turns_since_full = 0;
+        }
+        self.display_mode = preferences.display_mode;
         self.flash_on_close = preferences.flash_on_close;
         self.tap_layout = TapLayout::from_preference(&preferences.tap_layout);
         self.reverse_taps = preferences.reverse_taps
@@ -464,7 +470,7 @@ impl ReaderState {
         self.page = 1;
         self.reset_page_geometry();
         self.turns_since_full = 0;
-        ReaderUpdate::new(ReaderAction::ChapterChanged, RefreshRequest::Full)
+        ReaderUpdate::new(ReaderAction::ChapterChanged, self.chapter_refresh())
     }
 
     pub fn previous_chapter(&mut self) -> ReaderUpdate {
@@ -478,7 +484,7 @@ impl ReaderState {
         self.pending_vertical_bottom = self.direction == ReadingDirection::Vertical;
         self.wide_half = u8::from(self.wide_split_enabled());
         self.turns_since_full = 0;
-        ReaderUpdate::new(ReaderAction::ChapterChanged, RefreshRequest::Full)
+        ReaderUpdate::new(ReaderAction::ChapterChanged, self.chapter_refresh())
     }
 
     pub fn jump_to_page(&mut self, page: u32) -> ReaderUpdate {
@@ -647,8 +653,20 @@ impl ReaderState {
         self.split_wide && !self.spread && self.direction != ReadingDirection::Vertical
     }
 
+    fn chapter_refresh(&self) -> RefreshRequest {
+        if self.display_mode == crate::display::DisplayMode::Fast {
+            RefreshRequest::Partial
+        } else {
+            RefreshRequest::Full
+        }
+    }
+
     fn page_changed(&mut self) -> ReaderUpdate {
-        self.turns_since_full += 1;
+        if self.display_mode == crate::display::DisplayMode::Fast {
+            self.turns_since_full = 0;
+            return ReaderUpdate::new(ReaderAction::PageChanged, RefreshRequest::Partial);
+        }
+        self.turns_since_full = self.turns_since_full.saturating_add(1);
         let refresh = if self.refresh_every > 0 && self.turns_since_full >= self.refresh_every {
             self.turns_since_full = 0;
             RefreshRequest::Full
@@ -1572,5 +1590,23 @@ mod tests {
                 .action,
             ReaderAction::None
         );
+    }
+
+    #[test]
+    fn fast_navigation_ignores_saved_clearing_interval_across_chapters() {
+        let mut preferences = Preferences {
+            refresh_every: 1,
+            display_mode: crate::display::DisplayMode::Fast,
+            ..single_page_preferences()
+        };
+        let mut state = reader(preferences.clone());
+        for _ in 0..12 {
+            assert_eq!(state.next_page().refresh, RefreshRequest::Partial);
+        }
+        assert_eq!(state.previous_chapter().refresh, RefreshRequest::Partial);
+        preferences.display_mode = crate::display::DisplayMode::Normal;
+        state.apply_preferences(&preferences);
+        assert_eq!(state.next_page().refresh, RefreshRequest::Full);
+        assert_eq!(preferences.refresh_every, 1);
     }
 }

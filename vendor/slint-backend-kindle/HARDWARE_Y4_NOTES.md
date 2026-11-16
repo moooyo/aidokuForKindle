@@ -36,11 +36,22 @@ Hardware updates use the MTK ABI exclusively. Neither profile selection,
 resolution nor successful acceptance of a different ioctl grants eligibility.
 
 The hardware path preserves all Gray8 inputs until driver scanout. CPU palette
-quantization and Bayer processing belong to the software path. Every update
-while raw content is retained uses GC16. Hardware regions expand outward to
-eight-pixel boundaries and clip to visible bounds. This is MDP Y8-to-Y4
-processing, not a claim that the panel natively displays 256 physical levels.
+quantization and Bayer processing belong to the software path. Retained raw
+content uses a compatible grayscale waveform: GC16, GL16 or GLR16, or AUTO
+with an eligible swipe. Native inverted Gray8 maps GC16 to GCK16 and GL16/GLR16
+to GLKW16. A clearing request suppresses swipe, and GC16 remains the fallback.
+Hardware regions expand outward to eight-pixel boundaries and clip to visible
+bounds. This is MDP Y8-to-Y4 processing, not a claim that the panel natively
+displays 256 physical levels.
 
+The event loop settles the previous accepted update before changing mapped
+bytes. The application supplies swipe direction in logical coordinates; region
+resolution applies its render rotation, and the exact HWTCON driver applies
+framebuffer/panel orientation. Applying the native rotation twice is incorrect.
+Driver WAIT success is not an optical-completion certificate.
+
+Definite advanced-waveform rejection disables advanced refresh for the owner
+and first retries GC16 under a new marker without rewriting the raw scene.
 Definite Y4 rejection permits a checked canonical-scene software replacement
 under a new marker. Unknown delivery permits no automatic rewrite, resubmission,
 or acknowledgement of an older marker. The owner's existing native restoration
@@ -54,3 +65,10 @@ the project-designated verification environment. Actual firmware acceptance
 needs an exclusive, bounded physical-device batch with independently identified
 Aidoku artifacts and restoration/release evidence. BiliComics historical device
 results remain reference evidence for their exact source and executable only.
+
+The 2026-11-15 Aidoku follow-up adds identical-input off/on/off post-MDP Y4
+evidence on one Scribe and accepted native requests for four reader presets.
+See `../../docs/DISPLAY_MODES_20261115.md` and
+`../../docs/SCRIBE_HARDWARE_API_AUDIT_20261114.md` for exact artifacts, results,
+firmware, polarity and unqualified cases. No hardware JPEG/PNG decoder or
+standalone MDP scaling implementation is added to this backend.

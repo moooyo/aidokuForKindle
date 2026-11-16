@@ -1,0 +1,168 @@
+{
+  "schema": 1,
+  "run_id": "display-bench-20261115-85990cef",
+  "sample_count_per_mode": 7,
+  "warmup_count_per_mode": 1,
+  "alternating_order": true,
+  "native_ui_parked": true,
+  "timing_compiler_fences": true,
+  "probe_sha256": "eb5342d82c7a53268b22f437c36e834d5a441fdc1549cad8f6f5e2eb3525b437",
+  "cpu_benchmark_sha256": "1715a35f38c8757909fb1f367a0cacbbb666456252f836877244cc99b2ec7253",
+  "previous_complete_batch": "display-bench-20261115-ae9668a3",
+  "lease_released": true,
+  "native_owner_closed": true,
+  "lighting_restored": true,
+  "staging_removed": true,
+  "new_critical_kernel_lines": 0,
+  "results": [
+    {
+      "target": "logical",
+      "dimensions": [
+        930,
+        1240
+      ],
+      "input_sha256": "376ec78abb2c33477cbaf83fac6b5a3f940fc515e10a97a75cf80cdde90bf34b",
+      "scaler_source_sha256": "43a2674d61a844b0ef9854fa6c910ee884bd07204dcb5103f7200a73135ad1f7",
+      "quality": {
+        "benchmark_eligible": true,
+        "cpu_output_sha256": "1e342adf9c995c2445801b4d5734bb842edcf5508a25dfe0b508c86af7b1fa6f",
+        "hardware_checksum": 314218002,
+        "hardware_output_sha256": "ca792e870f3fdc2ece1bdaea85cdaeeae6282d7e34c840ce09c3bb8126527c49",
+        "mae": 0.060815990287894556,
+        "max_error": 58,
+        "pixel_count": 1153200,
+        "pixels_over_4": 1394,
+        "psnr_db": 50.95514770075773,
+        "threshold": "This scene only: MAE <= 1 and PSNR >= 40 dB; different filters are not bit-exact."
+      },
+      "metrics": {
+        "cpu_scale": {
+          "median_ms": 191.598308,
+          "minimum_ms": 187.706846,
+          "maximum_ms": 195.72661499999998,
+          "mean_ms": 192.16225271428573,
+          "samples_ms": [
+            193.240846,
+            187.706846,
+            195.10361600000002,
+            191.598308,
+            190.583077,
+            195.72661499999998,
+            191.176461
+          ]
+        },
+        "cpu_decode_scale": {
+          "median_ms": 277.12892300000004,
+          "minimum_ms": 274.697154,
+          "maximum_ms": 279.177385,
+          "mean_ms": 276.9580547142857,
+          "samples_ms": [
+            277.225307,
+            274.697154,
+            277.957307,
+            279.177385,
+            276.790846,
+            275.729461,
+            277.12892300000004
+          ]
+        },
+        "hardware_decode_scale": {
+          "median_ms": 27.68,
+          "minimum_ms": 26.265,
+          "maximum_ms": 28.719,
+          "mean_ms": 27.572285714285716,
+          "samples_ms": [
+            27.566,
+            26.878,
+            26.265,
+            27.68,
+            27.904,
+            27.994,
+            28.719
+          ],
+          "driver_decode_scale_median_ms": 17.942,
+          "helper_total_median_ms": 37.988
+        }
+      },
+      "decode_scale_speedup": 10.011883056358384,
+      "decode_scale_time_reduction_percent": 90.01186895241533,
+      "stock_cpu_settings": "scaling_cur_freq=1133000\nscaling_governor=ondemand\nscaling_max_freq=2000000\n",
+      "scope": "Quiet native UI; resident input; CPU production Triangle versus JPEG/IMGRZ. Cold hardware contexts include setup, owned Gray8 normalization, and cleanup; no pixel file I/O or hashing in measured samples."
+    },
+    {
+      "target": "native",
+      "dimensions": [
+        1860,
+        2480
+      ],
+      "input_sha256": "376ec78abb2c33477cbaf83fac6b5a3f940fc515e10a97a75cf80cdde90bf34b",
+      "scaler_source_sha256": "43a2674d61a844b0ef9854fa6c910ee884bd07204dcb5103f7200a73135ad1f7",
+      "quality": {
+        "benchmark_eligible": true,
+        "cpu_output_sha256": "69ffa1f19314937ccec64fe47cb21d15f55bf26d62866b2e16237de38b1349cc",
+        "hardware_checksum": 2258971954,
+        "hardware_output_sha256": "87f0c9aacd8cf08a32179392200d6d8e7e2635a42dff30b47c7083724caace72",
+        "mae": 0.003922346514047867,
+        "max_error": 7,
+        "pixel_count": 4612800,
+        "pixels_over_4": 2,
+        "psnr_db": 70.5929105150791,
+        "threshold": "This scene only: MAE <= 1 and PSNR >= 40 dB; different filters are not bit-exact."
+      },
+      "metrics": {
+        "cpu_scale": {
+          "median_ms": 364.194692,
+          "minimum_ms": 363.211307,
+          "maximum_ms": 366.805692,
+          "mean_ms": 364.47121957142855,
+          "samples_ms": [
+            364.995231,
+            363.211307,
+            363.582077,
+            366.805692,
+            364.194692,
+            364.988923,
+            363.52061499999996
+          ]
+        },
+        "cpu_decode_scale": {
+          "median_ms": 443.64446200000003,
+          "minimum_ms": 441.984846,
+          "maximum_ms": 445.067539,
+          "mean_ms": 443.6218792857143,
+          "samples_ms": [
+            444.957692,
+            442.069308,
+            441.984846,
+            444.388462,
+            443.64446200000003,
+            445.067539,
+            443.24084600000003
+          ]
+        },
+        "hardware_decode_scale": {
+          "median_ms": 53.374,
+          "minimum_ms": 50.839,
+          "maximum_ms": 58.168,
+          "mean_ms": 53.58828571428571,
+          "samples_ms": [
+            58.168,
+            52.772,
+            53.374,
+            50.839,
+            52.824,
+            53.594,
+            53.547
+          ],
+          "driver_decode_scale_median_ms": 24.597,
+          "helper_total_median_ms": 70.481
+        }
+      },
+      "decode_scale_speedup": 8.311995765728632,
+      "decode_scale_time_reduction_percent": 87.96919502626407,
+      "stock_cpu_settings": "scaling_cur_freq=1000000\nscaling_governor=ondemand\nscaling_max_freq=2000000\n",
+      "scope": "Quiet native UI; resident input; CPU production Triangle versus JPEG/IMGRZ. Cold hardware contexts include setup, owned Gray8 normalization, and cleanup; no pixel file I/O or hashing in measured samples."
+    }
+  ],
+  "scope": "One fixed grayscale JPEG on this Scribe. Pipeline comparison includes cold hardware setup, normalization and cleanup. Input buffer preparation/file I/O and output hashing excluded from compute times. CPU Triangle and hardware filters differ. No full-page display-speed or all-book generalization."
+}

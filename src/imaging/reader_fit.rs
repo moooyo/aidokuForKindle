@@ -84,10 +84,33 @@ pub fn decode(bytes: &[u8], options: &ImageOptions, fit: ReaderFit) -> Result<Gr
     let _permit = decode_permit()?;
     check_options(options)?;
     check_decode_cancelled()?;
-    let (mut image, geometry) = if needs_png_streaming(bytes)? {
+    let accelerated = if !options.crop_borders
+        && options.media_acceleration == crate::native_media::Acceleration::DecodeAndResize
+        && let Some((width, height)) = crate::native_media::information(bytes)
+    {
+        let g = geometry(width, height, (options.width, options.height), fit);
+        if g.left == 0.0
+            && g.top == 0.0
+            && g.width == f64::from(width)
+            && g.height == f64::from(height)
+            && (g.draw_width, g.draw_height) != (width, height)
+        {
+            crate::native_media::decode(bytes, Some((g.draw_width, g.draw_height)))
+                .map(|image| (image, g))
+        } else {
+            None
+        }
+    } else {
+        None
+    };
+    check_decode_cancelled()?;
+    let (mut image, geometry) = if let Some(result) = accelerated {
+        result
+    } else if needs_png_streaming(bytes)? {
         streaming(bytes, options, fit)?
     } else {
-        let mut source = decode_grayscale_for_algorithm(bytes, RasterAlgorithm::BiliTriangle)?;
+        let mut source =
+            decode_reader_grayscale_with_acceleration(bytes, options.media_acceleration)?;
         if options.crop_borders {
             source = crop_white_borders(source);
         }

@@ -1,0 +1,164 @@
+{
+  "schema": 1,
+  "run_id": "display-bench-20261115-ae9668a3",
+  "sample_count_per_mode": 7,
+  "warmup_count_per_mode": 1,
+  "alternating_order": true,
+  "native_ui_parked": true,
+  "lease_released": true,
+  "native_owner_closed": true,
+  "lighting_restored": true,
+  "staging_removed": true,
+  "new_critical_kernel_lines": 0,
+  "results": [
+    {
+      "target": "logical",
+      "dimensions": [
+        930,
+        1240
+      ],
+      "input_sha256": "376ec78abb2c33477cbaf83fac6b5a3f940fc515e10a97a75cf80cdde90bf34b",
+      "scaler_source_sha256": "43a2674d61a844b0ef9854fa6c910ee884bd07204dcb5103f7200a73135ad1f7",
+      "quality": {
+        "benchmark_eligible": true,
+        "cpu_output_sha256": "1e342adf9c995c2445801b4d5734bb842edcf5508a25dfe0b508c86af7b1fa6f",
+        "hardware_checksum": 314218002,
+        "hardware_output_sha256": "ca792e870f3fdc2ece1bdaea85cdaeeae6282d7e34c840ce09c3bb8126527c49",
+        "mae": 0.060815990287894556,
+        "max_error": 58,
+        "pixel_count": 1153200,
+        "pixels_over_4": 1394,
+        "psnr_db": 50.95514770075773,
+        "threshold": "This scene only: MAE <= 1 and PSNR >= 40 dB; different filters are not bit-exact."
+      },
+      "metrics": {
+        "cpu_scale": {
+          "median_ms": 192.12515399999998,
+          "minimum_ms": 190.931769,
+          "maximum_ms": 194.890538,
+          "mean_ms": 192.51352742857142,
+          "samples_ms": [
+            191.707616,
+            193.783769,
+            194.890538,
+            192.12515399999998,
+            190.931769,
+            193.12069200000002,
+            191.035154
+          ]
+        },
+        "cpu_decode_scale": {
+          "median_ms": 277.95707699999997,
+          "minimum_ms": 276.048231,
+          "maximum_ms": 282.568924,
+          "mean_ms": 278.88060457142853,
+          "samples_ms": [
+            276.804923,
+            278.697385,
+            282.174539,
+            277.913153,
+            282.568924,
+            277.95707699999997,
+            276.048231
+          ]
+        },
+        "hardware_decode_scale": {
+          "median_ms": 28.021,
+          "minimum_ms": 27.643,
+          "maximum_ms": 29.689,
+          "mean_ms": 28.18057142857143,
+          "samples_ms": [
+            27.92,
+            27.643,
+            28.021,
+            27.829,
+            28.058,
+            29.689,
+            28.104
+          ],
+          "driver_decode_scale_median_ms": 17.742,
+          "helper_total_median_ms": 37.926
+        }
+      },
+      "decode_scale_speedup": 9.919598765211804,
+      "decode_scale_time_reduction_percent": 89.91894708980553,
+      "stock_cpu_settings": "scaling_cur_freq=1400000\nscaling_governor=ondemand\nscaling_max_freq=2000000\n",
+      "scope": "Quiet native UI; resident input; CPU production Triangle versus JPEG/IMGRZ. Cold hardware contexts include setup, owned Gray8 normalization, and cleanup; no pixel file I/O or hashing in measured samples."
+    },
+    {
+      "target": "native",
+      "dimensions": [
+        1860,
+        2480
+      ],
+      "input_sha256": "376ec78abb2c33477cbaf83fac6b5a3f940fc515e10a97a75cf80cdde90bf34b",
+      "scaler_source_sha256": "43a2674d61a844b0ef9854fa6c910ee884bd07204dcb5103f7200a73135ad1f7",
+      "quality": {
+        "benchmark_eligible": true,
+        "cpu_output_sha256": "69ffa1f19314937ccec64fe47cb21d15f55bf26d62866b2e16237de38b1349cc",
+        "hardware_checksum": 2258971954,
+        "hardware_output_sha256": "87f0c9aacd8cf08a32179392200d6d8e7e2635a42dff30b47c7083724caace72",
+        "mae": 0.003922346514047867,
+        "max_error": 7,
+        "pixel_count": 4612800,
+        "pixels_over_4": 2,
+        "psnr_db": 70.5929105150791,
+        "threshold": "This scene only: MAE <= 1 and PSNR >= 40 dB; different filters are not bit-exact."
+      },
+      "metrics": {
+        "cpu_scale": {
+          "median_ms": 364.96130700000003,
+          "minimum_ms": 364.68569299999996,
+          "maximum_ms": 372.126769,
+          "mean_ms": 366.5787472857143,
+          "samples_ms": [
+            364.96130700000003,
+            364.698077,
+            364.68569299999996,
+            372.126769,
+            364.841769,
+            368.183385,
+            366.554231
+          ]
+        },
+        "cpu_decode_scale": {
+          "median_ms": 448.958077,
+          "minimum_ms": 445.80199999999996,
+          "maximum_ms": 452.92238499999996,
+          "mean_ms": 448.8687364285714,
+          "samples_ms": [
+            446.514538,
+            449.402846,
+            448.958077,
+            445.80199999999996,
+            446.768924,
+            452.92238499999996,
+            451.712385
+          ]
+        },
+        "hardware_decode_scale": {
+          "median_ms": 59.006,
+          "minimum_ms": 52.761,
+          "maximum_ms": 65.885,
+          "mean_ms": 59.40114285714286,
+          "samples_ms": [
+            65.885,
+            58.853,
+            52.761,
+            57.839,
+            59.006,
+            60.102,
+            61.362
+          ],
+          "driver_decode_scale_median_ms": 25.4,
+          "helper_total_median_ms": 76.853
+        }
+      },
+      "decode_scale_speedup": 7.608685167610074,
+      "decode_scale_time_reduction_percent": 86.85712474663865,
+      "stock_cpu_settings": "scaling_cur_freq=1266000\nscaling_governor=ondemand\nscaling_max_freq=2000000\n",
+      "scope": "Quiet native UI; resident input; CPU production Triangle versus JPEG/IMGRZ. Cold hardware contexts include setup, owned Gray8 normalization, and cleanup; no pixel file I/O or hashing in measured samples."
+    }
+  ],
+  "scope": "One fixed grayscale JPEG on this Scribe. Pipeline comparison includes cold hardware setup, normalization and cleanup. Input file I/O and output hashing excluded from compute times. CPU Triangle and hardware resampling filters differ. No full-page display-speed or all-book generalization."
+}

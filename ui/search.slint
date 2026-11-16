@@ -54,7 +54,7 @@ component ScopeChip inherits Rectangle {
     in property <bool> preserve-suffix: false;
     in property <length> width-limit: 300px;
     callback clicked();
-    property <bool> inverted: root.selected != touch.pressed;
+    property <bool> inverted: root.selected || touch.pressed;
     property <length> horizontal-padding: State.large-screen ? 20px : 16px;
     property <length> frame-height: State.large-screen ? 44px : 38px;
     property <length> frame-inset: ceil(Theme.control-border / 1px) * 1px;
@@ -78,7 +78,7 @@ component ScopeChip inherits Rectangle {
     }
     touch := TouchArea { x: 0px; y: 0px;
         clicked => { root.clicked(); }
-        pointer-event(event) => { if event.kind == PointerEventKind.down { Commands.refresh("fast"); } else if event.kind == PointerEventKind.up { Commands.refresh("ui"); } }
+        pointer-event(event) => { if event.kind == PointerEventKind.down { Commands.refresh("ui"); } else if event.kind == PointerEventKind.up || event.kind == PointerEventKind.cancel { Commands.refresh("ui"); } }
     }
 }
 
@@ -120,7 +120,7 @@ export component SearchPage inherits Rectangle {
         accessible-role: button; accessible-label: Strings.search-hint;
         edit-touch := TouchArea { x: 0px; y: 0px;
             clicked => { Commands.action("search", "edit", ""); }
-            pointer-event(event) => { if event.kind == PointerEventKind.down { Commands.refresh("fast"); } else if event.kind == PointerEventKind.up { Commands.refresh("ui"); } }
+            pointer-event(event) => { if event.kind == PointerEventKind.down { Commands.refresh("ui"); } else if event.kind == PointerEventKind.up || event.kind == PointerEventKind.cancel { Commands.refresh("ui"); } }
         }
         Icon { x: State.large-screen ? 20px : 16px; y: (parent.height - self.height) / 2; width: State.large-screen ? 26px : 21px; height: self.width; kind: "search"; inverted: edit-touch.pressed; }
         Text {
@@ -135,7 +135,7 @@ export component SearchPage inherits Rectangle {
             Icon { x: (parent.width - self.width) / 2; y: (parent.height - self.height) / 2; width: State.large-screen ? 18px : 15px; height: self.width; kind: "close"; inverted: clear-touch.pressed; }
             clear-touch := TouchArea { x: 0px; y: 0px;
                 clicked => { Commands.action("search", "clear", ""); }
-                pointer-event(event) => { if event.kind == PointerEventKind.down { Commands.refresh("fast"); } else if event.kind == PointerEventKind.up { Commands.refresh("ui"); } }
+                pointer-event(event) => { if event.kind == PointerEventKind.down { Commands.refresh("ui"); } else if event.kind == PointerEventKind.up || event.kind == PointerEventKind.cancel { Commands.refresh("ui"); } }
             }
         }
     }
@@ -193,7 +193,7 @@ export component SearchPage inherits Rectangle {
             Text { x: 90px; y: 57px; width: parent.width - 90px; height: 23px; text: book.subtitle; font-family: Theme.sans; font-size: 15px; color: touch.pressed ? Theme.paper : Theme.secondary; vertical-alignment: center; overflow: elide; }
             touch := TouchArea { x: 0px; y: 0px;
                 clicked => { Commands.action("search", "open", book.id); }
-                pointer-event(event) => { if event.kind == PointerEventKind.down { Commands.refresh("fast"); } else if event.kind == PointerEventKind.up { Commands.refresh("ui"); } }
+                pointer-event(event) => { if event.kind == PointerEventKind.down { Commands.refresh("ui"); } else if event.kind == PointerEventKind.up || event.kind == PointerEventKind.cancel { Commands.refresh("ui"); } }
             }
         }
         if State.search-local-matches.length == 0: Text { x: 0px; y: 37px; width: parent.width; height: 32px; text: Strings.no-library-match; font-family: Theme.sans; font-size: 17px; color: Theme.secondary; vertical-alignment: center; }

@@ -41,12 +41,12 @@ export component SettingsListRow inherits Rectangle {
     in property <SettingItem> item;
     in property <bool> sidebar: false;
     in property <bool> selected: false;
-    property <bool> inverted: root.selected != hit.pressed;
+    property <bool> inverted: root.selected;
     x: 0px;
     y: 0px;
     height: root.sidebar ? 46px : 52px;
     border-radius: root.sidebar ? Theme.control-radius : 0px;
-    background: root.inverted ? Theme.ink : Theme.paper;
+    background: root.inverted ? Theme.ink : hit.pressed ? Theme.fill : Theme.paper;
     accessible-role: button;
     accessible-label: root.item.title + " " + root.item.value;
     SettingSymbol {
@@ -98,8 +98,8 @@ export component SettingsListRow inherits Rectangle {
         width: parent.width;
         height: parent.height;
         pointer-event(event) => {
-            if event.kind == PointerEventKind.down { Commands.refresh("fast"); }
-            else if event.kind == PointerEventKind.up { Commands.refresh("ui"); }
+            if event.kind == PointerEventKind.down { Commands.refresh("ui"); }
+            else if event.kind == PointerEventKind.up || event.kind == PointerEventKind.cancel { Commands.refresh("ui"); }
         }
         clicked => { Commands.action("settings", "open", root.item.id); }
     }
@@ -109,8 +109,9 @@ export component SettingsChoice inherits Rectangle {
     in property <string> text;
     in property <bool> selected: false;
     in property <bool> enabled: true;
+    in property <bool> wrap-label: false;
     callback clicked();
-    property <bool> inverted: root.selected != (hit.pressed && root.enabled);
+    property <bool> inverted: root.enabled && (root.selected || hit.pressed);
     x: 0px;
     y: 0px;
     height: State.large-screen ? 50px : 44px;
@@ -124,11 +125,12 @@ export component SettingsChoice inherits Rectangle {
     accessible-checkable: true;
     accessible-checked: root.selected;
     BodyText {
-        x: 0px;
+        x: root.wrap-label ? 8px : 0px;
         y: 0px;
-        width: parent.width;
+        width: parent.width - self.x * 2;
         height: parent.height;
         text: root.text;
+        wrap: root.wrap-label ? word-wrap : no-wrap;
         font-size: State.large-screen ? 16px : 15px;
         font-weight: root.selected ? 700 : 500;
         horizontal-alignment: center;
@@ -141,8 +143,8 @@ export component SettingsChoice inherits Rectangle {
         height: Theme.touch;
         enabled: root.enabled;
         pointer-event(event) => {
-            if event.kind == PointerEventKind.down { Commands.refresh("fast"); }
-            else if event.kind == PointerEventKind.up { Commands.refresh("ui"); }
+            if event.kind == PointerEventKind.down { Commands.refresh("ui"); }
+            else if event.kind == PointerEventKind.up || event.kind == PointerEventKind.cancel { Commands.refresh("ui"); }
         }
         clicked => { root.clicked(); }
     }
@@ -183,7 +185,7 @@ export component SettingsSlider inherits Rectangle {
             accessible-role: slider;
             accessible-label: root.text;
             pointer-event(event) => {
-                if event.kind == PointerEventKind.down { Commands.refresh("fast"); }
+                if event.kind == PointerEventKind.down { Commands.refresh("ui"); }
                 else if event.kind == PointerEventKind.up {
                     if root.target-value != root.value { Commands.action("settings", "set", root.preference + "=" + root.target-value); }
                     Commands.refresh("ui");

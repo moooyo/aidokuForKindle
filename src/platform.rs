@@ -231,8 +231,13 @@ pub struct Platform {
     applied_lighting: Cell<Option<(u8, u8)>>,
     scene_inverted: Cell<bool>,
     reader_hardware_y4_requested: Cell<bool>,
+    reader_display: Cell<Option<crate::display::DisplayMode>>,
+    reader_content_only: Cell<bool>,
+    reader_animation_left: Cell<Option<bool>>,
     #[cfg(test)]
     hardware_y4_available_override: Cell<Option<bool>>,
+    #[cfg(test)]
+    hardware_media_available_override: Cell<Option<crate::native_media::Availability>>,
     sleep_requested: Cell<bool>,
     pointer_observer: RefCell<Option<PointerObserver>>,
     device_policies: RefCell<Option<device_policy::DevicePolicyWorker>>,
@@ -255,6 +260,7 @@ impl Platform {
         } else {
             profile.native_size()
         };
+        crate::native_media::initialize(kindle);
         Ok(Self {
             profile,
             kindle,
@@ -269,8 +275,13 @@ impl Platform {
             applied_lighting: Cell::new(None),
             scene_inverted: Cell::new(false),
             reader_hardware_y4_requested: Cell::new(false),
+            reader_display: Cell::new(None),
+            reader_content_only: Cell::new(false),
+            reader_animation_left: Cell::new(None),
             #[cfg(test)]
             hardware_y4_available_override: Cell::new(None),
+            #[cfg(test)]
+            hardware_media_available_override: Cell::new(None),
             sleep_requested: Cell::new(false),
             pointer_observer: RefCell::new(None),
             device_policies: RefCell::new(None),
@@ -289,6 +300,26 @@ impl Platform {
 
     pub const fn is_kindle(&self) -> bool {
         self.kindle
+    }
+
+    pub fn hardware_media_availability(&self) -> crate::native_media::Availability {
+        #[cfg(test)]
+        if let Some(value) = self.hardware_media_available_override.get() {
+            return value;
+        }
+        if self.kindle {
+            crate::native_media::availability()
+        } else {
+            crate::native_media::Availability::UnsupportedPlatform
+        }
+    }
+
+    #[cfg(test)]
+    pub(crate) fn set_test_hardware_media_availability(
+        &self,
+        value: crate::native_media::Availability,
+    ) {
+        self.hardware_media_available_override.set(Some(value));
     }
 
     /// The accepted software output transform, independent of hardware polarity.
@@ -325,6 +356,23 @@ impl Platform {
 
     pub fn reader_hardware_y4_requested(&self) -> bool {
         self.reader_hardware_y4_requested.get()
+    }
+
+    pub(crate) fn set_reader_display(
+        &self,
+        display: Option<crate::display::DisplayMode>,
+        content_only: bool,
+    ) {
+        self.reader_display.set(display);
+        self.reader_content_only
+            .set(display.is_some() && content_only);
+        if display.is_none() {
+            self.reader_animation_left.set(None);
+        }
+    }
+
+    pub(crate) fn arm_reader_animation(&self, left: Option<bool>) {
+        self.reader_animation_left.set(left);
     }
 
     #[cfg(test)]
@@ -852,35 +900,95 @@ impl Platform {
     }
 
     pub fn refresh(&self, requested: RefreshKind) {
-        let every = self.preferences.borrow().refresh_every;
+        use crate::display::DisplayMode;
+        let display = self.reader_display.get();
+        // Generic UI notifications can be queued in the same render pass as a
+        // page update. AUTO outranks DU in the backend's safety merge, so keep
+        // both requests on DU while the visible scene is a Fast reading frame.
+        // Menus and overlays retain AUTO for their grayscale controls.
+        let requested = if requested == RefreshKind::Ui
+            && display == Some(DisplayMode::Fast)
+            && self.reader_content_only.get()
+        {
+            RefreshKind::Fast
+        } else {
+            requested
+        };
+        let requested =
+            if requested == RefreshKind::Partial && display == Some(DisplayMode::HighQuality) {
+                RefreshKind::Full
+            } else {
+                requested
+            };
+        let animation = if matches!(requested, RefreshKind::Partial | RefreshKind::Full) {
+            self.reader_animation_left.take()
+        } else {
+            None
+        };
+        #[cfg(not(all(feature = "kindle", target_os = "linux")))]
+        let _ = animation;
+        let every = if display == Some(DisplayMode::Fast) {
+            0
+        } else {
+            self.preferences.borrow().refresh_every
+        };
         let (kind, count) = next_refresh(requested, self.partial_count.get(), every);
         self.partial_count.set(count);
         self.last_refresh.set(kind);
         self.refresh_count.set(self.refresh_count.get() + 1);
         #[cfg(all(feature = "kindle", target_os = "linux"))]
         if let Some(backend) = self.backend.borrow().as_ref() {
-            use slint_backend_kindle::{RefreshArea, RefreshRequest, RefreshWaveform};
+            use slint_backend_kindle::{
+                RefreshArea, RefreshRequest, RefreshWaveform, SwipeDirection,
+            };
             let request = match kind {
                 RefreshKind::Full => RefreshRequest::full(),
                 RefreshKind::FlashUi => RefreshRequest {
                     waveform: RefreshWaveform::Gc16,
                     flashing: true,
+                    animation: None,
                     area: RefreshArea::Dirty,
                 },
                 RefreshKind::Fast => RefreshRequest {
                     waveform: RefreshWaveform::Du,
                     flashing: false,
+                    animation: None,
                     area: RefreshArea::Dirty,
                 },
                 RefreshKind::A2 => RefreshRequest {
                     waveform: RefreshWaveform::A2,
                     flashing: false,
+                    animation: None,
                     area: RefreshArea::Dirty,
                 },
+                RefreshKind::Partial if display.is_some() => {
+                    let mode = display.unwrap();
+                    RefreshRequest {
+                        waveform: if mode == DisplayMode::Fast {
+                            RefreshWaveform::Du
+                        } else {
+                            RefreshWaveform::Reagl
+                        },
+                        flashing: false,
+                        animation: if mode == DisplayMode::Kindle {
+                            animation.map(|left| {
+                                if left {
+                                    SwipeDirection::Left
+                                } else {
+                                    SwipeDirection::Right
+                                }
+                            })
+                        } else {
+                            None
+                        },
+                        area: RefreshArea::Dirty,
+                    }
+                }
                 RefreshKind::Ui | RefreshKind::Partial => RefreshRequest {
                     // AUTO lets the detected driver select its safe partial waveform.
                     waveform: RefreshWaveform::Auto,
                     flashing: false,
+                    animation: None,
                     area: RefreshArea::Dirty,
                 },
             };
@@ -1596,6 +1704,34 @@ fn native_status(_preferences: &Preferences) -> DeviceStatus {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn fast_pages_skip_periodic_clearing_but_keep_explicit_full_refresh() {
+        use crate::display::DisplayMode;
+        let platform = Platform::new(DeviceProfile::Scribe, false).unwrap();
+        let preferences = Preferences {
+            refresh_every: 1,
+            ..Preferences::default()
+        };
+        platform.apply_preferences(&preferences).unwrap();
+        platform.set_reader_display(Some(DisplayMode::Fast), true);
+        for _ in 0..20 {
+            platform.refresh(RefreshKind::Partial);
+            assert_eq!(platform.last_refresh(), RefreshKind::Partial);
+        }
+        platform.refresh(RefreshKind::Full);
+        assert_eq!(platform.last_refresh(), RefreshKind::Full);
+        platform.refresh(RefreshKind::Partial);
+        assert_eq!(platform.last_refresh(), RefreshKind::Partial);
+        platform.refresh(RefreshKind::Ui);
+        assert_eq!(platform.last_refresh(), RefreshKind::Fast);
+        platform.set_reader_display(Some(DisplayMode::Fast), false);
+        platform.refresh(RefreshKind::Ui);
+        assert_eq!(platform.last_refresh(), RefreshKind::Ui);
+        platform.set_reader_display(Some(DisplayMode::Normal), true);
+        platform.refresh(RefreshKind::Partial);
+        assert_eq!(platform.last_refresh(), RefreshKind::Full);
+    }
 
     #[test]
     fn desktop_design_profiles_never_claim_native_y4_support() {

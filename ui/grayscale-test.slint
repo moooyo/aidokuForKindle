@@ -1,0 +1,36 @@
+import { State } from "state.slint";
+import { Theme } from "theme.slint";
+import { Strings } from "strings.slint";
+import { BodyText } from "widgets.slint";
+
+export component GrayscaleTest inherits Rectangle {
+    property <length> bar-height: State.large-screen ? 56px : 48px;
+    height: 40px + root.bar-height + 32px;
+
+    BodyText {
+        x: 0px; y: 0px; width: parent.width; height: 28px;
+        text: Strings.grayscale-test + " · 256"; font-size: Theme.body;
+    }
+    Rectangle {
+        x: 0px; y: 40px; width: parent.width; height: root.bar-height;
+        border-width: 1px; border-color: Theme.secondary;
+        Image {
+            x: 1px; y: 1px; width: parent.width - 2px; height: parent.height - 2px;
+            source: State.grayscale-preview;
+            image-fit: fill;
+        }
+    }
+    BodyText {
+        x: 0px; y: 48px + root.bar-height; width: 60px; height: 20px;
+        text: "0"; font-size: Theme.caption; color: Theme.secondary;
+    }
+    BodyText {
+        x: parent.width - 60px; y: 48px + root.bar-height; width: 60px; height: 20px;
+        text: "255"; horizontal-alignment: right; font-size: Theme.caption; color: Theme.secondary;
+    }
+    BodyText {
+        x: 72px; y: 48px + root.bar-height; width: parent.width - 144px; height: 20px;
+        text: !State.dither ? Strings.off : State.dither-method == "floyd_steinberg" ? Strings.dither-floyd : Strings.dither-bayer8;
+        horizontal-alignment: center; font-size: Theme.caption; color: Theme.secondary;
+    }
+}

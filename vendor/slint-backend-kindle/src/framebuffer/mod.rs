@@ -2,6 +2,8 @@ mod ffi;
 mod markers;
 
 #[cfg(test)]
+mod display_mode_tests;
+#[cfg(test)]
 mod dithering_tests;
 #[cfg(test)]
 mod polarity_tests;
@@ -12,7 +14,7 @@ mod test_support;
 
 use crate::dithering::{DitheringHandle, software_gray};
 use crate::gray_target::ScenePixels;
-use crate::refresh::{RefreshWaveform, ResolvedRefresh};
+use crate::refresh::{RefreshWaveform, ResolvedRefresh, SwipeDirection};
 use crate::render_control::GrayMode;
 use std::cell::Cell;
 use std::io;
@@ -23,11 +25,13 @@ use markers::UpdateMarkers;
 
 use ffi::{
     EPDC_FLAG_FORCE_MONOCHROME, FBIOGET_FSCREENINFO, FBIOGET_VSCREENINFO, FbFixScreeninfo,
-    FbVarScreeninfo, MTK_EPDC_FLAG_USE_DITHERING_Y4, MXCFB_SEND_UPDATE, MXCFB_SEND_UPDATE_MTK,
-    MXCFB_SEND_UPDATE_REX, MXCFB_SEND_UPDATE_ZELDA, MXCFB_WAIT_FOR_UPDATE_COMPLETE,
-    TEMP_USE_AMBIENT, UPDATE_MODE_FULL, UPDATE_MODE_PARTIAL, UpdateMarkerData, UpdateRect,
-    UpdateRequest, UpdateRequestMtk, UpdateRequestRex, UpdateRequestZelda, WAVEFORM_MODE_A2_LEGACY,
-    WAVEFORM_MODE_A2_MODERN, WAVEFORM_MODE_AUTO, WAVEFORM_MODE_DU, WAVEFORM_MODE_GC16,
+    FbVarScreeninfo, MTK_EPDC_FLAG_ENABLE_SWIPE, MTK_EPDC_FLAG_USE_DITHERING_Y4, MXCFB_SEND_UPDATE,
+    MXCFB_SEND_UPDATE_MTK, MXCFB_SEND_UPDATE_REX, MXCFB_SEND_UPDATE_ZELDA,
+    MXCFB_WAIT_FOR_UPDATE_COMPLETE, TEMP_USE_AMBIENT, UPDATE_MODE_FULL, UPDATE_MODE_PARTIAL,
+    UpdateMarkerData, UpdateRect, UpdateRequest, UpdateRequestMtk, UpdateRequestRex,
+    UpdateRequestZelda, WAVEFORM_MODE_A2_LEGACY, WAVEFORM_MODE_A2_MODERN, WAVEFORM_MODE_AUTO,
+    WAVEFORM_MODE_DU, WAVEFORM_MODE_DUNM, WAVEFORM_MODE_GC16, WAVEFORM_MODE_GCK16,
+    WAVEFORM_MODE_GL16, WAVEFORM_MODE_GLKW16, WAVEFORM_MODE_GLR16,
 };
 
 /// Read-only metadata from the descriptor used for this exact observation.
@@ -516,7 +520,8 @@ impl Framebuffer {
         }
     }
 
-    pub(crate) fn settle_dithering_transition(&self) -> io::Result<()> {
+    /// Retire the previous accepted read before modifying its framebuffer bytes.
+    pub(crate) fn settle_before_write(&self) -> io::Result<()> {
         if let Err(error) = self.wait_for_pending_update_complete_checked() {
             self.block_uncertain_dithering_delivery(&error);
             return Err(error);
@@ -539,7 +544,12 @@ impl Framebuffer {
     /// Raw retained pixels cannot receive DU/A2, even under a small UI overlay.
     pub(crate) fn resolve_dithering(&self, mut refresh: ResolvedRefresh) -> ResolvedRefresh {
         if self.raw_scene() {
-            refresh.waveform = RefreshWaveform::Gc16;
+            if !matches!(
+                refresh.waveform,
+                RefreshWaveform::Gc16 | RefreshWaveform::Gl16 | RefreshWaveform::Reagl
+            ) {
+                refresh.waveform = RefreshWaveform::Gc16;
+            }
             if self.hardware_y4_active() {
                 let region = aligned_dither_region(
                     UpdateRect {
@@ -685,12 +695,41 @@ impl Framebuffer {
         mode: u32,
         scene: Option<FallbackScene<'_>>,
     ) -> io::Result<SubmittedUpdate<'_>> {
-        self.send_update_using(
+        self.send_update_scene_animated(region, waveform, mode, scene, None)
+    }
+
+    fn send_update_scene_animated(
+        &self,
+        region: UpdateRect,
+        waveform: u32,
+        mode: u32,
+        scene: Option<FallbackScene<'_>>,
+        animation: Option<SwipeDirection>,
+    ) -> io::Result<SubmittedUpdate<'_>> {
+        self.send_update_using_animation(
             region,
             waveform,
             mode,
             scene,
-            |variant, region, waveform, mode, marker, y4| {
+            animation,
+            |variant, region, waveform, mode, marker, y4, animation| {
+                if variant == UpdateVariant::Mtk {
+                    let update = mtk_update_for_format(
+                        region,
+                        waveform,
+                        mode,
+                        marker,
+                        y4,
+                        animation,
+                        self.inverted_gray8.get(),
+                    );
+                    return if self.send_update_ioctl(MXCFB_SEND_UPDATE_MTK, &update) {
+                        trace_native_refresh(&update);
+                        Ok(())
+                    } else {
+                        Err(io::Error::last_os_error())
+                    };
+                }
                 if self.send_update_variant(variant, region, waveform, mode, marker, y4) {
                     Ok(())
                 } else {
@@ -701,20 +740,63 @@ impl Framebuffer {
         )
     }
 
+    #[cfg(test)]
     fn send_update_using(
         &self,
-        mut region: UpdateRect,
-        mut waveform: u32,
+        region: UpdateRect,
+        waveform: u32,
         mode: u32,
         scene: Option<FallbackScene<'_>>,
         mut send: impl FnMut(UpdateVariant, UpdateRect, u32, u32, u32, bool) -> io::Result<()>,
         wait: impl FnMut(u32) -> io::Result<()>,
     ) -> io::Result<SubmittedUpdate<'_>> {
+        self.send_update_using_animation(
+            region,
+            waveform,
+            mode,
+            scene,
+            None,
+            |variant, region, waveform, mode, marker, y4, _| {
+                send(variant, region, waveform, mode, marker, y4)
+            },
+            wait,
+        )
+    }
+
+    fn send_update_using_animation(
+        &self,
+        mut region: UpdateRect,
+        mut waveform: u32,
+        mut mode: u32,
+        scene: Option<FallbackScene<'_>>,
+        mut animation: Option<SwipeDirection>,
+        mut send: impl FnMut(
+            UpdateVariant,
+            UpdateRect,
+            u32,
+            u32,
+            u32,
+            bool,
+            Option<SwipeDirection>,
+        ) -> io::Result<()>,
+        mut wait: impl FnMut(u32) -> io::Result<()>,
+    ) -> io::Result<SubmittedUpdate<'_>> {
         self.require_known_dithering_delivery()?;
         let raw_scene = self.raw_scene();
         let y4 = self.hardware_y4_active();
-        if raw_scene {
+        if raw_scene && !y4_waveform(waveform) {
             waveform = WAVEFORM_MODE_GC16;
+        }
+        let mut advanced =
+            animation.is_some() || matches!(waveform, WAVEFORM_MODE_GL16 | WAVEFORM_MODE_GLR16);
+        if advanced
+            && (!self.dithering.advanced_refresh_available()
+                || !y4 && self.update_variant.get() != Some(UpdateVariant::Mtk))
+        {
+            waveform = WAVEFORM_MODE_GC16;
+            mode = UPDATE_MODE_FULL;
+            animation = None;
+            advanced = false;
         }
         if y4 {
             region = aligned_dither_region(region, self.width, self.height);
@@ -729,16 +811,47 @@ impl Framebuffer {
             ));
         }
         let mut rewritten = false;
-        let receipt = match self.submit_update_checked_with_policy(raw_scene, |variant, marker| {
-            send(
-                variant,
-                region,
-                waveform,
-                mode,
-                marker,
-                y4 && variant == UpdateVariant::Mtk,
-            )
-        }) {
+        let mut result =
+            self.submit_update_checked_with_policy(raw_scene || advanced, |variant, marker| {
+                send(
+                    variant,
+                    region,
+                    waveform,
+                    mode,
+                    marker,
+                    y4 && variant == UpdateVariant::Mtk,
+                    if variant == UpdateVariant::Mtk {
+                        animation
+                    } else {
+                        None
+                    },
+                )
+            });
+        if advanced
+            && result
+                .as_ref()
+                .is_err_and(|error| explicit_update_rejection(error.raw_os_error()))
+        {
+            self.dithering.reject_advanced_refresh();
+            if let Err(error) = self.update_markers.wait_for_last_submitted(&mut wait) {
+                self.block_uncertain_dithering_delivery(&error);
+                return Err(error);
+            }
+            eprintln!("aidoku: native refresh mode rejected; using GC16 for this display owner");
+            result =
+                self.submit_update_checked_with_policy(raw_scene || advanced, |variant, marker| {
+                    send(
+                        variant,
+                        region,
+                        WAVEFORM_MODE_GC16,
+                        UPDATE_MODE_FULL,
+                        marker,
+                        y4 && variant == UpdateVariant::Mtk,
+                        None,
+                    )
+                });
+        }
+        let receipt = match result {
             Ok(receipt) => receipt,
             Err(error) if y4 && explicit_update_rejection(error.raw_os_error()) => {
                 self.dithering.reject_hardware();
@@ -776,6 +889,7 @@ impl Framebuffer {
                         UPDATE_MODE_FULL,
                         marker,
                         false,
+                        None,
                     )
                 })?
             }
@@ -958,8 +1072,20 @@ impl Framebuffer {
         marker: u32,
         y4: bool,
     ) -> bool {
-        let update = mtk_update(region, waveform, mode, marker, y4);
-        self.send_update_ioctl(MXCFB_SEND_UPDATE_MTK, &update)
+        let update = mtk_update_for_format(
+            region,
+            waveform,
+            mode,
+            marker,
+            y4,
+            None,
+            self.inverted_gray8.get(),
+        );
+        let accepted = self.send_update_ioctl(MXCFB_SEND_UPDATE_MTK, &update);
+        if accepted {
+            trace_native_refresh(&update);
+        }
+        accepted
     }
 
     /// Issue `MXCFB_SEND_UPDATE_ZELDA` (88-byte struct, KOA2/KOA3 — Oasis 2/3).
@@ -1003,7 +1129,7 @@ impl Framebuffer {
     ) -> io::Result<SubmittedUpdate<'_>> {
         let refresh = self.resolve_dithering(refresh);
         let waveform = waveform_for_driver(refresh.waveform, self.update_variant.get());
-        self.send_update_scene(
+        self.send_update_scene_animated(
             UpdateRect {
                 top: refresh.region.y as u32,
                 left: refresh.region.x as u32,
@@ -1011,12 +1137,13 @@ impl Framebuffer {
                 height: refresh.region.height,
             },
             waveform,
-            if refresh.flashing {
+            if refresh.flashing || waveform == WAVEFORM_MODE_GLR16 {
                 UPDATE_MODE_FULL
             } else {
                 UPDATE_MODE_PARTIAL
             },
             scene,
+            refresh.animation,
         )
     }
 
@@ -1272,6 +1399,7 @@ fn aligned_dither_region(region: UpdateRect, width: u32, height: u32) -> UpdateR
     }
 }
 
+#[cfg(test)]
 fn mtk_update(
     region: UpdateRect,
     waveform: u32,
@@ -1279,20 +1407,111 @@ fn mtk_update(
     marker: u32,
     y4: bool,
 ) -> UpdateRequestMtk {
-    let y4 = y4 && waveform == WAVEFORM_MODE_GC16;
+    mtk_update_animated(region, waveform, mode, marker, y4, None)
+}
+
+fn y4_waveform(waveform: u32) -> bool {
+    matches!(
+        waveform,
+        WAVEFORM_MODE_GC16 | WAVEFORM_MODE_GL16 | WAVEFORM_MODE_GLR16
+    )
+}
+
+/// Optional accepted-request diagnostics; never includes device identifiers.
+fn trace_native_refresh(update: &UpdateRequestMtk) {
+    static ENABLED: std::sync::OnceLock<bool> = std::sync::OnceLock::new();
+    if *ENABLED.get_or_init(|| {
+        std::env::var("AIDOKU_NATIVE_REFRESH_TRACE").is_ok_and(|value| value == "1")
+    }) {
+        eprintln!(
+            "aidoku: native-refresh accepted marker={} waveform={} mode={} flags={:#x} region={},{},{},{} swipe={},{}",
+            update.update_marker,
+            update.waveform_mode,
+            update.update_mode,
+            update.flags,
+            update.update_region.left,
+            update.update_region.top,
+            update.update_region.width,
+            update.update_region.height,
+            update.swipe_data.direction,
+            update.swipe_data.steps
+        );
+    }
+}
+
+/// The native Gray8 encoding selects the driver's loaded waveform family.
+/// Semantic UI night colors do not change this scanout contract.
+fn mtk_update_for_format(
+    region: UpdateRect,
+    waveform: u32,
+    mode: u32,
+    marker: u32,
+    y4: bool,
+    animation: Option<SwipeDirection>,
+    inverted_gray8: bool,
+) -> UpdateRequestMtk {
+    let mut update = mtk_update_animated(region, waveform, mode, marker, y4, animation);
+    if inverted_gray8 {
+        update.waveform_mode = match update.waveform_mode {
+            WAVEFORM_MODE_GC16 => WAVEFORM_MODE_GCK16,
+            WAVEFORM_MODE_GL16 | WAVEFORM_MODE_GLR16 => WAVEFORM_MODE_GLKW16,
+            WAVEFORM_MODE_DU => WAVEFORM_MODE_DUNM,
+            value => value,
+        };
+        if update.waveform_mode == WAVEFORM_MODE_GLKW16 {
+            update.update_mode = UPDATE_MODE_FULL;
+        }
+    }
+    update
+}
+
+fn mtk_update_animated(
+    region: UpdateRect,
+    waveform: u32,
+    mode: u32,
+    marker: u32,
+    y4: bool,
+    animation: Option<SwipeDirection>,
+) -> UpdateRequestMtk {
+    let y4 = y4 && y4_waveform(waveform);
+    let animation = animation.filter(|direction| {
+        let extent = match direction {
+            SwipeDirection::Left | SwipeDirection::Right => region.width,
+            SwipeDirection::Up | SwipeDirection::Down => region.height,
+        };
+        extent >= 12 && region.width >= 12 && region.height >= 12
+    });
     UpdateRequestMtk {
         update_region: region,
-        waveform_mode: waveform,
-        update_mode: mode,
+        waveform_mode: if animation.is_some() {
+            WAVEFORM_MODE_AUTO
+        } else {
+            waveform
+        },
+        update_mode: if animation.is_some() {
+            UPDATE_MODE_PARTIAL
+        } else {
+            mode
+        },
         update_marker: marker,
         temperature: TEMP_USE_AMBIENT,
-        flags: if y4 {
+        flags: (if y4 {
             MTK_EPDC_FLAG_USE_DITHERING_Y4
         } else if waveform == WAVEFORM_MODE_DU {
             EPDC_FLAG_FORCE_MONOCHROME
         } else {
             0
+        }) | if animation.is_some() {
+            MTK_EPDC_FLAG_ENABLE_SWIPE
+        } else {
+            0
         },
+        swipe_data: animation
+            .map(|direction| ffi::SwipeData {
+                direction: direction.native_value(),
+                steps: 12,
+            })
+            .unwrap_or_default(),
         // MTK chooses Y8-to-Y4 processing through flags. These EPDCv2 fields
         // remain zero; quant_bit=7 is an i.MX convention, not this MTK ABI.
         dither_mode: 0,
@@ -1317,6 +1536,9 @@ fn waveform_for_driver(waveform: RefreshWaveform, variant: Option<UpdateVariant>
     match waveform {
         RefreshWaveform::Auto => WAVEFORM_MODE_AUTO,
         RefreshWaveform::Gc16 => WAVEFORM_MODE_GC16,
+        RefreshWaveform::Gl16 if variant == Some(UpdateVariant::Mtk) => WAVEFORM_MODE_GL16,
+        RefreshWaveform::Reagl if variant == Some(UpdateVariant::Mtk) => WAVEFORM_MODE_GLR16,
+        RefreshWaveform::Gl16 | RefreshWaveform::Reagl => WAVEFORM_MODE_GC16,
         RefreshWaveform::Du => WAVEFORM_MODE_DU,
         RefreshWaveform::A2 => match variant {
             Some(UpdateVariant::Legacy) => WAVEFORM_MODE_A2_LEGACY,

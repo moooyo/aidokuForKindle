@@ -45,7 +45,7 @@ component SourceLanguageFilter inherits Rectangle {
             preferred-width: caption.preferred-width + 32px + Theme.control-border * 2;
             min-width: Theme.touch;
             height: Theme.touch;
-            property <bool> inverted: (State.source-language-index == index) != touch.pressed;
+            property <bool> inverted: State.source-language-index == index || touch.pressed;
             Rectangle { x: 0px; y: (parent.height - self.height) / 2; width: parent.width; height: State.large-screen ? 42px : 38px; border-width: Theme.control-border; border-color: Theme.ink; border-radius: Theme.control-radius; background: parent.inverted ? Theme.ink : Theme.paper; }
             caption := Text { x: 0px; y: 0px; width: parent.width; height: parent.height; text: label; font-family: Theme.sans; font-size: State.large-screen ? 15px : 14px; font-weight: State.source-language-index == index ? 700 : 500; color: parent.inverted ? Theme.paper : Theme.ink; horizontal-alignment: center; vertical-alignment: center; }
             accessible-role: button;
@@ -54,7 +54,7 @@ component SourceLanguageFilter inherits Rectangle {
             accessible-checked: State.source-language-index == index;
             touch := TouchArea { x: 0px; y: 0px;
                 clicked => { Commands.action("sources", "language", root.codes[index]); }
-                pointer-event(event) => { if event.kind == PointerEventKind.down { Commands.refresh("fast"); } else if event.kind == PointerEventKind.up { Commands.refresh("ui"); } }
+                pointer-event(event) => { if event.kind == PointerEventKind.down { Commands.refresh("ui"); } else if event.kind == PointerEventKind.up || event.kind == PointerEventKind.cancel { Commands.refresh("ui"); } }
             }
         }
     }
@@ -62,7 +62,7 @@ component SourceLanguageFilter inherits Rectangle {
 
 component CatalogFilterButton inherits Rectangle {
     property <bool> selected: State.catalog-active-filter-count > 0;
-    property <bool> inverted: root.selected != touch.pressed;
+    property <bool> inverted: root.selected || touch.pressed;
     width: Theme.touch;
     height: Theme.touch;
     accessible-role: button;
@@ -81,7 +81,7 @@ component CatalogFilterButton inherits Rectangle {
     }
     touch := TouchArea { x: 0px; y: 0px;
         clicked => { Commands.action("catalog", "filter-menu", ""); }
-        pointer-event(event) => { if event.kind == PointerEventKind.down { Commands.refresh("fast"); } else if event.kind == PointerEventKind.up { Commands.refresh("ui"); } }
+        pointer-event(event) => { if event.kind == PointerEventKind.down { Commands.refresh("ui"); } else if event.kind == PointerEventKind.up || event.kind == PointerEventKind.cancel { Commands.refresh("ui"); } }
     }
 }
 
@@ -103,7 +103,7 @@ component CatalogTabs inherits Rectangle {
         touch := TouchArea { x: 0px;
             y: -4px; height: 56px;
             clicked => { Commands.action("catalog", "search", ""); }
-            pointer-event(event) => { if event.kind == PointerEventKind.down { Commands.refresh("fast"); } else if event.kind == PointerEventKind.up { Commands.refresh("ui"); } }
+            pointer-event(event) => { if event.kind == PointerEventKind.down { Commands.refresh("ui"); } else if event.kind == PointerEventKind.up || event.kind == PointerEventKind.cancel { Commands.refresh("ui"); } }
         }
     }
     if State.large-screen: CatalogFilterButton { x: parent.width - 28px - 52px; y: 3px; }
@@ -132,7 +132,7 @@ export component CatalogGrid inherits Rectangle {
         Text { x: 0px; y: 239px; width: parent.width; height: 18px; text: book.status; font-family: Theme.sans; font-size: 14px; color: touch.pressed ? Theme.paper : Theme.secondary; vertical-alignment: center; overflow: elide; }
         touch := TouchArea { x: 0px; y: 0px;
             clicked => { Commands.action("catalog", "open", book.id); }
-            pointer-event(event) => { if event.kind == PointerEventKind.down { Commands.refresh("fast"); } else if event.kind == PointerEventKind.up { Commands.refresh("ui"); } }
+            pointer-event(event) => { if event.kind == PointerEventKind.down { Commands.refresh("ui"); } else if event.kind == PointerEventKind.up || event.kind == PointerEventKind.cancel { Commands.refresh("ui"); } }
         }
     }
 }
@@ -222,7 +222,7 @@ export component CatalogPage inherits Rectangle {
             Text { x: 18px; y: 0px; width: parent.width - 36px; height: parent.height; text: State.source-server-address == "" ? "http://" : State.source-server-address; font-family: Theme.numbers; font-size: State.large-screen ? 18px : 16px; color: address-touch.pressed ? Theme.paper : State.source-server-address == "" ? Theme.muted : Theme.ink; vertical-alignment: center; overflow: elide; }
             address-touch := TouchArea { x: 0px; y: 0px;
                 clicked => { Commands.action("sources", "edit-address", State.source-id); }
-                pointer-event(event) => { if event.kind == PointerEventKind.down { Commands.refresh("fast"); } else if event.kind == PointerEventKind.up { Commands.refresh("ui"); } }
+                pointer-event(event) => { if event.kind == PointerEventKind.down { Commands.refresh("ui"); } else if event.kind == PointerEventKind.up || event.kind == PointerEventKind.cancel { Commands.refresh("ui"); } }
             }
         }
         Text { x: Theme.margin; y: State.large-screen ? 133.5px : 116px; width: min(640px, parent.width - Theme.margin * 2); height: 19.5px; text: Strings.server-credentials; font-family: Theme.sans; font-size: State.large-screen ? 13px : 12px; letter-spacing: State.large-screen ? 3px : 2px; color: Theme.secondary; vertical-alignment: center; }
@@ -233,7 +233,7 @@ export component CatalogPage inherits Rectangle {
             Text { x: 18px; y: 0px; width: parent.width - 36px; height: parent.height; text: State.source-server-credential == "" ? "[API Key]" : State.source-server-credential; font-family: Theme.numbers; font-size: State.large-screen ? 18px : 16px; color: credentials-touch.pressed ? Theme.paper : State.source-server-credential == "" ? Theme.muted : Theme.ink; vertical-alignment: center; overflow: elide; }
             credentials-touch := TouchArea { x: 0px; y: 0px;
                 clicked => { Commands.action("sources", "edit-credential", State.source-id); }
-                pointer-event(event) => { if event.kind == PointerEventKind.down { Commands.refresh("fast"); } else if event.kind == PointerEventKind.up { Commands.refresh("ui"); } }
+                pointer-event(event) => { if event.kind == PointerEventKind.down { Commands.refresh("ui"); } else if event.kind == PointerEventKind.up || event.kind == PointerEventKind.cancel { Commands.refresh("ui"); } }
             }
         }
         Rectangle {

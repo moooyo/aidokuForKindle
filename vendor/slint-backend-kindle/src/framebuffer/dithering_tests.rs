@@ -247,6 +247,7 @@ fn all_binary_waveforms_are_promoted_while_raw_pixels_are_retained() {
             },
             waveform,
             flashing: false,
+            animation: None,
         });
         assert_eq!(resolved.waveform, RefreshWaveform::Gc16);
         assert_eq!(
@@ -745,6 +746,7 @@ fn bilevel_mode_keeps_the_existing_fast_waveform_without_y4() {
         },
         waveform: RefreshWaveform::Du,
         flashing: false,
+        animation: None,
     };
     assert_eq!(framebuffer.resolve_dithering(refresh), refresh);
     framebuffer

@@ -112,7 +112,7 @@ component SourcePickerFooterAction inherits Rectangle {
     in property <length> text-size: State.large-screen ? 16px : 14px;
     in property <length> horizontal-padding: State.large-screen ? 18px : 12px;
     callback clicked();
-    property <bool> inverted: root.primary != hit.pressed;
+    property <bool> inverted: root.primary || hit.pressed;
     property <length> plus-space: root.show-plus ? (State.large-screen ? 24px : 22px) : 0px;
     property <length> badge-space: root.badge-count > 0 ? badge.width + 8px : 0px;
     preferred-width: max(Theme.touch, label.preferred-width + root.horizontal-padding * 2 + root.plus-space + root.badge-space);
@@ -133,7 +133,7 @@ component SourcePickerFooterAction inherits Rectangle {
     hit := TouchArea {
         x: 0px; y: (parent.height - max(parent.height, Theme.touch)) / 2; width: parent.width; height: max(parent.height, Theme.touch);
         pointer-event(event) => {
-            if event.kind == PointerEventKind.down { Commands.refresh("fast"); }
+            if event.kind == PointerEventKind.down { Commands.refresh("ui"); }
             else if event.kind == PointerEventKind.up || event.kind == PointerEventKind.cancel { Commands.refresh("ui"); }
         }
         clicked => { root.clicked(); }

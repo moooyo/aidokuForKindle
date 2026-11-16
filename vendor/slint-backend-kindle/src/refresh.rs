@@ -14,8 +14,43 @@ pub enum RefreshWaveform {
     #[default]
     Auto,
     Gc16,
+    Gl16,
+    Reagl,
     Du,
     A2,
+}
+
+/// Animation direction in the application's logical screen coordinates.
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub enum SwipeDirection {
+    Left,
+    Right,
+    Up,
+    Down,
+}
+
+impl SwipeDirection {
+    pub(crate) fn rotated(self, degrees: u32) -> Self {
+        let mut direction = self;
+        for _ in 0..((degrees % 360) / 90) {
+            direction = match direction {
+                Self::Left => Self::Up,
+                Self::Up => Self::Right,
+                Self::Right => Self::Down,
+                Self::Down => Self::Left,
+            };
+        }
+        direction
+    }
+
+    pub(crate) const fn native_value(self) -> u32 {
+        match self {
+            Self::Down => 0,
+            Self::Up => 1,
+            Self::Left => 2,
+            Self::Right => 3,
+        }
+    }
 }
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
@@ -39,6 +74,7 @@ pub enum RefreshArea {
 pub struct RefreshRequest {
     pub waveform: RefreshWaveform,
     pub flashing: bool,
+    pub animation: Option<SwipeDirection>,
     pub area: RefreshArea,
 }
 
@@ -47,6 +83,7 @@ impl RefreshRequest {
         Self {
             waveform: RefreshWaveform::Gc16,
             flashing: true,
+            animation: None,
             area: RefreshArea::Full,
         }
     }
@@ -154,6 +191,7 @@ pub(crate) struct ResolvedRefresh {
     pub region: PhysicalRect,
     pub waveform: RefreshWaveform,
     pub flashing: bool,
+    pub animation: Option<SwipeDirection>,
 }
 
 /// Resolve only after the current pixels have been written to the framebuffer.
@@ -168,6 +206,8 @@ pub(crate) fn resolve(
     let mut region = None;
     let mut waveform = RefreshWaveform::A2;
     let mut flashing = false;
+    let mut animation = None;
+    let mut animation_conflict = false;
     for request in pending.requests {
         let requested_region = match request.area {
             RefreshArea::Dirty => dirty,
@@ -193,12 +233,19 @@ pub(crate) fn resolve(
             waveform = request.waveform;
         }
         flashing |= request.flashing;
+        if let Some(direction) = request.animation {
+            if animation.is_some_and(|previous| previous != direction) {
+                animation_conflict = true;
+            }
+            animation = Some(direction);
+        }
     }
     let Some(mut region) = region else {
         return dirty.map(|region| ResolvedRefresh {
             region,
             waveform: RefreshWaveform::Auto,
             flashing: false,
+            animation: None,
         });
     };
     if let Some(dirty) = dirty {
@@ -206,11 +253,17 @@ pub(crate) fn resolve(
     }
     if flashing {
         waveform = RefreshWaveform::Gc16;
+        animation = None;
     }
+    if animation_conflict {
+        animation = None;
+    }
+    let animation = animation.map(|direction| direction.rotated(rotation));
     Some(ResolvedRefresh {
         region,
         waveform,
         flashing,
+        animation,
     })
 }
 
@@ -219,7 +272,9 @@ fn priority(waveform: RefreshWaveform) -> u8 {
         RefreshWaveform::A2 => 0,
         RefreshWaveform::Du => 1,
         RefreshWaveform::Auto => 2,
-        RefreshWaveform::Gc16 => 3,
+        RefreshWaveform::Gl16 => 3,
+        RefreshWaveform::Reagl => 4,
+        RefreshWaveform::Gc16 => 5,
     }
 }
 
@@ -297,6 +352,47 @@ fn union(first: PhysicalRect, second: PhysicalRect) -> PhysicalRect {
 mod tests {
     use super::*;
 
+    #[test]
+    fn animation_tracks_rotation_and_clearing_overrides_it() {
+        let animated = RefreshRequest {
+            waveform: RefreshWaveform::Reagl,
+            flashing: false,
+            animation: Some(SwipeDirection::Left),
+            area: RefreshArea::Full,
+        };
+        let mut pending = PendingRefresh::default();
+        pending.push(animated);
+        let result = resolve(pending, None, 32, 32, 90).unwrap();
+        assert_eq!(result.animation, Some(SwipeDirection::Up));
+        assert!(!result.flashing);
+        let mut pending = PendingRefresh::default();
+        pending.push(animated);
+        pending.push(RefreshRequest::full());
+        let result = resolve(pending, None, 32, 32, 90).unwrap();
+        assert_eq!(result.animation, None);
+        assert_eq!(result.waveform, RefreshWaveform::Gc16);
+        assert!(result.flashing);
+    }
+
+    #[test]
+    fn opposite_coalesced_turns_do_not_replay_a_stale_animation() {
+        let mut pending = PendingRefresh::default();
+        for direction in [SwipeDirection::Left, SwipeDirection::Right] {
+            pending.push(RefreshRequest {
+                waveform: RefreshWaveform::Reagl,
+                flashing: false,
+                animation: Some(direction),
+                area: RefreshArea::Full,
+            });
+        }
+        assert!(
+            resolve(pending, None, 32, 32, 0)
+                .unwrap()
+                .animation
+                .is_none()
+        );
+    }
+
     fn producer() -> (RefreshHandle, Arc<OwnedFd>) {
         let wake = crate::wakeup::make_wakeup().unwrap();
         (
@@ -340,7 +436,8 @@ mod tests {
             ResolvedRefresh {
                 region: rect(8, 12, 100, 48),
                 waveform: RefreshWaveform::Auto,
-                flashing: false
+                flashing: false,
+                animation: None,
             }
         );
     }
@@ -364,6 +461,7 @@ mod tests {
         let request = RefreshRequest {
             waveform: RefreshWaveform::Du,
             flashing: false,
+            animation: None,
             area: RefreshArea::Rect(rect(2000, 0, 20, 20)),
         };
         assert!(resolve(pending(request), None, 1264, 1680, 0).is_none());
@@ -389,6 +487,7 @@ mod tests {
         let request = RefreshRequest {
             waveform: RefreshWaveform::Gc16,
             flashing: true,
+            animation: None,
             area: RefreshArea::Rect(rect(20, 40, 200, 300)),
         };
         let result = resolve(pending(request), Some(rect(0, 0, 48, 48)), 1264, 1680, 0).unwrap();
@@ -417,11 +516,13 @@ mod tests {
         pending.push(RefreshRequest {
             waveform: RefreshWaveform::Du,
             flashing: false,
+            animation: None,
             area: RefreshArea::Rect(rect(0, 0, 48, 48)),
         });
         pending.push(RefreshRequest {
             waveform: RefreshWaveform::Gc16,
             flashing: false,
+            animation: None,
             area: RefreshArea::Rect(rect(40, 40, 200, 300)),
         });
         let result = resolve(pending, None, 1264, 1680, 0).unwrap();
@@ -443,6 +544,7 @@ mod tests {
                             .request(RefreshRequest {
                                 waveform: RefreshWaveform::Auto,
                                 flashing: false,
+                                animation: None,
                                 area: RefreshArea::Dirty,
                             })
                             .unwrap();

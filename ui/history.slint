@@ -38,7 +38,7 @@ component HistoryTab inherits Rectangle {
     }
     touch := TouchArea { x: 0px; y: 0px;
         pointer-event(event) => {
-            if event.kind == PointerEventKind.down { Commands.refresh("fast"); }
+            if event.kind == PointerEventKind.down { Commands.refresh("ui"); }
             else if event.kind == PointerEventKind.up || event.kind == PointerEventKind.cancel { Commands.refresh("ui"); }
         }
         clicked => { root.picked(); }
@@ -110,7 +110,7 @@ component HistoryDownload inherits Rectangle {
     }
     touch := TouchArea { x: 0px; y: 0px;
         pointer-event(event) => {
-            if event.kind == PointerEventKind.down { Commands.refresh("fast"); }
+            if event.kind == PointerEventKind.down { Commands.refresh("ui"); }
             else if event.kind == PointerEventKind.up || event.kind == PointerEventKind.cancel { Commands.refresh("ui"); }
         }
         clicked => { Commands.action("history", "download", root.entry.chapter-id); }
@@ -189,7 +189,7 @@ component HistoryEntry inherits Rectangle {
         }
         open-touch := TouchArea { x: 0px; y: 0px;
             pointer-event(event) => {
-                if event.kind == PointerEventKind.down { Commands.refresh("fast"); }
+                if event.kind == PointerEventKind.down { Commands.refresh("ui"); }
                 else if event.kind == PointerEventKind.up || event.kind == PointerEventKind.cancel { Commands.refresh("ui"); }
             }
             clicked => { Commands.action("history", "open", root.entry.chapter-id); }
@@ -214,7 +214,7 @@ component HistoryEntry inherits Rectangle {
         }
         remove-touch := TouchArea { x: 0px; y: 0px;
             pointer-event(event) => {
-                if event.kind == PointerEventKind.down { Commands.refresh("fast"); }
+                if event.kind == PointerEventKind.down { Commands.refresh("ui"); }
                 else if event.kind == PointerEventKind.up || event.kind == PointerEventKind.cancel { Commands.refresh("ui"); }
             }
             clicked => { Commands.action("history", "delete", root.entry.chapter-id); }

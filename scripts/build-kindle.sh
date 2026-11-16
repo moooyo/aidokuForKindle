@@ -26,6 +26,7 @@ mkdir -p "$STAGING_ROOT/aidoku/app" "$STAGING_ROOT/aidoku/licenses/backend" \
     "$STAGING_ROOT/aidoku/licenses/icons" "$STAGING_ROOT/aidoku/licenses/demo" \
     "$STAGING_ROOT/extensions/aidoku" "$STAGING_ROOT/documents"
 install -m 755 "$CARGO_TARGET_DIR/$TARGET/release/aidoku" "$STAGING_ROOT/aidoku/app/aidoku"
+install -m 755 "$CARGO_TARGET_DIR/$TARGET/release/kindle-jpeg-worker" "$STAGING_ROOT/aidoku/app/kindle-jpeg-worker"
 install -m 755 packaging/kindle/launch.sh "$STAGING_ROOT/aidoku/launch.sh"
 install -m 755 packaging/kindle/document-launcher.sh "$STAGING_ROOT/documents/Aidoku.sh"
 install -m 644 packaging/kindle/README.md "$STAGING_ROOT/aidoku/README.md"

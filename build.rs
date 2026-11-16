@@ -1,6 +1,35 @@
 use std::{env, fs, path::PathBuf};
 
 fn main() {
+    if env::var_os("CARGO_FEATURE_KINDLE").is_some()
+        && env::var("CARGO_CFG_TARGET_OS").is_ok_and(|os| os == "linux")
+    {
+        println!("cargo:rerun-if-changed=src/native_media/codec.c");
+        println!("cargo:rerun-if-changed=scripts/native-codec-probe.c");
+        println!("cargo:rerun-if-changed=scripts/native-codec-bench.h");
+        cc::Build::new()
+            .file("src/native_media/codec.c")
+            .std("c11")
+            .opt_level(2)
+            .warnings(true)
+            .compile("aidoku_jpeg_worker");
+    }
+    if env::var_os("CARGO_FEATURE_NATIVE_MEDIA_BENCH").is_some() {
+        assert_eq!(
+            env::var("CARGO_CFG_TARGET_OS").unwrap(),
+            "linux",
+            "Native media benchmarks require the designated Linux verification environment"
+        );
+        println!("cargo:rerun-if-changed=scripts/native-codec-probe.c");
+        println!("cargo:rerun-if-changed=scripts/native-codec-bench.h");
+        cc::Build::new()
+            .file("scripts/native-codec-probe.c")
+            .define("AIDOKU_CODEC_BENCH_LIBRARY", None)
+            .std("c11")
+            .opt_level(2)
+            .warnings(true)
+            .compile("aidoku_codec_bench");
+    }
     for locale in ["zh-CN", "zh-TW", "en", "ja"] {
         println!("cargo:rerun-if-changed=assets/i18n/{locale}.json");
     }

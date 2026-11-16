@@ -96,16 +96,17 @@ fn resize_region_with_plan_budget(
     for (y, output_row) in output.as_mut().chunks_exact_mut(width as usize).enumerate() {
         check_decode_cancelled()?;
         let first = vertical.weights(y as u32, &mut vertical_weights)? as usize;
-        let source_start = first * stride;
-        // Each component retains BiliComics' increasing-source-y accumulation
-        // and its stored f32 intermediate before horizontal sampling.
-        for first_x in (0..row.len()).step_by(PIXEL_BLOCK) {
-            check_decode_cancelled()?;
-            let end_x = (first_x + PIXEL_BLOCK).min(row.len());
-            for x in first_x..end_x {
-                row[x] = accumulate(&vertical_weights, |offset| {
-                    pixels[source_start + offset * stride + x] as f32
-                })?;
+        row.fill(0.0);
+        // Accumulate contiguous source rows. Every output component still sees
+        // the same increasing-y f32 multiply/add sequence as the reference.
+        for (offset, weight) in vertical_weights.iter().enumerate() {
+            let start = (first + offset) * stride;
+            let source_row = &pixels[start..start + stride];
+            for (values, source) in row.chunks_mut(PIXEL_BLOCK).zip(source_row.chunks(PIXEL_BLOCK)) {
+                check_decode_cancelled()?;
+                for (value, sample) in values.iter_mut().zip(source) {
+                    *value += f32::from(*sample) * *weight;
+                }
             }
         }
         if let Some(plan) = &plan {

@@ -1,0 +1,239 @@
+{
+  "schema": 1,
+  "run_id": "display-png-bench-20261115-4395b916",
+  "in_process": true,
+  "samples_per_mode": 7,
+  "warmups_per_mode": 1,
+  "native_ui_parked": true,
+  "new_critical_kernel_lines": 0,
+  "restoration": {
+    "native_owner_closed": true,
+    "lighting_restored": true,
+    "staging_removed": true,
+    "lease_released": true
+  },
+  "results": [
+    {
+      "input_color_mode": "gray",
+      "input_sha256": "2c4e3d07a3463186c7d0044654665c101a2bca754fe8dd49fa936b619269708d",
+      "source_size": [
+        1920,
+        2560
+      ],
+      "target_size": [
+        930,
+        1240
+      ],
+      "metrics": {
+        "cpu_scale": {
+          "median_ms": 191.33038399999998,
+          "minimum_ms": 187.881077,
+          "maximum_ms": 194.149385,
+          "samples_ms": [
+            194.149385,
+            193.488154,
+            187.881077,
+            191.33038399999998,
+            189.87438500000002,
+            189.029769,
+            192.549385
+          ]
+        },
+        "cpu_decode_scale": {
+          "median_ms": 219.036847,
+          "minimum_ms": 217.714231,
+          "maximum_ms": 221.246231,
+          "samples_ms": [
+            219.036847,
+            220.424616,
+            218.391615,
+            218.605615,
+            219.781692,
+            217.714231,
+            221.246231
+          ]
+        },
+        "hardware_decode_scale": {
+          "median_ms": 377.720538,
+          "minimum_ms": 373.170769,
+          "maximum_ms": 387.905846,
+          "samples_ms": [
+            373.170769,
+            377.720538,
+            374.239461,
+            375.444385,
+            387.905846,
+            382.884615,
+            383.058308
+          ],
+          "driver_decode_median_ms": 68.66376899927855,
+          "decode_normalize_median_ms": 187.37853800000002,
+          "cpu_resize_median_ms": 187.304385
+        }
+      },
+      "hardware_speedup": 0.5798912819508903,
+      "time_change_percent": 72.44611725076557,
+      "quality": {
+        "benchmark_eligible": true,
+        "cpu_output_sha256": "f66fc56f91e9e08229c9cbdf945d2e6d2b7d0aaa29aaee41618ec1ad5393f9b2",
+        "hardware_checksum": 4226203979,
+        "hardware_output_sha256": "f66fc56f91e9e08229c9cbdf945d2e6d2b7d0aaa29aaee41618ec1ad5393f9b2",
+        "mae": 0.0,
+        "max_error": 0,
+        "pixel_count": 1153200,
+        "pixels_over_4": 0,
+        "psnr_db": null,
+        "threshold": "PNG must match every CPU Reader pixel exactly."
+      },
+      "scope": "Resident identical PNG input; CPU decoder plus production Triangle versus in-process PNG hardware decode, the same Reader grayscale/alpha policy and the same CPU Triangle. Hardware time includes input DMA staging, all allocation, driver lifecycle, normalization, source release and scaling. No subprocess transport, pixel file I/O or hashing is included in compute times."
+    },
+    {
+      "input_color_mode": "rgb",
+      "input_sha256": "377519f83bbde1948409e3a7e4d84e932f5f154e6faae99092ea15af1534479a",
+      "source_size": [
+        1920,
+        2560
+      ],
+      "target_size": [
+        930,
+        1240
+      ],
+      "metrics": {
+        "cpu_scale": {
+          "median_ms": 192.139462,
+          "minimum_ms": 186.53115400000002,
+          "maximum_ms": 196.824846,
+          "samples_ms": [
+            192.007385,
+            196.824846,
+            192.604615,
+            186.53115400000002,
+            192.139462,
+            190.732307,
+            193.663692
+          ]
+        },
+        "cpu_decode_scale": {
+          "median_ms": 348.40592399999997,
+          "minimum_ms": 345.816154,
+          "maximum_ms": 350.275923,
+          "samples_ms": [
+            346.26815300000004,
+            348.91577,
+            345.816154,
+            346.799308,
+            348.40592399999997,
+            350.275923,
+            350.090077
+          ]
+        },
+        "hardware_decode_scale": {
+          "median_ms": 485.60369199999997,
+          "minimum_ms": 481.912769,
+          "maximum_ms": 489.57223100000004,
+          "samples_ms": [
+            485.060001,
+            489.57223100000004,
+            481.912769,
+            485.60369199999997,
+            489.004385,
+            487.720308,
+            482.883077
+          ],
+          "driver_decode_median_ms": 175.744077000767,
+          "decode_normalize_median_ms": 297.140615,
+          "cpu_resize_median_ms": 187.153461
+        }
+      },
+      "hardware_speedup": 0.717469676898585,
+      "time_change_percent": 39.378712745423925,
+      "quality": {
+        "benchmark_eligible": true,
+        "cpu_output_sha256": "f66fc56f91e9e08229c9cbdf945d2e6d2b7d0aaa29aaee41618ec1ad5393f9b2",
+        "hardware_checksum": 4226203979,
+        "hardware_output_sha256": "f66fc56f91e9e08229c9cbdf945d2e6d2b7d0aaa29aaee41618ec1ad5393f9b2",
+        "mae": 0.0,
+        "max_error": 0,
+        "pixel_count": 1153200,
+        "pixels_over_4": 0,
+        "psnr_db": null,
+        "threshold": "PNG must match every CPU Reader pixel exactly."
+      },
+      "scope": "Resident identical PNG input; CPU decoder plus production Triangle versus in-process PNG hardware decode, the same Reader grayscale/alpha policy and the same CPU Triangle. Hardware time includes input DMA staging, all allocation, driver lifecycle, normalization, source release and scaling. No subprocess transport, pixel file I/O or hashing is included in compute times."
+    },
+    {
+      "input_color_mode": "rgba",
+      "input_sha256": "89a72cd4da74fd63d77784fda5bb2ae3ebd3134071e6cb327b507f6bd10226ee",
+      "source_size": [
+        1920,
+        2560
+      ],
+      "target_size": [
+        930,
+        1240
+      ],
+      "metrics": {
+        "cpu_scale": {
+          "median_ms": 193.301769,
+          "minimum_ms": 190.234231,
+          "maximum_ms": 196.45299999999997,
+          "samples_ms": [
+            190.276538,
+            195.48723,
+            196.45299999999997,
+            193.301769,
+            190.234231,
+            196.156692,
+            192.717538
+          ]
+        },
+        "cpu_decode_scale": {
+          "median_ms": 404.822846,
+          "minimum_ms": 402.480923,
+          "maximum_ms": 415.26477,
+          "samples_ms": [
+            402.645153,
+            404.822846,
+            405.127538,
+            402.480923,
+            403.61277,
+            415.26477,
+            405.043616
+          ]
+        },
+        "hardware_decode_scale": {
+          "median_ms": 556.454923,
+          "minimum_ms": 544.5735390000001,
+          "maximum_ms": 574.6583069999999,
+          "samples_ms": [
+            544.5735390000001,
+            559.615846,
+            547.36277,
+            558.1279999999999,
+            554.2643069999999,
+            574.6583069999999,
+            556.454923
+          ],
+          "driver_decode_median_ms": 230.57730799913406,
+          "decode_normalize_median_ms": 367.24561500000004,
+          "cpu_resize_median_ms": 187.994847
+        }
+      },
+      "hardware_speedup": 0.7275033956344386,
+      "time_change_percent": 37.45640309045206,
+      "quality": {
+        "benchmark_eligible": true,
+        "cpu_output_sha256": "f66fc56f91e9e08229c9cbdf945d2e6d2b7d0aaa29aaee41618ec1ad5393f9b2",
+        "hardware_checksum": 4226203979,
+        "hardware_output_sha256": "f66fc56f91e9e08229c9cbdf945d2e6d2b7d0aaa29aaee41618ec1ad5393f9b2",
+        "mae": 0.0,
+        "max_error": 0,
+        "pixel_count": 1153200,
+        "pixels_over_4": 0,
+        "psnr_db": null,
+        "threshold": "PNG must match every CPU Reader pixel exactly."
+      },
+      "scope": "Resident identical PNG input; CPU decoder plus production Triangle versus in-process PNG hardware decode, the same Reader grayscale/alpha policy and the same CPU Triangle. Hardware time includes input DMA staging, all allocation, driver lifecycle, normalization, source release and scaling. No subprocess transport, pixel file I/O or hashing is included in compute times."
+    }
+  ]
+}

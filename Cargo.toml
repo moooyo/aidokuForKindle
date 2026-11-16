@@ -6,15 +6,26 @@ rust-version = "1.92"
 description = "A native e-ink manga reader for Kindle"
 license = "GPL-3.0-or-later"
 publish = false
+default-run = "aidoku"
 
 [[bin]]
 name = "aidoku"
 path = "src/main.rs"
 
+[[bin]]
+name = "kindle-jpeg-worker"
+path = "src/bin/jpeg_worker.rs"
+required-features = ["kindle"]
+
+[[example]]
+name = "native-media-benchmark"
+required-features = ["native-media-bench"]
+
 [features]
 default = ["desktop"]
 desktop = ["slint/backend-winit", "slint/renderer-software", "slint/unstable-winit-030"]
 kindle = ["dep:slint-backend-kindle"]
+native-media-bench = []
 
 [dependencies]
 anyhow = "1"
@@ -46,6 +57,7 @@ zip = { version = "4", default-features = false, features = ["deflate"] }
 slint-backend-kindle = { path = "vendor/slint-backend-kindle", optional = true }
 
 [build-dependencies]
+cc = "1"
 serde_json = "1"
 slint-build = "=1.17.1"
 

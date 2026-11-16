@@ -1,5 +1,30 @@
 # Project-owned Kindle backend patches
 
+## Reader presets and exact-source follow-up, 2026-11-15
+
+`RefreshWaveform` now includes GL16 and REAGL, with an independent one-shot
+`SwipeDirection`. MTK GLR16 uses FULL mode without redefining every FULL request
+as a visible clearing operation. Compatible grayscale requests retain Y4;
+swipe uses AUTO/PARTIAL with twelve steps. Clearing or conflicting directions
+cancel animation. Direction is rotated once for the application render space;
+HWTCON handles framebuffer/panel rotation. Unsupported driver families use
+GC16 instead of interpreting the MTK value 4 as legacy A2.
+
+Native inverted Gray8 selects GCK16, GLKW16 or DUNM as appropriate. A definite
+advanced-mode rejection disables that mode for the owner and first retries
+GC16 with a new marker. Unknown delivery is never retried. The event loop now
+settles the previous accepted update before every actual mapped write, not
+only before a dithering or sleep transition. Optional
+`AIDOKU_NATIVE_REFRESH_TRACE=1` records accepted wire parameters without device
+identifiers; it is disabled by default.
+
+The exact Amazon 5.19.5 build 4794320058 sources, pinned FBInk and KOReader
+clients, source-derived tests, and isolated Scribe trials are documented in
+`../../docs/SCRIBE_HARDWARE_API_AUDIT_20261114.md`. The accepted four-preset
+requests and separate post-MDP Y4 comparison do not certify optical quality,
+speed or every Paperwhite model. Standalone hardware media probes are outside
+the backend and are not used by the reader.
+
 ## Explicit final-frame MTK Y4 policy
 
 `KindleBackend::dithering_handle()` exposes the cloneable `DitheringHandle`.
@@ -13,8 +38,9 @@ behavior.
 
 The event loop freezes the scene's request and bilevel policy before writing.
 A policy revision settles the preceding accepted update and rewrites the whole
-retained scene before GC16. Raw scenes promote even overlay DU/A2/Auto requests
-to GC16; Y4 regions expand outward to eight-pixel boundaries and clip to the
+retained scene before GC16. Raw scenes preserve compatible grayscale waveforms
+and promote incompatible bilevel requests to GC16; Y4 regions expand outward
+to eight-pixel boundaries and clip to the
 panel. The MTK ioctl carries flag `0x4000`, zero `dither_mode` and `quant_bit`,
 and the reviewed histogram waveforms. Ordinary UI and bilevel waveforms retain
 their prior policy.
@@ -53,8 +79,9 @@ The upstream manifest declares `fontique 0.11` and `fontdb 0.24`, whereas Slint 
 
 `KindleBackend::refresh_handle()` returns a cloned `RefreshHandle` that is `Send + Sync`. `RefreshHandle::request()` accepts:
 
-- `RefreshWaveform::{Auto, Gc16, Du, A2}`;
+- `RefreshWaveform::{Auto, Gc16, Gl16, Reagl, Du, A2}`;
 - a `flashing` flag;
+- an optional logical `SwipeDirection::{Left, Right, Up, Down}`;
 - `RefreshArea::{Dirty, Full, Rect(PhysicalRect)}`.
 
 Rectangles use physical window pixels before render rotation. Empty rectangles are rejected immediately. Other rectangles are intersected with the actual window geometry and rotated into panel coordinates before an update is submitted. Signed positions and unsigned dimensions use widened arithmetic, preventing wraparound when a caller supplies a negative origin or a very large size.
@@ -81,7 +108,11 @@ The baseline already defines GC16 as 2, AUTO as 257, and the four update ioctl s
 
 DU requests set the reviewed `EPDC_FLAG_FORCE_MONOCHROME` value of 2. A2 falls back to AUTO when the driver family is not yet known or is unsupported. No new hardware inversion or pen support is introduced.
 
-The application adapter maps UI and reading partial requests to AUTO, press feedback to DU, and flashing/full requests to GC16. A2 is exposed for a future measured policy but is not selected by the application's initial adapter.
+The application adapter maps ordinary UI partial requests to AUTO, press
+feedback to DU, and clearing requests to GC16. Reader partial requests follow
+the selected preset: Fast preview DU with a retained GC16 final frame, Normal
+REAGL, High Quality GC16 clearing, and Kindle REAGL with eligible native swipe.
+A2 remains available at the interface but is not selected by these presets.
 
 ## Changed files
 

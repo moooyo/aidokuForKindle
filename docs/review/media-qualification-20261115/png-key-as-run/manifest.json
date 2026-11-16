@@ -1,0 +1,9 @@
+{
+  "status": "retired_after_non_palette_trns_disconnect",
+  "source_sha256": "d339353c4e8d3de384b66f392648857c891c1b562ec5d8a6b4bca3b3c3ed3324",
+  "arm_sha256": "cee1cf448734a9af4b0e1ce48eb05c6f7ff179ca71fbaa5f6b79b7e2addce3ca",
+  "run_id": "display-followup-20261115-22823e73",
+  "device_recovery": "pending",
+  "reason": "Non-palette tRNS directly dereferences the source USERPTR in the M2M decoder callback without a protected userspace read. Do not execute this input path.",
+  "source_annotation_correction": "The driver registers mtk_png_device_run directly; it is not a dedicated PNG worker. Exact fault context awaits the previous-kernel log."
+}

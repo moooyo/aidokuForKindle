@@ -4,6 +4,33 @@ This is an independent Rust/Slint application for jailbroken Kindle devices.
 It does not require the WeRead application, a WeRead account, or a KOReader plugin.
 The binary uses an isolated Aidoku data directory and a native framebuffer/input backend.
 
+The 2026-11-15 display-preset candidate adds Fast, Normal, High Quality and
+Kindle settings. Normal uses REAGL with periodic GC16 clearing; High Quality
+clears every page; Fast keeps a monochrome page after one quick update and
+uses manual clearing instead of delayed or periodic automatic clearing;
+Kindle uses eligible native page-turn animation. The main tab bar follows
+the original icon-and-label design, with its selection marker at the top.
+Hardware Y4 has post-MDP evidence on the tested Scribe. Physical Paperwhite
+5/6 and optical performance are not newly qualified by that trial. Settings now
+also offer optional JPEG hardware acceleration on supported Scribe 2022 models,
+independently of firmware or kernel version. Actual driver capability is checked.
+It is off by default and uses combined decode
+and resizing only for admitted inputs and geometry. Border trimming, local
+crops, unchanged sizes, PNG and unqualified JPEGs keep software processing.
+The packaged `kindle-jpeg-worker` owns hardware buffers independently of the UI.
+Experimental standalone media probes are not included in this bundle.
+Screen-refresh settings include a 256-swatch grayscale test, with one exact
+input value from 0 through 255 per swatch. This describes the test input, not
+a measured count of optically distinguishable panel levels.
+The candidate's external manifest and display-mode report identify its binary.
+The Candidate18 tables below retain their separate historical scope.
+
+The 2026-11-16 update provides Off, 8x8 Bayer and high-precision
+Floyd-Steinberg software choices. Fast-mode binary pixels are prepared before
+UI publication. Tab selection has no transient press/release fill. Optional
+high-resolution sleep-cover preparation waits for five seconds of Reader idle
+time and yields to further reading activity, retaining any ready cover.
+
 The current source follow-up adds bounded cross-chapter prefetch, background
 image preparation, wide-page halves, category editing and runtime languages.
 Settings also provide local metadata backup/restore, logs, optional prepared
@@ -11,7 +38,8 @@ download copies and scheduled updates. Backups include source/tracking account
 credentials and exclude comic images, caches and extension files. Tracking uses
 the user's legitimate credentials or registered OAuth client; automatic sync
 and scheduled updates are disabled by default. Stylus and custom sleep-screen
-controls remain unavailable until their native contracts are implemented.
+controls remain capability-dependent; prepared sleep covers are available on
+the qualified native path.
 
 ## Build on the remote worker
 
@@ -22,7 +50,7 @@ To build the ARM payload directly on that Linux worker:
 ```sh
 . /root/.cargo/env
 export CARGO_TARGET_DIR=/root/aidoku-build/target
-export CARGO_BUILD_JOBS=2
+export CARGO_BUILD_JOBS=6
 export ZIG_BIN_DIR=/root/weread-build/tools/zig-x86_64-linux-0.15.2
 export TMPDIR=/root/aidoku-phase3/build-temp
 mkdir -p "$TMPDIR"
@@ -66,7 +94,7 @@ The original Phase2 dist recovery and every failed attempt remain preserved.
 uses the existing Zig 0.15.2 installation on the designated remote worker;
 set it to the directory containing the executable on another worker. The
 build script prepends that directory to its own process `PATH`. It defaults
-to two Cargo build jobs unless `CARGO_BUILD_JOBS` is already set.
+to six Cargo build jobs unless `CARGO_BUILD_JOBS` is already set.
 
 The staged `aidoku/LICENSE` contains the complete GPLv3 text. The
 `aidoku/licenses/` directory retains the backend MIT/Apache licenses and

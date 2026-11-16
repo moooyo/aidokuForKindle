@@ -1,0 +1,36 @@
+import { State, Commands } from "state.slint";
+import { Theme } from "theme.slint";
+import { Strings } from "strings.slint";
+import { BodyText, ToggleRow } from "widgets.slint";
+
+export component HardwareOptions inherits Rectangle {
+    property <length> jpeg-top: 0px;
+    height: root.jpeg-top + Theme.touch + 280px;
+    ToggleRow {
+        x: 0px; y: root.jpeg-top; width: parent.width; height: Theme.touch;
+        text: Strings.jpeg-hardware-decode;
+        value: State.hardware-acceleration;
+        enabled: State.hardware-media-available;
+        toggled => { Commands.action("settings", "set", "hardware-acceleration=" + (State.hardware-acceleration ? "false" : "true")); }
+    }
+    BodyText {
+        x: 0px; y: root.jpeg-top + Theme.touch + 8px; width: parent.width; height: 88px;
+        text: Strings.jpeg-hardware-decode-hint; wrap: word-wrap; font-size: Theme.caption; color: Theme.secondary;
+    }
+    BodyText {
+        x: 0px; y: root.jpeg-top + Theme.touch + 104px; width: parent.width; height: 64px;
+        text: Strings.jpeg-hardware-resize-hint; wrap: word-wrap; font-size: Theme.caption; color: Theme.secondary;
+    }
+    Rectangle { x: 0px; y: root.jpeg-top + Theme.touch + 184px; width: parent.width; height: 1px; background: Theme.line; }
+    BodyText {
+        x: 0px; y: root.jpeg-top + Theme.touch + 200px; width: parent.width; height: 80px;
+        wrap: word-wrap; font-size: Theme.caption; color: Theme.secondary;
+        text: State.hardware-media-reason == "available" ? Strings.hardware-media-ready :
+            State.hardware-media-reason == "device" ? Strings.hardware-media-device :
+            State.hardware-media-reason == "helper" ? Strings.hardware-media-helper :
+            State.hardware-media-reason == "driver" ? Strings.hardware-media-driver :
+            State.hardware-media-reason == "diagnostics" ? Strings.hardware-media-diagnostics :
+            State.hardware-media-reason == "busy" ? Strings.hardware-media-busy :
+            State.hardware-media-reason == "failed" ? Strings.hardware-media-failed : Strings.hardware-media-platform;
+    }
+}

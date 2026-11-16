@@ -14,6 +14,7 @@ struct State {
     requested: AtomicBool,
     revision: AtomicU32,
     delivery_uncertain: AtomicBool,
+    advanced_refresh_rejected: AtomicBool,
 }
 
 /// A producer-side choice for the image already published to the scene.
@@ -72,6 +73,16 @@ impl DitheringHandle {
 
     pub fn hardware_y4_enabled(&self) -> bool {
         self.requested() && self.hardware_y4_available()
+    }
+
+    pub fn advanced_refresh_available(&self) -> bool {
+        !self.state.advanced_refresh_rejected.load(Ordering::Acquire)
+    }
+
+    pub(crate) fn reject_advanced_refresh(&self) {
+        self.state
+            .advanced_refresh_rejected
+            .store(true, Ordering::Release);
     }
 
     /// An uncertain SEND or fallback barrier permanently closes this owner's

@@ -304,8 +304,15 @@ export global State {
     in-out property <bool> flash-on-close: true;
     in-out property <bool> crop-borders: true;
     in-out property <bool> dither: true;
-    in-out property <string> dither-method: "software";
+    in-out property <string> display-mode: "normal";
+    in-out property <bool> reader-fast-frame: false;
+    in-out property <bool> reader-interacting: false;
+    in-out property <string> dither-method: "bayer8";
+    in-out property <image> grayscale-preview;
     in-out property <bool> hardware-dither-available: false;
+    in-out property <bool> hardware-media-available: false;
+    in-out property <string> hardware-media-reason: "platform";
+    in-out property <bool> hardware-acceleration: false;
     in-out property <bool> dither-pending: false;
     in-out property <int> contrast: 0;
     in-out property <string> reader-fit: "page";

@@ -501,11 +501,13 @@ mod tests {
             ..Preferences::default()
         };
         let options = ImageOptions {
+            media_acceleration: Default::default(),
             width: 4,
             height: 4,
             crop_borders: false,
             dither: false,
             hardware_dither: true,
+            spatial_dither: None,
             contrast: 0,
         };
         let cancellation = DecodeCancellation::new();

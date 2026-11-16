@@ -1,16 +1,48 @@
 # Hardware Y4 dithering
 
-Aidoku preserves its software Bayer default and the existing `dither` boolean.
-The optional `dither_method` preference selects `software` or `hardware`; an
-unknown method uses software processing. Turning dithering off retains the
-existing sixteen-level conversion without the Bayer offset.
+The product menu now exposes Off, Bayer8 and high-precision Floyd-Steinberg,
+as documented in [software dithering settings](SOFTWARE_DITHER_SETTINGS_20261116.md).
+Persisted enabled software/Y4 choices migrate to Bayer8; disabled choices stay
+disabled. The hardware paths described below remain low-level research and
+driver qualification interfaces, not a fourth product setting.
+Application attachment preserves the saved selection. Turning dithering off
+retains sixteen-level conversion without a spatial pattern.
+The Fast preset keeps its persistent monochrome frame in the software path;
+it does not enable Y4 or schedule a grayscale restoration after interaction.
 
 Hardware selection keeps the prepared Reader image in Gray8 until display
 processing. It does not claim that a Kindle panel has 256 independently
 addressable, stable grayscale levels. A framebuffer input histogram is not a
 post-MDP readback or a measurement of panel reflectance.
 
+For the user's intended spatial simulation of finer gray transitions, the
+[2026-11-16 prototype comparison](SPATIAL_GRAYSCALE_RESEARCH_20261116.md)
+demonstrates 256 increasing regional means on the physical Scribe with Bayer8
+and error diffusion. This is the current feasibility evidence for that goal.
+
+The stored physical gradient was reanalyzed on 2026-11-15 using equal-weight
+means of post-MDP codes within each original input stripe. Off had 16 distinct
+stripe means; Y4 had 217, with 39 adjacent plateaus and 8 adjacent reversals.
+Both outputs still contained only 16 per-pixel codes. The 7-8-pixel stripes
+sample different dithering phases, and encoded means are not optical luminance.
+Consequently, 217 is a statistic of this fixture, not a qualified effective
+grayscale count; neither 217 nor 256 independently distinguishable displayed
+levels is established. The [analysis and original source hashes](review/display-modes-20261115/y4-stripe-average-analysis.json)
+are retained separately from the original readback record. This reanalysis
+used stored buffers on test-env and made no new device requests.
+
 ## Device and driver boundary
+
+The [kindle-eink256 comparison](KINDLE_EINK256_COMPARISON_20261116.md) explains
+how the Android application's CPU error diffusion differs from Aidoku's
+Reader Bayer processing and native Y4 processing.
+
+The screen-refresh settings now include a
+[256-swatch input test](review/grayscale-256-20261115/README.md), with exact
+RGB values `(index, index, index)` for indices 0 through 255. It is drawn
+directly by Slint and does not pass through the comic-image quantizer. This
+settings-only scene does not enable the Reader-specific Y4 policy; its input
+histogram and desktop captures do not establish a post-MDP or optical count.
 
 The native backend admits only the reviewed monochrome Scribe 2022 and 2024
 identities, an actual eight-bit grayscale framebuffer and the MediaTek update
@@ -25,8 +57,12 @@ logs or public evidence.
 
 The MediaTek Y4 flag is `0x4000`; `0x8000` is REGAL. `dither_mode` and
 `quant_bit` remain zero. These parameters must not be copied from an older i.MX
-ABI. Raw grayscale requests use GC16 and an outward eight-pixel refresh region
-clipped to the visible screen. Normal non-raw UI refresh selection remains intact.
+ABI. Raw grayscale requests use compatible GC16, GL16 or GLR16 paths, or an
+eligible AUTO swipe request. GC16 remains the clearing and rejection fallback.
+Hardware regions expand outward to eight-pixel boundaries and clip to the
+visible screen. Native inverted Gray8 maps GC16 to GCK16 and GL16/GLR16 to
+GLKW16, independently of semantic UI night colors. Ordinary non-raw UI refresh
+selection remains separate from reader presets.
 
 ## Pixels and scene publication
 
@@ -48,14 +84,18 @@ retained frame, even when its preferences differ from a pending target. Existing
 eight-bit download preparation remains eligible; hardware selection does not
 silently disable the established download accelerator.
 
-The backend freezes a frame's request and grayscale transform before writing.
+The backend waits for the previous accepted update before changing framebuffer
+bytes, then freezes a frame's request and grayscale transform before writing.
 An observation callback cannot change the parameters of an already written
 frame. RGB fallback, canonical scene retention, portrait ownership, sleep fences
 and marker ownership remain in the existing renderer.
 
 ## Failure handling
 
-An explicit `EINVAL` or `ENOTTY` rejection disables hardware for the session.
+An explicit `EINVAL` or `ENOTTY` rejection of an advanced waveform first disables
+advanced refresh for that owner and retries GC16 under a fresh marker while
+retaining the same raw input. A definite rejection of Y4 itself disables
+hardware for the session.
 Before rewriting any pixels, the backend settles the previously accepted update.
 It then converts the retained canonical scene with software dithering, rewrites
 the complete mapping and submits a fresh marker. Clearing a flag on unchanged
@@ -188,3 +228,27 @@ The original incomplete runs remain preserved as separate evidence.
 
 Physical batch `b02` qualifies the earlier bounded-profile candidate identified
 above. The new standard ThinLTO binary has host build acceptance only.
+
+## Four-preset and post-MDP follow-up, 2026-11-15
+
+The records above retain their original 2026-11-13 scope. A later isolated
+Scribe batch compared identical Gray8 input with Y4 off/on/off and read the
+driver's actual post-MDP buffer. The two off results were identical; the on
+result differed in 1294375 of 4612800 bytes. This confirms a digital processing
+effect of Y4 on that device. It does not measure physical reflectance, ghosting
+or full-page latency.
+
+The application now implements Fast, Normal, High Quality and Kindle presets.
+Native page requests matched DU followed by GC16, GLR16 plus Y4, GC16 plus Y4,
+and opposite-direction twelve-step swipe plus Y4 respectively. Both batches
+restored native state and released fresh exclusive leases. These runs used
+native grayscale tag 1; they do not extend the earlier tag-2 observations into
+a new inverted-waveform trial.
+
+See [the implementation and qualification record](DISPLAY_MODES_20261115.md)
+and [the exact-source API audit](SCRIBE_HARDWARE_API_AUDIT_20261114.md).
+The separate standalone MDP full-size scaling test failed pixel qualification.
+At the user's subsequent request, a new guarded codec probe qualified selected
+JPEG/PNG paths and measured JPEG-linked IMGRZ scaling; the old common codec
+probe remains disabled. See [the media retest](SCRIBE_MEDIA_BENCHMARK_20261115.md).
+These media paths are not used to implement the reader presets.

@@ -238,6 +238,11 @@ impl NextFrameBuilder {
             && frame.zoom == self.key.target.zoom
             && frame.half == self.key.target.wide_half
             && frame.options.hardware_dither == self.key.hardware_dither
+            && frame.options.spatial_dither == reader_image_options_for_mode(
+                &self.key.preferences, self.key.viewport, frame.index, frame.index + 1,
+                self.key.hardware_dither,
+            ).spatial_dither
+            && frame.options.media_acceleration == self.key.preferences.media_acceleration()
     }
 
     fn finish(self, cache: &crate::cache::CacheManager) -> Option<PreparedNextFrame> {
@@ -321,6 +326,7 @@ impl App {
         &mut self,
         refresh: RefreshRequest,
     ) -> Result<()> {
+        self.defer_sleep_cover_for_reader();
         self.cancel_reader_image();
         self.cancel_reader_prefetch();
         self.reader_generation = self.reader_generation.wrapping_add(1);
@@ -489,11 +495,12 @@ impl App {
             };
             worker_cancellation.check()?;
             let prepare_timing = crate::reader_timing::Stage::new(timing, "prepare_finished");
+            let fast = effective.display_mode == crate::display::DisplayMode::Fast;
             let (first, second) = imaging::with_decode_cancellation(&worker_cancellation, || {
                 Ok((
-                    super::prepared_pixels::prepare_cancellable(first)?,
+                    super::prepared_pixels::prepare_reader_cancellable(first, fast)?,
                     second
-                        .map(super::prepared_pixels::prepare_cancellable)
+                        .map(|image| super::prepared_pixels::prepare_reader_cancellable(image, fast))
                         .transpose()?,
                 ))
             })?;
@@ -1150,7 +1157,10 @@ fn prefetch_chapter_frames(
             Ok(prepared) => {
                 cancellation.check()?;
                 let pixels = imaging::with_decode_cancellation(cancellation, || {
-                    super::prepared_pixels::prepare_cancellable(prepared.rendered.image.clone())
+                    super::prepared_pixels::prepare_reader_cancellable(
+                        prepared.rendered.image.clone(),
+                        preferences.display_mode == crate::display::DisplayMode::Fast,
+                    )
                 })?;
                 if let Some(next_frame) = next_frame.as_deref_mut() {
                     if let Err(error) =
@@ -1389,6 +1399,7 @@ fn reader_image_options_for_mode(
 ) -> ImageOptions {
     let (width, height) = viewport;
     ImageOptions {
+        media_acceleration: preferences.media_acceleration(),
         width: if frame_page_count(preferences, first_index, total) == 2 {
             width
         } else {
@@ -1398,6 +1409,11 @@ fn reader_image_options_for_mode(
         crop_borders: preferences.crop_borders,
         dither: preferences.dither,
         hardware_dither,
+        spatial_dither: if hardware_dither || preferences.display_mode == crate::display::DisplayMode::Fast {
+            None
+        } else {
+            Some(preferences.spatial_dither())
+        },
         contrast: preferences.contrast,
     }
 }
@@ -1506,6 +1522,128 @@ mod tests {
         let ui = AppWindow::new().unwrap();
         ui.global::<State>().set_booting(false);
         ui
+    }
+
+    fn display_mode_fixture(ui: &AppWindow) -> DemoRouteFixture {
+        let mut fixture = DemoRouteFixture::new("settings", DeviceProfile::Scribe, false);
+        let app = &mut fixture.app;
+        app.ui = ui.as_weak();
+        app.route = "reader".into();
+        app.prefs.display_mode = crate::display::DisplayMode::Fast;
+        let chapter = Chapter {
+            id: "display-mode-chapter".into(),
+            page_count: 4,
+            ..Chapter::default()
+        };
+        app.reader =
+            Some(ReaderState::new(vec![chapter.clone()], &chapter.id, 2, &app.prefs).unwrap());
+        app.reader_dirty = false;
+        app.reader_inflight = None;
+        app.displayed_reader = Some(DisplayedReader {
+            session: ReaderSession {
+                chapter_id: chapter.id,
+                page: 2,
+                total: 4,
+                zoom: 1.0,
+                ..ReaderSession::default()
+            },
+            preferences: app.prefs.clone(),
+            hardware_dither: false,
+            first_path: PathBuf::new(),
+            second_path: None,
+        });
+        fixture
+    }
+
+    #[test]
+    fn fast_frame_stays_binary_after_idle_and_pointer_release() {
+        let _publication = READER_PUBLICATION_TESTS.lock().unwrap();
+        let ui = reader_test_window();
+        let mut fixture = display_mode_fixture(&ui);
+        let app = &mut fixture.app;
+        let pixels =
+            prepared_pixels::prepare(Arc::new(GrayImage::from_pixel(16, 16, image::Luma([119]))));
+        let retained = pixels.clone();
+        assert!(app.publish_display_pixels(&ui, pixels, None, &app.prefs));
+        let fast = ui.global::<State>().get_reader_image().to_rgb8().unwrap();
+        assert!(
+            fast.as_bytes()
+                .iter()
+                .all(|value| matches!(*value, 0 | 255))
+        );
+        assert!(fast.as_bytes().contains(&0) && fast.as_bytes().contains(&255));
+        assert!(retained.as_bytes().iter().all(|value| *value == 119));
+        app.sync_presented_reader_dithering();
+        app.frame_refresh = None;
+        app.platform.refresh(RefreshKind::Partial);
+        ui.global::<State>().set_reader_interacting(true);
+        app.poll();
+        ui.global::<State>().set_reader_interacting(false);
+        // Exceed the old 220 ms restoration deadline through the real idle poll.
+        std::thread::sleep(Duration::from_millis(350));
+        app.poll();
+        assert!(ui.global::<State>().get_reader_fast_frame());
+        assert_eq!(
+            ui.global::<State>()
+                .get_reader_image()
+                .to_rgb8()
+                .unwrap()
+                .as_bytes(),
+            fast.as_bytes()
+        );
+        assert!(!matches!(
+            app.platform.last_refresh(),
+            RefreshKind::Full | RefreshKind::FlashUi
+        ));
+        assert!(!matches!(
+            app.frame_refresh,
+            Some(RefreshKind::Full | RefreshKind::FlashUi)
+        ));
+    }
+
+    #[test]
+    fn fast_spreads_keep_both_pages_until_a_normal_frame_replaces_them() {
+        let _publication = READER_PUBLICATION_TESTS.lock().unwrap();
+        let ui = reader_test_window();
+        let mut fixture = display_mode_fixture(&ui);
+        let app = &mut fixture.app;
+        let pixels =
+            prepared_pixels::prepare(Arc::new(GrayImage::from_pixel(16, 16, image::Luma([119]))));
+        let second =
+            prepared_pixels::prepare(Arc::new(GrayImage::from_pixel(16, 16, image::Luma([204]))));
+        assert!(app.publish_display_pixels(&ui, pixels, Some(second), &app.prefs));
+        for image in [
+            ui.global::<State>().get_reader_image(),
+            ui.global::<State>().get_reader_image_next(),
+        ] {
+            assert!(
+                image
+                    .to_rgb8()
+                    .unwrap()
+                    .as_bytes()
+                    .iter()
+                    .all(|value| matches!(*value, 0 | 255))
+            );
+        }
+        app.sync_presented_reader_dithering();
+        app.platform.refresh(RefreshKind::Full);
+        assert_eq!(app.platform.last_refresh(), RefreshKind::Full);
+        assert!(ui.global::<State>().get_reader_fast_frame());
+        app.prefs.display_mode = crate::display::DisplayMode::Normal;
+        let normal =
+            prepared_pixels::prepare(Arc::new(GrayImage::from_pixel(16, 16, image::Luma([204]))));
+        assert!(!app.publish_display_pixels(&ui, normal, None, &app.prefs));
+        assert!(!ui.global::<State>().get_reader_fast_frame());
+        assert!(
+            ui.global::<State>()
+                .get_reader_image()
+                .to_rgb8()
+                .unwrap()
+                .as_bytes()
+                .iter()
+                .all(|value| *value == 204)
+        );
+        assert_eq!(ui.global::<State>().get_reader_image_next().size().width, 0);
     }
 
     #[test]
@@ -1977,6 +2115,23 @@ mod tests {
         assert!(!app.reader_dither_pending());
         let pixels = ui.global::<State>().get_reader_image().to_rgb8().unwrap();
         assert!(pixels.as_bytes().iter().all(|sample| sample % 17 == 0));
+        let mut previous = pixels.as_bytes().to_vec();
+        for choice in ["floyd_steinberg", "off", "bayer8"] {
+            app.dispatch("settings", "set", &format!("dither-mode={choice}")).unwrap();
+            assert!(app.reader_dither_pending());
+            assert!(!app.platform.reader_hardware_y4_requested());
+            let result = app.job_rx.recv_timeout(Duration::from_secs(10)).unwrap();
+            app.job_tx.send(result).unwrap();
+            app.poll();
+            assert_eq!(app.store.preferences().unwrap().spatial_dither().key(), choice);
+            assert_eq!(app.displayed_reader.as_ref().unwrap().preferences.spatial_dither().key(), choice);
+            assert!(!app.reader_dither_pending());
+            assert!(!app.platform.reader_hardware_y4_requested());
+            let current = ui.global::<State>().get_reader_image().to_rgb8().unwrap();
+            assert!(current.as_bytes().iter().all(|sample| sample % 17 == 0));
+            assert_ne!(current.as_bytes(), previous.as_slice());
+            previous = current.as_bytes().to_vec();
+        }
     }
 
     #[test]
@@ -2417,6 +2572,7 @@ mod tests {
         fn key(&self) -> crate::cache::RenderKey {
             let checksum = format!("{:x}", Sha256::digest(fs::read(&self.original).unwrap()));
             crate::cache::RenderKey {
+                media_acceleration: self.options.media_acceleration,
                 source_key: format!(
                     "{}:{checksum}",
                     crate::cache::CacheManager::page_key(&self.page)
@@ -2426,6 +2582,7 @@ mod tests {
                 crop_borders: self.options.crop_borders,
                 dither: self.options.dither,
                 hardware_dither: self.options.hardware_dither,
+                spatial_dither: self.options.spatial_dither,
                 contrast: self.options.contrast,
                 vertical: false,
                 offset: 0,
@@ -2838,12 +2995,14 @@ mod tests {
 
     fn render_identity(page: &Page, options: &ImageOptions, zoom: f32) -> crate::cache::RenderKey {
         crate::cache::RenderKey {
+            media_acceleration: options.media_acceleration,
             source_key: page.url.clone(),
             width: options.width,
             height: options.height,
             crop_borders: options.crop_borders,
             dither: options.dither,
             hardware_dither: options.hardware_dither,
+            spatial_dither: options.spatial_dither,
             contrast: options.contrast,
             vertical: false,
             offset: 0,

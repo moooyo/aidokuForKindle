@@ -1,0 +1,84 @@
+{
+  "schema": 1,
+  "source_sha256": "6578296da3ee15d223864fa07c04c6788b72c71efa7269818c23654c3e7c4964",
+  "physical_device_opened": false,
+  "ioctl_executed": false,
+  "passed": 15,
+  "checks": [
+    {
+      "case": "baseline_rgb_admitted",
+      "passed": true,
+      "stage": "admitted_video_open_intercepted"
+    },
+    {
+      "case": "baseline_gray_admitted",
+      "passed": true,
+      "stage": "admitted_video_open_intercepted"
+    },
+    {
+      "case": "progressive_rgb_rejected",
+      "passed": true,
+      "stage": "unsupported_progressive_jpeg"
+    },
+    {
+      "case": "progressive_gray_rejected",
+      "passed": true,
+      "stage": "unsupported_progressive_jpeg"
+    },
+    {
+      "case": "metadata_marker_is_not_progressive",
+      "passed": true,
+      "stage": "admitted_video_open_intercepted"
+    },
+    {
+      "case": "truncated_frame_header",
+      "passed": true,
+      "stage": "invalid_jpeg_header"
+    },
+    {
+      "case": "short_segment_length",
+      "passed": true,
+      "stage": "invalid_jpeg_header"
+    },
+    {
+      "case": "segment_exceeds_input",
+      "passed": true,
+      "stage": "invalid_jpeg_header"
+    },
+    {
+      "case": "missing_frame",
+      "passed": true,
+      "stage": "invalid_jpeg_header"
+    },
+    {
+      "case": "wrong_dimensions",
+      "passed": true,
+      "stage": "jpeg_dimensions_mismatch"
+    },
+    {
+      "case": "unqualified_sequential_coding",
+      "passed": true,
+      "stage": "unsupported_jpeg_coding"
+    },
+    {
+      "case": "duplicate_frame_header",
+      "passed": true,
+      "stage": "invalid_jpeg_header"
+    },
+    {
+      "case": "progressive_marker_c6",
+      "passed": true,
+      "stage": "unsupported_progressive_jpeg"
+    },
+    {
+      "case": "progressive_marker_ca",
+      "passed": true,
+      "stage": "unsupported_progressive_jpeg"
+    },
+    {
+      "case": "progressive_marker_ce",
+      "passed": true,
+      "stage": "unsupported_progressive_jpeg"
+    }
+  ]
+}

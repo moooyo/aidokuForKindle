@@ -80,7 +80,7 @@ component MoreMenu inherits Rectangle {
             enabled: item.enabled;
             x: 0px; y: 0px; width: parent.width; height: parent.height;
             pointer-event(event) => {
-                if event.kind == PointerEventKind.down { Commands.refresh("fast"); }
+                if event.kind == PointerEventKind.down { Commands.refresh("ui"); }
                 else if event.kind == PointerEventKind.up || event.kind == PointerEventKind.cancel { Commands.refresh("ui"); }
             }
             clicked => { Commands.action("panel", "choose", item.id); }

@@ -41,7 +41,7 @@ component LibraryCategory inherits Rectangle {
     }
     touch := TouchArea { x: 0px; y: 0px;
         pointer-event(event) => {
-            if event.kind == PointerEventKind.down { Commands.refresh("fast"); }
+            if event.kind == PointerEventKind.down { Commands.refresh("ui"); }
             else if event.kind == PointerEventKind.up || event.kind == PointerEventKind.cancel { Commands.refresh("ui"); }
         }
         clicked => { root.clicked(); }
@@ -103,7 +103,7 @@ component LibraryBookCaption inherits Rectangle {
             if event.kind == PointerEventKind.down {
                 root.press-x = self.mouse-x; root.press-y = self.mouse-y;
                 root.suppress-click = false; hold.running = true;
-                Commands.refresh("fast");
+                Commands.refresh("ui");
             } else if event.kind == PointerEventKind.up || event.kind == PointerEventKind.cancel {
                 hold.running = false;
                 if event.kind == PointerEventKind.cancel { root.suppress-click = true; }

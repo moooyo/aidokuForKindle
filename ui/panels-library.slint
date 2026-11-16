@@ -139,7 +139,7 @@ export component DownloadQueuePanel inherits Rectangle {
         Rectangle { x: 0px; y: parent.height - 1px; width: parent.width; height: 1px; background: Theme.line; }
         hit := TouchArea {
             x: 0px; y: 0px; width: parent.width; height: parent.height;
-            pointer-event(event) => { if event.kind == PointerEventKind.down { Commands.refresh("fast"); } else if event.kind == PointerEventKind.up || event.kind == PointerEventKind.cancel { Commands.refresh("ui"); } }
+            pointer-event(event) => { if event.kind == PointerEventKind.down { Commands.refresh("ui"); } else if event.kind == PointerEventKind.up || event.kind == PointerEventKind.cancel { Commands.refresh("ui"); } }
             clicked => { Commands.action("panel", "choose", "job:" + item.id); }
         }
     }

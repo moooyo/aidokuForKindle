@@ -1,0 +1,241 @@
+{
+  "schema": 1,
+  "source_sha256": "1a9d12b08603af05e51164e37f1dc5bf4216728612457239552e460d59d62c26",
+  "mock_sha256": "5394432a3e56f09e2199958b807ca069a6c2998bd3e85ac79141c1967672ce9c",
+  "physical_device_opened": false,
+  "native_ioctl_executed": false,
+  "passed": 12,
+  "checks": [
+    {
+      "case": "gray-64-64-normal",
+      "passed": true,
+      "returncode": 0,
+      "stage": "complete",
+      "cleanup_errno": 0,
+      "planes": [
+        {
+          "index": 0,
+          "stride": 64,
+          "sizeimage": 4096,
+          "capacity": 8192,
+          "payload": 4096
+        }
+      ]
+    },
+    {
+      "case": "nv12-64-64-normal",
+      "passed": true,
+      "returncode": 0,
+      "stage": "complete",
+      "cleanup_errno": 0,
+      "planes": [
+        {
+          "index": 0,
+          "stride": 64,
+          "sizeimage": 4096,
+          "capacity": 8192,
+          "payload": 4096
+        },
+        {
+          "index": 1,
+          "stride": 64,
+          "sizeimage": 2048,
+          "capacity": 8192,
+          "payload": 2048
+        }
+      ]
+    },
+    {
+      "case": "nv16-64-64-normal",
+      "passed": true,
+      "returncode": 0,
+      "stage": "complete",
+      "cleanup_errno": 0,
+      "planes": [
+        {
+          "index": 0,
+          "stride": 64,
+          "sizeimage": 4096,
+          "capacity": 8192,
+          "payload": 4096
+        },
+        {
+          "index": 1,
+          "stride": 64,
+          "sizeimage": 4096,
+          "capacity": 8192,
+          "payload": 4096
+        }
+      ]
+    },
+    {
+      "case": "ayuv-64-64-normal",
+      "passed": true,
+      "returncode": 0,
+      "stage": "complete",
+      "cleanup_errno": 0,
+      "planes": [
+        {
+          "index": 0,
+          "stride": 256,
+          "sizeimage": 16384,
+          "capacity": 20480,
+          "payload": 16384
+        }
+      ]
+    },
+    {
+      "case": "nv12-32-32-normal",
+      "passed": true,
+      "returncode": 0,
+      "stage": "complete",
+      "cleanup_errno": 0,
+      "planes": [
+        {
+          "index": 0,
+          "stride": 32,
+          "sizeimage": 1024,
+          "capacity": 8192,
+          "payload": 1024
+        },
+        {
+          "index": 1,
+          "stride": 32,
+          "sizeimage": 512,
+          "capacity": 8192,
+          "payload": 512
+        }
+      ]
+    },
+    {
+      "case": "nv16-32-32-normal",
+      "passed": true,
+      "returncode": 0,
+      "stage": "complete",
+      "cleanup_errno": 0,
+      "planes": [
+        {
+          "index": 0,
+          "stride": 32,
+          "sizeimage": 1024,
+          "capacity": 8192,
+          "payload": 1024
+        },
+        {
+          "index": 1,
+          "stride": 32,
+          "sizeimage": 1024,
+          "capacity": 8192,
+          "payload": 1024
+        }
+      ]
+    },
+    {
+      "case": "nv16-33-25-normal",
+      "passed": true,
+      "returncode": 0,
+      "stage": "complete",
+      "cleanup_errno": 0,
+      "planes": [
+        {
+          "index": 0,
+          "stride": 48,
+          "sizeimage": 1216,
+          "capacity": 8192,
+          "payload": 1216
+        },
+        {
+          "index": 1,
+          "stride": 48,
+          "sizeimage": 1216,
+          "capacity": 8192,
+          "payload": 1216
+        }
+      ]
+    },
+    {
+      "case": "nv16-32-32-changed_planes",
+      "passed": true,
+      "returncode": 1,
+      "stage": "allocate_reported_capture_planes",
+      "cleanup_errno": 0,
+      "planes": [
+        {
+          "index": 0,
+          "stride": 32,
+          "sizeimage": 1024,
+          "capacity": 8192,
+          "payload": 0
+        },
+        {
+          "index": 1,
+          "stride": 32,
+          "sizeimage": 1024,
+          "capacity": 8192,
+          "payload": 0
+        }
+      ]
+    },
+    {
+      "case": "nv16-32-32-oversized_payload",
+      "passed": true,
+      "returncode": 1,
+      "stage": "dequeue_capture",
+      "cleanup_errno": 0,
+      "planes": [
+        {
+          "index": 0,
+          "stride": 32,
+          "sizeimage": 1024,
+          "capacity": 8192,
+          "payload": 0
+        },
+        {
+          "index": 1,
+          "stride": 32,
+          "sizeimage": 1024,
+          "capacity": 8192,
+          "payload": 0
+        }
+      ]
+    },
+    {
+      "case": "gray-64-64-stop_eintr",
+      "passed": true,
+      "returncode": 0,
+      "stage": "complete",
+      "cleanup_errno": 0,
+      "planes": [
+        {
+          "index": 0,
+          "stride": 64,
+          "sizeimage": 4096,
+          "capacity": 8192,
+          "payload": 4096
+        }
+      ]
+    },
+    {
+      "case": "gray-64-64-stop_io_once",
+      "passed": true,
+      "returncode": 1,
+      "stage": "complete",
+      "cleanup_errno": 5,
+      "planes": [
+        {
+          "index": 0,
+          "stride": 64,
+          "sizeimage": 4096,
+          "capacity": 8192,
+          "payload": 4096
+        }
+      ]
+    },
+    {
+      "case": "unresolved_stop_keeps_context_alive",
+      "passed": true,
+      "context_closed": false,
+      "only_fake_host_process_was_terminated": true
+    }
+  ]
+}

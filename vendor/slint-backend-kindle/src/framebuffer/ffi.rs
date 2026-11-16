@@ -196,7 +196,13 @@ pub(super) struct UpdateMarkerData {
     pub(super) collision_test: u32,
 }
 
-pub(super) const WAVEFORM_MODE_GC16: u32 = 2; // Full 16-level grayscale refresh (slow, high quality)
+pub(super) const WAVEFORM_MODE_GC16: u32 = 2; // Quality waveform; mode and region are independent.
+pub(super) const WAVEFORM_MODE_GL16: u32 = 3;
+pub(super) const WAVEFORM_MODE_GLR16: u32 = 4;
+pub(super) const WAVEFORM_MODE_GCK16: u32 = 8;
+pub(super) const WAVEFORM_MODE_GLKW16: u32 = 9;
+pub(super) const WAVEFORM_MODE_DUNM: u32 = 12;
+pub(super) const MTK_EPDC_FLAG_ENABLE_SWIPE: u32 = 0x10000;
 // Reviewed against KOReader-base 6e4bc81af4e04f78d81677a323a780a71b29702a
 // ffi/mxcfb_kindle_h.lua. A2 differs between the legacy and newer driver ABIs.
 pub(super) const WAVEFORM_MODE_DU: u32 = 1;
@@ -207,6 +213,6 @@ pub(super) const EPDC_FLAG_FORCE_MONOCHROME: u32 = 2;
 // MTK MDP Y8-to-Y4 processing; 0x8000 is the distinct REGAL flag.
 pub(super) const MTK_EPDC_FLAG_USE_DITHERING_Y4: u32 = 0x4000;
 pub(super) const WAVEFORM_MODE_AUTO: u32 = 257; // Let the driver pick the best waveform
-pub(super) const UPDATE_MODE_PARTIAL: u32 = 0; // Only redraw the dirty region
-pub(super) const UPDATE_MODE_FULL: u32 = 1; // Flash the whole screen (clears ghosting)
+pub(super) const UPDATE_MODE_PARTIAL: u32 = 0; // Partial treatment within the requested region.
+pub(super) const UPDATE_MODE_FULL: u32 = 1; // Full treatment; does not select the screen extent.
 pub(super) const TEMP_USE_AMBIENT: i32 = 0x1000; // Use the panel's ambient temperature sensor

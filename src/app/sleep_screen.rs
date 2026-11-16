@@ -11,6 +11,7 @@ const MAX_COVER_HEIGHT: u32 = 2048;
 const MAX_SOURCE_SIDE: u32 = 4096;
 const MAX_ENCODED_BYTES: usize = 8 * 1024 * 1024;
 const RETRY_DELAY: Duration = Duration::from_secs(30);
+const READER_IDLE_DELAY: Duration = Duration::from_secs(5);
 
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub(super) struct CoverIdentity {
@@ -51,6 +52,7 @@ pub(super) struct SleepScreenState {
     full_resolution: bool,
     job: Option<CoverJob>,
     retry_at: Option<Instant>,
+    reader_idle_until: Option<Instant>,
     failures: u8,
 }
 
@@ -141,12 +143,14 @@ fn derivative_alias(scope: &str) -> String {
 
 fn derivative_key(scope: &str, source_digest: &str) -> RenderKey {
     RenderKey {
+        media_acceleration: Default::default(),
         source_key: format!("aidoku-sleep-cover-v1:{scope}:{source_digest}"),
         width: MAX_COVER_WIDTH,
         height: MAX_COVER_HEIGHT,
         crop_borders: false,
         dither: false,
         hardware_dither: false,
+        spatial_dither: None,
         contrast: 0,
         vertical: false,
         offset: 0,
@@ -317,12 +321,21 @@ impl App {
         }
     }
 
+    /// Optional full-resolution cover work must yield to active page reading.
+    /// Keep the already available cover and the worker slot until its result drains.
+    pub(super) fn defer_sleep_cover_for_reader(&mut self) {
+        self.sleep_screen.reader_idle_until = Some(Instant::now() + READER_IDLE_DELAY);
+        self.cancel_sleep_cover_preparation();
+    }
+
     pub(super) fn clear_sleep_screen(&mut self) {
         self.cancel_sleep_cover_preparation();
         // Keep the worker slot until its envelope drains, even after selection changes.
         let job = self.sleep_screen.job.take();
+        let reader_idle_until = self.sleep_screen.reader_idle_until;
         self.sleep_screen = SleepScreenState {
             job,
+            reader_idle_until,
             ..SleepScreenState::default()
         };
         self.hide_sleep_cover();
@@ -429,6 +442,7 @@ impl App {
         };
         if self.sleep_screen.full_resolution
             || self.sleep_screen.job.is_some()
+            || self.sleep_screen.reader_idle_until.is_some_and(|until| Instant::now() < until)
             || self
                 .sleep_screen
                 .retry_at

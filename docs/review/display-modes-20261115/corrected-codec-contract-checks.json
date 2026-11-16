@@ -1,0 +1,390 @@
+{
+  "hardware_opened": false,
+  "cases": [
+    {
+      "case": "jpeg_nv12",
+      "passed": true,
+      "report": {
+        "schema": 1,
+        "codec": "jpeg",
+        "ioctl_completed": true,
+        "pixel_validated": false,
+        "stage": "complete",
+        "errno": 0,
+        "cleanup_errno": 0,
+        "header_before_capture_allocation": true,
+        "source_change_events": 1,
+        "coded_file_bytes": 1318,
+        "submitted_bytes": 1408,
+        "header_capture_fourcc": 842094158,
+        "header_capture_planes": 2,
+        "capture_fourcc": 842094158,
+        "capture_planes": 2,
+        "width": 64,
+        "height": 64,
+        "source_width": 64,
+        "source_height": 64,
+        "hardware_resize_requested": false,
+        "capture_flags": 4,
+        "source_flags": 4,
+        "allocator": "page_aligned_userptr",
+        "decode_ms": 0.002,
+        "compute_ms": 0.033,
+        "cleanup_ms": 0.001,
+        "normalized_checksum": 2166136261,
+        "benchmark_no_output": false,
+        "total_ms": 0.106,
+        "planes": [
+          {
+            "index": 0,
+            "stride": 64,
+            "sizeimage": 4096,
+            "capacity": 8192,
+            "payload": 4096
+          },
+          {
+            "index": 1,
+            "stride": 32,
+            "sizeimage": 2048,
+            "capacity": 8192,
+            "payload": 2048
+          }
+        ]
+      }
+    },
+    {
+      "case": "jpeg_gray",
+      "passed": true,
+      "report": {
+        "schema": 1,
+        "codec": "jpeg",
+        "ioctl_completed": true,
+        "pixel_validated": false,
+        "stage": "complete",
+        "errno": 0,
+        "cleanup_errno": 0,
+        "header_before_capture_allocation": true,
+        "source_change_events": 1,
+        "coded_file_bytes": 11959,
+        "submitted_bytes": 12032,
+        "header_capture_fourcc": 842094158,
+        "header_capture_planes": 2,
+        "capture_fourcc": 1497715271,
+        "capture_planes": 1,
+        "width": 128,
+        "height": 96,
+        "source_width": 128,
+        "source_height": 96,
+        "hardware_resize_requested": false,
+        "capture_flags": 4,
+        "source_flags": 4,
+        "allocator": "page_aligned_userptr",
+        "decode_ms": 0.002,
+        "compute_ms": 0.036,
+        "cleanup_ms": 0.001,
+        "normalized_checksum": 2166136261,
+        "benchmark_no_output": false,
+        "total_ms": 0.338,
+        "planes": [
+          {
+            "index": 0,
+            "stride": 128,
+            "sizeimage": 12288,
+            "capacity": 16384,
+            "payload": 12288
+          }
+        ]
+      }
+    },
+    {
+      "case": "png_layout",
+      "passed": true,
+      "report": {
+        "schema": 1,
+        "codec": "png",
+        "ioctl_completed": true,
+        "pixel_validated": false,
+        "stage": "complete",
+        "errno": 0,
+        "cleanup_errno": 0,
+        "header_before_capture_allocation": true,
+        "source_change_events": 0,
+        "coded_file_bytes": 149,
+        "submitted_bytes": 149,
+        "header_capture_fourcc": 875708738,
+        "header_capture_planes": 1,
+        "capture_fourcc": 875708738,
+        "capture_planes": 1,
+        "width": 64,
+        "height": 64,
+        "source_width": 64,
+        "source_height": 64,
+        "hardware_resize_requested": false,
+        "capture_flags": 4,
+        "source_flags": 4,
+        "allocator": "page_aligned_userptr",
+        "decode_ms": 0.002,
+        "compute_ms": 0.033,
+        "cleanup_ms": 0.001,
+        "normalized_checksum": 2166136261,
+        "benchmark_no_output": false,
+        "total_ms": 0.295,
+        "planes": [
+          {
+            "index": 0,
+            "stride": 256,
+            "sizeimage": 16384,
+            "capacity": 20480,
+            "payload": 16384
+          }
+        ]
+      }
+    },
+    {
+      "case": "changed_planes",
+      "passed": true,
+      "report": {
+        "schema": 1,
+        "codec": "jpeg",
+        "ioctl_completed": false,
+        "pixel_validated": false,
+        "stage": "allocate_reported_capture_planes",
+        "errno": 71,
+        "cleanup_errno": 0,
+        "header_before_capture_allocation": true,
+        "source_change_events": 1,
+        "coded_file_bytes": 1318,
+        "submitted_bytes": 1408,
+        "header_capture_fourcc": 842094158,
+        "header_capture_planes": 2,
+        "capture_fourcc": 842094158,
+        "capture_planes": 2,
+        "width": 64,
+        "height": 64,
+        "source_width": 64,
+        "source_height": 64,
+        "hardware_resize_requested": false,
+        "capture_flags": 0,
+        "source_flags": 0,
+        "allocator": "page_aligned_userptr",
+        "decode_ms": 0.0,
+        "compute_ms": 0.0,
+        "cleanup_ms": 0.003,
+        "normalized_checksum": 2166136261,
+        "benchmark_no_output": false,
+        "total_ms": 0.059,
+        "planes": [
+          {
+            "index": 0,
+            "stride": 64,
+            "sizeimage": 4096,
+            "capacity": 8192,
+            "payload": 0
+          },
+          {
+            "index": 1,
+            "stride": 32,
+            "sizeimage": 2048,
+            "capacity": 8192,
+            "payload": 0
+          }
+        ]
+      }
+    },
+    {
+      "case": "oversized_payload",
+      "passed": true,
+      "report": {
+        "schema": 1,
+        "codec": "jpeg",
+        "ioctl_completed": false,
+        "pixel_validated": false,
+        "stage": "dequeue_capture",
+        "errno": 75,
+        "cleanup_errno": 0,
+        "header_before_capture_allocation": true,
+        "source_change_events": 1,
+        "coded_file_bytes": 1318,
+        "submitted_bytes": 1408,
+        "header_capture_fourcc": 842094158,
+        "header_capture_planes": 2,
+        "capture_fourcc": 842094158,
+        "capture_planes": 2,
+        "width": 64,
+        "height": 64,
+        "source_width": 64,
+        "source_height": 64,
+        "hardware_resize_requested": false,
+        "capture_flags": 4,
+        "source_flags": 0,
+        "allocator": "page_aligned_userptr",
+        "decode_ms": 0.0,
+        "compute_ms": 0.0,
+        "cleanup_ms": 0.002,
+        "normalized_checksum": 2166136261,
+        "benchmark_no_output": false,
+        "total_ms": 0.062,
+        "planes": [
+          {
+            "index": 0,
+            "stride": 64,
+            "sizeimage": 4096,
+            "capacity": 8192,
+            "payload": 0
+          },
+          {
+            "index": 1,
+            "stride": 32,
+            "sizeimage": 2048,
+            "capacity": 8192,
+            "payload": 0
+          }
+        ]
+      }
+    },
+    {
+      "case": "jpeg_scale",
+      "passed": true,
+      "report": {
+        "schema": 1,
+        "codec": "jpeg",
+        "ioctl_completed": true,
+        "pixel_validated": false,
+        "stage": "complete",
+        "errno": 0,
+        "cleanup_errno": 0,
+        "header_before_capture_allocation": true,
+        "source_change_events": 1,
+        "coded_file_bytes": 1318,
+        "submitted_bytes": 1408,
+        "header_capture_fourcc": 842094158,
+        "header_capture_planes": 2,
+        "capture_fourcc": 1497715271,
+        "capture_planes": 1,
+        "width": 32,
+        "height": 32,
+        "source_width": 64,
+        "source_height": 64,
+        "hardware_resize_requested": true,
+        "capture_flags": 4,
+        "source_flags": 4,
+        "allocator": "page_aligned_userptr",
+        "decode_ms": 0.003,
+        "compute_ms": 0.036,
+        "cleanup_ms": 0.002,
+        "normalized_checksum": 2166136261,
+        "benchmark_no_output": false,
+        "total_ms": 0.332,
+        "planes": [
+          {
+            "index": 0,
+            "stride": 32,
+            "sizeimage": 1024,
+            "capacity": 8192,
+            "payload": 1024
+          }
+        ]
+      }
+    },
+    {
+      "case": "jpeg_scale_benchmark",
+      "passed": true,
+      "report": {
+        "schema": 1,
+        "codec": "jpeg",
+        "ioctl_completed": true,
+        "pixel_validated": false,
+        "stage": "complete",
+        "errno": 0,
+        "cleanup_errno": 0,
+        "header_before_capture_allocation": true,
+        "source_change_events": 1,
+        "coded_file_bytes": 1318,
+        "submitted_bytes": 1408,
+        "header_capture_fourcc": 842094158,
+        "header_capture_planes": 2,
+        "capture_fourcc": 1497715271,
+        "capture_planes": 1,
+        "width": 32,
+        "height": 32,
+        "source_width": 64,
+        "source_height": 64,
+        "hardware_resize_requested": true,
+        "capture_flags": 4,
+        "source_flags": 4,
+        "allocator": "page_aligned_userptr",
+        "decode_ms": 0.002,
+        "compute_ms": 0.03,
+        "cleanup_ms": 0.002,
+        "normalized_checksum": 1757507013,
+        "benchmark_no_output": true,
+        "total_ms": 0.063,
+        "planes": [
+          {
+            "index": 0,
+            "stride": 32,
+            "sizeimage": 1024,
+            "capacity": 8192,
+            "payload": 1024
+          }
+        ]
+      }
+    },
+    {
+      "case": "png_benchmark",
+      "passed": true,
+      "report": {
+        "schema": 1,
+        "codec": "png",
+        "ioctl_completed": true,
+        "pixel_validated": false,
+        "stage": "complete",
+        "errno": 0,
+        "cleanup_errno": 0,
+        "header_before_capture_allocation": true,
+        "source_change_events": 0,
+        "coded_file_bytes": 149,
+        "submitted_bytes": 149,
+        "header_capture_fourcc": 875708738,
+        "header_capture_planes": 1,
+        "capture_fourcc": 875708738,
+        "capture_planes": 1,
+        "width": 64,
+        "height": 64,
+        "source_width": 64,
+        "source_height": 64,
+        "hardware_resize_requested": false,
+        "capture_flags": 4,
+        "source_flags": 4,
+        "allocator": "page_aligned_userptr",
+        "decode_ms": 0.003,
+        "compute_ms": 0.103,
+        "cleanup_ms": 0.002,
+        "normalized_checksum": 1758948805,
+        "benchmark_no_output": true,
+        "total_ms": 0.192,
+        "planes": [
+          {
+            "index": 0,
+            "stride": 256,
+            "sizeimage": 16384,
+            "capacity": 20480,
+            "payload": 16384
+          }
+        ]
+      }
+    },
+    {
+      "case": "reject_nv12_benchmark",
+      "passed": true
+    },
+    {
+      "case": "reject_png_scaling",
+      "passed": true
+    },
+    {
+      "case": "opt_in_before_io",
+      "passed": true
+    }
+  ]
+}

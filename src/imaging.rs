@@ -1,5 +1,7 @@
 mod decode_scheduler;
 mod grayscale;
+pub mod spatial_dither;
+pub use spatial_dither::SpatialDither;
 mod reader_fit;
 mod reader_raster;
 pub use reader_fit::ReaderFit;
@@ -68,6 +70,9 @@ pub struct ImageOptions {
     pub dither: bool,
     /// Keep the prepared pixels in Gray8 for device-side dithering.
     pub hardware_dither: bool,
+    /// None retains legacy non-Reader processing and its existing cache identity.
+    pub spatial_dither: Option<SpatialDither>,
+    pub media_acceleration: crate::native_media::Acceleration,
     pub contrast: i32,
 }
 
@@ -79,6 +84,8 @@ impl Default for ImageOptions {
             crop_borders: true,
             dither: true,
             hardware_dither: false,
+            spatial_dither: None,
+            media_acceleration: crate::native_media::Acceleration::Off,
             contrast: 0,
         }
     }
@@ -154,6 +161,9 @@ fn quantize_raster(
     if options.hardware_dither {
         return Ok(());
     }
+    if let Some(algorithm) = options.spatial_dither {
+        return spatial_dither::apply(image, algorithm);
+    }
     match algorithm {
         RasterAlgorithm::Lanczos3 => {
             quantize(image, options.dither);
@@ -202,7 +212,26 @@ fn decode_page_with_algorithm(
     if needs_png_streaming(bytes)? {
         return Ok(render_streaming_png_with_algorithm(bytes, options, None, algorithm)?.image);
     }
-    let mut gray = decode_grayscale_for_algorithm(bytes, algorithm)?;
+    if matches!(algorithm, RasterAlgorithm::BiliTriangle)
+        && !options.crop_borders
+        && options.media_acceleration == crate::native_media::Acceleration::DecodeAndResize
+        && let Some((width, height)) = crate::native_media::information(bytes)
+    {
+        let target = fit_dimensions(width, height, options.width, options.height);
+        if target != (width, height)
+            && let Some(mut output) = crate::native_media::decode(bytes, Some(target))
+        {
+            check_decode_cancelled()?;
+            apply_contrast(&mut output, options.contrast);
+            quantize_raster(&mut output, options, algorithm)?;
+            return Ok(output);
+        }
+    }
+    let mut gray = if matches!(algorithm, RasterAlgorithm::BiliTriangle) {
+        decode_reader_grayscale_with_acceleration(bytes, options.media_acceleration)?
+    } else {
+        decode_grayscale_for_algorithm(bytes, algorithm)?
+    };
     if options.crop_borders {
         gray = crop_white_borders(gray);
     }
@@ -270,7 +299,10 @@ pub(crate) fn render_vertical_raster_with_source(
         source
     } else {
         ReaderSource {
-            image: Arc::new(decode_reader_grayscale(bytes)?),
+            image: Arc::new(decode_reader_grayscale_with_acceleration(
+                bytes,
+                options.media_acceleration,
+            )?),
         }
     };
     let crop = if options.crop_borders {
@@ -562,6 +594,10 @@ pub fn preload_indices(current: usize, total: usize) -> Vec<usize> {
 }
 
 fn check_options(options: &ImageOptions) -> Result<()> {
+    ensure!(
+        !options.hardware_dither || options.spatial_dither.is_none(),
+        "Software dithering and hardware Y4 cannot be applied together"
+    );
     ensure!(
         options.width > 0 && options.height > 0,
         "The target image dimensions must be positive"
@@ -868,6 +904,23 @@ fn decode_reader_grayscale(bytes: &[u8]) -> Result<GrayImage> {
     grayscale::into_reader_grayscale(decode_bounded_image(bytes)?)
 }
 
+fn decode_reader_grayscale_with_acceleration(
+    bytes: &[u8],
+    acceleration: crate::native_media::Acceleration,
+) -> Result<GrayImage> {
+    check_decode_cancelled()?;
+    // Decoder-only processing is retained for explicit benchmark comparisons.
+    // The user-facing automatic policy never pays that measured slower path.
+    if acceleration == crate::native_media::Acceleration::Decode {
+        let image = crate::native_media::decode(bytes, None);
+        check_decode_cancelled()?;
+        if let Some(image) = image {
+            return Ok(image);
+        }
+    }
+    decode_reader_grayscale(bytes)
+}
+
 fn decode_grayscale_for_algorithm(bytes: &[u8], algorithm: RasterAlgorithm) -> Result<GrayImage> {
     match algorithm {
         RasterAlgorithm::Lanczos3 => decode_grayscale(bytes),
@@ -1094,11 +1147,13 @@ mod tests {
 
     fn options(width: u32, height: u32) -> ImageOptions {
         ImageOptions {
+            media_acceleration: Default::default(),
             width,
             height,
             crop_borders: false,
             dither: false,
             hardware_dither: false,
+            spatial_dither: None,
             contrast: 0,
         }
     }

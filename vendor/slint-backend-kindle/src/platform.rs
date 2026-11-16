@@ -928,7 +928,7 @@ impl Platform for KindlePlatform {
             // Sleep presentation must settle it before changing mapped bytes.
             if sleep_token.is_some() || dithering_changed {
                 let settled = if dithering_changed {
-                    frame_buffer.settle_dithering_transition()
+                    frame_buffer.settle_before_write()
                 } else {
                     frame_buffer.wait_for_pending_update_complete_checked()
                 };
@@ -990,6 +990,15 @@ impl Platform for KindlePlatform {
                 });
             }
             let render_elapsed = render_started.map_or(Duration::ZERO, |start| start.elapsed());
+            // SEND queues MDP work asynchronously even on monochrome MTK.
+            // Keep its input stable until the previous owned update settles.
+            if dirty_region.is_some() || output_mode != gray_renderer.mode() {
+                frame_buffer.settle_before_write().map_err(|error| {
+                    PlatformError::Other(format!(
+                        "previous framebuffer consumption was not settled: {error}"
+                    ))
+                })?;
+            }
             let write_started = observed_frame.as_ref().map(|_| Instant::now());
             let written = gray_renderer.write_scene_frame(
                 scene.pixels(),

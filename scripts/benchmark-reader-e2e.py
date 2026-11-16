@@ -41,7 +41,7 @@ ACTION_TERMINALS = {"action_failed", "action_cancelled"}
 DEFAULT_ELIGIBLE_ACTIONS = {"next","previous","seek","next_chapter","previous_chapter","tap","zoom","open"}
 INPUT_ORIGINS = {"scripted_intent", "scripted_pointer", "app_dispatch"}
 ABORT_EVENTS = {"request_cancelled", "request_failed", "request_invalidated"}
-STAGE_EVENTS = {"source_manager_finished", "fetch_finished", "render_finished", "prepare_finished"}
+STAGE_EVENTS = {"source_manager_finished", "fetch_finished", "render_finished", "prepare_finished", "display_pixels_prepared"}
 REQUEST_EVENTS = {
     "request_created", "request_queued", "request_waiting_for_worker", "worker_started", "worker_finished", "ui_image_ready",
     "framebuffer_written", "send_accepted", "native_frame_unavailable",

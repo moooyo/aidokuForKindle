@@ -130,6 +130,9 @@ impl App {
         };
         if section != "lifecycle" {
             self.platform.note_user_activity();
+            if self.route == "reader" {
+                self.defer_sleep_cover_for_reader();
+            }
         }
         if section == "navigation"
             || action == "back"
@@ -962,8 +965,12 @@ impl App {
             state.set_flash_on_close(self.prefs.flash_on_close);
             state.set_crop_borders(self.prefs.crop_borders);
             state.set_dither(self.prefs.dither);
-            state.set_dither_method(self.prefs.normalized_dither_method().into());
+            state.set_dither_method(self.prefs.spatial_dither().key().into());
             state.set_hardware_dither_available(self.platform.hardware_y4_available());
+            let media = self.platform.hardware_media_availability();
+            state.set_hardware_media_available(media.available());
+            state.set_hardware_media_reason(media.reason().into());
+            state.set_hardware_acceleration(media.available() && self.prefs.hardware_acceleration);
             state.set_dither_pending(self.reader_dither_pending());
             state.set_contrast(self.prefs.contrast / 10);
             state.set_keep_awake(self.prefs.keep_awake);
@@ -1391,7 +1398,15 @@ impl App {
     }
 
     pub(super) fn load_reader_target(&mut self, target: ReaderTarget) -> Result<()> {
-        let result = self.begin_reader_target(&target);
+        self.load_reader_target_with_refresh(target, RefreshRequest::Full)
+    }
+
+    pub(super) fn load_reader_target_with_refresh(
+        &mut self,
+        target: ReaderTarget,
+        refresh: RefreshRequest,
+    ) -> Result<()> {
+        let result = self.begin_reader_target(&target, refresh);
         if let Err(error) = result {
             crate::reader_timing::action_failed();
             self.recover_reader_failure(target, error);
@@ -1399,8 +1414,13 @@ impl App {
         Ok(())
     }
 
-    fn begin_reader_target(&mut self, target: &ReaderTarget) -> Result<()> {
+    fn begin_reader_target(
+        &mut self,
+        target: &ReaderTarget,
+        refresh: RefreshRequest,
+    ) -> Result<()> {
         self.invalidate_reader_work();
+        self.reader_refresh = refresh;
         let chapter = self
             .store
             .chapter(&target.chapter_id)?
@@ -1419,7 +1439,7 @@ impl App {
             return Ok(());
         }
         if self.store.has_pages(&target.chapter_id)? {
-            return self.begin_reader_image(target);
+            return self.begin_reader_image(target, refresh);
         }
         if self.options.offline {
             bail!("{}", tr("chapter_unavailable"));
@@ -1455,13 +1475,13 @@ impl App {
     }
 
     pub(super) fn enter_reader_target(&mut self, target: ReaderTarget) -> Result<()> {
-        if let Err(error) = self.begin_reader_image(&target) {
+        if let Err(error) = self.begin_reader_image(&target, RefreshRequest::Full) {
             self.recover_reader_failure(target, error);
         }
         Ok(())
     }
 
-    fn begin_reader_image(&mut self, target: &ReaderTarget) -> Result<()> {
+    fn begin_reader_image(&mut self, target: &ReaderTarget, refresh: RefreshRequest) -> Result<()> {
         let chapter_id = &target.chapter_id;
         let chapter = self
             .store
@@ -1505,7 +1525,7 @@ impl App {
         {
             self.modal.clear();
         }
-        self.request_reader_images()?;
+        self.request_reader_images_with_refresh(refresh)?;
         Ok(())
     }
 
@@ -3458,6 +3478,7 @@ impl App {
             && matches!(
                 id,
                 "screen-refresh"
+                    | "hardware-acceleration"
                     | "frontlight-warmth"
                     | "wifi-sleep-exit"
                     | "storage"
@@ -4280,6 +4301,12 @@ impl App {
 
     fn set_preference(&mut self, key: &str, value: &str) -> Result<()> {
         let before = self.effective_reader_preferences();
+        if key.replace('-', "_") == "hardware_acceleration" && value == "true" {
+            anyhow::ensure!(
+                self.platform.hardware_media_availability().available(),
+                "JPEG hardware acceleration is unavailable on this device"
+            );
+        }
         let mut interaction_changed = false;
         if !extended_preferences::set(&mut self.prefs, key, value)? {
             match key {
@@ -4333,16 +4360,21 @@ impl App {
                 "night_mode" | "night-mode" => self.prefs.night_mode = value.parse()?,
                 "crop_borders" | "crop-borders" => self.prefs.crop_borders = value.parse()?,
                 "dither" => self.prefs.dither = value.parse()?,
-                "dither_method" | "dither-method" if matches!(value, "software" | "hardware") => {
-                    self.prefs.dither_method = value.into();
+                "dither_method" | "dither-method"
+                    if matches!(value, "software" | "hardware" | "bayer8" | "floyd" | "floyd_steinberg") => {
+                    self.prefs.dither_method = if matches!(value, "floyd" | "floyd_steinberg") {
+                        "floyd_steinberg"
+                    } else { "bayer8" }.into();
                     self.prefs.dither = true;
                 }
                 "dither_mode" | "dither-mode"
-                    if matches!(value, "software" | "hardware" | "off") =>
+                    if matches!(value, "software" | "hardware" | "off" | "bayer8" | "floyd" | "floyd_steinberg") =>
                 {
                     self.prefs.dither = value != "off";
                     if self.prefs.dither {
-                        self.prefs.dither_method = value.into();
+                        self.prefs.dither_method = if matches!(value, "floyd" | "floyd_steinberg") {
+                            "floyd_steinberg"
+                        } else { "bayer8" }.into();
                     }
                 }
                 "contrast" => {
@@ -4434,7 +4466,8 @@ impl App {
         {
             self.invalidate_automatic_updates();
         }
-        let input_changed = before.reading_direction != after.reading_direction
+        let input_changed = before.display_mode != after.display_mode
+            || before.reading_direction != after.reading_direction
             || before.tap_layout != after.tap_layout
             || before.reverse_taps != after.reverse_taps
             || before.double_tap_zoom != after.double_tap_zoom
@@ -4450,7 +4483,8 @@ impl App {
                 state.set_reader_input_epoch(state.get_reader_input_epoch().wrapping_add(1));
             }
         }
-        let render_images = before.reading_direction != after.reading_direction
+        let render_images = before.display_mode != after.display_mode
+            || before.reading_direction != after.reading_direction
             || before.landscape != after.landscape
             || before.spread != after.spread
             || before.cover_alone != after.cover_alone
@@ -4458,6 +4492,7 @@ impl App {
             || before.crop_borders != after.crop_borders
             || before.dither != after.dither
             || before.normalized_dither_method() != after.normalized_dither_method()
+            || before.hardware_acceleration != after.hardware_acceleration
             || before.contrast != after.contrast
             || before.reader_fit != after.reader_fit;
         self.save_preferences_with_render(render_images)
@@ -4901,21 +4936,32 @@ mod followup_command_tests {
     fn dithering_method_selection_persists_without_inventing_desktop_capability() {
         let mut fixture = DemoRouteFixture::new("settings", DeviceProfile::Scribe, false);
         let app = &mut fixture.app;
-        app.dispatch("settings", "set", "dither-mode=hardware")
-            .unwrap();
-        assert!(app.prefs.dither);
-        assert_eq!(app.prefs.normalized_dither_method(), "hardware");
+        for (choice, normalized) in [
+            ("bayer8", "bayer8"),
+            ("floyd_steinberg", "floyd_steinberg"),
+            ("hardware", "bayer8"),
+            ("software", "bayer8"),
+            ("floyd", "floyd_steinberg"),
+        ] {
+            app.dispatch("settings", "set", &format!("dither-mode={choice}"))
+                .unwrap();
+            assert!(app.prefs.dither);
+            assert_eq!(app.prefs.normalized_dither_method(), normalized);
+            assert!(!app.prefs.uses_hardware_dither(true));
+            assert_eq!(app.store.preferences().unwrap(), app.prefs);
+        }
         assert!(!app.platform.hardware_y4_available());
         assert_eq!(app.store.preferences().unwrap(), app.prefs);
         app.dispatch("settings", "set", "dither-mode=off").unwrap();
         assert!(!app.prefs.dither);
-        assert_eq!(app.prefs.normalized_dither_method(), "hardware");
+        assert_eq!(app.prefs.normalized_dither_method(), "floyd_steinberg");
+        assert_eq!(app.store.preferences().unwrap().spatial_dither(), crate::imaging::SpatialDither::Off);
         app.dispatch("settings", "set", "dither=true").unwrap();
-        assert_eq!(app.prefs.normalized_dither_method(), "hardware");
+        assert_eq!(app.prefs.normalized_dither_method(), "floyd_steinberg");
         app.dispatch("settings", "set", "dither-method=software")
             .unwrap();
         assert!(app.prefs.dither);
-        assert_eq!(app.prefs.normalized_dither_method(), "software");
+        assert_eq!(app.prefs.normalized_dither_method(), "bayer8");
         let saved = app.store.preferences().unwrap();
         assert!(
             app.dispatch("settings", "set", "dither-mode=invalid")
@@ -4926,6 +4972,42 @@ mod followup_command_tests {
                 .is_err()
         );
         assert_eq!(app.store.preferences().unwrap(), saved);
+    }
+
+    #[test]
+    fn jpeg_acceleration_requires_capability_and_persists_the_automatic_policy() {
+        use crate::native_media::{Acceleration, Availability};
+        let mut fixture = DemoRouteFixture::new("settings", DeviceProfile::Scribe, false);
+        let app = &mut fixture.app;
+        let before = app.prefs.clone();
+        assert!(!before.hardware_acceleration);
+        assert!(
+            app.dispatch("settings", "set", "hardware-acceleration=true")
+                .is_err()
+        );
+        assert_eq!(app.prefs, before);
+        app.platform
+            .set_test_hardware_media_availability(Availability::Available);
+        app.dispatch("settings", "set", "hardware_acceleration=true")
+            .unwrap();
+        assert_eq!(
+            app.prefs.media_acceleration(),
+            Acceleration::DecodeAndResize
+        );
+        assert_eq!(app.store.preferences().unwrap(), app.prefs);
+        app.platform
+            .set_test_hardware_media_availability(Availability::Failed);
+        assert_eq!(
+            app.effective_reader_preferences().media_acceleration(),
+            Acceleration::Off
+        );
+        assert!(
+            app.dispatch("settings", "set", "hardware-acceleration=true")
+                .is_err()
+        );
+        app.dispatch("settings", "set", "hardware-acceleration=false")
+            .unwrap();
+        assert!(!app.store.preferences().unwrap().hardware_acceleration);
     }
 
     #[test]

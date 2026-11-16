@@ -36,6 +36,49 @@ the viewer and image links resolve within the baseline directory.
 
 ## Scene index
 
+The [2026-11-16 Tab-feedback and Perf05 candidate](2026-11-16-a53b9716-tab-perf05/README.md)
+removes transient Tab fills and redundant press/release updates. It retains
+14 final desktop cases and seven final native snapshots, with separate earlier
+references. Its performance record covers worker-prepared Fast pixels and
+Reader-prioritized optional sleep-cover scheduling on the physical Scribe.
+
+The [2026-11-16 software-dithering and button-feedback candidate](2026-11-16-a53b9716-software-dither/README.md)
+records the Off/Bayer8/Floyd-Steinberg settings and actual generated test strip.
+It includes 28 paired-profile desktop cases, ten native Scribe snapshots and
+an additional native Fast trace. Selected buttons retain their fill while held;
+switches use neutral feedback. Source identities, original sidecars and replays
+are frozen with the captures.
+
+The [2026-11-16 original-navigation and Fast candidate](2026-11-16-a53b9716-navigation-fast/README.md)
+records the user-requested icon/label bottom bar and manual-only clearing in
+Fast. It includes paired final desktop captures and a final native Scribe
+navigation capture, all bound to the current source and executable identities.
+Earlier baselines remain frozen; native page-turn traces are linked from the
+candidate's implementation report.
+
+The [2026-11-15 display-preset candidate](2026-11-15-a53b9716-display-modes/README.md)
+adds 24 supplemental R05/S04 captures and related variants for both profiles.
+It is based on `a53b9716d64fe5521fac38431b24732c75cb8ff7` plus an uncommitted
+change set, identified by its source manifest and executable hash. The frozen
+2026-11-14 baseline remains the current baseline and is unchanged.
+
+The [2026-11-15 hardware-acceleration candidate](2026-11-15-a53b9716-media-acceleration/README.md)
+adds ten paired-profile settings checks and three physical Scribe digital
+captures. Its independent source manifest and executable identities cover the
+optional JPEG control, capability-disabled states and actual Reader use.
+
+The [2026-11-15 hardware-model policy candidate](2026-11-15-a53b9716-media-model-policy/README.md)
+records ten further desktop settings checks after removing the firmware/kernel
+version gate. Availability now uses supported model identity and actual driver
+capability. This supplemental capture set has its own source fingerprint;
+the earlier physical-device captures and current baseline remain unchanged.
+
+The [2026-11-15 grayscale-test candidate](2026-11-15-a53b9716-grayscale-256/README.md)
+adds the 256-swatch test to S04. Six day/night captures across Paperwhite 5,
+Paperwhite 6 and Scribe retain all input values from 0 through 255; two Reader
+panel checks preserve its existing layout. The input-pixel measurements and
+source manifest are separate from physical Y4 or optical grayscale evidence.
+
 | ID | Scene | Scribe | Paperwhite 5 |
 | --- | --- | --- | --- |
 | L01 | Library | [PNG](2026-11-14-433a1f6/raw/scribe/library.png) | [PNG](2026-11-14-433a1f6/raw/pw5/library.png) |

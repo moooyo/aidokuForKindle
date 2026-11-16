@@ -2,6 +2,8 @@ import { State, Commands } from "state.slint";
 import { Theme } from "theme.slint";
 import { Strings } from "strings.slint";
 import { BodyText, IconButton, ActionButton, ToggleRow } from "widgets.slint";
+import { GrayscaleTest } from "grayscale-test.slint";
+import { DitherSelector } from "dither-controls.slint";
 
 export component CompactPager inherits Rectangle {
     in property <int> page: 1;
@@ -22,6 +24,7 @@ export component NativeSlider inherits Rectangle {
     in property <int> maximum: 24;
     in property <bool> contrast: false;
     in property <bool> presets: false;
+    in property <bool> manual-refresh: false;
     in property <bool> enabled: true;
     in property <bool> show-value: true;
     in property <bool> show-label: true;
@@ -48,9 +51,13 @@ export component NativeSlider inherits Rectangle {
         x: root.inset + root.track-width * index / 4; y: 23px + Theme.touch / 2; width: 1px; height: 10px; background: Theme.ink;
     }
     Rectangle { x: root.inset + root.track-width * root.fraction - 12px; y: 16px + Theme.touch / 2; width: 24px; height: 24px; border-width: 1.5px; border-color: root.enabled ? Theme.ink : Theme.disabled; border-radius: 12px; background: Theme.paper; }
-    for label[index] in [Strings.refresh-each, "3" + Strings.pages-unit, "6" + Strings.pages-unit, "10" + Strings.pages-unit, Strings.refresh-chapter]: BodyText {
+    for label[index] in [Strings.refresh-each, "3" + Strings.pages-unit, "6" + Strings.pages-unit, "10" + Strings.pages-unit, root.manual-refresh ? Strings.refresh-manual : Strings.refresh-chapter]: BodyText {
         visible: root.presets;
-        x: root.inset + root.track-width * index / 4 - 28px; y: 32px + Theme.touch; width: 56px; height: 24px; text: label; horizontal-alignment: center; font-size: Theme.caption; font-weight: root.shown == index ? 700 : 400; color: root.shown == index ? Theme.ink : Theme.secondary;
+        width: root.width / 5;
+        x: clamp(root.inset + root.track-width * index / 4 - self.width / 2, 0px, root.width - self.width);
+        y: 32px + Theme.touch; height: 24px; text: label;
+        horizontal-alignment: index == 0 ? left : index == 4 ? right : center;
+        font-size: Theme.caption; font-weight: root.shown == index ? 700 : 400; color: root.shown == index ? Theme.ink : Theme.secondary;
     }
     slider-keys := FocusScope { x: 0px; y: 0px;
         enabled: root.enabled;
@@ -98,11 +105,39 @@ export component LightOptions inherits Rectangle {
 }
 
 export component RefreshOptions inherits Rectangle {
-    height: State.large-screen ? 128px : 112px;
+    in property <bool> show-grayscale-test: false;
+    property <length> mode-top: State.large-screen ? 144px : 128px;
+    property <length> controls-height: State.large-screen ? 368px : 336px;
+    property <length> dither-height: State.large-screen ? 281px : 126px;
+    property <length> test-gap: State.large-screen ? 24px : 16px;
+    height: root.controls-height + (root.show-grayscale-test ? 24px + root.dither-height + root.test-gap + (State.large-screen ? 128px : 120px) : 0px);
     NativeSlider { x: 0px; y: 0px;
         width: parent.width; label: Strings.refresh-interval; presets: true; maximum: 4;
-        value: State.refresh-every == 1 ? 0 : State.refresh-every == 3 ? 1 : State.refresh-every == 6 ? 2 : State.refresh-every == 10 ? 3 : 4;
+        enabled: State.display-mode != "high_quality" && State.display-mode != "fast";
+        manual-refresh: State.display-mode == "fast";
+        value: State.display-mode == "fast" ? 4 : State.display-mode == "high_quality" || State.refresh-every == 1 ? 0 : State.refresh-every == 3 ? 1 : State.refresh-every == 6 ? 2 : State.refresh-every == 10 ? 3 : 4;
         committed(value) => { Commands.action("settings", "set", "refresh-every=" + (value == 0 ? 1 : value == 1 ? 3 : value == 2 ? 6 : value == 3 ? 10 : 0)); }
     }
     ActionButton { x: parent.width - 140px; y: -8px; width: 140px; height: Theme.touch; text: Strings.refresh-now; quiet: true; clicked => { Commands.refresh("full"); } }
+    BodyText { x: 0px; y: root.mode-top; width: parent.width; height: 28px; text: Strings.display-mode; font-size: Theme.body; }
+    for label[index] in [Strings.display-fast, Strings.display-normal, Strings.display-high-quality, Strings.display-kindle]: ActionButton {
+        property <string> mode: index == 0 ? "fast" : index == 1 ? "normal" : index == 2 ? "high_quality" : "kindle";
+        x: mod(index, 2) * (parent.width + 8px) / 2;
+        y: root.mode-top + 36px + floor(index / 2) * (Theme.touch + 8px);
+        width: (parent.width - 8px) / 2; height: Theme.touch; text: label;
+        primary: State.display-mode == self.mode;
+        accessible-role: radio-button; accessible-label: label; accessible-checkable: true; accessible-checked: self.primary;
+        clicked => { if !self.primary { Commands.action("settings", "set", "display-mode=" + self.mode); } }
+    }
+    BodyText {
+        x: 0px; y: root.mode-top + 44px + (Theme.touch + 8px) * 2;
+        width: parent.width; height: 48px; wrap: word-wrap; font-size: Theme.caption; color: Theme.secondary;
+        text: State.display-mode == "fast" ? Strings.display-fast-hint : State.display-mode == "high_quality" ? Strings.display-high-quality-hint : State.display-mode == "kindle" ? Strings.display-kindle-hint : Strings.display-normal-hint;
+    }
+    if root.show-grayscale-test: DitherSelector {
+        x: 0px; y: root.controls-height + 24px; width: parent.width; height: root.dither-height;
+    }
+    if root.show-grayscale-test: GrayscaleTest {
+        x: 0px; y: root.controls-height + 24px + root.dither-height + root.test-gap; width: parent.width;
+    }
 }

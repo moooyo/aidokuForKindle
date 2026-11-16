@@ -34,8 +34,8 @@ component SettingsCreationButton inherits Rectangle {
         x: 0px; y: 0px; width: root.width; height: root.height;
         enabled: root.enabled;
         pointer-event(event) => {
-            if event.kind == PointerEventKind.down { Commands.refresh("fast"); }
-            else if event.kind == PointerEventKind.up { Commands.refresh("ui"); }
+            if event.kind == PointerEventKind.down { Commands.refresh("ui"); }
+            else if event.kind == PointerEventKind.up || event.kind == PointerEventKind.cancel { Commands.refresh("ui"); }
         }
         clicked => { root.clicked(); }
     }

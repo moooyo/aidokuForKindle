@@ -7,6 +7,11 @@ use crate::{domain::Preferences, ui::State};
 /// Return false for a setting owned by the core reader preference handler.
 pub(super) fn set(preferences: &mut Preferences, key: &str, value: &str) -> Result<bool> {
     match key.replace('-', "_").as_str() {
+        "display_mode" => {
+            preferences.display_mode = crate::display::DisplayMode::parse(value)
+                .context("Unsupported reader display mode")?;
+        }
+        "hardware_acceleration" => preferences.hardware_acceleration = boolean(value)?,
         "ahead_chapters" => {
             let count = value.parse::<u8>().context("Parse advance chapter count")?;
             ensure!(
@@ -68,6 +73,7 @@ fn boolean(value: &str) -> Result<bool> {
 
 /// Project persisted preferences without changing runtime capability flags.
 pub(super) fn sync(state: &State, preferences: &Preferences) {
+    state.set_display_mode(preferences.display_mode.as_str().into());
     state.set_ahead_chapters(i32::from(preferences.ahead_chapters));
     state.set_resize_downloads(preferences.resize_downloads);
     state.set_grayscale_downloads(preferences.grayscale_downloads);

@@ -53,6 +53,13 @@ pub struct RenderKey {
     pub dither: bool,
     #[serde(default, skip_serializing_if = "is_false")]
     pub hardware_dither: bool,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub spatial_dither: Option<crate::imaging::SpatialDither>,
+    #[serde(
+        default,
+        skip_serializing_if = "crate::native_media::Acceleration::is_off"
+    )]
+    pub media_acceleration: crate::native_media::Acceleration,
     pub contrast: i32,
     pub vertical: bool,
     pub offset: u32,
@@ -2569,12 +2576,14 @@ mod tests {
     }
     fn render(source: &str) -> RenderKey {
         RenderKey {
+            media_acceleration: Default::default(),
             source_key: source.into(),
             width: 100,
             height: 200,
             crop_borders: true,
             dither: true,
             hardware_dither: false,
+            spatial_dither: None,
             contrast: 0,
             vertical: false,
             offset: 0,
@@ -2589,6 +2598,18 @@ mod tests {
         assert_eq!(software, render("legacy"));
         assert!(!software.hardware_dither);
         assert_eq!(serde_json::to_string(&software).unwrap(), legacy);
+        let mut accelerated = software.clone();
+        accelerated.media_acceleration = crate::native_media::Acceleration::Decode;
+        let mut resized = accelerated.clone();
+        resized.media_acceleration = crate::native_media::Acceleration::DecodeAndResize;
+        assert_ne!(
+            render_key(&software).unwrap(),
+            render_key(&accelerated).unwrap()
+        );
+        assert_ne!(
+            render_key(&resized).unwrap(),
+            render_key(&accelerated).unwrap()
+        );
         let mut hardware = software.clone();
         hardware.hardware_dither = true;
         assert_ne!(
@@ -2599,6 +2620,23 @@ mod tests {
             serde_json::from_str::<RenderKey>(&serde_json::to_string(&hardware).unwrap()).unwrap(),
             hardware
         );
+    }
+
+    #[test]
+    fn spatial_dithering_has_versioned_distinct_render_keys() {
+        use crate::imaging::SpatialDither;
+        let legacy = render("same-source");
+        let mut keys = std::collections::HashSet::from([render_key(&legacy).unwrap()]);
+        for algorithm in [SpatialDither::Off, SpatialDither::Bayer8, SpatialDither::FloydSteinberg] {
+            let mut key = legacy.clone();
+            key.spatial_dither = Some(algorithm);
+            assert!(keys.insert(render_key(&key).unwrap()));
+            let encoded = serde_json::to_string(&key).unwrap();
+            assert_eq!(serde_json::from_str::<RenderKey>(&encoded).unwrap(), key);
+            if algorithm != SpatialDither::Off {
+                assert!(encoded.contains("_v1"));
+            }
+        }
     }
 
     fn image_bytes(marker: &str) -> Vec<u8> {
