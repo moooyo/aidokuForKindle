@@ -4,6 +4,13 @@ This is an independent Rust/Slint application for jailbroken Kindle devices.
 It does not require the WeRead application, a WeRead account, or a KOReader plugin.
 The binary uses an isolated Aidoku data directory and a native framebuffer/input backend.
 
+The single Library document invokes `launch.sh --library`. Its small entry
+waits for the independently supervised worker to finish restoring native state,
+so the shared Scriptlet service does not return to Library during startup.
+The worker still has its own session and survives retirement of the waiting
+entry. KUAL and direct package launches retain detached admission. No shared
+handler binary, registry association, scanner request, or cover asset is changed.
+
 The optional `aidoku-native-query` helper reads a fixed set of firmware LIPC
 properties through one connection per bounded transaction. It uses the native
 ARM hard-float glibc loader; firmware libraries are not included in the bundle.

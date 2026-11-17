@@ -114,8 +114,9 @@ The installed `documents/Aidoku.sh` starts with these Scriptlet declarations:
 # Icon: /mnt/us/aidoku/assets/aidoku-cover-v2.png
 ```
 
-The legacy ZIP uses a separate direct document entry and does not require KPM
-package registration.
+Both the ZIP and KPM installation expose one Aidoku document entry that invokes
+the installed production launcher directly. Package installation, updates and
+removal remain managed by KPM when KPM installed the files.
 
 The cover is packaged at `aidoku/assets/aidoku-cover-v2.png`, before the document
 entry in the installation allowlist. It uses the official Aidoku website logo
@@ -127,15 +128,17 @@ The declaration stays within the first six lines read by Scriptlet integration.
 The documented `DontUseFBInk` declaration suppresses Scriptlet stdout/stderr
 rendering when it appears in the first six lines. See the
 [Scriptlet documentation](https://kindlemodding.org/kindle-dev/scriptlets.html).
-The entry redirects all three standard descriptors before calling
-`/var/local/kmc/bin/kpm launch aidoku --asap`. The package launch hook redirects
-its own descriptors and invokes the production launcher's default detached
-mode. It does not pass `--foreground`, which remains available for supervised
-host fixtures. No added delay is used as proof that a native UI has closed.
+The Library entry redirects all three standard descriptors and calls
+`sh /mnt/us/aidoku/launch.sh --library`. This small entry waits on the worker's
+actual completion; the worker still runs in its independent session and owns
+sleep, wake and native restoration. The shared Scriptlet handler consequently
+returns to Library after that restoration instead of competing with startup.
+The package launch hook used by `kpm launch aidoku --asap` remains detached for
+non-Library callers. No fixed delay is used as proof that a native UI has closed.
 
 Private runtime logs are under `/mnt/us/aidoku/data/logs/`:
 
-- `kpm-entry.log` receives the complete KPM call's output.
+- `kpm-entry.log` receives the Library entry's output and final worker status.
 - `kpm-launch.log` records receipt by the package launch hook.
 - `launcher.log` receives the detached worker and application output, including
   startup failures and the worker's final exit status after normal cleanup.

@@ -1,0 +1,30 @@
+{
+  "run_id": "library-lifecycle-4b403d14",
+  "scope": "Real powerd screen-saver cycle with a scheduled six-second wake. This is not a long deep-suspend qualification.",
+  "cases": [
+    {
+      "variant": "baseline",
+      "covers_settled_before_suspend": true,
+      "same_application_process": true,
+      "parked": true,
+      "resumed_pixels_match_below_status_bar": true,
+      "retained_frame_acknowledged": true,
+      "shutdown_complete": true,
+      "framework_before": "com.lab126.KPPMainApp",
+      "framework_after": "com.lab126.KPPMainApp"
+    },
+    {
+      "variant": "candidate",
+      "covers_settled_before_suspend": true,
+      "same_application_process": true,
+      "parked": true,
+      "resumed_pixels_match_below_status_bar": true,
+      "retained_frame_acknowledged": true,
+      "shutdown_complete": true,
+      "framework_before": "tech.hackerdude.shell_integration.launcher",
+      "framework_after": "tech.hackerdude.shell_integration.launcher"
+    }
+  ],
+  "lease_released": true,
+  "native_and_entry_restored": true
+}

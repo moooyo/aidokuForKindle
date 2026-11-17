@@ -449,6 +449,7 @@ class LauncherTests(unittest.TestCase):
         self.event_descriptor = os.open(self.root / "event-input", os.O_RDWR | os.O_NONBLOCK)
         self.wm = subprocess.Popen(["sleep", "120"], start_new_session=True)
         self.launcher: subprocess.Popen | None = None
+        self.library_worker: int | None = None
         self.log = None
         self.environment = os.environ.copy()
         self.environment.update({
@@ -627,6 +628,46 @@ cat "$AIDOKU_TEST_ROOT/power-state"
         self.environment.update(AIDOKU_FAKE_EXIT_AFTER="0.2", AIDOKU_FAKE_EXIT_CODE="7")
         self.start_launcher()
         self.assertEqual(self.complete(), 7)
+        self.assert_recovered()
+
+    def start_library_entry(self) -> int:
+        self.log = (self.root / "launcher.log").open("wb")
+        self.launcher = subprocess.Popen(["sh", str(self.fixture_launcher), "--library"],
+                                         env=self.environment, stdout=self.log,
+                                         stderr=subprocess.STDOUT, start_new_session=True)
+        wait_for(lambda: (self.lock / "pid").exists(), description="independent library worker")
+        self.library_worker = int((self.lock / "pid").read_text())
+        wait_for(lambda: bool(self.traces("started")) and self.phase() == "active", description="library app ready")
+        self.assertNotEqual(self.library_worker, self.launcher.pid)
+        self.assertEqual(os.getsid(self.library_worker), self.library_worker)
+        self.assertIsNone(self.launcher.poll())
+        return self.traces("started")[-1]["pid"]
+
+    def test_library_entry_waits_for_worker_exit_and_preserves_its_status(self) -> None:
+        self.environment.update(AIDOKU_FAKE_EXIT_AFTER="0.6", AIDOKU_FAKE_EXIT_CODE="7")
+        self.start_library_entry()
+        self.assertEqual(self.complete(), 7)
+        self.assert_recovered()
+
+    def test_library_entry_survives_same_process_sleep_and_wake(self) -> None:
+        pid = self.start_library_entry()
+        self.park(pid)
+        self.assertIsNone(self.launcher.poll())
+        self.wake()
+        self.assertEqual(self.traces("resumed")[-1]["pid"], pid)
+        self.stop_launcher()
+        self.assert_recovered()
+
+    def test_retiring_only_the_library_waiter_keeps_owned_native_recovery_alive(self) -> None:
+        pid = self.start_library_entry()
+        self.launcher.kill()
+        self.launcher.wait(timeout=3)
+        self.assertFalse(self.process_state(pid).startswith(("gone", "Z", "X")))
+        self.park(pid)
+        self.wake()
+        self.assertEqual(self.traces("resumed")[-1]["pid"], pid)
+        os.kill(self.library_worker, signal.SIGTERM)
+        wait_for(lambda: not self.lock.exists(), seconds=12, description="detached recovery after waiter retirement")
         self.assert_recovered()
 
     def test_process_names_with_spaces_and_parentheses_preserve_owned_lifecycle(self) -> None:
@@ -1513,6 +1554,14 @@ cat "$AIDOKU_TEST_ROOT/power-state"
         self.assertEqual(self.traces(), [])
 
     def tearDown(self) -> None:
+        if self.library_worker is not None:
+            try:
+                command = Path(f"/proc/{self.library_worker}/cmdline").read_bytes()
+                if str(self.fixture_launcher).encode() in command:
+                    os.kill(self.library_worker, signal.SIGTERM)
+                    wait_for(lambda: not self.lock.exists(), seconds=14, description="owned library-worker cleanup")
+            except (FileNotFoundError, ProcessLookupError):
+                pass
         if self.launcher is not None:
             if self.launcher.poll() is None:
                 self.launcher.terminate()

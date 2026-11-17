@@ -323,9 +323,9 @@ exec "$AIDOKU_TEST_REAL_CP" "$@"
         content = KPM_DOCUMENT_ENTRY.read_bytes()
         self.assertEqual(content.splitlines()[:3], [b"#!/bin/sh", b"# Name: Aidoku", b"# DontUseFBInk"])
         self.assertNotIn(b"\r", content)
-        result, record = self.entry_record(KPM_DOCUMENT_ENTRY, "document", self.root / "fake-kpm")
+        result, record = self.entry_record(KPM_DOCUMENT_ENTRY, "document", self.home / "launch.sh")
         self.assert_private_descriptors(result, record)
-        self.assertEqual(record["arguments"], ["launch", "aidoku", "--asap"])
+        self.assertEqual(record["arguments"], ["--library"])
 
     def test_legacy_document_entry_needs_only_the_canonical_runtime(self) -> None:
         content = LEGACY_DOCUMENT_ENTRY.read_bytes()
@@ -334,7 +334,7 @@ exec "$AIDOKU_TEST_REAL_CP" "$@"
         self.assertFalse((self.root / "fake-kpm").exists())
         result, record = self.entry_record(LEGACY_DOCUMENT_ENTRY, "legacy-document", self.home / "launch.sh")
         self.assert_private_descriptors(result, record)
-        self.assertEqual(record["arguments"], [])
+        self.assertEqual(record["arguments"], ["--library"])
         self.assertFalse((self.root / "fake-kpm").exists())
 
     def test_kpm_entry_uses_the_detached_launcher_with_private_standard_streams(self) -> None:

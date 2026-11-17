@@ -77,6 +77,23 @@ if [ "${1:-}" != '--foreground' ]; then
     else
         nohup sh "$SCRIPT_PATH" --foreground >>"$DATA_DIR/logs/launcher.log" 2>&1 </dev/null &
     fi
+    LIBRARY_WORKER_PID=$!
+    if [ "${1:-}" = '--library' ]; then
+        # Keep the native Scriptlet active until its owned worker restores the
+        # display. The worker remains in its independent session if appmgrd
+        # retires this small waiting entry during a native ownership transition.
+        library_cancel() {
+            signal_child "$LIBRARY_WORKER_PID" "$ROOT_PID" TERM || :
+            wait "$LIBRARY_WORKER_PID" 2>/dev/null || :
+            exit "$1"
+        }
+        trap 'library_cancel 129' HUP
+        trap 'library_cancel 130' INT
+        trap 'library_cancel 143' TERM
+        LIBRARY_STATUS=0
+        wait "$LIBRARY_WORKER_PID" || LIBRARY_STATUS=$?
+        exit "$LIBRARY_STATUS"
+    fi
     exit 0
 fi
 
