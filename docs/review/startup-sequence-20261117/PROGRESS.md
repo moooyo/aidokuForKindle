@@ -11,13 +11,13 @@ source variants; production binaries must not contain diagnostic-only logging.
 
 | Order | Work | Status |
 | --- | --- | --- |
-| 0 | Merge and deploy the verified native-query version; establish consistent installed/runtime and complete-screen timing | Main merged and pushed; verified installation completed; frame/cover instrumentation in progress |
+| 0 | Merge and deploy the verified native-query version; establish consistent installed/runtime and complete-screen timing | Completed; accepted-frame, input, and cover endpoints verified in every comparison |
 | 1 | Overlap preparation with the initial full-frame completion wait while preserving input and display ownership | Retained after five A/B rounds; first Library median improved by 109 ms, software ready by 228 ms |
 | 2 | Profile and optimize first Library rendering | Retained after five A/B rounds; first Library improved by 134 ms, covers settled by 286 ms |
 | 3 | Measure and optimize the cover-loading tail | Retained both derivative reuse (2.466 s) and independently tested completion/publication scheduling (589 ms) |
 | 4 | Consolidate or reschedule the optional sleep-cover capability observation | Standalone helper trial rejected; combined portrait session retained after five A/B rounds (125 ms first-frame saving) |
 | 5 | Reduce lighting-application process overhead | Retained as a small change: 26 ms lower attachment median, confirmed native value readback |
-| 6 | Evaluate shared Scriptlet dispatch independently; preserve global scanner and recent-item semantics | Diagnostic entry prepared; native comparison pending |
+| 6 | Evaluate shared Scriptlet dispatch independently; preserve global scanner and recent-item semantics | Completed: 465 ms diagnostic boundary difference, but no equivalent production replacement established; shared handler unchanged |
 
 Timing distinguishes native launch requests, first business-frame submission,
 checked frame completion, software readiness, and complete visible-cover
@@ -251,3 +251,47 @@ Evidence: [A/B observations](step5-lighting.json),
 [readback and native pixels](step5-native-qualification.json).
 Application: `5f7fdd5010ee91bb9ac56cf37231dd08497ca2652c81b33b859c241a105e03f3`.
 Helper: `84c2f27d8233d8695001aa86d880e29454fe188deb9884aca1c6694c82a5887d`.
+
+## Item 6: isolate the shared dispatch boundary
+
+Batch `step6-dispatch-boundary-3a8718c4` used the same application, launcher,
+helper, and library for both routes. The control used the normal native
+Scriptlet service. A temporary diagnostic retained the reference handler's
+`utimes(entry)` and one `doFullScan` request, then launched the same login shell
+from an already privileged test connection. It omitted framework registration,
+privilege transition, and application-manager dispatch. It is not a production
+Library entry and is not qualified as an equivalent replacement.
+
+| Endpoint | Native route | Direct diagnostic | Difference |
+| --- | ---: | ---: | ---: |
+| Request to document entry | 330 ms | 90 ms | 240 ms |
+| First Library accepted frame | 2.246 s | 1.781 s | 465 ms |
+| Visible-cover settled accepted frame | 2.667 s | 2.196 s | 471 ms |
+
+All five first-frame pairs favored the diagnostic. Its scanner IPC took
+4.5-7.9 ms (5.6 ms median); asynchronous scan completion was not measured.
+Thus removing the scan request cannot be credited with the observed full
+difference. Application-entry-to-Library also fell by 183 ms, mostly before
+the initial refresh wait. That suggests scheduling or framework activity
+contributes beyond the dispatch boundary; this experiment does not isolate a
+specific native process as the cause. The initial completion barrier stayed
+about 365 ms, and Library rendering stayed about 202-204 ms.
+
+No shared handler, scanner policy, native registration, recent-item behavior,
+or production document entry was changed. A future shared-entry implementation
+would need an equivalent Library/framework lifecycle before its diagnostic
+upper opportunity can be claimed as a product improvement. This item is
+completed as an experimental assessment, with no production dispatch patch.
+All fourteen launches, complete-cover counts, native snapshots, restoration,
+and lease release passed.
+
+Evidence: [A/B observations and scanner timings](step6-dispatch-boundary.json),
+[diagnostic source](dispatch-diagnostic.c), and
+[native qualification](step6-native-qualification.json).
+The inspected reference is the pinned
+[Scriptlet handler](https://github.com/KindleModding/sh_integration/blob/adb7ef5c570a25c76fd64e94837ae0f590bd3b9c/launcher/main.c);
+the diagnostic does not establish a source identity for the installed handler.
+
+Qualification PNGs above are Slint software snapshots made by the native
+application. They establish final scene equivalence, not physical panel output.
+The final integration batch additionally checks raw framebuffer captures.
