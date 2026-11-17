@@ -1,0 +1,11 @@
+{
+  "source": "https://github.com/KindleModding/sh_integration/blob/adb7ef5c570a25c76fd64e94837ae0f590bd3b9c/launcher/main.c",
+  "observations": [
+    "The handler requests a scanner full scan before forking the application.",
+    "The one-second polling sleep appears after the application has been forked and is not a one-second pre-launch delay."
+  ],
+  "limitations": [
+    "The observed native-request-to-entry interval includes native dispatch and handler work. No measurement isolates scanner cost.",
+    "No shared handler, scanner policy or CPU governor was changed."
+  ]
+}

@@ -1,0 +1,34 @@
+--- a/src/bootstrap_startup.rs
++++ b/src/bootstrap_startup.rs
+@@ -239,8 +239,9 @@
+         let attached = application.borrow().clone();
+         if attached.is_none() {
+             let Some(prepared) = self.prepared.take() else {
+-                ui.global::<State>().set_startup_stage(1);
+-                self.update_activity(ui, platform);
++                if self.update_activity(ui, platform) {
++                    ui.global::<State>().set_startup_stage(1);
++                }
+                 return Ok(false);
+             };
+             // Keep the current loading scene until the business view is ready.
+@@ -288,7 +289,7 @@
+     }
+ 
+     /// Animate resource waits without adding display work to final attachment.
+-    fn update_activity(&mut self, ui: &AppWindow, platform: &Platform) {
++    fn update_activity(&mut self, ui: &AppWindow, platform: &Platform) -> bool {
+         let now = Instant::now();
+         if now.saturating_duration_since(self.activity_at)
+             >= crate::bootstrap_presentation::ACTIVITY_INTERVAL
+@@ -299,7 +300,9 @@
+             ui.window().request_redraw();
+             platform.refresh(RefreshKind::Fast);
+             aidoku_kindle::reader_timing::mark("startup_activity_pulse");
+-        }
++            return true;
++        }
++        false
+     }
+ 
+     pub fn fail(&mut self, ui: &AppWindow, platform: &Platform) {

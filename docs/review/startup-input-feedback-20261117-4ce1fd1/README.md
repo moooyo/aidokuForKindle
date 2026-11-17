@@ -2,6 +2,12 @@
 
 Date: 2026-11-17, Asia/Shanghai.
 
+> Build-audit correction: the original candidate binaries below contained
+> diagnostic backend logging inherited from a stale Cargo dependency. Keep
+> this record as historical evidence; use the [audit and clean remeasurement](../startup-native-query-20261117-4e06926/BUILD_AUDIT.md)
+> for authoritative source identity and performance conclusions. The code
+> change is retained, and the clean comparison confirms a small improvement.
+
 The retained candidate makes a modest improvement. Across ten paired warm
 Scribe launches, median software readiness changed from **2.810 s to 2.695 s**
 and first Library SEND acceptance from **3.185 s to 3.045 s**. The candidate

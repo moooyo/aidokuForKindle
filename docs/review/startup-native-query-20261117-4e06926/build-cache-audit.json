@@ -1,0 +1,49 @@
+{
+  "issue": "Project-owned Cargo dependency artifacts were reused across copied source trees whose preserved mtimes predated the cached fingerprint. Source manifests alone did not catch a stale vendored backend.",
+  "correction": "Force-clean aidoku-kindle and slint-backend-kindle for each ARM variant; retain immutable registry dependencies. Check diagnostic literals, rebuild both control and candidate, and repeat the primary A/B.",
+  "previous_provisional_measurements_retained": true,
+  "audit": [
+    {
+      "artifact": "input_discovery",
+      "sha256": "625ca3c1148c3c9dd99e90dc6762575acac27442f55305f4f00cec2d8efca352",
+      "bytes": 53343424,
+      "contains_diagnostic_backend_logging": false
+    },
+    {
+      "artifact": "input_feedback_attempt_1",
+      "sha256": "7b369333b6374f15ec33fac63a8e0ac8ac01a01dad7449e4461d0facc7782611",
+      "bytes": 53362784,
+      "contains_diagnostic_backend_logging": true
+    },
+    {
+      "artifact": "input_feedback_attempt_2",
+      "sha256": "302f4ee788cc12c44859604a04a7642946fe800d58efe26acda266b0fa931ea0",
+      "bytes": 53362784,
+      "contains_diagnostic_backend_logging": true
+    },
+    {
+      "artifact": "input_feedback_selected",
+      "sha256": "534ef996da84356018813283c72b1aa9d2d48f87a941a42dee500a66f549e8b9",
+      "bytes": 53362784,
+      "contains_diagnostic_backend_logging": true
+    },
+    {
+      "artifact": "native_query_candidate",
+      "sha256": "3833d6ec12c2462c29278fdca5a3451e0c62d55358de39c3aed3ce1b6a3a0bb9",
+      "bytes": 53360176,
+      "contains_diagnostic_backend_logging": false
+    },
+    {
+      "artifact": "caption_experiment",
+      "sha256": "43deb8e98a254a3cd704061b91a4fe570d52030cfcd68dd834839239c1a13f69",
+      "bytes": 53360000,
+      "contains_diagnostic_backend_logging": false
+    },
+    {
+      "artifact": "render_probe_stale_attempt",
+      "sha256": "3833d6ec12c2462c29278fdca5a3451e0c62d55358de39c3aed3ce1b6a3a0bb9",
+      "bytes": 53360176,
+      "contains_diagnostic_backend_logging": false
+    }
+  ]
+}
