@@ -12,6 +12,7 @@ jobs, then package that exact output from the production source tree:
 ```sh
 python3 scripts/package-kpm.py \
   --application target/armv7-unknown-linux-musleabihf/release/aidoku \
+  --native-query-helper target/native-query/aidoku-native-query \
   --output dist/aidoku-0.1.3.kpkg
 ```
 
@@ -20,6 +21,13 @@ The numeric package version comes from `--version`, `CARGO_PKG_VERSION`, or
 `--sample-cbz PATH` includes only an operator-selected public, redistributable
 sample as `aidoku/samples/Aidoku-Sample.cbz`. Without this option, no example
 comic is installed or imported.
+
+Build the optional query helper with
+`sh scripts/build-native-query.sh target/native-query/aidoku-native-query`
+on the same Linux worker. `--native-query-helper PATH` adds that exact ARM
+hard-float executable to the program allowlist with executable permissions.
+Without it, the application retains its legacy command-line native queries.
+The helper uses compatible firmware libraries in place; none are redistributed.
 
 The gzip-compressed tar archive contains a version-2 `manifest.json`, KPM
 `install.sh`, `launch.sh`, `uninstall.sh`, an immutable `payload.tsv`, and the

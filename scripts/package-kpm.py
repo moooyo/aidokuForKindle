@@ -120,6 +120,7 @@ def main() -> None:
     parser.add_argument("--source-root", type=Path, default=REPOSITORY)
     parser.add_argument("--version", help="Override CARGO_PKG_VERSION or the package version in Cargo.toml")
     parser.add_argument("--sample-cbz", type=Path, help="Optionally include a public, redistributable sample archive")
+    parser.add_argument("--native-query-helper", type=Path, help="Include the prebuilt optional firmware-ABI query helper")
     arguments = parser.parse_args()
     if os.name == "nt" or platform.system() != "Linux":
         parser.error("Run KPM packaging on the designated Linux worker through ssh test-env")
@@ -132,13 +133,15 @@ def main() -> None:
     try:
         version = package_version(root, arguments.version)
         inputs = production_inputs(root, arguments.application)
+        if arguments.native_query_helper is not None:
+            inputs["aidoku/app/aidoku-native-query"] = arguments.native_query_helper
         if arguments.sample_cbz is not None:
             inputs["aidoku/samples/Aidoku-Sample.cbz"] = arguments.sample_cbz
         payload: dict[str, tuple[bytes, int]] = {}
         records = []
         for name, path in sorted(inputs.items()):
             checked_relative(name)
-            executable = name.endswith(".sh") or name == "aidoku/app/aidoku"
+            executable = name.endswith(".sh") or name in ("aidoku/app/aidoku", "aidoku/app/aidoku-native-query")
             content = shell_file(path) if name.endswith(".sh") else read_file(path)
             mode = 0o755 if executable else 0o644
             payload[name] = (content, mode)
@@ -146,6 +149,12 @@ def main() -> None:
         application = payload["aidoku/app/aidoku"][0]
         if len(application) < 52 or application[:7] != b"\x7fELF\x01\x01\x01" or int.from_bytes(application[18:20], "little") != 40:
             raise ValueError("The application must be a prebuilt ELF32 little-endian ARM executable")
+        if arguments.native_query_helper is not None:
+            query = payload["aidoku/app/aidoku-native-query"][0]
+            if (len(query) < 52 or query[:7] != b"\x7fELF\x01\x01\x01"
+                    or int.from_bytes(query[18:20], "little") != 40
+                    or int.from_bytes(query[36:40], "little") & 0x600 != 0x400):
+                raise ValueError("The query helper must be a prebuilt ELF32 ARM hard-float executable")
         manifest = {
             "manifest_version": 2,
             "id": "aidoku",

@@ -18,7 +18,7 @@ import zipfile
 
 
 SOURCE_FILES = ("Cargo.toml", "Cargo.lock", "build.rs", "rust-toolchain.toml", ".cargo/config.toml",
-                "scripts/native-codec-probe.c", "scripts/native-codec-bench.h")
+                "scripts/native-codec-probe.c", "scripts/native-codec-bench.h", "scripts/build-native-query.sh")
 SOURCE_DIRECTORIES = ("src", "ui", "assets", "vendor", "examples")
 SOURCE_ALGORITHM = "sha256-of-canonical-sorted-relative-file-records-v1"
 
@@ -75,26 +75,38 @@ def expected_inputs(root: Path) -> dict[str, Path]:
     return inputs
 
 
-def elf_identity(content: bytes) -> dict[str, object]:
+def elf_identity(content: bytes, *, static: bool = True) -> dict[str, object]:
     if len(content) < 52 or content[:7] != b"\x7fELF\x01\x01\x01":
         raise ValueError("The application is not ELF32 little-endian version 1")
     fields = struct.unpack_from("<HHIIIIIHHHHHH", content, 16)
     executable_type, machine = fields[:2]
     program_offset, program_size, program_count = fields[4], fields[8], fields[9]
-    if executable_type != 2 or machine != 40 or program_size < 32 or program_count < 1:
+    if executable_type not in ((2,) if static else (2, 3)) or machine != 40 or program_size < 32 or program_count < 1:
         raise ValueError("The application is not a native ARM executable with program headers")
     types = []
+    interpreters = []
     for index in range(program_count):
         offset = program_offset + index * program_size
         if offset < 0 or offset + program_size > len(content):
             raise ValueError("The ELF program header table exceeds the application")
-        types.append(struct.unpack_from("<I", content, offset)[0])
+        program = struct.unpack_from("<IIIIIIII", content, offset)
+        types.append(program[0])
+        if program[0] == 3:
+            start, size = program[1], program[4]
+            if size > 512 or start + size > len(content):
+                raise ValueError("The ELF interpreter lies outside the executable")
+            interpreters.append(content[start:start + size])
     if 1 not in types:
         raise ValueError("The application has no PT_LOAD segment")
-    if 2 in types or 3 in types:
+    if static and (2 in types or 3 in types):
         raise ValueError("The application has PT_DYNAMIC or PT_INTERP and is not static")
-    return {"class": "ELF32", "endianness": "little", "machine": "ARM", "type": "EXEC", "static": True,
-            "program_header_count": program_count}
+    if not static and (2 not in types or interpreters != [b"/lib/ld-linux-armhf.so.3\0"]
+                       or fields[6] & 0x600 != 0x400):
+        raise ValueError("The native query helper must use the firmware ARM hard-float ABI")
+    return {"class": "ELF32", "endianness": "little", "machine": "ARM",
+            "type": "EXEC" if executable_type == 2 else "PIE", "static": static,
+            "program_header_count": program_count,
+            **({} if static else {"interpreter": "/lib/ld-linux-armhf.so.3", "float_abi": "hard"})}
 
 
 def main() -> int:
@@ -106,6 +118,7 @@ def main() -> int:
     parser.add_argument("--expected-source-sha256", required=True)
     parser.add_argument("--expected-application-sha256", required=True)
     parser.add_argument("--expected-helper-sha256", required=True)
+    parser.add_argument("--expected-native-query-sha256", required=True)
     parser.add_argument("--output", type=Path, required=True)
     arguments = parser.parse_args()
     if os.name == "nt" or platform.system() != "Linux":
@@ -142,7 +155,7 @@ def main() -> int:
                 and manifest.get("source_manifest_algorithm") == stored.get("algorithm"),
                 "The package manifest binds the exact verified production source", manifest.get("source_sha256"))
         inputs = expected_inputs(root)
-        expected_names = set(inputs) | {"aidoku/app/aidoku", "aidoku/app/kindle-jpeg-worker"}
+        expected_names = set(inputs) | {"aidoku/app/aidoku", "aidoku/app/kindle-jpeg-worker", "aidoku/app/aidoku-native-query"}
         records = manifest.get("files")
         require(isinstance(records, list) and all(isinstance(item, dict) for item in records),
                 "The package manifest contains explicit file records")
@@ -163,7 +176,7 @@ def main() -> int:
                         and "\\" not in name and not info.is_dir(),
                         f"The package member has a safe runtime-free path: {name}")
                 mode = info.external_attr >> 16
-                expected_mode = 0o755 if name.endswith(".sh") or name in ("aidoku/app/aidoku", "aidoku/app/kindle-jpeg-worker") else 0o644
+                expected_mode = 0o755 if name.endswith(".sh") or name in ("aidoku/app/aidoku", "aidoku/app/kindle-jpeg-worker", "aidoku/app/aidoku-native-query") else 0o644
                 require(info.create_system == 3 and stat.S_ISREG(mode) and stat.S_IMODE(mode) == expected_mode,
                         f"The member has correct Unix file permissions: {name}", oct(mode))
                 content = archive.read(info)
@@ -184,6 +197,11 @@ def main() -> int:
             require(sha256(helper) == arguments.expected_helper_sha256,
                     "The JPEG worker matches the frozen native executable", sha256(helper))
             require(elf_identity(helper)["static"] is True, "The JPEG worker is a static ARM ELF32")
+            query_helper = archive.read("aidoku/app/aidoku-native-query")
+            require(sha256(query_helper) == arguments.expected_native_query_sha256,
+                    "The native query helper matches the frozen executable", sha256(query_helper))
+            query_identity = elf_identity(query_helper, static=False)
+            require(query_identity["static"] is False, "The query helper uses the native firmware loader", query_identity)
             license_payload = None
             license_asset = root / "assets/licenses/GPL-3.0-or-later.txt"
             if license_asset.is_file():
@@ -219,7 +237,8 @@ def main() -> int:
                        "source_file_count": before["file_count"], "application_sha256": sha256(application),
                        "member_count": len(expected_names), "elf": identity, "fonts": font_results,
                        "license_view_payload": license_payload,
-                       "scope": "Development package identity and static archive checks; UI, native lifecycle and physical-device acceptance are separate."})
+                       "native_query_sha256": sha256(query_helper), "native_query_elf": query_identity,
+                       "scope": "Development package identity and archive checks; UI, native lifecycle and physical-device acceptance are separate."})
     except Exception as error:
         report["error"] = f"{type(error).__name__}: {error}"
     report["finished_at"] = dt.datetime.now(dt.timezone.utc).isoformat()

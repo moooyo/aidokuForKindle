@@ -13,6 +13,8 @@ pub mod localization;
 pub mod native_media;
 #[cfg(all(feature = "kindle", target_os = "linux"))]
 pub mod native_presentation;
+#[cfg(all(target_os = "linux", any(test, feature = "kindle")))]
+pub(crate) mod native_query;
 pub mod pairing;
 pub mod platform;
 pub mod reader;

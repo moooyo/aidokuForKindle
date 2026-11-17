@@ -8,6 +8,7 @@ use std::{
 };
 
 use super::*;
+use crate::native_query::{Property, Session};
 
 const TRANSACTION_TIMEOUT: Duration = Duration::from_millis(1700);
 const MAX_CHAIN_MEMBERS: usize = 12;
@@ -172,10 +173,11 @@ pub(super) fn capture_startup(profile: DeviceProfile, cancelled: impl Fn() -> bo
         "Startup portrait publication follows application initialization"
     );
     let deadline = Instant::now() + TRANSACTION_TIMEOUT;
-    ensure_active(deadline, &cancelled)?;
-    let captured_mode = native_mode(&bounded_value(
-        "lipc-get-prop",
-        &["-s", "com.lab126.winmgr", "epdcMode"],
+    let mut queries = Session::try_open(deadline, &cancelled);
+    ensure_active_with(&mut queries, deadline, &cancelled)?;
+    let captured_mode = native_mode(&query_property(
+        &mut queries,
+        Property::DisplayMode,
         deadline,
         &cancelled,
     )?)?;
@@ -185,12 +187,7 @@ pub(super) fn capture_startup(profile: DeviceProfile, cancelled: impl Fn() -> bo
     let automatic = slint_backend_kindle::observe_native_portrait_sensor()?.is_some();
     let direction = if automatic {
         native_direction(
-            &bounded_value(
-                "lipc-get-prop",
-                &["com.lab126.winmgr", "accelerometer"],
-                deadline,
-                &cancelled,
-            )?,
+            &query_property(&mut queries, Property::Portrait, deadline, &cancelled)?,
             profile,
         )?
     } else {
@@ -203,12 +200,7 @@ pub(super) fn capture_startup(profile: DeviceProfile, cancelled: impl Fn() -> bo
     );
     if automatic {
         let repeated = native_direction(
-            &bounded_value(
-                "lipc-get-prop",
-                &["com.lab126.winmgr", "accelerometer"],
-                deadline,
-                &cancelled,
-            )?,
+            &query_property(&mut queries, Property::Portrait, deadline, &cancelled)?,
             profile,
         )?;
         ensure!(
@@ -216,9 +208,9 @@ pub(super) fn capture_startup(profile: DeviceProfile, cancelled: impl Fn() -> bo
             "The native WM portrait direction changed during calibration"
         );
     }
-    let repeated_mode = native_mode(&bounded_value(
-        "lipc-get-prop",
-        &["-s", "com.lab126.winmgr", "epdcMode"],
+    let repeated_mode = native_mode(&query_property(
+        &mut queries,
+        Property::DisplayMode,
         deadline,
         &cancelled,
     )?)?;
@@ -226,7 +218,10 @@ pub(super) fn capture_startup(profile: DeviceProfile, cancelled: impl Fn() -> bo
         captured_mode == repeated_mode,
         "The native display mode changed during calibration"
     );
-    ensure_active(deadline, &cancelled)?;
+    ensure_active_with(&mut queries, deadline, &cancelled)?;
+    if let Some(session) = queries.take() {
+        session.finish(deadline, &cancelled)?;
+    }
     ensure!(
         !cancelled() && Instant::now() < deadline,
         "The native portrait transaction expired"
@@ -368,6 +363,35 @@ fn ensure_active(deadline: Instant, cancelled: &impl Fn() -> bool) -> Result<()>
         "Native screen-saver dismissal or unlock is incomplete"
     );
     Ok(())
+}
+
+fn ensure_active_with(
+    session: &mut Option<Session>,
+    deadline: Instant,
+    cancelled: &impl Fn() -> bool,
+) -> Result<()> {
+    ensure!(
+        query_property(session, Property::PowerState, deadline, cancelled)? == "active",
+        "Native screen-saver dismissal or unlock is incomplete"
+    );
+    Ok(())
+}
+
+fn query_property(
+    session: &mut Option<Session>,
+    property: Property,
+    deadline: Instant,
+    cancelled: &impl Fn() -> bool,
+) -> Result<String> {
+    match session {
+        Some(session) => session.query(property, deadline, cancelled),
+        None => bounded_value(
+            "lipc-get-prop",
+            property.legacy_arguments(),
+            deadline,
+            cancelled,
+        ),
+    }
 }
 
 struct QueryChild(Child);

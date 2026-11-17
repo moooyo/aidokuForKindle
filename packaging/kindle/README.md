@@ -4,6 +4,14 @@ This is an independent Rust/Slint application for jailbroken Kindle devices.
 It does not require the WeRead application, a WeRead account, or a KOReader plugin.
 The binary uses an isolated Aidoku data directory and a native framebuffer/input backend.
 
+The optional `aidoku-native-query` helper reads a fixed set of firmware LIPC
+properties through one connection per bounded transaction. It uses the native
+ARM hard-float glibc loader; firmware libraries are not included in the bundle.
+The application and JPEG worker remain static. Missing helpers, unsupported
+firmware ABIs or unavailable initial connections retain the command-line query
+path. A malformed connected portrait transaction still fails without publishing
+calibration. Fresh state checks, deadlines and display ownership are retained.
+
 The 2026-11-15 display-preset candidate adds Fast, Normal, High Quality and
 Kindle settings. Normal uses REAGL with periodic GC16 clearing; High Quality
 clears every page; Fast keeps a monochrome page after one quick update and

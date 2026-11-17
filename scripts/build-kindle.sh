@@ -19,6 +19,8 @@ command -v zig >/dev/null 2>&1 || { printf '%s\n' 'Zig is required; add it to PA
 export CARGO_TARGET_DIR CARGO_BUILD_JOBS
 cd "$REPO_ROOT"
 cargo zigbuild --locked --release --no-default-features --features kindle --target "$TARGET"
+NATIVE_QUERY_HELPER=$CARGO_TARGET_DIR/native-query/aidoku-native-query
+sh "$SCRIPT_DIR/build-native-query.sh" "$NATIVE_QUERY_HELPER"
 
 mkdir -p "$STAGING_ROOT/aidoku/app" "$STAGING_ROOT/aidoku/assets" \
     "$STAGING_ROOT/aidoku/licenses/launcher" "$STAGING_ROOT/aidoku/licenses/backend" \
@@ -28,6 +30,7 @@ mkdir -p "$STAGING_ROOT/aidoku/app" "$STAGING_ROOT/aidoku/assets" \
     "$STAGING_ROOT/extensions/aidoku" "$STAGING_ROOT/documents"
 install -m 755 "$CARGO_TARGET_DIR/$TARGET/release/aidoku" "$STAGING_ROOT/aidoku/app/aidoku"
 install -m 755 "$CARGO_TARGET_DIR/$TARGET/release/kindle-jpeg-worker" "$STAGING_ROOT/aidoku/app/kindle-jpeg-worker"
+install -m 755 "$NATIVE_QUERY_HELPER" "$STAGING_ROOT/aidoku/app/aidoku-native-query"
 install -m 755 packaging/kindle/launch.sh "$STAGING_ROOT/aidoku/launch.sh"
 install -m 644 assets/launcher/aidoku-cover.png "$STAGING_ROOT/aidoku/assets/aidoku-cover.png"
 install -m 644 assets/launcher/aidoku-cover-v2.png "$STAGING_ROOT/aidoku/assets/aidoku-cover-v2.png"

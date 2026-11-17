@@ -66,6 +66,10 @@ def main() -> None:
     helper_header = helper.read_bytes()[:20] if helper.is_file() else b""
     if len(helper_header) != 20 or helper_header[:6] != b"\x7fELF\x01\x01" or int.from_bytes(helper_header[18:20], "little") != 40:
         parser.error("The staging directory must contain the native JPEG worker")
+    query = staging / "aidoku/app/aidoku-native-query"
+    query_header = query.read_bytes()[:20] if query.is_file() else b""
+    if len(query_header) != 20 or query_header[:6] != b"\x7fELF\x01\x01" or int.from_bytes(query_header[18:20], "little") != 40:
+        parser.error("The staging directory must contain the native query helper")
     output = arguments.output.resolve()
     output.parent.mkdir(parents=True, exist_ok=True)
     manifest = []
@@ -77,7 +81,7 @@ def main() -> None:
             if path.is_symlink() or "data" in path.relative_to(staging).parts:
                 raise ValueError(f"Runtime state or a symlink is not a package input: {relative}")
             content = path.read_bytes()
-            executable_file = path.suffix == ".sh" or relative in ("aidoku/app/aidoku", "aidoku/app/kindle-jpeg-worker")
+            executable_file = path.suffix == ".sh" or relative in ("aidoku/app/aidoku", "aidoku/app/kindle-jpeg-worker", "aidoku/app/aidoku-native-query")
             info = zipfile.ZipInfo(relative, date_time=(2026, 11, 4, 0, 0, 0))
             info.create_system = 3
             info.compress_type = zipfile.ZIP_DEFLATED

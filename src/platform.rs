@@ -1662,15 +1662,47 @@ fn set_power_property(_property: &str, _value: u8) -> Result<()> {
 
 #[cfg(all(feature = "kindle", target_os = "linux"))]
 fn native_status(preferences: &Preferences) -> DeviceStatus {
-    let property = |name| {
-        command("lipc-get-prop", &["com.lab126.powerd", name])
+    let mut session = crate::native_query::Session::try_open(
+        Instant::now() + Duration::from_millis(250),
+        &|| false,
+    );
+    let observed = native_status_with(preferences, &mut session);
+    if let Some(session) = session {
+        if session
+            .finish(Instant::now() + Duration::from_millis(100), &|| false)
+            .is_err()
+        {
+            // A broken transport cannot publish a partially trusted snapshot.
+            // Retry the whole optional UI observation through the legacy path.
+            return native_status_with(preferences, &mut None);
+        }
+    }
+    observed
+}
+
+#[cfg(all(feature = "kindle", target_os = "linux"))]
+fn native_status_with(
+    preferences: &Preferences,
+    session: &mut Option<crate::native_query::Session>,
+) -> DeviceStatus {
+    use crate::native_query::Property;
+    let mut read = |property: Property| match session.as_mut() {
+        Some(session) => session.query(
+            property,
+            Instant::now() + Duration::from_millis(700),
+            &|| false,
+        ),
+        None => command("lipc-get-prop", property.legacy_arguments()),
+    };
+    let time = command("date", &["+%H:%M"]).unwrap_or_else(|_| "--:--".into());
+    let wifi = read(Property::WifiState)
+        .map(|value| value.trim().eq_ignore_ascii_case("connected"))
+        .unwrap_or(false);
+    let mut property = |property| {
+        read(property)
             .ok()
             .and_then(|value| value.parse::<u8>().ok())
     };
-    let time = command("date", &["+%H:%M"]).unwrap_or_else(|_| "--:--".into());
-    let wifi = command("lipc-get-prop", &["com.lab126.wifid", "cmState"])
-        .map(|value| value.trim().eq_ignore_ascii_case("connected"))
-        .unwrap_or(false);
     let mut filesystem = std::mem::MaybeUninit::<libc::statvfs>::uninit();
     // SAFETY: the C string is terminated and statvfs writes only to this buffer.
     let free_bytes = if unsafe { libc::statvfs(c"/mnt/us".as_ptr(), filesystem.as_mut_ptr()) } == 0
@@ -1683,13 +1715,13 @@ fn native_status(preferences: &Preferences) -> DeviceStatus {
     };
     DeviceStatus {
         time,
-        battery: property("battLevel").unwrap_or(0).min(100),
+        battery: property(Property::Battery).unwrap_or(0).min(100),
         wifi,
-        charging: property("isCharging").unwrap_or(0) != 0,
-        brightness: property("flIntensity")
+        charging: property(Property::Charging).unwrap_or(0) != 0,
+        brightness: property(Property::Brightness)
             .unwrap_or(preferences.brightness)
             .min(24),
-        warmth: property("currentAmberLevel")
+        warmth: property(Property::Warmth)
             .unwrap_or(preferences.warmth)
             .min(24),
         free_bytes,

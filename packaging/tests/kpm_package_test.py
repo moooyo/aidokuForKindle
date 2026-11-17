@@ -38,7 +38,8 @@ class KpmPackageTests(unittest.TestCase):
         self.sample.write_bytes(b"Public packaging fixture bytes; never opened as a comic.\n")
 
     def package(self, name: str, *, sample: bool = False, version: str | None = "2.3.4",
-                environment: dict[str, str] | None = None) -> tuple[Path, subprocess.CompletedProcess[str]]:
+                environment: dict[str, str] | None = None,
+                query_helper: Path | None = None) -> tuple[Path, subprocess.CompletedProcess[str]]:
         output = self.root / name
         command = [sys.executable, str(BUILDER), "--application", str(self.application),
                    "--source-root", str(REPOSITORY), "--output", str(output)]
@@ -46,11 +47,34 @@ class KpmPackageTests(unittest.TestCase):
             command.extend(("--version", version))
         if sample:
             command.extend(("--sample-cbz", str(self.sample)))
+        if query_helper is not None:
+            command.extend(("--native-query-helper", str(query_helper)))
         result = subprocess.run(command, env=environment, capture_output=True, text=True, timeout=30)
         return output, result
 
     def require_success(self, result: subprocess.CompletedProcess[str]) -> None:
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+
+    def test_native_query_helper_is_explicit_hashed_and_executable(self) -> None:
+        helper = self.root / "query-helper"
+        content = bytearray(self.application.read_bytes())
+        content[36:40] = (0x5000400).to_bytes(4, "little")
+        helper.write_bytes(content)
+        output, result = self.package("with-query.kpkg", query_helper=helper)
+        self.require_success(result)
+        with tarfile.open(output, "r:gz") as archive:
+            member = archive.getmember("payload/aidoku/app/aidoku-native-query")
+            self.assertEqual(member.mode, 0o755)
+            self.assertEqual(archive.extractfile(member).read(), content)
+            allowlist = archive.extractfile("payload.tsv").read().decode("ascii")
+            self.assertIn(f"{sha256(content)}|{len(content)}|755|aidoku/app/aidoku-native-query\n", allowlist)
+
+    def test_native_query_helper_rejects_an_incompatible_float_abi(self) -> None:
+        helper = self.root / "soft-helper"
+        helper.write_bytes(self.application.read_bytes())
+        _, result = self.package("bad-query.kpkg", query_helper=helper)
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("hard-float", result.stderr)
 
     def test_archive_has_kpm_metadata_and_a_complete_program_allowlist(self) -> None:
         output, result = self.package("aidoku.tar.gz", sample=True)
