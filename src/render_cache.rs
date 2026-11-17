@@ -803,6 +803,21 @@ pub fn render(
     )
 }
 
+/// A cached local cover proves its current source checksum and rendering key.
+/// Decode the full source for validation only on a derivative miss; warm hits
+/// still hash mutable source bytes and validate the bounded processed image.
+pub(crate) fn render_local_cover(
+    cache: &CacheManager,
+    page: &Page,
+    raw: &Path,
+    options: &ImageOptions,
+) -> Result<RenderedPage> {
+    render_with_source(cache, page, raw, options, false, 0, 1.0, |path| {
+        cache.validate_path(path)?;
+        read_source(path)
+    })
+}
+
 /// Prepare the Reader's BiliComics Raster in memory. The canonical source and a
 /// proof tied to its decoded bytes accompany the frame; no processed PNG is
 /// encoded, inflated again or committed before display.
@@ -1794,6 +1809,81 @@ mod tests {
     }
 
     #[test]
+    fn a_reopened_local_cover_cache_validates_current_bytes_without_decoding_the_source() {
+        let mut fixture = Fixture::new(artwork());
+        fixture.page.url.clear();
+        let cold =
+            render_local_cover(&fixture.cache, &fixture.page, &fixture.raw, &options()).unwrap();
+        assert!(!cold.cache_hit);
+        assert_eq!(fixture.cache.stats().external_validations, 1);
+        clear_memory(&fixture.cache);
+
+        // A separate namespace models a new process with no retained validation
+        // or decoded-image memo, while retaining the existing durable derivative.
+        let directory = fixture.directory.path().join("reopened");
+        let root = directory.join("cache/shared-v1");
+        let relative = cold
+            .cache_path
+            .strip_prefix(fixture.cache.namespace())
+            .unwrap();
+        let copy = root.join(relative);
+        fs::create_dir_all(copy.parent().unwrap()).unwrap();
+        fs::copy(&cold.cache_path, &copy).unwrap();
+        fs::copy(
+            fixture.cache.namespace().join("index.sqlite3"),
+            root.join("index.sqlite3"),
+        )
+        .unwrap();
+        let reopened = CacheManager::open_with_config(
+            &directory,
+            CacheConfig {
+                max_unpinned_bytes: 128 * 1024 * 1024,
+                min_free_bytes: 0,
+            },
+        )
+        .unwrap();
+        let warm = render_local_cover(&reopened, &fixture.page, &fixture.raw, &options()).unwrap();
+        assert!(warm.cache_hit && !warm.memory_hit);
+        assert_eq!(warm.image, cold.image);
+        assert_eq!(reopened.stats().external_validations, 0);
+        assert!(reopened.stats().checksum_bytes >= fs::metadata(&fixture.raw).unwrap().len());
+
+        clear_memory(&reopened);
+        fs::write(&warm.cache_path, b"corrupt derivative").unwrap();
+        let repaired =
+            render_local_cover(&reopened, &fixture.page, &fixture.raw, &options()).unwrap();
+        assert!(!repaired.cache_hit);
+        assert_eq!(repaired.image, cold.image);
+        assert_eq!(reopened.stats().external_validations, 1);
+        clear_memory(&reopened);
+    }
+
+    #[test]
+    fn local_cover_cache_cannot_hide_a_changed_missing_or_malformed_source() {
+        let mut fixture = Fixture::new(artwork());
+        fixture.page.url.clear();
+        let _ =
+            render_local_cover(&fixture.cache, &fixture.page, &fixture.raw, &options()).unwrap();
+        let modified = fs::metadata(&fixture.raw).unwrap().modified().unwrap();
+        let mut bytes = fs::read(&fixture.raw).unwrap();
+        bytes[0] = 0;
+        fs::write(&fixture.raw, bytes).unwrap();
+        OpenOptions::new()
+            .write(true)
+            .open(&fixture.raw)
+            .unwrap()
+            .set_times(fs::FileTimes::new().set_modified(modified))
+            .unwrap();
+        assert!(
+            render_local_cover(&fixture.cache, &fixture.page, &fixture.raw, &options()).is_err()
+        );
+        fs::remove_file(&fixture.raw).unwrap();
+        assert!(
+            render_local_cover(&fixture.cache, &fixture.page, &fixture.raw, &options()).is_err()
+        );
+    }
+
+    #[test]
     fn spatial_dither_switches_separate_prefetched_resident_and_disk_pixels() {
         use crate::imaging::SpatialDither;
         let fixture = Fixture::new(GrayImage::from_fn(96, 144, |x, y| {
@@ -1801,29 +1891,73 @@ mod tests {
         }));
         let input = fs::read(&fixture.raw).unwrap();
         let mut outputs = Vec::new();
-        for algorithm in [SpatialDither::Off, SpatialDither::Bayer8, SpatialDither::FloydSteinberg] {
+        for algorithm in [
+            SpatialDither::Off,
+            SpatialDither::Bayer8,
+            SpatialDither::FloydSteinberg,
+        ] {
             let options = ImageOptions {
                 dither: true,
                 spatial_dither: Some(algorithm),
                 ..options()
             };
             let expected = imaging::decode_reader_raster(&input, &options).unwrap();
-            let prefetched = prefetch_raster(&fixture.cache, &fixture.page, &fixture.raw,
-                &options, false, 0, 1.0).unwrap();
-            let foreground = render_raster(&fixture.cache, &fixture.page, &fixture.raw,
-                &options, false, 0, 1.0).unwrap();
+            let prefetched = prefetch_raster(
+                &fixture.cache,
+                &fixture.page,
+                &fixture.raw,
+                &options,
+                false,
+                0,
+                1.0,
+            )
+            .unwrap();
+            let foreground = render_raster(
+                &fixture.cache,
+                &fixture.page,
+                &fixture.raw,
+                &options,
+                false,
+                0,
+                1.0,
+            )
+            .unwrap();
             assert_eq!(*foreground.image, expected);
             assert!(Arc::ptr_eq(&foreground.image, &prefetched.image));
-            let disk = render(&fixture.cache, &fixture.page, &fixture.raw,
-                &options, false, 0, 1.0).unwrap();
-            fixture.cache.set_alias("spatial-choice", &disk.cache_path).unwrap();
+            let disk = render(
+                &fixture.cache,
+                &fixture.page,
+                &fixture.raw,
+                &options,
+                false,
+                0,
+                1.0,
+            )
+            .unwrap();
+            fixture
+                .cache
+                .set_alias("spatial-choice", &disk.cache_path)
+                .unwrap();
             clear_memory(&fixture.cache);
-            let loaded = load_alias(&fixture.cache, "spatial-choice", &options).unwrap().unwrap();
+            let loaded = load_alias(&fixture.cache, "spatial-choice", &options)
+                .unwrap()
+                .unwrap();
             assert_eq!(*loaded.image, expected);
-            for other in [SpatialDither::Off, SpatialDither::Bayer8, SpatialDither::FloydSteinberg] {
+            for other in [
+                SpatialDither::Off,
+                SpatialDither::Bayer8,
+                SpatialDither::FloydSteinberg,
+            ] {
                 if other != algorithm {
-                    let other_options = ImageOptions { spatial_dither: Some(other), ..options.clone() };
-                    assert!(load_alias(&fixture.cache, "spatial-choice", &other_options).unwrap().is_none());
+                    let other_options = ImageOptions {
+                        spatial_dither: Some(other),
+                        ..options.clone()
+                    };
+                    assert!(
+                        load_alias(&fixture.cache, "spatial-choice", &other_options)
+                            .unwrap()
+                            .is_none()
+                    );
                 }
             }
             outputs.push((options, disk.cache_path, expected));
@@ -1834,8 +1968,16 @@ mod tests {
                 assert_ne!(outputs[first].2, outputs[second].2);
             }
             let (options, _, expected) = &outputs[first];
-            let returned = render_raster(&fixture.cache, &fixture.page, &fixture.raw,
-                options, false, 0, 1.0).unwrap();
+            let returned = render_raster(
+                &fixture.cache,
+                &fixture.page,
+                &fixture.raw,
+                options,
+                false,
+                0,
+                1.0,
+            )
+            .unwrap();
             assert_eq!(returned.image.as_ref(), expected);
         }
     }

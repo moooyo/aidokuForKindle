@@ -469,15 +469,17 @@ fn prepare_cover_pixels(
             .then(|| PathBuf::from(&book.cover))
     });
     let rendered = if let Some(path) = local {
+        let raw = fs::canonicalize(&path).context("Resolve the local cover image")?;
         let request = Page {
             local_path: Some(path),
             ..Page::default()
         };
-        let raw = cache
-            .lookup_raw(&request)?
-            .context("The local cover image is unavailable")?;
-        crate::reader_timing::mark("cover_local_raw_validated");
-        let rendered = crate::render_cache::render(cache, &request, &raw, &options, false, 0, 1.0)?;
+        let rendered = crate::render_cache::render_local_cover(cache, &request, &raw, &options)?;
+        crate::reader_timing::mark(if rendered.cache_hit {
+            "cover_local_derivative_reused"
+        } else {
+            "cover_local_derivative_prepared"
+        });
         manager
             .network_control()
             .check_epoch(manager.network_epoch())?;

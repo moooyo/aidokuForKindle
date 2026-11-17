@@ -14,7 +14,7 @@ source variants; production binaries must not contain diagnostic-only logging.
 | 0 | Merge and deploy the verified native-query version; establish consistent installed/runtime and complete-screen timing | Main merged and pushed; verified installation completed; frame/cover instrumentation in progress |
 | 1 | Overlap preparation with the initial full-frame completion wait while preserving input and display ownership | Retained after five A/B rounds; first Library median improved by 109 ms, software ready by 228 ms |
 | 2 | Profile and optimize first Library rendering | Retained after five A/B rounds; first Library improved by 134 ms, covers settled by 286 ms |
-| 3 | Measure and optimize the cover-loading tail | In progress; repeated local source decoding dominates warm cover loading |
+| 3 | Measure and optimize the cover-loading tail | Source-validated derivative reuse retained: 2.466 s saved; evaluating completion/publication scheduling next |
 | 4 | Consolidate or reschedule the optional sleep-cover capability observation | Pending |
 | 5 | Reduce lighting-application process overhead | Pending |
 | 6 | Evaluate shared Scriptlet dispatch independently; preserve global scanner and recent-item semantics | Pending |
@@ -113,3 +113,33 @@ is the next optimization target; source-byte identity checks must be preserved.
 Evidence: [all A/B observations](step2-render-priority.json),
 [host verification](step2-host-verification.json). Application SHA-256:
 `f71846b0e233483f1efa06306739b2e8459a9de714f7842f2ec4e09ea52295e7`.
+
+## Item 3: reuse proven local cover derivatives
+
+Batch `step3-cover-cache-6dca06d2` compared item 2 with source-validated local
+derivative reuse. The source remains required, bounded, and freshly hashed.
+A derivative hit must match those bytes and the complete rendering key; its
+processed PNG is validated. Full original-image codec validation moves to the
+cache-miss branch. Cold rendering retains the previous validation, byte-proof,
+resource limits, and decode behavior. Network covers are unchanged.
+
+| Endpoint from native launch request | Previous median | Candidate median | Saved |
+| --- | ---: | ---: | ---: |
+| First Library accepted frame | 2.523 s | 2.525 s | -2 ms (no established change) |
+| Visible-cover settled accepted frame | 5.861 s | 3.395 s | **2.466 s** |
+
+All five complete-cover pairs improved. A representative six-cover run fell
+from 2.833 s of worker preparation to 257 ms, with all six derivatives reused.
+All seven visible image slots loaded, with no failures. Both separate native
+captures match pixel-for-pixel outside the live status bar. Fourteen cover
+tests and 44 render-cache tests passed (one existing ignored benchmark).
+New regressions cover a reopened cache, missing/malformed/changed source bytes,
+and corrupt derivative rebuilding. Both desktop profiles and keyboard replays
+remained pixel-identical; slow startup and cancellation checks passed.
+
+Evidence: [five A/B pairs and all warmups](step3-cover-cache.json),
+[host checks](step3-host-verification.json), and
+[native qualification](step3-native-qualification.json). All fourteen device
+launches completed and the owned state and lease were restored/released.
+Application SHA-256:
+`817023e92ac245872ebd88482e8db273fe173bcd3f0d9270eb5f91ed7f0e7aa0`.
