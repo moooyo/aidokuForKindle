@@ -1087,12 +1087,12 @@ impl Platform {
         let brightness = preferences.brightness.min(24);
         let warmth = preferences.warmth.min(24);
         let previous = self.applied_lighting.get();
-        if self.profile.has_frontlight() && previous.map(|value| value.0) != Some(brightness) {
-            set_power_property("flIntensity", brightness)?;
-        }
-        if self.profile.has_warmth() && previous.map(|value| value.1) != Some(warmth) {
-            set_power_property("currentAmberLevel", warmth)?;
-        }
+        set_lighting(
+            (self.profile.has_frontlight() && previous.map(|value| value.0) != Some(brightness))
+                .then_some(brightness),
+            (self.profile.has_warmth() && previous.map(|value| value.1) != Some(warmth))
+                .then_some(warmth),
+        )?;
         self.applied_lighting.set(Some((brightness, warmth)));
         Ok(())
     }
@@ -1705,17 +1705,60 @@ fn read_available_device_output(
 }
 
 #[cfg(all(feature = "kindle", target_os = "linux"))]
-fn set_power_property(property: &str, value: u8) -> Result<()> {
-    command(
-        "lipc-set-prop",
-        &["-i", "com.lab126.powerd", property, &value.to_string()],
-    )
-    .map(|_| ())
+fn set_lighting(brightness: Option<u8>, warmth: Option<u8>) -> Result<()> {
+    if brightness.is_none() && warmth.is_none() {
+        return Ok(());
+    }
+    crate::reader_timing::mark("native_lighting_started");
+    let helper = crate::native_query::helper_path();
+    let result = lighting_commands(
+        helper.as_deref().and_then(std::path::Path::to_str),
+        brightness,
+        warmth,
+        command,
+    );
+    crate::reader_timing::mark("native_lighting_finished");
+    result
 }
 
 #[cfg(not(all(feature = "kindle", target_os = "linux")))]
-fn set_power_property(_property: &str, _value: u8) -> Result<()> {
+fn set_lighting(_brightness: Option<u8>, _warmth: Option<u8>) -> Result<()> {
     bail!("Native power services are unavailable in this build")
+}
+
+#[cfg(any(test, all(feature = "kindle", target_os = "linux")))]
+fn lighting_commands(
+    helper: Option<&str>,
+    brightness: Option<u8>,
+    warmth: Option<u8>,
+    mut invoke: impl FnMut(&str, &[&str]) -> Result<String>,
+) -> Result<()> {
+    if brightness.is_none() && warmth.is_none() {
+        return Ok(());
+    }
+    let value = |value: Option<u8>| value.map_or_else(|| "-".to_owned(), |value| value.to_string());
+    if let Some(helper) = helper
+        && invoke(
+            helper,
+            &["--apply-lighting", &value(brightness), &value(warmth)],
+        )
+        .is_ok_and(|reply| reply == "APPLIED")
+    {
+        crate::reader_timing::mark("native_lighting_helper_applied");
+        return Ok(());
+    }
+    // Both operations are idempotent assignments. Reapplying the requested
+    // values also recovers a helper that stopped after only the first setter.
+    for (property, value) in [("flIntensity", brightness), ("currentAmberLevel", warmth)] {
+        if let Some(value) = value {
+            invoke(
+                "lipc-set-prop",
+                &["-i", "com.lab126.powerd", property, &value.to_string()],
+            )?;
+        }
+    }
+    crate::reader_timing::mark("native_lighting_legacy_applied");
+    Ok(())
 }
 
 #[cfg(all(feature = "kindle", target_os = "linux"))]
@@ -1794,6 +1837,80 @@ fn native_status(_preferences: &Preferences) -> DeviceStatus {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn lighting_batches_only_changed_supported_values() {
+        let mut calls = Vec::new();
+        for (brightness, warmth) in [(Some(0), Some(24)), (Some(7), None), (None, None)] {
+            lighting_commands(Some("helper"), brightness, warmth, |program, arguments| {
+                calls.push((
+                    program.to_owned(),
+                    arguments
+                        .iter()
+                        .map(|value| value.to_string())
+                        .collect::<Vec<_>>(),
+                ));
+                Ok("APPLIED".into())
+            })
+            .unwrap();
+        }
+        assert_eq!(calls.len(), 2);
+        assert_eq!(
+            calls[0],
+            (
+                "helper".into(),
+                vec!["--apply-lighting".into(), "0".into(), "24".into()]
+            )
+        );
+        assert_eq!(calls[1].1, ["--apply-lighting", "7", "-"]);
+    }
+
+    #[test]
+    fn partial_failed_or_old_lighting_helpers_reapply_the_exact_idempotent_values() {
+        for failure in [true, false] {
+            let mut calls = Vec::new();
+            lighting_commands(Some("helper"), Some(4), Some(6), |program, arguments| {
+                calls.push((
+                    program.to_owned(),
+                    arguments
+                        .iter()
+                        .map(|value| value.to_string())
+                        .collect::<Vec<_>>(),
+                ));
+                if program == "helper" && failure {
+                    bail!("The helper stopped after its first assignment");
+                }
+                Ok("unsupported acknowledgement".into())
+            })
+            .unwrap();
+            assert_eq!(calls.len(), 3);
+            assert_eq!(
+                calls[1],
+                (
+                    "lipc-set-prop".into(),
+                    vec![
+                        "-i".into(),
+                        "com.lab126.powerd".into(),
+                        "flIntensity".into(),
+                        "4".into()
+                    ]
+                )
+            );
+            assert_eq!(
+                calls[2].1,
+                ["-i", "com.lab126.powerd", "currentAmberLevel", "6"]
+            );
+        }
+        assert!(
+            lighting_commands(None, Some(4), Some(6), |_, args| {
+                if args[2] == "currentAmberLevel" {
+                    bail!("The native setter failed");
+                }
+                Ok(String::new())
+            })
+            .is_err()
+        );
+    }
 
     #[test]
     fn fast_pages_skip_periodic_clearing_but_keep_explicit_full_refresh() {

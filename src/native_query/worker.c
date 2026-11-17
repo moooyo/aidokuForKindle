@@ -1,4 +1,4 @@
-/* Read-only LIPC bridge for the firmware's native C ABI.
+/* Fixed LIPC sessions and lighting operations for the firmware's native C ABI.
  *
  * The static musl application cannot load the firmware's glibc libraries.
  * This small, separately linked process retains one LIPC handle per bounded
@@ -25,6 +25,7 @@ struct lipc_api {
     void (*close)(LipcHandle *);
     int (*get_string)(LipcHandle *, const char *, const char *, char **);
     int (*get_int)(LipcHandle *, const char *, const char *, int *);
+    int (*set_int)(LipcHandle *, const char *, const char *, int);
     void (*free_string)(char *);
 };
 
@@ -83,6 +84,8 @@ static void *load_api(struct lipc_api *api) {
         dlsym(library, "LipcGetStringProperty");
     api->get_int = (int (*)(LipcHandle *, const char *, const char *, int *))
         dlsym(library, "LipcGetIntProperty");
+    api->set_int = (int (*)(LipcHandle *, const char *, const char *, int))
+        dlsym(library, "LipcSetIntProperty");
     api->free_string = (void (*)(char *))dlsym(library, "LipcFreeString");
     if (!api->open || !api->close || !api->get_string || !api->get_int || !api->free_string) {
         dlclose(library);
@@ -91,9 +94,26 @@ static void *load_api(struct lipc_api *api) {
     return library;
 }
 
+static int lighting_value(const char *text, int *value) {
+    if (strcmp(text, "-") == 0) { *value = -1; return 1; }
+    size_t length = strlen(text);
+    if (length == 0 || length > 2) return 0;
+    int result = 0;
+    for (size_t index = 0; index < length; index++) {
+        if (text[index] < '0' || text[index] > '9') return 0;
+        result = result * 10 + text[index] - '0';
+    }
+    if (result > 24) return 0;
+    *value = result;
+    return 1;
+}
+
 int main(int argc, char **argv) {
     int startup = argc == 2 && strcmp(argv[1], "--startup-session") == 0;
-    if (!startup && (argc != 2 || strcmp(argv[1], "--session") != 0)) return 64;
+    int lighting = argc == 4 && strcmp(argv[1], "--apply-lighting") == 0;
+    int brightness = -1, warmth = -1;
+    if (!startup && !lighting && (argc != 2 || strcmp(argv[1], "--session") != 0)) return 64;
+    if (lighting && (!lighting_value(argv[2], &brightness) || !lighting_value(argv[3], &warmth))) return 64;
     pid_t parent = getppid();
     if (parent <= 1 || prctl(PR_SET_PDEATHSIG, SIGKILL) != 0 || getppid() != parent)
         return 70;
@@ -103,10 +123,22 @@ int main(int argc, char **argv) {
     struct lipc_api api = {0};
     void *library = load_api(&api);
     if (library == NULL) return 69;
+    if (lighting && api.set_int == NULL) { dlclose(library); return 69; }
     LipcHandle *handle = api.open();
     if (handle == NULL) {
         dlclose(library);
         return 69;
+    }
+    if (lighting) {
+        int status = 0;
+        if (brightness >= 0)
+            status = api.set_int(handle, "com.lab126.powerd", "flIntensity", brightness);
+        if (status == 0 && warmth >= 0)
+            status = api.set_int(handle, "com.lab126.powerd", "currentAmberLevel", warmth);
+        if (status == 0) status = write_all("APPLIED\n", 8);
+        api.close(handle);
+        dlclose(library);
+        return status == 0 ? 0 : 74;
     }
     int result = 0;
     /* The original command keeps AQ1 and its eight read-only opcodes. Only

@@ -14,6 +14,10 @@ calibration. Fresh state checks, deadlines and display ownership are retained.
 The startup-only `AQ2` session adds the optional sleep-module observation to
 the existing portrait transaction. Ordinary `AQ1` sessions remain compatible;
 older helpers use the bounded CLI observation before portrait publication.
+The separate `--apply-lighting` command assigns only the requested brightness
+and warmth values (0-24) through one handle. It cannot change arbitrary native
+properties. Unsupported or failed commands reapply those idempotent values with
+the existing bounded CLI setters; success is cached only after both complete.
 
 The 2026-11-15 display-preset candidate adds Fast, Normal, High Quality and
 Kindle settings. Normal uses REAGL with periodic GC16 clearing; High Quality

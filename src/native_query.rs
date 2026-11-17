@@ -1,4 +1,4 @@
-//! Bounded transport to an optional firmware-ABI, read-only LIPC helper.
+//! Bounded read-only sessions with the optional firmware-ABI LIPC helper.
 //!
 //! An unavailable helper falls back before any query is sent. Once connected,
 //! malformed or incomplete replies poison the session; they are never retried
@@ -8,7 +8,7 @@ use std::{
     fs::File,
     io::{self, Read, Write},
     os::fd::AsRawFd,
-    path::Path,
+    path::{Path, PathBuf},
     process::{Child, ChildStdin, ChildStdout, Command, Stdio},
     time::{Duration, Instant},
 };
@@ -57,6 +57,15 @@ pub(crate) struct Session {
     startup: bool,
 }
 
+pub(crate) fn helper_path() -> Option<PathBuf> {
+    if !system_abi_supported() {
+        return None;
+    }
+    let application = std::env::current_exe().ok()?;
+    let helper = application.parent()?.join("aidoku-native-query");
+    helper.is_file().then_some(helper)
+}
+
 impl Session {
     pub(crate) fn supports_sleep_modules(&self) -> bool {
         self.startup
@@ -66,14 +75,10 @@ impl Session {
         deadline: Instant,
         cancelled: &impl Fn() -> bool,
     ) -> Option<Self> {
-        if cancelled() || Instant::now() >= deadline || !system_abi_supported() {
+        if cancelled() || Instant::now() >= deadline {
             return None;
         }
-        let application = std::env::current_exe().ok()?;
-        let helper = application.parent()?.join("aidoku-native-query");
-        if !helper.is_file() {
-            return None;
-        }
+        let helper = helper_path()?;
         Self::open_startup_at(&helper, deadline, cancelled).ok()
     }
 
@@ -98,14 +103,10 @@ impl Session {
     }
 
     pub(crate) fn try_open(deadline: Instant, cancelled: &impl Fn() -> bool) -> Option<Self> {
-        if cancelled() || Instant::now() >= deadline || !system_abi_supported() {
+        if cancelled() || Instant::now() >= deadline {
             return None;
         }
-        let application = std::env::current_exe().ok()?;
-        let helper = application.parent()?.join("aidoku-native-query");
-        if !helper.is_file() {
-            return None;
-        }
+        let helper = helper_path()?;
         Self::open_at(
             &helper,
             deadline.min(Instant::now() + Duration::from_millis(250)),

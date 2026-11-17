@@ -16,8 +16,8 @@ source variants; production binaries must not contain diagnostic-only logging.
 | 2 | Profile and optimize first Library rendering | Retained after five A/B rounds; first Library improved by 134 ms, covers settled by 286 ms |
 | 3 | Measure and optimize the cover-loading tail | Retained both derivative reuse (2.466 s) and independently tested completion/publication scheduling (589 ms) |
 | 4 | Consolidate or reschedule the optional sleep-cover capability observation | Standalone helper trial rejected; combined portrait session retained after five A/B rounds (125 ms first-frame saving) |
-| 5 | Reduce lighting-application process overhead | Implementation in progress |
-| 6 | Evaluate shared Scriptlet dispatch independently; preserve global scanner and recent-item semantics | Pending |
+| 5 | Reduce lighting-application process overhead | Retained as a small change: 26 ms lower attachment median, confirmed native value readback |
+| 6 | Evaluate shared Scriptlet dispatch independently; preserve global scanner and recent-item semantics | Diagnostic entry prepared; native comparison pending |
 
 Timing distinguishes native launch requests, first business-frame submission,
 checked frame completion, software readiness, and complete visible-cover
@@ -218,3 +218,36 @@ owned state was restored and the lease released. Evidence:
 Application: `ca3b9b01b7586be7d3541b4567311020f604a31a9d0fa03436a082a3256a8c38`.
 Helper: `1216411f90fd5174cbee3a746af917058a4d6f949664642ca83881ad9b6818f5`.
 Launcher: `130413e24459e6ab55cad21c3e7a4b92c5f24be477ab51485417f83119baec79`.
+
+## Item 5: apply lighting through one bounded helper command
+
+The dedicated `--apply-lighting` command accepts only brightness and warmth,
+each either unchanged or an integer from 0 to 24. It opens one handle and
+acknowledges only successful completion of every requested assignment. The
+read-only AQ1/AQ2 protocols retain their opcode and version boundaries.
+The existing 700 ms command deadline and child cleanup apply. Unsupported,
+failed, or malformed helper responses reapply the exact requested values with
+the existing idempotent CLI setters. Failed assignment never updates the
+application's applied-values cache; unsupported hardware and unchanged values
+remain skipped.
+
+Batch `step5-lighting-cafcb00b` used the same helper and combined-probe launcher
+on both sides. The application attachment median fell from 70.2 to 43.8 ms
+(26.4 ms). First Library medians were 2.284/2.258 s and complete-cover medians
+2.695/2.667 s. Three of five complete-start pairs improved. This is a small
+blocking-work reduction; the end-to-end difference is not large relative to
+dispatch variation. Every candidate trace acknowledged the helper assignment.
+
+Separate native readback confirmed brightness 12 and warmth 8 for both variants,
+matching their unchanged preferences. Final native captures match outside the
+status bar. All fourteen launches completed; original lighting/native state and
+installed data were restored/unchanged and the lease was released.
+
+Remote all-target validation passed 931 Rust tests, with five pre-existing
+ignored tests. Eleven helper tests passed, including out-of-range arguments,
+single-property changes, and failure after the first setter. The prior 109
+launcher/package tests still cover the unchanged launcher.
+Evidence: [A/B observations](step5-lighting.json),
+[readback and native pixels](step5-native-qualification.json).
+Application: `5f7fdd5010ee91bb9ac56cf37231dd08497ca2652c81b33b859c241a105e03f3`.
+Helper: `84c2f27d8233d8695001aa86d880e29454fe188deb9884aca1c6694c82a5887d`.
