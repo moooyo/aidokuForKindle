@@ -15,7 +15,10 @@ use slint::platform::{Clipboard, EventLoopProxy, Platform, PlatformError, Window
 
 use crate::clipboard::{ClipboardKind, ClipboardStore};
 use crate::dithering::DitheringHandle;
-use crate::frame_observer::{FrameObserverState, NativeFrameUnavailable, reader_output_eligible};
+use crate::frame_observer::{
+    FrameObserverState, NativeCheckpointPhase, NativeFrameCheckpoint, NativeFrameUnavailable,
+    reader_output_eligible,
+};
 use crate::framebuffer::Framebuffer;
 use crate::gray_target::RetainedScene;
 use crate::lifecycle::{LifecycleHandle, LifecycleState};
@@ -614,6 +617,7 @@ impl Platform for KindlePlatform {
         }
         let initial_mode = self.output_mode();
         let mut initial_scene_pending = true;
+        let mut input_checkpoint: Option<NativeFrameCheckpoint> = None;
 
         let width = frame_buffer.width as usize;
         let (panel_width, panel_height) = (frame_buffer.width, frame_buffer.height);
@@ -820,7 +824,18 @@ impl Platform for KindlePlatform {
                         || file_descriptors[2].revents & libc::POLLIN != 0)
                 {
                     match touch_input.synchronize_after_frame() {
-                        Ok(()) => input_epoch.complete_frame(),
+                        Ok(()) => {
+                            input_epoch.complete_frame();
+                            if let Some(mut checkpoint) = input_checkpoint.take() {
+                                checkpoint.phase = NativeCheckpointPhase::InputReady;
+                                checkpoint.input_blocked = false;
+                                checkpoint.active = checkpoint.active
+                                    && !self.lifecycle.pause_requested.load(Ordering::Acquire)
+                                    && !self.lifecycle.applied_paused.load(Ordering::Acquire)
+                                    && !self.quit_flag.load(Ordering::Acquire);
+                                self.frame_observer.checkpoint(checkpoint);
+                            }
+                        }
                         Err(error) if synchronization_retryable(&error) => {}
                         Err(error) => {
                             return Err(PlatformError::Other(format!(
@@ -939,7 +954,8 @@ impl Platform for KindlePlatform {
             // An armed image belongs to this single output attempt. Snapshot
             // rendering and later menu/wake redraws cannot consume it again.
             let mut observed_frame = self.frame_observer.begin();
-            let render_started = observed_frame.as_ref().map(|_| Instant::now());
+            let measure_frame = observed_frame.is_some() || self.frame_observer.checkpoint_timing();
+            let render_started = measure_frame.then(Instant::now);
             let mut dirty_region = None;
             let mut did_draw = false;
             self.window.draw_if_needed(|renderer| {
@@ -990,6 +1006,7 @@ impl Platform for KindlePlatform {
             let render_elapsed = render_started.map_or(Duration::ZERO, |start| start.elapsed());
             // SEND queues MDP work asynchronously even on monochrome MTK.
             // Keep its input stable until the previous owned update settles.
+            let settle_started = measure_frame.then(Instant::now);
             if dirty_region.is_some() || output_mode != gray_renderer.mode() {
                 frame_buffer.settle_before_write().map_err(|error| {
                     PlatformError::Other(format!(
@@ -997,7 +1014,8 @@ impl Platform for KindlePlatform {
                     ))
                 })?;
             }
-            let write_started = observed_frame.as_ref().map(|_| Instant::now());
+            let settle_elapsed = settle_started.map_or(Duration::ZERO, |start| start.elapsed());
+            let write_started = measure_frame.then(Instant::now);
             let written = gray_renderer.write_scene_frame(
                 scene.pixels(),
                 (panel_width, panel_height),
@@ -1036,7 +1054,7 @@ impl Platform for KindlePlatform {
                     observed.unavailable(NativeFrameUnavailable::NoWrite);
                 }
             }
-            let submission_started = observed_frame.as_ref().map(|_| Instant::now());
+            let submission_started = measure_frame.then(Instant::now);
             let fallback_writes_before = frame_buffer.canonical_rewrite_count();
             let mut sleep_submission = None;
             let submission = if sleep_token.is_some() {
@@ -1093,7 +1111,9 @@ impl Platform for KindlePlatform {
                     .fetch_add(fallback_writes, Ordering::AcqRel)
                     .wrapping_add(fallback_writes)
             });
-            if matches!(&submission, Some(Ok(()))) {
+            let accepted = matches!(&submission, Some(Ok(())));
+            let initial = initial_scene_pending;
+            if accepted {
                 initial_scene_pending = false;
                 self.lifecycle
                     .frame_send_count
@@ -1135,6 +1155,26 @@ impl Platform for KindlePlatform {
             applied_dithering = dithering_revision;
             drawn_rotation = applied_rotation;
             drawn_render_rotation = render_rotation;
+            if accepted {
+                let checkpoint = NativeFrameCheckpoint {
+                    phase: NativeCheckpointPhase::Submitted,
+                    frame_sequence: rewritten_sequence.or(frame_sequence).unwrap_or(0),
+                    marker: frame_buffer.last_submitted_marker(),
+                    initial,
+                    full: force_full || rotation_changed || written.mode_changed,
+                    active: sleep_token.is_none()
+                        && !self.lifecycle.pause_requested.load(Ordering::Acquire)
+                        && !self.lifecycle.applied_paused.load(Ordering::Acquire)
+                        && !self.quit_flag.load(Ordering::Acquire),
+                    input_blocked: input_epoch.is_blocked(),
+                    render_elapsed,
+                    settle_elapsed,
+                    write_elapsed,
+                    submit_elapsed: submission_elapsed,
+                };
+                input_checkpoint = Some(checkpoint);
+                self.frame_observer.checkpoint(checkpoint);
+            }
             if let Some(token) = sleep_token {
                 let receipt = sleep_submission.as_ref().ok_or_else(|| {
                     PlatformError::Other("sleep presentation has no accepted update".into())
@@ -1202,6 +1242,17 @@ impl Platform for KindlePlatform {
                         )));
                     }
                 }
+            }
+            if !input_epoch.is_blocked()
+                && let Some(mut checkpoint) = input_checkpoint.take()
+            {
+                checkpoint.phase = NativeCheckpointPhase::InputReady;
+                checkpoint.input_blocked = false;
+                checkpoint.active = checkpoint.active
+                    && !self.lifecycle.pause_requested.load(Ordering::Acquire)
+                    && !self.lifecycle.applied_paused.load(Ordering::Acquire)
+                    && !self.quit_flag.load(Ordering::Acquire);
+                self.frame_observer.checkpoint(checkpoint);
             }
         }
         self.event_loop_result()

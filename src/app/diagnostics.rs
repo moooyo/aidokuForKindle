@@ -79,6 +79,36 @@ impl App {
         self.cover_work_pending() || self.background_ui_dirty
     }
 
+    /// Count projected Library image slots without reading storage or book IDs.
+    /// Settled means no pending publication; failed or empty images stay visible
+    /// in the counts rather than being described as successfully loaded covers.
+    pub fn startup_cover_projection(&self) -> Option<(u32, u32, bool)> {
+        if self.route != "library" || !self.modal.is_empty() {
+            return None;
+        }
+        let ui = self.ui.upgrade()?;
+        let state = ui.global::<State>();
+        let mut slots = 0;
+        let mut images = 0;
+        let mut count = |book: BookItem| {
+            if !book.id.is_empty() {
+                slots += 1;
+                let size = book.cover.size();
+                images += u32::from(size.width > 0 && size.height > 0);
+            }
+        };
+        if state.get_library_count() > 0 && !self.selection_mode {
+            count(state.get_current_book());
+        }
+        let books = state.get_books();
+        for row in 0..books.row_count() {
+            if let Some(book) = books.row_data(row) {
+                count(book);
+            }
+        }
+        Some((slots, images, self.capture_projection_pending()))
+    }
+
     /// Extend capture evidence without querying storage, files, or a provider.
     pub(super) fn extend_diagnostics_snapshot(&self, snapshot: &mut Value) {
         let Some(ui) = self.ui.upgrade() else {

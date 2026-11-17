@@ -389,6 +389,17 @@ checked sleep follow-up requires its own Aidoku remote tests, runtime checks,
 and exact device evidence; neither the earlier 125-test run nor BiliComics'
 separate test counts or physical results establish its acceptance.
 
+## Accepted startup checkpoints
+
+An independent UI-thread callback observes successful SEND and the existing
+input barrier acknowledgement. It does not consume, arm, or invalidate Reader
+tokens. The callback is cloned before invocation and must not mutate UI models.
+Optional durations separate rendering, prior-buffer settling, writing, and SEND.
+The application can begin background-only preparation after its accepted first
+full frame while retaining the synchronous completion, fresh-pose, and touch
+synchronization checks. Pause, sleep, quit, and input generations keep their
+existing ownership semantics. No extra update or framebuffer wait is requested.
+
 ## Native Y8INV byte encoding
 
 The 2026-11-13 Aidoku follow-up normalizes canonical luma at the framebuffer

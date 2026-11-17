@@ -40,6 +40,16 @@ struct Event {
     name: &'static str,
     at_us: u64,
     #[serde(skip_serializing_if = "Option::is_none")]
+    boottime_us: Option<u64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    cover_slots: Option<u32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    cover_images: Option<u32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    cover_pending: Option<bool>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    frame_cost_us: Option<[u64; 4]>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     request_id: Option<u64>,
     #[serde(skip_serializing_if = "Option::is_none")]
     action_id: Option<u64>,
@@ -95,6 +105,11 @@ impl Event {
         Self {
             name,
             at_us: 0,
+            boottime_us: None,
+            cover_slots: None,
+            cover_images: None,
+            cover_pending: None,
+            frame_cost_us: None,
             request_id: token.map(|token| token.request_id),
             action_id: token.and_then(|token| token.action_id),
             reader_generation: token.map(|token| token.reader_generation),
@@ -447,7 +462,51 @@ pub fn enable(path: Option<&Path>, process_entry: Instant) -> Result<()> {
 }
 
 pub fn mark(name: &'static str) {
-    update(|state, at_us| state.record(Event::new(name, None), at_us));
+    update(|state, at_us| {
+        let mut event = Event::new(name, None);
+        event.boottime_us = boottime_us();
+        state.record(event, at_us);
+    });
+}
+
+fn boottime_us() -> Option<u64> {
+    #[cfg(target_os = "linux")]
+    {
+        let mut time = libc::timespec {
+            tv_sec: 0,
+            tv_nsec: 0,
+        };
+        // The kernel fills this initialized, correctly aligned timespec.
+        if unsafe { libc::clock_gettime(libc::CLOCK_BOOTTIME, &mut time) } == 0 {
+            return u64::try_from(time.tv_sec).ok().map(|seconds| {
+                seconds.saturating_mul(1_000_000) + time.tv_nsec.max(0) as u64 / 1_000
+            });
+        }
+    }
+    None
+}
+
+/// The cost array is render, prior-buffer settle, pixel write, then SEND.
+pub fn startup_frame(
+    name: &'static str,
+    frame: crate::platform::FrameCheckpoint,
+    covers: Option<(u32, u32, bool)>,
+) {
+    update(|state, at_us| {
+        let mut event = Event::new(name, None);
+        event.boottime_us = boottime_us();
+        event.frame_sequence = Some(frame.sequence);
+        event.marker = frame.marker;
+        event.full = Some(frame.full);
+        event.frame_cost_us =
+            Some([frame.render, frame.settle, frame.write, frame.submit].map(micros));
+        if let Some((slots, images, pending)) = covers {
+            event.cover_slots = Some(slots);
+            event.cover_images = Some(images);
+            event.cover_pending = Some(pending);
+        }
+        state.record(event, at_us);
+    });
 }
 
 pub fn with_scripted_input<R>(pointer: bool, apply: impl FnOnce() -> R) -> R {

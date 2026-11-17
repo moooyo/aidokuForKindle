@@ -136,6 +136,7 @@ pub struct Startup {
     fonts: Fonts,
     fonts_registered: bool,
     prepared: Option<PreparedApp>,
+    workers_started: bool,
     started: bool,
     ready: bool,
     failed: bool,
@@ -172,6 +173,7 @@ impl Startup {
             fonts: Fonts::default(),
             fonts_registered: false,
             prepared: None,
+            workers_started: false,
             started: false,
             ready: false,
             failed: false,
@@ -182,6 +184,21 @@ impl Startup {
 
     pub fn failed(&self) -> bool {
         self.failed
+    }
+
+    /// Prepare bytes and metadata while the accepted initial full frame settles.
+    /// UI attachment still requires FirstScene and the normal event-loop turn.
+    pub fn prepare_after_submission(&mut self) {
+        if self.ready || self.failed || self.cancelled.load(Ordering::Acquire) {
+            return;
+        }
+        if let Err(error) = self.start_workers() {
+            let _ = publish(
+                &self.sender,
+                &self.wake,
+                StartupEvent::Failed(format!("{error:#}")),
+            );
+        }
     }
 
     /// Called only while the native lifecycle allows active application work.
@@ -365,6 +382,11 @@ impl Startup {
     }
 
     fn start_workers(&mut self) -> Result<()> {
+        if self.workers_started {
+            return Ok(());
+        }
+        // Latch before the first spawn: a partial failure must never spawn twice.
+        self.workers_started = true;
         let options = self
             .options
             .take()
@@ -445,7 +467,7 @@ mod tests {
     use super::*;
 
     #[test]
-    fn startup_workers_require_a_new_native_send_and_a_yielded_turn() {
+    fn startup_attachment_requires_a_new_native_send_and_a_yielded_turn() {
         let mut scene = FirstScene {
             submitted_baseline: 7,
             yielded: false,

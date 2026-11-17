@@ -38,7 +38,10 @@ mod touch;
 mod wakeup;
 
 pub use dithering::DitheringHandle;
-pub use frame_observer::{NativeFrameObservation, NativeFramePhase, NativeFrameUnavailable};
+pub use frame_observer::{
+    NativeCheckpointPhase, NativeFrameCheckpoint, NativeFrameObservation, NativeFramePhase,
+    NativeFrameUnavailable,
+};
 pub use framebuffer::{NativeFramebufferObservation, probe_native_framebuffer};
 pub use lifecycle::{LifecycleError, LifecycleHandle, LifecycleStatus};
 pub use portrait::NativePortraitOrientation;
@@ -111,6 +114,17 @@ pub struct KindleBackend<State = NoSchedule> {
 }
 
 impl<State> KindleBackend<State> {
+    /// Observe accepted startup output without altering completion or input gates.
+    /// The UI-thread callback must not change UI models or render recursively.
+    pub fn set_checkpoint_observer(
+        &self,
+        observer: impl Fn(NativeFrameCheckpoint) + 'static,
+        timing: bool,
+    ) {
+        self.frame_observer
+            .set_checkpoint_observer(observer, timing);
+    }
+
     /// Observe one armed Reader output without changing rendering or refreshes.
     /// The callback runs on the UI thread after a write or accepted SEND. It
     /// must not mutate UI models or render recursively. No callback borrow or

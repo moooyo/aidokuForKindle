@@ -30,6 +30,22 @@ pub struct PointerInput {
     pub position: slint::LogicalPosition,
 }
 
+/// A driver-accepted frame boundary, not an optical panel-completion claim.
+#[derive(Clone, Copy, Debug)]
+pub struct FrameCheckpoint {
+    pub submitted: bool,
+    pub sequence: u64,
+    pub marker: Option<u32>,
+    pub initial: bool,
+    pub full: bool,
+    pub active: bool,
+    pub input_blocked: bool,
+    pub render: Duration,
+    pub settle: Duration,
+    pub write: Duration,
+    pub submit: Duration,
+}
+
 impl PointerInput {
     pub fn from_window_event(event: &slint::platform::WindowEvent) -> Option<Self> {
         use slint::platform::{PointerEventButton, WindowEvent};
@@ -300,6 +316,33 @@ impl Platform {
 
     pub const fn is_kindle(&self) -> bool {
         self.kindle
+    }
+
+    pub fn set_checkpoint_observer(&self, observer: impl Fn(FrameCheckpoint) + 'static) {
+        #[cfg(all(feature = "kindle", target_os = "linux"))]
+        if let Some(backend) = self.backend.borrow().as_ref() {
+            backend.set_checkpoint_observer(
+                move |frame| {
+                    observer(FrameCheckpoint {
+                        submitted: frame.phase
+                            == slint_backend_kindle::NativeCheckpointPhase::Submitted,
+                        sequence: frame.frame_sequence,
+                        marker: frame.marker,
+                        initial: frame.initial,
+                        full: frame.full,
+                        active: frame.active,
+                        input_blocked: frame.input_blocked,
+                        render: frame.render_elapsed,
+                        settle: frame.settle_elapsed,
+                        write: frame.write_elapsed,
+                        submit: frame.submit_elapsed,
+                    });
+                },
+                crate::reader_timing::enabled(),
+            );
+            return;
+        }
+        let _ = observer;
     }
 
     pub fn hardware_media_availability(&self) -> crate::native_media::Availability {

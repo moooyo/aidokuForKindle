@@ -1,5 +1,6 @@
 mod bootstrap_fonts;
 mod bootstrap_lifecycle;
+mod bootstrap_metrics;
 mod bootstrap_presentation;
 mod bootstrap_startup;
 mod sleep_cover_protocol;
@@ -52,6 +53,10 @@ struct Arguments {
     /// Limit one launcher powerd query without entering the application runtime.
     #[arg(long, hide = true, default_value_t = 700, value_parser = clap::value_parser!(u64).range(1..=700))]
     native_power_state_timeout_ms: u64,
+
+    /// Keep preparation after the initial completion barrier for controlled A/B runs.
+    #[arg(long, hide = true)]
+    startup_serial_preparation: bool,
 
     /// Select a design profile, not a declaration of hardware compatibility.
     #[arg(long, default_value = "pw5")]
@@ -279,6 +284,14 @@ fn run(arguments: Arguments) -> Result<()> {
     let lifecycle = Rc::new(RefCell::new(bootstrap_lifecycle::Coordinator::new(
         arguments.kindle,
     )));
+    bootstrap_metrics::observe(
+        &platform,
+        &ui,
+        &startup,
+        &app,
+        &lifecycle,
+        !arguments.startup_serial_preparation,
+    );
     let advance_startup: Rc<RefCell<dyn FnMut() -> bool>> = {
         let ui = ui.as_weak();
         let app = Rc::downgrade(&app);

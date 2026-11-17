@@ -61,6 +61,30 @@ pub struct NativeFrameObservation {
 
 type Observer = Rc<dyn Fn(NativeFrameObservation)>;
 
+/// Startup checkpoints are independent of the one-shot Reader token protocol.
+#[derive(Debug, Clone, Copy, Eq, PartialEq)]
+pub enum NativeCheckpointPhase {
+    Submitted,
+    InputReady,
+}
+
+#[derive(Debug, Clone, Copy)]
+pub struct NativeFrameCheckpoint {
+    pub phase: NativeCheckpointPhase,
+    pub frame_sequence: u64,
+    pub marker: Option<u32>,
+    pub initial: bool,
+    pub full: bool,
+    pub active: bool,
+    pub input_blocked: bool,
+    pub render_elapsed: Duration,
+    pub settle_elapsed: Duration,
+    pub write_elapsed: Duration,
+    pub submit_elapsed: Duration,
+}
+
+type CheckpointObserver = Rc<dyn Fn(NativeFrameCheckpoint)>;
+
 /// Initial scene allocation may require a full write of the first accepted
 /// Reader image. Later ownership, rotation or output-mode rewrites cannot be
 /// reused as page-turn completions; a resume is never an initial-start sample.
@@ -77,12 +101,34 @@ pub(crate) fn reader_output_eligible(
 #[derive(Default)]
 pub(crate) struct FrameObserverState {
     observer: RefCell<Option<Observer>>,
+    checkpoint_observer: RefCell<Option<CheckpointObserver>>,
+    checkpoint_timing: Cell<bool>,
     pending: Cell<Option<u64>>,
     revision: Cell<u64>,
     invalidated_by: Cell<Option<NativeFrameUnavailable>>,
 }
 
 impl FrameObserverState {
+    pub(crate) fn set_checkpoint_observer(
+        &self,
+        observer: impl Fn(NativeFrameCheckpoint) + 'static,
+        timing: bool,
+    ) {
+        self.checkpoint_observer.replace(Some(Rc::new(observer)));
+        self.checkpoint_timing.set(timing);
+    }
+
+    pub(crate) fn checkpoint_timing(&self) -> bool {
+        self.checkpoint_timing.get()
+    }
+
+    pub(crate) fn checkpoint(&self, checkpoint: NativeFrameCheckpoint) {
+        let observer = self.checkpoint_observer.borrow().clone();
+        if let Some(observer) = observer {
+            observer(checkpoint);
+        }
+    }
+
     pub(crate) fn set_observer(&self, observer: impl Fn(NativeFrameObservation) + 'static) {
         self.cancel();
         self.observer.replace(Some(Rc::new(observer)));
@@ -277,6 +323,47 @@ mod tests {
         let state = Rc::new(FrameObserverState::default());
         assert_eq!(state.arm(5), None);
         assert!(state.begin().is_none());
+    }
+
+    #[test]
+    fn startup_observation_can_replace_itself_without_consuming_reader_identity() {
+        let (state, events) = observed();
+        state.arm(11);
+        let weak = Rc::downgrade(&state);
+        let calls = Rc::new(Cell::new(0));
+        let observed_calls = calls.clone();
+        state.set_checkpoint_observer(
+            move |_| {
+                observed_calls.set(observed_calls.get() + 1);
+                weak.upgrade()
+                    .unwrap()
+                    .set_checkpoint_observer(|_| {}, false);
+            },
+            true,
+        );
+        assert!(state.checkpoint_timing());
+        let checkpoint = NativeFrameCheckpoint {
+            phase: NativeCheckpointPhase::Submitted,
+            frame_sequence: 1,
+            marker: Some(1),
+            initial: true,
+            full: true,
+            active: true,
+            input_blocked: true,
+            render_elapsed: Duration::ZERO,
+            settle_elapsed: Duration::ZERO,
+            write_elapsed: Duration::ZERO,
+            submit_elapsed: Duration::ZERO,
+        };
+        state.checkpoint(checkpoint);
+        state.checkpoint(checkpoint);
+        assert_eq!(calls.get(), 1);
+        assert!(!state.checkpoint_timing());
+        let mut attempt = state.begin().unwrap();
+        write(&mut attempt);
+        attempt.accepted(Some(2), Duration::ZERO);
+        assert!(events.borrow().iter().all(|event| event.token == 11));
+        assert_eq!(events.borrow().len(), 2);
     }
 
     #[test]
