@@ -119,4 +119,16 @@ Application: `570887a0e5603ce2f6d820cf87b2f4e9b385514f71e9a729e85c8ead2f6729fc`.
 Native helper: `84c2f27d8233d8695001aa86d880e29454fe188deb9884aca1c6694c82a5887d`.
 Measured launcher: `1ae50f6bd7a8262cce185dea08c69f5bc317ed9b7bd7945c55c1f5239dcdd385`.
 
-Build/package identities and deployment evidence accompany the final delivery.
+The final ZIP passed 187 package checks. Its production source fingerprint is
+unchanged from the previously qualified application, so the exact existing
+application/helper binaries are reused; no unnecessary Rust rebuild substitutes
+a different executable. See [delivery identity](delivery.json) and
+[package verification](package-verification.json).
+
+The code and report were merged to main and pushed. The verified bundle was
+installed in batch `deploy-library-b52f63e2`; installed launcher and document
+hashes match the measured/package inputs. The library, profile, cover assets and
+shared executable were preserved. Native state was restored and the fresh lease
+released. The original files remain in
+`/mnt/us/.aidoku-performance-backups/deploy-library-b52f63e2` and a private host
+backup. See [deployment evidence](deployment.json).
