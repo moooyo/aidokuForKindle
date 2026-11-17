@@ -244,6 +244,7 @@ pub struct Platform {
     last_refresh: Cell<RefreshKind>,
     refresh_count: Cell<u64>,
     status_cache: RefCell<Option<(Option<Instant>, DeviceStatus)>>,
+    startup_render_pending: Cell<bool>,
     applied_lighting: Cell<Option<(u8, u8)>>,
     scene_inverted: Cell<bool>,
     reader_hardware_y4_requested: Cell<bool>,
@@ -288,6 +289,7 @@ impl Platform {
             last_refresh: Cell::new(RefreshKind::Ui),
             refresh_count: Cell::new(0),
             status_cache: RefCell::new(None),
+            startup_render_pending: Cell::new(false),
             applied_lighting: Cell::new(None),
             scene_inverted: Cell::new(false),
             reader_hardware_y4_requested: Cell::new(false),
@@ -316,6 +318,19 @@ impl Platform {
 
     pub const fn is_kindle(&self) -> bool {
         self.kindle
+    }
+
+    pub fn set_startup_render_priority(&self, pending: bool) {
+        self.startup_render_pending.set(pending);
+    }
+
+    pub fn startup_render_pending(&self) -> bool {
+        self.startup_render_pending.get()
+    }
+
+    /// Release only after an active business frame was accepted by the driver.
+    pub fn release_startup_render_priority(&self) -> bool {
+        self.startup_render_pending.replace(false)
     }
 
     pub fn set_checkpoint_observer(&self, observer: impl Fn(FrameCheckpoint) + 'static) {

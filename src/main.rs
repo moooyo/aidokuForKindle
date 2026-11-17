@@ -58,6 +58,10 @@ struct Arguments {
     #[arg(long, hide = true)]
     startup_serial_preparation: bool,
 
+    /// Allow background covers to compete with the first Library render in A/B runs.
+    #[arg(long, hide = true)]
+    startup_eager_covers: bool,
+
     /// Select a design profile, not a declaration of hardware compatibility.
     #[arg(long, default_value = "pw5")]
     device: DeviceProfile,
@@ -210,6 +214,12 @@ fn run(arguments: Arguments) -> Result<()> {
     fs::create_dir_all(&data_dir).context("Create the application data directory")?;
     bootstrap_lifecycle::install_signal_wakeup(None)?;
     let platform = Rc::new(Platform::new(arguments.device, arguments.kindle)?);
+    platform.set_startup_render_priority(
+        arguments.kindle
+            && arguments.screen == "library"
+            && !arguments.resume
+            && !arguments.startup_eager_covers,
+    );
     aidoku_kindle::reader_timing::mark("platform_initialized");
     if STOP_REQUESTED.load(Ordering::Relaxed) {
         return Ok(());

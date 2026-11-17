@@ -209,6 +209,7 @@ impl App {
             || self.suspended
             || self.resume_frame_pending
             || self.cover_inflight.is_some()
+            || self.platform.startup_render_pending()
         {
             return Ok(false);
         }
@@ -447,9 +448,12 @@ fn prepare_cover(
     allow_network: bool,
     configuration: Option<SourceConfig>,
 ) -> Result<JobResult> {
-    imaging::with_background_decode(None, || {
+    crate::reader_timing::mark("cover_preparation_started");
+    let result = imaging::with_background_decode(None, || {
         prepare_cover_pixels(manager, book, options, allow_network, configuration)
-    })
+    });
+    crate::reader_timing::mark("cover_preparation_finished");
+    result
 }
 
 fn prepare_cover_pixels(
@@ -472,6 +476,7 @@ fn prepare_cover_pixels(
         let raw = cache
             .lookup_raw(&request)?
             .context("The local cover image is unavailable")?;
+        crate::reader_timing::mark("cover_local_raw_validated");
         let rendered = crate::render_cache::render(cache, &request, &raw, &options, false, 0, 1.0)?;
         manager
             .network_control()
@@ -559,6 +564,7 @@ fn prepare_cover_pixels(
     manager
         .network_control()
         .check_epoch(manager.network_epoch())?;
+    crate::reader_timing::mark("cover_render_ready");
     Ok(JobResult::Cover {
         id: book.id,
         uri: book.cover,
@@ -657,6 +663,34 @@ mod tests {
     use super::*;
     use image::{ImageFormat, Luma};
     use std::io::Cursor;
+
+    #[test]
+    fn first_frame_priority_keeps_cover_admission_closed_until_released() {
+        use crate::app::tests::DemoRouteFixture;
+        let mut fixture =
+            DemoRouteFixture::new("catalog", crate::platform::DeviceProfile::Pw5, false);
+        let book = Book {
+            id: "pending-cover".into(),
+            cover: "/missing-cover.png".into(),
+            ..Book::default()
+        };
+        fixture.app.catalog.push(book.clone());
+        fixture.app.cover_view.push(book.id.clone());
+        fixture.app.cover_pending.insert(book.id.clone());
+        fixture.app.cover_queue.push_back(book);
+        fixture.app.platform.set_startup_render_priority(true);
+        fixture.app.start_cover_job().unwrap();
+        assert_eq!(fixture.app.cover_queue.len(), 1);
+        assert!(fixture.app.cover_inflight.is_none());
+        assert!(fixture.app.platform.release_startup_render_priority());
+        fixture.app.suspended = true;
+        fixture.app.start_cover_job().unwrap();
+        assert!(fixture.app.cover_inflight.is_none());
+        fixture.app.suspended = false;
+        fixture.app.start_cover_job().unwrap();
+        assert!(fixture.app.cover_inflight.is_some());
+        assert!(fixture.app.cover_queue.is_empty());
+    }
 
     struct LegacyCoverFixture {
         manager: Arc<SourceManager>,

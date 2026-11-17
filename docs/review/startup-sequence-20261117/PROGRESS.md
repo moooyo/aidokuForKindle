@@ -13,8 +13,8 @@ source variants; production binaries must not contain diagnostic-only logging.
 | --- | --- | --- |
 | 0 | Merge and deploy the verified native-query version; establish consistent installed/runtime and complete-screen timing | Main merged and pushed; verified installation completed; frame/cover instrumentation in progress |
 | 1 | Overlap preparation with the initial full-frame completion wait while preserving input and display ownership | Retained after five A/B rounds; first Library median improved by 109 ms, software ready by 228 ms |
-| 2 | Profile and optimize first Library rendering | Investigation in progress; first render is slower after overlap and offsets some of its benefit |
-| 3 | Measure and optimize the cover-loading tail | Pending |
+| 2 | Profile and optimize first Library rendering | Retained after five A/B rounds; first Library improved by 134 ms, covers settled by 286 ms |
+| 3 | Measure and optimize the cover-loading tail | In progress; repeated local source decoding dominates warm cover loading |
 | 4 | Consolidate or reschedule the optional sleep-cover capability observation | Pending |
 | 5 | Reduce lighting-application process overhead | Pending |
 | 6 | Evaluate shared Scriptlet dispatch independently; preserve global scanner and recent-item semantics | Pending |
@@ -78,3 +78,38 @@ Evidence: [all A/B observations](step1-overlap.json) and
 launcher output, source archive, and lease proofs remain on test-env under the
 matching batch directory. Application SHA-256:
 `383eb94db3b3beb94118dcd87ff351b2f7ae84d9dfe796ff1aa0c3eeae1760e8`.
+
+## Item 2: prioritize the first Library render
+
+Batch `step2-render-priority-8399bcac` used one executable, with
+`--startup-eager-covers` selecting the previous scheduling. The candidate queues
+the same covers during attachment but admits workers after an active business
+frame is accepted. A queued UI turn returns through the existing lifecycle gate;
+the callback itself changes no UI models. Other routes, resume, and desktop
+startup retain their existing admission behavior.
+
+| Endpoint from native launch request | Eager median | First-frame priority median | Saved |
+| --- | ---: | ---: | ---: |
+| Software ready | 2.300 s | 2.270 s | 30 ms |
+| First Library accepted frame | 2.630 s | 2.496 s | 134 ms |
+| Software input readiness | 2.630 s | 2.496 s | 134 ms |
+| Visible-cover settled accepted frame | 6.028 s | 5.741 s | 286 ms |
+| First Library render duration | 322 ms | 202 ms | 120 ms |
+
+All five first-frame pairs and all five cover-settled pairs favored the
+candidate. Thus the scheduling improvement did not merely transfer a wait to
+the cover endpoint. Fourteen cover tests, including closed admission and sleep
+gating, passed remotely. Both profiles' final Library and keyboard captures
+were pixel-identical; slow/cancelled metadata checks also passed. All fourteen
+device launches completed, all measured covers loaded, and restoration/lease
+checks passed. The two warmups used a longer twelve-second observation window.
+
+Separate cover milestones show repeated full validation of local source images
+before consulting the already rendered derivative. In a representative
+candidate run, six raw validation intervals total about 2.7 s; one is 1.67 s.
+The derivative-render and texture-preparation intervals are much smaller. This
+is the next optimization target; source-byte identity checks must be preserved.
+
+Evidence: [all A/B observations](step2-render-priority.json),
+[host verification](step2-host-verification.json). Application SHA-256:
+`f71846b0e233483f1efa06306739b2e8459a9de714f7842f2ec4e09ea52295e7`.

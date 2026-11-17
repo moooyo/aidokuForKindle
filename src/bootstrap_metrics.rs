@@ -8,7 +8,7 @@ use std::{
 use aidoku_kindle::{
     platform::Platform,
     reader_timing,
-    ui::{AppWindow, State},
+    ui::{AppWindow, Commands, State},
 };
 use slint::ComponentHandle;
 
@@ -18,7 +18,7 @@ use crate::{
 };
 
 pub fn observe(
-    platform: &Platform,
+    platform: &Rc<Platform>,
     ui: &AppWindow,
     startup: &Rc<RefCell<Startup>>,
     application: &ApplicationSlot,
@@ -29,6 +29,7 @@ pub fn observe(
     let startup = Rc::downgrade(startup);
     let application = Rc::downgrade(application);
     let lifecycle = Rc::downgrade(lifecycle);
+    let observed_platform = Rc::downgrade(platform);
     let first_library = Cell::new(None::<u64>);
     let library_input_ready = Cell::new(false);
     let covers_settled = Cell::new(false);
@@ -48,7 +49,10 @@ pub fn observe(
                 startup.borrow_mut().prepare_after_submission();
             }
         }
-        if !reader_timing::enabled() || (covers_settled.get() && library_input_ready.get()) {
+        let Some(platform) = observed_platform.upgrade() else {
+            return;
+        };
+        if !reader_timing::enabled() && !platform.startup_render_pending() {
             return;
         }
         if frame.initial && !frame.submitted && !frame.input_blocked {
@@ -56,6 +60,19 @@ pub fn observe(
         }
         let Some(ui) = ui.upgrade() else { return };
         if ui.global::<State>().get_booting() {
+            return;
+        }
+        if frame.submitted && platform.release_startup_render_priority() {
+            reader_timing::mark("startup_background_covers_admitted");
+            let ui = ui.as_weak();
+            // Return to the regular lifecycle-gated dispatcher before starting work.
+            slint::Timer::single_shot(std::time::Duration::ZERO, move || {
+                if let Some(ui) = ui.upgrade() {
+                    ui.global::<Commands>().invoke_job_ready();
+                }
+            });
+        }
+        if !reader_timing::enabled() || (covers_settled.get() && library_input_ready.get()) {
             return;
         }
         let Some(app) = application.upgrade().and_then(|slot| slot.borrow().clone()) else {
