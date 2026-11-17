@@ -131,5 +131,11 @@ was sampled; no earlier executable is substituted based only on source hashes.
 See [build identity](final-build.json), [source manifest](final-source-manifest.json),
 and [package verification](final-package-verification.json).
 
-Daily installation deployment evidence is recorded after the verified package
-is installed. The original program files are retained in an owned rollback backup.
+The verified package is installed on the tested Kindle. Deployment batch
+`deploy-final-ec36aea6` confirmed all installed hashes, preserved the library,
+device profile, document entry and cover hashes, restored native state, and
+released its fresh lease. Original program files remain in
+`/mnt/us/.aidoku-performance-backups/deploy-final-ec36aea6`, with an additional
+private host backup. See [deployment evidence](deployment.json) and
+[delivery identity](final-delivery.json). Main was merged and pushed before
+deployment; the final deployment record is a subsequent documentation update.

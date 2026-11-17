@@ -295,3 +295,24 @@ the diagnostic does not establish a source identity for the installed handler.
 Qualification PNGs above are Slint software snapshots made by the native
 application. They establish final scene equivalence, not physical panel output.
 The final integration batch additionally checks raw framebuffer captures.
+
+## Final integration and delivery
+
+The [final report](README.md) records six whole-change pairs from batch
+`final-integration-fde4063e`: first Library 2.822 to 2.254 s, visible covers
+6.153 to 2.677 s, with all six pairs improving both endpoints. Older-helper and
+missing-helper qualification passed. Raw framebuffer pixels match the baseline
+and software snapshots below the live status bar. The final package passed
+187 checks and its exact application was sampled.
+
+The frozen committed-source audit exposed one existing night-theme sleep-screen
+integration failure that the earlier experiment snapshot omitted. It reproduces
+on `f56dd36` with identical UI and test hashes. The complete-source library,
+startup and example targets pass 931 tests, with five pre-existing ignored tests.
+See [the baseline reproduction](preexisting-ui-test.json).
+
+Main was merged and pushed, and the verified package was installed in batch
+`deploy-final-ec36aea6`. Installed hashes match the final artifact. The user
+library, profile, document entry and cover remain unchanged; native state was
+restored and the lease released. The original program backup is retained.
+See [deployment evidence](deployment.json).
