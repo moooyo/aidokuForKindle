@@ -15,8 +15,8 @@ source variants; production binaries must not contain diagnostic-only logging.
 | 1 | Overlap preparation with the initial full-frame completion wait while preserving input and display ownership | Retained after five A/B rounds; first Library median improved by 109 ms, software ready by 228 ms |
 | 2 | Profile and optimize first Library rendering | Retained after five A/B rounds; first Library improved by 134 ms, covers settled by 286 ms |
 | 3 | Measure and optimize the cover-loading tail | Retained both derivative reuse (2.466 s) and independently tested completion/publication scheduling (589 ms) |
-| 4 | Consolidate or reschedule the optional sleep-cover capability observation | Helper implementation prepared; remote lifecycle and package verification in progress |
-| 5 | Reduce lighting-application process overhead | Pending |
+| 4 | Consolidate or reschedule the optional sleep-cover capability observation | Standalone helper trial rejected; combined portrait session retained after five A/B rounds (125 ms first-frame saving) |
+| 5 | Reduce lighting-application process overhead | Implementation in progress |
 | 6 | Evaluate shared Scriptlet dispatch independently; preserve global scanner and recent-item semantics | Pending |
 
 Timing distinguishes native launch requests, first business-frame submission,
@@ -169,3 +169,52 @@ Evidence: [A/B observations](step3b-cover-events.json),
 [host checks](step3b-host-verification.json), and
 [native qualification](step3b-native-qualification.json). Application SHA-256:
 `687344c73c6bfbbe3ff7dc4ca3e51d6e297354fcb0c311bc76f6798bdc3e3d63`.
+
+## Item 4: consolidate the supervised sleep-capability observation
+
+The initial standalone-helper trial did not reduce the target interval: both
+medians were 150 ms. Its 42/51 ms whole-start medians are not sufficient evidence
+of a real improvement in that operation. That implementation is not retained.
+See [all observations](step4-standalone.json) and its
+[preserved patch](step4-standalone.patch).
+
+The retained implementation reads the same blanket module list inside the
+existing supervised startup portrait transaction, before its critical fresh
+state observations. An explicit `--startup-session` / `AQ2` negotiation enables
+the ninth read-only opcode. The original `--session` remains `AQ1` with eight
+opcodes, including compatibility with older parents. An older or missing helper
+uses the original CLI read inside the owned transaction, before calibration;
+unsupported sessions never receive opcode 9. Native property failure or unknown
+modules deny the optional capability. A malformed connected transport still
+fails calibration rather than publishing an uncertain portrait.
+
+The publisher returns the capability bit only after successful typed record
+publication, clean session finish, and ownership revalidation. The launcher
+caches it for its managed session. Original portrait output has an explicit
+legacy-parser fallback; malformed combined output cannot take the display.
+The byte bound, allowlist, advertisement rejection, passcode checks, sleep and
+wake ownership boundaries remain intact.
+
+Batch `step4b-combined-probe-ae530933` used one ELF/helper and two launchers:
+
+| Endpoint | Separate observation | Combined transaction | Saved |
+| --- | ---: | ---: | ---: |
+| First Library accepted frame | 2.519 s | 2.394 s | 125 ms |
+| Visible-cover settled accepted frame | 2.931 s | 2.825 s | 106 ms |
+| Independent capability interval | 120 ms | None | Removed |
+| Portrait transaction | 260 ms | 280 ms | -20 ms |
+
+All five pairs improved the combined capability-plus-calibration interval.
+Three of five complete-start pairs improved amid unrelated dispatch variation.
+The bundled property read took 4.9-10.4 ms. Every calibration used one session,
+with six replies in the control and seven in the candidate; every capability
+decision was supported. Both final native captures match outside the status bar.
+
+Remote validation passed nine transport tests, ten presentation tests, 22 startup
+tests, and 109 packaging/lifecycle tests. All fourteen native launches completed;
+owned state was restored and the lease released. Evidence:
+[A/B observations](step4b-combined-probe.json),
+[native qualification](step4b-native-qualification.json).
+Application: `ca3b9b01b7586be7d3541b4567311020f604a31a9d0fa03436a082a3256a8c38`.
+Helper: `1216411f90fd5174cbee3a746af917058a4d6f949664642ca83881ad9b6818f5`.
+Launcher: `130413e24459e6ab55cad21c3e7a4b92c5f24be477ab51485417f83119baec79`.

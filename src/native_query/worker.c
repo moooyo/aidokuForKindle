@@ -44,6 +44,7 @@ static const struct property properties[] = {
     {"com.lab126.powerd", "isCharging", 1},
     {"com.lab126.powerd", "flIntensity", 1},
     {"com.lab126.powerd", "currentAmberLevel", 1},
+    {"com.lab126.blanket", "load", 0},
 };
 
 static int write_all(const void *buffer, size_t length) {
@@ -91,7 +92,8 @@ static void *load_api(struct lipc_api *api) {
 }
 
 int main(int argc, char **argv) {
-    if (argc != 2 || strcmp(argv[1], "--session") != 0) return 64;
+    int startup = argc == 2 && strcmp(argv[1], "--startup-session") == 0;
+    if (!startup && (argc != 2 || strcmp(argv[1], "--session") != 0)) return 64;
     pid_t parent = getppid();
     if (parent <= 1 || prctl(PR_SET_PDEATHSIG, SIGKILL) != 0 || getppid() != parent)
         return 70;
@@ -107,14 +109,16 @@ int main(int argc, char **argv) {
         return 69;
     }
     int result = 0;
-    if (write_all("AQ1\n", 4) != 0) result = 74;
+    /* The original command keeps AQ1 and its eight read-only opcodes. Only
+     * the explicit extended command advertises the optional blanket read. */
+    if (write_all(startup ? "AQ2\n" : "AQ1\n", 4) != 0) result = 74;
     unsigned int requests = 0;
     while (result == 0) {
         unsigned char opcode;
         ssize_t count = read(STDIN_FILENO, &opcode, 1);
         if (count < 0 && errno == EINTR) continue;
         if (count == 0) break;
-        if (count != 1 || opcode == 0 || opcode > sizeof(properties) / sizeof(properties[0])
+        if (count != 1 || opcode == 0 || opcode > (startup ? 9 : 8)
             || requests++ >= MAX_REQUESTS) {
             result = 64;
             break;
@@ -136,8 +140,20 @@ int main(int argc, char **argv) {
             else if (value == NULL) result = reply(opcode, 2, NULL, 0);
             else {
                 size_t length = strnlen(value, MAX_VALUE + 1);
-                result = length > MAX_VALUE ? reply(opcode, 2, NULL, 0)
-                                            : reply(opcode, 0, value, length);
+                if (opcode == 9) {
+                    /* Preserve the legacy CLI's trailing newline and total
+                     * byte budget for the strict module parser. */
+                    char text[MAX_VALUE];
+                    if (length >= MAX_VALUE) result = reply(opcode, 2, NULL, 0);
+                    else {
+                        memcpy(text, value, length);
+                        text[length] = '\n';
+                        result = reply(opcode, 0, text, length + 1);
+                    }
+                } else {
+                    result = length > MAX_VALUE ? reply(opcode, 2, NULL, 0)
+                                                : reply(opcode, 0, value, length);
+                }
                 api.free_string(value);
             }
         }

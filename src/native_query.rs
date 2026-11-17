@@ -17,6 +17,7 @@ use anyhow::{Context, Result, bail, ensure};
 
 const MAX_VALUE: usize = 128;
 const HELLO: &[u8; 4] = b"AQ1\n";
+const STARTUP_HELLO: &[u8; 4] = b"AQ2\n";
 
 #[derive(Clone, Copy, Debug)]
 #[repr(u8)]
@@ -29,6 +30,7 @@ pub(crate) enum Property {
     Charging = 6,
     Brightness = 7,
     Warmth = 8,
+    SleepModules = 9,
 }
 
 impl Property {
@@ -42,6 +44,7 @@ impl Property {
             Self::Charging => &["com.lab126.powerd", "isCharging"],
             Self::Brightness => &["com.lab126.powerd", "flIntensity"],
             Self::Warmth => &["com.lab126.powerd", "currentAmberLevel"],
+            Self::SleepModules => &["-s", "com.lab126.blanket", "load"],
         }
     }
 }
@@ -51,9 +54,49 @@ pub(crate) struct Session {
     input: Option<ChildStdin>,
     output: ChildStdout,
     broken: bool,
+    startup: bool,
 }
 
 impl Session {
+    pub(crate) fn supports_sleep_modules(&self) -> bool {
+        self.startup
+    }
+
+    pub(crate) fn try_open_startup(
+        deadline: Instant,
+        cancelled: &impl Fn() -> bool,
+    ) -> Option<Self> {
+        if cancelled() || Instant::now() >= deadline || !system_abi_supported() {
+            return None;
+        }
+        let application = std::env::current_exe().ok()?;
+        let helper = application.parent()?.join("aidoku-native-query");
+        if !helper.is_file() {
+            return None;
+        }
+        Self::open_startup_at(&helper, deadline, cancelled).ok()
+    }
+
+    fn open_startup_at(
+        helper: &Path,
+        deadline: Instant,
+        cancelled: &impl Fn() -> bool,
+    ) -> Result<Self> {
+        Self::open_protocol_at(
+            helper,
+            deadline.min(Instant::now() + Duration::from_millis(250)),
+            cancelled,
+            true,
+        )
+        .or_else(|_| {
+            Self::open_at(
+                helper,
+                deadline.min(Instant::now() + Duration::from_millis(250)),
+                cancelled,
+            )
+        })
+    }
+
     pub(crate) fn try_open(deadline: Instant, cancelled: &impl Fn() -> bool) -> Option<Self> {
         if cancelled() || Instant::now() >= deadline || !system_abi_supported() {
             return None;
@@ -72,9 +115,22 @@ impl Session {
     }
 
     fn open_at(helper: &Path, deadline: Instant, cancelled: &impl Fn() -> bool) -> Result<Self> {
+        Self::open_protocol_at(helper, deadline, cancelled, false)
+    }
+
+    fn open_protocol_at(
+        helper: &Path,
+        deadline: Instant,
+        cancelled: &impl Fn() -> bool,
+        startup: bool,
+    ) -> Result<Self> {
         check_deadline(deadline, cancelled)?;
         let mut child = Command::new(helper)
-            .arg("--session")
+            .arg(if startup {
+                "--startup-session"
+            } else {
+                "--session"
+            })
             .stdin(Stdio::piped())
             .stdout(Stdio::piped())
             .stderr(Stdio::null())
@@ -88,6 +144,7 @@ impl Session {
             input: Some(input),
             output,
             broken: false,
+            startup,
         };
         nonblocking(session.input.as_ref().unwrap().as_raw_fd())?;
         nonblocking(session.output.as_raw_fd())?;
@@ -95,7 +152,7 @@ impl Session {
         let fd = session.output.as_raw_fd();
         read_exact(&mut session.output, fd, &mut hello, deadline, cancelled)?;
         ensure!(
-            &hello == HELLO,
+            &hello == if startup { STARTUP_HELLO } else { HELLO },
             "The native query helper protocol is unavailable"
         );
         crate::reader_timing::mark("native_query_session_ready");
@@ -109,6 +166,10 @@ impl Session {
         cancelled: &impl Fn() -> bool,
     ) -> Result<String> {
         ensure!(!self.broken, "The native query session is no longer usable");
+        ensure!(
+            !matches!(property, Property::SleepModules) || self.startup,
+            "The native helper did not advertise startup query support"
+        );
         check_deadline(deadline, cancelled)?;
         self.broken = true;
         let input = self
@@ -150,7 +211,11 @@ impl Session {
             "Native property {property:?} is unavailable"
         );
         crate::reader_timing::mark("native_query_response");
-        Ok(value.trim_ascii().to_owned())
+        Ok(if matches!(property, Property::SleepModules) {
+            value.to_owned()
+        } else {
+            value.trim_ascii().to_owned()
+        })
     }
 
     /// Require clean EOF and successful termination before trusting a batch.
@@ -298,9 +363,11 @@ mod tests {
                 r#"#!/usr/bin/python3 -I
 import os, sys, time
 mode = {mode:?}
+if mode == 'legacy' and sys.argv[1] != '--session': sys.exit(64)
 if mode == 'bad-hello':
     os.write(1, b'BAD!'); sys.exit(0)
-os.write(1, b'AQ1\n')
+extended = mode == 'v2' and sys.argv[1] == '--startup-session'
+os.write(1, b'AQ2\n' if extended else b'AQ1\n')
 while True:
     opcode = os.read(0, 1)
     if not opcode: break
@@ -310,7 +377,7 @@ while True:
     if mode == 'wrong-tag': os.write(1, b'\xff\x00\x00\x00'); continue
     if mode == 'native-error' and opcode == b'\x01':
         os.write(1, opcode + b'\x01\x00\x00'); continue
-    value = b'active' if opcode == b'\x01' else b'42'
+    value = b'\x0bscreensaver\n' if opcode == b'\x09' else b'active' if opcode == b'\x01' else b'42'
     os.write(1, opcode + b'\x00' + len(value).to_bytes(2, 'big') + value)
     if mode == 'bad-exit': sys.exit(2)
 if mode == 'trailing': os.write(1, b'extra')
@@ -338,6 +405,47 @@ if mode == 'trailing': os.write(1, b'extra')
                 .query(Property::Battery, deadline, &|| false)
                 .unwrap(),
             "42"
+        );
+        session.finish(deadline, &|| false).unwrap();
+    }
+
+    #[test]
+    fn extended_startup_queries_require_an_advertised_protocol_and_preserve_raw_bytes() {
+        let (_root, path) = fixture("v2");
+        let deadline = Instant::now() + Duration::from_secs(2);
+        let mut session = Session::open_startup_at(&path, deadline, &|| false).unwrap();
+        assert!(session.supports_sleep_modules());
+        assert_eq!(
+            session
+                .query(Property::SleepModules, deadline, &|| false)
+                .unwrap(),
+            "\x0bscreensaver\n"
+        );
+        assert_eq!(
+            session
+                .query(Property::PowerState, deadline, &|| false)
+                .unwrap(),
+            "active"
+        );
+        session.finish(deadline, &|| false).unwrap();
+    }
+
+    #[test]
+    fn older_helpers_are_negotiated_before_any_new_opcode_is_sent() {
+        let (_root, path) = fixture("legacy");
+        let deadline = Instant::now() + Duration::from_secs(2);
+        let mut session = Session::open_startup_at(&path, deadline, &|| false).unwrap();
+        assert!(!session.supports_sleep_modules());
+        assert!(
+            session
+                .query(Property::SleepModules, deadline, &|| false)
+                .is_err()
+        );
+        assert_eq!(
+            session
+                .query(Property::PowerState, deadline, &|| false)
+                .unwrap(),
+            "active"
         );
         session.finish(deadline, &|| false).unwrap();
     }

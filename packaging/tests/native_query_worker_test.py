@@ -24,6 +24,11 @@ void LipcFreeString(char *value) { record("free"); free(value); }
 int LipcGetStringProperty(void *handle, const char *service, const char *name, char **value) {
     (void)handle; record(service); record(name);
     const char *mode = getenv("QUERY_STUB_MODE");
+    if (strcmp(name, "load") == 0) {
+        if (mode && strcmp(mode, "error") == 0) return 7;
+        if (mode && strcmp(mode, "null") == 0) { *value = NULL; return 0; }
+        *value = strdup("screensaver langpicker blankwindow usb"); return 0;
+    }
     if (strcmp(name, "state") == 0 && mode && strcmp(mode, "error") == 0) return 7;
     if (strcmp(name, "state") == 0 && mode && strcmp(mode, "long") == 0) {
         *value = malloc(130); memset(*value, 'x', 129); (*value)[129] = 0; return 0;
@@ -74,7 +79,7 @@ class WorkerTests(unittest.TestCase):
                                 capture_output=True, timeout=7, env=environment)
         events = log.read_text().splitlines()
         if result.stdout:
-            self.assertEqual(result.stdout[:4], b"AQ1\n")
+            self.assertEqual(result.stdout[:4], b"AQ2\n" if arguments == ("--startup-session",) else b"AQ1\n")
         frames = []
         remaining = result.stdout[4:]
         while remaining:
@@ -135,6 +140,19 @@ class WorkerTests(unittest.TestCase):
         self.assertNotEqual(result.returncode, 0)
         self.assertEqual(len(frames), 32)
         self.assertEqual(events.count("close"), 1)
+
+    def test_extended_startup_command_advertises_the_optional_read(self):
+        result, frames, events = self.run_worker(b"\x09\x01", arguments=("--startup-session",))
+        self.assertEqual(result.returncode, 0)
+        self.assertEqual(frames, [(9, 0, b"screensaver langpicker blankwindow usb\n"), (1, 0, b"active")])
+        self.assertEqual(events.count("open"), 1)
+        self.assertEqual(events.count("close"), 1)
+
+    def test_optional_property_errors_keep_the_extended_session_well_framed(self):
+        for mode, status in [("error", 1), ("null", 2)]:
+            result, frames, _ = self.run_worker(b"\x09\x05", mode, arguments=("--startup-session",))
+            self.assertEqual(result.returncode, 0)
+            self.assertEqual(frames, [(9, status, b""), (5, 0, b"88")])
 
 
 if __name__ == "__main__":

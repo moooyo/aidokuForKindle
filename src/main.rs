@@ -42,6 +42,10 @@ struct Arguments {
     #[arg(long, hide = true)]
     capture_native_portrait: bool,
 
+    /// Include the optional sleep capability in the owned startup transaction.
+    #[arg(long, hide = true)]
+    capture_sleep_capability: bool,
+
     /// Authorize fresh portrait metadata for the launcher's current sleep epoch.
     #[arg(long, hide = true)]
     authorize_native_portrait_resume: Option<u64>,
@@ -170,6 +174,9 @@ fn main() -> std::process::ExitCode {
 
 fn run(arguments: Arguments) -> Result<()> {
     install_shutdown_signals()?;
+    if arguments.capture_sleep_capability && !arguments.capture_native_portrait {
+        bail!("The sleep capability requires startup portrait publication");
+    }
     if arguments.capture_native_portrait || arguments.authorize_native_portrait_resume.is_some() {
         if !arguments.kindle
             || arguments.native_power_state
@@ -181,6 +188,15 @@ fn run(arguments: Arguments) -> Result<()> {
         #[cfg(all(feature = "kindle", target_os = "linux"))]
         {
             if arguments.capture_native_portrait {
+                if arguments.capture_sleep_capability {
+                    let supported =
+                        aidoku_kindle::native_presentation::capture_startup_with_sleep_capability(
+                            arguments.device,
+                            || STOP_REQUESTED.load(Ordering::Acquire),
+                        )?;
+                    println!("PUBLISHED {}", u8::from(supported));
+                    return Ok(());
+                }
                 aidoku_kindle::native_presentation::capture_startup(arguments.device, || {
                     STOP_REQUESTED.load(Ordering::Acquire)
                 })?;

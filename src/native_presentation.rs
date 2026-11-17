@@ -363,7 +363,15 @@ impl BindingIdentity {
 }
 
 pub fn capture_startup(profile: DeviceProfile, cancelled: impl Fn() -> bool) -> Result<()> {
-    portrait_writer::capture_startup(profile, cancelled)
+    portrait_writer::capture_startup(profile, false, cancelled).map(|_| ())
+}
+
+pub fn capture_startup_with_sleep_capability(
+    profile: DeviceProfile,
+    cancelled: impl Fn() -> bool,
+) -> Result<bool> {
+    portrait_writer::capture_startup(profile, true, cancelled)?
+        .context("The startup sleep capability was not observed")
 }
 
 pub fn authorize_resume(epoch: u64, cancelled: impl Fn() -> bool) -> Result<()> {

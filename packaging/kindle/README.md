@@ -11,6 +11,9 @@ The application and JPEG worker remain static. Missing helpers, unsupported
 firmware ABIs or unavailable initial connections retain the command-line query
 path. A malformed connected portrait transaction still fails without publishing
 calibration. Fresh state checks, deadlines and display ownership are retained.
+The startup-only `AQ2` session adds the optional sleep-module observation to
+the existing portrait transaction. Ordinary `AQ1` sessions remain compatible;
+older helpers use the bounded CLI observation before portrait publication.
 
 The 2026-11-15 display-preset candidate adds Fast, Normal, High Quality and
 Kindle settings. Normal uses REAGL with periodic GC16 clearing; High Quality

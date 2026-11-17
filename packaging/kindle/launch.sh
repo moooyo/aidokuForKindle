@@ -90,7 +90,7 @@ NATIVE_READ_PID=''; NATIVE_READ_BIRTH=''; NATIVE_READ_SEQUENCE=0
 NATIVE_RESUME_ATTEMPTS=0
 SLEEP_APP_PID=0; SLEEP_PENDING=0; WAKE_PENDING=0
 DISPLAY_OWNED=0; PAUSED_WM_RECORDS=''; STATUSBAR_STOPPED=0; STOCK_REPAINT_PENDING=0; EXIT_REDRAW=1; EVENT_FD_OPEN=0
-STATUSBAR_QUIESCED=0; COVER_SLEEP_SUPPORTED=0; SLEEP_COVER_ACTIVE=0
+STATUSBAR_QUIESCED=0; COVER_SLEEP_SUPPORTED=0; COVER_SLEEP_CHECKED=0; SLEEP_COVER_ACTIVE=0
 COVER_SEQUENCE=0; SLEEP_COVER_SEQUENCE=0; SLEEP_APP_BIRTH=''; SLEEP_RUNNER_BIRTH=''
 
 native_read_is_owned() {
@@ -223,6 +223,7 @@ native_read_hex() {
 }
 
 configure_cover_sleep() {
+    # Compatibility path for a publisher without a combined capability result.
     # Adopt the BiliComics read-only blanket observation. An unknown module,
     # advertisement module, malformed response or failed query keeps stock sleep.
     # Probe once before display takeover; capability belongs to this managed
@@ -498,8 +499,17 @@ start_application() {
     # Every ELF generation has its own native WM/GETVAR anchor. The bounded
     # reader publishes its typed private record before awesome is stopped.
     if [ "$DISPLAY_OWNED" -eq 1 ]; then release_display 0; fi
-    native_read_command "$APP_DIR/aidoku" --kindle --device "$PROFILE" --capture-native-portrait || fail 'The native startup portrait calibration is unavailable.'
-    [ "$(native_read_hex)" = 5055424c49534845440a ] || fail 'The native startup portrait publication is invalid.'
+    startup_capability_argument=''
+    if [ "$COVER_SLEEP_CHECKED" -eq 0 ]; then startup_capability_argument=--capture-sleep-capability; fi
+    native_read_command "$APP_DIR/aidoku" --kindle --device "$PROFILE" --capture-native-portrait $startup_capability_argument || fail 'The native startup portrait calibration is unavailable.'
+    case "$(native_read_hex)" in
+        5055424c495348454420310a) COVER_SLEEP_SUPPORTED=1 ;;
+        5055424c495348454420300a) COVER_SLEEP_SUPPORTED=0 ;;
+        5055424c49534845440a)
+            if [ "$COVER_SLEEP_CHECKED" -eq 0 ]; then configure_cover_sleep; fi ;;
+        *) fail 'The native startup portrait publication is invalid.' ;;
+    esac
+    COVER_SLEEP_CHECKED=1
     take_display
     run_application "$APP_GENERATION" "$1" & RUNNER_PID=$!
 }
@@ -714,7 +724,6 @@ mkfifo "$LOCK_DIR/power-events"
 # Keep both ends open so transitions cannot drop queued wake or exit events.
 exec 3<>"$LOCK_DIR/power-events"; EVENT_FD_OPEN=1
 start_observer
-configure_cover_sleep
 start_application 0
 
 while IFS= read -r event <&3; do

@@ -164,7 +164,11 @@ impl Writer {
     }
 }
 
-pub(super) fn capture_startup(profile: DeviceProfile, cancelled: impl Fn() -> bool) -> Result<()> {
+pub(super) fn capture_startup(
+    profile: DeviceProfile,
+    observe_sleep: bool,
+    cancelled: impl Fn() -> bool,
+) -> Result<Option<bool>> {
     let writer = Writer::from_environment()?;
     let lease = writer.lease()?;
     ensure!(
@@ -173,7 +177,38 @@ pub(super) fn capture_startup(profile: DeviceProfile, cancelled: impl Fn() -> bo
         "Startup portrait publication follows application initialization"
     );
     let deadline = Instant::now() + TRANSACTION_TIMEOUT;
-    let mut queries = Session::try_open(deadline, &cancelled);
+    let mut queries = if observe_sleep {
+        Session::try_open_startup(deadline, &cancelled)
+    } else {
+        Session::try_open(deadline, &cancelled)
+    };
+    let sleep_supported = observe_sleep.then(|| {
+        crate::reader_timing::mark("startup_sleep_capability_started");
+        let capability_deadline = deadline.min(Instant::now() + Duration::from_millis(700));
+        let value = if queries
+            .as_ref()
+            .is_some_and(Session::supports_sleep_modules)
+        {
+            query_property(
+                &mut queries,
+                Property::SleepModules,
+                capability_deadline,
+                &cancelled,
+            )
+        } else {
+            // AQ1 helpers never receive opcode 9. Missing or older helpers use
+            // the original read inside this same supervised transaction.
+            query_property(
+                &mut None,
+                Property::SleepModules,
+                capability_deadline,
+                &cancelled,
+            )
+        };
+        let supported = value.as_deref().is_ok_and(stock_sleep_modules);
+        crate::reader_timing::mark("startup_sleep_capability_finished");
+        supported
+    });
     ensure_active_with(&mut queries, deadline, &cancelled)?;
     let captured_mode = native_mode(&query_property(
         &mut queries,
@@ -246,7 +281,28 @@ pub(super) fn capture_startup(profile: DeviceProfile, cancelled: impl Fn() -> bo
         valid_layout_token(&calibration.layout),
         "The framebuffer layout token is malformed"
     );
-    writer.publish(STARTUP_RECORD, STARTUP_PENDING, &calibration, &lease)
+    writer.publish(STARTUP_RECORD, STARTUP_PENDING, &calibration, &lease)?;
+    Ok(sleep_supported)
+}
+
+fn stock_sleep_modules(value: &str) -> bool {
+    if value.is_empty()
+        || value.len() > MAX_NATIVE_VALUE_BYTES
+        || !value
+            .bytes()
+            .all(|byte| matches!(byte, b'a'..=b'z' | b'_' | b' ' | b'\t' | b'\r' | b'\n'))
+    {
+        return false;
+    }
+    let mut screensaver = false;
+    for module in value.split_ascii_whitespace() {
+        match module {
+            "screensaver" => screensaver = true,
+            "langpicker" | "blankwindow" | "usb" => {}
+            _ => return false,
+        }
+    }
+    screensaver
 }
 
 pub(super) fn authorize_resume(epoch: u64, cancelled: impl Fn() -> bool) -> Result<()> {
@@ -385,6 +441,12 @@ fn query_property(
 ) -> Result<String> {
     match session {
         Some(session) => session.query(property, deadline, cancelled),
+        None if matches!(property, Property::SleepModules) => bounded_raw_value(
+            "lipc-get-prop",
+            property.legacy_arguments(),
+            deadline,
+            cancelled,
+        ),
         None => bounded_value(
             "lipc-get-prop",
             property.legacy_arguments(),
@@ -404,6 +466,16 @@ impl Drop for QueryChild {
 }
 
 fn bounded_value(
+    program: &str,
+    arguments: &[&str],
+    deadline: Instant,
+    cancelled: &impl Fn() -> bool,
+) -> Result<String> {
+    bounded_raw_value(program, arguments, deadline, cancelled)
+        .map(|value| value.trim_ascii().to_owned())
+}
+
+fn bounded_raw_value(
     program: &str,
     arguments: &[&str],
     deadline: Instant,
@@ -460,9 +532,7 @@ fn bounded_value(
         if let Some(status) = child.0.try_wait()? {
             ensure!(status.success(), "The native query failed with {status}");
             if eof {
-                return Ok(std::str::from_utf8(&bytes[..length])?
-                    .trim_ascii()
-                    .to_owned());
+                return Ok(std::str::from_utf8(&bytes[..length])?.to_owned());
             }
         }
         std::thread::sleep(
@@ -476,6 +546,38 @@ fn bounded_value(
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn optional_sleep_capability_preserves_the_shell_allowlist_and_raw_framing() {
+        for value in [
+            "screensaver",
+            "screensaver langpicker blankwindow usb\n",
+            "\tusb\r\n screensaver screensaver  ",
+        ] {
+            assert!(stock_sleep_modules(value));
+        }
+        for value in [
+            "",
+            " \n",
+            "usb langpicker",
+            "screensaver ad_screensaver",
+            "screensaver unknown",
+            "screensaver\0",
+            "\x0bscreensaver",
+            "screensaver\x0c",
+            "Screensaver",
+            "screensaver/usb",
+        ] {
+            assert!(
+                !stock_sleep_modules(value),
+                "Unexpected module admission: {value:?}"
+            );
+        }
+        assert!(!stock_sleep_modules(&format!(
+            "screensaver {}",
+            "x".repeat(128)
+        )));
+    }
 
     #[test]
     fn only_the_reviewed_scribe_profile_normalizes_landscape_native_tokens() {

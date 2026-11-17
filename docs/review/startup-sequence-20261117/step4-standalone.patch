@@ -1,0 +1,198 @@
+diff --git a/packaging/kindle/launch.sh b/packaging/kindle/launch.sh
+index 0d06b3e..4c9a0a6 100755
+--- a/packaging/kindle/launch.sh
++++ b/packaging/kindle/launch.sh
+@@ -228,6 +228,14 @@ configure_cover_sleep() {
+     # Probe once before display takeover; capability belongs to this managed
+     # session. Sleep and wake still recheck current ownership independently.
+     COVER_SLEEP_SUPPORTED=0
++    if [ -x "$APP_DIR/aidoku-native-query" ] &&
++        native_read_command "$APP_DIR/aidoku-native-query" --sleep-cover-capability; then
++        case "$(native_read_hex)" in
++            310a) COVER_SLEEP_SUPPORTED=1; return 0 ;;
++            300a) return 0 ;;
++        esac
++    fi
++    # Missing, older, or incompatible helpers retain the original observation.
+     native_read_command lipc-get-prop -s com.lab126.blanket load || return 0
+     cover_configuration_size=$(LC_ALL=C stat -c %s "$LOCK_DIR/native-read-output") || return 0
+     [ "$cover_configuration_size" -gt 0 ] && [ "$cover_configuration_size" -le 128 ] || return 0
+diff --git a/packaging/tests/launcher_test.py b/packaging/tests/launcher_test.py
+index 5cffc3d..8305bbc 100644
+--- a/packaging/tests/launcher_test.py
++++ b/packaging/tests/launcher_test.py
+@@ -863,6 +863,44 @@ cat "$AIDOKU_TEST_ROOT/power-state"
+         (self.root / "cover-configuration").write_text("screensaver langpicker blankwindow usb ad_screensaver\n")
+         self.assert_cover_fallback(requested=False)
+ 
++    def test_native_sleep_capability_probe_preserves_retained_sleep_and_wake(self) -> None:
++        self.configure_sleep_cover()
++        self.shell(self.home / "app/aidoku-native-query", '''
++[ "$*" = --sleep-cover-capability ]
++printf '%s|%s\\n' "$(cat "$AIDOKU_TEST_ROOT/power-state")" "$(cat "$AIDOKU_TEST_ROOT/statusbar")" >"$AIDOKU_TEST_ROOT/native-cover-context"
++printf '1\\n'
++''')
++        pid = self.start_launcher()
++        self.assertEqual((self.root / "native-cover-context").read_text(), "active|running\n")
++        self.assertFalse((self.root / "cover-queries").exists())
++        self.park_with_cover(pid)
++        self.wake()
++        self.assertEqual(self.traces("resumed")[-1]["pid"], pid)
++        self.stop_launcher()
++        self.assert_recovered()
++
++    def test_native_sleep_capability_denial_keeps_stock_sleep(self) -> None:
++        self.configure_sleep_cover()
++        self.shell(self.home / "app/aidoku-native-query", "printf '0\\n'")
++        self.assert_cover_fallback(requested=False)
++        self.assertFalse((self.root / "cover-queries").exists())
++
++    def test_old_native_sleep_helper_falls_back_to_the_legacy_observation(self) -> None:
++        self.configure_sleep_cover()
++        self.shell(self.home / "app/aidoku-native-query", "exit 64")
++        pid = self.start_launcher()
++        self.assertEqual(len((self.root / "cover-queries").read_text().splitlines()), 1)
++        self.park_with_cover(pid)
++        self.stop_launcher()
++        self.assert_recovered()
++
++    def test_malformed_native_sleep_output_is_not_trusted(self) -> None:
++        self.configure_sleep_cover()
++        (self.root / "cover-configuration").write_text("screensaver unknown\n")
++        self.shell(self.home / "app/aidoku-native-query", "printf '1 unexpected\\n'")
++        self.assert_cover_fallback(requested=False)
++        self.assertEqual(len((self.root / "cover-queries").read_text().splitlines()), 1)
++
+     def test_unknown_module_configuration_keeps_stock_sleep(self) -> None:
+         self.configure_sleep_cover()
+         (self.root / "cover-configuration").write_text("screensaver langpicker blankwindow usb unknown\n")
+diff --git a/packaging/tests/native_query_worker_test.py b/packaging/tests/native_query_worker_test.py
+index 3b2a9a7..3a596cd 100644
+--- a/packaging/tests/native_query_worker_test.py
++++ b/packaging/tests/native_query_worker_test.py
+@@ -24,6 +24,13 @@ void LipcFreeString(char *value) { record("free"); free(value); }
+ int LipcGetStringProperty(void *handle, const char *service, const char *name, char **value) {
+     (void)handle; record(service); record(name);
+     const char *mode = getenv("QUERY_STUB_MODE");
++    if (strcmp(name, "load") == 0) {
++        if (mode && strcmp(mode, "error") == 0) return 7;
++        if (mode && strcmp(mode, "null") == 0) { *value = NULL; return 0; }
++        const char *modules = getenv("QUERY_STUB_LOAD");
++        *value = strdup(modules ? modules : "screensaver langpicker blankwindow usb");
++        return 0;
++    }
+     if (strcmp(name, "state") == 0 && mode && strcmp(mode, "error") == 0) return 7;
+     if (strcmp(name, "state") == 0 && mode && strcmp(mode, "long") == 0) {
+         *value = malloc(130); memset(*value, 'x', 129); (*value)[129] = 0; return 0;
+@@ -66,13 +73,16 @@ class WorkerTests(unittest.TestCase):
+     def tearDownClass(cls):
+         cls.temporary.cleanup()
+ 
+-    def run_worker(self, requests, mode="", arguments=("--session",)):
++    def run_worker(self, requests, mode="", arguments=("--session",), modules="screensaver"):
+         log = self.root / (self.id().split(".")[-1] + ".log")
+         log.write_text("")
+-        environment = dict(os.environ, QUERY_STUB_LOG=str(log), QUERY_STUB_MODE=mode)
++        environment = dict(os.environ, QUERY_STUB_LOG=str(log), QUERY_STUB_MODE=mode,
++                           QUERY_STUB_LOAD=modules)
+         result = subprocess.run([str(self.worker), *arguments], input=requests,
+                                 capture_output=True, timeout=7, env=environment)
+         events = log.read_text().splitlines()
++        if arguments != ("--session",):
++            return result, [], events
+         if result.stdout:
+             self.assertEqual(result.stdout[:4], b"AQ1\n")
+         frames = []
+@@ -136,6 +146,29 @@ class WorkerTests(unittest.TestCase):
+         self.assertEqual(len(frames), 32)
+         self.assertEqual(events.count("close"), 1)
+ 
++    def test_sleep_capability_retains_the_exact_module_allowlist(self):
++        for modules in ["screensaver", "screensaver langpicker blankwindow usb\n",
++                        "\tusb\r\n screensaver screensaver  "]:
++            result, _, events = self.run_worker(b"", arguments=("--sleep-cover-capability",), modules=modules)
++            self.assertEqual(result.returncode, 0)
++            self.assertEqual(result.stdout, b"1\n")
++            self.assertEqual(events, ["open", "com.lab126.blanket", "load", "free", "close"])
++        for modules in ["", " \n", "usb langpicker", "screensaver ad_screensaver",
++                        "screensaver unknown", "screensaver\vusb", "Screensaver",
++                        "screensaver " + "x" * 128]:
++            result, _, _ = self.run_worker(b"", arguments=("--sleep-cover-capability",), modules=modules)
++            self.assertEqual(result.returncode, 0)
++            self.assertEqual(result.stdout, b"0\n")
++
++    def test_sleep_capability_handles_native_error_and_null(self):
++        result, _, events = self.run_worker(b"", "error", arguments=("--sleep-cover-capability",))
++        self.assertNotEqual(result.returncode, 0)
++        self.assertEqual(result.stdout, b"")
++        self.assertEqual(events[-1], "close")
++        result, _, _ = self.run_worker(b"", "null", arguments=("--sleep-cover-capability",))
++        self.assertEqual(result.returncode, 0)
++        self.assertEqual(result.stdout, b"0\n")
++
+ 
+ if __name__ == "__main__":
+     unittest.main()
+diff --git a/src/native_query/worker.c b/src/native_query/worker.c
+index 5217d82..cd23fcc 100644
+--- a/src/native_query/worker.c
++++ b/src/native_query/worker.c
+@@ -90,8 +90,44 @@ static void *load_api(struct lipc_api *api) {
+     return library;
+ }
+ 
++static int module_space(unsigned char byte) {
++    return byte == ' ' || byte == '\t' || byte == '\r' || byte == '\n';
++}
++
++static int stock_sleep_modules(const char *value) {
++    if (value == NULL) return 0;
++    size_t length = strnlen(value, MAX_VALUE + 1);
++    if (length == 0 || length > MAX_VALUE) return 0;
++    int screensaver = 0;
++    for (size_t offset = 0; offset < length;) {
++        if (module_space((unsigned char)value[offset])) { offset++; continue; }
++        size_t start = offset;
++        while (offset < length && !module_space((unsigned char)value[offset])) offset++;
++        size_t size = offset - start;
++        if (size == 11 && memcmp(value + start, "screensaver", 11) == 0) screensaver = 1;
++        else if (size == 10 && memcmp(value + start, "langpicker", 10) == 0) {}
++        else if (size == 11 && memcmp(value + start, "blankwindow", 11) == 0) {}
++        else if (size == 3 && memcmp(value + start, "usb", 3) == 0) {}
++        else return 0;
++    }
++    return screensaver;
++}
++
++/* A separate command leaves the existing AQ1 session and opcode set unchanged.
++ * Older helpers reject this command before opening LIPC; the launcher falls
++ * back to its original bounded observation and parser. */
++static int sleep_capability(struct lipc_api *api, LipcHandle *handle) {
++    char *value = NULL;
++    int status = api->get_string(handle, "com.lab126.blanket", "load", &value);
++    if (status != 0) return -1;
++    int supported = stock_sleep_modules(value);
++    if (value != NULL) api->free_string(value);
++    return write_all(supported ? "1\n" : "0\n", 2);
++}
++
+ int main(int argc, char **argv) {
+-    if (argc != 2 || strcmp(argv[1], "--session") != 0) return 64;
++    int probe_sleep = argc == 2 && strcmp(argv[1], "--sleep-cover-capability") == 0;
++    if (!probe_sleep && (argc != 2 || strcmp(argv[1], "--session") != 0)) return 64;
+     pid_t parent = getppid();
+     if (parent <= 1 || prctl(PR_SET_PDEATHSIG, SIGKILL) != 0 || getppid() != parent)
+         return 70;
+@@ -106,6 +142,12 @@ int main(int argc, char **argv) {
+         dlclose(library);
+         return 69;
+     }
++    if (probe_sleep) {
++        int result = sleep_capability(&api, handle);
++        api.close(handle);
++        dlclose(library);
++        return result == 0 ? 0 : 74;
++    }
+     int result = 0;
+     if (write_all("AQ1\n", 4) != 0) result = 74;
+     unsigned int requests = 0;

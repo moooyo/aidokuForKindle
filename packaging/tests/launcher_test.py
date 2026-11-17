@@ -103,6 +103,7 @@ if "--capture-native-portrait" in sys.argv or "--authorize-native-portrait-resum
     commands = parser.add_mutually_exclusive_group(required=True)
     commands.add_argument("--capture-native-portrait", action="store_true")
     commands.add_argument("--authorize-native-portrait-resume")
+    parser.add_argument("--capture-sleep-capability", action="store_true")
     arguments = parser.parse_args(sys.argv[1:])
     epoch = arguments.authorize_native_portrait_resume
     if epoch is not None:
@@ -158,7 +159,9 @@ if "--capture-native-portrait" in sys.argv or "--authorize-native-portrait-resum
         raise SystemExit(1)
     malformed = epoch is not None and (root / "malformed-portrait-resume").exists()
     portrait_trace("malformed" if malformed else "published")
-    sys.stdout.write("INVALID\n" if malformed else "PUBLISHED\n")
+    capability = os.environ.get("AIDOKU_FAKE_CAPTURE_SLEEP_CAPABILITY") if arguments.capture_sleep_capability else None
+    publication = "PUBLISHED\n" if capability is None else f"PUBLISHED {capability}\n"
+    sys.stdout.write("INVALID\n" if malformed else publication)
     sys.stdout.flush()
     raise SystemExit(0)
 
@@ -862,6 +865,31 @@ cat "$AIDOKU_TEST_ROOT/power-state"
         self.configure_sleep_cover()
         (self.root / "cover-configuration").write_text("screensaver langpicker blankwindow usb ad_screensaver\n")
         self.assert_cover_fallback(requested=False)
+
+    def test_combined_capability_preserves_retained_sleep_and_wake(self) -> None:
+        self.configure_sleep_cover()
+        self.environment["AIDOKU_FAKE_CAPTURE_SLEEP_CAPABILITY"] = "1"
+        pid = self.start_launcher()
+        self.assertFalse((self.root / "cover-queries").exists())
+        self.park_with_cover(pid)
+        self.wake()
+        self.assertEqual(self.traces("resumed")[-1]["pid"], pid)
+        self.stop_launcher()
+        self.assert_recovered()
+
+    def test_combined_capability_denial_keeps_stock_sleep(self) -> None:
+        self.configure_sleep_cover()
+        self.environment["AIDOKU_FAKE_CAPTURE_SLEEP_CAPABILITY"] = "0"
+        self.assert_cover_fallback(requested=False)
+        self.assertFalse((self.root / "cover-queries").exists())
+
+    def test_malformed_combined_publication_cannot_take_the_display(self) -> None:
+        self.environment["AIDOKU_FAKE_CAPTURE_SLEEP_CAPABILITY"] = "1 unexpected"
+        self.spawn_launcher()
+        self.assertEqual(self.complete(), 1)
+        self.assertFalse(self.lock.exists())
+        self.assertEqual(self.operations.read_text(), "")
+        self.assertEqual(self.traces(), [])
 
     def test_unknown_module_configuration_keeps_stock_sleep(self) -> None:
         self.configure_sleep_cover()
