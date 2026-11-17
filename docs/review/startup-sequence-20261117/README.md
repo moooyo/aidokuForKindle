@@ -4,6 +4,11 @@
 2.254 seconds and the settled visible-cover submission from 6.153 to 2.677
 seconds in the final six-round comparison. All six pairs improve both endpoints.**
 
+These absolute timings use a temporary script outside `documents`, not the
+indexed Library item. The later [same-version route attribution](../startup-cost-attribution-20261117/README.md)
+measures that distinction and explains why formal Library startup takes longer.
+The within-batch optimization gains below remain valid for their stated route.
+
 The five application/launcher items are implemented. The sixth, shared dispatch,
 was experimentally assessed without replacing the production shared handler.
 The [item-by-item record](PROGRESS.md) includes unsuccessful experiments.

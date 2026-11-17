@@ -213,6 +213,9 @@ trap 'exit 129' HUP; trap 'exit 130' INT; trap 'exit 143' TERM
 backup_metadata
 install_payload
 prepare_manual_data
+if regular "$HOME_DIR/install-catalog-entry.sh" && regular "$HOME_DIR/native-catalog/SHA256SUMS"; then
+    sh "$HOME_DIR/install-catalog-entry.sh" || printf '%s\n' 'aidoku-kpm: Optional catalog integration was not enabled; original Library startup remains available.' >&2
+fi
 record installation-complete true
 printf '%s\n' "$(sha "$MANIFEST")" >"$PACKAGE_DIR/.aidoku-installation-complete.pending"
 mv "$PACKAGE_DIR/.aidoku-installation-complete.pending" "$PACKAGE_DIR/.aidoku-installation-complete"

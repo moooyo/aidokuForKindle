@@ -18,7 +18,8 @@ import zipfile
 
 
 SOURCE_FILES = ("Cargo.toml", "Cargo.lock", "build.rs", "rust-toolchain.toml", ".cargo/config.toml",
-                "scripts/native-codec-probe.c", "scripts/native-codec-bench.h", "scripts/build-native-query.sh")
+                "scripts/native-codec-probe.c", "scripts/native-codec-bench.h", "scripts/build-native-query.sh",
+                "scripts/build-native-catalog-entry.sh")
 SOURCE_DIRECTORIES = ("src", "ui", "assets", "vendor", "examples")
 SOURCE_ALGORITHM = "sha256-of-canonical-sorted-relative-file-records-v1"
 
@@ -45,6 +46,7 @@ def source_manifest(root: Path) -> dict[str, object]:
 def expected_inputs(root: Path) -> dict[str, Path]:
     inputs = {
         "aidoku/launch.sh": root / "packaging/kindle/launch.sh",
+        "aidoku/install-catalog-entry.sh": root / "packaging/kindle/install-catalog-entry.sh",
         "documents/Aidoku.sh": root / "packaging/kindle/document-launcher.sh",
         "aidoku/assets/aidoku-cover.png": root / "assets/launcher/aidoku-cover.png",
         "aidoku/assets/aidoku-cover-v2.png": root / "assets/launcher/aidoku-cover-v2.png",
@@ -119,6 +121,7 @@ def main() -> int:
     parser.add_argument("--expected-application-sha256", required=True)
     parser.add_argument("--expected-helper-sha256", required=True)
     parser.add_argument("--expected-native-query-sha256", required=True)
+    parser.add_argument("--expected-catalog-dir", type=Path)
     parser.add_argument("--output", type=Path, required=True)
     arguments = parser.parse_args()
     if os.name == "nt" or platform.system() != "Linux":
@@ -156,6 +159,9 @@ def main() -> int:
                 "The package manifest binds the exact verified production source", manifest.get("source_sha256"))
         inputs = expected_inputs(root)
         expected_names = set(inputs) | {"aidoku/app/aidoku", "aidoku/app/kindle-jpeg-worker", "aidoku/app/aidoku-native-query"}
+        catalog_names = ("aidoku-library-dispatch", "aidoku-entry-hooks.so", "aidoku-catalog-client", "SHA256SUMS")
+        if arguments.expected_catalog_dir is not None:
+            expected_names.update("aidoku/native-catalog/" + name for name in catalog_names)
         records = manifest.get("files")
         require(isinstance(records, list) and all(isinstance(item, dict) for item in records),
                 "The package manifest contains explicit file records")
@@ -176,7 +182,7 @@ def main() -> int:
                         and "\\" not in name and not info.is_dir(),
                         f"The package member has a safe runtime-free path: {name}")
                 mode = info.external_attr >> 16
-                expected_mode = 0o755 if name.endswith(".sh") or name in ("aidoku/app/aidoku", "aidoku/app/kindle-jpeg-worker", "aidoku/app/aidoku-native-query") else 0o644
+                expected_mode = 0o755 if name.endswith(".sh") or name in ("aidoku/app/aidoku", "aidoku/app/kindle-jpeg-worker", "aidoku/app/aidoku-native-query", "aidoku/native-catalog/aidoku-library-dispatch", "aidoku/native-catalog/aidoku-catalog-client") else 0o644
                 require(info.create_system == 3 and stat.S_ISREG(mode) and stat.S_IMODE(mode) == expected_mode,
                         f"The member has correct Unix file permissions: {name}", oct(mode))
                 content = archive.read(info)
@@ -202,6 +208,20 @@ def main() -> int:
                     "The native query helper matches the frozen executable", sha256(query_helper))
             query_identity = elf_identity(query_helper, static=False)
             require(query_identity["static"] is False, "The query helper uses the native firmware loader", query_identity)
+            if arguments.expected_catalog_dir is not None:
+                for name in catalog_names:
+                    payload = archive.read("aidoku/native-catalog/" + name)
+                    require(payload == (arguments.expected_catalog_dir / name).read_bytes(),
+                            f"The catalog runtime matches its qualified build: {name}")
+                    if name in ("aidoku-library-dispatch", "aidoku-catalog-client"):
+                        require(elf_identity(payload, static=False)["static"] is False,
+                                f"The catalog executable uses the native firmware loader: {name}")
+                    elif name.endswith(".so"):
+                        require(payload[:7] == b"\x7fELF\x01\x01\x01"
+                                and int.from_bytes(payload[16:18], "little") == 3
+                                and int.from_bytes(payload[18:20], "little") == 40
+                                and int.from_bytes(payload[36:40], "little") & 0x600 == 0x400,
+                                "The catalog interposition library is ARM hard-float ELF32")
             license_payload = None
             license_asset = root / "assets/licenses/GPL-3.0-or-later.txt"
             if license_asset.is_file():

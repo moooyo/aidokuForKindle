@@ -1,0 +1,781 @@
+{
+  "schema_version": 1,
+  "run_id": "route-attribution-b9aef85e",
+  "scope": "Same current application/helper/launcher and --library lifetime on both routes. Control opens a temporary .sh outside documents; indexed opens the actual Aidoku.sh. Both use native file URI routing and an eight-second native-screen stabilization outside the measured interval. Warm offline data, predetermined AB/BA, no primary sampling/capture. Separate diagnostic cases sample CPU/frequency at 100ms.",
+  "artifact_identities": {
+    "baseline": {
+      "application_sha256": "570887a0e5603ce2f6d820cf87b2f4e9b385514f71e9a729e85c8ead2f6729fc",
+      "application_bytes": 53366912,
+      "launcher_sha256": "1ae50f6bd7a8262cce185dea08c69f5bc317ed9b7bd7945c55c1f5239dcdd385",
+      "native_query_sha256": "84c2f27d8233d8695001aa86d880e29454fe188deb9884aca1c6694c82a5887d"
+    },
+    "candidate": {
+      "application_sha256": "570887a0e5603ce2f6d820cf87b2f4e9b385514f71e9a729e85c8ead2f6729fc",
+      "application_bytes": 53366912,
+      "launcher_sha256": "1ae50f6bd7a8262cce185dea08c69f5bc317ed9b7bd7945c55c1f5239dcdd385",
+      "native_query_sha256": "84c2f27d8233d8695001aa86d880e29454fe188deb9884aca1c6694c82a5887d"
+    }
+  },
+  "stage_method": "Disjoint monotonic intervals; stage means sum to the mean total. Independent medians need not sum to the median total. Shell marks have 10ms resolution. Portrait internal last event and process reaping have different boundaries. Subintervals are not promised savings.",
+  "frame_cost_order": [
+    "render",
+    "prior_buffer_settle",
+    "pixel_write",
+    "send"
+  ],
+  "routes": {
+    "temporary": {
+      "endpoints_ms": {
+        "startup_ready": {
+          "count": 6,
+          "mean": 2082.075,
+          "median": 2079.256,
+          "min": 1858.2,
+          "max": 2241.208
+        },
+        "startup_library_frame_submitted": {
+          "count": 6,
+          "mean": 2334.569,
+          "median": 2350.067,
+          "min": 2059.657,
+          "max": 2509.727
+        },
+        "startup_library_input_ready": {
+          "count": 6,
+          "mean": 2334.586,
+          "median": 2350.086,
+          "min": 2059.673,
+          "max": 2509.741
+        },
+        "startup_visible_covers_settled": {
+          "count": 6,
+          "mean": 2997.346,
+          "median": 3143.842,
+          "min": 2484.963,
+          "max": 3265.833
+        }
+      },
+      "stages_ms": {
+        "native_dispatch": {
+          "count": 6,
+          "mean": 318.333,
+          "median": 320.0,
+          "min": 290.0,
+          "max": 340.0
+        },
+        "launcher_and_process_start": {
+          "count": 6,
+          "mean": 968.756,
+          "median": 939.904,
+          "min": 760.201,
+          "max": 1138.454
+        },
+        "platform": {
+          "count": 6,
+          "mean": 49.725,
+          "median": 49.101,
+          "min": 45.825,
+          "max": 53.84
+        },
+        "backend": {
+          "count": 6,
+          "mean": 79.387,
+          "median": 78.525,
+          "min": 70.374,
+          "max": 90.731
+        },
+        "window": {
+          "count": 6,
+          "mean": 72.979,
+          "median": 72.091,
+          "min": 61.068,
+          "max": 81.995
+        },
+        "initial_submission": {
+          "count": 6,
+          "mean": 48.889,
+          "median": 46.614,
+          "min": 43.88,
+          "max": 55.532
+        },
+        "initial_barrier": {
+          "count": 6,
+          "mean": 366.275,
+          "median": 365.869,
+          "min": 364.935,
+          "max": 368.876
+        },
+        "remaining_fonts_and_attachment": {
+          "count": 6,
+          "mean": 87.597,
+          "median": 89.085,
+          "min": 79.598,
+          "max": 92.459
+        },
+        "initial_view_sync": {
+          "count": 6,
+          "mean": 90.133,
+          "median": 85.404,
+          "min": 79.271,
+          "max": 119.491
+        },
+        "first_library_render_and_submission": {
+          "count": 6,
+          "mean": 252.494,
+          "median": 256.082,
+          "min": 201.457,
+          "max": 286.527
+        },
+        "cover_tail": {
+          "count": 6,
+          "mean": 662.777,
+          "median": 745.606,
+          "min": 425.306,
+          "max": 799.245
+        }
+      },
+      "budgets_ms": {
+        "portrait_outer_ms": {
+          "count": 6,
+          "mean": 326.667,
+          "median": 325.0,
+          "min": 270.0,
+          "max": 390.0
+        },
+        "portrait_internal_last_event_ms": {
+          "count": 6,
+          "mean": 167.996,
+          "median": 164.483,
+          "min": 145.252,
+          "max": 202.403
+        },
+        "portrait_surround_ms": {
+          "count": 6,
+          "mean": 158.67,
+          "median": 158.286,
+          "min": 116.819,
+          "max": 187.597
+        },
+        "first_frame_to_all_covers_prepared_ms": {
+          "count": 6,
+          "mean": 377.946,
+          "median": 374.862,
+          "min": 270.994,
+          "max": 479.686
+        },
+        "all_covers_prepared_to_submission_ms": {
+          "count": 6,
+          "mean": 284.831,
+          "median": 291.933,
+          "min": 126.613,
+          "max": 477.348
+        },
+        "total_ms": {
+          "count": 6,
+          "mean": 2997.346,
+          "median": 3143.842,
+          "min": 2484.963,
+          "max": 3265.833
+        }
+      },
+      "first_frame_render_ms": {
+        "count": 6,
+        "mean": 232.183,
+        "median": 238.024,
+        "min": 181.442,
+        "max": 268.553
+      }
+    },
+    "indexed": {
+      "endpoints_ms": {
+        "startup_ready": {
+          "count": 6,
+          "mean": 2800.996,
+          "median": 2813.377,
+          "min": 2608.846,
+          "max": 2919.429
+        },
+        "startup_library_frame_submitted": {
+          "count": 6,
+          "mean": 3288.279,
+          "median": 3283.075,
+          "min": 3135.138,
+          "max": 3494.363
+        },
+        "startup_library_input_ready": {
+          "count": 6,
+          "mean": 3288.293,
+          "median": 3283.085,
+          "min": 3135.149,
+          "max": 3494.374
+        },
+        "startup_visible_covers_settled": {
+          "count": 6,
+          "mean": 4276.998,
+          "median": 4088.365,
+          "min": 4022.978,
+          "max": 4961.631
+        }
+      },
+      "stages_ms": {
+        "native_dispatch": {
+          "count": 6,
+          "mean": 313.333,
+          "median": 325.0,
+          "min": 250.0,
+          "max": 350.0
+        },
+        "launcher_and_process_start": {
+          "count": 6,
+          "mean": 1308.85,
+          "median": 1304.945,
+          "min": 1207.052,
+          "max": 1427.423
+        },
+        "platform": {
+          "count": 6,
+          "mean": 72.339,
+          "median": 75.154,
+          "min": 44.638,
+          "max": 91.727
+        },
+        "backend": {
+          "count": 6,
+          "mean": 83.661,
+          "median": 82.333,
+          "min": 67.139,
+          "max": 103.917
+        },
+        "window": {
+          "count": 6,
+          "mean": 96.491,
+          "median": 84.837,
+          "min": 66.592,
+          "max": 186.469
+        },
+        "initial_submission": {
+          "count": 6,
+          "mean": 84.473,
+          "median": 86.371,
+          "min": 61.468,
+          "max": 103.562
+        },
+        "initial_barrier": {
+          "count": 6,
+          "mean": 364.999,
+          "median": 364.992,
+          "min": 360.165,
+          "max": 368.184
+        },
+        "remaining_fonts_and_attachment": {
+          "count": 6,
+          "mean": 192.148,
+          "median": 211.574,
+          "min": 93.88,
+          "max": 266.744
+        },
+        "initial_view_sync": {
+          "count": 6,
+          "mean": 284.702,
+          "median": 273.857,
+          "min": 219.921,
+          "max": 372.365
+        },
+        "first_library_render_and_submission": {
+          "count": 6,
+          "mean": 487.283,
+          "median": 469.698,
+          "min": 372.038,
+          "max": 644.067
+        },
+        "cover_tail": {
+          "count": 6,
+          "mean": 988.719,
+          "median": 805.29,
+          "min": 780.423,
+          "max": 1467.268
+        }
+      },
+      "budgets_ms": {
+        "portrait_outer_ms": {
+          "count": 6,
+          "mean": 641.667,
+          "median": 650.0,
+          "min": 540.0,
+          "max": 720.0
+        },
+        "portrait_internal_last_event_ms": {
+          "count": 6,
+          "mean": 254.211,
+          "median": 251.767,
+          "min": 197.928,
+          "max": 331.194
+        },
+        "portrait_surround_ms": {
+          "count": 6,
+          "mean": 387.456,
+          "median": 384.912,
+          "min": 340.156,
+          "max": 446.31
+        },
+        "first_frame_to_all_covers_prepared_ms": {
+          "count": 6,
+          "mean": 736.232,
+          "median": 658.904,
+          "min": 586.651,
+          "max": 1048.533
+        },
+        "all_covers_prepared_to_submission_ms": {
+          "count": 6,
+          "mean": 252.486,
+          "median": 197.113,
+          "min": 91.753,
+          "max": 436.958
+        },
+        "total_ms": {
+          "count": 6,
+          "mean": 4276.998,
+          "median": 4088.365,
+          "min": 4022.978,
+          "max": 4961.631
+        }
+      },
+      "first_frame_render_ms": {
+        "count": 6,
+        "mean": 437.084,
+        "median": 429.834,
+        "min": 352.065,
+        "max": 559.463
+      }
+    }
+  },
+  "records": [
+    {
+      "case": "baseline-01",
+      "route": "temporary",
+      "endpoints_ms": {
+        "startup_ready": 2049.734,
+        "startup_library_frame_submitted": 2304.828,
+        "startup_library_input_ready": 2304.844,
+        "startup_visible_covers_settled": 3093.134
+      },
+      "stages_ms": {
+        "native_dispatch": 340.0,
+        "launcher_and_process_start": 932.432,
+        "platform": 47.707,
+        "backend": 78.549,
+        "window": 70.046,
+        "initial_submission": 43.88,
+        "initial_barrier": 366.735,
+        "remaining_fonts_and_attachment": 90.32,
+        "initial_view_sync": 80.065,
+        "first_library_render_and_submission": 255.094,
+        "cover_tail": 788.306
+      },
+      "first_frame_cost_ms": [
+        236.773,
+        0.028,
+        16.066,
+        0.27
+      ],
+      "portrait_outer_ms": 310.0,
+      "portrait_internal_last_event_ms": 155.504,
+      "portrait_surround_ms": 154.496,
+      "first_frame_to_all_covers_prepared_ms": 310.958,
+      "all_covers_prepared_to_submission_ms": 477.348,
+      "total_ms": 3093.134
+    },
+    {
+      "case": "candidate-01",
+      "route": "indexed",
+      "endpoints_ms": {
+        "startup_ready": 2800.651,
+        "startup_library_frame_submitted": 3242.555,
+        "startup_library_input_ready": 3242.578,
+        "startup_visible_covers_settled": 4022.978
+      },
+      "stages_ms": {
+        "native_dispatch": 330.0,
+        "launcher_and_process_start": 1207.052,
+        "platform": 67.206,
+        "backend": 96.82,
+        "window": 186.469,
+        "initial_submission": 61.468,
+        "initial_barrier": 368.184,
+        "remaining_fonts_and_attachment": 247.039,
+        "initial_view_sync": 236.413,
+        "first_library_render_and_submission": 441.904,
+        "cover_tail": 780.423
+      },
+      "first_frame_cost_ms": [
+        400.252,
+        0.016,
+        23.378,
+        0.159
+      ],
+      "portrait_outer_ms": 540.0,
+      "portrait_internal_last_event_ms": 197.928,
+      "portrait_surround_ms": 342.072,
+      "first_frame_to_all_covers_prepared_ms": 688.67,
+      "all_covers_prepared_to_submission_ms": 91.753,
+      "total_ms": 4022.978
+    },
+    {
+      "case": "candidate-02",
+      "route": "indexed",
+      "endpoints_ms": {
+        "startup_ready": 2850.296,
+        "startup_library_frame_submitted": 3494.363,
+        "startup_library_input_ready": 3494.374,
+        "startup_visible_covers_settled": 4961.631
+      },
+      "stages_ms": {
+        "native_dispatch": 350.0,
+        "launcher_and_process_start": 1313.85,
+        "platform": 44.638,
+        "backend": 91.694,
+        "window": 89.606,
+        "initial_submission": 100.831,
+        "initial_barrier": 365.235,
+        "remaining_fonts_and_attachment": 122.077,
+        "initial_view_sync": 372.365,
+        "first_library_render_and_submission": 644.067,
+        "cover_tail": 1467.268
+      },
+      "first_frame_cost_ms": [
+        559.463,
+        0.026,
+        62.117,
+        8.71
+      ],
+      "portrait_outer_ms": 700.0,
+      "portrait_internal_last_event_ms": 253.69,
+      "portrait_surround_ms": 446.31,
+      "first_frame_to_all_covers_prepared_ms": 1048.533,
+      "all_covers_prepared_to_submission_ms": 418.735,
+      "total_ms": 4961.631
+    },
+    {
+      "case": "baseline-02",
+      "route": "temporary",
+      "endpoints_ms": {
+        "startup_ready": 2108.779,
+        "startup_library_frame_submitted": 2395.306,
+        "startup_library_input_ready": 2395.328,
+        "startup_visible_covers_settled": 3194.551
+      },
+      "stages_ms": {
+        "native_dispatch": 320.0,
+        "launcher_and_process_start": 928.272,
+        "platform": 52.775,
+        "backend": 90.731,
+        "window": 81.995,
+        "initial_submission": 55.532,
+        "initial_barrier": 368.876,
+        "remaining_fonts_and_attachment": 91.107,
+        "initial_view_sync": 119.491,
+        "first_library_render_and_submission": 286.527,
+        "cover_tail": 799.245
+      },
+      "first_frame_cost_ms": [
+        268.553,
+        0.036,
+        15.313,
+        0.249
+      ],
+      "portrait_outer_ms": 340.0,
+      "portrait_internal_last_event_ms": 178.175,
+      "portrait_surround_ms": 161.825,
+      "first_frame_to_all_covers_prepared_ms": 479.686,
+      "all_covers_prepared_to_submission_ms": 319.559,
+      "total_ms": 3194.551
+    },
+    {
+      "case": "baseline-03",
+      "route": "temporary",
+      "endpoints_ms": {
+        "startup_ready": 1858.2,
+        "startup_library_frame_submitted": 2059.657,
+        "startup_library_input_ready": 2059.673,
+        "startup_visible_covers_settled": 2484.963
+      },
+      "stages_ms": {
+        "native_dispatch": 320.0,
+        "launcher_and_process_start": 760.201,
+        "platform": 48.519,
+        "backend": 70.374,
+        "window": 74.136,
+        "initial_submission": 46.099,
+        "initial_barrier": 365.782,
+        "remaining_fonts_and_attachment": 92.459,
+        "initial_view_sync": 80.63,
+        "first_library_render_and_submission": 201.457,
+        "cover_tail": 425.306
+      },
+      "first_frame_cost_ms": [
+        181.442,
+        0.024,
+        17.463,
+        0.321
+      ],
+      "portrait_outer_ms": 270.0,
+      "portrait_internal_last_event_ms": 153.181,
+      "portrait_surround_ms": 116.819,
+      "first_frame_to_all_covers_prepared_ms": 298.693,
+      "all_covers_prepared_to_submission_ms": 126.613,
+      "total_ms": 2484.963
+    },
+    {
+      "case": "candidate-03",
+      "route": "indexed",
+      "endpoints_ms": {
+        "startup_ready": 2608.846,
+        "startup_library_frame_submitted": 3135.138,
+        "startup_library_input_ready": 3135.149,
+        "startup_visible_covers_settled": 4424.189
+      },
+      "stages_ms": {
+        "native_dispatch": 330.0,
+        "launcher_and_process_start": 1272.788,
+        "platform": 87.919,
+        "backend": 69.422,
+        "window": 66.605,
+        "initial_submission": 103.562,
+        "initial_barrier": 364.749,
+        "remaining_fonts_and_attachment": 93.88,
+        "initial_view_sync": 219.921,
+        "first_library_render_and_submission": 526.292,
+        "cover_tail": 1289.051
+      },
+      "first_frame_cost_ms": [
+        451.055,
+        0.014,
+        70.236,
+        0.785
+      ],
+      "portrait_outer_ms": 590.0,
+      "portrait_internal_last_event_ms": 249.844,
+      "portrait_surround_ms": 340.156,
+      "first_frame_to_all_covers_prepared_ms": 852.093,
+      "all_covers_prepared_to_submission_ms": 436.958,
+      "total_ms": 4424.189
+    },
+    {
+      "case": "candidate-04",
+      "route": "indexed",
+      "endpoints_ms": {
+        "startup_ready": 2801.416,
+        "startup_library_frame_submitted": 3275.667,
+        "startup_library_input_ready": 3275.677,
+        "startup_visible_covers_settled": 4083.862
+      },
+      "stages_ms": {
+        "native_dispatch": 300.0,
+        "launcher_and_process_start": 1296.039,
+        "platform": 59.441,
+        "backend": 103.917,
+        "window": 66.592,
+        "initial_submission": 68.235,
+        "initial_barrier": 366.973,
+        "remaining_fonts_and_attachment": 208.417,
+        "initial_view_sync": 331.802,
+        "first_library_render_and_submission": 474.251,
+        "cover_tail": 808.195
+      },
+      "first_frame_cost_ms": [
+        431.244,
+        0.014,
+        30.444,
+        0.096
+      ],
+      "portrait_outer_ms": 670.0,
+      "portrait_internal_last_event_ms": 288.982,
+      "portrait_surround_ms": 381.018,
+      "first_frame_to_all_covers_prepared_ms": 612.308,
+      "all_covers_prepared_to_submission_ms": 195.887,
+      "total_ms": 4083.862
+    },
+    {
+      "case": "baseline-04",
+      "route": "temporary",
+      "endpoints_ms": {
+        "startup_ready": 2236.146,
+        "startup_library_frame_submitted": 2509.727,
+        "startup_library_input_ready": 2509.741,
+        "startup_visible_covers_settled": 3265.833
+      },
+      "stages_ms": {
+        "native_dispatch": 340.0,
+        "launcher_and_process_start": 1105.804,
+        "platform": 49.683,
+        "backend": 84.255,
+        "window": 69.524,
+        "initial_submission": 46.103,
+        "initial_barrier": 365.368,
+        "remaining_fonts_and_attachment": 84.247,
+        "initial_view_sync": 91.162,
+        "first_library_render_and_submission": 273.581,
+        "cover_tail": 756.106
+      },
+      "first_frame_cost_ms": [
+        242.345,
+        0.014,
+        28.297,
+        1.054
+      ],
+      "portrait_outer_ms": 390.0,
+      "portrait_internal_last_event_ms": 202.403,
+      "portrait_surround_ms": 187.597,
+      "first_frame_to_all_covers_prepared_ms": 438.766,
+      "all_covers_prepared_to_submission_ms": 317.34,
+      "total_ms": 3265.833
+    },
+    {
+      "case": "baseline-05",
+      "route": "temporary",
+      "endpoints_ms": {
+        "startup_ready": 1998.381,
+        "startup_library_frame_submitted": 2239.617,
+        "startup_library_input_ready": 2239.632,
+        "startup_visible_covers_settled": 2712.21
+      },
+      "stages_ms": {
+        "native_dispatch": 290.0,
+        "launcher_and_process_start": 947.376,
+        "platform": 45.825,
+        "backend": 73.91,
+        "window": 61.068,
+        "initial_submission": 47.125,
+        "initial_barrier": 365.956,
+        "remaining_fonts_and_attachment": 87.85,
+        "initial_view_sync": 79.271,
+        "first_library_render_and_submission": 241.236,
+        "cover_tail": 472.593
+      },
+      "first_frame_cost_ms": [
+        224.712,
+        0.029,
+        14.198,
+        0.273
+      ],
+      "portrait_outer_ms": 300.0,
+      "portrait_internal_last_event_ms": 145.252,
+      "portrait_surround_ms": 154.748,
+      "first_frame_to_all_covers_prepared_ms": 270.994,
+      "all_covers_prepared_to_submission_ms": 201.599,
+      "total_ms": 2712.21
+    },
+    {
+      "case": "candidate-05",
+      "route": "indexed",
+      "endpoints_ms": {
+        "startup_ready": 2919.429,
+        "startup_library_frame_submitted": 3291.467,
+        "startup_library_input_ready": 3291.487,
+        "startup_visible_covers_settled": 4076.457
+      },
+      "stages_ms": {
+        "native_dispatch": 250.0,
+        "launcher_and_process_start": 1427.423,
+        "platform": 83.102,
+        "backend": 67.139,
+        "window": 85.184,
+        "initial_submission": 80.8,
+        "initial_barrier": 364.689,
+        "remaining_fonts_and_attachment": 266.744,
+        "initial_view_sync": 294.348,
+        "first_library_render_and_submission": 372.038,
+        "cover_tail": 784.99
+      },
+      "first_frame_cost_ms": [
+        352.065,
+        0.014,
+        16.716,
+        0.142
+      ],
+      "portrait_outer_ms": 720.0,
+      "portrait_internal_last_event_ms": 331.194,
+      "portrait_surround_ms": 388.806,
+      "first_frame_to_all_covers_prepared_ms": 586.651,
+      "all_covers_prepared_to_submission_ms": 198.339,
+      "total_ms": 4076.457
+    },
+    {
+      "case": "candidate-06",
+      "route": "indexed",
+      "endpoints_ms": {
+        "startup_ready": 2825.338,
+        "startup_library_frame_submitted": 3290.483,
+        "startup_library_input_ready": 3290.493,
+        "startup_visible_covers_settled": 4092.868
+      },
+      "stages_ms": {
+        "native_dispatch": 320.0,
+        "launcher_and_process_start": 1335.945,
+        "platform": 91.727,
+        "backend": 72.972,
+        "window": 84.49,
+        "initial_submission": 91.942,
+        "initial_barrier": 360.165,
+        "remaining_fonts_and_attachment": 214.731,
+        "initial_view_sync": 253.366,
+        "first_library_render_and_submission": 465.145,
+        "cover_tail": 802.385
+      },
+      "first_frame_cost_ms": [
+        428.423,
+        0.016,
+        33.837,
+        0.776
+      ],
+      "portrait_outer_ms": 630.0,
+      "portrait_internal_last_event_ms": 203.626,
+      "portrait_surround_ms": 426.374,
+      "first_frame_to_all_covers_prepared_ms": 629.139,
+      "all_covers_prepared_to_submission_ms": 173.246,
+      "total_ms": 4092.868
+    },
+    {
+      "case": "baseline-06",
+      "route": "temporary",
+      "endpoints_ms": {
+        "startup_ready": 2241.208,
+        "startup_library_frame_submitted": 2498.278,
+        "startup_library_input_ready": 2498.295,
+        "startup_visible_covers_settled": 3233.385
+      },
+      "stages_ms": {
+        "native_dispatch": 300.0,
+        "launcher_and_process_start": 1138.454,
+        "platform": 53.84,
+        "backend": 78.501,
+        "window": 81.103,
+        "initial_submission": 54.598,
+        "initial_barrier": 364.935,
+        "remaining_fonts_and_attachment": 79.598,
+        "initial_view_sync": 90.179,
+        "first_library_render_and_submission": 257.07,
+        "cover_tail": 735.107
+      },
+      "first_frame_cost_ms": [
+        239.274,
+        0.032,
+        14.455,
+        0.287
+      ],
+      "portrait_outer_ms": 350.0,
+      "portrait_internal_last_event_ms": 173.463,
+      "portrait_surround_ms": 176.537,
+      "first_frame_to_all_covers_prepared_ms": 468.58,
+      "all_covers_prepared_to_submission_ms": 266.527,
+      "total_ms": 3233.385
+    }
+  ],
+  "indexed_extra_median_ms": {
+    "startup_ready": 734.121,
+    "startup_library_frame_submitted": 933.008,
+    "startup_library_input_ready": 932.999,
+    "startup_visible_covers_settled": 944.523
+  },
+  "all_six_pairs_slower_on_indexed_route": true
+}

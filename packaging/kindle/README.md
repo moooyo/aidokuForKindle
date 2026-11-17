@@ -8,8 +8,27 @@ The single Library document invokes `launch.sh --library`. Its small entry
 waits for the independently supervised worker to finish restoring native state,
 so the shared Scriptlet service does not return to Library during startup.
 The worker still has its own session and survives retirement of the waiting
-entry. KUAL and direct package launches retain detached admission. No shared
-handler binary, registry association, scanner request, or cover asset is changed.
+entry. KUAL and direct package launches retain detached admission.
+
+The optional catalog runtime records recent access on the existing Library
+item at launch and publishes its normal catalog notification after the owned
+worker restores native control. This keeps native Library background work out
+of startup. The original handler executable, scanner request, MIME association
+and cover remain in place. Unknown handler/catalog versions use original
+dispatch. Other script documents do not opt into this Aidoku-only policy.
+
+After copying the complete ZIP bundle, enable the qualified runtime once as
+root with `sh /mnt/us/aidoku/install-catalog-entry.sh`. It installs immutable
+versions under `/var/local/kindle-catalog-entry` and updates only the existing
+Scriptlet command. `sh /mnt/us/aidoku/install-catalog-entry.sh --disable`
+restores original dispatch. Old runtime files remain available to active
+workers and are not removed automatically. There is still one Aidoku Library
+item. Firmware libraries and private authentication material are not packaged.
+
+Notification ownership stays with the independent worker across sleep/wake and
+retirement of the small Library waiter. A rejected or unavailable completion
+uses the original timestamp/scan recovery when native ownership was acquired.
+Recent-access time is committed at launch and is not changed to the exit time.
 
 The optional `aidoku-native-query` helper reads a fixed set of firmware LIPC
 properties through one connection per bounded transaction. It uses the native

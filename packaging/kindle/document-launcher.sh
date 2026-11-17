@@ -3,6 +3,7 @@
 # DontUseFBInk
 # Author: Aidoku
 # Icon: /mnt/us/aidoku/assets/aidoku-cover-v2.png
+# AidokuCatalogAccess: deferred-v1
 set -eu
 umask 077
 LOG_DIR=/mnt/us/aidoku/data/logs

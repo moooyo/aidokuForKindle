@@ -1,8 +1,9 @@
 # Aidoku KPM Package
 
 This package uses the existing KPM installation and the Kindle home-screen
-Scriptlet entry. It does not install a different launcher or replace a global
-document hook. Build, package, and verify through `ssh test-env`.
+Scriptlet entry. The optional qualified catalog runtime keeps the original
+shared executable while opting the Aidoku item into deferred catalog
+notifications. Build, package, and verify through `ssh test-env`.
 
 ## Package a prebuilt application
 
@@ -13,6 +14,7 @@ jobs, then package that exact output from the production source tree:
 python3 scripts/package-kpm.py \
   --application target/armv7-unknown-linux-musleabihf/release/aidoku \
   --native-query-helper target/native-query/aidoku-native-query \
+  --native-catalog-dir target/native-catalog \
   --output dist/aidoku-0.1.3.kpkg
 ```
 
@@ -28,6 +30,17 @@ on the same Linux worker. `--native-query-helper PATH` adds that exact ARM
 hard-float executable to the program allowlist with executable permissions.
 Without it, the application retains its legacy command-line native queries.
 The helper uses compatible firmware libraries in place; none are redistributed.
+
+Build the catalog runtime with `sh scripts/build-native-catalog-entry.sh
+target/native-catalog`. When `--native-catalog-dir` is supplied, KPM's install
+hook enables the qualified runtime after the complete program payload is in
+place. Unsupported versions and unrelated handler registrations are preserved.
+Recent access is committed at launch; the independent application worker sends
+the normal notification after restoring native control. The original handler,
+scanner request, MIME association and accepted cover remain unchanged. Runtime
+versions live outside the removable application payload so active workers and
+other Scriptlet documents retain a valid dispatch target. Use the installed
+`install-catalog-entry.sh --disable` to restore original dispatch explicitly.
 
 The gzip-compressed tar archive contains a version-2 `manifest.json`, KPM
 `install.sh`, `launch.sh`, `uninstall.sh`, an immutable `payload.tsv`, and the

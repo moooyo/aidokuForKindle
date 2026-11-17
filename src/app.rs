@@ -297,6 +297,7 @@ pub struct App {
     cover_pending: HashSet<String>,
     cover_queue: VecDeque<Book>,
     cover_inflight: Option<u64>,
+    startup_cover_publication: Option<cover_jobs::StartupCoverPublication>,
     cover_view: Vec<String>,
     cover_retry_after: HashMap<String, Instant>,
     source_revision: u64,
@@ -482,6 +483,7 @@ impl App {
             cover_pending: HashSet::new(),
             cover_queue: VecDeque::new(),
             cover_inflight: None,
+            startup_cover_publication: None,
             cover_view: Vec::new(),
             cover_retry_after: HashMap::new(),
             source_revision: 0,
@@ -857,6 +859,7 @@ impl App {
             self.message_until = None;
             changed = true;
         }
+        let startup_cover_due = self.startup_cover_publication_due();
         let background_due = Instant::now() >= self.next_background_ui;
         if background_due && self.download_ui_dirty {
             if self.modal == "downloads" {
@@ -867,7 +870,10 @@ impl App {
             }
             self.download_ui_dirty = false;
         }
-        if changed || background_due && self.background_ui_dirty {
+        if changed || (background_due || startup_cover_due) && self.background_ui_dirty {
+            if startup_cover_due {
+                crate::reader_timing::mark("startup_final_cover_publication");
+            }
             match self.sync_view() {
                 Ok(()) => self.publish_reader_timing(),
                 Err(error) => {
@@ -1996,6 +2002,7 @@ mod tests {
                 cover_pending: HashSet::new(),
                 cover_queue: VecDeque::new(),
                 cover_inflight: None,
+                startup_cover_publication: None,
                 cover_view: Vec::new(),
                 cover_retry_after: HashMap::new(),
                 source_revision: 0,

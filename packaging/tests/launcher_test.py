@@ -10,6 +10,7 @@ they do not exercise framebuffer calibration or physical sensor acceptance.
 
 from __future__ import annotations
 
+import hashlib
 import json
 import os
 from pathlib import Path
@@ -443,8 +444,11 @@ class LauncherTests(unittest.TestCase):
         self.fixture_launcher.write_text(
             LAUNCHER.read_text().replace(
                 "/var/local/system/userpasswdenabled", str(self.root / "passcode")
-            )
+            ).replace("/var/local/kindle-catalog-entry", str(self.root / "catalog"))
+            .replace("/mnt/us/documents/Aidoku.sh", str(self.root / "Aidoku.sh"))
         )
+        (self.root / "Aidoku.sh").write_text("#!/bin/sh\nexit 0\n")
+        self.shell(self.bin / "lipc-set-prop", 'printf "%s\\n" "catalog-scan:$*" >>"$AIDOKU_TEST_ROOT/operations"')
         os.mkfifo(self.root / "event-input", 0o600)
         self.event_descriptor = os.open(self.root / "event-input", os.O_RDWR | os.O_NONBLOCK)
         self.wm = subprocess.Popen(["sleep", "120"], start_new_session=True)
@@ -642,6 +646,85 @@ cat "$AIDOKU_TEST_ROOT/power-state"
         self.assertEqual(os.getsid(self.library_worker), self.library_worker)
         self.assertIsNone(self.launcher.poll())
         return self.traces("started")[-1]["pid"]
+
+    def enable_catalog_notification(self, *, behavior: str = "success") -> Path:
+        directory = self.root / "catalog" / ("v1-" + "a" * 64)
+        directory.mkdir(parents=True)
+        helper = directory / "aidoku-catalog-client"
+        self.shell(helper, r'''
+printf '%s\n' "catalog-notify:$(cat "$AIDOKU_TEST_ROOT/statusbar")" >>"$AIDOKU_TEST_ROOT/operations"
+case "$AIDOKU_TEST_CATALOG_BEHAVIOR" in
+ fail) exit 7;;
+ hang) exec sleep 120;;
+ overflow) printf 'NOTIFIED\n'; head -c 129 /dev/zero;;
+ *) printf 'NOTIFIED\n';;
+esac
+''')
+        self.environment.update({
+            "AIDOKU_CATALOG_NOTIFY_HELPER": str(helper),
+            "AIDOKU_CATALOG_NOTIFY_SHA256": hashlib.sha256(helper.read_bytes()).hexdigest(),
+            "AIDOKU_TEST_CATALOG_BEHAVIOR": behavior,
+        })
+        return helper
+
+    def test_catalog_notification_follows_native_restoration_once(self) -> None:
+        self.enable_catalog_notification()
+        self.environment.update(AIDOKU_FAKE_EXIT_AFTER="0.4", AIDOKU_FAKE_EXIT_CODE="0")
+        self.start_library_entry()
+        self.assertEqual(self.complete(), 0)
+        self.assert_recovered()
+        operations = self.operations.read_text().splitlines()
+        self.assertEqual(operations.count("catalog-notify:running"), 1)
+        self.assertGreater(operations.index("catalog-notify:running"), operations.index("start:statusbar"))
+
+    def test_catalog_notification_keeps_nonzero_application_status(self) -> None:
+        self.enable_catalog_notification()
+        self.environment.update(AIDOKU_FAKE_EXIT_AFTER="0.4", AIDOKU_FAKE_EXIT_CODE="7")
+        self.start_library_entry()
+        self.assertEqual(self.complete(), 7)
+        self.assertEqual(self.operations.read_text().count("catalog-notify:running"), 1)
+
+    def test_catalog_notification_survives_library_waiter_retirement(self) -> None:
+        self.enable_catalog_notification()
+        self.start_library_entry()
+        self.launcher.kill()
+        self.launcher.wait(timeout=3)
+        os.kill(self.library_worker, signal.SIGTERM)
+        wait_for(lambda: not self.lock.exists(), seconds=12, description="catalog completion after waiter retirement")
+        self.assertEqual(self.operations.read_text().count("catalog-notify:running"), 1)
+        self.assert_recovered()
+
+    def test_catalog_notification_failure_uses_bounded_standard_scan(self) -> None:
+        self.enable_catalog_notification(behavior="fail")
+        self.environment.update(AIDOKU_FAKE_EXIT_AFTER="0.4", AIDOKU_FAKE_EXIT_CODE="0")
+        self.start_library_entry()
+        self.assertEqual(self.complete(), 0)
+        self.assertIn("catalog-scan:-i com.lab126.scanner doFullScan 1", self.operations.read_text())
+        self.assert_recovered()
+
+    def test_catalog_notification_overflow_is_not_accepted(self) -> None:
+        self.enable_catalog_notification(behavior="overflow")
+        self.environment.update(AIDOKU_FAKE_EXIT_AFTER="0.4", AIDOKU_FAKE_EXIT_CODE="0")
+        self.start_library_entry()
+        self.assertEqual(self.complete(), 0)
+        self.assertIn("catalog-scan:-i com.lab126.scanner doFullScan 1", self.operations.read_text())
+
+    def test_catalog_notification_timeout_preserves_exit_and_restoration(self) -> None:
+        self.enable_catalog_notification(behavior="hang")
+        self.environment.update(AIDOKU_FAKE_EXIT_AFTER="0.4", AIDOKU_FAKE_EXIT_CODE="0")
+        self.start_library_entry()
+        self.assertEqual(self.complete(timeout=10), 0)
+        self.assertIn("catalog-scan:-i com.lab126.scanner doFullScan 1", self.operations.read_text())
+        self.assert_recovered()
+
+    def test_catalog_notification_rejects_modified_helper(self) -> None:
+        helper = self.enable_catalog_notification()
+        helper.write_text(helper.read_text() + "# changed\n")
+        self.environment.update(AIDOKU_FAKE_EXIT_AFTER="0.4", AIDOKU_FAKE_EXIT_CODE="0")
+        self.start_library_entry()
+        self.assertEqual(self.complete(), 0)
+        self.assertNotIn("catalog-notify:", self.operations.read_text())
+        self.assertIn("catalog-scan:-i com.lab126.scanner doFullScan 1", self.operations.read_text())
 
     def test_library_entry_waits_for_worker_exit_and_preserves_its_status(self) -> None:
         self.environment.update(AIDOKU_FAKE_EXIT_AFTER="0.6", AIDOKU_FAKE_EXIT_CODE="7")

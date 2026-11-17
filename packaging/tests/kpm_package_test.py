@@ -39,7 +39,8 @@ class KpmPackageTests(unittest.TestCase):
 
     def package(self, name: str, *, sample: bool = False, version: str | None = "2.3.4",
                 environment: dict[str, str] | None = None,
-                query_helper: Path | None = None) -> tuple[Path, subprocess.CompletedProcess[str]]:
+                query_helper: Path | None = None,
+                catalog_dir: Path | None = None) -> tuple[Path, subprocess.CompletedProcess[str]]:
         output = self.root / name
         command = [sys.executable, str(BUILDER), "--application", str(self.application),
                    "--source-root", str(REPOSITORY), "--output", str(output)]
@@ -49,6 +50,8 @@ class KpmPackageTests(unittest.TestCase):
             command.extend(("--sample-cbz", str(self.sample)))
         if query_helper is not None:
             command.extend(("--native-query-helper", str(query_helper)))
+        if catalog_dir is not None:
+            command.extend(("--native-catalog-dir", str(catalog_dir)))
         result = subprocess.run(command, env=environment, capture_output=True, text=True, timeout=30)
         return output, result
 
@@ -75,6 +78,31 @@ class KpmPackageTests(unittest.TestCase):
         _, result = self.package("bad-query.kpkg", query_helper=helper)
         self.assertNotEqual(result.returncode, 0)
         self.assertIn("hard-float", result.stderr)
+
+    def test_catalog_runtime_is_explicit_and_preserves_modes(self) -> None:
+        directory = self.root / "catalog"
+        directory.mkdir()
+        content = bytearray(self.application.read_bytes())
+        content[36:40] = (0x5000400).to_bytes(4, "little")
+        for name in ("aidoku-library-dispatch", "aidoku-entry-hooks.so", "aidoku-catalog-client"):
+            (directory / name).write_bytes(content)
+        (directory / "SHA256SUMS").write_text("Fixture manifest\n")
+        output, result = self.package("catalog.kpkg", catalog_dir=directory)
+        self.require_success(result)
+        with tarfile.open(output, "r:gz") as archive:
+            for name in ("aidoku-library-dispatch", "aidoku-catalog-client"):
+                self.assertEqual(archive.getmember("payload/aidoku/native-catalog/" + name).mode, 0o755)
+            self.assertEqual(archive.getmember("payload/aidoku/native-catalog/aidoku-entry-hooks.so").mode, 0o644)
+            self.assertIn("payload/aidoku/install-catalog-entry.sh", archive.getnames())
+
+    def test_catalog_runtime_rejects_host_architecture(self) -> None:
+        directory = self.root / "invalid-catalog"
+        directory.mkdir()
+        for name in ("aidoku-library-dispatch", "aidoku-entry-hooks.so", "aidoku-catalog-client", "SHA256SUMS"):
+            (directory / name).write_bytes(b"not a firmware artifact")
+        _, result = self.package("invalid-catalog.kpkg", catalog_dir=directory)
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("ARM hard-float", result.stderr)
 
     def test_archive_has_kpm_metadata_and_a_complete_program_allowlist(self) -> None:
         output, result = self.package("aidoku.tar.gz", sample=True)

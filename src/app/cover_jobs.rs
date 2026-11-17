@@ -2,11 +2,65 @@
 
 use super::*;
 
+pub(super) struct StartupCoverPublication {
+    lifecycle_generation: u64,
+    source_revision: u64,
+    visible: Vec<String>,
+}
+
 impl App {
     /// Gather initial cover results during the existing UI publication interval.
     /// No UI model is changed from the accepted-frame observer.
     pub fn begin_startup_cover_publication(&mut self) {
         self.next_background_ui = Instant::now() + Duration::from_millis(300);
+        self.startup_cover_publication =
+            (self.route == "library" && self.modal.is_empty()).then(|| StartupCoverPublication {
+                lifecycle_generation: self.lifecycle_generation,
+                source_revision: self.source_revision,
+                visible: self.visible_cover_ids(),
+            });
+    }
+
+    pub(super) fn startup_cover_publication_due(&mut self) -> bool {
+        if self.startup_cover_publication.is_none()
+            || self.cover_work_pending()
+            || !self.cover_pending.is_empty()
+        {
+            return false;
+        }
+        let visible = self.visible_cover_ids();
+        self.finish_startup_cover_publication(&visible)
+    }
+
+    fn finish_startup_cover_publication(&mut self, visible: &[String]) -> bool {
+        let Some(startup) = self.startup_cover_publication.as_ref() else {
+            return false;
+        };
+        if self.shutting_down
+            || self.suspended
+            || self.resume_frame_pending
+            || self.route != "library"
+            || !self.modal.is_empty()
+            || self.lifecycle_generation != startup.lifecycle_generation
+            || self.source_revision != startup.source_revision
+            || visible != startup.visible.as_slice()
+        {
+            self.startup_cover_publication = None;
+            return false;
+        }
+        if self.cover_work_pending()
+            || !self.cover_pending.is_empty()
+            || self.cover_view.as_slice() != visible
+        {
+            return false;
+        }
+        // Retire this one-time opportunity even if no pixels changed or a
+        // failed cover is waiting for its normal retry/publication cadence.
+        self.startup_cover_publication = None;
+        self.background_ui_dirty
+            && !visible
+                .iter()
+                .any(|id| self.cover_retry_after.contains_key(id))
     }
 
     pub(super) fn request_covers(&mut self, _books: &[Book]) -> Result<()> {
@@ -671,6 +725,120 @@ mod tests {
     use super::*;
     use image::{ImageFormat, Luma};
     use std::io::Cursor;
+
+    fn pending_startup_publication(app: &mut App, visible: &[String]) {
+        app.startup_cover_publication = Some(StartupCoverPublication {
+            lifecycle_generation: app.lifecycle_generation,
+            source_revision: app.source_revision,
+            visible: visible.to_vec(),
+        });
+        app.cover_view = visible.to_vec();
+        app.background_ui_dirty = true;
+        app.next_background_ui = Instant::now() + Duration::from_secs(5);
+    }
+
+    #[test]
+    fn final_startup_cover_flush_waits_for_all_work_and_happens_once() {
+        use crate::app::tests::DemoRouteFixture;
+        let mut fixture =
+            DemoRouteFixture::new("library", crate::platform::DeviceProfile::Pw5, false);
+        let visible = vec!["cover-a".to_owned(), "cover-b".to_owned()];
+        let app = &mut fixture.app;
+        pending_startup_publication(app, &visible);
+        let ordinary_deadline = app.next_background_ui;
+        app.cover_queue.push_back(Book {
+            id: visible[0].clone(),
+            ..Book::default()
+        });
+        assert!(!app.finish_startup_cover_publication(&visible));
+        app.cover_queue.clear();
+        app.cover_inflight = Some(7);
+        app.cover_pending.insert(visible[0].clone());
+        assert!(!app.finish_startup_cover_publication(&visible));
+        app.cover_inflight = None;
+        assert!(!app.finish_startup_cover_publication(&visible));
+        app.cover_pending.clear();
+        assert!(app.finish_startup_cover_publication(&visible));
+        assert!(!app.finish_startup_cover_publication(&visible));
+        assert_eq!(app.next_background_ui, ordinary_deadline);
+    }
+
+    #[test]
+    fn startup_flush_waits_until_the_visible_queue_has_been_established() {
+        use crate::app::tests::DemoRouteFixture;
+        let mut fixture =
+            DemoRouteFixture::new("library", crate::platform::DeviceProfile::Pw5, false);
+        let visible = vec!["cover-a".to_owned()];
+        let app = &mut fixture.app;
+        pending_startup_publication(app, &visible);
+        app.cover_view.clear();
+        assert!(!app.finish_startup_cover_publication(&visible));
+        assert!(app.startup_cover_publication.is_some());
+        app.cover_view = visible.clone();
+        assert!(app.finish_startup_cover_publication(&visible));
+    }
+
+    #[test]
+    fn startup_flush_rejects_stale_or_unowned_presentations() {
+        use crate::app::tests::DemoRouteFixture;
+        for scenario in 0..7 {
+            let mut fixture =
+                DemoRouteFixture::new("library", crate::platform::DeviceProfile::Pw5, false);
+            let visible = vec!["cover-a".to_owned()];
+            let app = &mut fixture.app;
+            pending_startup_publication(app, &visible);
+            match scenario {
+                0 => app.lifecycle_generation += 1,
+                1 => app.source_revision += 1,
+                2 => app.route = "catalog".into(),
+                3 => app.modal = "downloads".into(),
+                4 => app.suspended = true,
+                5 => app.resume_frame_pending = true,
+                _ => app.shutting_down = true,
+            }
+            assert!(
+                !app.finish_startup_cover_publication(&visible),
+                "scenario {scenario}"
+            );
+            assert!(app.startup_cover_publication.is_none());
+            assert!(app.background_ui_dirty);
+        }
+    }
+
+    #[test]
+    fn changed_visible_books_cancel_the_startup_flush() {
+        use crate::app::tests::DemoRouteFixture;
+        let mut fixture =
+            DemoRouteFixture::new("library", crate::platform::DeviceProfile::Pw5, false);
+        let visible = vec!["cover-a".to_owned()];
+        pending_startup_publication(&mut fixture.app, &visible);
+        assert!(
+            !fixture
+                .app
+                .finish_startup_cover_publication(&["cover-b".into()])
+        );
+        assert!(fixture.app.startup_cover_publication.is_none());
+    }
+
+    #[test]
+    fn failed_or_unchanged_covers_keep_the_normal_publication_cadence() {
+        use crate::app::tests::DemoRouteFixture;
+        let mut fixture =
+            DemoRouteFixture::new("library", crate::platform::DeviceProfile::Pw5, false);
+        let visible = vec!["cover-a".to_owned()];
+        let app = &mut fixture.app;
+        pending_startup_publication(app, &visible);
+        app.cover_retry_after
+            .insert(visible[0].clone(), Instant::now() + Duration::from_secs(30));
+        assert!(!app.finish_startup_cover_publication(&visible));
+        assert!(app.background_ui_dirty);
+        app.cover_retry_after.clear();
+        pending_startup_publication(app, &visible);
+        app.background_ui_dirty = false;
+        assert!(!app.finish_startup_cover_publication(&visible));
+        app.background_ui_dirty = true;
+        assert!(!app.finish_startup_cover_publication(&visible));
+    }
 
     #[test]
     fn first_frame_priority_keeps_cover_admission_closed_until_released() {

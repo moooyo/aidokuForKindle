@@ -10,6 +10,66 @@ DATA_DIR=$AIDOKU_HOME/data
 LOCK_DIR=${AIDOKU_LOCK_DIR:-/tmp/aidoku-launcher.lock}
 FRAMEBUFFER=${AIDOKU_FRAMEBUFFER:-/dev/fb0}
 ROOT_PID=$$
+CATALOG_NOTIFY_HELPER=${AIDOKU_CATALOG_NOTIFY_HELPER:-}
+CATALOG_NOTIFY_SHA256=${AIDOKU_CATALOG_NOTIFY_SHA256:-}
+CATALOG_NOTIFY_PENDING=0
+if [ "${1:-}" != --library ] && [ "${1:-}" != --foreground ]; then
+    CATALOG_NOTIFY_HELPER=''; CATALOG_NOTIFY_SHA256=''
+    unset AIDOKU_CATALOG_NOTIFY_HELPER AIDOKU_CATALOG_NOTIFY_SHA256
+fi
+if [ -n "$CATALOG_NOTIFY_HELPER" ] && [ -n "$CATALOG_NOTIFY_SHA256" ]; then CATALOG_NOTIFY_PENDING=1; fi
+
+catalog_helper_is_current() {
+    [ "${#CATALOG_NOTIFY_SHA256}" -eq 64 ] || return 1
+    case "$CATALOG_NOTIFY_SHA256" in *[!0-9a-f]*) return 1 ;; esac
+    catalog_directory=${CATALOG_NOTIFY_HELPER%/*}
+    catalog_version=${catalog_directory##*/}
+    [ "${catalog_directory%/*}" = /var/local/kindle-catalog-entry ] || return 1
+    case "$catalog_version" in v1-*) ;; *) return 1 ;; esac
+    catalog_version=${catalog_version#v1-}
+    [ "${#catalog_version}" -eq 64 ] || return 1
+    case "$catalog_version" in *[!0-9a-f]*) return 1 ;; esac
+    [ "${CATALOG_NOTIFY_HELPER##*/}" = aidoku-catalog-client ] || return 1
+    [ ! -L /var/local/kindle-catalog-entry ] && [ ! -L "$catalog_directory" ] &&
+        [ ! -L "$CATALOG_NOTIFY_HELPER" ] && [ -f "$CATALOG_NOTIFY_HELPER" ] &&
+        [ -x "$CATALOG_NOTIFY_HELPER" ] || return 1
+    catalog_digest=$(sha256sum "$CATALOG_NOTIFY_HELPER" 2>/dev/null) || return 1
+    [ "${catalog_digest%% *}" = "$CATALOG_NOTIFY_SHA256" ]
+}
+
+finish_catalog_notification() {
+    [ "$CATALOG_NOTIFY_PENDING" -eq 1 ] || return 0
+    CATALOG_NOTIFY_PENDING=0
+    if catalog_helper_is_current; then
+        if [ -n "${NONCE:-}" ] && [ "$(cat "$LOCK_DIR/pid" 2>/dev/null || :)" = "$ROOT_PID" ]; then
+            if native_read_command "$CATALOG_NOTIFY_HELPER" --notify-protocol &&
+                [ "$(native_read_hex)" = 4e4f5449464945440a ]; then
+                printf '%s\n' 'aidoku: Catalog notification completed.' >&2
+                return 0
+            fi
+        else
+            # Before native ownership exists, the fixed client still enforces
+            # its whole-process alarm and bounded loopback transaction deadline.
+            catalog_result=$("$CATALOG_NOTIFY_HELPER" --notify-protocol 2>/dev/null) || catalog_result=''
+            if [ "$catalog_result" = NOTIFIED ]; then return 0; fi
+        fi
+    fi
+    printf '%s\n' 'aidoku: Catalog notification unavailable; using standard reindex recovery.' >&2
+    if [ -n "${NONCE:-}" ] && [ "$(cat "$LOCK_DIR/pid" 2>/dev/null || :)" = "$ROOT_PID" ]; then
+        native_read_command sh -c '
+            if [ -f /mnt/us/documents/Aidoku.sh ] && [ ! -L /mnt/us/documents/Aidoku.sh ]; then
+                touch -c /mnt/us/documents/Aidoku.sh || exit 1
+            fi
+            lipc-set-prop -i com.lab126.scanner doFullScan 1
+        ' || :
+    elif [ -f /mnt/us/documents/Aidoku.sh ] && [ ! -L /mnt/us/documents/Aidoku.sh ]; then
+        touch -c /mnt/us/documents/Aidoku.sh || :
+    fi
+    return 0
+}
+
+# Early startup failures must not lose a committed recent-access notification.
+trap 'catalog_early_status=$?; trap - 0; finish_catalog_notification; exit "$catalog_early_status"' 0
 
 fail() { printf '%s\n' "aidoku: $*" >&2; exit 1; }
 valid_pid() { case "$1" in ''|*[!0-9]*) return 1 ;; *) [ "$1" -gt 1 ] ;; esac; }
@@ -78,6 +138,9 @@ if [ "${1:-}" != '--foreground' ]; then
         nohup sh "$SCRIPT_PATH" --foreground >>"$DATA_DIR/logs/launcher.log" 2>&1 </dev/null &
     fi
     LIBRARY_WORKER_PID=$!
+    # The independent worker retains notification responsibility if this small
+    # Library waiter is retired by the native application manager.
+    trap - 0
     if [ "${1:-}" = '--library' ]; then
         # Keep the native Scriptlet active until its owned worker restores the
         # display. The worker remains in its independent session if appmgrd
@@ -96,6 +159,8 @@ if [ "${1:-}" != '--foreground' ]; then
     fi
     exit 0
 fi
+
+unset AIDOKU_CATALOG_NOTIFY_HELPER AIDOKU_CATALOG_NOTIFY_SHA256
 
 # A different launcher's lock is never stolen or repaired.
 mkdir "$LOCK_DIR" 2>/dev/null || fail 'Another Aidoku launcher owns the display lock.'
@@ -718,6 +783,7 @@ cleanup() {
     stop_native_read; stop_redraw; stop_ack; stop_wake; stop_resume; stop_application; stop_helper "$OBSERVER_PID" observer; OBSERVER_PID=''
     clear_sleep_cover_records
     release_display "$EXIT_REDRAW"
+    finish_catalog_notification
     if [ "$EVENT_FD_OPEN" -eq 1 ]; then exec 3>&-; EVENT_FD_OPEN=0; fi
     for record in pid nonce generation phase epoch application-pid power-events sleep-request sleep-ready resume-request resume-ready fallback-sleep ordinary-exit lifecycle-state.json native-portrait-calibration resume-native-portrait-calibration native-read-output native-read-done native-read-command native-read-go runner-child runner-command observer-child observer-command ack-child ack-command wake-child wake-command wake-power resume-child resume-command; do rm -f "$LOCK_DIR/$record" "$LOCK_DIR/$record.pending"; done
     rm -f "$LOCK_DIR"/resume-native-portrait-calibration-*.pending

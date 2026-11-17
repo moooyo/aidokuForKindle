@@ -65,6 +65,12 @@ the actual indexed Library document and its metadata updates. The earlier
 2.25/2.68 s figures are therefore not a directly comparable absolute baseline.
 The current same-batch before/after comparison establishes this change's gain.
 
+The subsequent [same-version route attribution](../startup-cost-attribution-20261117/README.md)
+holds the current application, helper, launcher and `--library` lifetime fixed.
+It measures an additional 933 ms to first Library submission and 945 ms to
+complete covers on the indexed route, with catalog identity and scheduler
+diagnostics identifying the next optimization opportunity.
+
 ## Correctness
 
 - 115 remote packaging/lifecycle tests pass, including waiting for the real

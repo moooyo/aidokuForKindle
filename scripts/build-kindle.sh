@@ -21,17 +21,22 @@ cd "$REPO_ROOT"
 cargo zigbuild --locked --release --no-default-features --features kindle --target "$TARGET"
 NATIVE_QUERY_HELPER=$CARGO_TARGET_DIR/native-query/aidoku-native-query
 sh "$SCRIPT_DIR/build-native-query.sh" "$NATIVE_QUERY_HELPER"
+NATIVE_CATALOG_DIR=$CARGO_TARGET_DIR/native-catalog
+sh "$SCRIPT_DIR/build-native-catalog-entry.sh" "$NATIVE_CATALOG_DIR"
 
 mkdir -p "$STAGING_ROOT/aidoku/app" "$STAGING_ROOT/aidoku/assets" \
     "$STAGING_ROOT/aidoku/licenses/launcher" "$STAGING_ROOT/aidoku/licenses/backend" \
     "$STAGING_ROOT/aidoku/licenses/image-triangle" \
     "$STAGING_ROOT/aidoku/licenses/pinyin" "$STAGING_ROOT/aidoku/licenses/sources" \
     "$STAGING_ROOT/aidoku/licenses/icons" "$STAGING_ROOT/aidoku/licenses/demo" \
-    "$STAGING_ROOT/extensions/aidoku" "$STAGING_ROOT/documents"
+    "$STAGING_ROOT/extensions/aidoku" "$STAGING_ROOT/documents" "$STAGING_ROOT/aidoku/native-catalog"
 install -m 755 "$CARGO_TARGET_DIR/$TARGET/release/aidoku" "$STAGING_ROOT/aidoku/app/aidoku"
 install -m 755 "$CARGO_TARGET_DIR/$TARGET/release/kindle-jpeg-worker" "$STAGING_ROOT/aidoku/app/kindle-jpeg-worker"
 install -m 755 "$NATIVE_QUERY_HELPER" "$STAGING_ROOT/aidoku/app/aidoku-native-query"
 install -m 755 packaging/kindle/launch.sh "$STAGING_ROOT/aidoku/launch.sh"
+install -m 755 packaging/kindle/install-catalog-entry.sh "$STAGING_ROOT/aidoku/install-catalog-entry.sh"
+install -m 755 "$NATIVE_CATALOG_DIR/aidoku-library-dispatch" "$NATIVE_CATALOG_DIR/aidoku-catalog-client" "$STAGING_ROOT/aidoku/native-catalog/"
+install -m 644 "$NATIVE_CATALOG_DIR/aidoku-entry-hooks.so" "$NATIVE_CATALOG_DIR/SHA256SUMS" "$STAGING_ROOT/aidoku/native-catalog/"
 install -m 644 assets/launcher/aidoku-cover.png "$STAGING_ROOT/aidoku/assets/aidoku-cover.png"
 install -m 644 assets/launcher/aidoku-cover-v2.png "$STAGING_ROOT/aidoku/assets/aidoku-cover-v2.png"
 install -m 644 assets/launcher/README.md "$STAGING_ROOT/aidoku/licenses/launcher/README.md"

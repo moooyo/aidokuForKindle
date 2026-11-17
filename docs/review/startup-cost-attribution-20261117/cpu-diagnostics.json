@@ -1,0 +1,180 @@
+{
+  "cpu_policy": [
+    "scaling_governor ondemand",
+    "scaling_min_freq 600000",
+    "scaling_max_freq 2000000",
+    "cpuinfo_min_freq 600000",
+    "cpuinfo_max_freq 2000000"
+  ],
+  "cases": [
+    {
+      "case": "baseline-diag1",
+      "scope": "Diagnostic only; 100ms read-only sampling, excluded from primary performance comparisons.",
+      "duration_to_covers_ms": 3167.763,
+      "frequency_khz_mean": 1770935,
+      "frequency_values_khz": [
+        600000,
+        666000,
+        733000,
+        1534000,
+        1702000,
+        1786000,
+        1938000,
+        2000000
+      ],
+      "aggregate_cpu_busy_percent": 74.39,
+      "process_roles": {
+        "appmgrd": {
+          "cpu_tick_delta_through_covers": 5,
+          "cpu_tick_delta_first_two_seconds": 5,
+          "major_fault_delta": 0
+        },
+        "awesome": {
+          "cpu_tick_delta_through_covers": 1,
+          "cpu_tick_delta_first_two_seconds": 1,
+          "major_fault_delta": 0
+        },
+        "KPPMainApp": {
+          "cpu_tick_delta_through_covers": 19,
+          "cpu_tick_delta_first_two_seconds": 17,
+          "major_fault_delta": 0
+        },
+        "scanner-main": {
+          "cpu_tick_delta_through_covers": 11,
+          "cpu_tick_delta_first_two_seconds": 11,
+          "major_fault_delta": 0
+        },
+        "aidoku": {
+          "cpu_tick_delta_through_covers": 71,
+          "cpu_tick_delta_first_two_seconds": 17,
+          "major_fault_delta": 374
+        }
+      }
+    },
+    {
+      "case": "candidate-diag1",
+      "scope": "Diagnostic only; 100ms read-only sampling, excluded from primary performance comparisons.",
+      "duration_to_covers_ms": 4718.663,
+      "frequency_khz_mean": 1995447,
+      "frequency_values_khz": [
+        1786000,
+        2000000
+      ],
+      "aggregate_cpu_busy_percent": 97.63,
+      "process_roles": {
+        "appmgrd": {
+          "cpu_tick_delta_through_covers": 5,
+          "cpu_tick_delta_first_two_seconds": 5,
+          "major_fault_delta": 0
+        },
+        "awesome": {
+          "cpu_tick_delta_through_covers": 0,
+          "cpu_tick_delta_first_two_seconds": 0,
+          "major_fault_delta": 0
+        },
+        "KPPMainApp": {
+          "cpu_tick_delta_through_covers": 193,
+          "cpu_tick_delta_first_two_seconds": 99,
+          "major_fault_delta": 0
+        },
+        "scanner-main": {
+          "cpu_tick_delta_through_covers": 11,
+          "cpu_tick_delta_first_two_seconds": 11,
+          "major_fault_delta": 0
+        },
+        "aidoku": {
+          "cpu_tick_delta_through_covers": 84,
+          "cpu_tick_delta_first_two_seconds": 4,
+          "major_fault_delta": 399
+        }
+      }
+    },
+    {
+      "case": "candidate-diag2",
+      "scope": "Diagnostic only; 100ms read-only sampling, excluded from primary performance comparisons.",
+      "duration_to_covers_ms": 4071.484,
+      "frequency_khz_mean": 1898350,
+      "frequency_values_khz": [
+        666000,
+        733000,
+        833000,
+        1702000,
+        2000000
+      ],
+      "aggregate_cpu_busy_percent": 93.06,
+      "process_roles": {
+        "appmgrd": {
+          "cpu_tick_delta_through_covers": 5,
+          "cpu_tick_delta_first_two_seconds": 5,
+          "major_fault_delta": 0
+        },
+        "awesome": {
+          "cpu_tick_delta_through_covers": 0,
+          "cpu_tick_delta_first_two_seconds": 0,
+          "major_fault_delta": 0
+        },
+        "KPPMainApp": {
+          "cpu_tick_delta_through_covers": 190,
+          "cpu_tick_delta_first_two_seconds": 118,
+          "major_fault_delta": 0
+        },
+        "scanner-main": {
+          "cpu_tick_delta_through_covers": 10,
+          "cpu_tick_delta_first_two_seconds": 10,
+          "major_fault_delta": 0
+        },
+        "aidoku": {
+          "cpu_tick_delta_through_covers": 64,
+          "cpu_tick_delta_first_two_seconds": 7,
+          "major_fault_delta": 367
+        }
+      }
+    },
+    {
+      "case": "baseline-diag2",
+      "scope": "Diagnostic only; 100ms read-only sampling, excluded from primary performance comparisons.",
+      "duration_to_covers_ms": 3256.559,
+      "frequency_khz_mean": 1752938,
+      "frequency_values_khz": [
+        666000,
+        733000,
+        833000,
+        1266000,
+        1467000,
+        1588000,
+        1786000,
+        1870000,
+        2000000
+      ],
+      "aggregate_cpu_busy_percent": 74.48,
+      "process_roles": {
+        "appmgrd": {
+          "cpu_tick_delta_through_covers": 6,
+          "cpu_tick_delta_first_two_seconds": 6,
+          "major_fault_delta": 0
+        },
+        "awesome": {
+          "cpu_tick_delta_through_covers": 1,
+          "cpu_tick_delta_first_two_seconds": 1,
+          "major_fault_delta": 0
+        },
+        "KPPMainApp": {
+          "cpu_tick_delta_through_covers": 20,
+          "cpu_tick_delta_first_two_seconds": 18,
+          "major_fault_delta": 0
+        },
+        "scanner-main": {
+          "cpu_tick_delta_through_covers": 11,
+          "cpu_tick_delta_first_two_seconds": 11,
+          "major_fault_delta": 0
+        },
+        "aidoku": {
+          "cpu_tick_delta_through_covers": 68,
+          "cpu_tick_delta_first_two_seconds": 13,
+          "major_fault_delta": 328
+        }
+      }
+    }
+  ],
+  "limitations": "Role CPU ticks are observed deltas over different endpoint windows. First-two-second deltas use a common window. These observations identify correlation and competition; they do not prove a specific KPP call stack. No governor or frequency policy was changed."
+}

@@ -1,0 +1,623 @@
+{
+  "schema_version": 1,
+  "run_id": "scheduler-diagnostic-0739ab6e",
+  "method": "Two warmups followed by AB/BA diagnostic launches. Read-only 100ms sampling is excluded from primary latency statistics. Process CPU is user+system ticks; schedstat covers only the main thread. Deltas use the first and last samples inside each window, without extrapolation. New-process discovery and final fractional sample intervals are omitted. These values cannot be added to wall time.",
+  "warmup_caveat": "The initial temporary-route warmup also observes catalog identity replacement because the research document was just staged. Both warmups are excluded from route attribution.",
+  "records": [
+    {
+      "case": "baseline-warmup",
+      "route": "temporary",
+      "warmup": true,
+      "catalog_identity_changed": true,
+      "catalog_rows_after": 1,
+      "document_mtime_changed": false
+    },
+    {
+      "case": "candidate-warmup",
+      "route": "indexed",
+      "warmup": true,
+      "catalog_identity_changed": true,
+      "catalog_rows_after": 1,
+      "document_mtime_changed": true
+    },
+    {
+      "case": "baseline-diag1",
+      "route": "temporary",
+      "warmup": false,
+      "catalog_identity_changed": false,
+      "catalog_rows_after": 1,
+      "document_mtime_changed": false,
+      "clock_ticks_per_second": 100,
+      "windows": {
+        "first_two_seconds": {
+          "requested_duration_ms": 2000.0,
+          "roles": {
+            "KPPMainApp": {
+              "samples": 20,
+              "observed_window_ms": 1943.698,
+              "cpu_ms": 160.0,
+              "main_run_ms": 19.824,
+              "main_wait_ms": 70.11,
+              "major_fault_delta": 0
+            },
+            "aidoku": {
+              "samples": 6,
+              "observed_window_ms": 510.775,
+              "cpu_ms": 140.0,
+              "main_run_ms": 76.563,
+              "main_wait_ms": 29.269,
+              "major_fault_delta": 124
+            },
+            "appmgrd": {
+              "samples": 20,
+              "observed_window_ms": 1943.698,
+              "cpu_ms": 50.0,
+              "main_run_ms": 28.748,
+              "main_wait_ms": 13.848,
+              "major_fault_delta": 0
+            },
+            "awesome": {
+              "samples": 20,
+              "observed_window_ms": 1943.698,
+              "cpu_ms": 10.0,
+              "main_run_ms": 4.703,
+              "main_wait_ms": 8.528,
+              "major_fault_delta": 0
+            },
+            "scanner-main": {
+              "samples": 20,
+              "observed_window_ms": 1943.698,
+              "cpu_ms": 110.0,
+              "main_run_ms": 0.0,
+              "main_wait_ms": 0.0,
+              "major_fault_delta": 0
+            }
+          },
+          "frequency_khz_mean": 1746350
+        },
+        "first_library": {
+          "requested_duration_ms": 2478.898,
+          "roles": {
+            "KPPMainApp": {
+              "samples": 24,
+              "observed_window_ms": 2362.819,
+              "cpu_ms": 180.0,
+              "main_run_ms": 20.015,
+              "main_wait_ms": 70.11,
+              "major_fault_delta": 0
+            },
+            "aidoku": {
+              "samples": 10,
+              "observed_window_ms": 929.896,
+              "cpu_ms": 330.0,
+              "main_run_ms": 235.848,
+              "main_wait_ms": 86.767,
+              "major_fault_delta": 275
+            },
+            "appmgrd": {
+              "samples": 24,
+              "observed_window_ms": 2362.819,
+              "cpu_ms": 50.0,
+              "main_run_ms": 28.748,
+              "main_wait_ms": 13.848,
+              "major_fault_delta": 0
+            },
+            "awesome": {
+              "samples": 24,
+              "observed_window_ms": 2362.819,
+              "cpu_ms": 10.0,
+              "main_run_ms": 4.703,
+              "main_wait_ms": 8.528,
+              "major_fault_delta": 0
+            },
+            "scanner-main": {
+              "samples": 24,
+              "observed_window_ms": 2362.819,
+              "cpu_ms": 110.0,
+              "main_run_ms": 0.0,
+              "main_wait_ms": 0.0,
+              "major_fault_delta": 0
+            }
+          },
+          "frequency_khz_mean": 1752625
+        },
+        "settled_covers": {
+          "requested_duration_ms": 3244.448,
+          "roles": {
+            "KPPMainApp": {
+              "samples": 32,
+              "observed_window_ms": 3181.542,
+              "cpu_ms": 180.0,
+              "main_run_ms": 20.015,
+              "main_wait_ms": 70.11,
+              "major_fault_delta": 0
+            },
+            "aidoku": {
+              "samples": 18,
+              "observed_window_ms": 1748.619,
+              "cpu_ms": 730.0,
+              "main_run_ms": 458.615,
+              "main_wait_ms": 127.236,
+              "major_fault_delta": 328
+            },
+            "appmgrd": {
+              "samples": 32,
+              "observed_window_ms": 3181.542,
+              "cpu_ms": 50.0,
+              "main_run_ms": 28.748,
+              "main_wait_ms": 13.848,
+              "major_fault_delta": 0
+            },
+            "awesome": {
+              "samples": 32,
+              "observed_window_ms": 3181.542,
+              "cpu_ms": 10.0,
+              "main_run_ms": 4.703,
+              "main_wait_ms": 8.528,
+              "major_fault_delta": 0
+            },
+            "scanner-main": {
+              "samples": 32,
+              "observed_window_ms": 3181.542,
+              "cpu_ms": 110.0,
+              "main_run_ms": 0.0,
+              "main_wait_ms": 0.0,
+              "major_fault_delta": 0
+            }
+          },
+          "frequency_khz_mean": 1731125
+        }
+      }
+    },
+    {
+      "case": "candidate-diag1",
+      "route": "indexed",
+      "warmup": false,
+      "catalog_identity_changed": true,
+      "catalog_rows_after": 1,
+      "document_mtime_changed": true,
+      "clock_ticks_per_second": 100,
+      "windows": {
+        "first_two_seconds": {
+          "requested_duration_ms": 2000.0,
+          "roles": {
+            "KPPMainApp": {
+              "samples": 20,
+              "observed_window_ms": 1954.86,
+              "cpu_ms": 1030.0,
+              "main_run_ms": 59.401,
+              "main_wait_ms": 295.151,
+              "major_fault_delta": 0
+            },
+            "aidoku": {
+              "samples": 2,
+              "observed_window_ms": 103.642,
+              "cpu_ms": 10.0,
+              "main_run_ms": 11.195,
+              "main_wait_ms": 39.824,
+              "major_fault_delta": 30
+            },
+            "appmgrd": {
+              "samples": 20,
+              "observed_window_ms": 1954.86,
+              "cpu_ms": 40.0,
+              "main_run_ms": 30.732,
+              "main_wait_ms": 32.782,
+              "major_fault_delta": 0
+            },
+            "awesome": {
+              "samples": 20,
+              "observed_window_ms": 1954.86,
+              "cpu_ms": 10.0,
+              "main_run_ms": 4.575,
+              "main_wait_ms": 6.533,
+              "major_fault_delta": 0
+            },
+            "scanner-main": {
+              "samples": 20,
+              "observed_window_ms": 1954.86,
+              "cpu_ms": 100.0,
+              "main_run_ms": 0.0,
+              "main_wait_ms": 0.0,
+              "major_fault_delta": 0
+            }
+          },
+          "frequency_khz_mean": 1933300
+        },
+        "first_library": {
+          "requested_duration_ms": 3381.55,
+          "roles": {
+            "KPPMainApp": {
+              "samples": 33,
+              "observed_window_ms": 3284.765,
+              "cpu_ms": 1580.0,
+              "main_run_ms": 59.611,
+              "main_wait_ms": 295.222,
+              "major_fault_delta": 0
+            },
+            "aidoku": {
+              "samples": 15,
+              "observed_window_ms": 1433.547,
+              "cpu_ms": 310.0,
+              "main_run_ms": 226.522,
+              "main_wait_ms": 555.74,
+              "major_fault_delta": 310
+            },
+            "appmgrd": {
+              "samples": 33,
+              "observed_window_ms": 3284.765,
+              "cpu_ms": 50.0,
+              "main_run_ms": 30.732,
+              "main_wait_ms": 32.782,
+              "major_fault_delta": 0
+            },
+            "awesome": {
+              "samples": 33,
+              "observed_window_ms": 3284.765,
+              "cpu_ms": 10.0,
+              "main_run_ms": 4.575,
+              "main_wait_ms": 6.533,
+              "major_fault_delta": 0
+            },
+            "scanner-main": {
+              "samples": 33,
+              "observed_window_ms": 3284.765,
+              "cpu_ms": 100.0,
+              "main_run_ms": 0.0,
+              "main_wait_ms": 0.0,
+              "major_fault_delta": 0
+            }
+          },
+          "frequency_khz_mean": 1959576
+        },
+        "settled_covers": {
+          "requested_duration_ms": 4209.952,
+          "roles": {
+            "KPPMainApp": {
+              "samples": 41,
+              "observed_window_ms": 4098.874,
+              "cpu_ms": 1830.0,
+              "main_run_ms": 98.138,
+              "main_wait_ms": 378.095,
+              "major_fault_delta": 0
+            },
+            "aidoku": {
+              "samples": 23,
+              "observed_window_ms": 2247.656,
+              "cpu_ms": 630.0,
+              "main_run_ms": 364.716,
+              "main_wait_ms": 736.535,
+              "major_fault_delta": 340
+            },
+            "appmgrd": {
+              "samples": 41,
+              "observed_window_ms": 4098.874,
+              "cpu_ms": 50.0,
+              "main_run_ms": 30.732,
+              "main_wait_ms": 32.782,
+              "major_fault_delta": 0
+            },
+            "awesome": {
+              "samples": 41,
+              "observed_window_ms": 4098.874,
+              "cpu_ms": 10.0,
+              "main_run_ms": 4.575,
+              "main_wait_ms": 6.533,
+              "major_fault_delta": 0
+            },
+            "scanner-main": {
+              "samples": 41,
+              "observed_window_ms": 4098.874,
+              "cpu_ms": 100.0,
+              "main_run_ms": 0.0,
+              "main_wait_ms": 0.0,
+              "major_fault_delta": 0
+            }
+          },
+          "frequency_khz_mean": 1957024
+        }
+      }
+    },
+    {
+      "case": "candidate-diag2",
+      "route": "indexed",
+      "warmup": false,
+      "catalog_identity_changed": true,
+      "catalog_rows_after": 1,
+      "document_mtime_changed": true,
+      "clock_ticks_per_second": 100,
+      "windows": {
+        "first_two_seconds": {
+          "requested_duration_ms": 2000.0,
+          "roles": {
+            "KPPMainApp": {
+              "samples": 20,
+              "observed_window_ms": 1934.75,
+              "cpu_ms": 890.0,
+              "main_run_ms": 60.014,
+              "main_wait_ms": 118.743,
+              "major_fault_delta": 0
+            },
+            "aidoku": {
+              "samples": 2,
+              "observed_window_ms": 101.535,
+              "cpu_ms": 20.0,
+              "main_run_ms": 14.944,
+              "main_wait_ms": 37.376,
+              "major_fault_delta": 74
+            },
+            "appmgrd": {
+              "samples": 20,
+              "observed_window_ms": 1934.75,
+              "cpu_ms": 50.0,
+              "main_run_ms": 33.034,
+              "main_wait_ms": 26.98,
+              "major_fault_delta": 0
+            },
+            "awesome": {
+              "samples": 20,
+              "observed_window_ms": 1934.75,
+              "cpu_ms": 0.0,
+              "main_run_ms": 4.218,
+              "main_wait_ms": 4.198,
+              "major_fault_delta": 0
+            },
+            "scanner-main": {
+              "samples": 20,
+              "observed_window_ms": 1934.75,
+              "cpu_ms": 100.0,
+              "main_run_ms": 0.0,
+              "main_wait_ms": 0.0,
+              "major_fault_delta": 0
+            }
+          },
+          "frequency_khz_mean": 1938550
+        },
+        "first_library": {
+          "requested_duration_ms": 3468.499,
+          "roles": {
+            "KPPMainApp": {
+              "samples": 34,
+              "observed_window_ms": 3359.278,
+              "cpu_ms": 1520.0,
+              "main_run_ms": 60.514,
+              "main_wait_ms": 118.743,
+              "major_fault_delta": 0
+            },
+            "aidoku": {
+              "samples": 16,
+              "observed_window_ms": 1526.063,
+              "cpu_ms": 310.0,
+              "main_run_ms": 229.251,
+              "main_wait_ms": 655.922,
+              "major_fault_delta": 363
+            },
+            "appmgrd": {
+              "samples": 34,
+              "observed_window_ms": 3359.278,
+              "cpu_ms": 50.0,
+              "main_run_ms": 33.034,
+              "main_wait_ms": 26.98,
+              "major_fault_delta": 0
+            },
+            "awesome": {
+              "samples": 34,
+              "observed_window_ms": 3359.278,
+              "cpu_ms": 0.0,
+              "main_run_ms": 4.218,
+              "main_wait_ms": 4.198,
+              "major_fault_delta": 0
+            },
+            "scanner-main": {
+              "samples": 34,
+              "observed_window_ms": 3359.278,
+              "cpu_ms": 100.0,
+              "main_run_ms": 0.0,
+              "main_wait_ms": 0.0,
+              "major_fault_delta": 0
+            }
+          },
+          "frequency_khz_mean": 1963853
+        },
+        "settled_covers": {
+          "requested_duration_ms": 4680.929,
+          "roles": {
+            "KPPMainApp": {
+              "samples": 46,
+              "observed_window_ms": 4580.598,
+              "cpu_ms": 1870.0,
+              "main_run_ms": 98.67,
+              "main_wait_ms": 231.684,
+              "major_fault_delta": 0
+            },
+            "aidoku": {
+              "samples": 28,
+              "observed_window_ms": 2747.383,
+              "cpu_ms": 740.0,
+              "main_run_ms": 470.869,
+              "main_wait_ms": 923.432,
+              "major_fault_delta": 400
+            },
+            "appmgrd": {
+              "samples": 46,
+              "observed_window_ms": 4580.598,
+              "cpu_ms": 50.0,
+              "main_run_ms": 33.034,
+              "main_wait_ms": 26.98,
+              "major_fault_delta": 0
+            },
+            "awesome": {
+              "samples": 46,
+              "observed_window_ms": 4580.598,
+              "cpu_ms": 0.0,
+              "main_run_ms": 4.218,
+              "main_wait_ms": 4.198,
+              "major_fault_delta": 0
+            },
+            "scanner-main": {
+              "samples": 46,
+              "observed_window_ms": 4580.598,
+              "cpu_ms": 100.0,
+              "main_run_ms": 0.0,
+              "main_wait_ms": 0.0,
+              "major_fault_delta": 0
+            }
+          },
+          "frequency_khz_mean": 1973283
+        }
+      }
+    },
+    {
+      "case": "baseline-diag2",
+      "route": "temporary",
+      "warmup": false,
+      "catalog_identity_changed": false,
+      "catalog_rows_after": 1,
+      "document_mtime_changed": false,
+      "clock_ticks_per_second": 100,
+      "windows": {
+        "first_two_seconds": {
+          "requested_duration_ms": 2000.0,
+          "roles": {
+            "KPPMainApp": {
+              "samples": 20,
+              "observed_window_ms": 1946.57,
+              "cpu_ms": 180.0,
+              "main_run_ms": 21.007,
+              "main_wait_ms": 56.475,
+              "major_fault_delta": 0
+            },
+            "aidoku": {
+              "samples": 9,
+              "observed_window_ms": 816.426,
+              "cpu_ms": 290.0,
+              "main_run_ms": 203.53,
+              "main_wait_ms": 54.869,
+              "major_fault_delta": 283
+            },
+            "appmgrd": {
+              "samples": 20,
+              "observed_window_ms": 1946.57,
+              "cpu_ms": 60.0,
+              "main_run_ms": 31.672,
+              "main_wait_ms": 13.087,
+              "major_fault_delta": 0
+            },
+            "awesome": {
+              "samples": 20,
+              "observed_window_ms": 1946.57,
+              "cpu_ms": 10.0,
+              "main_run_ms": 4.931,
+              "main_wait_ms": 7.649,
+              "major_fault_delta": 0
+            },
+            "scanner-main": {
+              "samples": 20,
+              "observed_window_ms": 1946.57,
+              "cpu_ms": 100.0,
+              "main_run_ms": 0.0,
+              "main_wait_ms": 0.0,
+              "major_fault_delta": 0
+            }
+          },
+          "frequency_khz_mean": 1697550
+        },
+        "first_library": {
+          "requested_duration_ms": 2106.898,
+          "roles": {
+            "KPPMainApp": {
+              "samples": 21,
+              "observed_window_ms": 2048.435,
+              "cpu_ms": 180.0,
+              "main_run_ms": 21.214,
+              "main_wait_ms": 56.584,
+              "major_fault_delta": 0
+            },
+            "aidoku": {
+              "samples": 10,
+              "observed_window_ms": 918.291,
+              "cpu_ms": 360.0,
+              "main_run_ms": 273.533,
+              "main_wait_ms": 65.017,
+              "major_fault_delta": 322
+            },
+            "appmgrd": {
+              "samples": 21,
+              "observed_window_ms": 2048.435,
+              "cpu_ms": 60.0,
+              "main_run_ms": 31.672,
+              "main_wait_ms": 13.087,
+              "major_fault_delta": 0
+            },
+            "awesome": {
+              "samples": 21,
+              "observed_window_ms": 2048.435,
+              "cpu_ms": 10.0,
+              "main_run_ms": 4.931,
+              "main_wait_ms": 7.649,
+              "major_fault_delta": 0
+            },
+            "scanner-main": {
+              "samples": 21,
+              "observed_window_ms": 2048.435,
+              "cpu_ms": 100.0,
+              "main_run_ms": 0.0,
+              "main_wait_ms": 0.0,
+              "major_fault_delta": 0
+            }
+          },
+          "frequency_khz_mean": 1705762
+        },
+        "settled_covers": {
+          "requested_duration_ms": 2610.866,
+          "roles": {
+            "KPPMainApp": {
+              "samples": 26,
+              "observed_window_ms": 2560.498,
+              "cpu_ms": 200.0,
+              "main_run_ms": 21.214,
+              "main_wait_ms": 56.584,
+              "major_fault_delta": 0
+            },
+            "aidoku": {
+              "samples": 15,
+              "observed_window_ms": 1430.354,
+              "cpu_ms": 650.0,
+              "main_run_ms": 397.026,
+              "main_wait_ms": 160.925,
+              "major_fault_delta": 354
+            },
+            "appmgrd": {
+              "samples": 26,
+              "observed_window_ms": 2560.498,
+              "cpu_ms": 60.0,
+              "main_run_ms": 31.672,
+              "main_wait_ms": 13.087,
+              "major_fault_delta": 0
+            },
+            "awesome": {
+              "samples": 26,
+              "observed_window_ms": 2560.498,
+              "cpu_ms": 10.0,
+              "main_run_ms": 4.931,
+              "main_wait_ms": 7.649,
+              "major_fault_delta": 0
+            },
+            "scanner-main": {
+              "samples": 26,
+              "observed_window_ms": 2560.498,
+              "cpu_ms": 100.0,
+              "main_run_ms": 0.0,
+              "main_wait_ms": 0.0,
+              "major_fault_delta": 0
+            }
+          },
+          "frequency_khz_mean": 1762346
+        }
+      }
+    }
+  ],
+  "native_state_and_original_document_restored": true,
+  "lease_released": true,
+  "same_boot_as_primary_batch": true
+}
