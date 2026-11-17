@@ -14,8 +14,8 @@ source variants; production binaries must not contain diagnostic-only logging.
 | 0 | Merge and deploy the verified native-query version; establish consistent installed/runtime and complete-screen timing | Main merged and pushed; verified installation completed; frame/cover instrumentation in progress |
 | 1 | Overlap preparation with the initial full-frame completion wait while preserving input and display ownership | Retained after five A/B rounds; first Library median improved by 109 ms, software ready by 228 ms |
 | 2 | Profile and optimize first Library rendering | Retained after five A/B rounds; first Library improved by 134 ms, covers settled by 286 ms |
-| 3 | Measure and optimize the cover-loading tail | Source-validated derivative reuse retained: 2.466 s saved; evaluating completion/publication scheduling next |
-| 4 | Consolidate or reschedule the optional sleep-cover capability observation | Pending |
+| 3 | Measure and optimize the cover-loading tail | Retained both derivative reuse (2.466 s) and independently tested completion/publication scheduling (589 ms) |
+| 4 | Consolidate or reschedule the optional sleep-cover capability observation | Helper implementation prepared; remote lifecycle and package verification in progress |
 | 5 | Reduce lighting-application process overhead | Pending |
 | 6 | Evaluate shared Scriptlet dispatch independently; preserve global scanner and recent-item semantics | Pending |
 
@@ -143,3 +143,29 @@ Evidence: [five A/B pairs and all warmups](step3-cover-cache.json),
 launches completed and the owned state and lease were restored/released.
 Application SHA-256:
 `817023e92ac245872ebd88482e8db273fe173bcd3f0d9270eb5f91ed7f0e7aa0`.
+
+### Item 3 follow-up: prompt completion, coalesced initial publication
+
+Batch `step3b-cover-events-53aae7d9` kept the derivative fix on both sides.
+Visible-cover completion now uses the existing coalesced job-ready wake path,
+so the next single cover worker does not wait for a 50 ms maintenance tick.
+After the first Library SEND, initial cover publication uses the existing
+300 ms background interval to collect results before drawing. Foreground
+interaction and lifecycle processing retain their normal priority.
+
+The complete-cover median improved from **3.515 to 2.926 s (589 ms)**. All five
+pairs improved. The Library frame count through settled covers fell from
+`4,4,5,4,4` to `2,2,2,2,2`: the first content frame and one completed-cover frame.
+First-render medians remained similar (218/214 ms); the apparent 69 ms first-SEND
+change tracks pre-render variation and is not claimed as a rendering saving.
+
+Fourteen cover tests, four source-pool tests, slow/cancelled preparation checks,
+and both profiles' Library/keyboard pixel comparisons passed remotely. The
+native final captures match outside the live status bar. All measured visible
+slots contain images, with no failures; all fourteen runs and restoration
+checks passed and the lease was released.
+
+Evidence: [A/B observations](step3b-cover-events.json),
+[host checks](step3b-host-verification.json), and
+[native qualification](step3b-native-qualification.json). Application SHA-256:
+`687344c73c6bfbbe3ff7dc4ca3e51d6e297354fcb0c311bc76f6798bdc3e3d63`.

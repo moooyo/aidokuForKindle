@@ -3,6 +3,12 @@
 use super::*;
 
 impl App {
+    /// Gather initial cover results during the existing UI publication interval.
+    /// No UI model is changed from the accepted-frame observer.
+    pub fn begin_startup_cover_publication(&mut self) {
+        self.next_background_ui = Instant::now() + Duration::from_millis(300);
+    }
+
     pub(super) fn request_covers(&mut self, _books: &[Book]) -> Result<()> {
         // A result may contain hundreds of books. Only the currently visible
         // rows are eligible for the single cover worker after sync_view.

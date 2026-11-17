@@ -248,6 +248,9 @@ impl App {
         let ui = self.ui.clone();
         let ready_pending = self.foreground_ready_pending.clone();
         let ready_posts = self.foreground_ready_posts.clone();
+        // A visible-cover completion can admit the next bounded worker without
+        // waiting for the maintenance tick. View publication remains throttled.
+        let notify_ui = foreground || matches!(&context.kind, JobKind::Cover(_));
         let timing = matches!(context.kind, JobKind::Reader)
             .then(|| {
                 crate::reader_timing::token(context.reader_generation, context.lifecycle_generation)
@@ -270,7 +273,7 @@ impl App {
                         result,
                     })
                     .is_ok()
-                    && foreground
+                    && notify_ui
                     && !ready_pending.swap(true, Ordering::AcqRel)
                 {
                     let posted = ui.upgrade_in_event_loop(|ui| {
@@ -299,7 +302,7 @@ impl App {
             .store(false, Ordering::Release);
     }
 
-    /// Foreground results may be consumed only after lifecycle control runs.
+    /// Prompt results may be consumed only after lifecycle control runs.
     pub fn poll_foreground_jobs(&mut self) {
         self.acknowledge_foreground_jobs_ready();
         self.poll();

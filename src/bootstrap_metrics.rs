@@ -64,6 +64,9 @@ pub fn observe(
         }
         if frame.submitted && platform.release_startup_render_priority() {
             reader_timing::mark("startup_background_covers_admitted");
+            if let Some(app) = application.upgrade().and_then(|slot| slot.borrow().clone()) {
+                app.borrow_mut().begin_startup_cover_publication();
+            }
             let ui = ui.as_weak();
             // Return to the regular lifecycle-gated dispatcher before starting work.
             slint::Timer::single_shot(std::time::Duration::ZERO, move || {
