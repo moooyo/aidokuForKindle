@@ -1,0 +1,30 @@
+{
+  "baseline_commit": "f56dd36657bf77b8652ed7808f1c4a0927dcd8ba",
+  "candidate_commit": "fc51eac0625565052fb3fd0ef7c1f117705ecba5",
+  "test": "sleep_screen_preserves_complete_covers_text_and_retained_reader_at_all_layouts",
+  "failure": "The cover must fit completely without cropping or reserved chrome: (618.0, 824.0) versus (549.3333333333334, 824.0)",
+  "reproduced_on_baseline": true,
+  "unchanged_files": [
+    {
+      "path": "ui/sleep-screen.slint",
+      "baseline_sha256": "b73efa0c8b4a43d055eb9c39706c8c9ac8aa4f65b778da63c8a120de0d76e66b",
+      "candidate_sha256": "b73efa0c8b4a43d055eb9c39706c8c9ac8aa4f65b778da63c8a120de0d76e66b"
+    },
+    {
+      "path": "ui/theme.slint",
+      "baseline_sha256": "a89d11d6ea2605b1f4809bd1c6321237401e4e7d66f7539509d3b7c639875ff2",
+      "candidate_sha256": "a89d11d6ea2605b1f4809bd1c6321237401e4e7d66f7539509d3b7c639875ff2"
+    },
+    {
+      "path": "ui/app.slint",
+      "baseline_sha256": "a994e6e6ef7b5a36aef09b244c3b06dcf04d42942d3aa9ca5efb081cf4881a9e",
+      "candidate_sha256": "a994e6e6ef7b5a36aef09b244c3b06dcf04d42942d3aa9ca5efb081cf4881a9e"
+    },
+    {
+      "path": "tests/sleep_screen_ui.rs",
+      "baseline_sha256": "3b74e652606d7d388cd98c83bad488dcb5a6f93a12aa527e38fda02f20b76a3d",
+      "candidate_sha256": "3b74e652606d7d388cd98c83bad488dcb5a6f93a12aa527e38fda02f20b76a3d"
+    }
+  ],
+  "scope": "Earlier frozen experiment source omitted tests/. Final committed-source verification includes it. The failure occurs on the dark-preference cover scene before application startup code is exercised."
+}

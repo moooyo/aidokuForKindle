@@ -1,0 +1,64 @@
+{
+  "base_commit": "fc51eac0625565052fb3fd0ef7c1f117705ecba5",
+  "application_sha256": "570887a0e5603ce2f6d820cf87b2f4e9b385514f71e9a729e85c8ead2f6729fc",
+  "application_bytes": 53366912,
+  "source_sha256": "99f7c65e7c683c2109ed86b3082cb6caacf0949cb1c613233b4e6144ce787f37",
+  "compiler_fingerprint": {
+    "rustc": 11835527281324007204,
+    "features": "[\"kindle\"]",
+    "profile": 3820015361459430332,
+    "rustflags": [],
+    "compile_kind": 12436321913395366697
+  },
+  "matches_baseline_compiler_configuration": true,
+  "build_jobs": 6,
+  "elf": {
+    "class": "ELF32",
+    "endianness": "little",
+    "machine": "ARM",
+    "type": "EXEC",
+    "static": true,
+    "program_header_count": 9
+  },
+  "tests": {
+    "exact_source_core_passed": 814,
+    "exact_source_startup_passed": 22,
+    "preexisting_ignored": 5,
+    "known_integration_failure": {
+      "baseline_commit": "f56dd36657bf77b8652ed7808f1c4a0927dcd8ba",
+      "candidate_commit": "fc51eac0625565052fb3fd0ef7c1f117705ecba5",
+      "test": "sleep_screen_preserves_complete_covers_text_and_retained_reader_at_all_layouts",
+      "failure": "The cover must fit completely without cropping or reserved chrome: (618.0, 824.0) versus (549.3333333333334, 824.0)",
+      "reproduced_on_baseline": true,
+      "unchanged_files": [
+        {
+          "path": "ui/sleep-screen.slint",
+          "baseline_sha256": "b73efa0c8b4a43d055eb9c39706c8c9ac8aa4f65b778da63c8a120de0d76e66b",
+          "candidate_sha256": "b73efa0c8b4a43d055eb9c39706c8c9ac8aa4f65b778da63c8a120de0d76e66b"
+        },
+        {
+          "path": "ui/theme.slint",
+          "baseline_sha256": "a89d11d6ea2605b1f4809bd1c6321237401e4e7d66f7539509d3b7c639875ff2",
+          "candidate_sha256": "a89d11d6ea2605b1f4809bd1c6321237401e4e7d66f7539509d3b7c639875ff2"
+        },
+        {
+          "path": "ui/app.slint",
+          "baseline_sha256": "a994e6e6ef7b5a36aef09b244c3b06dcf04d42942d3aa9ca5efb081cf4881a9e",
+          "candidate_sha256": "a994e6e6ef7b5a36aef09b244c3b06dcf04d42942d3aa9ca5efb081cf4881a9e"
+        },
+        {
+          "path": "tests/sleep_screen_ui.rs",
+          "baseline_sha256": "3b74e652606d7d388cd98c83bad488dcb5a6f93a12aa527e38fda02f20b76a3d",
+          "candidate_sha256": "3b74e652606d7d388cd98c83bad488dcb5a6f93a12aa527e38fda02f20b76a3d"
+        }
+      ],
+      "scope": "Earlier frozen experiment source omitted tests/. Final committed-source verification includes it. The failure occurs on the dark-preference cover scene before application startup code is exercised."
+    },
+    "log_sha256": "fe4ef235f5aee4a2eb1aece210ec489318567869eb9080c23cfc29ceca2fe72b",
+    "helper_test_log_sha256": "2de6a7c11f779ee6c19d165f6d2ccffaf57f9448dde7f49719987feac3d61bc8",
+    "exact_source_examples_passed": 95,
+    "example_test_log_sha256": "2e7083f09038f6a2ceb2d33c6f18548a9ed25f263e418d6b5dc6ec813ad0c6cf",
+    "total_passed": 931,
+    "known_preexisting_integration_failures": 1
+  }
+}
