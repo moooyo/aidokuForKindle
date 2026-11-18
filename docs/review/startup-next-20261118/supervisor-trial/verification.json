@@ -1,0 +1,58 @@
+{
+  "scope": "Previously completed Linux tests and replay validation on test-env, no device access in this archiving step. Measurements affecting the product decision are from the physical screen, not the mock timing.",
+  "parent_commit": "78c5b2bc09a469133c886eb0d73aaf9ed63195b2",
+  "patch_sha256": "b0512ca9ac1318caf912a38eb02e89b01f5085c607f060defe0a5ea0915a6394",
+  "all_nine_replayed_files_match_frozen_trial_inputs": true,
+  "rebuild_equals_measured_arm_helper": true,
+  "arm_helper_bytes": 10108,
+  "arm_helper_sha256": "bde28cd5953d26b0dc3bfebe16fcfe1cde329021c17449edae7c59470376ed50",
+  "trial_source_sha256": {
+    "packaging/kindle/launch.sh": "0188c72aa13a8dac5a9d1d1069afba5758781ae2b2318e908ecbb8aa62ed3133",
+    "packaging/tests/kpm_package_test.py": "7596a37fbc45492c59aaea6e1011a1a56e4b993da8c96c717b6030c5c063600f",
+    "packaging/tests/startup_portrait_supervisor_test.py": "8d3fcaf7c2de90d5468d17d1facd9fbaae437c1f5a3af86c1021345b20caf01d",
+    "scripts/build-kindle.sh": "3c0afa06f2ac34605d926ca0fbf6445dea0dc39245efe86f1e54b1c8ec04e153",
+    "scripts/build-startup-portrait.sh": "65cccb794b36722cc0916eaa10cf77f1fde5a87ab4debb6214672f7046589a77",
+    "scripts/package-kindle.py": "3a85548b0dce156917e9d3ece8ee8b1e6def17902faa633a6faad983b26898a1",
+    "scripts/package-kpm.py": "61df59123a3ac2593fb7d157a33857e6e312f409cbdc7aeb9bfc6a496aa8bd6e",
+    "scripts/verify-kindle-package.py": "64e7d66236336093cc01e75173ec8b6f585562eaf224787f955a8f3e4716f4e5",
+    "src/native_query/startup_portrait.c": "6d2135d1734b918de206544bfdf489137f8c97cb622be76271703f67b377fb45"
+  },
+  "host": {
+    "legacy_launcher": {
+      "passed": 89,
+      "log_sha256": "471c33ef9169b1690b2eb1977e6384b0c7f701f0bbfc87de2a9fa001d2b3bb32"
+    },
+    "native_launcher_scoped": {
+      "passed": 6,
+      "log_sha256": "81732d7fec6069e158fff323a44101aae59df39403386009bda7660c5ee026af"
+    },
+    "native_failure_and_recovery": {
+      "passed": 16,
+      "log_sha256": "ea7d3e90807d078e138ef80955cd9476bee7488e8052b79fc01c06aa47aa4734"
+    },
+    "kpm_package": {
+      "passed": 9,
+      "log_sha256": "41f347304fdb3a839495effae591175716a9ba58eaefea475cfd19267ef81ea3"
+    },
+    "linux_fixture_probe": {
+      "medians_ms": {
+        "legacy": {
+          "launch_to_fake_application_ms": 112.862,
+          "portrait_getter_to_fake_application_ms": 45.505,
+          "result_to_application_ms": 45.375
+        },
+        "native": {
+          "launch_to_fake_application_ms": 100.457,
+          "portrait_getter_to_fake_application_ms": 31.383,
+          "result_to_application_ms": 31.29
+        }
+      },
+      "report_sha256": "87cae44092b39d617ef5b13cea3a66da411bb318f9af6a19e2ddf490e2493e0e",
+      "scope": "test-env x86_64 Linux isolated fake hardware/launcher process fixture. Not Kindle timings, not deployment criteria. One warmup per arm; six balanced AB/BA pairs."
+    }
+  },
+  "physical_report_sha256": "710d2b4861d886abe2d133bbac443611b92392c4eabc80a2a1e3bde0ddb3d354",
+  "physical_batch": "aidoku-next-native-screen-ae51d7bc",
+  "physical_confirmed_native_runs": 6,
+  "passed_screen": false
+}

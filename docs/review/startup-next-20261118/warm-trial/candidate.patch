@@ -1,0 +1,756 @@
+diff --git a/src/app/cover_jobs.rs b/src/app/cover_jobs.rs
+index ab209dd8fc219316abbfef09d18285b44e4a7214..f960094eeab8ff06cb3433d963b114cb3c6b97bb 100644
+--- a/src/app/cover_jobs.rs
++++ b/src/app/cover_jobs.rs
+@@ -172,16 +172,7 @@ impl App {
+             && self.route == "detail"
+             && self.current_book_id.as_deref() == Some(id);
+         let (width, height) = if large_detail { (612, 840) } else { (376, 514) };
+-        ImageOptions {
+-            media_acceleration: Default::default(),
+-            width,
+-            height,
+-            crop_borders: false,
+-            dither: true,
+-            hardware_dither: false,
+-            spatial_dither: None,
+-            contrast: 0,
+-        }
++        cover_options(width, height)
+     }
+ 
+     fn prepared_cover(&self, book: &Book, options: &ImageOptions) -> bool {
+@@ -380,6 +371,19 @@ impl App {
+     }
+ }
+ 
++pub(super) fn cover_options(width: u32, height: u32) -> ImageOptions {
++    ImageOptions {
++        media_acceleration: Default::default(),
++        width,
++        height,
++        crop_borders: false,
++        dither: true,
++        hardware_dither: false,
++        spatial_dither: None,
++        contrast: 0,
++    }
++}
++
+ fn cover_pixels_fit(width: u32, height: u32, options: &ImageOptions) -> bool {
+     width > 0 && height > 0 && (width >= options.width || height >= options.height)
+ }
+@@ -535,6 +539,9 @@ fn prepare_cover_pixels(
+             ..Page::default()
+         };
+         let rendered = crate::render_cache::render_local_cover(cache, &request, &raw, &options)?;
++        if rendered.memory_hit {
++            crate::reader_timing::mark("cover_local_derivative_memory_hit");
++        }
+         crate::reader_timing::mark(if rendered.cache_hit {
+             "cover_local_derivative_reused"
+         } else {
+diff --git a/src/app/startup.rs b/src/app/startup.rs
+index 2e0ded362f5d10ef51b564da6435266869de6dd6..43882c8157732a23702090d0dcf19867325a7335 100644
+--- a/src/app/startup.rs
++++ b/src/app/startup.rs
+@@ -19,7 +19,98 @@ pub struct PreparedApp {
+     pub(super) downloads: DownloadWorker,
+ }
+ 
++pub struct StartupCoverWarm {
++    cache: crate::cache::CacheManager,
++    database: PathBuf,
++    current_book: String,
++    sort_key: &'static str,
++    ascending: bool,
++    limit: usize,
++}
++
++impl StartupCoverWarm {
++    pub fn run(self, allowed: impl Fn() -> bool) {
++        let _ = self.read_cached(&allowed);
++        if !allowed() {
++            crate::reader_timing::mark("startup_cover_warm_stopped");
++        }
++    }
++
++    fn read_cached(&self, allowed: &impl Fn() -> bool) -> Result<()> {
++        if !allowed() {
++            return Ok(());
++        }
++        let store = Store::open_read_only_with_timeout(&self.database, Duration::ZERO)?;
++        let mut books = Vec::new();
++        if let Some(book) = store
++            .book(&self.current_book)?
++            .filter(|book| book.in_library)
++        {
++            books.push(book);
++        }
++        if allowed() && books.len() < self.limit && store.small_library_for_startup_warm()? {
++            let page = store.library_view_page(
++                crate::store::view_queries::LibraryQuery {
++                    sort_key: Some(self.sort_key),
++                    ascending: self.ascending,
++                    ..Default::default()
++                },
++                1,
++                self.limit,
++            )?;
++            for book in page.items {
++                if !books.iter().any(|candidate| candidate.id == book.id) {
++                    books.push(book);
++                }
++            }
++        }
++        drop(store);
++        let options = cover_jobs::cover_options(376, 514);
++        for book in books.into_iter().take(self.limit) {
++            if !allowed() {
++                break;
++            }
++            if book.source_id != "local" {
++                continue;
++            }
++            let Ok(Some(path)) = cover_jobs::local_cover_path(&book.cover, true) else {
++                continue;
++            };
++            if !path.is_absolute() {
++                continue;
++            }
++            crate::reader_timing::mark("startup_cover_warm_attempt");
++            if matches!(
++                crate::render_cache::warm_cached_local_cover(&self.cache, path, &options, allowed),
++                Ok(true)
++            ) {
++                crate::reader_timing::mark("startup_cover_warm_hit");
++            }
++        }
++        Ok(())
++    }
++}
++
+ impl PreparedApp {
++    pub fn startup_cover_warm(&self, limit: u8) -> Option<StartupCoverWarm> {
++        if limit == 0
++            || self.options.demo
++            || self.options.resume
++            || self.options.initial_screen != "library"
++            || self.interactions.library_filters != [0; 4]
++        {
++            return None;
++        }
++        Some(StartupCoverWarm {
++            cache: self.disk_cache.clone(),
++            database: self.data_dir.join("library.sqlite3"),
++            current_book: self.current_book_id.clone()?,
++            sort_key: self.interactions.library_sort.id(),
++            ascending: self.interactions.library_ascending,
++            limit: usize::from(limit.min(2)),
++        })
++    }
++
+     /// Cancel an unattached controller without blocking the startup scene.
+     pub fn shutdown(&self) {
+         self.downloads.shutdown();
+@@ -200,6 +291,40 @@ impl App {
+ mod tests {
+     use super::*;
+ 
++    #[test]
++    fn startup_warm_admits_only_fresh_unfiltered_library_starts_and_caps_work() {
++        let directory = tempfile::tempdir().unwrap();
++        let mut prepared = App::prepare(
++            AppOptions {
++                data_dir: directory.path().into(),
++                demo: false,
++                offline: true,
++                initial_screen: "library".into(),
++                landscape: false,
++                resume: false,
++            },
++            DeviceProfile::Pw5,
++        )
++        .unwrap();
++        assert!(prepared.startup_cover_warm(2).is_none());
++        prepared.current_book_id = Some("current".into());
++        assert_eq!(prepared.startup_cover_warm(9).unwrap().limit, 2);
++        assert!(prepared.startup_cover_warm(0).is_none());
++        prepared.options.resume = true;
++        assert!(prepared.startup_cover_warm(2).is_none());
++        prepared.options.resume = false;
++        prepared.interactions.library_filters = [-1, 0, 0, 0];
++        assert!(prepared.startup_cover_warm(2).is_none());
++        prepared.interactions.library_filters = [0; 4];
++        prepared.options.initial_screen = "reader".into();
++        assert!(prepared.startup_cover_warm(2).is_none());
++        prepared.options.initial_screen = "library".into();
++        prepared.options.demo = true;
++        assert!(prepared.startup_cover_warm(2).is_none());
++        prepared.shutdown();
++        assert!(prepared.finish_shutdown(Duration::from_secs(2)));
++    }
++
+     #[test]
+     fn prepared_metadata_can_move_from_the_worker_to_the_ui_thread() {
+         fn require_send<T: Send>() {}
+diff --git a/src/bootstrap_lifecycle.rs b/src/bootstrap_lifecycle.rs
+index 103d0a01f4598635d6a3f3fc58ab029c637ae1e1..b57f5f601043d333657d8cd7afb1321849abea63 100644
+--- a/src/bootstrap_lifecycle.rs
++++ b/src/bootstrap_lifecycle.rs
+@@ -21,6 +21,7 @@ use crate::{
+ 
+ static SUSPEND_REQUESTED: AtomicBool = AtomicBool::new(false);
+ static RESUME_REQUESTED: AtomicBool = AtomicBool::new(false);
++static STARTUP_INTERRUPTED: AtomicBool = AtomicBool::new(false);
+ static SIGNAL_WAKE_FD: AtomicI32 = AtomicI32::new(-1);
+ 
+ #[derive(Clone, Debug, PartialEq, Eq)]
+@@ -607,6 +608,7 @@ fn write_atomic(directory: &Path, name: &str, bytes: &[u8]) -> Result<()> {
+ 
+ #[cfg(unix)]
+ extern "C" fn lifecycle_signal(signal: libc::c_int) {
++    STARTUP_INTERRUPTED.store(true, Ordering::Release);
+     if signal == libc::SIGUSR1 {
+         SUSPEND_REQUESTED.store(true, Ordering::Release);
+     }
+@@ -665,6 +667,10 @@ pub fn display_activity_allowed() -> bool {
+         && !crate::STOP_REQUESTED.load(Ordering::Acquire)
+ }
+ 
++pub fn startup_speculation_allowed() -> bool {
++    !STARTUP_INTERRUPTED.load(Ordering::Acquire) && display_activity_allowed()
++}
++
+ pub fn clear_signal_wakeup() {
+     SIGNAL_WAKE_FD.store(-1, Ordering::Release);
+ }
+diff --git a/src/bootstrap_metrics.rs b/src/bootstrap_metrics.rs
+index 1ccde89cb7c838cf43169ae4ace9e482fa86511f..5c603045b9fe0ecb9aa50cae4b62310ea193b413 100644
+--- a/src/bootstrap_metrics.rs
++++ b/src/bootstrap_metrics.rs
+@@ -56,6 +56,9 @@ pub fn observe(
+             return;
+         }
+         if frame.initial && !frame.submitted && !frame.input_blocked {
++            if let Some(startup) = startup.upgrade() {
++                startup.borrow().close_cover_warm_window();
++            }
+             reader_timing::startup_frame("startup_initial_input_ready", frame, None);
+         }
+         let Some(ui) = ui.upgrade() else { return };
+diff --git a/src/bootstrap_startup.rs b/src/bootstrap_startup.rs
+index ee4da394eeeb903cd71353b1604836fed3f64c1a..1e217f8203fe9f77d51bbb8bb7b86ee0c52da7ac 100644
+--- a/src/bootstrap_startup.rs
++++ b/src/bootstrap_startup.rs
+@@ -123,6 +123,8 @@ impl FirstScene {
+ pub struct Startup {
+     options: Option<AppOptions>,
+     profile: DeviceProfile,
++    warm_limit: u8,
++    warm_closed: Arc<AtomicBool>,
+     import: Option<PathBuf>,
+     sender: Sender<StartupEvent>,
+     receiver: Receiver<StartupEvent>,
+@@ -151,12 +153,15 @@ impl Startup {
+         profile: DeviceProfile,
+         import: Option<PathBuf>,
+         submitted_baseline: u64,
++        warm_limit: u8,
+     ) -> Self {
+         let (sender, receiver) = mpsc::channel();
+         let (completion_sender, completed) = mpsc::channel();
+         Self {
+             options: Some(options),
+             profile,
++            warm_limit,
++            warm_closed: Arc::new(AtomicBool::new(false)),
+             import,
+             sender,
+             receiver,
+@@ -186,6 +191,10 @@ impl Startup {
+         self.failed
+     }
+ 
++    pub fn close_cover_warm_window(&self) {
++        self.warm_closed.store(true, Ordering::Release);
++    }
++
+     /// Prepare bytes and metadata while the accepted initial full frame settles.
+     /// UI attachment still requires FirstScene and the normal event-loop turn.
+     pub fn prepare_after_submission(&mut self) {
+@@ -392,6 +401,9 @@ impl Startup {
+             .take()
+             .context("Startup preparation was already started")?;
+         let profile = self.profile;
++        let warm_limit = self.warm_limit;
++        let warm_closed = self.warm_closed.clone();
++        let warm_deadline = Instant::now() + Duration::from_millis(300);
+         self.spawn("aidoku-fonts", |cancelled, sender, wake| {
+             Fonts::prepare_faces(cancelled, |face| {
+                 publish(sender, wake, StartupEvent::Font(face))
+@@ -407,7 +419,18 @@ impl Startup {
+                 let _ = prepared.finish_shutdown(Duration::from_secs(2));
+                 return Ok(());
+             }
+-            publish(sender, wake, StartupEvent::State(prepared))
++            let warm = prepared.startup_cover_warm(warm_limit);
++            publish(sender, wake, StartupEvent::State(prepared))?;
++            // State delivery must never depend on speculative I/O or decoding.
++            if let Some(warm) = warm {
++                warm.run(|| {
++                    Instant::now() < warm_deadline
++                        && !cancelled.load(Ordering::Acquire)
++                        && !warm_closed.load(Ordering::Acquire)
++                        && crate::bootstrap_lifecycle::startup_speculation_allowed()
++                });
++            }
++            Ok(())
+         })?;
+         aidoku_kindle::reader_timing::mark("startup_workers_started");
+         Ok(())
+diff --git a/src/cache.rs b/src/cache.rs
+index e625e46a6c97e7fcbc843f0864e510c30ce06394..9cad50e8053c281e2c86710bbe07f2141327cc89 100644
+--- a/src/cache.rs
++++ b/src/cache.rs
+@@ -688,6 +688,22 @@ impl CacheManager {
+         self.lookup_with_fingerprint(Kind::Processed, &render_key(key)?)
+     }
+ 
++    /// A hint for speculative reads only. It grants neither a lease nor proof
++    /// of the current bytes; the caller must hash the exact snapshot it uses.
++    pub(crate) fn processed_read_hint(
++        &self,
++        key: &RenderKey,
++        byte_limit: u64,
++    ) -> Result<Option<(PathBuf, String)>> {
++        let key = render_key(key)?;
++        let entry = self.lock()?.load_entry(&cache_id(Kind::Processed, &key))?;
++        let Some(entry) = entry.filter(|e| e.valid && (1..=byte_limit).contains(&e.size)) else {
++            return Ok(None);
++        };
++        let path = generated_path(&self.inner.root, Kind::Processed, &key, false)?;
++        Ok(Some((path, entry.checksum)))
++    }
++
+     pub fn begin_processed(&self, key: &RenderKey, expected_bytes: u64) -> Result<CacheWrite> {
+         self.begin(Kind::Processed, render_key(key)?, None, expected_bytes)
+     }
+diff --git a/src/imaging.rs b/src/imaging.rs
+index fbbd9e189713b37815c0da9a4a36b6e24c1b846e..d97e4c86947b9bd3e5ab5a4e9fe8a81c1ef3045f 100644
+--- a/src/imaging.rs
++++ b/src/imaging.rs
+@@ -15,7 +15,7 @@ pub use decode_scheduler::{
+     DecodeCancellation, check_decode_cancelled, is_decode_cancelled, with_background_decode,
+ };
+ pub(crate) use decode_scheduler::{
+-    decode_permit, with_decode_cancellation, without_decode_cancellation,
++    decode_permit, try_spare_decode_permit, with_decode_cancellation, without_decode_cancellation,
+ };
+ 
+ use std::{
+diff --git a/src/imaging/decode_scheduler.rs b/src/imaging/decode_scheduler.rs
+index de2a47c037921e9d5391246a19089499d5668608..92e3e2db14c858906eb594f38ad7b82bec4fbeb4 100644
+--- a/src/imaging/decode_scheduler.rs
++++ b/src/imaging/decode_scheduler.rs
+@@ -148,6 +148,18 @@ pub(crate) fn decode_permit() -> Result<DecodePermit<'static>> {
+     SCHEDULER.acquire(context.background, context.cancellation.as_ref())
+ }
+ 
++/// Startup speculation must never queue in front of real image work.
++pub(crate) fn try_spare_decode_permit() -> Option<DecodePermit<'static>> {
++    let mut state = SCHEDULER.state.try_lock().ok()?;
++    if state.active || !state.waiters.is_empty() {
++        return None;
++    }
++    state.active = true;
++    Some(DecodePermit {
++        scheduler: &SCHEDULER,
++    })
++}
++
+ struct Waiter {
+     ticket: u64,
+     background: bool,
+diff --git a/src/main.rs b/src/main.rs
+index 2be77c678f075185c6895395cfb549a24c85ba06..70749970f38762c638a76f00be69c6ffc1332f52 100644
+--- a/src/main.rs
++++ b/src/main.rs
+@@ -66,6 +66,10 @@ struct Arguments {
+     #[arg(long, hide = true)]
+     startup_eager_covers: bool,
+ 
++    /// Prewarm this many validated, cached local covers during initial presentation.
++    #[arg(long, hide = true, default_value_t = 2, value_parser = clap::value_parser!(u8).range(0..=2))]
++    startup_cached_covers: u8,
++
+     /// Select a design profile, not a declaration of hardware compatibility.
+     #[arg(long, default_value = "pw5")]
+     device: DeviceProfile,
+@@ -258,6 +262,14 @@ fn run(arguments: Arguments) -> Result<()> {
+     platform.configure_window(ui.window(), arguments.landscape)?;
+     bootstrap_presentation::configure_startup(&ui, &data_dir, arguments.demo)?;
+     let app: ApplicationSlot = Rc::new(RefCell::new(None));
++    let warm_limit = if platform.startup_render_pending()
++        && !arguments.startup_serial_preparation
++        && arguments.import.is_none()
++    {
++        arguments.startup_cached_covers
++    } else {
++        0
++    };
+     let startup = Rc::new(RefCell::new(Startup::new(
+         &ui,
+         AppOptions {
+@@ -271,6 +283,7 @@ fn run(arguments: Arguments) -> Result<()> {
+         arguments.device,
+         arguments.import,
+         platform.sleep_status().frame_send_count,
++        warm_limit,
+     )));
+     {
+         let ui_weak = ui.as_weak();
+diff --git a/src/render_cache.rs b/src/render_cache.rs
+index 513d6eddd013bda3568935e0f48c67535a807a15..94a66041b2188ab9fb0c407eccac2319e0e773fc 100644
+--- a/src/render_cache.rs
++++ b/src/render_cache.rs
+@@ -11,7 +11,7 @@
+ use std::{
+     collections::HashMap,
+     fs::{self, File, OpenOptions},
+-    io::{BufReader, BufWriter, Read, Write},
++    io::{BufRead, BufReader, BufWriter, Cursor, Read, Seek, Write},
+     path::{Path, PathBuf},
+     sync::{Arc, Mutex, MutexGuard, OnceLock, TryLockError, Weak},
+     time::Duration,
+@@ -818,6 +818,125 @@ pub(crate) fn render_local_cover(
+     })
+ }
+ 
++/// Warm only an existing local cover derivative. No source decoder, cache
++/// repair, alias publication or persistent access update runs on this path.
++/// The regular foreground lookup proves the source and derivative again.
++pub(crate) fn warm_cached_local_cover(
++    cache: &CacheManager,
++    path: PathBuf,
++    options: &ImageOptions,
++    allowed: &impl Fn() -> bool,
++) -> Result<bool> {
++    const MAX_SOURCE: u64 = 2 * 1024 * 1024;
++    const MAX_DERIVATIVE: u64 = 512 * 1024;
++    if !allowed() || options.width > 376 || options.height > 514 {
++        return Ok(false);
++    }
++    let raw = fs::canonicalize(&path)?;
++    let Some(source) = small_warm_snapshot(&raw, MAX_SOURCE, allowed)? else {
++        return Ok(false);
++    };
++    let page = Page {
++        local_path: Some(path),
++        ..Page::default()
++    };
++    let checksum = format!("{:x}", Sha256::digest(&source));
++    drop(source);
++    let key = viewport_key(
++        format!("{}:{checksum}", CacheManager::page_key(&page)),
++        options,
++        false,
++        0,
++        1000,
++    );
++    if !allowed() {
++        return Ok(false);
++    }
++    let Some((artifact, expected)) = cache.processed_read_hint(&key, MAX_DERIVATIVE)? else {
++        return Ok(false);
++    };
++    let Some(bytes) = small_warm_snapshot(&artifact, MAX_DERIVATIVE, allowed)? else {
++        return Ok(false);
++    };
++    if format!("{:x}", Sha256::digest(&bytes)) != expected || !allowed() {
++        return Ok(false);
++    }
++    // Decode the same bounded snapshot we just verified, even if a concurrent
++    // cache clear or replacement changes the pathname before foreground reuse.
++    let Some(_permit) = imaging::try_spare_decode_permit() else {
++        return Ok(false);
++    };
++    let (reader, metadata) = processed_input(Cursor::new(bytes), Some(&key))?;
++    let image = read_processed_frame(&artifact, reader, metadata)?;
++    if !allowed() {
++        return Ok(false);
++    }
++    let key = DecodedKey {
++        namespace: cache.namespace().to_path_buf(),
++        render: key,
++    };
++    decoded(|state| state.remember(key, &image, expected, RenderPurpose::Prefetch));
++    Ok(true)
++}
++
++fn small_warm_snapshot(
++    path: &Path,
++    limit: u64,
++    allowed: &impl Fn() -> bool,
++) -> Result<Option<Vec<u8>>> {
++    use std::io::ErrorKind;
++    if !allowed() {
++        return Ok(None);
++    }
++    let mut options = OpenOptions::new();
++    options.read(true);
++    #[cfg(unix)]
++    {
++        use std::os::unix::fs::OpenOptionsExt;
++        options.custom_flags(libc::O_NONBLOCK | libc::O_NOFOLLOW);
++    }
++    let file = options.open(path)?;
++    let meta = file.metadata()?;
++    if !meta.is_file() || !(1..=limit).contains(&meta.len()) {
++        return Ok(None);
++    }
++    let mut input = file.take(meta.len() + 1);
++    let mut bytes = Vec::with_capacity(meta.len() as usize);
++    let mut chunk = [0; 16384];
++    while allowed() {
++        match input.read(&mut chunk) {
++            Ok(0) => return Ok((bytes.len() as u64 == meta.len()).then_some(bytes)),
++            Ok(n) => bytes.extend_from_slice(&chunk[..n]),
++            Err(e) if e.kind() == ErrorKind::Interrupted => continue,
++            Err(e) => return Err(e.into()),
++        }
++    }
++    Ok(None)
++}
++
++fn viewport_key(
++    source_key: String,
++    options: &ImageOptions,
++    vertical: bool,
++    offset: u32,
++    zoom_milli: u32,
++) -> RenderKey {
++    RenderKey {
++        source_key,
++        media_acceleration: options.media_acceleration,
++        width: options.width,
++        height: options.height,
++        crop_borders: options.crop_borders,
++        dither: options.dither,
++        hardware_dither: options.hardware_dither,
++        spatial_dither: options.spatial_dither,
++        contrast: options.contrast,
++        vertical,
++        offset,
++        zoom_milli,
++    }
++}
++
+ /// Prepare the Reader's BiliComics Raster in memory. The canonical source and a
+ /// proof tied to its decoded bytes accompany the frame; no processed PNG is
+ /// encoded, inflated again or committed before display.
+@@ -1035,26 +1154,14 @@ fn render_for_purpose(
+     let source_checksum = cache.fingerprint(raw)?;
+     let source_proof = SourceProof::for_source(page, raw, &source_checksum, metadata.len())?;
+     let source_key = format!("{}:{source_checksum}", CacheManager::page_key(page));
+-    let key = RenderKey {
+-        media_acceleration: options.media_acceleration,
+-        source_key: if let Some(fit) = mode.fit() {
+-            format!("{READER_RASTER_VERSION}:fit-v1:{}:{source_key}", fit.key())
+-        } else if mode.is_reader() {
+-            format!("{READER_RASTER_VERSION}:{source_key}")
+-        } else {
+-            source_key
+-        },
+-        width: options.width,
+-        height: options.height,
+-        crop_borders: options.crop_borders,
+-        dither: options.dither,
+-        hardware_dither: options.hardware_dither,
+-        spatial_dither: options.spatial_dither,
+-        contrast: options.contrast,
+-        vertical,
+-        offset,
+-        zoom_milli,
++    let source_key = if let Some(fit) = mode.fit() {
++        format!("{READER_RASTER_VERSION}:fit-v1:{}:{source_key}", fit.key())
++    } else if mode.is_reader() {
++        format!("{READER_RASTER_VERSION}:{source_key}")
++    } else {
++        source_key
+     };
++    let key = viewport_key(source_key, options, vertical, offset, zoom_milli);
+     let decoded_key = DecodedKey {
+         namespace: cache.namespace().to_path_buf(),
+         render: key.clone(),
+@@ -1520,8 +1627,15 @@ fn processed_reader(
+         file.metadata()?.len() <= MAX_PAGE_BYTES,
+         "The processed PNG exceeds the compressed-image limit"
+     );
++    processed_input(BufReader::new(file), expected)
++}
++
++fn processed_input<R: BufRead + Seek>(
++    input: R,
++    expected: Option<&RenderKey>,
++) -> Result<(png::Reader<R>, Metadata)> {
+     let decoder = png::Decoder::new_with_limits(
+-        BufReader::new(file),
++        input,
+         png::Limits {
+             bytes: MAX_DECODE_BYTES as usize,
+         },
+@@ -1648,7 +1762,15 @@ fn decode_processed(path: &Path, key: &RenderKey) -> Result<RenderedPage> {
+ }
+ 
+ fn decode_processed_inner(path: &Path, key: &RenderKey) -> Result<RenderedPage> {
+-    let (mut reader, metadata) = processed_reader(path, Some(key))?;
++    let (reader, metadata) = processed_reader(path, Some(key))?;
++    read_processed_frame(path, reader, metadata)
++}
++
++fn read_processed_frame<R: BufRead + Seek>(
++    path: &Path,
++    mut reader: png::Reader<R>,
++    metadata: Metadata,
++) -> Result<RenderedPage> {
+     let size = reader
+         .output_buffer_size()
+         .context("The processed PNG output size overflowed")?;
+@@ -1808,6 +1930,99 @@ mod tests {
+         })
+     }
+ 
++    #[test]
++    fn startup_warm_reuses_only_verified_pixels_without_generating_a_missing_derivative() {
++        let mut fixture = Fixture::new(artwork());
++        fixture.page.url.clear();
++        let allowed = || true;
++        let warm = || {
++            warm_cached_local_cover(&fixture.cache, fixture.raw.clone(), &options(), &allowed)
++                .unwrap()
++        };
++        let key = fixture.key(&options(), false, 0, 1.0);
++        assert!(!warm());
++        assert!(
++            fixture
++                .cache
++                .processed_read_hint(&key, u64::MAX)
++                .unwrap()
++                .is_none()
++        );
++        let fresh =
++            render_local_cover(&fixture.cache, &fixture.page, &fixture.raw, &options()).unwrap();
++        clear_memory(&fixture.cache);
++        let deadline = Instant::now() + Duration::from_secs(5);
++        while !warm() {
++            assert!(
++                Instant::now() < deadline,
++                "A spare decode slot never became available"
++            );
++            std::thread::yield_now();
++        }
++        let displayed =
++            render_local_cover(&fixture.cache, &fixture.page, &fixture.raw, &options()).unwrap();
++        assert!(displayed.memory_hit);
++        assert_eq!(fresh.image, displayed.image);
++        fs::write(&fresh.cache_path, b"replaced processed image").unwrap();
++        assert!(!warm());
++        assert_eq!(
++            fs::read(&fresh.cache_path).unwrap(),
++            b"replaced processed image"
++        );
++        let repaired =
++            render_local_cover(&fixture.cache, &fixture.page, &fixture.raw, &options()).unwrap();
++        assert!(!repaired.memory_hit);
++        assert_eq!(fresh.image, repaired.image);
++        // Mutable local files may have their timestamps restored after an edit.
++        let modified = fs::metadata(&fixture.raw).unwrap().modified().unwrap();
++        let mut bytes = fs::read(&fixture.raw).unwrap();
++        bytes[0] = 0;
++        fs::write(&fixture.raw, bytes).unwrap();
++        File::options()
++            .write(true)
++            .open(&fixture.raw)
++            .unwrap()
++            .set_times(fs::FileTimes::new().set_modified(modified))
++            .unwrap();
++        assert!(!warm());
++        assert!(
++            render_local_cover(&fixture.cache, &fixture.page, &fixture.raw, &options()).is_err()
++        );
++    }
++
++    #[test]
++    fn startup_warm_can_skip_busy_or_oversized_images_and_stops_reading_after_cancellation() {
++        let mut fixture = Fixture::new(artwork());
++        fixture.page.url.clear();
++        let _ =
++            render_local_cover(&fixture.cache, &fixture.page, &fixture.raw, &options()).unwrap();
++        clear_memory(&fixture.cache);
++        let permit = imaging::decode_permit().unwrap();
++        assert!(
++            !warm_cached_local_cover(&fixture.cache, fixture.raw.clone(), &options(), &|| true)
++                .unwrap()
++        );
++        drop(permit);
++        let source = fixture.directory.path().join("warm-bounds");
++        fs::write(&source, vec![0; 128 * 1024]).unwrap();
++        let permits = Cell::new(0);
++        let allowed = || {
++            permits.set(permits.get() + 1);
++            permits.get() < 4
++        };
++        assert!(
++            small_warm_snapshot(&source, 128 * 1024, &allowed)
++                .unwrap()
++                .is_none()
++        );
++        assert_eq!(permits.get(), 4);
++        assert!(
++            small_warm_snapshot(&source, 128 * 1024 - 1, &|| true)
++                .unwrap()
++                .is_none()
++        );
++    }
++
+     #[test]
+     fn a_reopened_local_cover_cache_validates_current_bytes_without_decoding_the_source() {
+         let mut fixture = Fixture::new(artwork());
+diff --git a/src/store.rs b/src/store.rs
+index 59b4afbf80302b6c753acd648c083b437eed8b4d..d71123461d82528754e2582672b096fcc19e5243 100644
+--- a/src/store.rs
++++ b/src/store.rs
+@@ -175,14 +175,31 @@ impl Store {
+ 
+     /// Background observers must not run schema migration or startup recovery.
+     pub fn open_read_only(path: impl AsRef<Path>) -> Result<Self> {
++        Self::open_read_only_with_timeout(path, Duration::from_secs(5))
++    }
++
++    pub(crate) fn open_read_only_with_timeout(
++        path: impl AsRef<Path>,
++        timeout: Duration,
++    ) -> Result<Self> {
+         let connection = Connection::open_with_flags(path, OpenFlags::SQLITE_OPEN_READ_ONLY)
+             .context("Open application database read-only")?;
+-        connection.busy_timeout(Duration::from_secs(5))?;
++        connection.busy_timeout(timeout)?;
+         connection.pragma_update(None, "query_only", "ON")?;
+         connection.pragma_update(None, "mmap_size", 0)?;
+         Ok(Self { connection })
+     }
+ 
++    /// Skip speculative sorting on large databases, including saved source
++    /// listings. This capped probe does not count or sort the whole collection.
++    pub(crate) fn small_library_for_startup_warm(&self) -> Result<bool> {
++        Ok(!self.connection.query_row(
++            "SELECT EXISTS(SELECT 1 FROM books LIMIT 1 OFFSET 64)",
++            [],
++            |row| row.get::<_, bool>(0),
++        )?)
++    }
++
+     /// Connect only after the application's primary Store has initialized its
+     /// schema. Background mutations must never recover another live worker.
+     pub fn open_existing_for_write(path: impl AsRef<Path>) -> Result<Self> {

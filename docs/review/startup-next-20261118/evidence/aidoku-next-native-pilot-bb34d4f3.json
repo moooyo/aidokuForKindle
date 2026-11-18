@@ -1,0 +1,121 @@
+{
+  "run_id": "aidoku-next-native-pilot-bb34d4f3",
+  "trial": "supervisor-pilot",
+  "phase": "pilot",
+  "primary_endpoint": "usable",
+  "cache_regime": "warm_local_thumbnail_cache",
+  "program_hashes": {
+    "baseline": {
+      "application_sha256": "62de2771891b5bf8f720572c4544a3a732d619fa95131111cb00bccb6e0bc612",
+      "launcher_sha256": "10432125b74ab5b69c8a0ec54a34abd5a74dc4a3cc9ed9b9d5cc8d03bbd75296",
+      "native_query_sha256": "84c2f27d8233d8695001aa86d880e29454fe188deb9884aca1c6694c82a5887d"
+    },
+    "candidate": {
+      "application_sha256": "62de2771891b5bf8f720572c4544a3a732d619fa95131111cb00bccb6e0bc612",
+      "launcher_sha256": "0188c72aa13a8dac5a9d1d1069afba5758781ae2b2318e908ecbb8aa62ed3133",
+      "native_query_sha256": "84c2f27d8233d8695001aa86d880e29454fe188deb9884aca1c6694c82a5887d",
+      "portrait_helper_sha256": "bde28cd5953d26b0dc3bfebe16fcfe1cde329021c17449edae7c59470376ed50"
+    }
+  },
+  "batch_guards": {
+    "success": true,
+    "lease_released": true,
+    "same_boot": true,
+    "entry_restored": true,
+    "native_restored": true,
+    "installed_and_user_unchanged": true,
+    "input_roster_unchanged": true
+  },
+  "reported_issue_count": 0,
+  "excluded_warmups": {
+    "baseline-warmup": "ok",
+    "candidate-warmup": "ok"
+  },
+  "mechanism_counts": {
+    "baseline": {
+      "native": 0,
+      "shell": 0,
+      "unmarked": 1
+    },
+    "candidate": {
+      "native": 1,
+      "shell": 0,
+      "unmarked": 0
+    }
+  },
+  "pairs": [
+    {
+      "round": 1,
+      "order": "AB",
+      "case_status": [
+        "ok",
+        "ok"
+      ],
+      "usable_ms": [
+        2183.604,
+        2114.997,
+        68.607
+      ],
+      "covers_ms": [
+        2656.359,
+        2575.642,
+        80.717
+      ],
+      "exit_ms": [
+        3327.437,
+        3408.187,
+        -80.75
+      ],
+      "intermediate_frames": [
+        0,
+        0
+      ]
+    }
+  ],
+  "summary": {
+    "planned_pairs": 1,
+    "complete_pairs": 1,
+    "endpoint_ms": {
+      "usable": {
+        "baseline_median": 2183.604,
+        "candidate_median": 2114.997,
+        "difference_of_medians": 68.607,
+        "median_of_paired_savings": 68.607,
+        "candidate_faster_pairs": 1,
+        "by_order_median_paired_saving": {
+          "AB": 68.607
+        }
+      },
+      "covers": {
+        "baseline_median": 2656.359,
+        "candidate_median": 2575.642,
+        "difference_of_medians": 80.717,
+        "median_of_paired_savings": 80.717,
+        "candidate_faster_pairs": 1,
+        "by_order_median_paired_saving": {
+          "AB": 80.717
+        }
+      },
+      "exit": {
+        "baseline_median": 3327.437,
+        "candidate_median": 3408.187,
+        "difference_of_medians": -80.75,
+        "median_of_paired_savings": -80.75,
+        "candidate_faster_pairs": 0,
+        "by_order_median_paired_saving": {
+          "AB": -80.75
+        }
+      }
+    },
+    "intermediate_frames": {
+      "total": [
+        0,
+        0
+      ],
+      "runs_with_any": [
+        0,
+        0
+      ]
+    }
+  }
+}

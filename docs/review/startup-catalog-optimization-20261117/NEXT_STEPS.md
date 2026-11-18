@@ -3,6 +3,11 @@
 Date: 2026-11-18, Asia/Shanghai.
 Reference: the deployed implementation in [the final report](README.md).
 
+Follow-up: [the next physical comparison](../startup-next-20261118/README.md)
+tests the supervisor, cache prewarming, final-frame grace and newly identified
+first-time thumbnail work. The estimates below describe the original proposals;
+use the later paired results for measured claims.
+
 The controlled baseline is now **2.278 s to the first Library frame** and
 **2.829 s to complete visible covers**, using the real indexed entry, warm offline
 data and software/driver endpoints. The prior catalog and final-publication work

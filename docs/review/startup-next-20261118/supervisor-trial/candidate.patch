@@ -1,0 +1,749 @@
+diff --git a/packaging/kindle/launch.sh b/packaging/kindle/launch.sh
+index 28561a52fe9fbb83f53c111392fbdb2a59584ace..65afd0791bed3bba64ba5dac40273a32d0440875 100755
+--- a/packaging/kindle/launch.sh
++++ b/packaging/kindle/launch.sh
+@@ -220,6 +220,25 @@ stop_native_read() {
+ native_read_command() {
+     rm -f "$LOCK_DIR/native-read-output" "$LOCK_DIR/native-read-done" "$LOCK_DIR/native-read-done.pending" "$LOCK_DIR/native-read-command" "$LOCK_DIR/native-read-command.pending" "$LOCK_DIR/native-read-go" "$LOCK_DIR/native-read-go.pending" || return 1
+     NATIVE_READ_SEQUENCE=$((NATIVE_READ_SEQUENCE + 1))
++    native_portrait_mode=''
++    if [ "$1" = "$APP_DIR/aidoku" ] && [ "${2:-}" = --kindle ] && [ "${3:-}" = --device ] &&
++        [ "${4:-}" = "$PROFILE" ] && [ "${5:-}" = --capture-native-portrait ] &&
++        { [ "$#" -eq 5 ] || { [ "$#" -eq 6 ] && [ "$6" = --capture-sleep-capability ]; }; }; then
++        native_portrait_mode=shell
++        if [ "${AIDOKU_STARTUP_PORTRAIT:-native}" = native ] && [ -x "$APP_DIR/aidoku-startup-portrait" ]; then native_portrait_mode=native; fi
++    fi
++    if [ "$native_portrait_mode" = native ]; then
++        "$APP_DIR/aidoku-startup-portrait" "$ROOT_PID" "$NATIVE_READ_SEQUENCE" "$PROFILE" ${6:+"$6"} >"$LOCK_DIR/native-read-output" 2>/dev/null 3>&- 4>&- &
++    else
++        start_legacy_native_read "$@"
++    fi
++    NATIVE_READ_PID=$!
++    finish_native_read || return 1
++    if [ -n "$native_portrait_mode" ]; then printf 'aidoku: Startup portrait supervisor: %s.\n' "$native_portrait_mode" >&2; fi
++    return 0
++}
++
++start_legacy_native_read() {
+     setsid sh -c '
+         completed=$1
+         permission=$2
+@@ -267,7 +286,9 @@ native_read_command() {
+         mv -f "$completed.pending" "$completed"
+         while :; do sleep 1; done
+     ' sh "$LOCK_DIR/native-read-done" "$LOCK_DIR/native-read-go" "$NATIVE_READ_SEQUENCE" "$NONCE" "$LOCK_DIR/native-read-command" "$@" >"$LOCK_DIR/native-read-output" 2>/dev/null 3>&- 4>&- &
+-    NATIVE_READ_PID=$!
++}
++
++finish_native_read() {
+     NATIVE_READ_BIRTH=$(process_birth "$NATIVE_READ_PID" 2>/dev/null || :)
+     # Keep the same two-second sleep budget, with earlier completion detection.
+     native_read_checks=100
+diff --git a/packaging/tests/kpm_package_test.py b/packaging/tests/kpm_package_test.py
+index bd970c972c2dab99f14bfc9a5f977594d6564643..366de605f3fe48d2d944ed54d82b8df5f6ac8561 100644
+--- a/packaging/tests/kpm_package_test.py
++++ b/packaging/tests/kpm_package_test.py
+@@ -40,6 +40,7 @@ class KpmPackageTests(unittest.TestCase):
+     def package(self, name: str, *, sample: bool = False, version: str | None = "2.3.4",
+                 environment: dict[str, str] | None = None,
+                 query_helper: Path | None = None,
++                portrait_helper: Path | None = None,
+                 catalog_dir: Path | None = None) -> tuple[Path, subprocess.CompletedProcess[str]]:
+         output = self.root / name
+         command = [sys.executable, str(BUILDER), "--application", str(self.application),
+@@ -50,6 +51,8 @@ class KpmPackageTests(unittest.TestCase):
+             command.extend(("--sample-cbz", str(self.sample)))
+         if query_helper is not None:
+             command.extend(("--native-query-helper", str(query_helper)))
++        if portrait_helper is not None:
++            command.extend(("--startup-portrait-helper", str(portrait_helper)))
+         if catalog_dir is not None:
+             command.extend(("--native-catalog-dir", str(catalog_dir)))
+         result = subprocess.run(command, env=environment, capture_output=True, text=True, timeout=30)
+@@ -79,6 +82,26 @@ class KpmPackageTests(unittest.TestCase):
+         self.assertNotEqual(result.returncode, 0)
+         self.assertIn("hard-float", result.stderr)
+ 
++    def test_optional_portrait_supervisor_binds_executable_content_and_mode(self) -> None:
++        helper = self.root / "portrait"
++        content = bytearray(self.application.read_bytes())
++        content[16:18] = (3).to_bytes(2, "little")
++        content[36:40] = (0x5000400).to_bytes(4, "little")
++        helper.write_bytes(content)
++        output, result = self.package("portrait.kpkg", portrait_helper=helper)
++        self.require_success(result)
++        with tarfile.open(output, "r:gz") as archive:
++            member = archive.getmember("payload/aidoku/app/aidoku-startup-portrait")
++            self.assertEqual(member.mode, 0o755)
++            self.assertEqual(archive.extractfile(member).read(), content)
++            self.assertIn(f"{sha256(content)}|{len(content)}|755|aidoku/app/aidoku-startup-portrait\n",
++                          archive.extractfile("payload.tsv").read().decode("ascii"))
++        content[16:18] = (1).to_bytes(2, "little")
++        helper.write_bytes(content)
++        bad, result = self.package("bad-portrait.kpkg", portrait_helper=helper)
++        self.assertNotEqual(result.returncode, 0)
++        self.assertFalse(bad.exists())
++
+     def test_catalog_runtime_is_explicit_and_preserves_modes(self) -> None:
+         directory = self.root / "catalog"
+         directory.mkdir()
+@@ -186,6 +209,7 @@ class KpmPackageTests(unittest.TestCase):
+         self.assertEqual(first.read_bytes(), second.read_bytes())
+         with tarfile.open(first, "r:gz") as archive:
+             self.assertNotIn("payload/aidoku/samples/Aidoku-Sample.cbz", archive.getnames())
++            self.assertNotIn("payload/aidoku/app/aidoku-startup-portrait", archive.getnames())
+ 
+     def test_environment_version_is_used_without_an_explicit_override(self) -> None:
+         environment = os.environ | {"CARGO_PKG_VERSION": "5.6.7"}
+diff --git a/packaging/tests/startup_portrait_supervisor_test.py b/packaging/tests/startup_portrait_supervisor_test.py
+new file mode 100644
+index 0000000000000000000000000000000000000000..7e720cb8fb64fc5f18ab9c651e0c1652b8dbdfbf
+--- /dev/null
++++ b/packaging/tests/startup_portrait_supervisor_test.py
+@@ -0,0 +1,302 @@
++"""Exercise the startup-only native portrait reader on the Linux test worker."""
++
++import ctypes
++import json
++import os
++from pathlib import Path
++import shutil
++import signal
++import subprocess
++import sys
++import tempfile
++import time
++import unittest
++
++
++SOURCE = Path(__file__).resolve().parents[2] / 'src/native_query/startup_portrait.c'
++NAME = 'aidoku-startup-portrait'
++NONCE = 'de12345678abcdef0123456789abcdef'
++SEQ = '17'
++CAP = '--capture-sleep-capability'
++GETTER = '''#!/usr/bin/env python3
++import json, os, sys, time
++from pathlib import Path
++root = Path(os.environ['PORTRAIT_FIXTURE'])
++mode = (root / 'mode').read_text()
++record = {'pid':os.getpid(), 'group':os.getpgrp(), 'session':os.getsid(0), 'args':sys.argv[1:]}
++if mode in ('hang', 'writer'):
++    child = os.fork()
++    if not child:
++        time.sleep(12)
++        os._exit(0)
++    record['descendant'] = child
++(root / 'seen.tmp').write_text(json.dumps(record))
++os.replace(root / 'seen.tmp', root / 'seen')
++if mode == 'hang': time.sleep(12)
++if mode == 'hold':
++    while not (root / 'finish').exists(): time.sleep(.005)
++os.write(1, (root / 'reply').read_bytes())
++sys.exit(23 if mode == 'nonzero' else 0)
++'''
++
++
++def eventually(check, seconds=3.0):
++    deadline = time.monotonic() + seconds
++    while time.monotonic() < deadline:
++        if check():
++            return
++        time.sleep(.01)
++    raise AssertionError(f'Condition did not hold within {seconds}s: {check}')
++
++
++def ident(pid):
++    try:
++        fields = Path(f'/proc/{pid}/stat').read_text().rsplit(') ', 1)[1].split()
++        return fields[0], int(fields[1]), int(fields[2]), int(fields[3])
++    except FileNotFoundError:
++        return None
++
++
++def group_members(group):
++    for entry in Path('/proc').iterdir():
++        if entry.name.isdigit():
++            pid = int(entry.name)
++            state = ident(pid)
++            if state and state[2:4] == (group, group):
++                yield pid, state[0]
++
++
++@unittest.skipUnless(sys.platform == 'linux', 'Run through ssh test-env')
++class StartupPortraitSupervisorTests(unittest.TestCase):
++    @classmethod
++    def setUpClass(cls):
++        tmp = tempfile.TemporaryDirectory(prefix='aidoku-portrait-host-')
++        cls.addClassCleanup(tmp.cleanup)
++        cls.binary = Path(tmp.name) / NAME
++        override = os.environ.get('AIDOKU_TEST_PORTRAIT_SUPERVISOR')
++        if override:
++            shutil.copy2(override, cls.binary)
++        else:
++            subprocess.run(['cc', '-std=c11', '-O2', '-Wall', '-Wextra', '-Werror',
++                            str(SOURCE), '-o', str(cls.binary)], check=True)
++        libc = ctypes.CDLL(None, use_errno=True)
++        previous = ctypes.c_int()
++        # Adopt and reap orphaned fixture descendants when simulating parent loss.
++        if libc.prctl(37, ctypes.byref(previous), 0, 0, 0) or libc.prctl(36, 1, 0, 0, 0):
++            raise OSError(ctypes.get_errno(), 'Cannot adopt fixture children')
++        cls.addClassCleanup(libc.prctl, 36, previous.value, 0, 0, 0)
++
++    def setUp(self):
++        tmp = tempfile.TemporaryDirectory(prefix='aidoku-portrait-case-')
++        self.addCleanup(tmp.cleanup)
++        self.root = Path(tmp.name)
++        self.app = self.root / 'app'
++        self.app.mkdir()
++        self.lock = self.root / 'lock'
++        self.lock.mkdir(mode=0o700)
++        self.helper = self.app / NAME
++        shutil.copy2(self.binary, self.helper)
++        getter = self.app / 'aidoku'
++        getter.write_text(GETTER)
++        getter.chmod(0o755)
++        self.env = dict(os.environ, AIDOKU_LAUNCHER_DIR=str(self.lock),
++                        AIDOKU_LAUNCH_NONCE=NONCE, AIDOKU_LAUNCH_GENERATION='1',
++                        PORTRAIT_FIXTURE=str(self.root))
++        self.mode = self.root / 'mode'
++        self.mode.write_text('success')
++        self.reply = self.root / 'reply'
++        self.reply.write_bytes(b'PUBLISHED\n')
++        self.seen = self.root / 'seen'
++        self.output = self.root / 'output'
++        self.done = self.lock / 'native-read-done'
++        for name, value in [('pid', str(os.getpid())), ('nonce', NONCE),
++                            ('generation', '1:'+NONCE), ('phase','starting'), ('epoch','0')]:
++            self.private(name, value + '\n')
++
++    def private(self, name, value, mode=0o600):
++        pending = self.lock / (name + '.tmp')
++        pending.write_text(value)
++        pending.chmod(mode)
++        pending.replace(self.lock / name)
++
++    def launch(self, owner=None, caps=False, profile='scribe2'):
++        args = [str(self.helper), str(os.getpid() if owner is None else owner), SEQ, profile]
++        if caps:
++            args.append(CAP)
++        with self.output.open('wb') as output:
++            worker = subprocess.Popen(args, env=self.env, stdout=output)
++        self.addCleanup(self.retire, worker)
++        return worker
++
++    def reap(self, group):
++        def empty():
++            members = list(group_members(group))
++            for pid, status in members:
++                if status == 'Z':
++                    try:
++                        os.waitpid(pid, os.WNOHANG)
++                    except ChildProcessError:
++                        pass
++            return not members
++        eventually(empty)
++
++    def retire(self, worker):
++        state = ident(worker.pid)
++        if state and state[1:4] == (os.getpid(), worker.pid, worker.pid):
++            os.killpg(worker.pid, signal.SIGKILL)
++        elif worker.poll() is None:
++            worker.kill()
++        worker.wait(timeout=2)
++        self.reap(worker.pid)
++
++    def gate(self, worker, sequence=SEQ, nonce=NONCE, mode=0o600):
++        pid = worker.pid
++        eventually(lambda: (state := ident(pid)) and state[2:4] == (pid, pid))
++        self.private('native-read-go', f'{pid}:{sequence}:{nonce}\n', mode)
++
++    def was_success(self):
++        return self.done.is_file() and self.done.read_bytes() == f'{SEQ}:{NONCE}:0\n'.encode()
++
++    def expect_success(self, payload, caps=False):
++        self.reply.write_bytes(payload)
++        worker = self.launch(caps=caps)
++        self.assertFalse(self.seen.exists())
++        self.gate(worker)
++        eventually(self.done.is_file)
++        self.assertTrue(self.was_success())
++        self.assertEqual(self.output.read_bytes(), payload)
++        record = json.loads(self.seen.read_text())
++        self.assertNotEqual(record['pid'], worker.pid)
++        self.assertEqual((record['group'], record['session']), (worker.pid, worker.pid))
++        self.assertEqual(record['args'], ['--kindle', '--device', 'scribe2', '--capture-native-portrait']
++                         + ([CAP] if caps else []))
++        self.assertIsNone(worker.poll(), 'The group leader must live through parent retirement')
++
++    def test_exact_publication(self):
++        self.expect_success(b'PUBLISHED\n')
++
++    def test_combined_capability_false(self):
++        self.expect_success(b'PUBLISHED 0\n', True)
++
++    def test_combined_capability_true(self):
++        self.expect_success(b'PUBLISHED 1\n', True)
++
++    def expect_failure(self, payload):
++        self.reply.write_bytes(payload)
++        worker = self.launch(caps=True)
++        self.gate(worker)
++        eventually(lambda: self.done.exists() or worker.poll() is not None)
++        self.assertTrue(self.seen.exists())
++        self.assertFalse(self.was_success())
++        self.assertEqual(self.output.read_bytes(), b'')
++
++    def test_success_bytes_with_nonzero_status_rejected(self):
++        self.mode.write_text('nonzero')
++        self.expect_failure(b'PUBLISHED 1\n')
++
++    def test_trailing_binary_rejected(self):
++        self.expect_failure(b'PUBLISHED\n\0')
++
++    def test_valid_prefix_plus_overflow_rejected(self):
++        self.expect_failure(b'PUBLISHED 1\n' + b'a' * 127)
++
++    def test_missing_newline_rejected(self):
++        self.expect_failure(b'PUBLISHED 0')
++
++    def test_wrong_parent_rejected(self):
++        worker = self.launch(owner=1)
++        self.assertNotEqual(worker.wait(timeout=3), 0)
++        self.assertFalse(self.seen.exists())
++
++    def test_invalid_device_rejected(self):
++        worker = self.launch(profile='other')
++        self.assertNotEqual(worker.wait(timeout=3), 0)
++        self.assertFalse(self.seen.exists())
++
++    def test_wrong_permission_never_admits_the_getter(self):
++        worker = self.launch()
++        self.gate(worker, sequence='18', nonce='0' * 32)
++        worker.wait(timeout=3.2)
++        self.assertFalse(self.seen.exists())
++        self.assertFalse(self.was_success())
++
++    def test_revoked_permission_before_getter_exit_prevents_publication(self):
++        self.mode.write_text('hold')
++        worker = self.launch()
++        self.gate(worker)
++        eventually(self.seen.is_file)
++        self.private('native-read-go', f'{worker.pid}:18:{NONCE}\n')
++        (self.root / 'finish').touch()
++        worker.wait(timeout=3.2)
++        self.assertFalse(self.was_success())
++        self.assertEqual(self.output.read_bytes(), b'')
++
++    def test_public_permission_never_admits_the_getter(self):
++        worker = self.launch()
++        self.gate(worker, mode=0o644)
++        worker.wait(timeout=3.2)
++        self.assertFalse(self.seen.exists())
++        self.assertFalse(self.was_success())
++
++    def test_hung_getter_tree_is_retired(self):
++        self.mode.write_text('hang')
++        worker = self.launch()
++        self.gate(worker)
++        eventually(self.seen.is_file)
++        child = json.loads(self.seen.read_text())['descendant']
++        self.assertEqual(ident(child)[2:4], (worker.pid, worker.pid))
++        self.assertNotEqual(worker.wait(timeout=3.2), 0)
++        self.reap(worker.pid)
++        self.assertFalse(self.was_success())
++
++    def test_getter_exit_with_unclosed_descendant_stdout(self):
++        self.mode.write_text('writer')
++        worker = self.launch()
++        self.gate(worker)
++        eventually(self.seen.is_file)
++        worker.wait(timeout=3.2)
++        self.reap(worker.pid)
++        self.assertFalse(self.was_success())
++
++    def test_killing_leader_leaves_no_group_member(self):
++        self.mode.write_text('hang')
++        worker = self.launch()
++        self.gate(worker)
++        eventually(self.seen.is_file)
++        worker.kill()
++        worker.wait(timeout=1)
++        self.reap(worker.pid)
++
++    def test_killing_launcher_retires_its_reader_tree(self):
++        self.mode.write_text('hang')
++        driver = '''import os, signal, subprocess, sys, time
++from pathlib import Path
++root, helper, nonce, seq = sys.argv[1:]
++lock = Path(root) / 'lock'
++(lock / 'pid').write_text(str(os.getpid()) + '\\n')
++worker = subprocess.Popen([helper, str(os.getpid()), seq, 'scribe2'])
++while os.getsid(worker.pid) != worker.pid: time.sleep(.005)
++os.umask(0o077)
++pending = lock / 'driver-go'
++pending.write_text(f'{worker.pid}:{seq}:{nonce}\\n')
++pending.replace(lock / 'native-read-go')
++(Path(root) / 'leader').write_text(str(worker.pid))
++signal.pause()
++'''
++        with self.output.open('wb') as output:
++            parent = subprocess.Popen([sys.executable, '-c', driver, str(self.root),
++                                       str(self.helper), NONCE, SEQ], env=self.env, stdout=output)
++        try:
++            eventually(self.seen.is_file)
++            leader = int((self.root / 'leader').read_text())
++            parent.kill()
++            parent.wait(timeout=1)
++            self.reap(leader)
++        finally:
++            if parent.poll() is None:
++                parent.kill()
++            parent.wait(timeout=1)
++
++
++if __name__ == '__main__':
++    unittest.main(verbosity=2)
+diff --git a/scripts/build-kindle.sh b/scripts/build-kindle.sh
+index 3dd0f3610206eb924897168fc25b2d11fb304e1b..6057def13eb4786bf25ea59df4100826c9ae045b 100755
+--- a/scripts/build-kindle.sh
++++ b/scripts/build-kindle.sh
+@@ -21,6 +21,8 @@ cd "$REPO_ROOT"
+ cargo zigbuild --locked --release --no-default-features --features kindle --target "$TARGET"
+ NATIVE_QUERY_HELPER=$CARGO_TARGET_DIR/native-query/aidoku-native-query
+ sh "$SCRIPT_DIR/build-native-query.sh" "$NATIVE_QUERY_HELPER"
++STARTUP_PORTRAIT_HELPER=$CARGO_TARGET_DIR/native-query/aidoku-startup-portrait
++sh "$SCRIPT_DIR/build-startup-portrait.sh" "$STARTUP_PORTRAIT_HELPER"
+ NATIVE_CATALOG_DIR=$CARGO_TARGET_DIR/native-catalog
+ sh "$SCRIPT_DIR/build-native-catalog-entry.sh" "$NATIVE_CATALOG_DIR"
+ 
+@@ -33,6 +35,7 @@ mkdir -p "$STAGING_ROOT/aidoku/app" "$STAGING_ROOT/aidoku/assets" \
+ install -m 755 "$CARGO_TARGET_DIR/$TARGET/release/aidoku" "$STAGING_ROOT/aidoku/app/aidoku"
+ install -m 755 "$CARGO_TARGET_DIR/$TARGET/release/kindle-jpeg-worker" "$STAGING_ROOT/aidoku/app/kindle-jpeg-worker"
+ install -m 755 "$NATIVE_QUERY_HELPER" "$STAGING_ROOT/aidoku/app/aidoku-native-query"
++install -m 755 "$STARTUP_PORTRAIT_HELPER" "$STAGING_ROOT/aidoku/app/aidoku-startup-portrait"
+ install -m 755 packaging/kindle/launch.sh "$STAGING_ROOT/aidoku/launch.sh"
+ install -m 755 packaging/kindle/install-catalog-entry.sh "$STAGING_ROOT/aidoku/install-catalog-entry.sh"
+ install -m 755 "$NATIVE_CATALOG_DIR/aidoku-library-dispatch" "$NATIVE_CATALOG_DIR/aidoku-catalog-client" "$STAGING_ROOT/aidoku/native-catalog/"
+diff --git a/scripts/build-startup-portrait.sh b/scripts/build-startup-portrait.sh
+new file mode 100644
+index 0000000000000000000000000000000000000000..7c9d4d782435d2b9908fde192e68934aef3020c9
+--- /dev/null
++++ b/scripts/build-startup-portrait.sh
+@@ -0,0 +1,10 @@
++#!/bin/sh
++# Build the optional startup portrait supervisor on the Linux worker.
++set -eu
++dir=$(CDPATH= cd "$(dirname "$0")" && pwd)
++out=${1:?Pass the output path for the startup portrait supervisor}
++mkdir -p "$(dirname "$out")"
++"${ZIG_BIN_DIR:+$ZIG_BIN_DIR/}zig" cc -target arm-linux-gnueabihf.2.4 \
++    -mcpu=cortex_a8 -mfpu=vfpv3-d16 -mfloat-abi=hard \
++    -std=c11 -O2 -Wall -Wextra -Werror -fstack-protector-strong -fPIE -pie \
++    -Wl,-z,relro,-z,now -s "$dir/../src/native_query/startup_portrait.c" -o "$out"
+diff --git a/scripts/package-kindle.py b/scripts/package-kindle.py
+index 4e371bfbc04d52fb35f5726a1deb0994d67c1601..1f49992067e596844d21cd897ba040f823a70516 100644
+--- a/scripts/package-kindle.py
++++ b/scripts/package-kindle.py
+@@ -81,7 +81,7 @@ def main() -> None:
+             if path.is_symlink() or "data" in path.relative_to(staging).parts:
+                 raise ValueError(f"Runtime state or a symlink is not a package input: {relative}")
+             content = path.read_bytes()
+-            executable_file = path.suffix == ".sh" or relative in ("aidoku/app/aidoku", "aidoku/app/kindle-jpeg-worker", "aidoku/app/aidoku-native-query", "aidoku/native-catalog/aidoku-library-dispatch", "aidoku/native-catalog/aidoku-catalog-client")
++            executable_file = path.suffix == ".sh" or relative in ("aidoku/app/aidoku", "aidoku/app/kindle-jpeg-worker", "aidoku/app/aidoku-native-query", "aidoku/app/aidoku-startup-portrait", "aidoku/native-catalog/aidoku-library-dispatch", "aidoku/native-catalog/aidoku-catalog-client")
+             info = zipfile.ZipInfo(relative, date_time=(2026, 11, 4, 0, 0, 0))
+             info.create_system = 3
+             info.compress_type = zipfile.ZIP_DEFLATED
+diff --git a/scripts/package-kpm.py b/scripts/package-kpm.py
+index fd950fb856e3a2af338732880ddadbd412c8551a..a6c96f9c7b0bba216b374a77e64216fc3b331090 100644
+--- a/scripts/package-kpm.py
++++ b/scripts/package-kpm.py
+@@ -122,6 +122,7 @@ def main() -> None:
+     parser.add_argument("--version", help="Override CARGO_PKG_VERSION or the package version in Cargo.toml")
+     parser.add_argument("--sample-cbz", type=Path, help="Optionally include a public, redistributable sample archive")
+     parser.add_argument("--native-query-helper", type=Path, help="Include the prebuilt optional firmware-ABI query helper")
++    parser.add_argument("--startup-portrait-helper", type=Path, help="Include the optional bounded startup portrait supervisor")
+     parser.add_argument("--native-catalog-dir", type=Path, help="Include a prebuilt qualified catalog runtime")
+     arguments = parser.parse_args()
+     if os.name == "nt" or platform.system() != "Linux":
+@@ -137,6 +138,8 @@ def main() -> None:
+         inputs = production_inputs(root, arguments.application)
+         if arguments.native_query_helper is not None:
+             inputs["aidoku/app/aidoku-native-query"] = arguments.native_query_helper
++        if arguments.startup_portrait_helper is not None:
++            inputs["aidoku/app/aidoku-startup-portrait"] = arguments.startup_portrait_helper
+         if arguments.native_catalog_dir is not None:
+             for name in ("aidoku-library-dispatch", "aidoku-entry-hooks.so", "aidoku-catalog-client", "SHA256SUMS"):
+                 inputs["aidoku/native-catalog/" + name] = arguments.native_catalog_dir / name
+@@ -146,7 +149,7 @@ def main() -> None:
+         records = []
+         for name, path in sorted(inputs.items()):
+             checked_relative(name)
+-            executable = name.endswith(".sh") or name in ("aidoku/app/aidoku", "aidoku/app/aidoku-native-query", "aidoku/native-catalog/aidoku-library-dispatch", "aidoku/native-catalog/aidoku-catalog-client")
++            executable = name.endswith(".sh") or name in ("aidoku/app/aidoku", "aidoku/app/aidoku-native-query", "aidoku/app/aidoku-startup-portrait", "aidoku/native-catalog/aidoku-library-dispatch", "aidoku/native-catalog/aidoku-catalog-client")
+             content = shell_file(path) if name.endswith(".sh") else read_file(path)
+             mode = 0o755 if executable else 0o644
+             payload[name] = (content, mode)
+@@ -160,6 +163,13 @@ def main() -> None:
+                     or int.from_bytes(query[18:20], "little") != 40
+                     or int.from_bytes(query[36:40], "little") & 0x600 != 0x400):
+                 raise ValueError("The query helper must be a prebuilt ELF32 ARM hard-float executable")
++        if arguments.startup_portrait_helper is not None:
++            helper = payload["aidoku/app/aidoku-startup-portrait"][0]
++            if (len(helper) < 52 or helper[:7] != b"\x7fELF\x01\x01\x01"
++                    or int.from_bytes(helper[16:18], "little") not in (2, 3)
++                    or int.from_bytes(helper[18:20], "little") != 40
++                    or int.from_bytes(helper[36:40], "little") & 0x600 != 0x400):
++                raise ValueError("The portrait supervisor must be a prebuilt ELF32 ARM hard-float executable")
+         if arguments.native_catalog_dir is not None:
+             for name in ("aidoku-library-dispatch", "aidoku-entry-hooks.so", "aidoku-catalog-client"):
+                 content = payload["aidoku/native-catalog/" + name][0]
+diff --git a/scripts/verify-kindle-package.py b/scripts/verify-kindle-package.py
+index 7fa268e67e89706a9183d363f46f0016cfc12e8d..de0c32946006e5bc0d34300038a4f32f06fa51d2 100644
+--- a/scripts/verify-kindle-package.py
++++ b/scripts/verify-kindle-package.py
+@@ -19,7 +19,7 @@ import zipfile
+ 
+ SOURCE_FILES = ("Cargo.toml", "Cargo.lock", "build.rs", "rust-toolchain.toml", ".cargo/config.toml",
+                 "scripts/native-codec-probe.c", "scripts/native-codec-bench.h", "scripts/build-native-query.sh",
+-                "scripts/build-native-catalog-entry.sh")
++                "scripts/build-native-catalog-entry.sh", "scripts/build-startup-portrait.sh")
+ SOURCE_DIRECTORIES = ("src", "ui", "assets", "vendor", "examples")
+ SOURCE_ALGORITHM = "sha256-of-canonical-sorted-relative-file-records-v1"
+ 
+@@ -121,6 +121,7 @@ def main() -> int:
+     parser.add_argument("--expected-application-sha256", required=True)
+     parser.add_argument("--expected-helper-sha256", required=True)
+     parser.add_argument("--expected-native-query-sha256", required=True)
++    parser.add_argument("--expected-startup-portrait-sha256")
+     parser.add_argument("--expected-catalog-dir", type=Path)
+     parser.add_argument("--output", type=Path, required=True)
+     arguments = parser.parse_args()
+@@ -159,6 +160,8 @@ def main() -> int:
+                 "The package manifest binds the exact verified production source", manifest.get("source_sha256"))
+         inputs = expected_inputs(root)
+         expected_names = set(inputs) | {"aidoku/app/aidoku", "aidoku/app/kindle-jpeg-worker", "aidoku/app/aidoku-native-query"}
++        if arguments.expected_startup_portrait_sha256 is not None:
++            expected_names.add("aidoku/app/aidoku-startup-portrait")
+         catalog_names = ("aidoku-library-dispatch", "aidoku-entry-hooks.so", "aidoku-catalog-client", "SHA256SUMS")
+         if arguments.expected_catalog_dir is not None:
+             expected_names.update("aidoku/native-catalog/" + name for name in catalog_names)
+@@ -182,7 +185,7 @@ def main() -> int:
+                         and "\\" not in name and not info.is_dir(),
+                         f"The package member has a safe runtime-free path: {name}")
+                 mode = info.external_attr >> 16
+-                expected_mode = 0o755 if name.endswith(".sh") or name in ("aidoku/app/aidoku", "aidoku/app/kindle-jpeg-worker", "aidoku/app/aidoku-native-query", "aidoku/native-catalog/aidoku-library-dispatch", "aidoku/native-catalog/aidoku-catalog-client") else 0o644
++                expected_mode = 0o755 if name.endswith(".sh") or name in ("aidoku/app/aidoku", "aidoku/app/kindle-jpeg-worker", "aidoku/app/aidoku-native-query", "aidoku/app/aidoku-startup-portrait", "aidoku/native-catalog/aidoku-library-dispatch", "aidoku/native-catalog/aidoku-catalog-client") else 0o644
+                 require(info.create_system == 3 and stat.S_ISREG(mode) and stat.S_IMODE(mode) == expected_mode,
+                         f"The member has correct Unix file permissions: {name}", oct(mode))
+                 content = archive.read(info)
+@@ -208,6 +211,13 @@ def main() -> int:
+                     "The native query helper matches the frozen executable", sha256(query_helper))
+             query_identity = elf_identity(query_helper, static=False)
+             require(query_identity["static"] is False, "The query helper uses the native firmware loader", query_identity)
++            if arguments.expected_startup_portrait_sha256 is not None:
++                portrait = archive.read("aidoku/app/aidoku-startup-portrait")
++                require(sha256(portrait) == arguments.expected_startup_portrait_sha256,
++                        "The startup portrait supervisor matches the frozen executable", sha256(portrait))
++                require(elf_identity(portrait, static=False)["static"] is False,
++                        "The startup portrait supervisor uses the native firmware loader")
++                report["startup_portrait_sha256"] = sha256(portrait)
+             if arguments.expected_catalog_dir is not None:
+                 for name in catalog_names:
+                     payload = archive.read("aidoku/native-catalog/" + name)
+diff --git a/src/native_query/startup_portrait.c b/src/native_query/startup_portrait.c
+new file mode 100644
+index 0000000000000000000000000000000000000000..fc891b89571e33cdfd52f1b58dad8faf4b176d29
+--- /dev/null
++++ b/src/native_query/startup_portrait.c
+@@ -0,0 +1,191 @@
++/* Bounded supervisor for the sibling application's startup portrait transaction. */
++#define _GNU_SOURCE
++#include <errno.h>
++#include <fcntl.h>
++#include <limits.h>
++#include <signal.h>
++#include <stdbool.h>
++#include <stdio.h>
++#include <stdlib.h>
++#include <string.h>
++#include <sys/prctl.h>
++#include <sys/stat.h>
++#include <sys/wait.h>
++#include <time.h>
++#include <unistd.h>
++
++enum { OUTPUT_LIMIT = 128 };
++static pid_t group_id;
++
++/* Either guardian can die first. A member can only stop its own private
++ * group, whose ID cannot be reused while that member is still alive. */
++static void stop_group(int signo) {
++    (void)signo;
++    if (group_id > 1 && getpgrp() == group_id && getsid(0) == group_id)
++        (void)kill(0, SIGKILL);
++    _exit(1);
++}
++
++static int arm_guard(pid_t parent) {
++    struct sigaction action = {.sa_handler = stop_group};
++    sigemptyset(&action.sa_mask);
++    sigset_t signals;
++    sigemptyset(&signals);
++    const int guarded[] = {SIGTERM, SIGINT, SIGHUP, SIGALRM};
++    for (unsigned i = 0; i < sizeof(guarded) / sizeof(*guarded); ++i) {
++        if (sigaction(guarded[i], &action, NULL) < 0) return -1;
++        sigaddset(&signals, guarded[i]);
++    }
++    if (sigprocmask(SIG_UNBLOCK, &signals, NULL) < 0 ||
++        prctl(PR_SET_PDEATHSIG, SIGTERM) < 0 || getppid() != parent) return -1;
++    alarm(2);
++    return 0;
++}
++
++static bool positive_decimal(const char *value) {
++    if (!value || value[0] < '1' || value[0] > '9') return false;
++    for (const char *p = value + 1; *p; ++p)
++        if (*p < '0' || *p > '9') return false;
++    return true;
++}
++
++static bool known_profile(const char *value) {
++    const char *const profiles[] = {"pw5", "pw6", "scribe", "scribe2", "scribe3", "scribe3-nofrontlight"};
++    for (unsigned i = 0; i < sizeof(profiles) / sizeof(*profiles); ++i)
++        if (!strcmp(value, profiles[i])) return true;
++    return false;
++}
++
++static bool directory_current(int directory, const char *path) {
++    struct stat file, name;
++    return fstat(directory, &file) == 0 && lstat(path, &name) == 0 &&
++        S_ISDIR(name.st_mode) && name.st_uid == geteuid() &&
++        (name.st_mode & 0777) == 0700 && name.st_dev == file.st_dev && name.st_ino == file.st_ino;
++}
++
++enum match { MISMATCH, MATCH, MISSING };
++
++static enum match exact_record(int directory, const char *leaf, const char *expected) {
++    int fd = openat(directory, leaf, O_RDONLY | O_NONBLOCK | O_CLOEXEC | O_NOFOLLOW);
++    if (fd < 0) return errno == ENOENT ? MISSING : MISMATCH;
++    struct stat before, after;
++    char buffer[132];
++    size_t length = strlen(expected);
++    bool valid = fstat(fd, &before) == 0 && S_ISREG(before.st_mode) &&
++        before.st_uid == geteuid() && before.st_nlink == 1 &&
++        ((before.st_mode & 0777) == 0600 || (before.st_mode & 0777) == 0400) &&
++        before.st_size == (off_t)length && length < sizeof(buffer) &&
++        read(fd, buffer, sizeof(buffer)) == (ssize_t)length && !memcmp(buffer, expected, length) &&
++        fstatat(directory, leaf, &after, AT_SYMLINK_NOFOLLOW) == 0 &&
++        before.st_dev == after.st_dev && before.st_ino == after.st_ino &&
++        before.st_ctim.tv_sec == after.st_ctim.tv_sec && before.st_ctim.tv_nsec == after.st_ctim.tv_nsec;
++    close(fd);
++    return valid ? MATCH : MISMATCH;
++}
++
++static bool current(int directory, const char *path, const char *owner,
++                    const char *nonce_record, const char *permission) {
++    return directory_current(directory, path) && exact_record(directory, "pid", owner) == MATCH &&
++        exact_record(directory, "nonce", nonce_record) == MATCH &&
++        exact_record(directory, "native-read-go", permission) == MATCH;
++}
++
++static bool publish_done(int directory, const char *done) {
++    int fd = openat(directory, "native-read-done.pending",
++                    O_WRONLY | O_CLOEXEC | O_CREAT | O_EXCL | O_NOFOLLOW, 0600);
++    if (fd < 0) return false;
++    size_t length = strlen(done);
++    bool wrote = write(fd, done, length) == (ssize_t)length;
++    if (close(fd) < 0 || !wrote) return false;
++    return renameat(directory, "native-read-done.pending", directory, "native-read-done") == 0;
++}
++
++static bool collect(const char *profile, bool capability, char output[OUTPUT_LIMIT + 1], size_t *used) {
++    char application[PATH_MAX];
++    ssize_t n = readlink("/proc/self/exe", application, sizeof(application) - 1);
++    if (n < 1 || (size_t)n >= sizeof(application) - 1) return false;
++    application[n] = 0;
++    char *leaf = strrchr(application, '/');
++    if (!leaf || sizeof(application) - (size_t)(leaf - application) < sizeof("/aidoku")) return false;
++    memcpy(leaf, "/aidoku", sizeof("/aidoku"));
++    int output_pipe[2];
++    if (pipe(output_pipe) < 0) return false;
++    pid_t child = fork();
++    if (child == 0) {
++        close(output_pipe[0]);
++        if (getppid() != group_id || dup2(output_pipe[1], STDOUT_FILENO) < 0) _exit(1);
++        close(output_pipe[1]);
++        char *const args[] = {application, "--kindle", "--device", (char *)profile,
++            "--capture-native-portrait", capability ? "--capture-sleep-capability" : NULL, NULL};
++        execv(application, args);
++        _exit(1);
++    }
++    close(output_pipe[1]);
++    if (child < 0) { close(output_pipe[0]); return false; }
++    size_t total = 0;
++    while (total <= OUTPUT_LIMIT) {
++        ssize_t got = read(output_pipe[0], output + total, OUTPUT_LIMIT + 1 - total);
++        if (got < 0 && errno == EINTR) continue;
++        if (got < 0) { close(output_pipe[0]); return false; }
++        if (!got) break;
++        total += (size_t)got;
++    }
++    close(output_pipe[0]);
++    if (total > OUTPUT_LIMIT) return false;
++    int status;
++    pid_t waited;
++    do { waited = waitpid(child, &status, 0); } while (waited < 0 && errno == EINTR);
++    if (waited != child || !WIFEXITED(status) || WEXITSTATUS(status) != 0) return false;
++    *used = total;
++    return (total == sizeof("PUBLISHED\n") - 1 && !memcmp(output, "PUBLISHED\n", total)) ||
++        (total == sizeof("PUBLISHED 0\n") - 1 &&
++         (!memcmp(output, "PUBLISHED 0\n", total) || !memcmp(output, "PUBLISHED 1\n", total)));
++}
++
++int main(int argc, char **argv) {
++    if ((argc != 4 && argc != 5) || !positive_decimal(argv[1]) || !positive_decimal(argv[2]) ||
++        strlen(argv[2]) > 20 || !known_profile(argv[3]) ||
++        (argc == 5 && strcmp(argv[4], "--capture-sleep-capability"))) return 64;
++    errno = 0;
++    long parent_number = strtol(argv[1], NULL, 10);
++    if (errno || parent_number <= 1 || parent_number > INT_MAX || (pid_t)parent_number != getppid()) return 1;
++    errno = 0;
++    (void)strtoull(argv[2], NULL, 10);
++    if (errno) return 64;
++    const char *path = getenv("AIDOKU_LAUNCHER_DIR"), *nonce = getenv("AIDOKU_LAUNCH_NONCE");
++    if (!path || *path != '/' || !nonce || strlen(nonce) != 32 ||
++        strspn(nonce, "0123456789abcdefABCDEF") != 32) return 1;
++
++    group_id = getpid();
++    if (getsid(0) != group_id && setsid() != group_id) return 1;
++    if (getpgrp() != group_id || getsid(0) != group_id || arm_guard((pid_t)parent_number) < 0) return 1;
++    pid_t watchdog = fork();
++    if (watchdog < 0) return 1;
++    if (watchdog == 0) {
++        if (arm_guard(group_id) < 0) stop_group(0);
++        for (;;) pause();
++    }
++
++    int dir = open(path, O_RDONLY | O_DIRECTORY | O_CLOEXEC | O_NOFOLLOW);
++    if (dir < 0 || !directory_current(dir, path)) stop_group(0);
++    char owner[36], nonce_record[34], permission[96], done[96];
++    snprintf(owner, sizeof(owner), "%ld\n", parent_number);
++    snprintf(nonce_record, sizeof(nonce_record), "%s\n", nonce);
++    snprintf(permission, sizeof(permission), "%ld:%s:%s\n", (long)group_id, argv[2], nonce);
++    enum match permission_state;
++    const struct timespec tick = {.tv_nsec = 1000000};
++    while ((permission_state = exact_record(dir, "native-read-go", permission)) == MISSING)
++        nanosleep(&tick, NULL);
++    if (permission_state != MATCH || !current(dir, path, owner, nonce_record, permission)) stop_group(0);
++
++    char result[OUTPUT_LIMIT + 1];
++    size_t used = 0;
++    bool ok = collect(argv[3], argc == 5, result, &used);
++    if (!current(dir, path, owner, nonce_record, permission)) stop_group(0);
++    if (ok) ok = write(STDOUT_FILENO, result, used) == (ssize_t)used;
++    snprintf(done, sizeof(done), "%s:%s:%d\n", argv[2], nonce, ok ? 0 : 1);
++    if (!publish_done(dir, done)) stop_group(0);
++    close(dir);
++    /* Keep the proven session leader alive through the launcher's group reap. */
++    for (;;) pause();
++}

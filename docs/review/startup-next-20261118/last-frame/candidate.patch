@@ -1,0 +1,521 @@
+diff --git a/src/app.rs b/src/app.rs
+index 5c74569..c8c0836 100644
+--- a/src/app.rs
++++ b/src/app.rs
+@@ -143,6 +143,7 @@ enum JobResult {
+         uri: String,
+         path: PathBuf,
+         image: prepared_pixels::PreparedPixels,
++        local_cache_hit: bool,
+     },
+     SleepCover {
+         identity: sleep_screen::CoverIdentity,
+@@ -314,6 +315,7 @@ pub struct App {
+     tracking_accounts: tracking_accounts::TrackingAccounts,
+     metadata_restore: runtime_restore::RestoreRuntime,
+     background_ui_dirty: bool,
++    cover_ui_dirty: bool,
+     download_ui_dirty: bool,
+     next_background_ui: Instant,
+     lifecycle_generation: u64,
+@@ -500,6 +502,7 @@ impl App {
+             tracking_accounts: tracking_accounts::TrackingAccounts::default(),
+             metadata_restore: runtime_restore::RestoreRuntime::default(),
+             background_ui_dirty: false,
++            cover_ui_dirty: false,
+             download_ui_dirty: false,
+             next_background_ui: Instant::now(),
+             lifecycle_generation: 0,
+@@ -724,7 +727,7 @@ impl App {
+                 }
+             }
+             if matches!(&message.context.kind, JobKind::Cover(_)) {
+-                self.background_ui_dirty = true;
++                self.cover_ui_dirty = true;
+                 self.invalidate_storage_details();
+             } else if !prefetch_job
+                 && !matches!(
+@@ -859,8 +862,12 @@ impl App {
+             self.message_until = None;
+             changed = true;
+         }
++        if changed || self.background_ui_dirty {
++            self.cancel_startup_cover_grace();
++        }
+         let startup_cover_due = self.startup_cover_publication_due();
+-        let background_due = Instant::now() >= self.next_background_ui;
++        let now = Instant::now();
++        let background_due = now >= self.next_background_ui;
+         if background_due && self.download_ui_dirty {
+             if self.modal == "downloads" {
+                 if let Err(error) = self.refresh_download_rows() {
+@@ -870,7 +877,15 @@ impl App {
+             }
+             self.download_ui_dirty = false;
+         }
+-        if changed || (background_due || startup_cover_due) && self.background_ui_dirty {
++        let due = background_due || startup_cover_due;
++        let publish = changed || due && (self.background_ui_dirty || self.cover_ui_dirty);
++        let defer_cover = publish
++            && !changed
++            && !self.background_ui_dirty
++            && !startup_cover_due
++            && self.defer_last_startup_cover(now);
++        if publish && !defer_cover {
++            self.cancel_startup_cover_grace();
+             if startup_cover_due {
+                 crate::reader_timing::mark("startup_final_cover_publication");
+             }
+@@ -888,11 +903,12 @@ impl App {
+             self.platform
+                 .refresh(self.frame_refresh.take().unwrap_or(RefreshKind::Ui));
+             self.background_ui_dirty = false;
++            self.cover_ui_dirty = false;
+             self.next_background_ui = Instant::now() + Duration::from_millis(300);
+         }
+         match self.refresh_visible_covers() {
+             Ok(true) => {
+-                self.background_ui_dirty = true;
++                self.cover_ui_dirty = true;
+             }
+             Ok(false) => {}
+             Err(error) => eprintln!("aidoku: queue visible covers: {error:#}"),
+@@ -969,6 +985,7 @@ impl App {
+     }
+ 
+     pub(crate) fn source_images_changed(&mut self) {
++        self.cancel_startup_cover_grace();
+         self.clear_sleep_screen();
+         self.pending_wide_navigation = 0;
+         self.cancel_pending_user_network();
+@@ -1241,7 +1258,8 @@ impl App {
+                 uri,
+                 path,
+                 image,
+-            } => self.accept_cover(context, id, uri, path, image)?,
++                local_cache_hit,
++            } => self.accept_cover(context, id, uri, path, image, local_cache_hit)?,
+             JobResult::SleepCover { identity, image } => self.accept_sleep_cover(identity, image),
+             JobResult::DownloadUsage(result) => {
+                 if self.accept_download_usage(result) && self.route == "settings" {
+@@ -2019,6 +2037,7 @@ mod tests {
+                 tracking_accounts: tracking_accounts::TrackingAccounts::default(),
+                 metadata_restore: runtime_restore::RestoreRuntime::default(),
+                 background_ui_dirty: false,
++                cover_ui_dirty: false,
+                 download_ui_dirty: false,
+                 next_background_ui: Instant::now(),
+                 lifecycle_generation: 0,
+diff --git a/src/app/actions.rs b/src/app/actions.rs
+index aea5d86..dcea7e2 100644
+--- a/src/app/actions.rs
++++ b/src/app/actions.rs
+@@ -21,6 +21,7 @@ pub(super) struct PendingUserNetwork {
+ 
+ impl App {
+     pub fn dispatch(&mut self, section: &str, action: &str, value: &str) -> Result<()> {
++        self.cancel_startup_cover_grace();
+         match self.dispatch_action(section, action, value) {
+             Err(error)
+                 if self.route == "reader"
+@@ -4361,20 +4362,34 @@ impl App {
+                 "crop_borders" | "crop-borders" => self.prefs.crop_borders = value.parse()?,
+                 "dither" => self.prefs.dither = value.parse()?,
+                 "dither_method" | "dither-method"
+-                    if matches!(value, "software" | "hardware" | "bayer8" | "floyd" | "floyd_steinberg") => {
++                    if matches!(
++                        value,
++                        "software" | "hardware" | "bayer8" | "floyd" | "floyd_steinberg"
++                    ) =>
++                {
+                     self.prefs.dither_method = if matches!(value, "floyd" | "floyd_steinberg") {
+                         "floyd_steinberg"
+-                    } else { "bayer8" }.into();
++                    } else {
++                        "bayer8"
++                    }
++                    .into();
+                     self.prefs.dither = true;
+                 }
+                 "dither_mode" | "dither-mode"
+-                    if matches!(value, "software" | "hardware" | "off" | "bayer8" | "floyd" | "floyd_steinberg") =>
++                    if matches!(
++                        value,
++                        "software" | "hardware" | "off" | "bayer8" | "floyd" | "floyd_steinberg"
++                    ) =>
+                 {
+                     self.prefs.dither = value != "off";
+                     if self.prefs.dither {
+-                        self.prefs.dither_method = if matches!(value, "floyd" | "floyd_steinberg") {
+-                            "floyd_steinberg"
+-                        } else { "bayer8" }.into();
++                        self.prefs.dither_method =
++                            if matches!(value, "floyd" | "floyd_steinberg") {
++                                "floyd_steinberg"
++                            } else {
++                                "bayer8"
++                            }
++                            .into();
+                     }
+                 }
+                 "contrast" => {
+@@ -4955,7 +4970,10 @@ mod followup_command_tests {
+         app.dispatch("settings", "set", "dither-mode=off").unwrap();
+         assert!(!app.prefs.dither);
+         assert_eq!(app.prefs.normalized_dither_method(), "floyd_steinberg");
+-        assert_eq!(app.store.preferences().unwrap().spatial_dither(), crate::imaging::SpatialDither::Off);
++        assert_eq!(
++            app.store.preferences().unwrap().spatial_dither(),
++            crate::imaging::SpatialDither::Off
++        );
+         app.dispatch("settings", "set", "dither=true").unwrap();
+         assert_eq!(app.prefs.normalized_dither_method(), "floyd_steinberg");
+         app.dispatch("settings", "set", "dither-method=software")
+diff --git a/src/app/cover_jobs.rs b/src/app/cover_jobs.rs
+index ab209dd..12fa68f 100644
+--- a/src/app/cover_jobs.rs
++++ b/src/app/cover_jobs.rs
+@@ -2,10 +2,42 @@
+ 
+ use super::*;
+ 
++const FINAL_LOCAL_GRACE: Duration = Duration::from_millis(40);
++
++#[derive(Default)]
++struct LastCoverGrace {
++    local_hits: HashSet<String>,
++    last_local_job: Option<u64>,
++    timer: Option<slint::Timer>,
++    retired: bool,
++}
++
++impl LastCoverGrace {
++    fn eligible(&self, visible: &[String], pending: &str, inflight: Option<u64>) -> bool {
++        !self.retired
++            && visible.len() >= 2
++            && inflight.is_some()
++            && self.last_local_job == inflight
++            && visible.iter().any(|id| id == pending)
++            && !self.local_hits.contains(pending)
++            && visible
++                .iter()
++                .all(|id| id == pending || self.local_hits.contains(id))
++    }
++
++    fn retire(&mut self, mark: &'static str) {
++        if self.timer.take().is_some() {
++            crate::reader_timing::mark(mark);
++        }
++        self.retired = true;
++    }
++}
++
+ pub(super) struct StartupCoverPublication {
+     lifecycle_generation: u64,
+     source_revision: u64,
+     visible: Vec<String>,
++    grace: LastCoverGrace,
+ }
+ 
+ impl App {
+@@ -18,9 +50,86 @@ impl App {
+                 lifecycle_generation: self.lifecycle_generation,
+                 source_revision: self.source_revision,
+                 visible: self.visible_cover_ids(),
++                grace: LastCoverGrace::default(),
+             });
+     }
+ 
++    pub(super) fn cancel_startup_cover_grace(&mut self) {
++        if let Some(startup) = &mut self.startup_cover_publication {
++            startup.grace.retire("startup_cover_last_grace_cancelled");
++        }
++    }
++
++    fn last_cover_can_wait(&self, startup: &StartupCoverPublication, visible: &[String]) -> bool {
++        self.cover_ui_dirty
++            && !self.background_ui_dirty
++            && !self.shutting_down
++            && !self.suspended
++            && !self.resume_frame_pending
++            && self.route == "library"
++            && self.modal.is_empty()
++            && self.lifecycle_generation == startup.lifecycle_generation
++            && self.source_revision == startup.source_revision
++            && self.cover_queue.is_empty()
++            && self.cover_pending.len() == 1
++            && self.cover_retry_after.is_empty()
++            && self.cover_view == startup.visible
++            && visible == startup.visible.as_slice()
++            && self
++                .cover_pending
++                .iter()
++                .next()
++                .is_some_and(|id| startup.grace.eligible(visible, id, self.cover_inflight))
++    }
++
++    pub(super) fn defer_last_startup_cover(&mut self, now: Instant) -> bool {
++        let Some(startup) = &self.startup_cover_publication else {
++            return false;
++        };
++        if startup.grace.retired {
++            return false;
++        }
++        let end = self.next_background_ui + FINAL_LOCAL_GRACE;
++        if now >= end {
++            self.startup_cover_publication
++                .as_mut()
++                .unwrap()
++                .grace
++                .retire("startup_cover_last_grace_expired");
++            return false;
++        }
++        if self.cover_pending.len() != 1
++            || !self.last_cover_can_wait(startup, &self.visible_cover_ids())
++        {
++            self.cancel_startup_cover_grace();
++            return false;
++        }
++        let grace = &mut self.startup_cover_publication.as_mut().unwrap().grace;
++        if grace.timer.is_none() {
++            // Workers already wake the dispatcher on completion. Wake it once
++            // at the original deadline plus 40 ms even if the last item stalls.
++            let ui = self.ui.clone();
++            let timer = slint::Timer::default();
++            let remaining = end.saturating_duration_since(Instant::now());
++            if remaining.is_zero() {
++                return false;
++            }
++            let millis = remaining.as_nanos().div_ceil(1_000_000) as u64;
++            timer.start(
++                slint::TimerMode::SingleShot,
++                Duration::from_millis(millis),
++                move || {
++                    if let Some(ui) = ui.upgrade() {
++                        ui.global::<Commands>().invoke_job_ready();
++                    }
++                },
++            );
++            grace.timer = Some(timer);
++            crate::reader_timing::mark("startup_cover_last_grace_started");
++        }
++        true
++    }
++
+     pub(super) fn startup_cover_publication_due(&mut self) -> bool {
+         if self.startup_cover_publication.is_none()
+             || self.cover_work_pending()
+@@ -45,6 +154,7 @@ impl App {
+             || self.source_revision != startup.source_revision
+             || visible != startup.visible.as_slice()
+         {
++            self.cancel_startup_cover_grace();
+             self.startup_cover_publication = None;
+             return false;
+         }
+@@ -56,11 +166,24 @@ impl App {
+         }
+         // Retire this one-time opportunity even if no pixels changed or a
+         // failed cover is waiting for its normal retry/publication cadence.
+-        self.startup_cover_publication = None;
+-        self.background_ui_dirty
++        let publish = (self.background_ui_dirty || self.cover_ui_dirty)
+             && !visible
+                 .iter()
+-                .any(|id| self.cover_retry_after.contains_key(id))
++                .any(|id| self.cover_retry_after.contains_key(id));
++        let mut startup = self.startup_cover_publication.take().unwrap();
++        let event = if !publish
++            || !visible
++                .iter()
++                .all(|id| startup.grace.local_hits.contains(id))
++        {
++            "startup_cover_last_grace_cancelled"
++        } else if Instant::now() >= self.next_background_ui + FINAL_LOCAL_GRACE {
++            "startup_cover_last_grace_expired"
++        } else {
++            "startup_cover_last_grace_completed"
++        };
++        startup.grace.retire(event);
++        publish
+     }
+ 
+     pub(super) fn request_covers(&mut self, _books: &[Book]) -> Result<()> {
+@@ -294,6 +417,7 @@ impl App {
+                 && !self.options.demo
+                 && !self.resume_network_pending
+                 && !migration_origin;
++            let final_local = book.source_id == "local" && self.cover_queue.is_empty();
+             // Reuse the same snapshot source_jobs needs for manager creation.
+             // Looking up a disabled origin must not call configuration(), which
+             // rejects it before its existing cache aliases can be inspected.
+@@ -317,6 +441,9 @@ impl App {
+             match result {
+                 Ok(job) => {
+                     self.cover_inflight = Some(job);
++                    if final_local && let Some(startup) = &mut self.startup_cover_publication {
++                        startup.grace.last_local_job = Some(job);
++                    }
+                     break;
+                 }
+                 Err(error) => {
+@@ -337,6 +464,7 @@ impl App {
+         uri: String,
+         path: PathBuf,
+         image: prepared_pixels::PreparedPixels,
++        local_cache_hit: bool,
+     ) -> Result<()> {
+         self.cover_pending.remove(&id);
+         self.cover_retry_after.remove(&id);
+@@ -368,6 +496,15 @@ impl App {
+             "The prepared cover contains no pixels"
+         );
+         let texture = image.into_image();
++        if let Some(startup) = &mut self.startup_cover_publication
++            && !startup.grace.retired
++        {
++            if local_cache_hit && startup.visible == visible {
++                startup.grace.local_hits.insert(id.clone());
++            } else {
++                startup.grace.retire("startup_cover_last_grace_cancelled");
++            }
++        }
+         self.cover_cache
+             .retain(|(cached_id, _), _| cached_id != &id);
+         self.cover_cache.insert((id.clone(), path.clone()), texture);
+@@ -528,6 +665,7 @@ fn prepare_cover_pixels(
+         (url::Url::parse(&book.cover).is_err() && Path::new(&book.cover).is_file())
+             .then(|| PathBuf::from(&book.cover))
+     });
++    let local_library = local.is_some() && book.source_id == "local";
+     let rendered = if let Some(path) = local {
+         let raw = fs::canonicalize(&path).context("Resolve the local cover image")?;
+         let request = Page {
+@@ -628,6 +766,7 @@ fn prepare_cover_pixels(
+         .check_epoch(manager.network_epoch())?;
+     crate::reader_timing::mark("cover_render_ready");
+     Ok(JobResult::Cover {
++        local_cache_hit: local_library && rendered.cache_hit,
+         id: book.id,
+         uri: book.cover,
+         path: rendered.cache_path,
+@@ -731,12 +870,94 @@ mod tests {
+             lifecycle_generation: app.lifecycle_generation,
+             source_revision: app.source_revision,
+             visible: visible.to_vec(),
++            grace: LastCoverGrace::default(),
+         });
+         app.cover_view = visible.to_vec();
+         app.background_ui_dirty = true;
+         app.next_background_ui = Instant::now() + Duration::from_secs(5);
+     }
+ 
++    fn last_job(app: &mut App, ids: &[String]) {
++        pending_startup_publication(app, ids);
++        app.background_ui_dirty = false;
++        app.cover_ui_dirty = true;
++        app.cover_inflight = Some(17);
++        app.cover_pending = HashSet::from([ids[1].clone()]);
++        let grace = &mut app.startup_cover_publication.as_mut().unwrap().grace;
++        grace.local_hits.insert(ids[0].clone());
++        grace.last_local_job = Some(17);
++    }
++
++    #[test]
++    fn grace_requires_only_cover_work_and_a_single_owned_final_local_job() {
++        let mut fixture = crate::app::tests::DemoRouteFixture::new(
++            "library",
++            crate::platform::DeviceProfile::Pw5,
++            false,
++        );
++        let app = &mut fixture.app;
++        let ids = ["a".to_owned(), "b".to_owned()];
++        let eligible = |app: &App| {
++            app.last_cover_can_wait(app.startup_cover_publication.as_ref().unwrap(), &ids)
++        };
++        last_job(app, &ids);
++        assert!(eligible(app));
++        assert!(
++            !app.last_cover_can_wait(app.startup_cover_publication.as_ref().unwrap(), &ids[..1])
++        );
++        app.background_ui_dirty = true;
++        assert!(!eligible(app));
++        app.background_ui_dirty = false;
++        app.cover_inflight = Some(18);
++        assert!(!eligible(app));
++        app.cover_inflight = Some(17);
++        app.cover_pending.insert("a".into());
++        assert!(!eligible(app));
++        app.cover_pending.remove("a");
++        app.cover_retry_after.insert("a".into(), Instant::now());
++        assert!(!eligible(app));
++        app.cover_retry_after.clear();
++        app.modal = "settings".into();
++        assert!(!eligible(app));
++        app.modal.clear();
++        app.source_revision += 1;
++        assert!(!eligible(app));
++        app.source_revision -= 1;
++        app.startup_cover_publication
++            .as_mut()
++            .unwrap()
++            .grace
++            .local_hits
++            .clear();
++        assert!(!eligible(app));
++    }
++
++    #[test]
++    fn expired_grace_is_never_rearmed_and_completed_cover_work_can_publish() {
++        let mut fixture = crate::app::tests::DemoRouteFixture::new(
++            "library",
++            crate::platform::DeviceProfile::Pw5,
++            false,
++        );
++        let app = &mut fixture.app;
++        let ids = ["a".to_owned(), "b".to_owned()];
++        last_job(app, &ids);
++        let absolute_end = app.next_background_ui + FINAL_LOCAL_GRACE;
++        assert!(!app.defer_last_startup_cover(absolute_end));
++        assert!(
++            app.startup_cover_publication
++                .as_ref()
++                .unwrap()
++                .grace
++                .retired
++        );
++        assert!(!app.defer_last_startup_cover(app.next_background_ui));
++        app.cover_inflight = None;
++        app.cover_pending.clear();
++        assert!(app.finish_startup_cover_publication(&ids));
++        assert!(!app.finish_startup_cover_publication(&ids));
++    }
++
+     #[test]
+     fn final_startup_cover_flush_waits_for_all_work_and_happens_once() {
+         use crate::app::tests::DemoRouteFixture;
+diff --git a/src/app/diagnostics.rs b/src/app/diagnostics.rs
+index 3cf2cd8..956d0f5 100644
+--- a/src/app/diagnostics.rs
++++ b/src/app/diagnostics.rs
+@@ -76,7 +76,7 @@ impl App {
+ 
+     /// A completed cover may still await the throttled view publication.
+     pub fn capture_projection_pending(&self) -> bool {
+-        self.cover_work_pending() || self.background_ui_dirty
++        self.cover_work_pending() || self.background_ui_dirty || self.cover_ui_dirty
+     }
+ 
+     /// Count projected Library image slots without reading storage or book IDs.
+diff --git a/src/app/lifecycle.rs b/src/app/lifecycle.rs
+index 161acbe..354e347 100644
+--- a/src/app/lifecycle.rs
++++ b/src/app/lifecycle.rs
+@@ -6,6 +6,7 @@ impl App {
+     /// Close application and transport admission, then project prepared memory.
+     /// The caller must return to the event loop before checkpointing a cover.
+     pub fn begin_sleep_transition(&mut self, show_cover: bool) -> Result<bool> {
++        self.cancel_startup_cover_grace();
+         if self.suspended {
+             if show_cover && self.sleep_cover_enabled() {
+                 self.show_sleep_cover()?;
