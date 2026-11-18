@@ -125,7 +125,7 @@ impl App {
         selected.sort();
         state.set_selected_books(model(selected.into_iter().map(Into::into)));
 
-        let status = self.platform.status();
+        let status = self.platform.view_status(show_library);
         let (time, battery, wifi) = if self.options.demo {
             let minute = if large {
                 match self.route.as_str() {

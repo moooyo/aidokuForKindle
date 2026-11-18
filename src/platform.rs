@@ -12,6 +12,10 @@ use crate::domain::Preferences;
 mod device_policy;
 pub use device_policy::{DevicePolicyCapabilities, DevicePolicyObservation};
 
+#[path = "platform_startup_toolbar.rs"]
+mod startup_toolbar;
+use startup_toolbar::{StartupToolbar, ViewStatus};
+
 #[cfg(all(feature = "kindle", target_os = "linux"))]
 #[path = "platform_activity.rs"]
 mod activity;
@@ -244,6 +248,7 @@ pub struct Platform {
     last_refresh: Cell<RefreshKind>,
     refresh_count: Cell<u64>,
     status_cache: RefCell<Option<(Option<Instant>, DeviceStatus)>>,
+    startup_toolbar: RefCell<StartupToolbar>,
     startup_render_pending: Cell<bool>,
     applied_lighting: Cell<Option<(u8, u8)>>,
     scene_inverted: Cell<bool>,
@@ -289,6 +294,7 @@ impl Platform {
             last_refresh: Cell::new(RefreshKind::Ui),
             refresh_count: Cell::new(0),
             status_cache: RefCell::new(None),
+            startup_toolbar: RefCell::new(StartupToolbar::default()),
             startup_render_pending: Cell::new(false),
             applied_lighting: Cell::new(None),
             scene_inverted: Cell::new(false),
@@ -534,6 +540,7 @@ impl Platform {
 
     pub fn begin_suspend(&self) -> Result<()> {
         self.sleep_requested.set(true);
+        self.startup_toolbar.borrow_mut().retire();
         if let Some(worker) = self.device_policies.borrow().as_ref() {
             worker.pause();
         }
@@ -1066,7 +1073,9 @@ impl Platform {
 
     pub fn apply_preferences(&self, preferences: &Preferences) -> Result<()> {
         *self.preferences.borrow_mut() = preferences.clone();
-        self.invalidate_status_cache();
+        self.invalidate_status(
+            self.kindle && self.applied_lighting.get().is_none() && !self.sleep_requested.get(),
+        );
         #[cfg(all(feature = "kindle", target_os = "linux"))]
         if let Some(worker) = self.activity.borrow().as_ref() {
             worker.set_keep_download_awake(preferences.keep_awake);
@@ -1131,6 +1140,36 @@ impl Platform {
         self.observe_status_with(|| native_status(&preferences))
     }
 
+    /// Sample only the first Library's display fields while the accepted panel update is in flight.
+    pub fn prepare_startup_toolbar(&self, cancelled: impl Fn() -> bool) {
+        #[cfg(all(feature = "kindle", target_os = "linux"))]
+        if self.kindle && !self.sleep_requested.get() && !cancelled() {
+            self.startup_toolbar
+                .borrow_mut()
+                .observe(|| startup_toolbar::query(&cancelled));
+        }
+        #[cfg(not(all(feature = "kindle", target_os = "linux")))]
+        let _ = cancelled;
+    }
+
+    pub(crate) fn view_status(&self, library: bool) -> ViewStatus {
+        #[cfg(all(feature = "kindle", target_os = "linux"))]
+        if library
+            && self.kindle
+            && !self.sleep_requested.get()
+            && self.status_cache.borrow().is_none()
+            && let Some(view) = self
+                .startup_toolbar
+                .borrow_mut()
+                .view(Instant::now(), native_local_status)
+        {
+            return view;
+        }
+        #[cfg(not(all(feature = "kindle", target_os = "linux")))]
+        let _ = library;
+        self.status().into()
+    }
+
     fn observe_status_with(&self, refresh: impl FnOnce() -> DeviceStatus) -> DeviceStatus {
         if let Some((Some(instant), status)) = self.status_cache.borrow().as_ref()
             && instant.elapsed() < Duration::from_secs(30)
@@ -1150,15 +1189,29 @@ impl Platform {
             .map(|(_, status)| status.clone())
             .unwrap_or_else(|| {
                 let preferences = self.preferences.borrow();
-                DeviceStatus {
+                let mut status = DeviceStatus {
                     brightness: preferences.brightness,
                     warmth: preferences.warmth,
                     ..DeviceStatus::default()
+                };
+                if let Some(view) = self.startup_toolbar.borrow().cached() {
+                    status.time = view.time;
+                    status.battery = view.battery;
+                    status.wifi = view.wifi;
+                    status.free_bytes = view.free_bytes;
                 }
+                status
             })
     }
 
     pub fn invalidate_status_cache(&self) {
+        self.invalidate_status(false);
+    }
+
+    fn invalidate_status(&self, initial_preferences: bool) {
+        self.startup_toolbar
+            .borrow_mut()
+            .invalidate(initial_preferences);
         if let Some((observed_at, _)) = self.status_cache.borrow_mut().as_mut() {
             // Stale observations remain truthful cached values. Only the next
             // explicit status() observation may replace them with fresh data.
@@ -1782,6 +1835,29 @@ fn native_status(preferences: &Preferences) -> DeviceStatus {
 }
 
 #[cfg(all(feature = "kindle", target_os = "linux"))]
+fn native_time() -> String {
+    command("date", &["+%H:%M"]).unwrap_or_else(|_| "--:--".into())
+}
+
+#[cfg(all(feature = "kindle", target_os = "linux"))]
+fn native_free_bytes() -> u64 {
+    let mut filesystem = std::mem::MaybeUninit::<libc::statvfs>::uninit();
+    // SAFETY: the C string is terminated and statvfs writes only to this buffer.
+    if unsafe { libc::statvfs(c"/mnt/us".as_ptr(), filesystem.as_mut_ptr()) } == 0 {
+        // SAFETY: successful statvfs initialized the complete structure.
+        let filesystem = unsafe { filesystem.assume_init() };
+        filesystem.f_bavail as u64 * filesystem.f_frsize as u64
+    } else {
+        0
+    }
+}
+
+#[cfg(all(feature = "kindle", target_os = "linux"))]
+fn native_local_status() -> (String, u64) {
+    (native_time(), native_free_bytes())
+}
+
+#[cfg(all(feature = "kindle", target_os = "linux"))]
 fn native_status_with(
     preferences: &Preferences,
     session: &mut Option<crate::native_query::Session>,
@@ -1795,7 +1871,7 @@ fn native_status_with(
         ),
         None => command("lipc-get-prop", property.legacy_arguments()),
     };
-    let time = command("date", &["+%H:%M"]).unwrap_or_else(|_| "--:--".into());
+    let time = native_time();
     let wifi = read(Property::WifiState)
         .map(|value| value.trim().eq_ignore_ascii_case("connected"))
         .unwrap_or(false);
@@ -1804,16 +1880,7 @@ fn native_status_with(
             .ok()
             .and_then(|value| value.parse::<u8>().ok())
     };
-    let mut filesystem = std::mem::MaybeUninit::<libc::statvfs>::uninit();
-    // SAFETY: the C string is terminated and statvfs writes only to this buffer.
-    let free_bytes = if unsafe { libc::statvfs(c"/mnt/us".as_ptr(), filesystem.as_mut_ptr()) } == 0
-    {
-        // SAFETY: successful statvfs initialized the complete structure.
-        let filesystem = unsafe { filesystem.assume_init() };
-        filesystem.f_bavail as u64 * filesystem.f_frsize as u64
-    } else {
-        0
-    };
+    let free_bytes = native_free_bytes();
     DeviceStatus {
         time,
         battery: property(Property::Battery).unwrap_or(0).min(100),
@@ -2164,6 +2231,32 @@ mod tests {
             first.clone()
         });
         assert_eq!(observations.get(), 4);
+    }
+
+    #[test]
+    fn cached_status_preserves_observed_toolbar_fields_through_suspend() {
+        let platform = Platform::new(DeviceProfile::Pw5, false).unwrap();
+        platform
+            .startup_toolbar
+            .borrow_mut()
+            .observe(|| Some((false, 13)));
+        let expected = platform
+            .startup_toolbar
+            .borrow_mut()
+            .view(Instant::now(), || ("07:53".into(), 98))
+            .unwrap();
+        assert_eq!(ViewStatus::from(platform.cached_status()), expected);
+        platform.begin_suspend().unwrap();
+        assert_eq!(ViewStatus::from(platform.status()), expected);
+        assert_eq!(
+            platform
+                .startup_toolbar
+                .borrow_mut()
+                .view(Instant::now(), || panic!(
+                    "a parked status cannot be published fresh"
+                )),
+            None
+        );
     }
 
     #[test]

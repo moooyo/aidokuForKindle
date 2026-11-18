@@ -24,6 +24,7 @@ pub fn observe(
     application: &ApplicationSlot,
     lifecycle: &Rc<RefCell<bootstrap_lifecycle::Coordinator>>,
     overlap: bool,
+    prepare_toolbar: bool,
 ) {
     let ui = ui.as_weak();
     let startup = Rc::downgrade(startup);
@@ -43,15 +44,19 @@ pub fn observe(
         if !lifecycle.borrow().application_work_allowed() {
             return;
         }
+        let Some(platform) = observed_platform.upgrade() else {
+            return;
+        };
         if frame.initial && frame.full && frame.submitted {
             reader_timing::startup_frame("startup_initial_frame_submitted", frame, None);
             if overlap && let Some(startup) = startup.upgrade() {
                 startup.borrow_mut().prepare_after_submission();
             }
+            if prepare_toolbar && frame.input_blocked {
+                platform
+                    .prepare_startup_toolbar(|| !bootstrap_lifecycle::display_activity_allowed());
+            }
         }
-        let Some(platform) = observed_platform.upgrade() else {
-            return;
-        };
         if !reader_timing::enabled() && !platform.startup_render_pending() {
             return;
         }

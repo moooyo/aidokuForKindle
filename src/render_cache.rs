@@ -326,6 +326,7 @@ enum RenderPurpose {
 #[derive(Clone, Copy, PartialEq, Eq)]
 enum RenderMode {
     Persistent,
+    LocalCover,
     ReaderRaster,
     ReaderNextFrame,
     FittedReader(imaging::ReaderFit, bool),
@@ -333,7 +334,7 @@ enum RenderMode {
 
 impl RenderMode {
     fn is_reader(self) -> bool {
-        self != Self::Persistent
+        !matches!(self, Self::Persistent | Self::LocalCover)
     }
     fn is_next(self) -> bool {
         matches!(self, Self::ReaderNextFrame | Self::FittedReader(_, true))
@@ -804,18 +805,27 @@ pub fn render(
 }
 
 /// A cached local cover proves its current source checksum and rendering key.
-/// Decode the full source for validation only on a derivative miss; warm hits
-/// still hash mutable source bytes and validate the bounded processed image.
+/// On a miss, eligible external sources use the rendition's bounded decode
+/// as full validation. Warm hits still hash mutable source bytes and validate
+/// the processed image.
 pub(crate) fn render_local_cover(
     cache: &CacheManager,
     page: &Page,
     raw: &Path,
     options: &ImageOptions,
 ) -> Result<RenderedPage> {
-    render_with_source(cache, page, raw, options, false, 0, 1.0, |path| {
-        cache.validate_path(path)?;
-        read_source(path)
-    })
+    render_for_purpose(
+        cache,
+        page,
+        raw,
+        options,
+        false,
+        0,
+        1.0,
+        RenderPurpose::Foreground,
+        RenderMode::LocalCover,
+        read_source,
+    )
 }
 
 /// Prepare the Reader's BiliComics Raster in memory. The canonical source and a
@@ -1099,7 +1109,26 @@ fn render_for_purpose(
     }
 
     imaging::check_decode_cancelled()?;
-    let bytes = source(raw)?;
+    let external_cover =
+        mode == RenderMode::LocalCover && !source_proof.source_path.starts_with(cache.namespace());
+    if mode == RenderMode::LocalCover && !external_cover {
+        crate::reader_timing::mark("cover_cold_validation_fallback");
+        cache.validate_path(raw)?;
+    }
+    let mut bytes = source(raw)?;
+    let combined = if external_cover && imaging::single_decode_cover_source(&bytes)? {
+        crate::reader_timing::mark("cover_cold_validation_combined_started");
+        true
+    } else {
+        if external_cover {
+            // Legacy file validation must not overlap a retained 32 MiB input.
+            drop(bytes);
+            crate::reader_timing::mark("cover_cold_validation_fallback");
+            cache.validate_path(raw)?;
+            bytes = read_source(raw)?;
+        }
+        false
+    };
     ensure!(
         !bytes.is_empty() && bytes.len() as u64 <= MAX_PAGE_BYTES,
         "The raw comic changed beyond the compressed-image limit"
@@ -1158,6 +1187,15 @@ fn render_for_purpose(
         (image, 0, 0)
     };
     drop(bytes);
+    if combined {
+        cache.remember_decoded_cover(
+            &source_proof.source_path,
+            page.local_path.as_deref().unwrap_or(raw),
+            &metadata,
+            &source_checksum,
+        )?;
+        crate::reader_timing::mark("cover_cold_decode_validated");
+    }
     let image = Arc::new(zoom_image(image, zoom_milli));
     decoded(|state| {
         state.stats.cold_renders += 1;
@@ -1806,6 +1844,120 @@ mod tests {
                 ((x * 7 + y * 13) % 247) as u8
             }])
         })
+    }
+
+    #[test]
+    fn a_local_cover_must_validate_the_png_tail_before_publication() {
+        let fixture = Fixture::new(artwork());
+        let png = fs::read(&fixture.raw).unwrap();
+        assert!(imaging::single_decode_cover_source(&png).unwrap());
+        let mut bad_crc = png.clone();
+        *bad_crc.last_mut().unwrap() ^= 1;
+        for bad in [&bad_crc[..], &png[..png.len() - 12], &png[..png.len() - 1]] {
+            fs::write(&fixture.raw, bad).unwrap();
+            let key = fixture.key(&options(), false, 0, 1.0);
+            assert!(
+                render_local_cover(&fixture.cache, &fixture.page, &fixture.raw, &options())
+                    .is_err()
+            );
+            assert!(fixture.cache.lookup_processed(&key).unwrap().is_none());
+            assert_eq!(fixture.cache.stats().external_validations, 0);
+        }
+    }
+
+    #[test]
+    fn changed_named_cover_cannot_establish_a_validation_proof() {
+        let fixture = Fixture::new(artwork());
+        let old = fs::metadata(&fixture.raw).unwrap();
+        let sum = fixture.cache.fingerprint(&fixture.raw).unwrap();
+        let mut bytes = fs::read(&fixture.raw).unwrap();
+        bytes[7] ^= 1;
+        fs::write(&fixture.raw, bytes).unwrap();
+        assert!(
+            fixture
+                .cache
+                .remember_decoded_cover(&fixture.raw, &fixture.raw, &old, &sum)
+                .is_err()
+        );
+        assert_eq!(fixture.cache.stats().external_validations, 0);
+    }
+
+    #[test]
+    fn optional_png_crc_keeps_the_legacy_cover_decoder_policy() {
+        let fixture = Fixture::new(artwork());
+        let png = fs::read(&fixture.raw).unwrap();
+        let mut bytes = png[..33].to_vec();
+        bytes.extend_from_slice(b"\x00\x00\x00\x03tEXtk\x00v\x00\x00\x00\x00");
+        bytes.extend_from_slice(&png[33..]);
+        assert!(!imaging::single_decode_cover_source(&bytes).unwrap());
+        fs::write(&fixture.raw, bytes).unwrap();
+        let legacy = imaging::validate_file(&fixture.raw)
+            .and_then(|_| imaging::render_page(&fixture.raw, &options()));
+        let candidate = render_local_cover(&fixture.cache, &fixture.page, &fixture.raw, &options());
+        assert_eq!(candidate.is_ok(), legacy.is_ok());
+        if let (Ok(actual), Ok(expected)) = (candidate, legacy) {
+            assert_eq!(actual.image.as_ref(), &expected);
+        }
+    }
+
+    #[test]
+    #[ignore = "Requires the six generated images on the designated Linux worker"]
+    fn cold_fixture_snapshot() {
+        let root = PathBuf::from(std::env::var_os("COLD_TRIAL_INPUT_DIR").unwrap());
+        let legacy = std::env::var("COLD_TRIAL_VARIANT").unwrap() == "baseline";
+        let data = tempfile::tempdir().unwrap();
+        let cache = CacheManager::open_with_config(
+            data.path(),
+            CacheConfig {
+                max_unpinned_bytes: 128 * 1024 * 1024,
+                min_free_bytes: 0,
+            },
+        )
+        .unwrap();
+        let mut settings = options();
+        settings.width = 376;
+        settings.height = 514;
+        settings.dither = true;
+        for (index, name) in [
+            "01-gray.png",
+            "02-rgb-large.png",
+            "03-alpha.png",
+            "04-baseline.jpg",
+            "05-progressive.jpg",
+            "06-tall-gray.png",
+        ]
+        .iter()
+        .enumerate()
+        {
+            let raw = fs::canonicalize(root.join(name)).unwrap();
+            let page = Page {
+                local_path: Some(raw.clone()),
+                ..Page::default()
+            };
+            let start = Instant::now();
+            let image = if legacy {
+                render_with_source(&cache, &page, &raw, &settings, false, 0, 1.0, |p| {
+                    cache.validate_path(p)?;
+                    read_source(p)
+                })
+            } else {
+                render_local_cover(&cache, &page, &raw, &settings)
+            }
+            .unwrap();
+            let elapsed = start.elapsed().as_micros();
+            assert!(!image.cache_hit && image.cache_path != raw);
+            let (w, h) = image.image.dimensions();
+            println!(
+                "COLD_COVER {} {} {} {} {:x}",
+                index + 1,
+                elapsed,
+                w,
+                h,
+                Sha256::digest(image.image.as_raw())
+            );
+        }
+        assert_eq!(cache.stats().external_validations, 6);
+        clear_memory(&cache);
     }
 
     #[test]

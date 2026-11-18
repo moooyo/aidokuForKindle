@@ -1103,6 +1103,44 @@ impl CacheManager {
         Ok(())
     }
 
+    /// Accept a completed bounded decode of externally owned bytes only while
+    /// the named source still resolves to that exact file and content.
+    pub(crate) fn remember_decoded_cover(
+        &self,
+        path: &Path,
+        requested: &Path,
+        original: &Metadata,
+        expected: &str,
+    ) -> Result<()> {
+        let unchanged = || -> Result<bool> {
+            Ok(!path.starts_with(&self.inner.root)
+                && fs::canonicalize(requested)? == path
+                && fs::canonicalize(path)? == path
+                && metadata_fingerprint(&fs::metadata(path)?) == metadata_fingerprint(original))
+        };
+        ensure!(unchanged()?, "The local cover changed during rendering");
+        ensure!(
+            self.fingerprint(path)? == expected && unchanged()?,
+            "The decoded local cover no longer matches its source"
+        );
+        let fingerprint = metadata_fingerprint(original);
+        let mut state = self.lock()?;
+        if !state.external.get(path).is_some_and(|entry| {
+            entry.image_validated && entry.fingerprint == fingerprint && entry.checksum == expected
+        }) {
+            state.stats.external_validations += 1;
+            state.remember_external(
+                path.to_path_buf(),
+                Validation {
+                    fingerprint,
+                    checksum: expected.to_owned(),
+                    image_validated: true,
+                },
+            );
+        }
+        Ok(())
+    }
+
     pub fn fingerprint(&self, path: &Path) -> Result<String> {
         if let Some((kind, key)) = self.managed_id(path) {
             if self.lookup(kind, &key)?.is_some() {
@@ -2627,7 +2665,11 @@ mod tests {
         use crate::imaging::SpatialDither;
         let legacy = render("same-source");
         let mut keys = std::collections::HashSet::from([render_key(&legacy).unwrap()]);
-        for algorithm in [SpatialDither::Off, SpatialDither::Bayer8, SpatialDither::FloydSteinberg] {
+        for algorithm in [
+            SpatialDither::Off,
+            SpatialDither::Bayer8,
+            SpatialDither::FloydSteinberg,
+        ] {
             let mut key = legacy.clone();
             key.spatial_dither = Some(algorithm);
             assert!(keys.insert(render_key(&key).unwrap()));

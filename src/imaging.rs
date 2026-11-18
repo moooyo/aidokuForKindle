@@ -194,6 +194,50 @@ pub fn decode_page(bytes: &[u8], options: &ImageOptions) -> Result<GrayImage> {
     decode_page_with_algorithm(bytes, options, RasterAlgorithm::Lanczos3)
 }
 
+/// A cover rendition already reads every source pixel with the bounded image
+/// decoder, or every row of a large noninterlaced PNG with a final finish().
+/// Normal PNG decoders may stop at the last pixel, so verify all chunk CRCs
+/// and the terminal IEND before treating the rendition as a full validation.
+pub(crate) fn single_decode_cover_source(bytes: &[u8]) -> Result<bool> {
+    if bytes.starts_with(&[0xff, 0xd8, 0xff]) {
+        return Ok(true);
+    }
+    let Some(mut chunks) = bytes.strip_prefix(PNG_SIGNATURE.as_slice()) else {
+        return Ok(false);
+    };
+    let mut use_legacy = false;
+    while chunks.len() >= 12 {
+        check_decode_cancelled()?;
+        let length = u32::from_be_bytes(chunks[..4].try_into().unwrap()) as usize;
+        ensure!(length <= chunks.len() - 12, "Truncated cover PNG chunk");
+        let kind = &chunks[4..8];
+        let mut crc = flate2::Crc::new();
+        for slice in chunks[4..8 + length].chunks(64 * 1024) {
+            check_decode_cancelled()?;
+            crc.update(slice);
+        }
+        let expected = u32::from_be_bytes(chunks[8 + length..12 + length].try_into().unwrap());
+        if crc.sum() != expected {
+            // The legacy PNG reader may discard a damaged optional chunk.
+            // Do not change that policy or claim a single-decode proof for it.
+            ensure!(
+                kind[0] & 0x20 != 0,
+                "Invalid critical cover PNG chunk checksum"
+            );
+            use_legacy = true;
+        }
+        use_legacy |= kind == b"acTL";
+        if kind == b"IEND" {
+            ensure!(length == 0, "Invalid cover PNG end chunk");
+            // Keep the usual decoder/validation behaviour for unusual streams
+            // with trailing data and for animated covers.
+            return Ok(!use_legacy && chunks.len() == 12);
+        }
+        chunks = &chunks[12 + length..];
+    }
+    bail!("The cover PNG has no complete end chunk")
+}
+
 /// Prepare the Reader with BiliComics' single-channel Triangle sampler and
 /// crop-local Bayer tone tables. Cover and download derivatives retain their
 /// original renderer; callers must namespace this algorithm's cache keys.

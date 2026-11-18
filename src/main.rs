@@ -230,6 +230,11 @@ fn run(arguments: Arguments) -> Result<()> {
     fs::create_dir_all(&data_dir).context("Create the application data directory")?;
     bootstrap_lifecycle::install_signal_wakeup(None)?;
     let platform = Rc::new(Platform::new(arguments.device, arguments.kindle)?);
+    let prepare_library_toolbar = arguments.kindle
+        && !arguments.demo
+        && !arguments.resume
+        && arguments.screen == "library"
+        && !arguments.startup_serial_preparation;
     platform.set_startup_render_priority(
         arguments.kindle
             && arguments.screen == "library"
@@ -317,6 +322,7 @@ fn run(arguments: Arguments) -> Result<()> {
         &app,
         &lifecycle,
         !arguments.startup_serial_preparation,
+        prepare_library_toolbar,
     );
     let advance_startup: Rc<RefCell<dyn FnMut() -> bool>> = {
         let ui = ui.as_weak();
