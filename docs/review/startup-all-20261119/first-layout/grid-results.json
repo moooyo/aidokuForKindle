@@ -1,0 +1,146 @@
+{
+  "scope": "Worker microbenchmark; visible grid SQL, SQLite stepping and Python JSON only. Excludes Rust/Slint, current book, daily updates, thumbnails, display and startup.",
+  "baseline_source": "c6867d1",
+  "python": "3.13.5",
+  "sqlite": "3.46.1",
+  "architecture": "x86_64",
+  "design": "One read-only offline demo DB; fixed first page/default unfiltered recent-read. Six argument-order permutations, six warm-up rounds. OS/SQLite page caches warm. Python statement cache disabled to match uncached rusqlite prepare/query_row calls. Paired savings are baseline minus variant within a round; positive means less time.",
+  "rounds_per_mode": 120,
+  "fixture": {
+    "database_sha256": "4fefbd124f9d41ec0d78afa3259ef6a353b68aa5b4908468a2477dcc4b976697",
+    "library_books": 46,
+    "chapters": 137,
+    "progress_rows": 46
+  },
+  "cases": [
+    {
+      "visible_books": 6,
+      "ordered_rows_identical": true,
+      "modes": {
+        "baseline": {
+          "statements": 8,
+          "book_decodes": 12,
+          "median_us": {
+            "count": 32.3,
+            "select_and_decode_page": 100.4,
+            "subsequent_metadata": 92.1,
+            "total": 247.9
+          },
+          "p90_total_us": 334.2
+        },
+        "joined": {
+          "statements": 2,
+          "book_decodes": 6,
+          "median_us": {
+            "count": 31.4,
+            "select_and_decode_page": 125.0,
+            "subsequent_metadata": 0.0,
+            "total": 158.7
+          },
+          "p90_total_us": 256.9
+        },
+        "batch_flags": {
+          "statements": 3,
+          "book_decodes": 6,
+          "median_us": {
+            "count": 31.3,
+            "select_and_decode_page": 107.9,
+            "subsequent_metadata": 33.6,
+            "total": 187.6
+          },
+          "p90_total_us": 269.9
+        }
+      },
+      "paired_median_savings_us": {
+        "joined": 70.6,
+        "batch_flags": 63.5
+      }
+    },
+    {
+      "visible_books": 8,
+      "ordered_rows_identical": true,
+      "modes": {
+        "baseline": {
+          "statements": 10,
+          "book_decodes": 16,
+          "median_us": {
+            "count": 31.6,
+            "select_and_decode_page": 102.5,
+            "subsequent_metadata": 118.8,
+            "total": 279.8
+          },
+          "p90_total_us": 336.8
+        },
+        "joined": {
+          "statements": 2,
+          "book_decodes": 8,
+          "median_us": {
+            "count": 30.4,
+            "select_and_decode_page": 127.5,
+            "subsequent_metadata": 0.0,
+            "total": 158.6
+          },
+          "p90_total_us": 203.0
+        },
+        "batch_flags": {
+          "statements": 3,
+          "book_decodes": 8,
+          "median_us": {
+            "count": 31.8,
+            "select_and_decode_page": 110.9,
+            "subsequent_metadata": 36.1,
+            "total": 195.4
+          },
+          "p90_total_us": 256.5
+        }
+      },
+      "paired_median_savings_us": {
+        "joined": 113.6,
+        "batch_flags": 95.6
+      }
+    },
+    {
+      "visible_books": 15,
+      "ordered_rows_identical": true,
+      "modes": {
+        "baseline": {
+          "statements": 17,
+          "book_decodes": 30,
+          "median_us": {
+            "count": 31.3,
+            "select_and_decode_page": 123.9,
+            "subsequent_metadata": 230.6,
+            "total": 421.3
+          },
+          "p90_total_us": 470.7
+        },
+        "joined": {
+          "statements": 2,
+          "book_decodes": 15,
+          "median_us": {
+            "count": 32.5,
+            "select_and_decode_page": 169.4,
+            "subsequent_metadata": 0.0,
+            "total": 209.3
+          },
+          "p90_total_us": 270.0
+        },
+        "batch_flags": {
+          "statements": 3,
+          "book_decodes": 15,
+          "median_us": {
+            "count": 39.9,
+            "select_and_decode_page": 129.4,
+            "subsequent_metadata": 46.3,
+            "total": 223.3
+          },
+          "p90_total_us": 278.4
+        }
+      },
+      "paired_median_savings_us": {
+        "joined": 203.7,
+        "batch_flags": 197.6
+      }
+    }
+  ]
+}

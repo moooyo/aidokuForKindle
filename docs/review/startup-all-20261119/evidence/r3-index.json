@@ -1,0 +1,88 @@
+{
+  "schema_version": 1,
+  "revision": "R3",
+  "build_label": "final-v3-clean",
+  "product_commit": "8baf57ffb64d74000abef49111baf6e726d4d425",
+  "reference_revision": "c6867d174792cbcc71dab7f59c52570f8ddd8911",
+  "reference_elf_sha256": "9d92dc4cd01005a6ba2f48fe61786e5df5570c43feb5709fe3159bb164807d0f",
+  "compiled_source_manifest_sha256": "28c1bb314e12fe5689b401ca23cf932a91c138f5763c4c1ea18d454f41c990cf",
+  "build_receipt_sha256": "516d572640a5f04b3243180b42b5f792f80687664febdac182f2bc8dc6e083c8",
+  "program_sha256": {
+    "aidoku/app/aidoku": "1b1c508e1ee84a4be3bd0c15bcf6d42bdd492d688f3fa81b065fb256e00dd3af",
+    "aidoku/app/aidoku-startup-portrait": "bde28cd5953d26b0dc3bfebe16fcfe1cde329021c17449edae7c59470376ed50",
+    "aidoku/launch.sh": "412163f1e84a4ce0ae869439555f80bea8c0ac6b56dcd54b0cd3bccf68804675"
+  },
+  "source_comparison": {
+    "verification_environment": "test-env",
+    "worktree_and_frozen_files": 483,
+    "missing_extra_or_different_files": 0,
+    "special_or_duplicate_files": 0,
+    "changed_file_from_r2": "packaging/kindle/launch.sh",
+    "artifact_tuple_matches_receipt": true
+  },
+  "recommended_options": {
+    "portrait": "shell",
+    "prewarm": "0",
+    "last_cover_grace": "off",
+    "import_thumbnail": "off",
+    "first_layout": "optimized",
+    "resident": "off"
+  },
+  "launcher_host_qualification": {
+    "status": "passed",
+    "admission_and_compatibility": "../launcher-r3/host-receipt.json",
+    "worktree_launcher_receipt": "../launcher-r3/worktree-receipt.json",
+    "physical_performance_claim": false
+  },
+  "physical_defaults": {
+    "pair_columns": ["order", "usable_ms_ab", "complete_covers_ms_ab", "native_home_ms_ab"],
+    "default_guard_max_median_regression_ms": 50,
+    "warm": {
+      "status": "default_guard_passed",
+      "source_report_name": "v3-default-w.json",
+      "frozen_payload_verified": true,
+      "balanced_pairs": 6,
+      "median_paired_savings_ms": {"usable": 101.088, "complete_covers": 161.602, "native_home": 440.661},
+      "favorable_pairs": {"usable": 4, "complete_covers": 5, "native_home": 4},
+      "pairs": [
+        ["AB", [2202.079, 2120.142], [3031.062, 2845.708], [3562.554, 2712.400]],
+        ["BA", [2347.364, 2227.124], [3182.047, 2959.438], [3533.182, 3382.543]],
+        ["AB", [2074.388, 2157.241], [2857.947, 2892.359], [3582.489, 3682.618]],
+        ["BA", [2344.309, 2105.339], [3405.225, 2818.114], [3393.327, 2662.644]],
+        ["AB", [2116.996, 2152.340], [2882.774, 2850.958], [2672.425, 3512.594]],
+        ["BA", [2199.543, 2071.007], [2921.512, 2783.662], [3533.409, 2712.522]]
+      ]
+    },
+    "cold": {
+      "status": "default_guard_passed",
+      "source_report_name": "v3-default-c.json",
+      "frozen_payload_verified": true,
+      "balanced_pairs": 6,
+      "median_paired_savings_ms": {"usable": -9.358, "complete_covers": 48.212, "native_home": -115.261},
+      "favorable_pairs": {"usable": 3, "complete_covers": 4, "native_home": 3},
+      "pairs": [
+        ["AB", [2097.281, 2250.199], [8110.486, 8264.868], [3583.607, 3463.806]],
+        ["BA", [2208.514, 2074.430], [8262.435, 7990.952], [3732.564, 3693.198]],
+        ["AB", [2082.542, 2145.698], [8129.936, 8127.874], [3453.657, 2823.001]],
+        ["BA", [2188.383, 2070.372], [8072.030, 7977.669], [2722.526, 3542.937]],
+        ["AB", [2246.359, 2946.907], [8354.619, 9037.885], [2703.321, 3702.544]],
+        ["BA", [2343.870, 2299.431], [8966.976, 8301.862], [3522.672, 3792.560]]
+      ]
+    },
+    "independent_pixels": {"status": "prepared_not_run_on_kindle"},
+    "lifecycle": {"status": "not_run_on_kindle"}
+  },
+  "specialist_trials": {
+    "status": "not_run_on_kindle",
+    "scopes": ["all_options", "native_portrait", "first_layout", "cached_cover_prewarm", "last_cover_grace", "idle_import_pixels", "two_open_retention"],
+    "two_open_retention_cases": ["immediate", "ordinary_exit", "natural_expiry", "second_gui_sleep_wake", "paired_screen"],
+    "startup_replay_analyzer": "../bench/analyze_v3.py"
+  },
+  "release": {
+    "candidate_programs_staged": true,
+    "package": {"status": "release_zip_and_kpm_not_produced"},
+    "installed_entry": {"status": "r3_deployment_not_attempted", "reference_still_installed": true},
+    "package_and_install_procedure": "../promotion/README.md"
+  },
+  "scope": "R3 observations only. Earlier revisions remain in their own evidence indexes. Software readiness and accepted framebuffer endpoints are not optical times. Program and source identities are public; device, user and private fixture identities are excluded."
+}

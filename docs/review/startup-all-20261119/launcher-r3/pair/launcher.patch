@@ -1,0 +1,45 @@
+--- a/packaging/kindle/launch.sh
++++ b/packaging/kindle/launch.sh
+@@ -125,12 +125,28 @@
+ case "$AIDOKU_HOME:$LOCK_DIR" in /*:/*) ;; *) fail 'Application and lock directories must be absolute.' ;; esac
+ [ -x "$APP_DIR/aidoku" ] || fail 'The ARM application executable is missing.'
+ [ -c "$FRAMEBUFFER" ] || fail 'A native Kindle framebuffer is required.'
+-mkdir -p "$DATA_DIR/logs" "$DATA_DIR/imports"
++if [ ! -d "$DATA_DIR/logs" ] || [ ! -d "$DATA_DIR/imports" ]; then
++    mkdir -p "$DATA_DIR/logs" "$DATA_DIR/imports"
++fi
+ PROFILE=pw5
+-if [ -r "$DATA_DIR/device-profile" ]; then PROFILE=$(sed -n '1{s/\r$//;p;}' "$DATA_DIR/device-profile"); fi
++if [ -r "$DATA_DIR/device-profile" ]; then
++    PROFILE=''
++    if [ -f "$DATA_DIR/device-profile" ]; then
++        IFS= read -r PROFILE <"$DATA_DIR/device-profile" || :
++    fi
++    case "$PROFILE" in
++        ''|*[!a-z0-9-])
++            # Retain read errors and CR handling even if the shell discarded a NUL.
++            PROFILE=$(sed -n '1{s/\r$//;p;q;}' "$DATA_DIR/device-profile") ;;
++    esac
++fi
+ case "$PROFILE" in pw5|pw6|scribe|scribe2|scribe3|scribe3-nofrontlight) ;; *) fail 'Unknown device profile.' ;; esac
+-SCRIPT_PATH=$(CDPATH= cd "$(dirname "$0")" && pwd)/$(basename "$0")
+ if [ "${1:-}" != '--foreground' ]; then
++    if [ "$0" = "$AIDOKU_HOME/launch.sh" ]; then
++        SCRIPT_PATH=$0
++    else
++        SCRIPT_PATH=$(CDPATH= cd "$(dirname "$0")" && pwd)/$(basename "$0")
++    fi
+     export AIDOKU_HOME
+     # Only the managed Library path can offer its next open a short pixel handoff.
+     unset AIDOKU_MANAGED_LIBRARY
+@@ -252,7 +268,9 @@
+         [ "${4:-}" = "$PROFILE" ] && [ "${5:-}" = --capture-native-portrait ] &&
+         { [ "$#" -eq 5 ] || { [ "$#" -eq 6 ] && [ "$6" = --capture-sleep-capability ]; }; }; then
+         native_portrait_mode=shell
+-        if [ -x "$APP_DIR/aidoku-startup-portrait" ] && startup_portrait_native; then native_portrait_mode=native; fi
++        if [ -x "$APP_DIR/aidoku-startup-portrait" ] &&
++            { [ -n "${AIDOKU_STARTUP_PORTRAIT:-}" ] || [ -s "$DATA_DIR/startup-options" ]; } &&
++            startup_portrait_native; then native_portrait_mode=native; fi
+     fi
+     if [ "$native_portrait_mode" = native ]; then
+         "$APP_DIR/aidoku-startup-portrait" "$ROOT_PID" "$NATIVE_READ_SEQUENCE" "$PROFILE" ${6:+"$6"} >"$LOCK_DIR/native-read-output" 2>/dev/null 3>&- 4>&- &

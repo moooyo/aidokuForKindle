@@ -1,0 +1,79 @@
+{
+  "measurement": "Linux host; unchanged production Rust verifier and private processes",
+  "native_firmware": false,
+  "observations": {
+    "after_first_waiter_return": {
+      "original_waiter_exited": true,
+      "participant_full_identity_unchanged": true,
+      "runner_full_identity_unchanged": true,
+      "worker_parent_changed": true,
+      "worker_same_pid_birth_executable": true
+    },
+    "fresh_context_same_participant_synthetic_anchor": {
+      "context": {
+        "error": null,
+        "hardware_calls": 0,
+        "ok": true
+      },
+      "fresh_probe_required": {
+        "error": "Observe the native framebuffer without acquiring display ownership",
+        "hardware_calls": 1,
+        "ok": false
+      },
+      "hardware_observation_succeeded": false,
+      "record_source": "test fixture only; not a native writer"
+    },
+    "new_capture_with_live_application": {
+      "error": "Startup portrait publication follows application initialization",
+      "hardware_calls": 0,
+      "ok": false
+    },
+    "new_capture_with_outstanding_sleep": {
+      "error": "Startup portrait publication follows application initialization",
+      "hardware_calls": 0,
+      "ok": false
+    },
+    "new_owner_cannot_claim_old_participant": {
+      "error": "The application is not owned by the native presentation launcher",
+      "hardware_calls": 0,
+      "ok": false
+    },
+    "next_generation_in_old_context": {
+      "error": "The native presentation belongs to another launcher generation",
+      "hardware_calls": 0,
+      "ok": false
+    },
+    "old_anchor_after_waiter_exit": {
+      "error": "The native launcher identity changed",
+      "hardware_calls": 0,
+      "ok": false
+    },
+    "original_context_opened": {
+      "error": null,
+      "hardware_calls": 0,
+      "ok": true
+    },
+    "replaced_anchor_in_old_context": {
+      "error": "The native portrait calibration changed during this run",
+      "hardware_calls": 0,
+      "ok": false
+    },
+    "same_pid_resume_after_waiter_exit": {
+      "error": "The native launcher identity changed",
+      "hardware_calls": 0,
+      "ok": false
+    },
+    "sleep_signal_cannot_accept_replaced_anchor": {
+      "error": "The native portrait calibration changed during this run",
+      "hardware_calls": 0,
+      "ok": false
+    }
+  },
+  "schema": 1,
+  "slint_gui_exercised": false,
+  "sources_sha256": {
+    "src/native_presentation.rs": "91ac1748bc501b68493c37688f663aac1a941635a1ea0d9a950cb4fa8b98f4f9",
+    "src/native_presentation/portrait_writer.rs": "6d54440c56243eb56c5f951bd90fbb2dc11fc03e7fa31271819cc3b7bafd1f47",
+    "src/native_query.rs": "7c1ca54f9f8c61f5d6d76ac97fd672a801559574e7b62024d43fc5d18d109442"
+  }
+}

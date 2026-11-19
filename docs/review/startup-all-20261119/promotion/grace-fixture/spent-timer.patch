@@ -1,0 +1,20 @@
+diff --git a/src/app/cover_jobs.rs b/src/app/cover_jobs.rs
+--- a/src/app/cover_jobs.rs
++++ b/src/app/cover_jobs.rs
+@@ -110,7 +110,15 @@ impl App {
+             return false;
+         }
+         let end = self.next_background_ui + FINAL_LOCAL_GRACE;
+-        if now >= end {
++        // Slint deadlines are integer milliseconds. Its single-shot wake can
++        // precede the high-resolution deadline by a fraction of a millisecond.
++        // A spent timer cannot wake us again, so publish on that same turn.
++        let timer_spent = startup
++            .grace
++            .as_ref()
++            .and_then(|grace| grace.timer.as_ref())
++            .is_some_and(|timer| !timer.running());
++        if now >= end || timer_spent {
+             self.retire_startup_cover_grace("startup_cover_last_grace_expired");
+             return false;
+         }

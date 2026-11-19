@@ -1,0 +1,1117 @@
+{
+  "application_sha256": "1b1c508e1ee84a4be3bd0c15bcf6d42bdd492d688f3fa81b065fb256e00dd3af",
+  "baseline_launcher_sha256": "2b0d6e8ee76076c1f14e92dae97a505b40f0a78e07cec78cdea23ec59398bae5",
+  "candidate_launcher_sha256": "412163f1e84a4ce0ae869439555f80bea8c0ac6b56dcd54b0cd3bccf68804675",
+  "checks": {
+    "fewer_hot_path_external_execs": true,
+    "no_new_shared_writes": true,
+    "original_and_candidate_route_match": true,
+    "owned_native_restoration": true,
+    "profile_failure_parity": true,
+    "worker_exit_and_notification_parity": true
+  },
+  "helper_sha256": "bde28cd5953d26b0dc3bfebe16fcfe1cde329021c17449edae7c59470376ed50",
+  "host_admission_timing": {
+    "baseline_median_ms": 6.8426,
+    "baseline_minus_candidate_ms_median_ms": 4.8426,
+    "candidate_faster": 30,
+    "candidate_median_ms": 1.8668,
+    "end": "Library waiter returns its worker error from the deliberately preowned lock; no display transaction occurs",
+    "paired_ms": [
+      {
+        "baseline": 8.6292,
+        "baseline_minus_candidate_ms": 6.7822,
+        "candidate": 1.847
+      },
+      {
+        "baseline": 6.4811,
+        "baseline_minus_candidate_ms": 4.4325,
+        "candidate": 2.0486
+      },
+      {
+        "baseline": 8.612,
+        "baseline_minus_candidate_ms": 6.8134,
+        "candidate": 1.7986
+      },
+      {
+        "baseline": 7.1726,
+        "baseline_minus_candidate_ms": 5.3655,
+        "candidate": 1.8071
+      },
+      {
+        "baseline": 8.2431,
+        "baseline_minus_candidate_ms": 6.3776,
+        "candidate": 1.8655
+      },
+      {
+        "baseline": 8.1001,
+        "baseline_minus_candidate_ms": 6.3221,
+        "candidate": 1.778
+      },
+      {
+        "baseline": 6.8444,
+        "baseline_minus_candidate_ms": 4.6416,
+        "candidate": 2.2028
+      },
+      {
+        "baseline": 6.4222,
+        "baseline_minus_candidate_ms": 4.3889,
+        "candidate": 2.0333
+      },
+      {
+        "baseline": 5.7847,
+        "baseline_minus_candidate_ms": 3.861,
+        "candidate": 1.9237
+      },
+      {
+        "baseline": 6.5504,
+        "baseline_minus_candidate_ms": 4.6003,
+        "candidate": 1.9501
+      },
+      {
+        "baseline": 6.0241,
+        "baseline_minus_candidate_ms": 3.7548,
+        "candidate": 2.2693
+      },
+      {
+        "baseline": 6.6431,
+        "baseline_minus_candidate_ms": 3.1579,
+        "candidate": 3.4852
+      },
+      {
+        "baseline": 7.0022,
+        "baseline_minus_candidate_ms": 3.1971,
+        "candidate": 3.8051
+      },
+      {
+        "baseline": 11.6533,
+        "baseline_minus_candidate_ms": 9.0971,
+        "candidate": 2.5562
+      },
+      {
+        "baseline": 8.855,
+        "baseline_minus_candidate_ms": 6.7516,
+        "candidate": 2.1034
+      },
+      {
+        "baseline": 7.1733,
+        "baseline_minus_candidate_ms": 5.3636,
+        "candidate": 1.8097
+      },
+      {
+        "baseline": 9.4377,
+        "baseline_minus_candidate_ms": 6.5786,
+        "candidate": 2.8591
+      },
+      {
+        "baseline": 7.1059,
+        "baseline_minus_candidate_ms": 5.3128,
+        "candidate": 1.7931
+      },
+      {
+        "baseline": 5.8194,
+        "baseline_minus_candidate_ms": 4.0402,
+        "candidate": 1.7792
+      },
+      {
+        "baseline": 7.3214,
+        "baseline_minus_candidate_ms": 5.5446,
+        "candidate": 1.7768
+      },
+      {
+        "baseline": 5.8185,
+        "baseline_minus_candidate_ms": 3.9807,
+        "candidate": 1.8378
+      },
+      {
+        "baseline": 6.634,
+        "baseline_minus_candidate_ms": 4.8251,
+        "candidate": 1.8089
+      },
+      {
+        "baseline": 6.6248,
+        "baseline_minus_candidate_ms": 4.5585,
+        "candidate": 2.0663
+      },
+      {
+        "baseline": 5.8576,
+        "baseline_minus_candidate_ms": 4.0249,
+        "candidate": 1.8327
+      },
+      {
+        "baseline": 8.091,
+        "baseline_minus_candidate_ms": 6.2628,
+        "candidate": 1.8282
+      },
+      {
+        "baseline": 7.0011,
+        "baseline_minus_candidate_ms": 5.1331,
+        "candidate": 1.868
+      },
+      {
+        "baseline": 6.8408,
+        "baseline_minus_candidate_ms": 5.0813,
+        "candidate": 1.7595
+      },
+      {
+        "baseline": 5.9085,
+        "baseline_minus_candidate_ms": 3.4649,
+        "candidate": 2.4436
+      },
+      {
+        "baseline": 6.8156,
+        "baseline_minus_candidate_ms": 4.8601,
+        "candidate": 1.9555
+      },
+      {
+        "baseline": 5.9026,
+        "baseline_minus_candidate_ms": 4.0613,
+        "candidate": 1.8413
+      }
+    ],
+    "warmup_pairs_excluded": 2
+  },
+  "inputs": {
+    "frozen_fixture_sha256": "78323cfbe8fd397d8506affa5ff0ae0844bce63a4a2ff9eac3d660f4a6c1e47f",
+    "tools": {
+      "admission-fixture/trace_admission.py": "93b18d84cc38a1bc85f1aff4f03f84765d3d9d8480d0c674c57e7f675b0ea631",
+      "catalog-fixture/check_catalog.py": "4616da3e728e89b3ed632d0522ddf56e10a78fd7b261b59fc8c2f66d4072a8f5",
+      "lifecycle-fixture/lifecycle.py": "33755f67a8afc7efe27cb0f7f43d52d2e9d03ea92aede988d779b421a64a1100",
+      "pair/launcher.patch": "2ec319f5992160ed58810c2b3beaf68644cc7c758320721af3072114cac0e306",
+      "profile-fixture/run_profile_parity.sh": "e68cdb3f608c08ac8c942b58abefda2869643b4df4ce98b8039709e137b79ef9"
+    },
+    "verifier_sha256": "854158395338949384548f568feaf554f5525de4c8f1c698f09d2405673f0ebe"
+  },
+  "raw_receipt_sha256": {
+    "admission": "13e0958e8bb7e4faa11ada556f3bd7745ed9285192587b156e0cdd5decd2b189",
+    "baseline_catalog": "7b7090a1e695e2804120ff4193167071245f586d12e43ef29a606047cd5629c2",
+    "baseline_lifecycle": "913ae1dc176d128c3f809cd17f0a492967dad76b7ecc4c6552bd6b3e1150197f",
+    "candidate_catalog": "68afb5a034119471cd07c2d256880760a57365d77b5f6f18f5535ce18331fedc",
+    "candidate_lifecycle": "639d6667ce7ba08a7063d3b0e6ab65a455feee213c9c18fd68ff26aac18eef94",
+    "profile": "b760694e0616e7bd7b3d5b3b6ec2375e89fe0ea484fd0c1c47ecacd049b3322a",
+    "trace_list_sha256": "97659a866e6df7412d3b3d539d1519d6fa87b1ba31073fbd2a624a156991763d"
+  },
+  "result": "pass",
+  "schema": 1,
+  "scope": "Report replayed on Linux. Admission reached a preowned private lock; two complete lifecycle runs used isolated mock stock services. No measured number is a Kindle timing or authorization.",
+  "stable": {
+    "admission": {
+      "absent-profile-library": {
+        "baseline": {
+          "execs": 10,
+          "forks": 10,
+          "programs": {
+            "basename": 2,
+            "dash": 1,
+            "dirname": 2,
+            "mkdir": 3,
+            "setsid": 1,
+            "sh": 1
+          },
+          "status": 1,
+          "successful_write_targets": [
+            "open:/dev/null",
+            "open:{fixture}/Aidoku home/data/logs/launcher.log"
+          ]
+        },
+        "candidate": {
+          "execs": 4,
+          "forks": 2,
+          "programs": {
+            "dash": 1,
+            "mkdir": 1,
+            "setsid": 1,
+            "sh": 1
+          },
+          "status": 1,
+          "successful_write_targets": [
+            "open:/dev/null",
+            "open:{fixture}/Aidoku home/data/logs/launcher.log"
+          ]
+        }
+      },
+      "crlf-library": {
+        "baseline": {
+          "execs": 12,
+          "forks": 12,
+          "programs": {
+            "basename": 2,
+            "dash": 1,
+            "dirname": 2,
+            "mkdir": 3,
+            "sed": 2,
+            "setsid": 1,
+            "sh": 1
+          },
+          "status": 1,
+          "successful_write_targets": [
+            "open:/dev/null",
+            "open:{fixture}/Aidoku home/data/logs/launcher.log"
+          ]
+        },
+        "candidate": {
+          "execs": 6,
+          "forks": 4,
+          "programs": {
+            "dash": 1,
+            "mkdir": 1,
+            "sed": 2,
+            "setsid": 1,
+            "sh": 1
+          },
+          "status": 1,
+          "successful_write_targets": [
+            "open:/dev/null",
+            "open:{fixture}/Aidoku home/data/logs/launcher.log"
+          ]
+        }
+      },
+      "custom": {
+        "baseline": {
+          "execs": 12,
+          "forks": 12,
+          "programs": {
+            "basename": 2,
+            "dash": 1,
+            "dirname": 2,
+            "mkdir": 3,
+            "sed": 2,
+            "setsid": 1,
+            "sh": 1
+          },
+          "status": 1,
+          "successful_write_targets": [
+            "open:/dev/null",
+            "open:{fixture}/Aidoku home/data/logs/launcher.log"
+          ]
+        },
+        "candidate": {
+          "execs": 6,
+          "forks": 5,
+          "programs": {
+            "basename": 1,
+            "dash": 1,
+            "dirname": 1,
+            "mkdir": 1,
+            "setsid": 1,
+            "sh": 1
+          },
+          "status": 1,
+          "successful_write_targets": [
+            "open:/dev/null",
+            "open:{fixture}/Aidoku home/data/logs/launcher.log"
+          ]
+        }
+      },
+      "first-library": {
+        "baseline": {
+          "execs": 12,
+          "forks": 12,
+          "programs": {
+            "basename": 2,
+            "dash": 1,
+            "dirname": 2,
+            "mkdir": 3,
+            "sed": 2,
+            "setsid": 1,
+            "sh": 1
+          },
+          "status": 1,
+          "successful_write_targets": [
+            "mkdir:imports",
+            "mkdir:logs",
+            "open:/dev/null",
+            "open:{fixture}/Aidoku home/data/logs/launcher.log"
+          ]
+        },
+        "candidate": {
+          "execs": 5,
+          "forks": 3,
+          "programs": {
+            "dash": 1,
+            "mkdir": 2,
+            "setsid": 1,
+            "sh": 1
+          },
+          "status": 1,
+          "successful_write_targets": [
+            "mkdir:imports",
+            "mkdir:logs",
+            "open:/dev/null",
+            "open:{fixture}/Aidoku home/data/logs/launcher.log"
+          ]
+        }
+      },
+      "fresh-worker": {
+        "baseline": {
+          "execs": 6,
+          "forks": 6,
+          "programs": {
+            "basename": 1,
+            "dash": 1,
+            "dirname": 1,
+            "mkdir": 2,
+            "sed": 1
+          },
+          "status": 1,
+          "successful_write_targets": [
+            "mkdir:imports",
+            "mkdir:logs",
+            "open:/dev/null"
+          ]
+        },
+        "candidate": {
+          "execs": 3,
+          "forks": 2,
+          "programs": {
+            "dash": 1,
+            "mkdir": 2
+          },
+          "status": 1,
+          "successful_write_targets": [
+            "mkdir:imports",
+            "mkdir:logs",
+            "open:/dev/null"
+          ]
+        }
+      },
+      "kual": {
+        "baseline": {
+          "execs": 12,
+          "forks": 12,
+          "programs": {
+            "basename": 2,
+            "dash": 1,
+            "dirname": 2,
+            "mkdir": 3,
+            "sed": 2,
+            "setsid": 1,
+            "sh": 1
+          },
+          "status": 0,
+          "successful_write_targets": [
+            "open:/dev/null",
+            "open:{fixture}/Aidoku home/data/logs/launcher.log"
+          ]
+        },
+        "candidate": {
+          "execs": 4,
+          "forks": 2,
+          "programs": {
+            "dash": 1,
+            "mkdir": 1,
+            "setsid": 1,
+            "sh": 1
+          },
+          "status": 0,
+          "successful_write_targets": [
+            "open:/dev/null",
+            "open:{fixture}/Aidoku home/data/logs/launcher.log"
+          ]
+        }
+      },
+      "library": {
+        "baseline": {
+          "execs": 12,
+          "forks": 12,
+          "programs": {
+            "basename": 2,
+            "dash": 1,
+            "dirname": 2,
+            "mkdir": 3,
+            "sed": 2,
+            "setsid": 1,
+            "sh": 1
+          },
+          "status": 1,
+          "successful_write_targets": [
+            "open:/dev/null",
+            "open:{fixture}/Aidoku home/data/logs/launcher.log"
+          ]
+        },
+        "candidate": {
+          "execs": 4,
+          "forks": 2,
+          "programs": {
+            "dash": 1,
+            "mkdir": 1,
+            "setsid": 1,
+            "sh": 1
+          },
+          "status": 1,
+          "successful_write_targets": [
+            "open:/dev/null",
+            "open:{fixture}/Aidoku home/data/logs/launcher.log"
+          ]
+        }
+      },
+      "relative": {
+        "baseline": {
+          "execs": 12,
+          "forks": 12,
+          "programs": {
+            "basename": 2,
+            "dash": 1,
+            "dirname": 2,
+            "mkdir": 3,
+            "sed": 2,
+            "setsid": 1,
+            "sh": 1
+          },
+          "status": 1,
+          "successful_write_targets": [
+            "open:/dev/null",
+            "open:{fixture}/Aidoku home/data/logs/launcher.log"
+          ]
+        },
+        "candidate": {
+          "execs": 6,
+          "forks": 5,
+          "programs": {
+            "basename": 1,
+            "dash": 1,
+            "dirname": 1,
+            "mkdir": 1,
+            "setsid": 1,
+            "sh": 1
+          },
+          "status": 1,
+          "successful_write_targets": [
+            "open:/dev/null",
+            "open:{fixture}/Aidoku home/data/logs/launcher.log"
+          ]
+        }
+      },
+      "worker": {
+        "baseline": {
+          "execs": 6,
+          "forks": 6,
+          "programs": {
+            "basename": 1,
+            "dash": 1,
+            "dirname": 1,
+            "mkdir": 2,
+            "sed": 1
+          },
+          "status": 1,
+          "successful_write_targets": [
+            "open:/dev/null"
+          ]
+        },
+        "candidate": {
+          "execs": 2,
+          "forks": 1,
+          "programs": {
+            "dash": 1,
+            "mkdir": 1
+          },
+          "status": 1,
+          "successful_write_targets": [
+            "open:/dev/null"
+          ]
+        }
+      }
+    },
+    "catalog": {
+      "test_catalog_notification_failure_uses_bounded_standard_scan": true,
+      "test_catalog_notification_follows_native_restoration_once": true,
+      "test_catalog_notification_keeps_nonzero_application_status": true,
+      "test_catalog_notification_overflow_is_not_accepted": true,
+      "test_catalog_notification_rejects_modified_helper": true,
+      "test_catalog_notification_survives_library_waiter_retirement": true,
+      "test_catalog_notification_timeout_preserves_exit_and_restoration": true
+    },
+    "guard_function_sha256": {
+      "catalog_helper_is_current": "e8ba669a9e6d9150af3f6db98d60c162b4d68e2b94ea2a920bc09cacc81c8479",
+      "cleanup": "dc219c833c62ed88e5d8acedbd08cf728e63fd8363b4af26313c713cd12b549e",
+      "finish_catalog_notification": "f4d9db41a5ecc51e293a2b0adf26f64730a05afd871fda8dc750c001bef7f33f",
+      "finish_native_read": "b7293e731780d3b4d62491f5038383e17d3b03b8de8f8655a5a0b5a17447b03e",
+      "native_read_group_is_owned": "84d450e4a254be062f9b70d2d322463d42c0cfe4f01c2cdd0c0a8a36d28ecf17",
+      "native_read_is_owned": "d6eb8411017925f02094e3da4dd405f4674eb863843f69a1c8ba53646548a7f3",
+      "release_display": "74260747e3741f2c37583da0a8321b0364fb87a1f9f302eb30d8b8a57effd046",
+      "start_application": "cd17de2b4af9e083bc1ff64040f0011a6dd9fec6c6d6061d3f6559317ff79624",
+      "start_legacy_native_read": "0617279bb83d20b6f49a06aeaaff0a172a912a4fcc09f8436b281dd8d7d4a76b",
+      "stop_application": "b085ee82904f0de4177013128c16018e6244c904139e80afbcdaa103f2e20943",
+      "stop_native_read": "501491554e973b71c3307499826f0316cde40a506c689c13a80c691eecdf0b58",
+      "take_display": "8babd5610dd235f7d610e9bf6448228cd77ba1234b1ddca541fd2de3bdc20b49"
+    },
+    "lifecycle": {
+      "foreground:native:0": {
+        "entry_alive_while_active": true,
+        "entry_exit_status": 7,
+        "independent_worker": false,
+        "lock_removed": true,
+        "native_helper_dispatches": 1,
+        "owned_descendants_reaped": true,
+        "passed": true,
+        "same_app_across_waiter_retirement_and_wake": null,
+        "stock_redraw_count": 1,
+        "stock_restored": true,
+        "stock_start_count": 1,
+        "stock_stop_count": 1,
+        "worker_exit_status": 7,
+        "worker_is_session_leader": true
+      },
+      "foreground:shell:0": {
+        "entry_alive_while_active": true,
+        "entry_exit_status": 7,
+        "independent_worker": false,
+        "lock_removed": true,
+        "native_helper_dispatches": 0,
+        "owned_descendants_reaped": true,
+        "passed": true,
+        "same_app_across_waiter_retirement_and_wake": null,
+        "stock_redraw_count": 1,
+        "stock_restored": true,
+        "stock_start_count": 1,
+        "stock_stop_count": 1,
+        "worker_exit_status": 7,
+        "worker_is_session_leader": true
+      },
+      "kual:native:0": {
+        "entry_alive_while_active": false,
+        "entry_exit_status": 0,
+        "independent_worker": true,
+        "lock_removed": true,
+        "native_helper_dispatches": 1,
+        "owned_descendants_reaped": true,
+        "passed": true,
+        "same_app_across_waiter_retirement_and_wake": null,
+        "stock_redraw_count": 1,
+        "stock_restored": true,
+        "stock_start_count": 1,
+        "stock_stop_count": 1,
+        "worker_exit_status": 7,
+        "worker_is_session_leader": true
+      },
+      "kual:shell:0": {
+        "entry_alive_while_active": false,
+        "entry_exit_status": 0,
+        "independent_worker": true,
+        "lock_removed": true,
+        "native_helper_dispatches": 0,
+        "owned_descendants_reaped": true,
+        "passed": true,
+        "same_app_across_waiter_retirement_and_wake": null,
+        "stock_redraw_count": 1,
+        "stock_restored": true,
+        "stock_start_count": 1,
+        "stock_stop_count": 1,
+        "worker_exit_status": 7,
+        "worker_is_session_leader": true
+      },
+      "library:native:0": {
+        "entry_alive_while_active": true,
+        "entry_exit_status": 7,
+        "independent_worker": true,
+        "lock_removed": true,
+        "native_helper_dispatches": 1,
+        "owned_descendants_reaped": true,
+        "passed": true,
+        "same_app_across_waiter_retirement_and_wake": null,
+        "stock_redraw_count": 1,
+        "stock_restored": true,
+        "stock_start_count": 1,
+        "stock_stop_count": 1,
+        "worker_exit_status": 7,
+        "worker_is_session_leader": true
+      },
+      "library:native:1": {
+        "entry_alive_while_active": true,
+        "entry_exit_status": -9,
+        "independent_worker": true,
+        "lock_removed": true,
+        "native_helper_dispatches": 1,
+        "owned_descendants_reaped": true,
+        "passed": true,
+        "same_app_across_waiter_retirement_and_wake": true,
+        "stock_redraw_count": 1,
+        "stock_restored": true,
+        "stock_start_count": 2,
+        "stock_stop_count": 2,
+        "worker_exit_status": 0,
+        "worker_is_session_leader": true
+      },
+      "library:shell:0": {
+        "entry_alive_while_active": true,
+        "entry_exit_status": 7,
+        "independent_worker": true,
+        "lock_removed": true,
+        "native_helper_dispatches": 0,
+        "owned_descendants_reaped": true,
+        "passed": true,
+        "same_app_across_waiter_retirement_and_wake": null,
+        "stock_redraw_count": 1,
+        "stock_restored": true,
+        "stock_start_count": 1,
+        "stock_stop_count": 1,
+        "worker_exit_status": 7,
+        "worker_is_session_leader": true
+      },
+      "library:shell:1": {
+        "entry_alive_while_active": true,
+        "entry_exit_status": -9,
+        "independent_worker": true,
+        "lock_removed": true,
+        "native_helper_dispatches": 0,
+        "owned_descendants_reaped": true,
+        "passed": true,
+        "same_app_across_waiter_retirement_and_wake": true,
+        "stock_redraw_count": 1,
+        "stock_restored": true,
+        "stock_start_count": 2,
+        "stock_stop_count": 2,
+        "worker_exit_status": 0,
+        "worker_is_session_leader": true
+      }
+    },
+    "profiles": {
+      "profile_absent_default": {
+        "exit_code": 1,
+        "first_directories_created": true,
+        "mode": "root",
+        "stderr_normalized_sha256": "0a37f18c5524cef1d05fb5d39f235af356ebf00ad0105ec602abae83cb86aa4d"
+      },
+      "profile_backslash": {
+        "exit_code": 1,
+        "first_directories_created": true,
+        "mode": "root",
+        "stderr_normalized_sha256": "f7f1d6b7c20b0af6b9985d97787c1bef76fcd4d71c5646d426ec11e95cb50186"
+      },
+      "profile_cr_nul": {
+        "exit_code": 1,
+        "first_directories_created": true,
+        "mode": "root",
+        "stderr_normalized_sha256": "f7f1d6b7c20b0af6b9985d97787c1bef76fcd4d71c5646d426ec11e95cb50186"
+      },
+      "profile_double_cr": {
+        "exit_code": 1,
+        "first_directories_created": true,
+        "mode": "root",
+        "stderr_normalized_sha256": "f7f1d6b7c20b0af6b9985d97787c1bef76fcd4d71c5646d426ec11e95cb50186"
+      },
+      "profile_empty": {
+        "exit_code": 1,
+        "first_directories_created": true,
+        "mode": "root",
+        "stderr_normalized_sha256": "f7f1d6b7c20b0af6b9985d97787c1bef76fcd4d71c5646d426ec11e95cb50186"
+      },
+      "profile_invalid_firstline_second_valid": {
+        "exit_code": 1,
+        "first_directories_created": true,
+        "mode": "root",
+        "stderr_normalized_sha256": "f7f1d6b7c20b0af6b9985d97787c1bef76fcd4d71c5646d426ec11e95cb50186"
+      },
+      "profile_invalid_trailing_space": {
+        "exit_code": 1,
+        "first_directories_created": true,
+        "mode": "root",
+        "stderr_normalized_sha256": "f7f1d6b7c20b0af6b9985d97787c1bef76fcd4d71c5646d426ec11e95cb50186"
+      },
+      "profile_nul_cr": {
+        "exit_code": 1,
+        "first_directories_created": true,
+        "mode": "root",
+        "stderr_normalized_sha256": "0a37f18c5524cef1d05fb5d39f235af356ebf00ad0105ec602abae83cb86aa4d"
+      },
+      "profile_path_is_directory": {
+        "exit_code": 4,
+        "first_directories_created": true,
+        "mode": "root",
+        "stderr_normalized_sha256": "fc5eb8358e0beb97bfd202379ba16f4899c9d0f2ba1ff9622ed472f7028dc07b"
+      },
+      "profile_symlink_valid": {
+        "exit_code": 1,
+        "first_directories_created": true,
+        "mode": "root",
+        "stderr_normalized_sha256": "0a37f18c5524cef1d05fb5d39f235af356ebf00ad0105ec602abae83cb86aa4d"
+      },
+      "profile_unreadable_regular_user": {
+        "exit_code": 1,
+        "first_directories_created": true,
+        "mode": "regular_user",
+        "stderr_normalized_sha256": "0a37f18c5524cef1d05fb5d39f235af356ebf00ad0105ec602abae83cb86aa4d"
+      },
+      "profile_valid_pw5": {
+        "exit_code": 1,
+        "first_directories_created": true,
+        "mode": "root",
+        "stderr_normalized_sha256": "0a37f18c5524cef1d05fb5d39f235af356ebf00ad0105ec602abae83cb86aa4d"
+      },
+      "profile_valid_pw6": {
+        "exit_code": 1,
+        "first_directories_created": true,
+        "mode": "root",
+        "stderr_normalized_sha256": "0a37f18c5524cef1d05fb5d39f235af356ebf00ad0105ec602abae83cb86aa4d"
+      },
+      "profile_valid_pw6_cr_only_no_lf": {
+        "exit_code": 1,
+        "first_directories_created": true,
+        "mode": "root",
+        "stderr_normalized_sha256": "0a37f18c5524cef1d05fb5d39f235af356ebf00ad0105ec602abae83cb86aa4d"
+      },
+      "profile_valid_pw6_crlf_extra": {
+        "exit_code": 1,
+        "first_directories_created": true,
+        "mode": "root",
+        "stderr_normalized_sha256": "0a37f18c5524cef1d05fb5d39f235af356ebf00ad0105ec602abae83cb86aa4d"
+      },
+      "profile_valid_pw6_nolf": {
+        "exit_code": 1,
+        "first_directories_created": true,
+        "mode": "root",
+        "stderr_normalized_sha256": "0a37f18c5524cef1d05fb5d39f235af356ebf00ad0105ec602abae83cb86aa4d"
+      },
+      "profile_valid_scribe": {
+        "exit_code": 1,
+        "first_directories_created": true,
+        "mode": "root",
+        "stderr_normalized_sha256": "0a37f18c5524cef1d05fb5d39f235af356ebf00ad0105ec602abae83cb86aa4d"
+      },
+      "profile_valid_scribe2": {
+        "exit_code": 1,
+        "first_directories_created": true,
+        "mode": "root",
+        "stderr_normalized_sha256": "0a37f18c5524cef1d05fb5d39f235af356ebf00ad0105ec602abae83cb86aa4d"
+      },
+      "profile_valid_scribe3": {
+        "exit_code": 1,
+        "first_directories_created": true,
+        "mode": "root",
+        "stderr_normalized_sha256": "0a37f18c5524cef1d05fb5d39f235af356ebf00ad0105ec602abae83cb86aa4d"
+      },
+      "profile_valid_scribe3_nofrontlight": {
+        "exit_code": 1,
+        "first_directories_created": true,
+        "mode": "root",
+        "stderr_normalized_sha256": "0a37f18c5524cef1d05fb5d39f235af356ebf00ad0105ec602abae83cb86aa4d"
+      },
+      "profile_valid_unreadable_root_chmod000": {
+        "exit_code": 1,
+        "first_directories_created": true,
+        "mode": "root",
+        "stderr_normalized_sha256": "0a37f18c5524cef1d05fb5d39f235af356ebf00ad0105ec602abae83cb86aa4d"
+      },
+      "profile_with_nul": {
+        "exit_code": 1,
+        "first_directories_created": true,
+        "mode": "root",
+        "stderr_normalized_sha256": "f7f1d6b7c20b0af6b9985d97787c1bef76fcd4d71c5646d426ec11e95cb50186"
+      }
+    },
+    "selector": {
+      "duplicate": {
+        "baseline": {
+          "execs": 4,
+          "forks": 6,
+          "mode": "shell",
+          "programs": {
+            "awk": 1,
+            "dash": 1,
+            "od": 1,
+            "rm": 1
+          },
+          "status": 0
+        },
+        "candidate": {
+          "execs": 4,
+          "forks": 6,
+          "mode": "shell",
+          "programs": {
+            "awk": 1,
+            "dash": 1,
+            "od": 1,
+            "rm": 1
+          },
+          "status": 0
+        }
+      },
+      "empty": {
+        "baseline": {
+          "execs": 4,
+          "forks": 6,
+          "mode": "shell",
+          "programs": {
+            "awk": 1,
+            "dash": 1,
+            "od": 1,
+            "rm": 1
+          },
+          "status": 0
+        },
+        "candidate": {
+          "execs": 2,
+          "forks": 2,
+          "mode": "shell",
+          "programs": {
+            "dash": 1,
+            "rm": 1
+          },
+          "status": 0
+        }
+      },
+      "file-native": {
+        "baseline": {
+          "execs": 5,
+          "forks": 6,
+          "mode": "native",
+          "programs": {
+            "aidoku-startup-portrait": 1,
+            "awk": 1,
+            "dash": 1,
+            "od": 1,
+            "rm": 1
+          },
+          "status": 0
+        },
+        "candidate": {
+          "execs": 5,
+          "forks": 6,
+          "mode": "native",
+          "programs": {
+            "aidoku-startup-portrait": 1,
+            "awk": 1,
+            "dash": 1,
+            "od": 1,
+            "rm": 1
+          },
+          "status": 0
+        }
+      },
+      "invalid-override": {
+        "baseline": {
+          "execs": 2,
+          "forks": 3,
+          "mode": "shell",
+          "programs": {
+            "dash": 1,
+            "rm": 1
+          },
+          "status": 0
+        },
+        "candidate": {
+          "execs": 2,
+          "forks": 3,
+          "mode": "shell",
+          "programs": {
+            "dash": 1,
+            "rm": 1
+          },
+          "status": 0
+        }
+      },
+      "legacy-override": {
+        "baseline": {
+          "execs": 2,
+          "forks": 3,
+          "mode": "shell",
+          "programs": {
+            "dash": 1,
+            "rm": 1
+          },
+          "status": 0
+        },
+        "candidate": {
+          "execs": 2,
+          "forks": 3,
+          "mode": "shell",
+          "programs": {
+            "dash": 1,
+            "rm": 1
+          },
+          "status": 0
+        }
+      },
+      "missing": {
+        "baseline": {
+          "execs": 2,
+          "forks": 3,
+          "mode": "shell",
+          "programs": {
+            "dash": 1,
+            "rm": 1
+          },
+          "status": 0
+        },
+        "candidate": {
+          "execs": 2,
+          "forks": 2,
+          "mode": "shell",
+          "programs": {
+            "dash": 1,
+            "rm": 1
+          },
+          "status": 0
+        }
+      },
+      "missing-helper": {
+        "baseline": {
+          "execs": 2,
+          "forks": 2,
+          "mode": "shell",
+          "programs": {
+            "dash": 1,
+            "rm": 1
+          },
+          "status": 0
+        },
+        "candidate": {
+          "execs": 2,
+          "forks": 2,
+          "mode": "shell",
+          "programs": {
+            "dash": 1,
+            "rm": 1
+          },
+          "status": 0
+        }
+      },
+      "native-override": {
+        "baseline": {
+          "execs": 3,
+          "forks": 3,
+          "mode": "native",
+          "programs": {
+            "aidoku-startup-portrait": 1,
+            "dash": 1,
+            "rm": 1
+          },
+          "status": 0
+        },
+        "candidate": {
+          "execs": 3,
+          "forks": 3,
+          "mode": "native",
+          "programs": {
+            "aidoku-startup-portrait": 1,
+            "dash": 1,
+            "rm": 1
+          },
+          "status": 0
+        }
+      },
+      "noncapture": {
+        "baseline": {
+          "execs": 2,
+          "forks": 2,
+          "mode": "generic",
+          "programs": {
+            "dash": 1,
+            "rm": 1
+          },
+          "status": 0
+        },
+        "candidate": {
+          "execs": 2,
+          "forks": 2,
+          "mode": "generic",
+          "programs": {
+            "dash": 1,
+            "rm": 1
+          },
+          "status": 0
+        }
+      },
+      "nul": {
+        "baseline": {
+          "execs": 4,
+          "forks": 6,
+          "mode": "shell",
+          "programs": {
+            "awk": 1,
+            "dash": 1,
+            "od": 1,
+            "rm": 1
+          },
+          "status": 0
+        },
+        "candidate": {
+          "execs": 4,
+          "forks": 6,
+          "mode": "shell",
+          "programs": {
+            "awk": 1,
+            "dash": 1,
+            "od": 1,
+            "rm": 1
+          },
+          "status": 0
+        }
+      },
+      "overlong": {
+        "baseline": {
+          "execs": 4,
+          "forks": 6,
+          "mode": "shell",
+          "programs": {
+            "awk": 1,
+            "dash": 1,
+            "od": 1,
+            "rm": 1
+          },
+          "status": 0
+        },
+        "candidate": {
+          "execs": 4,
+          "forks": 6,
+          "mode": "shell",
+          "programs": {
+            "awk": 1,
+            "dash": 1,
+            "od": 1,
+            "rm": 1
+          },
+          "status": 0
+        }
+      },
+      "recommended": {
+        "baseline": {
+          "execs": 4,
+          "forks": 6,
+          "mode": "shell",
+          "programs": {
+            "awk": 1,
+            "dash": 1,
+            "od": 1,
+            "rm": 1
+          },
+          "status": 0
+        },
+        "candidate": {
+          "execs": 4,
+          "forks": 6,
+          "mode": "shell",
+          "programs": {
+            "awk": 1,
+            "dash": 1,
+            "od": 1,
+            "rm": 1
+          },
+          "status": 0
+        }
+      },
+      "symlink-native": {
+        "baseline": {
+          "execs": 2,
+          "forks": 3,
+          "mode": "shell",
+          "programs": {
+            "dash": 1,
+            "rm": 1
+          },
+          "status": 0
+        },
+        "candidate": {
+          "execs": 2,
+          "forks": 3,
+          "mode": "shell",
+          "programs": {
+            "dash": 1,
+            "rm": 1
+          },
+          "status": 0
+        }
+      }
+    }
+  }
+}

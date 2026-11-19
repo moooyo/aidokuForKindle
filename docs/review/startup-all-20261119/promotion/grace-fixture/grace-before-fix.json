@@ -1,0 +1,109 @@
+{
+  "application_sha256": "3ef03a4124970139fe46d3873c4b9fc7d5cd25af55e66482e497dca46b584375",
+  "events": {
+    "cancel": {
+      "armed": true,
+      "case": "cancel",
+      "deferred_after_spent_timer": false,
+      "grace_limit_ms": 40,
+      "last_still_pending": true,
+      "production_trace": [
+        "startup_cover_last_grace_started",
+        "startup_cover_last_grace_cancelled"
+      ],
+      "publication_once_after_last_result": false,
+      "rounded_delivery_us": null,
+      "test_passed": true,
+      "trace_success": true,
+      "visible": 2,
+      "wake_callbacks": 0
+    },
+    "disabled": {
+      "armed": false,
+      "case": "disabled",
+      "deferred_after_spent_timer": false,
+      "grace_limit_ms": 40,
+      "last_still_pending": true,
+      "production_trace": [],
+      "publication_once_after_last_result": false,
+      "rounded_delivery_us": null,
+      "test_passed": true,
+      "trace_success": true,
+      "visible": 2,
+      "wake_callbacks": 0
+    },
+    "early": {
+      "armed": true,
+      "case": "early",
+      "deferred_after_spent_timer": false,
+      "grace_limit_ms": 40,
+      "last_still_pending": false,
+      "production_trace": [
+        "startup_cover_last_grace_started",
+        "startup_cover_last_grace_completed"
+      ],
+      "publication_once_after_last_result": true,
+      "rounded_delivery_us": null,
+      "test_passed": true,
+      "trace_success": true,
+      "visible": 2,
+      "wake_callbacks": 0
+    },
+    "expiry": {
+      "armed": true,
+      "case": "expiry",
+      "deferred_after_spent_timer": false,
+      "grace_limit_ms": 40,
+      "last_still_pending": false,
+      "production_trace": [
+        "startup_cover_last_grace_started",
+        "startup_cover_last_grace_expired"
+      ],
+      "publication_once_after_last_result": true,
+      "rounded_delivery_us": null,
+      "test_passed": true,
+      "trace_success": true,
+      "visible": 2,
+      "wake_callbacks": 1
+    },
+    "foreign": {
+      "armed": false,
+      "case": "foreign",
+      "deferred_after_spent_timer": false,
+      "grace_limit_ms": 40,
+      "last_still_pending": true,
+      "production_trace": [],
+      "publication_once_after_last_result": false,
+      "rounded_delivery_us": null,
+      "test_passed": true,
+      "trace_success": true,
+      "visible": 2,
+      "wake_callbacks": 0
+    },
+    "rounded-wake": {
+      "armed": true,
+      "case": "rounded-wake",
+      "deferred_after_spent_timer": true,
+      "grace_limit_ms": 40,
+      "last_still_pending": false,
+      "production_trace": [
+        "startup_cover_last_grace_started",
+        "startup_cover_last_grace_expired"
+      ],
+      "publication_once_after_last_result": true,
+      "rounded_delivery_us": 39100,
+      "test_passed": false,
+      "trace_success": false,
+      "visible": 2,
+      "wake_callbacks": 1
+    }
+  },
+  "fixture_sha256": "9cd216d36900919b8cd635233641180e64b21976aede03069efc13d8f9db1966",
+  "functional_qualification_passed": false,
+  "performance_claim": false,
+  "platform": "test-env Linux with a controlled Slint platform clock",
+  "run_id": "grace-dcd49c014bb7",
+  "scope": "Same production functions with a cfg(test)-only adapter. Ordinary physical timing samples, real screen presentation and a release speed claim are outside this controlled test. The negative rounded-wake case forced a valid 39.1 ms first callback and the unmodified application still returned defer with no timer left running.",
+  "source_manifest_sha256": "bbe5ed5fff13bf5af89059fa0d835b3514a0834a49dec09345e3fa048053e9b5",
+  "test_elf_sha256": "14b8355156b2428726d59e3654b3132e5fce973c4e5eb41a5729c8f06e99dce8"
+}

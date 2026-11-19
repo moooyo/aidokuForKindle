@@ -1,0 +1,107 @@
+{
+  "auditor_sha256": "ad8f1562e4cc88e3bde97f404b403c3dad543fcbb4fe8a77d821a5ff272f6a95",
+  "completed_sha256": "b1dae68157a47a7ae2e2e875a32ae55c3d1ab197b212707ea31ca30d1f7ee7de",
+  "feature": "grace",
+  "fixture_sha256": "9b95a00338d3254a4a51c9bde75a05c04e4292f3ad6cebd6cee77c6a61250e93",
+  "functional_negative": true,
+  "functional_positive": true,
+  "latency_gate_passed": null,
+  "observations": {
+    "cancel": {
+      "armed": true,
+      "case": "cancel",
+      "deferred_after_spent_timer": false,
+      "events": [
+        "started",
+        "cancelled"
+      ],
+      "grace_limit_ms": 40,
+      "last_still_pending": true,
+      "publication_once_after_last_result": false,
+      "rounded_delivery_us": null,
+      "visible": 2,
+      "wake_callbacks": 0
+    },
+    "disabled": {
+      "armed": false,
+      "case": "disabled",
+      "deferred_after_spent_timer": false,
+      "events": [],
+      "grace_limit_ms": 40,
+      "last_still_pending": true,
+      "publication_once_after_last_result": false,
+      "rounded_delivery_us": null,
+      "visible": 2,
+      "wake_callbacks": 0
+    },
+    "early": {
+      "armed": true,
+      "case": "early",
+      "deferred_after_spent_timer": false,
+      "events": [
+        "started",
+        "completed"
+      ],
+      "grace_limit_ms": 40,
+      "last_still_pending": false,
+      "publication_once_after_last_result": true,
+      "rounded_delivery_us": null,
+      "visible": 2,
+      "wake_callbacks": 0
+    },
+    "expiry": {
+      "armed": true,
+      "case": "expiry",
+      "deferred_after_spent_timer": false,
+      "events": [
+        "started",
+        "expired"
+      ],
+      "grace_limit_ms": 40,
+      "last_still_pending": false,
+      "publication_once_after_last_result": true,
+      "rounded_delivery_us": null,
+      "visible": 2,
+      "wake_callbacks": 1
+    },
+    "foreign": {
+      "armed": false,
+      "case": "foreign",
+      "deferred_after_spent_timer": false,
+      "events": [],
+      "grace_limit_ms": 40,
+      "last_still_pending": true,
+      "publication_once_after_last_result": false,
+      "rounded_delivery_us": null,
+      "visible": 2,
+      "wake_callbacks": 0
+    },
+    "rounded-wake": {
+      "armed": true,
+      "case": "rounded-wake",
+      "deferred_after_spent_timer": false,
+      "events": [
+        "started",
+        "expired"
+      ],
+      "grace_limit_ms": 40,
+      "last_still_pending": false,
+      "publication_once_after_last_result": true,
+      "rounded_delivery_us": 39100,
+      "visible": 2,
+      "wake_callbacks": 1
+    }
+  },
+  "performance_claim": false,
+  "platform": "test-env-linux-host",
+  "program_sha256": {
+    "aidoku/app/aidoku": "1b1c508e1ee84a4be3bd0c15bcf6d42bdd492d688f3fa81b065fb256e00dd3af",
+    "aidoku/app/aidoku-startup-portrait": "bde28cd5953d26b0dc3bfebe16fcfe1cde329021c17449edae7c59470376ed50",
+    "aidoku/launch.sh": "2b0d6e8ee76076c1f14e92dae97a505b40f0a78e07cec78cdea23ec59398bae5"
+  },
+  "run_id": "grace-ec810112e67b",
+  "schema": 1,
+  "scope": "Exact production source with a test-only adapter; real application grace timer and publication functions, controlled synthetic result readiness. No physical-frame or speed claim.",
+  "source_manifest_sha256": "28c1bb314e12fe5689b401ca23cf932a91c138f5763c4c1ea18d454f41c990cf",
+  "test_elf_sha256": "d81bbf846d9a3303c9fe7b9cf65dd273bced238fd77ccdac470619b64cf582f0"
+}

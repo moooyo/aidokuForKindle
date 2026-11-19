@@ -1,0 +1,305 @@
+{
+  "group": "import",
+  "phase": "pilot",
+  "revision": "r1",
+  "valid": true,
+  "batches": [
+    {
+      "run": "aidoku-all-import-pilot-2eb9d909",
+      "mode": "pilot"
+    }
+  ],
+  "pair_data": [
+    {
+      "round": 1,
+      "run": "aidoku-all-import-pilot-2eb9d909",
+      "order": "AB",
+      "complete": true,
+      "ingest_publish_ms": [
+        1886.465,
+        1935.45,
+        -48.985
+      ],
+      "ingest_request_to_visible_ms": [
+        7099.502,
+        8099.299,
+        -999.797
+      ],
+      "ingest_request_to_all_work_ms": [
+        7099.502,
+        9614.007,
+        -2514.505
+      ],
+      "extra_tail_ms": [
+        0.0,
+        1514.708,
+        -1514.708
+      ],
+      "worker_elapsed_ms": [
+        0,
+        1091.396,
+        -1091.396
+      ],
+      "ingest_cached_bytes": [
+        666249,
+        965184,
+        -298935.0
+      ],
+      "ingest_cache_count": [
+        16,
+        20,
+        -4.0
+      ],
+      "ingest_exit_ms": [
+        2853.339,
+        3702.509,
+        -849.17
+      ],
+      "reopen_usable_ms": [
+        2285.674,
+        2506.305,
+        -220.631
+      ],
+      "reopen_covers_ms": [
+        4107.865,
+        3326.615,
+        781.25
+      ],
+      "reopen_exit_ms": [
+        2792.573,
+        3802.385,
+        -1009.812
+      ],
+      "two_visible_waits_ms": [
+        11207.367,
+        11425.914,
+        -218.547
+      ],
+      "two_including_deferred_ms": [
+        11207.367,
+        12940.622,
+        -1733.255
+      ],
+      "reopen_derivative_hits": [
+        11,
+        15
+      ],
+      "reopen_derivative_misses": [
+        4,
+        0
+      ],
+      "idle_jobs": [
+        0,
+        4
+      ]
+    }
+  ],
+  "status": "pilot_only",
+  "arms": {
+    "baseline": {
+      "elf": "3ef03a4124970139fe46d3873c4b9fc7d5cd25af55e66482e497dca46b584375",
+      "launcher": "10432125b74ab5b69c8a0ec54a34abd5a74dc4a3cc9ed9b9d5cc8d03bbd75296",
+      "options": {
+        "import_thumbnail": "off"
+      }
+    },
+    "candidate": {
+      "elf": "3ef03a4124970139fe46d3873c4b9fc7d5cd25af55e66482e497dca46b584375",
+      "launcher": "10432125b74ab5b69c8a0ec54a34abd5a74dc4a3cc9ed9b9d5cc8d03bbd75296",
+      "options": {
+        "import_thumbnail": "idle"
+      }
+    }
+  },
+  "mechanism_observed": true,
+  "gates": {
+    "reopen_latency": null,
+    "default_economics": null,
+    "pixels": null
+  },
+  "scope": "Synthetic local shelf. Two distinct processes: visible import publication, optional idle derivative preparation, then a later shelf open. Extra time, stored bytes and subsequent cache hits are separate from the user-visible timing. No GUI process survives, no per-user frequency or energy estimate.",
+  "summary_units_in_metric_names": {
+    "ingest_publish_ms": {
+      "a_median": 1886.465,
+      "b_median": 1935.45,
+      "difference_of_medians": -48.985,
+      "median_paired_saving": -48.985,
+      "positive_pairs": 0,
+      "range_of_paired_savings": [
+        -48.985,
+        -48.985
+      ],
+      "by_order": {
+        "AB": -48.985
+      }
+    },
+    "ingest_request_to_visible_ms": {
+      "a_median": 7099.502,
+      "b_median": 8099.299,
+      "difference_of_medians": -999.797,
+      "median_paired_saving": -999.797,
+      "positive_pairs": 0,
+      "range_of_paired_savings": [
+        -999.797,
+        -999.797
+      ],
+      "by_order": {
+        "AB": -999.797
+      }
+    },
+    "ingest_request_to_all_work_ms": {
+      "a_median": 7099.502,
+      "b_median": 9614.007,
+      "difference_of_medians": -2514.505,
+      "median_paired_saving": -2514.505,
+      "positive_pairs": 0,
+      "range_of_paired_savings": [
+        -2514.505,
+        -2514.505
+      ],
+      "by_order": {
+        "AB": -2514.505
+      }
+    },
+    "extra_tail_ms": {
+      "a_median": 0.0,
+      "b_median": 1514.708,
+      "difference_of_medians": -1514.708,
+      "median_paired_saving": -1514.708,
+      "positive_pairs": 0,
+      "range_of_paired_savings": [
+        -1514.708,
+        -1514.708
+      ],
+      "by_order": {
+        "AB": -1514.708
+      }
+    },
+    "worker_elapsed_ms": {
+      "a_median": 0.0,
+      "b_median": 1091.396,
+      "difference_of_medians": -1091.396,
+      "median_paired_saving": -1091.396,
+      "positive_pairs": 0,
+      "range_of_paired_savings": [
+        -1091.396,
+        -1091.396
+      ],
+      "by_order": {
+        "AB": -1091.396
+      }
+    },
+    "ingest_cached_bytes": {
+      "a_median": 666249.0,
+      "b_median": 965184.0,
+      "difference_of_medians": -298935.0,
+      "median_paired_saving": -298935.0,
+      "positive_pairs": 0,
+      "range_of_paired_savings": [
+        -298935.0,
+        -298935.0
+      ],
+      "by_order": {
+        "AB": -298935.0
+      }
+    },
+    "ingest_cache_count": {
+      "a_median": 16.0,
+      "b_median": 20.0,
+      "difference_of_medians": -4.0,
+      "median_paired_saving": -4.0,
+      "positive_pairs": 0,
+      "range_of_paired_savings": [
+        -4.0,
+        -4.0
+      ],
+      "by_order": {
+        "AB": -4.0
+      }
+    },
+    "ingest_exit_ms": {
+      "a_median": 2853.339,
+      "b_median": 3702.509,
+      "difference_of_medians": -849.17,
+      "median_paired_saving": -849.17,
+      "positive_pairs": 0,
+      "range_of_paired_savings": [
+        -849.17,
+        -849.17
+      ],
+      "by_order": {
+        "AB": -849.17
+      }
+    },
+    "reopen_usable_ms": {
+      "a_median": 2285.674,
+      "b_median": 2506.305,
+      "difference_of_medians": -220.631,
+      "median_paired_saving": -220.631,
+      "positive_pairs": 0,
+      "range_of_paired_savings": [
+        -220.631,
+        -220.631
+      ],
+      "by_order": {
+        "AB": -220.631
+      }
+    },
+    "reopen_covers_ms": {
+      "a_median": 4107.865,
+      "b_median": 3326.615,
+      "difference_of_medians": 781.25,
+      "median_paired_saving": 781.25,
+      "positive_pairs": 1,
+      "range_of_paired_savings": [
+        781.25,
+        781.25
+      ],
+      "by_order": {
+        "AB": 781.25
+      }
+    },
+    "reopen_exit_ms": {
+      "a_median": 2792.573,
+      "b_median": 3802.385,
+      "difference_of_medians": -1009.812,
+      "median_paired_saving": -1009.812,
+      "positive_pairs": 0,
+      "range_of_paired_savings": [
+        -1009.812,
+        -1009.812
+      ],
+      "by_order": {
+        "AB": -1009.812
+      }
+    },
+    "two_visible_waits_ms": {
+      "a_median": 11207.367,
+      "b_median": 11425.914,
+      "difference_of_medians": -218.547,
+      "median_paired_saving": -218.547,
+      "positive_pairs": 0,
+      "range_of_paired_savings": [
+        -218.547,
+        -218.547
+      ],
+      "by_order": {
+        "AB": -218.547
+      }
+    },
+    "two_including_deferred_ms": {
+      "a_median": 11207.367,
+      "b_median": 12940.622,
+      "difference_of_medians": -1733.255,
+      "median_paired_saving": -1733.255,
+      "positive_pairs": 0,
+      "range_of_paired_savings": [
+        -1733.255,
+        -1733.255
+      ],
+      "by_order": {
+        "AB": -1733.255
+      }
+    }
+  }
+}

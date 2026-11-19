@@ -1,0 +1,978 @@
+diff --git a/packaging/tests/launch_guardian_test.py b/packaging/tests/launch_guardian_test.py
+new file mode 100644
+index 0000000..e1dba27
+--- /dev/null
++++ b/packaging/tests/launch_guardian_test.py
+@@ -0,0 +1,153 @@
++"""Exercise the Linux guardian with only privately owned fixture processes."""
++
++import ctypes
++import os
++from pathlib import Path
++import signal
++import subprocess
++import sys
++import tempfile
++import time
++import unittest
++
++
++HELPER = Path(sys.argv.pop(1)).absolute()
++SCRIPT = Path(__file__).absolute()
++
++
++def wait_for(check, seconds=4):
++    deadline = time.monotonic() + seconds
++    while time.monotonic() < deadline:
++        value = check()
++        if value:
++            return value
++        time.sleep(0.01)
++    raise TimeoutError("fixture did not reach the expected state")
++
++
++def pedigree(pid):
++    fields = Path(f"/proc/{pid}/stat").read_text().rsplit(") ", 1)[1].split()
++    # State, direct parent, Unix session, and kernel birth ticks.
++    return fields[0], int(fields[1]), int(fields[3]), int(fields[19])
++
++
++def worker(path, ambient_fd):
++    try:
++        os.fstat(ambient_fd)
++    except OSError:
++        pass
++    else:
++        sys.exit("unexpected inherited descriptor")
++
++    def cancelled(_sig, _frame):
++        (path / "cleaned").touch()
++        raise SystemExit(73)
++
++    signal.signal(signal.SIGTERM, cancelled)
++    pending = path / "ready.pending"
++    pending.write_text(str(os.getpid()))
++    pending.replace(path / "ready")
++    wait_for(lambda: (path / "settle").exists() or (path / "exit").exists())
++    if (path / "settle").exists():
++        (path / "cleaned").touch()
++        fd = int(os.environ["AIDOKU_INITIAL_WAITER_FD"])
++        os.write(fd, b"S")
++        os.close(fd)
++        wait_for((path / "exit").exists)
++    sys.exit(41)
++
++
++class GuardianTest(unittest.TestCase):
++    def setUp(self):
++        self.directory = tempfile.TemporaryDirectory()
++        self.addCleanup(self.directory.cleanup)
++        self.path = Path(self.directory.name)
++        self.app = None
++        self.guardian = None
++
++    def launch(self):
++        import fcntl
++
++        with open(self.path / "ambient", "w") as file:
++            ambient = fcntl.fcntl(file.fileno(), fcntl.F_DUPFD, 64)
++            try:
++                self.waiter = subprocess.Popen(
++                    [HELPER, "--", sys.executable, SCRIPT, HELPER, "--worker", self.path, str(ambient)],
++                    pass_fds=(ambient,),
++                    stdin=subprocess.DEVNULL,
++                )
++            finally:
++                os.close(ambient)
++        self.addCleanup(self.finish_if_live)
++        wait_for(lambda: (self.path / "ready").exists())
++        self.app = int((self.path / "ready").read_text())
++        self.original = pedigree(self.app)
++        _, self.guardian, session, _ = self.original
++        self.assertEqual(self.guardian, session)
++        self.assertNotEqual(self.guardian, self.waiter.pid)
++        self.assertEqual(pedigree(self.guardian)[1], self.waiter.pid)
++
++    def finish_if_live(self):
++        (self.path / "exit").touch()
++        if self.waiter.poll() is None:
++            self.waiter.terminate()
++            self.waiter.wait(timeout=4)
++        for pid in (self.guardian, self.app):
++            if pid is None:
++                continue
++
++            def reaped():
++                try:
++                    return os.waitpid(pid, os.WNOHANG)[0] == pid
++                except ChildProcessError:
++                    return not Path(f"/proc/{pid}").exists()
++
++            wait_for(reaped)
++
++    def test_worker_exit_status_returns_to_initial_waiter(self):
++        self.launch()
++        (self.path / "exit").touch()
++        self.assertEqual(self.waiter.wait(timeout=4), 41)
++
++    def test_initial_waiter_settles_without_reparenting_worker(self):
++        self.launch()
++        (self.path / "settle").touch()
++        self.assertEqual(self.waiter.wait(timeout=4), 0)
++        self.assertTrue((self.path / "cleaned").exists())
++        self.assertEqual(pedigree(self.app)[1:], self.original[1:])
++        def closed_sockets():
++            fds = list(Path(f"/proc/{self.guardian}/fd").iterdir())
++            return fds if len(fds) == 2 else None
++
++        descriptors = wait_for(closed_sockets)
++        self.assertEqual(len(descriptors), 2)
++        self.assertTrue(all(os.readlink(fd).startswith("pipe:[") for fd in descriptors))
++
++    def test_native_waiter_retirement_leaves_worker_parent_intact(self):
++        self.launch()
++        self.waiter.kill()
++        self.assertEqual(self.waiter.wait(timeout=4), -signal.SIGKILL)
++        self.assertEqual(pedigree(self.app)[1:], self.original[1:])
++        (self.path / "settle").touch()
++        wait_for((self.path / "cleaned").exists)
++
++    def test_cancel_waits_for_owned_worker_cleanup(self):
++        self.launch()
++        self.waiter.terminate()
++        self.assertEqual(self.waiter.wait(timeout=4), 128 + signal.SIGTERM)
++        self.assertTrue((self.path / "cleaned").exists())
++
++    def test_unexpected_guardian_retirement_notifies_worker(self):
++        self.launch()
++        os.kill(self.guardian, signal.SIGKILL)
++        self.assertEqual(self.waiter.wait(timeout=4), 125)
++        wait_for((self.path / "cleaned").exists)
++
++
++if __name__ == "__main__":
++    if sys.argv[1:2] == ["--worker"]:
++        worker(Path(sys.argv[2]), int(sys.argv[3]))
++    # Adopt only fixture orphans rather than depending on the test host's PID 1.
++    if ctypes.CDLL(None, use_errno=True).prctl(36, 1, 0, 0, 0) != 0:
++        raise OSError(ctypes.get_errno(), "could not adopt fixture orphans")
++    unittest.main()
+diff --git a/scripts/build-launch-guardian.sh b/scripts/build-launch-guardian.sh
+new file mode 100644
+index 0000000..108a72f
+--- /dev/null
++++ b/scripts/build-launch-guardian.sh
+@@ -0,0 +1,12 @@
++#!/bin/sh
++# Build the app-private Library lifecycle helper on the remote Linux worker.
++set -eu
++dir=$(CDPATH= cd "$(dirname "$0")" && pwd)
++out=${1:?Pass the output path for the launcher guardian}
++source=$dir/../src/native_launcher/guardian.c
++if [ -f "$dir/launch_guardian.c" ]; then source=$dir/launch_guardian.c; fi
++mkdir -p "$(dirname "$out")"
++"${ZIG_BIN_DIR:+$ZIG_BIN_DIR/}zig" cc -target arm-linux-gnueabihf.2.4 \
++    -mcpu=cortex_a8 -mfpu=vfpv3-d16 -mfloat-abi=hard \
++    -std=c11 -O2 -Wall -Wextra -Werror -fstack-protector-strong -fPIE -pie \
++    -Wl,-z,relro,-z,now -s "$source" -o "$out"
+diff --git a/src/native_launcher/guardian.c b/src/native_launcher/guardian.c
+new file mode 100644
+index 0000000..117d465
+--- /dev/null
++++ b/src/native_launcher/guardian.c
+@@ -0,0 +1,211 @@
++#define _GNU_SOURCE
++#include <dirent.h>
++#include <errno.h>
++#include <fcntl.h>
++#include <limits.h>
++#include <poll.h>
++#include <signal.h>
++#include <stdbool.h>
++#include <stdint.h>
++#include <stdlib.h>
++#include <string.h>
++#include <sys/prctl.h>
++#include <sys/socket.h>
++#include <sys/types.h>
++#include <sys/wait.h>
++#include <unistd.h>
++
++enum { INITIAL_WAITER_FD = 8, FAILED = 125 };
++static volatile sig_atomic_t notify_fd = -1;
++static volatile sig_atomic_t cancel_fd = -1;
++static volatile sig_atomic_t cancel_signal = 0;
++
++static void child_exited(int signo) {
++    (void)signo;
++    int saved = errno;
++    if (notify_fd >= 0) {
++        const char ch = 1;
++        (void)write(notify_fd, &ch, sizeof(ch));
++    }
++    errno = saved;
++}
++
++static void initial_waiter_cancelled(int signo) {
++    int saved = errno;
++    if (cancel_fd >= 0 && cancel_signal == 0) {
++        const char request = 'C';
++        cancel_signal = signo;
++        (void)send(cancel_fd, &request, sizeof(request), MSG_NOSIGNAL | MSG_DONTWAIT);
++    }
++    errno = saved;
++}
++
++static int waiter_signals(void (*handler)(int)) {
++    struct sigaction action = { .sa_handler = handler };
++    if (sigemptyset(&action.sa_mask) < 0 || sigaddset(&action.sa_mask, SIGHUP) < 0 ||
++        sigaddset(&action.sa_mask, SIGINT) < 0 || sigaddset(&action.sa_mask, SIGTERM) < 0 ||
++        sigaction(SIGHUP, &action, NULL) < 0 || sigaction(SIGINT, &action, NULL) < 0 ||
++        sigaction(SIGTERM, &action, NULL) < 0 || sigprocmask(SIG_UNBLOCK, &action.sa_mask, NULL) < 0) return -1;
++    return 0;
++}
++
++static int close_ambient(int keep) {
++    DIR *fds = opendir("/proc/self/fd");
++    if (fds == NULL) return -1;
++    const int own = dirfd(fds);
++    int result = 0;
++    for (;;) {
++        errno = 0;
++        struct dirent *entry = readdir(fds);
++        if (entry == NULL) {
++            if (errno != 0) result = -1;
++            break;
++        }
++        char *end;
++        long fd = strtol(entry->d_name, &end, 10);
++        if (fd > STDERR_FILENO && fd <= INT_MAX && *end == '\0' && fd != own && fd != keep) {
++            (void)close((int)fd);
++        }
++    }
++    closedir(fds);
++    return result;
++}
++
++static void reply(int fd, uint8_t kind, uint8_t status) {
++    const uint8_t result[2] = { kind, status };
++    ssize_t n;
++    do { n = send(fd, result, sizeof(result), MSG_NOSIGNAL); } while (n < 0 && errno == EINTR);
++}
++
++static bool original_worker_settled(int fd, pid_t worker, uid_t uid, gid_t gid) {
++    char ch;
++    struct iovec payload = { .iov_base = &ch, .iov_len = sizeof(ch) };
++    union {
++        struct cmsghdr align;
++        char bytes[CMSG_SPACE(sizeof(struct ucred))];
++    } control;
++    struct msghdr msg = {
++        .msg_iov = &payload, .msg_iovlen = 1,
++        .msg_control = control.bytes, .msg_controllen = sizeof(control.bytes),
++    };
++    const ssize_t n = recvmsg(fd, &msg, MSG_DONTWAIT);
++    if (n != 1 || ch != 'S' || (msg.msg_flags & (MSG_TRUNC | MSG_CTRUNC))) return false;
++    struct cmsghdr *header = CMSG_FIRSTHDR(&msg);
++    if (header == NULL || header->cmsg_level != SOL_SOCKET || header->cmsg_type != SCM_CREDENTIALS ||
++        header->cmsg_len != CMSG_LEN(sizeof(struct ucred))) return false;
++    struct ucred actual;
++    memcpy(&actual, CMSG_DATA(header), sizeof(actual));
++    return actual.pid == worker && actual.uid == uid && actual.gid == gid;
++}
++
++static void worker_main(char **command, pid_t guardian, int settle) {
++    // This signal invokes the existing worker's cleanup if its guardian dies.
++    if (prctl(PR_SET_PDEATHSIG, SIGTERM, 0L, 0L, 0L) < 0 || getppid() != guardian) _exit(FAILED);
++    if (signal(SIGCHLD, SIG_DFL) == SIG_ERR || dup2(settle, INITIAL_WAITER_FD) < 0 ||
++        fcntl(INITIAL_WAITER_FD, F_SETFD, 0) < 0 || close_ambient(INITIAL_WAITER_FD) < 0 ||
++        setenv("AIDOKU_INITIAL_WAITER_FD", "8", 1) < 0) _exit(FAILED);
++    execv(command[0], command);
++    _exit(errno == ENOENT ? 127 : 126);
++}
++
++static int guardian_main(char **command, int waiter) {
++    int settle[2], notify[2];
++    int enabled = 1;
++    if (setsid() < 0 || waiter_signals(SIG_DFL) < 0 || close_ambient(waiter) < 0 ||
++        socketpair(AF_UNIX, SOCK_SEQPACKET, 0, settle) < 0 ||
++        setsockopt(settle[0], SOL_SOCKET, SO_PASSCRED, &enabled, sizeof(enabled)) < 0 ||
++        pipe(notify) < 0 || fcntl(notify[1], F_SETFL, O_NONBLOCK) < 0) return FAILED;
++
++    struct sigaction action = { .sa_handler = child_exited, .sa_flags = SA_NOCLDSTOP };
++    sigset_t child_signal;
++    if (sigemptyset(&action.sa_mask) < 0 || sigemptyset(&child_signal) < 0 ||
++        sigaddset(&child_signal, SIGCHLD) < 0) return FAILED;
++    notify_fd = notify[1];
++    if (sigaction(SIGCHLD, &action, NULL) < 0 || sigprocmask(SIG_UNBLOCK, &child_signal, NULL) < 0) return FAILED;
++
++    const pid_t guardian = getpid();
++    const uid_t uid = getuid();
++    const gid_t gid = getgid();
++    const pid_t worker = fork();
++    if (worker < 0) return FAILED;
++    if (worker == 0) worker_main(command, guardian, settle[1]);
++
++    close(settle[1]);
++    close(STDIN_FILENO);
++    close(STDOUT_FILENO);
++    close(STDERR_FILENO);
++    (void)chdir("/");
++
++    struct pollfd observe[] = {
++        { .fd = notify[0], .events = POLLIN },
++        { .fd = settle[0], .events = POLLIN },
++        { .fd = waiter, .events = POLLIN },
++    };
++    bool cancelled = false;
++    for (;;) {
++        int status;
++        const pid_t done = waitpid(worker, &status, WNOHANG);
++        if (done == worker) {
++            const int code = WIFEXITED(status) ? WEXITSTATUS(status) : 128 + WTERMSIG(status);
++            if (waiter >= 0) reply(waiter, 'X', (uint8_t)code);
++            return code;
++        }
++        if (done < 0 && errno != EINTR) return FAILED;
++        const int ready = poll(observe, sizeof(observe) / sizeof(observe[0]), -1);
++        if (ready < 0 && errno != EINTR) return FAILED;
++        if (ready <= 0 || observe[0].revents) continue;
++        if (observe[2].revents) {
++            char request;
++            ssize_t n = recv(waiter, &request, sizeof(request), MSG_DONTWAIT);
++            if (n == 1 && request == 'C' && !cancelled) {
++                // This child cannot be recycled before our waitpid reaps it.
++                cancelled = true;
++                (void)kill(worker, SIGTERM);
++            }
++            if (n == 0 || (observe[2].revents & (POLLERR | POLLHUP | POLLNVAL))) {
++                close(waiter);
++                waiter = -1;
++                observe[2].fd = -1;
++            }
++        }
++        if ((observe[1].revents & POLLIN) && original_worker_settled(settle[0], worker, uid, gid)) {
++            if (waiter >= 0 && !cancelled) {
++                reply(waiter, 'S', 0);
++                close(waiter);
++                waiter = -1;
++                observe[2].fd = -1;
++            }
++            close(settle[0]);
++            observe[1].fd = -1;
++        } else if (observe[1].revents & (POLLERR | POLLHUP | POLLNVAL)) {
++            close(settle[0]);
++            observe[1].fd = -1;
++        }
++    }
++}
++
++int main(int argc, char **argv) {
++    if (argc < 3 || strcmp(argv[1], "--") != 0 || argv[2][0] != '/') return FAILED;
++    int channel[2];
++    if (socketpair(AF_UNIX, SOCK_SEQPACKET, 0, channel) < 0) return FAILED;
++    cancel_fd = channel[0];
++    if (waiter_signals(initial_waiter_cancelled) < 0) return FAILED;
++    const pid_t guardian = fork();
++    if (guardian < 0) return FAILED;
++    if (guardian == 0) {
++        close(channel[0]);
++        _exit(guardian_main(argv + 2, channel[1]));
++    }
++
++    close(channel[1]);
++    uint8_t result[2];
++    ssize_t n;
++    do { n = recv(channel[0], result, sizeof(result), 0); } while (n < 0 && errno == EINTR);
++    cancel_fd = -1;
++    close(channel[0]);
++    if (n != sizeof(result) || result[0] == 'X') {
++        while (waitpid(guardian, NULL, 0) < 0 && errno == EINTR) {}
++    }
++    if (cancel_signal != 0) return 128 + cancel_signal;
++    return n == sizeof(result) && (result[0] == 'X' || result[0] == 'S') ? result[1] : FAILED;
++}
+diff --git a/src/native_library_idle.rs b/src/native_library_idle.rs
+new file mode 100644
+index 0000000..350f388
+--- /dev/null
++++ b/src/native_library_idle.rs
+@@ -0,0 +1,415 @@
++//! Bound one app-owned idle period before a newly admitted native Library visit.
++
++use std::{
++    fs::File,
++    io::{self, Read},
++    os::{
++        fd::{AsRawFd, FromRawFd, OwnedFd},
++        unix::net::{UnixListener, UnixStream},
++    },
++    time::Duration,
++};
++
++const TTL: Duration = Duration::from_secs(45);
++const SAMPLE_INTERVAL: Duration = Duration::from_secs(1);
++const MIN_AVAILABLE_KIB: u64 = 48 * 1024;
++
++#[derive(Clone, Copy, Debug, Eq, PartialEq)]
++pub(crate) enum IdleEnd {
++    Expired,
++    LowMemory,
++    UnknownMemory,
++    Exit,
++    Usb,
++    Sleep,
++    OwnerLost,
++    MonitorFailed,
++}
++
++#[derive(Clone, Copy)]
++pub(crate) enum IdleOwnerEvent {
++    Exit,
++    Usb,
++    Sleep,
++}
++
++pub(crate) struct IdleOwnerEvents(UnixStream);
++pub(crate) struct IdleOwnerNotices(UnixStream);
++
++/// Issue a single peer to an app-owned observer and retain its paired endpoint.
++/// The role is bound by this private capability for the idle period; its bytes
++/// only cancel retention. This channel never carries a native visit or wake.
++pub(crate) fn idle_owner_channel() -> io::Result<(IdleOwnerEvents, IdleOwnerNotices)> {
++    let (writer, reader) = UnixStream::pair()?;
++    Ok((IdleOwnerEvents(writer), IdleOwnerNotices(reader)))
++}
++
++impl IdleOwnerEvents {
++    pub(crate) fn cancel(&self, event: IdleOwnerEvent) -> io::Result<()> {
++        let byte: u8 = match event {
++            IdleOwnerEvent::Exit => b'X',
++            IdleOwnerEvent::Usb => b'U',
++            IdleOwnerEvent::Sleep => b'D',
++        };
++        loop {
++            let n = unsafe {
++                libc::send(
++                    self.0.as_raw_fd(),
++                    (&raw const byte).cast(),
++                    1,
++                    libc::MSG_DONTWAIT | libc::MSG_NOSIGNAL,
++                )
++            };
++            if n == 1 {
++                return Ok(());
++            }
++            if n == 0 {
++                return Err(io::ErrorKind::WriteZero.into());
++            }
++            let error = io::Error::last_os_error();
++            if error.kind() != io::ErrorKind::Interrupted {
++                return Err(error);
++            }
++        }
++    }
++}
++
++impl IdleOwnerNotices {
++    fn check(&self) -> Result<(), IdleEnd> {
++        let mut byte: u8 = 0;
++        loop {
++            let n = unsafe {
++                libc::recv(
++                    self.0.as_raw_fd(),
++                    (&raw mut byte).cast(),
++                    1,
++                    libc::MSG_DONTWAIT,
++                )
++            };
++            return Err(match n {
++                1 => match byte {
++                    b'X' => IdleEnd::Exit,
++                    b'U' => IdleEnd::Usb,
++                    b'D' => IdleEnd::Sleep,
++                    _ => IdleEnd::MonitorFailed,
++                },
++                0 => IdleEnd::OwnerLost,
++                -1 => match io::Error::last_os_error().kind() {
++                    io::ErrorKind::Interrupted => continue,
++                    io::ErrorKind::WouldBlock => return Ok(()),
++                    _ => IdleEnd::MonitorFailed,
++                },
++                _ => IdleEnd::MonitorFailed,
++            });
++        }
++    }
++}
++
++pub(crate) struct NativeLibraryIdle {
++    owner: IdleOwnerNotices,
++    timer: OwnedFd,
++    deadline: Duration,
++    next_sample: Duration,
++    memory: fn() -> Option<u64>,
++    end: Option<IdleEnd>,
++}
++
++impl NativeLibraryIdle {
++    /// Begin once when the worker enters confirmed Home, after all device I/O
++    /// and presentation ownership are released. Keep this instance across
++    /// rejected, timed-out, and otherwise incomplete Library visits.
++    pub(crate) fn start(owner: IdleOwnerNotices) -> Result<Self, IdleEnd> {
++        Self::start_with(owner, TTL, available_memory)
++    }
++
++    fn start_with(
++        owner: IdleOwnerNotices,
++        ttl: Duration,
++        memory: fn() -> Option<u64>,
++    ) -> Result<Self, IdleEnd> {
++        let entered = boottime()?;
++        let deadline = entered.checked_add(ttl).ok_or(IdleEnd::MonitorFailed)?;
++        let fd = unsafe {
++            libc::timerfd_create(libc::CLOCK_BOOTTIME, libc::TFD_CLOEXEC | libc::TFD_NONBLOCK)
++        };
++        if fd < 0 {
++            return Err(IdleEnd::MonitorFailed);
++        }
++        let mut idle = Self {
++            owner,
++            timer: unsafe { OwnedFd::from_raw_fd(fd) },
++            deadline,
++            next_sample: entered,
++            memory,
++            end: None,
++        };
++        idle.check(false)?;
++        Ok(idle)
++    }
++
++    /// Wait for a possible visit or a terminal idle condition. Listener readiness
++    /// has no admission meaning. The caller must independently verify a new visit.
++    pub(crate) fn wait_for_visit(&mut self, visits: &UnixListener) -> Result<(), IdleEnd> {
++        loop {
++            self.check(false)?;
++            let mut fds = [
++                poll_fd(self.owner.0.as_raw_fd()),
++                poll_fd(self.timer.as_raw_fd()),
++                poll_fd(visits.as_raw_fd()),
++            ];
++            let available = unsafe { libc::poll(fds.as_mut_ptr(), fds.len() as _, -1) };
++            if available < 0 {
++                if io::Error::last_os_error().kind() == io::ErrorKind::Interrupted {
++                    continue;
++                }
++                return self.latch(Err(IdleEnd::MonitorFailed));
++            }
++            self.check(false)?;
++            if fds.iter().any(|fd| fd.revents & libc::POLLNVAL != 0)
++                || fds[1..]
++                    .iter()
++                    .any(|fd| fd.revents & (libc::POLLERR | libc::POLLHUP) != 0)
++            {
++                return self.latch(Err(IdleEnd::MonitorFailed));
++            }
++            if fds[2].revents & libc::POLLIN != 0 {
++                return Ok(());
++            }
++        }
++    }
++
++    /// Recheck after the potentially slow native proof and immediately before
++    /// committing takeover. Doing this cannot grant a visit or extend idle time.
++    pub(crate) fn before_commit(&mut self) -> Result<(), IdleEnd> {
++        self.check(true)
++    }
++
++    fn check(&mut self, force_memory: bool) -> Result<(), IdleEnd> {
++        if let Some(end) = self.end {
++            return Err(end);
++        }
++        let result = self.check_current(force_memory);
++        self.latch(result)
++    }
++
++    fn check_current(&mut self, force_memory: bool) -> Result<(), IdleEnd> {
++        self.owner.check()?;
++        let now = boottime()?;
++        if now >= self.deadline {
++            return Err(IdleEnd::Expired);
++        }
++        if now >= self.next_sample || force_memory {
++            let value = (self.memory)().ok_or(IdleEnd::UnknownMemory)?;
++            if value < MIN_AVAILABLE_KIB {
++                return Err(IdleEnd::LowMemory);
++            }
++            self.owner.check()?;
++            let checked = boottime()?;
++            if checked >= self.deadline {
++                return Err(IdleEnd::Expired);
++            }
++            if now >= self.next_sample {
++                self.next_sample = checked
++                    .checked_add(SAMPLE_INTERVAL)
++                    .ok_or(IdleEnd::MonitorFailed)?;
++                self.arm(self.next_sample.min(self.deadline))?;
++            }
++        }
++        Ok(())
++    }
++
++    fn arm(&self, at: Duration) -> Result<(), IdleEnd> {
++        let spec = libc::itimerspec {
++            it_interval: libc::timespec {
++                tv_sec: 0,
++                tv_nsec: 0,
++            },
++            it_value: libc::timespec {
++                tv_sec: at
++                    .as_secs()
++                    .try_into()
++                    .map_err(|_| IdleEnd::MonitorFailed)?,
++                tv_nsec: at.subsec_nanos() as libc::c_long,
++            },
++        };
++        if unsafe {
++            libc::timerfd_settime(
++                self.timer.as_raw_fd(),
++                libc::TFD_TIMER_ABSTIME,
++                &spec,
++                std::ptr::null_mut(),
++            )
++        } != 0
++        {
++            return Err(IdleEnd::MonitorFailed);
++        }
++        Ok(())
++    }
++
++    fn latch(&mut self, result: Result<(), IdleEnd>) -> Result<(), IdleEnd> {
++        if let Err(end) = result {
++            self.end = Some(end);
++        }
++        result
++    }
++}
++
++fn poll_fd(fd: libc::c_int) -> libc::pollfd {
++    libc::pollfd {
++        fd,
++        events: libc::POLLIN,
++        revents: 0,
++    }
++}
++
++fn boottime() -> Result<Duration, IdleEnd> {
++    let mut time = libc::timespec {
++        tv_sec: 0,
++        tv_nsec: 0,
++    };
++    if unsafe { libc::clock_gettime(libc::CLOCK_BOOTTIME, &mut time) } != 0
++        || time.tv_sec < 0
++        || !(0..1_000_000_000).contains(&time.tv_nsec)
++    {
++        return Err(IdleEnd::MonitorFailed);
++    }
++    Ok(Duration::new(time.tv_sec as u64, time.tv_nsec as u32))
++}
++
++fn available_memory() -> Option<u64> {
++    let mut text = String::new();
++    File::open("/proc/meminfo")
++        .ok()?
++        .take(32 * 1024 + 1)
++        .read_to_string(&mut text)
++        .ok()?;
++    (text.len() <= 32 * 1024)
++        .then(|| memory_from(&text))
++        .flatten()
++}
++
++fn memory_from(text: &str) -> Option<u64> {
++    let mut entries = text
++        .lines()
++        .filter_map(|line| line.strip_prefix("MemAvailable:"));
++    let mut fields = entries.next()?.split_ascii_whitespace();
++    let number = fields.next()?;
++    if !number.bytes().all(|b| b.is_ascii_digit())
++        || fields.next() != Some("kB")
++        || fields.next().is_some()
++        || entries.next().is_some()
++    {
++        return None;
++    }
++    number.parse().ok()
++}
++
++#[cfg(test)]
++mod tests {
++    use super::*;
++    use std::{
++        os::{linux::net::SocketAddrExt, unix::net::SocketAddr},
++        sync::atomic::{AtomicU32, Ordering},
++    };
++
++    fn listener() -> (UnixListener, SocketAddr) {
++        static NEXT: AtomicU32 = AtomicU32::new(0);
++        let address = SocketAddr::from_abstract_name(format!(
++            "aidoku.idle-test.{}.{}",
++            std::process::id(),
++            NEXT.fetch_add(1, Ordering::Relaxed)
++        ))
++        .unwrap();
++        (UnixListener::bind_addr(&address).unwrap(), address)
++    }
++
++    fn healthy() -> Option<u64> {
++        Some(MIN_AVAILABLE_KIB)
++    }
++
++    #[test]
++    fn initial_deadline_survives_repeated_unadmitted_connections() {
++        let (_observer, owner) = idle_owner_channel().unwrap();
++        let mut idle =
++            NativeLibraryIdle::start_with(owner, Duration::from_secs(2), healthy).unwrap();
++        let deadline = idle.deadline;
++        let (visits, address) = listener();
++        for _ in 0..3 {
++            let _unadmitted = UnixStream::connect_addr(&address).unwrap();
++            idle.wait_for_visit(&visits).unwrap();
++            drop(visits.accept().unwrap());
++            assert_eq!(deadline, idle.deadline);
++        }
++        assert_eq!(idle.wait_for_visit(&visits), Err(IdleEnd::Expired));
++        assert_eq!(idle.before_commit(), Err(IdleEnd::Expired));
++    }
++
++    #[test]
++    fn trusted_signals_interrupt_idle_even_with_a_ready_visit() {
++        for (event, expected) in [
++            (IdleOwnerEvent::Exit, IdleEnd::Exit),
++            (IdleOwnerEvent::Usb, IdleEnd::Usb),
++            (IdleOwnerEvent::Sleep, IdleEnd::Sleep),
++        ] {
++            let (observer, owner) = idle_owner_channel().unwrap();
++            let mut idle = NativeLibraryIdle::start_with(owner, TTL, healthy).unwrap();
++            let (visits, address) = listener();
++            observer.cancel(event).unwrap();
++            let _arrival = UnixStream::connect_addr(&address).unwrap();
++            assert_eq!(idle.wait_for_visit(&visits), Err(expected));
++            assert_eq!(idle.before_commit(), Err(expected));
++        }
++    }
++
++    #[test]
++    fn receiving_peer_loss_interrupts_a_blocked_wait() {
++        let (observer, owner) = idle_owner_channel().unwrap();
++        let mut idle = NativeLibraryIdle::start_with(owner, TTL, healthy).unwrap();
++        let (visits, _) = listener();
++        let waiting = std::thread::spawn(move || idle.wait_for_visit(&visits));
++        drop(observer);
++        assert_eq!(waiting.join().unwrap(), Err(IdleEnd::OwnerLost));
++    }
++
++    #[test]
++    fn pressure_is_resampled_while_idle_without_a_visit() {
++        static AVAILABLE: AtomicU32 = AtomicU32::new(MIN_AVAILABLE_KIB as u32);
++        let (_observer, owner) = idle_owner_channel().unwrap();
++        let mut idle = NativeLibraryIdle::start_with(owner, TTL, || {
++            Some(AVAILABLE.load(Ordering::Relaxed).into())
++        })
++        .unwrap();
++        AVAILABLE.store(MIN_AVAILABLE_KIB as u32 - 1, Ordering::Relaxed);
++        let (visits, _) = listener();
++        assert_eq!(idle.wait_for_visit(&visits), Err(IdleEnd::LowMemory));
++    }
++
++    #[test]
++    fn unknown_memory_never_starts_idle() {
++        let (_observer, owner) = idle_owner_channel().unwrap();
++        assert!(matches!(
++            NativeLibraryIdle::start_with(owner, TTL, || None),
++            Err(IdleEnd::UnknownMemory)
++        ));
++        assert_eq!(memory_from("MemAvailable: 49152 kB\n"), healthy());
++        assert_eq!(memory_from("MemFree: 49152 kB\n"), None);
++        assert_eq!(memory_from("MemAvailable: 49152 bytes\n"), None);
++        assert_eq!(
++            memory_from("MemAvailable: 49152 kB\nMemAvailable: 1 kB\n"),
++            None
++        );
++    }
++
++    #[test]
++    #[ignore = "uses the full 45-second production idle deadline"]
++    fn production_home_deadline_expires_after_45_seconds() {
++        let (_observer, owner) = idle_owner_channel().unwrap();
++        let started = boottime().unwrap();
++        let mut idle = NativeLibraryIdle::start(owner).unwrap();
++        let (visits, _) = listener();
++        assert_eq!(idle.wait_for_visit(&visits), Err(IdleEnd::Expired));
++        let elapsed = boottime().unwrap() - started;
++        assert!(elapsed >= TTL);
++        println!("production_boottime_elapsed_ms={}", elapsed.as_millis());
++    }
++}
+diff --git a/src/native_library_wait.rs b/src/native_library_wait.rs
+new file mode 100644
+index 0000000..59002f5
+--- /dev/null
++++ b/src/native_library_wait.rs
+@@ -0,0 +1,157 @@
++//! Link one newly admitted native Library visit to its eventual stock restoration.
++//!
++//! The listener's owner checks freshness, idle expiry, and current native ownership.
++//! This module checks the route and retains the very socket used by that check.
++
++use crate::native_library_visit::{self, NativeLibraryVisit, ProcessBirth};
++use std::{
++    io::{self, Read},
++    os::{fd::AsRawFd, unix::net::UnixStream},
++    time::Duration,
++};
++
++const ADMITTED: u8 = b'A';
++const SETTLED: u8 = b'S';
++
++pub(crate) struct PendingLibraryWaiter {
++    stream: UnixStream,
++    visit: NativeLibraryVisit,
++}
++
++impl PendingLibraryWaiter {
++    pub(crate) fn observe(stream: UnixStream) -> io::Result<Self> {
++        let visit = native_library_visit::observe(&stream)?;
++        Ok(Self { stream, visit })
++    }
++
++    pub(crate) fn key(&self) -> ProcessBirth {
++        self.visit.su
++    }
++
++    /// Call once after the launcher has reserved this unused visit key. The
++    /// final checks run after route revalidation and must include the current
++    /// idle gate and native ownership prerequisites. No bytes from the waiter
++    /// can grant ownership or cause a wake.
++    pub(crate) fn admit(
++        self,
++        confirm_after_proof: impl FnOnce() -> io::Result<()>,
++    ) -> io::Result<ActiveLibraryWaiter> {
++        self.visit.revalidate(&self.stream)?;
++        confirm_after_proof()?;
++        send(&self.stream, ADMITTED)?;
++        Ok(ActiveLibraryWaiter(self.stream))
++    }
++}
++
++pub(crate) struct ActiveLibraryWaiter(UnixStream);
++
++impl ActiveLibraryWaiter {
++    pub(crate) fn connected(&self) -> io::Result<bool> {
++        let mut fd = libc::pollfd {
++            fd: self.0.as_raw_fd(),
++            events: libc::POLLRDHUP,
++            revents: 0,
++        };
++        if unsafe { libc::poll(&mut fd, 1, 0) } < 0 {
++            return Err(io::Error::last_os_error());
++        }
++        Ok(fd.revents & (libc::POLLERR | libc::POLLHUP | libc::POLLNVAL | libc::POLLRDHUP) == 0)
++    }
++
++    /// Consume the visit after native display and input have been restored. Dropping
++    /// an active visit without this acknowledgement reports a lost visit to its waiter.
++    pub(crate) fn settle(self) -> io::Result<()> {
++        send(&self.0, SETTLED)
++    }
++}
++
++#[derive(Debug, Eq, PartialEq)]
++pub(crate) enum WaitOutcome {
++    Unadmitted,
++    Settled,
++}
++
++/// Wait on a connection to the caller's authenticated app-private supervisor.
++/// An error after admission must not be interpreted as permission to cold-start.
++pub(crate) fn wait_for_settlement(
++    mut stream: UnixStream,
++    admission_timeout: Duration,
++) -> io::Result<WaitOutcome> {
++    stream.set_nonblocking(false)?;
++    stream.set_read_timeout(Some(admission_timeout))?;
++    match receive(&mut stream)? {
++        None => return Ok(WaitOutcome::Unadmitted),
++        Some(ADMITTED) => (),
++        Some(_) => return Err(io::ErrorKind::InvalidData.into()),
++    }
++    stream.set_read_timeout(None)?;
++    match receive(&mut stream)? {
++        Some(SETTLED) => Ok(WaitOutcome::Settled),
++        None => Err(io::ErrorKind::ConnectionAborted.into()),
++        Some(_) => Err(io::ErrorKind::InvalidData.into()),
++    }
++}
++
++fn receive(stream: &mut UnixStream) -> io::Result<Option<u8>> {
++    loop {
++        let mut byte = 0;
++        match stream.read(std::slice::from_mut(&mut byte)) {
++            Ok(0) => return Ok(None),
++            Ok(_) => return Ok(Some(byte)),
++            Err(error) if error.kind() == io::ErrorKind::Interrupted => (),
++            Err(error) => return Err(error),
++        }
++    }
++}
++
++fn send(stream: &UnixStream, byte: u8) -> io::Result<()> {
++    loop {
++        let written = unsafe {
++            libc::send(
++                stream.as_raw_fd(),
++                (&raw const byte).cast(),
++                1,
++                libc::MSG_DONTWAIT | libc::MSG_NOSIGNAL,
++            )
++        };
++        match written {
++            1 => return Ok(()),
++            -1 => {
++                let error = io::Error::last_os_error();
++                if error.kind() != io::ErrorKind::Interrupted {
++                    return Err(error);
++                }
++            }
++            _ => return Err(io::ErrorKind::WriteZero.into()),
++        }
++    }
++}
++
++#[cfg(test)]
++mod tests {
++    use super::*;
++
++    #[test]
++    fn admitted_waiter_returns_only_after_its_own_settlement() {
++        // Test the responses of two independently admitted visits without creating
++        // a native admission profile or impersonating a stock process.
++        let (first_server, first_client) = UnixStream::pair().unwrap();
++        let (next_server, next_client) = UnixStream::pair().unwrap();
++        let wait = |stream| {
++            std::thread::spawn(move || wait_for_settlement(stream, Duration::from_secs(2)))
++        };
++        let first = wait(first_client);
++        let next = wait(next_client);
++        send(&first_server, ADMITTED).unwrap();
++        send(&next_server, ADMITTED).unwrap();
++        let first_active = ActiveLibraryWaiter(first_server);
++        let next_active = ActiveLibraryWaiter(next_server);
++        assert!(first_active.connected().unwrap());
++        assert!(next_active.connected().unwrap());
++        first_active.settle().unwrap();
++        assert_eq!(first.join().unwrap().unwrap(), WaitOutcome::Settled);
++        assert!(!next.is_finished());
++        next_active.settle().unwrap();
++        assert_eq!(next.join().unwrap().unwrap(), WaitOutcome::Settled);
++    }
++}

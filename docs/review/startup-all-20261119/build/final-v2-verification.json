@@ -1,0 +1,68 @@
+{
+  "baseline": {
+    "revision": "c6867d174792cbcc71dab7f59c52570f8ddd8911",
+    "source_sha256": "1c7909c4efefd88d80cdacab12f1e832fa0533f3b62ef094cd956f16ca75f768"
+  },
+  "build_and_test_inputs_sha256": "4f4c0a487ba9391aa64551fefc8bcc17b0e646ada09bf83882234f0307330343",
+  "build_receipt_sha256": "8fe4362b2b0e3d12ac51047d22740cd9deae051b7a5431aae471ab6b8cf8b786",
+  "desktop_sha256": "97acfaa6741e1b8b24fcc87351b0e3fcb4b528d2b08dba4cc2cc22f87a2f15b9",
+  "host_suites": {
+    "aidoku": {
+      "failed": "0",
+      "ignored": "0",
+      "passed": "22",
+      "result": "ok"
+    },
+    "aidoku_kindle": {
+      "failed": "0",
+      "ignored": "6",
+      "passed": "852",
+      "result": "ok"
+    },
+    "sleep_screen_ui": {
+      "failed": "1",
+      "ignored": "0",
+      "passed": "0",
+      "result": "FAILED"
+    }
+  },
+  "label": "final-v2",
+  "program_sha256": {
+    "aidoku/app/aidoku": "1b1c508e1ee84a4be3bd0c15bcf6d42bdd492d688f3fa81b065fb256e00dd3af",
+    "aidoku/app/aidoku-startup-portrait": "bde28cd5953d26b0dc3bfebe16fcfe1cde329021c17449edae7c59470376ed50",
+    "aidoku/launch.sh": "2b0d6e8ee76076c1f14e92dae97a505b40f0a78e07cec78cdea23ec59398bae5"
+  },
+  "same_failure_on_installed_baseline": {
+    "remaining_sleep_scenes_not_reached": true,
+    "report": "sleep-baseline-control.json",
+    "sha256": "dd406eadada61fea1d14f1059f5908c95c9c873c93f31cff39f126c87d2da121"
+  },
+  "scope": "Host builds and tests. The standalone sleep UI integration failed on both revisions. Physical Kindle qualification and release are separate.",
+  "settings_ui": {
+    "by_profile": {
+      "pw5": {
+        "cases": 15,
+        "checks": 408
+      },
+      "scribe": {
+        "cases": 14,
+        "checks": 385
+      }
+    },
+    "cases": 29,
+    "checks": 793,
+    "passed": true,
+    "report_sha256": "18a24d608f647bfa28881c9786643c631141314f1ce893a29bb648df1894d45a"
+  },
+  "source_archive_sha256": "862040ed5e8f24212570006a8821ca659d086ad13e905b6696f8f62e06bb7534",
+  "source_file_count": 369,
+  "source_manifest_sha256": "28c1bb314e12fe5689b401ca23cf932a91c138f5763c4c1ea18d454f41c990cf",
+  "toolchain": {
+    "cargo_jobs": 6,
+    "release_codegen_units": 16,
+    "release_lto": false,
+    "rustc": "1.99.1",
+    "zig": "0.15.2"
+  },
+  "whole_host_suite_passed": false
+}

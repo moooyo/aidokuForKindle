@@ -1,0 +1,48 @@
+{
+  "execution_environment": "ssh test-env",
+  "scope": "App-private Linux process, wait protocol, and Home idle gate",
+  "physical_device_used": false,
+  "shared_device_lease_taken": false,
+  "stock_registration_changed": false,
+  "packaged_launcher_changed": false,
+  "qualified_native_document_profile": false,
+  "guardian": {
+    "passed": 5,
+    "checks": [
+      "Normal worker exit status reaches the original waiter",
+      "First waiter settles while worker PID, birth, and direct parent remain stable",
+      "Uncatchable waiter retirement leaves the same direct parent and live worker",
+      "Catchable cancellation waits for worker cleanup",
+      "Guardian loss delivers parent-death cleanup to the worker"
+    ],
+    "idle_descriptors_after_settlement": ["internal notification pipe read end", "internal notification pipe write end"]
+  },
+  "rust_host": {
+    "passed": 8,
+    "includes_existing_observer_tests": 2,
+    "fresh_visit_transport": "Independent acknowledged connections settle independently",
+    "rule_without_qualified_profile": "Native observer fails closed",
+    "idle_conditions_verified": [
+      "Repeated unadmitted connections preserve the initial deadline",
+      "Exit, USB, and a new sleep event cancel even with a ready connection",
+      "Owner peer loss interrupts an idle wait",
+      "Low available memory is resampled without a visit",
+      "Unknown or malformed memory information fails closed"
+    ]
+  },
+  "full_deadline_host": {
+    "passed": true,
+    "clock": "CLOCK_BOOTTIME",
+    "configured_ms": 45000,
+    "observed_ms": 45000,
+    "used_production_policy": true
+  },
+  "arm": {
+    "c_helper_built": true,
+    "elf": "ARM EABI5 PIE",
+    "libc_maximum_symbol_requirement": "GLIBC_2.4",
+    "rust_typecheck_target": "armv7-unknown-linux-musleabihf",
+    "rust_typecheck_passed": true,
+    "physical_runtime_verified": false
+  }
+}

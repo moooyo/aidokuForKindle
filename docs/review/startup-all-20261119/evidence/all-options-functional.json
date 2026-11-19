@@ -1,0 +1,81 @@
+{
+  "group": "all-options-functional",
+  "revision": "r1",
+  "phase": "qualify",
+  "valid": true,
+  "batches": [
+    {
+      "run": "aidoku-all-all-options-c834c5dd",
+      "guards": {
+        "success": true,
+        "lease_released": true,
+        "same_boot": true,
+        "native_restored": true,
+        "entry_restored": true,
+        "installed_and_user_unchanged": true,
+        "input_roster_unchanged": true
+      }
+    }
+  ],
+  "status": "qualified_without_speed_claim",
+  "arms": {
+    "baseline": {
+      "elf": "3ef03a4124970139fe46d3873c4b9fc7d5cd25af55e66482e497dca46b584375",
+      "launcher": "2b0d6e8ee76076c1f14e92dae97a505b40f0a78e07cec78cdea23ec59398bae5",
+      "options": {}
+    },
+    "candidate": {
+      "elf": "3ef03a4124970139fe46d3873c4b9fc7d5cd25af55e66482e497dca46b584375",
+      "launcher": "2b0d6e8ee76076c1f14e92dae97a505b40f0a78e07cec78cdea23ec59398bae5",
+      "options": {
+        "first_layout": "optimized",
+        "import_thumbnail": "idle",
+        "last_cover_grace": "on",
+        "portrait": "native",
+        "prewarm": "2",
+        "resident": "45"
+      }
+    }
+  },
+  "observed": [
+    {
+      "side": "baseline",
+      "selection": {
+        "portrait": "shell",
+        "prewarm": "0",
+        "last_cover_grace": "off",
+        "first_layout": "optimized",
+        "import_thumbnail": "idle",
+        "resident": "off"
+      },
+      "portrait_execution": "shell",
+      "recorded": true,
+      "ordinary_exit": true,
+      "attempted_prewarm": 0,
+      "consumed_prewarm": 0,
+      "grace_started": 0,
+      "intermediate_cover_frames": 1
+    },
+    {
+      "side": "candidate",
+      "selection": {
+        "portrait": "native",
+        "prewarm": "2",
+        "last_cover_grace": "on",
+        "first_layout": "optimized",
+        "import_thumbnail": "idle",
+        "resident": "45"
+      },
+      "portrait_execution": "native",
+      "recorded": true,
+      "ordinary_exit": true,
+      "attempted_prewarm": 0,
+      "consumed_prewarm": 0,
+      "grace_started": 0,
+      "intermediate_cover_frames": 1
+    }
+  ],
+  "matched_body": true,
+  "matched_right_status_bar": true,
+  "scope": "Same integrated release on both sides. Proves joint setting selection and compatible normal entry/exit. Not import economics, actual keeper reacquisition or same-GUI return, and not a latency comparison."
+}

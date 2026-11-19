@@ -1,0 +1,265 @@
+{
+  "group": "defaults-warm",
+  "workload": "warm",
+  "phase": "pilot",
+  "valid": false,
+  "revision": "r1",
+  "arms": {
+    "baseline": {
+      "elf": "9d92dc4cd01005a6ba2f48fe61786e5df5570c43feb5709fe3159bb164807d0f",
+      "launcher": "10432125b74ab5b69c8a0ec54a34abd5a74dc4a3cc9ed9b9d5cc8d03bbd75296",
+      "options": {}
+    },
+    "candidate": {
+      "elf": "3ef03a4124970139fe46d3873c4b9fc7d5cd25af55e66482e497dca46b584375",
+      "launcher": "2b0d6e8ee76076c1f14e92dae97a505b40f0a78e07cec78cdea23ec59398bae5",
+      "options": {}
+    }
+  },
+  "mechanism_observed": false,
+  "gates": {
+    "protection": null,
+    "latency": null,
+    "pixels": null
+  },
+  "status": "invalid_observations",
+  "mechanism": {
+    "baseline": {
+      "cold_source_validated_jobs": 0,
+      "grace_cancelled": 0,
+      "grace_completed_single_frame_runs": 0,
+      "grace_expired": 0,
+      "grace_started_runs": 0,
+      "intermediate_cover_frames": 1,
+      "observed": 1,
+      "planned": 1,
+      "prewarm_attempted_runs": 0,
+      "prewarm_plans": 0,
+      "prewarm_ready": 0,
+      "prewarm_usable_runs": 0,
+      "prewarm_zero_attempt_runs": 1,
+      "toolbar_fallbacks": 0,
+      "toolbar_hits": 1,
+      "layouts": {
+        "unmarked": 1
+      },
+      "portrait_engines": {
+        "unmarked": 1
+      }
+    },
+    "candidate": {
+      "cold_source_validated_jobs": 0,
+      "grace_cancelled": 0,
+      "grace_completed_single_frame_runs": 0,
+      "grace_expired": 0,
+      "grace_started_runs": 0,
+      "intermediate_cover_frames": 1,
+      "observed": 1,
+      "planned": 1,
+      "prewarm_attempted_runs": 0,
+      "prewarm_plans": 0,
+      "prewarm_ready": 0,
+      "prewarm_usable_runs": 0,
+      "prewarm_zero_attempt_runs": 1,
+      "toolbar_fallbacks": 0,
+      "toolbar_hits": 1,
+      "layouts": {
+        "batched": 1
+      },
+      "portrait_engines": {
+        "shell": 1
+      }
+    }
+  },
+  "batches": [
+    {
+      "run": "aidoku-all-joint-pilot-14aec612",
+      "mode": "pilot",
+      "guards": {
+        "success": true,
+        "lease_released": true,
+        "same_boot": true,
+        "native_restored": true,
+        "entry_restored": true,
+        "installed_and_user_unchanged": true,
+        "input_roster_unchanged": true
+      }
+    }
+  ],
+  "pair_data": [
+    {
+      "run": "aidoku-all-joint-pilot-14aec612",
+      "round": 1,
+      "order": "AB",
+      "complete": true,
+      "usable": [
+        2100.268,
+        2212.643,
+        -112.375
+      ],
+      "covers": [
+        2839.18,
+        2936.457,
+        -97.277
+      ],
+      "exit": [
+        3582.593,
+        3402.609,
+        179.984
+      ],
+      "intermediate_frames": [
+        1,
+        1
+      ],
+      "cover_job_ms_by_ordinal": [
+        [
+          67.982,
+          75.509,
+          -7.527
+        ],
+        [
+          74.017,
+          74.579,
+          -0.562
+        ],
+        [
+          53.765,
+          59.08,
+          -5.315
+        ],
+        [
+          48.152,
+          57.537,
+          -9.385
+        ],
+        [
+          154.504,
+          87.941,
+          66.563
+        ],
+        [
+          45.399,
+          55.246,
+          -9.847
+        ]
+      ],
+      "cover_tail_ms": [
+        738.927,
+        723.836,
+        15.091
+      ],
+      "serial_cover_jobs_ms": [
+        443.81899999999996,
+        409.892,
+        33.927
+      ]
+    }
+  ],
+  "reason": "frozen_plan_mismatch",
+  "summary_ms": {
+    "usable": {
+      "a_median": 2100.268,
+      "b_median": 2212.643,
+      "difference_of_medians": -112.375,
+      "median_paired_saving": -112.375,
+      "positive_pairs": 0,
+      "range_of_paired_savings": [
+        -112.375,
+        -112.375
+      ],
+      "by_order": {
+        "AB": -112.375
+      }
+    },
+    "covers": {
+      "a_median": 2839.18,
+      "b_median": 2936.457,
+      "difference_of_medians": -97.277,
+      "median_paired_saving": -97.277,
+      "positive_pairs": 0,
+      "range_of_paired_savings": [
+        -97.277,
+        -97.277
+      ],
+      "by_order": {
+        "AB": -97.277
+      }
+    },
+    "exit": {
+      "a_median": 3582.593,
+      "b_median": 3402.609,
+      "difference_of_medians": 179.984,
+      "median_paired_saving": 179.984,
+      "positive_pairs": 1,
+      "range_of_paired_savings": [
+        179.984,
+        179.984
+      ],
+      "by_order": {
+        "AB": 179.984
+      }
+    }
+  },
+  "phase_ms": {
+    "request_to_launcher_bridge": [
+      450.0,
+      490.0,
+      -40.0
+    ],
+    "launcher_entry_to_worker": [
+      170.0,
+      130.0,
+      40.0
+    ],
+    "observer_start_to_ready": [
+      50.0,
+      120.0,
+      -70.0
+    ],
+    "portrait_outer": [
+      270.0,
+      290.0,
+      -20.0
+    ],
+    "display_takeover": [
+      100.0,
+      100.0,
+      0.0
+    ],
+    "initial_send_to_input": [
+      368.168,
+      360.875,
+      7.293
+    ],
+    "first_library_view": [
+      39.644,
+      32.721,
+      6.923
+    ],
+    "first_render": [
+      166.468,
+      168.792,
+      -2.324
+    ],
+    "first_to_all_covers": [
+      738.927,
+      723.836,
+      15.091
+    ],
+    "serial_visible_cover_jobs": [
+      443.819,
+      409.892,
+      33.927
+    ],
+    "complete_cover_render": [
+      53.011,
+      69.001,
+      -15.99
+    ],
+    "complete_cover_prior_buffer_settle": [
+      0.015,
+      19.546,
+      -19.531
+    ]
+  }
+}

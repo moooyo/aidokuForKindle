@@ -1,0 +1,445 @@
+{
+  "passed": true,
+  "environment": "test-env, Linux /bin/sh and a host build of the exact Rust module",
+  "scope": "Configuration parity for the portrait key, launcher-only diagnostic overrides, full Library waiter/worker with mocked services and app, native fault fixtures; no Kindle access or performance assertion.",
+  "sha256": {
+    "candidate_arm": "3ef03a4124970139fe46d3873c4b9fc7d5cd25af55e66482e497dca46b584375",
+    "portrait_arm": "bde28cd5953d26b0dc3bfebe16fcfe1cde329021c17449edae7c59470376ed50",
+    "packaging/kindle/launch.sh": "2b0d6e8ee76076c1f14e92dae97a505b40f0a78e07cec78cdea23ec59398bae5",
+    "src/startup_options.rs": "0b980f4a43bac07a1a934ad69792f18fffe3f0926fe48a10cee23803f5219406",
+    "src/native_query/startup_portrait.c": "6d2135d1734b918de206544bfdf489137f8c97cb622be76271703f67b377fb45",
+    "packaging/tests/startup_portrait_supervisor_test.py": "8d3fcaf7c2de90d5468d17d1facd9fbaae437c1f5a3af86c1021345b20caf01d",
+    "packaging/tests/launcher_test.py": "78323cfbe8fd397d8506affa5ff0ae0844bce63a4a2ff9eac3d660f4a6c1e47f",
+    "check_host.py": "5dbbf347c2a6d9fe79ec5cf742025e23f2e6e29eba7f0968ac7d6b8aca251669"
+  },
+  "file_cases": [
+    {
+      "case": "empty",
+      "bytes": 0,
+      "saved_portrait_stdout": "portrait=shell",
+      "selector_stdout": "shell"
+    },
+    {
+      "case": "native",
+      "bytes": 16,
+      "saved_portrait_stdout": "portrait=native",
+      "selector_stdout": "native"
+    },
+    {
+      "case": "shell",
+      "bytes": 15,
+      "saved_portrait_stdout": "portrait=shell",
+      "selector_stdout": "shell"
+    },
+    {
+      "case": "all-six",
+      "bytes": 103,
+      "saved_portrait_stdout": "portrait=native",
+      "selector_stdout": "native"
+    },
+    {
+      "case": "only-other-settings",
+      "bytes": 22,
+      "saved_portrait_stdout": "portrait=shell",
+      "selector_stdout": "shell"
+    },
+    {
+      "case": "unknown-key",
+      "bytes": 22,
+      "saved_portrait_stdout": "portrait=shell",
+      "selector_stdout": "shell"
+    },
+    {
+      "case": "unknown-key-with-known",
+      "bytes": 20,
+      "saved_portrait_stdout": "portrait=native",
+      "selector_stdout": "native"
+    },
+    {
+      "case": "unknown-value",
+      "bytes": 14,
+      "saved_portrait_stdout": "portrait=shell",
+      "selector_stdout": "shell"
+    },
+    {
+      "case": "blank-value",
+      "bytes": 10,
+      "saved_portrait_stdout": "portrait=shell",
+      "selector_stdout": "shell"
+    },
+    {
+      "case": "extra-equals",
+      "bytes": 22,
+      "saved_portrait_stdout": "portrait=shell",
+      "selector_stdout": "shell"
+    },
+    {
+      "case": "leading-space",
+      "bytes": 17,
+      "saved_portrait_stdout": "portrait=shell",
+      "selector_stdout": "shell"
+    },
+    {
+      "case": "trailing-space",
+      "bytes": 17,
+      "saved_portrait_stdout": "portrait=shell",
+      "selector_stdout": "shell"
+    },
+    {
+      "case": "case-sensitive",
+      "bytes": 16,
+      "saved_portrait_stdout": "portrait=shell",
+      "selector_stdout": "shell"
+    },
+    {
+      "case": "malformed-unrelated-line",
+      "bytes": 29,
+      "saved_portrait_stdout": "portrait=native",
+      "selector_stdout": "native"
+    },
+    {
+      "case": "final-no-lf",
+      "bytes": 15,
+      "saved_portrait_stdout": "portrait=native",
+      "selector_stdout": "native"
+    },
+    {
+      "case": "duplicate-native",
+      "bytes": 32,
+      "saved_portrait_stdout": "portrait=shell",
+      "selector_stdout": "shell"
+    },
+    {
+      "case": "conflicting-duplicate",
+      "bytes": 31,
+      "saved_portrait_stdout": "portrait=shell",
+      "selector_stdout": "shell"
+    },
+    {
+      "case": "invalid-then-native",
+      "bytes": 31,
+      "saved_portrait_stdout": "portrait=shell",
+      "selector_stdout": "shell"
+    },
+    {
+      "case": "three-portraits",
+      "bytes": 48,
+      "saved_portrait_stdout": "portrait=shell",
+      "selector_stdout": "shell"
+    },
+    {
+      "case": "duplicate-other-key",
+      "bytes": 36,
+      "saved_portrait_stdout": "portrait=native",
+      "selector_stdout": "native"
+    },
+    {
+      "case": "control-crlf",
+      "bytes": 17,
+      "saved_portrait_stdout": "portrait=shell",
+      "selector_stdout": "shell"
+    },
+    {
+      "case": "control-tab-after",
+      "bytes": 22,
+      "saved_portrait_stdout": "portrait=shell",
+      "selector_stdout": "shell"
+    },
+    {
+      "case": "nul-inline",
+      "bytes": 17,
+      "saved_portrait_stdout": "portrait=shell",
+      "selector_stdout": "shell"
+    },
+    {
+      "case": "nul-after-valid",
+      "bytes": 17,
+      "saved_portrait_stdout": "portrait=shell",
+      "selector_stdout": "shell"
+    },
+    {
+      "case": "byte-del",
+      "bytes": 17,
+      "saved_portrait_stdout": "portrait=shell",
+      "selector_stdout": "shell"
+    },
+    {
+      "case": "non-ascii",
+      "bytes": 18,
+      "saved_portrait_stdout": "portrait=shell",
+      "selector_stdout": "shell"
+    },
+    {
+      "case": "boundary-1023",
+      "bytes": 1023,
+      "saved_portrait_stdout": "portrait=native",
+      "selector_stdout": "native"
+    },
+    {
+      "case": "boundary-1024",
+      "bytes": 1024,
+      "saved_portrait_stdout": "portrait=native",
+      "selector_stdout": "native"
+    },
+    {
+      "case": "boundary-1025",
+      "bytes": 1025,
+      "saved_portrait_stdout": "portrait=shell",
+      "selector_stdout": "shell"
+    },
+    {
+      "case": "late-duplicate-at-limit",
+      "bytes": 1024,
+      "saved_portrait_stdout": "portrait=shell",
+      "selector_stdout": "shell"
+    },
+    {
+      "case": "inert-shell-text",
+      "bytes": 26,
+      "saved_portrait_stdout": "portrait=shell",
+      "selector_stdout": "shell"
+    },
+    {
+      "case": "missing",
+      "bytes": null,
+      "saved_portrait_stdout": "portrait=shell",
+      "selector_stdout": "shell"
+    },
+    {
+      "case": "symlink",
+      "bytes": null,
+      "saved_portrait_stdout": "portrait=shell",
+      "selector_stdout": "shell"
+    },
+    {
+      "case": "dangling-symlink",
+      "bytes": null,
+      "saved_portrait_stdout": "portrait=shell",
+      "selector_stdout": "shell"
+    },
+    {
+      "case": "directory",
+      "bytes": null,
+      "saved_portrait_stdout": "portrait=shell",
+      "selector_stdout": "shell"
+    },
+    {
+      "case": "fifo",
+      "bytes": null,
+      "saved_portrait_stdout": "portrait=shell",
+      "selector_stdout": "shell"
+    }
+  ],
+  "overrides": [
+    {
+      "file": "native",
+      "override": "",
+      "saved_portrait_stdout": "portrait=native",
+      "selector_stdout": "native"
+    },
+    {
+      "file": "native",
+      "override": "native",
+      "saved_portrait_stdout": "portrait=native",
+      "selector_stdout": "native"
+    },
+    {
+      "file": "native",
+      "override": "shell",
+      "saved_portrait_stdout": "portrait=native",
+      "selector_stdout": "shell"
+    },
+    {
+      "file": "native",
+      "override": "legacy",
+      "saved_portrait_stdout": "portrait=native",
+      "selector_stdout": "shell"
+    },
+    {
+      "file": "native",
+      "override": "unknown",
+      "saved_portrait_stdout": "portrait=native",
+      "selector_stdout": "shell"
+    },
+    {
+      "file": "native",
+      "override": "Native",
+      "saved_portrait_stdout": "portrait=native",
+      "selector_stdout": "shell"
+    },
+    {
+      "file": "shell",
+      "override": "",
+      "saved_portrait_stdout": "portrait=shell",
+      "selector_stdout": "shell"
+    },
+    {
+      "file": "shell",
+      "override": "native",
+      "saved_portrait_stdout": "portrait=shell",
+      "selector_stdout": "native"
+    },
+    {
+      "file": "shell",
+      "override": "shell",
+      "saved_portrait_stdout": "portrait=shell",
+      "selector_stdout": "shell"
+    },
+    {
+      "file": "shell",
+      "override": "legacy",
+      "saved_portrait_stdout": "portrait=shell",
+      "selector_stdout": "shell"
+    },
+    {
+      "file": "shell",
+      "override": "unknown",
+      "saved_portrait_stdout": "portrait=shell",
+      "selector_stdout": "shell"
+    },
+    {
+      "file": "shell",
+      "override": "Native",
+      "saved_portrait_stdout": "portrait=shell",
+      "selector_stdout": "shell"
+    },
+    {
+      "file": "missing",
+      "override": "",
+      "saved_portrait_stdout": "portrait=shell",
+      "selector_stdout": "shell"
+    },
+    {
+      "file": "missing",
+      "override": "native",
+      "saved_portrait_stdout": "portrait=shell",
+      "selector_stdout": "native"
+    },
+    {
+      "file": "missing",
+      "override": "shell",
+      "saved_portrait_stdout": "portrait=shell",
+      "selector_stdout": "shell"
+    },
+    {
+      "file": "missing",
+      "override": "legacy",
+      "saved_portrait_stdout": "portrait=shell",
+      "selector_stdout": "shell"
+    },
+    {
+      "file": "missing",
+      "override": "unknown",
+      "saved_portrait_stdout": "portrait=shell",
+      "selector_stdout": "shell"
+    },
+    {
+      "file": "missing",
+      "override": "Native",
+      "saved_portrait_stdout": "portrait=shell",
+      "selector_stdout": "shell"
+    },
+    {
+      "file": "nul-after-valid",
+      "override": "",
+      "saved_portrait_stdout": "portrait=shell",
+      "selector_stdout": "shell"
+    },
+    {
+      "file": "nul-after-valid",
+      "override": "native",
+      "saved_portrait_stdout": "portrait=shell",
+      "selector_stdout": "native"
+    },
+    {
+      "file": "nul-after-valid",
+      "override": "shell",
+      "saved_portrait_stdout": "portrait=shell",
+      "selector_stdout": "shell"
+    },
+    {
+      "file": "nul-after-valid",
+      "override": "legacy",
+      "saved_portrait_stdout": "portrait=shell",
+      "selector_stdout": "shell"
+    },
+    {
+      "file": "nul-after-valid",
+      "override": "unknown",
+      "saved_portrait_stdout": "portrait=shell",
+      "selector_stdout": "shell"
+    },
+    {
+      "file": "nul-after-valid",
+      "override": "Native",
+      "saved_portrait_stdout": "portrait=shell",
+      "selector_stdout": "shell"
+    }
+  ],
+  "library_entry_cases": [
+    {
+      "case": "default",
+      "worker_log_engine": "shell",
+      "native_state_restored": true
+    },
+    {
+      "case": "native",
+      "worker_log_engine": "native",
+      "native_state_restored": true
+    },
+    {
+      "case": "explicit-shell",
+      "worker_log_engine": "shell",
+      "native_state_restored": true
+    },
+    {
+      "case": "legacy-overrides-native",
+      "worker_log_engine": "shell",
+      "native_state_restored": true
+    },
+    {
+      "case": "native-overrides-shell",
+      "worker_log_engine": "native",
+      "native_state_restored": true
+    },
+    {
+      "case": "unknown-override",
+      "worker_log_engine": "shell",
+      "native_state_restored": true
+    },
+    {
+      "case": "missing-helper",
+      "worker_log_engine": "shell",
+      "native_state_restored": true
+    },
+    {
+      "case": "nonexecutable-helper",
+      "worker_log_engine": "shell",
+      "native_state_restored": true
+    }
+  ],
+  "native_fault_cases": [
+    "test_combined_capability_false",
+    "test_combined_capability_true",
+    "test_exact_publication",
+    "test_getter_exit_with_unclosed_descendant_stdout",
+    "test_hung_getter_tree_is_retired",
+    "test_invalid_device_rejected",
+    "test_killing_launcher_retires_its_reader_tree",
+    "test_killing_leader_leaves_no_group_member",
+    "test_missing_newline_rejected",
+    "test_public_permission_never_admits_the_getter",
+    "test_revoked_permission_before_getter_exit_prevents_publication",
+    "test_success_bytes_with_nonzero_status_rejected",
+    "test_trailing_binary_rejected",
+    "test_valid_prefix_plus_overflow_rejected",
+    "test_wrong_parent_rejected",
+    "test_wrong_permission_never_admits_the_getter"
+  ],
+  "counts": {
+    "file_cases": 36,
+    "override_cases": 24,
+    "library_entry_cases": 8,
+    "native_fault_cases": 16
+  }
+}
