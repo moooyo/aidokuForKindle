@@ -1,0 +1,281 @@
+{
+  "schema_version": 1,
+  "environment": "test-env",
+  "revision": "R3",
+  "scope_name": "import",
+  "valid": true,
+  "qualified": true,
+  "performance_claim": false,
+  "timing_pairs_in_this_qualification": 0,
+  "source_report_sha256": "a161b9fda33b7f38ea6890b2a39aae22941453a52c2fcc324dbdb421196779ad",
+  "operation_report_sha256": "11e6759a19c6f4190c1b4940c276468e3f7bdcb1f95994b757b5e95eea6f9abc",
+  "release_receipt_sha256": "def0c584ba8bcda7860b1591b0447820388fdbdf3368af9a03ed8e3bc2c4c535",
+  "plan_sha256": "d90d293c48867eb6aec4740e2f87bb0f4687490dc4762a1a97511358f1adf0ed",
+  "programs": {
+    "baseline": {
+      "application_sha256": "1b1c508e1ee84a4be3bd0c15bcf6d42bdd492d688f3fa81b065fb256e00dd3af",
+      "launcher_sha256": "412163f1e84a4ce0ae869439555f80bea8c0ac6b56dcd54b0cd3bccf68804675",
+      "native_query_sha256": "84c2f27d8233d8695001aa86d880e29454fe188deb9884aca1c6694c82a5887d",
+      "extra_sha256": {
+        "aidoku-startup-portrait": "bde28cd5953d26b0dc3bfebe16fcfe1cde329021c17449edae7c59470376ed50"
+      },
+      "startup_options": {
+        "import_thumbnail": "off"
+      }
+    },
+    "candidate": {
+      "application_sha256": "1b1c508e1ee84a4be3bd0c15bcf6d42bdd492d688f3fa81b065fb256e00dd3af",
+      "launcher_sha256": "412163f1e84a4ce0ae869439555f80bea8c0ac6b56dcd54b0cd3bccf68804675",
+      "native_query_sha256": "84c2f27d8233d8695001aa86d880e29454fe188deb9884aca1c6694c82a5887d",
+      "extra_sha256": {
+        "aidoku-startup-portrait": "bde28cd5953d26b0dc3bfebe16fcfe1cde329021c17449edae7c59470376ed50"
+      },
+      "startup_options": {
+        "import_thumbnail": "idle"
+      }
+    }
+  },
+  "completed_stages": 8,
+  "cases": [
+    {
+      "case": "baseline-warmup-ingest",
+      "mode": "off",
+      "cohort": "warmup",
+      "phase": "ingest",
+      "source_images_verified": true,
+      "target_count": 4,
+      "target_derivative_count": 0,
+      "persisted_derivative_count": 16,
+      "targets_offscreen_during_ingest": true,
+      "targets_visible_on_reopen": null,
+      "counts": {
+        "worker_jobs": 0
+      },
+      "worker_outcomes": {}
+    },
+    {
+      "case": "baseline-warmup-reopen",
+      "mode": "off",
+      "cohort": "warmup",
+      "phase": "reopen",
+      "source_images_verified": true,
+      "target_count": 4,
+      "target_derivative_count": 4,
+      "persisted_derivative_count": 20,
+      "targets_offscreen_during_ingest": null,
+      "targets_visible_on_reopen": true,
+      "counts": {
+        "created": 4,
+        "reused": 11
+      },
+      "worker_outcomes": {}
+    },
+    {
+      "case": "candidate-warmup-ingest",
+      "mode": "idle",
+      "cohort": "warmup",
+      "phase": "ingest",
+      "source_images_verified": true,
+      "target_count": 4,
+      "target_derivative_count": 4,
+      "persisted_derivative_count": 20,
+      "targets_offscreen_during_ingest": true,
+      "targets_visible_on_reopen": null,
+      "counts": {
+        "worker_jobs": 4
+      },
+      "worker_outcomes": {
+        "import_thumbnail_persisted": 4
+      }
+    },
+    {
+      "case": "candidate-warmup-reopen",
+      "mode": "idle",
+      "cohort": "warmup",
+      "phase": "reopen",
+      "source_images_verified": true,
+      "target_count": 4,
+      "target_derivative_count": 4,
+      "persisted_derivative_count": 20,
+      "targets_offscreen_during_ingest": null,
+      "targets_visible_on_reopen": true,
+      "counts": {
+        "created": 0,
+        "reused": 15
+      },
+      "worker_outcomes": {}
+    },
+    {
+      "case": "baseline-qualify-ingest",
+      "mode": "off",
+      "cohort": "qualify",
+      "phase": "ingest",
+      "source_images_verified": true,
+      "target_count": 4,
+      "target_derivative_count": 0,
+      "persisted_derivative_count": 16,
+      "targets_offscreen_during_ingest": true,
+      "targets_visible_on_reopen": null,
+      "counts": {
+        "worker_jobs": 0
+      },
+      "worker_outcomes": {}
+    },
+    {
+      "case": "baseline-qualify-reopen",
+      "mode": "off",
+      "cohort": "qualify",
+      "phase": "reopen",
+      "source_images_verified": true,
+      "target_count": 4,
+      "target_derivative_count": 4,
+      "persisted_derivative_count": 20,
+      "targets_offscreen_during_ingest": null,
+      "targets_visible_on_reopen": true,
+      "counts": {
+        "created": 4,
+        "reused": 11
+      },
+      "worker_outcomes": {}
+    },
+    {
+      "case": "candidate-qualify-ingest",
+      "mode": "idle",
+      "cohort": "qualify",
+      "phase": "ingest",
+      "source_images_verified": true,
+      "target_count": 4,
+      "target_derivative_count": 4,
+      "persisted_derivative_count": 20,
+      "targets_offscreen_during_ingest": true,
+      "targets_visible_on_reopen": null,
+      "counts": {
+        "worker_jobs": 4
+      },
+      "worker_outcomes": {
+        "import_thumbnail_persisted": 4
+      }
+    },
+    {
+      "case": "candidate-qualify-reopen",
+      "mode": "idle",
+      "cohort": "qualify",
+      "phase": "reopen",
+      "source_images_verified": true,
+      "target_count": 4,
+      "target_derivative_count": 4,
+      "persisted_derivative_count": 20,
+      "targets_offscreen_during_ingest": null,
+      "targets_visible_on_reopen": true,
+      "counts": {
+        "created": 0,
+        "reused": 15
+      },
+      "worker_outcomes": {}
+    }
+  ],
+  "prepared_target_continuity": {
+    "warmup": {
+      "four_prepared_offscreen_targets_match_reopened_pixels": true,
+      "target_count": 4
+    },
+    "qualify": {
+      "four_prepared_offscreen_targets_match_reopened_pixels": true,
+      "target_count": 4
+    }
+  },
+  "independent_native_pixels": {
+    "ingest": {
+      "width": 1860,
+      "height": 2480,
+      "regions": {
+        "body": {
+          "bbox": [
+            0,
+            72,
+            1860,
+            2480
+          ],
+          "different_pixels": 0,
+          "observable_contrast": 255
+        },
+        "right_status_bar": {
+          "bbox": [
+            930,
+            0,
+            1860,
+            72
+          ],
+          "different_pixels": 0,
+          "observable_contrast": 238
+        }
+      }
+    },
+    "reopen": {
+      "width": 1860,
+      "height": 2480,
+      "regions": {
+        "body": {
+          "bbox": [
+            0,
+            72,
+            1860,
+            2480
+          ],
+          "different_pixels": 0,
+          "observable_contrast": 255
+        },
+        "right_status_bar": {
+          "bbox": [
+            930,
+            0,
+            1860,
+            72
+          ],
+          "different_pixels": 0,
+          "observable_contrast": 238
+        }
+      }
+    }
+  },
+  "user_cache_file_guard": {
+    "file_count_before": 55,
+    "file_count_after": 55,
+    "changed_files": 0,
+    "changes": {
+      "added": 0,
+      "removed": 0,
+      "size": 0,
+      "mtime": 0,
+      "content": 0
+    },
+    "exactly_equal": true
+  },
+  "legacy_guard_reconstructed_from_full_inventory": true,
+  "protected_before_after_equal": true,
+  "restoration": {
+    "success": true,
+    "cases_completed": true,
+    "same_boot": true,
+    "native_restored": true,
+    "entry_restored": true,
+    "installed_and_user_unchanged": true,
+    "input_roster_unchanged": true,
+    "lease_released": true,
+    "temporary_stage_absent": true,
+    "inventory_attempted": true,
+    "inventory_before_valid": true,
+    "private_cache_verified": true
+  },
+  "release": {
+    "ok": true,
+    "owner_and_token_checked": true,
+    "native_restored_and_connections_closed": true,
+    "lease_directory_absent_after_release": true
+  },
+  "operations": {
+    "recorded": 22,
+    "failed": 0
+  },
+  "scope": "R3 functional and digital-pixel qualification only. Generated offscreen derivatives are compared through the later independently launched GUI. The complete source-bound image and per-file user-cache checks were replayed on test-env. This report exports counts and booleans, never private source names, image hashes, user pixels, device identifiers, or tokens. Earlier R2 economic timing evidence remains separate and is not relabeled as R3."
+}

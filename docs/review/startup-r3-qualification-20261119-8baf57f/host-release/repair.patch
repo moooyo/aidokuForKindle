@@ -1,0 +1,80 @@
+--- original/prepare_all.py
++++ corrected/prepare_all.py
+@@ -193,7 +193,7 @@
+            'd9be7683b614e97a84d7183d25649371bae5d2533f91edd2fede16b0fdc650f6',
+            'c954eff22cc43bfc2cd27236d6fb0e9e5d8490d6322bd49763c0f4b7fb5acda2'}
+ AUDITORS = {'bench': BENCH/'tools/analyze_all.py', 'resident': BENCH/'reopen_probe/analyze_reopen.py',
+-            'import': BENCH/'import_probe_r2/tools/analyze_import.py', 'defaults': HOST/'tools/defaults.py'}
++            'import': BENCH/'import_probe_r2/tools/analyze_import.py', 'defaults': HERE/'defaults.py'}
+ R2_APP='1b1c508e1ee84a4be3bd0c15bcf6d42bdd492d688f3fa81b065fb256e00dd3af'
+ R2_BENCH='cd124c43ede8eb884c0d59da9f003c39d84fd771f9337488d840f89715d0a3ae'
+ R3_BENCH='00e747b04dbadb3d0681d754f6643a4a678da461dd5aaabcf0aa23219037ce4b'
+@@ -202,7 +202,7 @@
+ DEFAULT_AUDITOR = 'fe1d1243c9a289ec3ded4150730fe43027f39dc008f22335a642e4594f44a341'
+ DEFAULT_DEPS = {'release_common.py': '44478d6a74ff570e32c31d7fd79c71be9ed08efa12bbac58ec8ed42bdfe97dcf',
+                 'capture_private.py': '7f51c4df408096691e05fa24356e2717585ac270883140fdbf60817c4e31b64c',
+-                'r3_lineage.py': '5761c2d63e11e76b40253ff43378a75e6c3e689097d594012620c64c61e3714b'}
++                'r3_lineage.py': '83a79a7f2ede1cb38aa68c2dcd05f820e0a5a55044ab66f3325c6e09a21c8e8b'}
+ 
+ 
+ def is_r3(program):
+--- original/r3_lineage.py
++++ corrected/r3_lineage.py
+@@ -194,7 +194,7 @@
+     _,patch=reference(selection['patch'],128*1024);c.require(c.sha(patch)==HOST_DEPENDENCIES['pair/launcher.patch'],'Unreviewed source change');apply_exact(old,new,patch)
+     c.exact(QA/'check_host.py',HOST_AUDITOR_SHA,512*1024)
+     for rel,want in HOST_DEPENDENCIES.items():c.exact(QA/rel,want,4*1024*1024)
+-    _,original=reference(selection['host_report'],2*1024*1024); controls=stable_host(c.unique_json(original),new_sha)
++    _,host_report_bytes=reference(selection['host_report'],2*1024*1024); controls=stable_host(c.unique_json(host_report_bytes),new_sha)
+     checked_replay(controls,new_sha)
+     c.require(original==tree(R2_SOURCE) and final==tree(root),'Frozen source changed during lineage verification')
+     return {'schema':1,'generation':'r3-launcher-only','installed_application_sha256':c.BASE,
+--- original/test_r3_lineage.py
++++ corrected/test_r3_lineage.py
+@@ -3,6 +3,7 @@
+ import copy
+ import json
+ from pathlib import Path
++import shutil
+ import sys
+ import tempfile
+ import unittest
+@@ -14,6 +15,38 @@
+ 
+ 
+ class ReusedBinaries(unittest.TestCase):
++    def test_complete_frozen_lineage_replays_and_rejects_a_changed_source_snapshot(self):
++        directory=r.c.ROOT/'prepared/r3-launcher-only'
++        inputs=r.c.unique_json(r.c.exact(directory/'inputs.json','3abd9103a7469bf48e1cfcb380d7a349ee6cb328db87b103fb19321fc940ca90'))
++        expected=r.c.unique_json(r.c.exact(directory/'lineage.json','b2697257ed4cc2030589af32168c4443eeaa0bbfc288b1591251f64947378268'))
++        self.assertEqual(r.verify_inputs(inputs),expected)
++        original_tree=r.tree; observations=0
++        def changed_snapshot(path):
++            nonlocal observations
++            result=original_tree(path)
++            if path==r.R2_SOURCE:
++                observations+=1
++                if observations==2:
++                    result[r.SCRIPT][0]='f'*64
++            return result
++        with patch.object(r,'tree',side_effect=changed_snapshot):
++            with self.assertRaisesRegex(ValueError,'Frozen source changed during lineage verification'):
++                r.verify_inputs(inputs)
++        self.assertEqual(observations,2)
++
++    def test_host_replay_rejects_a_modified_trace_in_an_independent_copy(self):
++        report=r.c.unique_json(r.c.exact(r.RECHECK,r.RECHECK_SHA))
++        controls=r.stable_host(report,r.REVIEWED_LAUNCHER_SHA)
++        with tempfile.TemporaryDirectory() as name:
++            copy_root=Path(name)/'recheck'
++            shutil.copytree(r.RECHECK.parent,copy_root)
++            with patch.object(r,'RECHECK',copy_root/'checked.json'):
++                r.checked_replay(controls,r.REVIEWED_LAUNCHER_SHA)
++                trace=copy_root/'raw/admission-fixture/raw/baseline-library.strace'
++                trace.write_bytes(trace.read_bytes()+b'corrupted trace\n')
++                with self.assertRaisesRegex(ValueError,'Input identity differs'):
++                    r.checked_replay(controls,r.REVIEWED_LAUNCHER_SHA)
++
+     def test_only_the_launcher_bytes_may_change_anywhere_in_the_frozen_tree(self):
+         with tempfile.TemporaryDirectory() as name:
+             root=Path(name);old,new=[root/s for s in ('old','new')]

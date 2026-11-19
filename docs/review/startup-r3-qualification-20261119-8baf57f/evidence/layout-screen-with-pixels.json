@@ -1,0 +1,342 @@
+{
+  "schema_version": 1,
+  "environment": "test-env",
+  "revision": "R3",
+  "trial": "layout",
+  "phase": "screen",
+  "primary_endpoint": "usable",
+  "other_endpoint": "covers",
+  "source_report_sha256": "f6cee6d27914bb0415211c906c26063a3d04e9e67413a2880503baef568e2626",
+  "public_exporter_sha256": "468856f1000bae648c03e4b88744eccd6d2a204790c5e88eb3f37a472b2f9a3c",
+  "program_sha256": {
+    "candidate-arm": "1b1c508e1ee84a4be3bd0c15bcf6d42bdd492d688f3fa81b065fb256e00dd3af",
+    "launch.sh": "412163f1e84a4ce0ae869439555f80bea8c0ac6b56dcd54b0cd3bccf68804675",
+    "aidoku-startup-portrait": "bde28cd5953d26b0dc3bfebe16fcfe1cde329021c17449edae7c59470376ed50"
+  },
+  "valid": true,
+  "qualification_passed": true,
+  "latency_gate_passed": false,
+  "source_issue_count": 0,
+  "source_input_failure_count": 0,
+  "complete_pairs": 6,
+  "numeric_screen_checks": {
+    "primary_median_at_least_100_ms": false,
+    "at_least_five_primary_improvements": false,
+    "other_median_regression_at_most_50_ms": false
+  },
+  "summary_ms": {
+    "usable": {
+      "median_paired_savings_ms": -27.859,
+      "faster_pairs": 3
+    },
+    "covers": {
+      "median_paired_savings_ms": -186.839,
+      "faster_pairs": 2
+    },
+    "exit": {
+      "median_paired_savings_ms": 149.635,
+      "faster_pairs": 3
+    }
+  },
+  "pair_columns": [
+    "baseline",
+    "candidate",
+    "baseline_minus_candidate"
+  ],
+  "pairs": [
+    {
+      "round": 1,
+      "order": "AB",
+      "milliseconds": {
+        "usable": [
+          2285.097,
+          2579.443,
+          -294.346
+        ],
+        "covers": [
+          3046.897,
+          3348.568,
+          -301.671
+        ],
+        "exit": [
+          3582.562,
+          3673.368,
+          -90.806
+        ]
+      }
+    },
+    {
+      "round": 2,
+      "order": "BA",
+      "milliseconds": {
+        "usable": [
+          2494.756,
+          2208.345,
+          286.411
+        ],
+        "covers": [
+          3588.265,
+          2912.614,
+          675.651
+        ],
+        "exit": [
+          3562.569,
+          2592.552,
+          970.017
+        ]
+      }
+    },
+    {
+      "round": 3,
+      "order": "AB",
+      "milliseconds": {
+        "usable": [
+          2537.57,
+          2421.146,
+          116.424
+        ],
+        "covers": [
+          3322.032,
+          3517.959,
+          -195.927
+        ],
+        "exit": [
+          3603.328,
+          3693.232,
+          -89.904
+        ]
+      }
+    },
+    {
+      "round": 4,
+      "order": "BA",
+      "milliseconds": {
+        "usable": [
+          2766.727,
+          2379.173,
+          387.554
+        ],
+        "covers": [
+          3511.938,
+          3135.375,
+          376.563
+        ],
+        "exit": [
+          3391.779,
+          2682.552,
+          709.227
+        ]
+      }
+    },
+    {
+      "round": 5,
+      "order": "AB",
+      "milliseconds": {
+        "usable": [
+          2498.957,
+          2671.25,
+          -172.293
+        ],
+        "covers": [
+          3319.105,
+          3496.856,
+          -177.751
+        ],
+        "exit": [
+          2603.247,
+          3502.529,
+          -899.282
+        ]
+      }
+    },
+    {
+      "round": 6,
+      "order": "BA",
+      "milliseconds": {
+        "usable": [
+          2087.941,
+          2260.084,
+          -172.143
+        ],
+        "covers": [
+          2819.269,
+          3333.94,
+          -514.671
+        ],
+        "exit": [
+          3312.572,
+          2923.399,
+          389.173
+        ]
+      }
+    }
+  ],
+  "mechanism_verified": true,
+  "mechanism_observations": {
+    "timing": {
+      "baseline": {
+        "planned": 6,
+        "observed": 6,
+        "prewarm_plans": 0,
+        "prewarm_ready": 0,
+        "prewarm_attempted_runs": 0,
+        "prewarm_usable_runs": 0,
+        "prewarm_zero_attempt_runs": 6,
+        "grace_started_runs": 0,
+        "grace_completed_single_frame_runs": 0,
+        "grace_expired": 0,
+        "grace_cancelled": 0,
+        "layouts": {
+          "rowwise": 6
+        },
+        "portrait_engines": {
+          "shell": 6
+        }
+      },
+      "candidate": {
+        "planned": 6,
+        "observed": 6,
+        "prewarm_plans": 0,
+        "prewarm_ready": 0,
+        "prewarm_attempted_runs": 0,
+        "prewarm_usable_runs": 0,
+        "prewarm_zero_attempt_runs": 6,
+        "grace_started_runs": 0,
+        "grace_completed_single_frame_runs": 0,
+        "grace_expired": 0,
+        "grace_cancelled": 0,
+        "layouts": {
+          "batched": 6
+        },
+        "portrait_engines": {
+          "shell": 6
+        }
+      }
+    },
+    "pixels": {
+      "baseline": {
+        "planned": 1,
+        "observed": 1,
+        "prewarm_plans": 0,
+        "prewarm_ready": 0,
+        "prewarm_attempted_runs": 0,
+        "prewarm_usable_runs": 0,
+        "prewarm_zero_attempt_runs": 1,
+        "grace_started_runs": 0,
+        "grace_completed_single_frame_runs": 0,
+        "grace_expired": 0,
+        "grace_cancelled": 0,
+        "layouts": {
+          "rowwise": 1
+        },
+        "portrait_engines": {
+          "shell": 1
+        }
+      },
+      "candidate": {
+        "planned": 1,
+        "observed": 1,
+        "prewarm_plans": 0,
+        "prewarm_ready": 0,
+        "prewarm_attempted_runs": 0,
+        "prewarm_usable_runs": 0,
+        "prewarm_zero_attempt_runs": 1,
+        "grace_started_runs": 0,
+        "grace_completed_single_frame_runs": 0,
+        "grace_expired": 0,
+        "grace_cancelled": 0,
+        "layouts": {
+          "batched": 1
+        },
+        "portrait_engines": {
+          "shell": 1
+        }
+      }
+    },
+    "warmup": {
+      "baseline": {
+        "planned": 2,
+        "observed": 2,
+        "prewarm_plans": 0,
+        "prewarm_ready": 0,
+        "prewarm_attempted_runs": 0,
+        "prewarm_usable_runs": 0,
+        "prewarm_zero_attempt_runs": 2,
+        "grace_started_runs": 0,
+        "grace_completed_single_frame_runs": 0,
+        "grace_expired": 0,
+        "grace_cancelled": 0,
+        "layouts": {
+          "rowwise": 2
+        },
+        "portrait_engines": {
+          "shell": 2
+        }
+      },
+      "candidate": {
+        "planned": 2,
+        "observed": 2,
+        "prewarm_plans": 0,
+        "prewarm_ready": 0,
+        "prewarm_attempted_runs": 0,
+        "prewarm_usable_runs": 0,
+        "prewarm_zero_attempt_runs": 2,
+        "grace_started_runs": 0,
+        "grace_completed_single_frame_runs": 0,
+        "grace_expired": 0,
+        "grace_cancelled": 0,
+        "layouts": {
+          "batched": 2
+        },
+        "portrait_engines": {
+          "shell": 2
+        }
+      }
+    }
+  },
+  "batches": [
+    {
+      "mode": "screen",
+      "case_count": 14,
+      "guards": {
+        "success": true,
+        "lease_released": true,
+        "same_boot": true,
+        "native_restored": true,
+        "entry_restored": true,
+        "installed_and_user_unchanged": true,
+        "input_roster_unchanged": true
+      }
+    },
+    {
+      "mode": "qualify",
+      "case_count": 4,
+      "guards": {
+        "success": true,
+        "lease_released": true,
+        "same_boot": true,
+        "native_restored": true,
+        "entry_restored": true,
+        "installed_and_user_unchanged": true,
+        "input_roster_unchanged": true
+      }
+    }
+  ],
+  "pixels": [
+    {
+      "width": 1860,
+      "height": 2480,
+      "status_bar_excluded_pixels": 72,
+      "right_status_bar_region": {
+        "x": 930,
+        "y": 0,
+        "width": 930,
+        "height": 72
+      },
+      "identical_below_status_bar": true,
+      "right_status_bar_observable": true,
+      "identical_right_status_bar": true
+    }
+  ],
+  "scope": "All six predetermined pairs are retained. Numeric screening, observed feature mechanisms, independent digital pixels, and restoration are separate results. An unpassed numeric screen does not request independent ten-pair confirmation and cannot support a speed benefit. Actual branch exercise must also support any proposed benefit. These are not optical or battery measurements."
+}

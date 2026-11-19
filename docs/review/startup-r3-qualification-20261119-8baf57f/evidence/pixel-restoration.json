@@ -1,0 +1,45 @@
+{
+  "schema_version": 1,
+  "environment": "test-env",
+  "scope": "Host-only replay of retained restoration and release records. No device commands or raw private identifiers are included.",
+  "batches": {
+    "warm": {
+      "source_report_sha256": "9d6916eb9ccf96780460338aece74ad09c50717d9b9428f6c312a1a3b6bf613d",
+      "release_receipt_sha256": "b216e9badf78c2cab168615194dc0b687c2c9fe8e9687dfda681b15f99850f6a",
+      "checks": {
+        "success": true,
+        "lease_released": true,
+        "native_restored": true,
+        "entry_restored": true,
+        "temporary_stage_absent": true,
+        "installed_and_user_unchanged": true,
+        "input_roster_unchanged": true,
+        "owner_and_token_checked": true,
+        "native_restored_and_connections_closed": true,
+        "lease_directory_absent_after_release": true,
+        "protected_before_after_bytes_equal": true
+      },
+      "operation_count": 16,
+      "failed_operations": 0
+    },
+    "cold": {
+      "source_report_sha256": "df6833468d4f76910dcd57b396952930e898a7a9a37948673960a0482866d422",
+      "release_receipt_sha256": "6b47a7d5c9e02dbc7917ddfcb4d8ac67df0b695bb3e2f459d57536e4bde1ea8a",
+      "checks": {
+        "success": true,
+        "lease_released": true,
+        "native_restored": true,
+        "entry_restored": true,
+        "temporary_stage_absent": true,
+        "installed_and_user_unchanged": true,
+        "input_roster_unchanged": true,
+        "owner_and_token_checked": true,
+        "native_restored_and_connections_closed": true,
+        "lease_directory_absent_after_release": true,
+        "protected_before_after_bytes_equal": true
+      },
+      "operation_count": 16,
+      "failed_operations": 0
+    }
+  }
+}

@@ -1,0 +1,775 @@
+{
+  "schema_version": 1,
+  "trial": "supervisor",
+  "feature": "portrait",
+  "phase": "screen",
+  "attempt": "first",
+  "revision": "R3",
+  "source_commit": "8baf57ffb64d74000abef49111baf6e726d4d425",
+  "exported_at_utc": "2026-11-19T01:50:22.352225+00:00",
+  "valid": false,
+  "qualification_passed": false,
+  "latency_gate_passed": null,
+  "issues": [
+    "right_status_bar_mismatch"
+  ],
+  "input_failures": [],
+  "performance_claim": false,
+  "source_evidence": {
+    "source_report_name": "portrait-screen-with-pixels.json",
+    "source_report_sha256": "ee097c84401efcc2b49a01023f07e89c57acaade23a08975692ac85ade3b9d95",
+    "build_receipt_sha256": "516d572640a5f04b3243180b42b5f792f80687664febdac182f2bc8dc6e083c8"
+  },
+  "program_sha256": {
+    "baseline": {
+      "application_sha256": "1b1c508e1ee84a4be3bd0c15bcf6d42bdd492d688f3fa81b065fb256e00dd3af",
+      "launcher_sha256": "412163f1e84a4ce0ae869439555f80bea8c0ac6b56dcd54b0cd3bccf68804675",
+      "portrait_helper_sha256": "bde28cd5953d26b0dc3bfebe16fcfe1cde329021c17449edae7c59470376ed50",
+      "native_query_sha256": "84c2f27d8233d8695001aa86d880e29454fe188deb9884aca1c6694c82a5887d"
+    },
+    "candidate": {
+      "application_sha256": "1b1c508e1ee84a4be3bd0c15bcf6d42bdd492d688f3fa81b065fb256e00dd3af",
+      "launcher_sha256": "412163f1e84a4ce0ae869439555f80bea8c0ac6b56dcd54b0cd3bccf68804675",
+      "portrait_helper_sha256": "bde28cd5953d26b0dc3bfebe16fcfe1cde329021c17449edae7c59470376ed50",
+      "native_query_sha256": "84c2f27d8233d8695001aa86d880e29454fe188deb9884aca1c6694c82a5887d"
+    }
+  },
+  "pairs": [
+    {
+      "round": 1,
+      "order": "AB",
+      "complete": true,
+      "baseline_ms": {
+        "ready": 1961.494,
+        "first": 2157.941,
+        "input_ready": 2157.971,
+        "covers": 3199.048,
+        "usable": 2157.971,
+        "exit": 4092.367
+      },
+      "candidate_ms": {
+        "ready": 2056.374,
+        "first": 2267.23,
+        "input_ready": 2267.255,
+        "covers": 2983.887,
+        "usable": 2267.255,
+        "exit": 2532.413
+      },
+      "savings_ms": {
+        "ready": -94.88,
+        "first": -109.289,
+        "input_ready": -109.284,
+        "covers": 215.161,
+        "usable": -109.284,
+        "exit": 1559.954
+      }
+    },
+    {
+      "round": 2,
+      "order": "BA",
+      "complete": true,
+      "baseline_ms": {
+        "ready": 2101.612,
+        "first": 2314.105,
+        "input_ready": 2314.167,
+        "covers": 3044.282,
+        "usable": 2314.167,
+        "exit": 2573.358
+      },
+      "candidate_ms": {
+        "ready": 1848.525,
+        "first": 2041.671,
+        "input_ready": 2041.73,
+        "covers": 2783.266,
+        "usable": 2041.73,
+        "exit": 2702.581
+      },
+      "savings_ms": {
+        "ready": 253.087,
+        "first": 272.434,
+        "input_ready": 272.437,
+        "covers": 261.016,
+        "usable": 272.437,
+        "exit": -129.223
+      }
+    },
+    {
+      "round": 3,
+      "order": "AB",
+      "complete": true,
+      "baseline_ms": {
+        "ready": 2172.597,
+        "first": 2360.13,
+        "input_ready": 2360.157,
+        "covers": 3074.429,
+        "usable": 2360.157,
+        "exit": 3642.564
+      },
+      "candidate_ms": {
+        "ready": 2125.492,
+        "first": 2383.698,
+        "input_ready": 2383.776,
+        "covers": 3136.945,
+        "usable": 2383.776,
+        "exit": 3392.991
+      },
+      "savings_ms": {
+        "ready": 47.105,
+        "first": -23.568,
+        "input_ready": -23.619,
+        "covers": -62.516,
+        "usable": -23.619,
+        "exit": 249.573
+      }
+    },
+    {
+      "round": 4,
+      "order": "BA",
+      "complete": true,
+      "baseline_ms": {
+        "ready": 1874.094,
+        "first": 2064.866,
+        "input_ready": 2064.89,
+        "covers": 2804.827,
+        "usable": 2064.89,
+        "exit": 3562.645
+      },
+      "candidate_ms": {
+        "ready": 1971.483,
+        "first": 2161.241,
+        "input_ready": 2161.268,
+        "covers": 2875.065,
+        "usable": 2161.268,
+        "exit": 2672.81
+      },
+      "savings_ms": {
+        "ready": -97.389,
+        "first": -96.375,
+        "input_ready": -96.378,
+        "covers": -70.238,
+        "usable": -96.378,
+        "exit": 889.835
+      }
+    },
+    {
+      "round": 5,
+      "order": "AB",
+      "complete": true,
+      "baseline_ms": {
+        "ready": 2363.539,
+        "first": 2579.487,
+        "input_ready": 2579.51,
+        "covers": 3396.478,
+        "usable": 2579.51,
+        "exit": 2752.457
+      },
+      "candidate_ms": {
+        "ready": 2095.866,
+        "first": 2304.25,
+        "input_ready": 2304.305,
+        "covers": 3021.266,
+        "usable": 2304.305,
+        "exit": 3313.317
+      },
+      "savings_ms": {
+        "ready": 267.673,
+        "first": 275.237,
+        "input_ready": 275.205,
+        "covers": 375.212,
+        "usable": 275.205,
+        "exit": -560.86
+      }
+    },
+    {
+      "round": 6,
+      "order": "BA",
+      "complete": true,
+      "baseline_ms": {
+        "ready": 2246.361,
+        "first": 2433.871,
+        "input_ready": 2433.908,
+        "covers": 3171.07,
+        "usable": 2433.908,
+        "exit": 2743.306
+      },
+      "candidate_ms": {
+        "ready": 1883.438,
+        "first": 2081.021,
+        "input_ready": 2081.039,
+        "covers": 2797.742,
+        "usable": 2081.039,
+        "exit": 3693.386
+      },
+      "savings_ms": {
+        "ready": 362.923,
+        "first": 352.85,
+        "input_ready": 352.869,
+        "covers": 373.328,
+        "usable": 352.869,
+        "exit": -950.08
+      }
+    }
+  ],
+  "independent_numeric_screen": {
+    "complete_pairs": 6,
+    "pair_order_counts": {
+      "AB": 3,
+      "BA": 3
+    },
+    "all_six_pairs_retained": true,
+    "all_reported_pair_savings_verified": true,
+    "savings_direction": "baseline_minus_candidate",
+    "primary_endpoint": "usable",
+    "secondary_endpoint": "covers",
+    "minimum_primary_median_ms": 100,
+    "minimum_positive_primary_pairs": 5,
+    "minimum_secondary_median_ms": -50,
+    "median_paired_savings_ms": {
+      "usable": 124.409,
+      "covers": 238.0885
+    },
+    "positive_pairs": {
+      "usable": 3,
+      "covers": 4
+    },
+    "primary_median_passed": true,
+    "primary_positive_pair_count_passed": false,
+    "secondary_regression_guard_passed": true,
+    "numeric_screen_passed": false,
+    "ten_pair_confirmation_triggered": false,
+    "scope": "Independent arithmetic only. It does not override the failed visual qualification or the source report null latency gate."
+  },
+  "case_count": 18,
+  "cases": [
+    {
+      "scope": "timing",
+      "case": "baseline-warmup",
+      "portrait_engine": "shell",
+      "six_actual_options": {
+        "portrait": "shell",
+        "prewarm": "0",
+        "last_cover_grace": "off",
+        "first_layout": "optimized",
+        "import_thumbnail": "off",
+        "resident": "off"
+      },
+      "actual_option_events_verified": true,
+      "toolbar_event_counts": {
+        "startup_toolbar_probe_started": 1,
+        "startup_toolbar_probe_ready": 1,
+        "startup_toolbar_probe_unavailable": 0,
+        "startup_toolbar_snapshot_used": 1,
+        "startup_toolbar_sync_fallback": 0,
+        "native_query_response": 2
+      },
+      "toolbar_trace_has_no_property_values": true
+    },
+    {
+      "scope": "timing",
+      "case": "candidate-warmup",
+      "portrait_engine": "native",
+      "six_actual_options": {
+        "portrait": "native",
+        "prewarm": "0",
+        "last_cover_grace": "off",
+        "first_layout": "optimized",
+        "import_thumbnail": "off",
+        "resident": "off"
+      },
+      "actual_option_events_verified": true,
+      "toolbar_event_counts": {
+        "startup_toolbar_probe_started": 1,
+        "startup_toolbar_probe_ready": 1,
+        "startup_toolbar_probe_unavailable": 0,
+        "startup_toolbar_snapshot_used": 1,
+        "startup_toolbar_sync_fallback": 0,
+        "native_query_response": 2
+      },
+      "toolbar_trace_has_no_property_values": true
+    },
+    {
+      "scope": "timing",
+      "case": "baseline-01",
+      "portrait_engine": "shell",
+      "six_actual_options": {
+        "portrait": "shell",
+        "prewarm": "0",
+        "last_cover_grace": "off",
+        "first_layout": "optimized",
+        "import_thumbnail": "off",
+        "resident": "off"
+      },
+      "actual_option_events_verified": true,
+      "toolbar_event_counts": {
+        "startup_toolbar_probe_started": 1,
+        "startup_toolbar_probe_ready": 1,
+        "startup_toolbar_probe_unavailable": 0,
+        "startup_toolbar_snapshot_used": 1,
+        "startup_toolbar_sync_fallback": 0,
+        "native_query_response": 2
+      },
+      "toolbar_trace_has_no_property_values": true
+    },
+    {
+      "scope": "timing",
+      "case": "candidate-01",
+      "portrait_engine": "native",
+      "six_actual_options": {
+        "portrait": "native",
+        "prewarm": "0",
+        "last_cover_grace": "off",
+        "first_layout": "optimized",
+        "import_thumbnail": "off",
+        "resident": "off"
+      },
+      "actual_option_events_verified": true,
+      "toolbar_event_counts": {
+        "startup_toolbar_probe_started": 1,
+        "startup_toolbar_probe_ready": 1,
+        "startup_toolbar_probe_unavailable": 0,
+        "startup_toolbar_snapshot_used": 1,
+        "startup_toolbar_sync_fallback": 0,
+        "native_query_response": 2
+      },
+      "toolbar_trace_has_no_property_values": true
+    },
+    {
+      "scope": "timing",
+      "case": "candidate-02",
+      "portrait_engine": "native",
+      "six_actual_options": {
+        "portrait": "native",
+        "prewarm": "0",
+        "last_cover_grace": "off",
+        "first_layout": "optimized",
+        "import_thumbnail": "off",
+        "resident": "off"
+      },
+      "actual_option_events_verified": true,
+      "toolbar_event_counts": {
+        "startup_toolbar_probe_started": 1,
+        "startup_toolbar_probe_ready": 1,
+        "startup_toolbar_probe_unavailable": 0,
+        "startup_toolbar_snapshot_used": 1,
+        "startup_toolbar_sync_fallback": 0,
+        "native_query_response": 2
+      },
+      "toolbar_trace_has_no_property_values": true
+    },
+    {
+      "scope": "timing",
+      "case": "baseline-02",
+      "portrait_engine": "shell",
+      "six_actual_options": {
+        "portrait": "shell",
+        "prewarm": "0",
+        "last_cover_grace": "off",
+        "first_layout": "optimized",
+        "import_thumbnail": "off",
+        "resident": "off"
+      },
+      "actual_option_events_verified": true,
+      "toolbar_event_counts": {
+        "startup_toolbar_probe_started": 1,
+        "startup_toolbar_probe_ready": 1,
+        "startup_toolbar_probe_unavailable": 0,
+        "startup_toolbar_snapshot_used": 1,
+        "startup_toolbar_sync_fallback": 0,
+        "native_query_response": 2
+      },
+      "toolbar_trace_has_no_property_values": true
+    },
+    {
+      "scope": "timing",
+      "case": "baseline-03",
+      "portrait_engine": "shell",
+      "six_actual_options": {
+        "portrait": "shell",
+        "prewarm": "0",
+        "last_cover_grace": "off",
+        "first_layout": "optimized",
+        "import_thumbnail": "off",
+        "resident": "off"
+      },
+      "actual_option_events_verified": true,
+      "toolbar_event_counts": {
+        "startup_toolbar_probe_started": 1,
+        "startup_toolbar_probe_ready": 1,
+        "startup_toolbar_probe_unavailable": 0,
+        "startup_toolbar_snapshot_used": 1,
+        "startup_toolbar_sync_fallback": 0,
+        "native_query_response": 2
+      },
+      "toolbar_trace_has_no_property_values": true
+    },
+    {
+      "scope": "timing",
+      "case": "candidate-03",
+      "portrait_engine": "native",
+      "six_actual_options": {
+        "portrait": "native",
+        "prewarm": "0",
+        "last_cover_grace": "off",
+        "first_layout": "optimized",
+        "import_thumbnail": "off",
+        "resident": "off"
+      },
+      "actual_option_events_verified": true,
+      "toolbar_event_counts": {
+        "startup_toolbar_probe_started": 1,
+        "startup_toolbar_probe_ready": 1,
+        "startup_toolbar_probe_unavailable": 0,
+        "startup_toolbar_snapshot_used": 1,
+        "startup_toolbar_sync_fallback": 0,
+        "native_query_response": 2
+      },
+      "toolbar_trace_has_no_property_values": true
+    },
+    {
+      "scope": "timing",
+      "case": "candidate-04",
+      "portrait_engine": "native",
+      "six_actual_options": {
+        "portrait": "native",
+        "prewarm": "0",
+        "last_cover_grace": "off",
+        "first_layout": "optimized",
+        "import_thumbnail": "off",
+        "resident": "off"
+      },
+      "actual_option_events_verified": true,
+      "toolbar_event_counts": {
+        "startup_toolbar_probe_started": 1,
+        "startup_toolbar_probe_ready": 1,
+        "startup_toolbar_probe_unavailable": 0,
+        "startup_toolbar_snapshot_used": 1,
+        "startup_toolbar_sync_fallback": 0,
+        "native_query_response": 2
+      },
+      "toolbar_trace_has_no_property_values": true
+    },
+    {
+      "scope": "timing",
+      "case": "baseline-04",
+      "portrait_engine": "shell",
+      "six_actual_options": {
+        "portrait": "shell",
+        "prewarm": "0",
+        "last_cover_grace": "off",
+        "first_layout": "optimized",
+        "import_thumbnail": "off",
+        "resident": "off"
+      },
+      "actual_option_events_verified": true,
+      "toolbar_event_counts": {
+        "startup_toolbar_probe_started": 1,
+        "startup_toolbar_probe_ready": 1,
+        "startup_toolbar_probe_unavailable": 0,
+        "startup_toolbar_snapshot_used": 1,
+        "startup_toolbar_sync_fallback": 0,
+        "native_query_response": 2
+      },
+      "toolbar_trace_has_no_property_values": true
+    },
+    {
+      "scope": "timing",
+      "case": "baseline-05",
+      "portrait_engine": "shell",
+      "six_actual_options": {
+        "portrait": "shell",
+        "prewarm": "0",
+        "last_cover_grace": "off",
+        "first_layout": "optimized",
+        "import_thumbnail": "off",
+        "resident": "off"
+      },
+      "actual_option_events_verified": true,
+      "toolbar_event_counts": {
+        "startup_toolbar_probe_started": 1,
+        "startup_toolbar_probe_ready": 1,
+        "startup_toolbar_probe_unavailable": 0,
+        "startup_toolbar_snapshot_used": 1,
+        "startup_toolbar_sync_fallback": 0,
+        "native_query_response": 2
+      },
+      "toolbar_trace_has_no_property_values": true
+    },
+    {
+      "scope": "timing",
+      "case": "candidate-05",
+      "portrait_engine": "native",
+      "six_actual_options": {
+        "portrait": "native",
+        "prewarm": "0",
+        "last_cover_grace": "off",
+        "first_layout": "optimized",
+        "import_thumbnail": "off",
+        "resident": "off"
+      },
+      "actual_option_events_verified": true,
+      "toolbar_event_counts": {
+        "startup_toolbar_probe_started": 1,
+        "startup_toolbar_probe_ready": 1,
+        "startup_toolbar_probe_unavailable": 0,
+        "startup_toolbar_snapshot_used": 1,
+        "startup_toolbar_sync_fallback": 0,
+        "native_query_response": 2
+      },
+      "toolbar_trace_has_no_property_values": true
+    },
+    {
+      "scope": "timing",
+      "case": "candidate-06",
+      "portrait_engine": "native",
+      "six_actual_options": {
+        "portrait": "native",
+        "prewarm": "0",
+        "last_cover_grace": "off",
+        "first_layout": "optimized",
+        "import_thumbnail": "off",
+        "resident": "off"
+      },
+      "actual_option_events_verified": true,
+      "toolbar_event_counts": {
+        "startup_toolbar_probe_started": 1,
+        "startup_toolbar_probe_ready": 1,
+        "startup_toolbar_probe_unavailable": 0,
+        "startup_toolbar_snapshot_used": 1,
+        "startup_toolbar_sync_fallback": 0,
+        "native_query_response": 2
+      },
+      "toolbar_trace_has_no_property_values": true
+    },
+    {
+      "scope": "timing",
+      "case": "baseline-06",
+      "portrait_engine": "shell",
+      "six_actual_options": {
+        "portrait": "shell",
+        "prewarm": "0",
+        "last_cover_grace": "off",
+        "first_layout": "optimized",
+        "import_thumbnail": "off",
+        "resident": "off"
+      },
+      "actual_option_events_verified": true,
+      "toolbar_event_counts": {
+        "startup_toolbar_probe_started": 1,
+        "startup_toolbar_probe_ready": 1,
+        "startup_toolbar_probe_unavailable": 0,
+        "startup_toolbar_snapshot_used": 1,
+        "startup_toolbar_sync_fallback": 0,
+        "native_query_response": 2
+      },
+      "toolbar_trace_has_no_property_values": true
+    },
+    {
+      "scope": "pixels",
+      "case": "baseline-warmup",
+      "portrait_engine": "shell",
+      "six_actual_options": {
+        "portrait": "shell",
+        "prewarm": "0",
+        "last_cover_grace": "off",
+        "first_layout": "optimized",
+        "import_thumbnail": "off",
+        "resident": "off"
+      },
+      "actual_option_events_verified": true,
+      "toolbar_event_counts": {
+        "startup_toolbar_probe_started": 1,
+        "startup_toolbar_probe_ready": 1,
+        "startup_toolbar_probe_unavailable": 0,
+        "startup_toolbar_snapshot_used": 1,
+        "startup_toolbar_sync_fallback": 0,
+        "native_query_response": 2
+      },
+      "toolbar_trace_has_no_property_values": true
+    },
+    {
+      "scope": "pixels",
+      "case": "candidate-warmup",
+      "portrait_engine": "native",
+      "six_actual_options": {
+        "portrait": "native",
+        "prewarm": "0",
+        "last_cover_grace": "off",
+        "first_layout": "optimized",
+        "import_thumbnail": "off",
+        "resident": "off"
+      },
+      "actual_option_events_verified": true,
+      "toolbar_event_counts": {
+        "startup_toolbar_probe_started": 1,
+        "startup_toolbar_probe_ready": 1,
+        "startup_toolbar_probe_unavailable": 0,
+        "startup_toolbar_snapshot_used": 1,
+        "startup_toolbar_sync_fallback": 0,
+        "native_query_response": 2
+      },
+      "toolbar_trace_has_no_property_values": true
+    },
+    {
+      "scope": "pixels",
+      "case": "baseline-qualify",
+      "portrait_engine": "shell",
+      "six_actual_options": {
+        "portrait": "shell",
+        "prewarm": "0",
+        "last_cover_grace": "off",
+        "first_layout": "optimized",
+        "import_thumbnail": "off",
+        "resident": "off"
+      },
+      "actual_option_events_verified": true,
+      "toolbar_event_counts": {
+        "startup_toolbar_probe_started": 1,
+        "startup_toolbar_probe_ready": 1,
+        "startup_toolbar_probe_unavailable": 0,
+        "startup_toolbar_snapshot_used": 1,
+        "startup_toolbar_sync_fallback": 0,
+        "native_query_response": 2
+      },
+      "toolbar_trace_has_no_property_values": true
+    },
+    {
+      "scope": "pixels",
+      "case": "candidate-qualify",
+      "portrait_engine": "native",
+      "six_actual_options": {
+        "portrait": "native",
+        "prewarm": "0",
+        "last_cover_grace": "off",
+        "first_layout": "optimized",
+        "import_thumbnail": "off",
+        "resident": "off"
+      },
+      "actual_option_events_verified": true,
+      "toolbar_event_counts": {
+        "startup_toolbar_probe_started": 1,
+        "startup_toolbar_probe_ready": 0,
+        "startup_toolbar_probe_unavailable": 1,
+        "startup_toolbar_snapshot_used": 0,
+        "startup_toolbar_sync_fallback": 1,
+        "native_query_response": 7
+      },
+      "toolbar_trace_has_no_property_values": true
+    }
+  ],
+  "batches": [
+    {
+      "scope": "timing",
+      "source_evidence": {
+        "operation_report_name": "report.json",
+        "operation_report_sha256": "f4c055a033cd717cff93fdbfe1ea2a39fbabe5c04d9987d28419e58d32fc9d2a",
+        "lease_release_receipt_name": "lease-released.json",
+        "lease_release_receipt_sha256": "ac6be1ddd2c5b4519fbbc2466b9166e82437f7ce7c2d393c170f84cc2701e429",
+        "frozen_plan_sha256": "0e2566eb2a3346a753a7323631bd688236906a23dd1670288393cc88d1ca2c08"
+      },
+      "planned_case_count": 14,
+      "completed_case_count": 14,
+      "operations": {
+        "recorded": 26,
+        "failed": 0,
+        "case_exception_absent": true
+      },
+      "restoration": {
+        "operation_report": {
+          "success": true,
+          "cases_completed": true,
+          "same_boot": true,
+          "native_restored": true,
+          "entry_restored": true,
+          "installed_and_user_unchanged": true,
+          "input_roster_unchanged": true,
+          "temporary_stage_absent": true,
+          "lease_released": true
+        },
+        "lease_release_receipt": {
+          "ok": true,
+          "owner_and_token_checked": true,
+          "native_restored_and_connections_closed": true,
+          "only_owned_owner_json_removed_then_rmdir": true,
+          "lease_directory_absent_after_release": true
+        },
+        "protected_before_after_bytes_equal": true,
+        "completed_cases_match_plan": true
+      }
+    },
+    {
+      "scope": "pixels",
+      "source_evidence": {
+        "operation_report_name": "report.json",
+        "operation_report_sha256": "d48dfc8478c24c2b2b10b972ecf62aa7841304a3f6147c03b514e1e4eaffee89",
+        "lease_release_receipt_name": "lease-released.json",
+        "lease_release_receipt_sha256": "cc42ca8bdf9797126bf494db9f76b1fd031411395e26bd3e93660446d04460c6",
+        "frozen_plan_sha256": "876931cbff76c0757f485bb19931cd0f580d454e3f51dd2c427fd89447441329"
+      },
+      "planned_case_count": 4,
+      "completed_case_count": 4,
+      "operations": {
+        "recorded": 16,
+        "failed": 0,
+        "case_exception_absent": true
+      },
+      "restoration": {
+        "operation_report": {
+          "success": true,
+          "cases_completed": true,
+          "same_boot": true,
+          "native_restored": true,
+          "entry_restored": true,
+          "installed_and_user_unchanged": true,
+          "input_roster_unchanged": true,
+          "temporary_stage_absent": true,
+          "lease_released": true
+        },
+        "lease_release_receipt": {
+          "ok": true,
+          "owner_and_token_checked": true,
+          "native_restored_and_connections_closed": true,
+          "only_owned_owner_json_removed_then_rmdir": true,
+          "lease_directory_absent_after_release": true
+        },
+        "protected_before_after_bytes_equal": true,
+        "completed_cases_match_plan": true
+      }
+    }
+  ],
+  "pixels": {
+    "width": 1860,
+    "height": 2480,
+    "status_bar_excluded_pixels": 72,
+    "identical_below_status_bar": true,
+    "right_status_bar_region": {
+      "x": 930,
+      "y": 0,
+      "width": 930,
+      "height": 72
+    },
+    "right_status_bar_observable": true,
+    "identical_right_status_bar": false
+  },
+  "toolbar_observation": {
+    "snapshot_cases": 17,
+    "fallback_case_count": 1,
+    "fallback_cases": [
+      {
+        "scope": "pixels",
+        "case": "candidate-qualify"
+      }
+    ],
+    "difference_cause_established": false,
+    "scope": "Only the candidate pixel qualification case records an unavailable toolbar probe and synchronous fallback. The retained sidecars and trace do not contain actual battery or Wi-Fi values. This observation does not establish the cause of the right status pixel mismatch."
+  },
+  "evidence_fields": {
+    "case_options": "outputs/out/<case>/application.json: $.events[*].name",
+    "portrait_engine": "outputs/out/<case>/portrait-engine",
+    "toolbar_event_counts": "outputs/out/<case>/application.json: $.events[*].name",
+    "operation_counts": "report.json: $.commands[*].returncode",
+    "protected_snapshot_equality": "before.stdout compared byte for byte with after.stdout",
+    "restoration": "report.json: native_restored, entry_restored, installed_and_user_unchanged, input_roster_unchanged, temporary_stage_absent, lease_released",
+    "lease_checks": "lease-released.json: owner_and_token_checked, native_restored_and_connections_closed, lease_directory_absent_after_release"
+  },
+  "scope": "Whitelist export from retained timing and independent pixel observations. All six timing pairs and all 18 cases are retained. The body matched but observable right status pixels differed. No device operation, new plan, image modification, or relaxed qualification rule was used. Private fixtures, native identifiers, tokens, user pixels, and image hashes are omitted."
+}

@@ -1,0 +1,193 @@
+{
+  "schema_version": 1,
+  "trial": "all-options",
+  "attempt": "first",
+  "revision": "R3",
+  "source_commit": "8baf57ffb64d74000abef49111baf6e726d4d425",
+  "exported_at_utc": "2026-11-19T01:12:48.638003+00:00",
+  "valid": false,
+  "qualification_passed": false,
+  "all_options_functional_passed": false,
+  "qualification_only": true,
+  "performance_claim": false,
+  "latency_gate_passed": null,
+  "issues": [
+    "right_toolbar_unverified_or_different"
+  ],
+  "input_failures": [],
+  "source_evidence": {
+    "source_report_name": "all-options.json",
+    "source_report_sha256": "919adda6d7013ec295818985b98cffe3343e9f06774588733124d99639ae0f20",
+    "operation_report_name": "report.json",
+    "operation_report_sha256": "d835244b7640f43f0dde44fd2d2289511e6b014aac9e7d79a47b86affc035c48",
+    "lease_release_receipt_name": "lease-released.json",
+    "lease_release_receipt_sha256": "2778571ecfafaf97bcf61d5093fa001301d15c257b1b01e53bd8e54f214723c8",
+    "frozen_plan_sha256": "89e72462618e8cb248490c095556af4b5526f10b9a493d1be4ded7475f5a6a36",
+    "build_receipt_sha256": "516d572640a5f04b3243180b42b5f792f80687664febdac182f2bc8dc6e083c8"
+  },
+  "program_sha256": {
+    "baseline": {
+      "application_sha256": "1b1c508e1ee84a4be3bd0c15bcf6d42bdd492d688f3fa81b065fb256e00dd3af",
+      "launcher_sha256": "412163f1e84a4ce0ae869439555f80bea8c0ac6b56dcd54b0cd3bccf68804675",
+      "portrait_helper_sha256": "bde28cd5953d26b0dc3bfebe16fcfe1cde329021c17449edae7c59470376ed50",
+      "native_query_sha256": "84c2f27d8233d8695001aa86d880e29454fe188deb9884aca1c6694c82a5887d"
+    },
+    "candidate": {
+      "application_sha256": "1b1c508e1ee84a4be3bd0c15bcf6d42bdd492d688f3fa81b065fb256e00dd3af",
+      "launcher_sha256": "412163f1e84a4ce0ae869439555f80bea8c0ac6b56dcd54b0cd3bccf68804675",
+      "portrait_helper_sha256": "bde28cd5953d26b0dc3bfebe16fcfe1cde329021c17449edae7c59470376ed50",
+      "native_query_sha256": "84c2f27d8233d8695001aa86d880e29454fe188deb9884aca1c6694c82a5887d"
+    }
+  },
+  "case_count": 4,
+  "completed_case_count": 4,
+  "cases": [
+    {
+      "case": "baseline-warmup",
+      "status": "ok",
+      "six_actual_options": {
+        "portrait": "shell",
+        "prewarm": "0",
+        "last_cover_grace": "off",
+        "first_layout": "optimized",
+        "import_thumbnail": "off",
+        "resident": "off"
+      },
+      "actual_option_events_verified": true,
+      "portrait_engine": "shell",
+      "ordinary_exit_verified": true,
+      "ordered_shutdown": true,
+      "shutdown_event_counts": {
+        "shutdown_started": 1,
+        "shutdown_complete": 1,
+        "process_finished": 1
+      },
+      "keeper_published_event_count": 0,
+      "keeper_reclaimed_event_count": 0,
+      "case_ok_verified": true
+    },
+    {
+      "case": "candidate-warmup",
+      "status": "ok",
+      "six_actual_options": {
+        "portrait": "native",
+        "prewarm": "2",
+        "last_cover_grace": "on",
+        "first_layout": "optimized",
+        "import_thumbnail": "idle",
+        "resident": "45"
+      },
+      "actual_option_events_verified": true,
+      "portrait_engine": "native",
+      "ordinary_exit_verified": true,
+      "ordered_shutdown": true,
+      "shutdown_event_counts": {
+        "shutdown_started": 1,
+        "shutdown_complete": 1,
+        "process_finished": 1
+      },
+      "keeper_published_event_count": 0,
+      "keeper_reclaimed_event_count": 0,
+      "case_ok_verified": true
+    },
+    {
+      "case": "baseline-qualify",
+      "status": "ok",
+      "six_actual_options": {
+        "portrait": "shell",
+        "prewarm": "0",
+        "last_cover_grace": "off",
+        "first_layout": "optimized",
+        "import_thumbnail": "off",
+        "resident": "off"
+      },
+      "actual_option_events_verified": true,
+      "portrait_engine": "shell",
+      "ordinary_exit_verified": true,
+      "ordered_shutdown": true,
+      "shutdown_event_counts": {
+        "shutdown_started": 1,
+        "shutdown_complete": 1,
+        "process_finished": 1
+      },
+      "keeper_published_event_count": 0,
+      "keeper_reclaimed_event_count": 0,
+      "case_ok_verified": true
+    },
+    {
+      "case": "candidate-qualify",
+      "status": "ok",
+      "six_actual_options": {
+        "portrait": "native",
+        "prewarm": "2",
+        "last_cover_grace": "on",
+        "first_layout": "optimized",
+        "import_thumbnail": "idle",
+        "resident": "45"
+      },
+      "actual_option_events_verified": true,
+      "portrait_engine": "native",
+      "ordinary_exit_verified": true,
+      "ordered_shutdown": true,
+      "shutdown_event_counts": {
+        "shutdown_started": 1,
+        "shutdown_complete": 1,
+        "process_finished": 1
+      },
+      "keeper_published_event_count": 0,
+      "keeper_reclaimed_event_count": 0,
+      "case_ok_verified": true
+    }
+  ],
+  "operations": {
+    "recorded": 16,
+    "failed": 0,
+    "case_exception_absent": true
+  },
+  "restoration": {
+    "operation_report": {
+      "success": true,
+      "cases_completed": true,
+      "same_boot": true,
+      "native_restored": true,
+      "entry_restored": true,
+      "installed_and_user_unchanged": true,
+      "input_roster_unchanged": true,
+      "temporary_stage_absent": true,
+      "lease_released": true
+    },
+    "lease_release_receipt": {
+      "ok": true,
+      "owner_and_token_checked": true,
+      "native_restored_and_connections_closed": true,
+      "only_owned_owner_json_removed_then_rmdir": true,
+      "lease_directory_absent_after_release": true
+    },
+    "protected_before_after_bytes_equal": true,
+    "completed_cases_match_plan": true
+  },
+  "pixels": {
+    "width": 1860,
+    "height": 2480,
+    "status_bar_excluded_pixels": 72,
+    "identical_below_status_bar": true,
+    "right_status_bar_region": {
+      "x": 930,
+      "y": 0,
+      "width": 930,
+      "height": 72
+    },
+    "right_status_bar_observable": true,
+    "identical_right_status_bar": false
+  },
+  "evidence_fields": {
+    "case_options": "outputs/out/<case>/application.json: $.events[*].name; source report: $.batches[0].cases[*].application_selection.values",
+    "portrait_engine": "outputs/out/<case>/portrait-engine",
+    "ordered_shutdown_and_keeper_events": "outputs/out/<case>/application.json: $.events[*].name",
+    "operation_counts": "report.json: $.commands[*].returncode",
+    "protected_snapshot_equality": "before.stdout compared byte for byte with after.stdout",
+    "restoration": "report.json: native_restored, entry_restored, installed_and_user_unchanged, input_roster_unchanged, temporary_stage_absent, lease_released",
+    "lease_checks": "lease-released.json: owner_and_token_checked, native_restored_and_connections_closed, lease_directory_absent_after_release"
+  },
+  "scope": "Whitelist export of the retained first All-options attempt. The complete application body matched and the right status region was observable, but right status pixels differed. All-options qualification remains failed. Ordinary shutdown and zero keeper publication/reclamation events are retained; these traces are not a per-case keeper process census. No physical rerun, image editing, or relaxed pixel rule was used. No private fixture identity, user pixels or image hash, native identifier, or token is included."
+}

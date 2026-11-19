@@ -1,0 +1,39 @@
+{
+  "schema_version": 1,
+  "status": "prepared_not_run_on_kindle",
+  "host_environment": "test-env",
+  "plan_path": "/root/aidoku-all-bench-20261119/portrait-v3/private/aidoku-all-v3-portrait-7f0ded74/plan.json",
+  "plan_sha256": "876931cbff76c0757f485bb19931cd0f580d454e3f51dd2c427fd89447441329",
+  "scope": "Independent R3 shell/native portrait pixels. Host-only preparation and frozen-input replay. No device connection or lease.",
+  "checks": {
+    "release_receipt_and_artifacts": true,
+    "exact_frozen_runner_and_device_script": true,
+    "payload_members_and_instrumentation": true,
+    "case_order": true,
+    "same_R3_programs_and_only_portrait_setting_difference": true,
+    "unconsumed_plan_at_preparation": true
+  },
+  "cases": [
+    "baseline-warmup",
+    "candidate-warmup",
+    "baseline-qualify",
+    "candidate-qualify"
+  ],
+  "program_sha256": {
+    "candidate-arm": "1b1c508e1ee84a4be3bd0c15bcf6d42bdd492d688f3fa81b065fb256e00dd3af",
+    "launch.sh": "412163f1e84a4ce0ae869439555f80bea8c0ac6b56dcd54b0cd3bccf68804675",
+    "aidoku-startup-portrait": "bde28cd5953d26b0dc3bfebe16fcfe1cde329021c17449edae7c59470376ed50"
+  },
+  "baseline_option": {
+    "portrait": "shell"
+  },
+  "candidate_option": {
+    "portrait": "native"
+  },
+  "runner_sha256": "28af8484760c609c8822de500b24fa7e5ae31faace91a31b653bb6f408e76f5c",
+  "device_script_sha256": "b81b54db195ec3e0de03f0374e16c614fe75e43b424b918c31e4be1648944f4a",
+  "payload_sha256": "62fdd40a8451a3e21d33768e7674e95f6fd92ca7104768266bcb41926ce5d196",
+  "analyzer_sha256": "00e747b04dbadb3d0681d754f6643a4a678da461dd5aaabcf0aa23219037ce4b",
+  "screen_plan_path": "/root/aidoku-all-bench-20261119/portrait-v3/private/aidoku-all-v3-portrait-0d7ea40e/plan.json",
+  "screen_plan_sha256": "0e2566eb2a3346a753a7323631bd688236906a23dd1670288393cc88d1ca2c08"
+}

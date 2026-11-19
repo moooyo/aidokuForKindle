@@ -1,0 +1,92 @@
+{
+  "schema_version": 1,
+  "date_local": "2026-11-19",
+  "product_commit": "8baf57f",
+  "environment": "test-env",
+  "scope": "Read-only source inspection and analysis of retained GUI event logs. No new device access, image capture or runtime test.",
+  "timing_units": "milliseconds",
+  "cases": {
+    "portrait_baseline": {
+      "probe_elapsed_ms": 53.207,
+      "startup_response_count": 2,
+      "startup_response_offsets_ms": [
+        39.347,
+        43.425
+      ],
+      "snapshot_used": true,
+      "sync_fallback": false,
+      "fallback_response_count": 0,
+      "inferred_selected_battery_response_offset_ms": 43.425,
+      "first_library_frame_offset_ms": 864.451,
+      "snapshot_used_offset_ms": 510.564
+    },
+    "portrait_candidate": {
+      "probe_elapsed_ms": 83.701,
+      "startup_response_count": 2,
+      "startup_response_offsets_ms": [
+        73.575,
+        77.387
+      ],
+      "snapshot_used": false,
+      "sync_fallback": true,
+      "fallback_response_count": 5,
+      "inferred_selected_battery_response_offset_ms": 481.572,
+      "first_library_frame_offset_ms": 785.293,
+      "fallback_reread_after_discarded_battery_response_ms": 404.185
+    },
+    "all_options_baseline": {
+      "probe_elapsed_ms": 69.057,
+      "startup_response_count": 2,
+      "startup_response_offsets_ms": [
+        60.803,
+        66.132
+      ],
+      "snapshot_used": true,
+      "sync_fallback": false,
+      "fallback_response_count": 0,
+      "inferred_selected_battery_response_offset_ms": 66.132,
+      "first_library_frame_offset_ms": 838.206,
+      "snapshot_used_offset_ms": 511.063
+    },
+    "all_options_candidate": {
+      "probe_elapsed_ms": 47.412,
+      "startup_response_count": 2,
+      "startup_response_offsets_ms": [
+        39.232,
+        44.546
+      ],
+      "snapshot_used": true,
+      "sync_fallback": false,
+      "fallback_response_count": 0,
+      "inferred_selected_battery_response_offset_ms": 44.546,
+      "first_library_frame_offset_ms": 688.311,
+      "snapshot_used_offset_ms": 471.967
+    }
+  },
+  "cross_visit_battery_response_gaps_seconds": {
+    "portrait": 30.544251,
+    "all_options": 31.160957
+  },
+  "raw_property_values_recorded": false,
+  "query_order_inference": "The first two toolbar responses are WiFiState and Battery. The fallback status responses are WiFiState, Battery, Charging, Brightness and Warmth. Event records do not contain the property value.",
+  "source_policy": {
+    "toolbar_total_deadline_ms": 80,
+    "startup_sample_max_age_ms": 1000,
+    "published_view_cache_ms": 30000,
+    "ordinary_status_cache_ms": 30000,
+    "battery_source": "com.lab126.powerd.battLevel via LipcGetIntProperty",
+    "battery_conversion": "Decimal integer parsed as u8. No rounding or subtraction. Optional ordinary fallback clamps to 100 and uses zero only when parsing fails.",
+    "native_portrait_properties": [
+      "SleepModules when requested",
+      "PowerState",
+      "DisplayMode",
+      "Portrait"
+    ],
+    "native_portrait_transfers_battery_or_wifi": false
+  },
+  "limitations": [
+    "The unavailable event does not retain an error class; a finish/deadline failure is an inference from the 80 ms budget and two successful replies.",
+    "No independent firmware battery or WiFi value was recorded for these visits. The logs cannot establish natural battery decline or completely exclude an implementation issue.",
+    "Each process retains its own toolbar observation for up to 30 seconds. Neither supervisor publishes a shared battery cache."
+  ]
+}

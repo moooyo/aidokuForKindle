@@ -1,0 +1,240 @@
+{
+  "schema_version": 1,
+  "environment": "test-env",
+  "qualification_status": "failed_retained",
+  "qualification_issue": "right_toolbar_unverified_or_different",
+  "cross_arm_pixel_differences": {
+    "native-settled.ppm": {
+      "full": {
+        "different_pixels": 1362,
+        "bbox": [
+          140,
+          21,
+          1705,
+          51
+        ],
+        "maximum_channel_difference": 238
+      },
+      "left_status": {
+        "different_pixels": 234,
+        "bbox": [
+          140,
+          26,
+          156,
+          49
+        ],
+        "maximum_channel_difference": 238
+      },
+      "right_status": {
+        "different_pixels": 1128,
+        "bbox": [
+          1585,
+          21,
+          1705,
+          51
+        ],
+        "maximum_channel_difference": 238
+      },
+      "body": {
+        "different_pixels": 0,
+        "bbox": null,
+        "maximum_channel_difference": 0
+      },
+      "wifi": {
+        "different_pixels": 335,
+        "bbox": [
+          1585,
+          21,
+          1623,
+          51
+        ],
+        "maximum_channel_difference": 238
+      },
+      "battery_label": {
+        "different_pixels": 793,
+        "bbox": [
+          1642,
+          26,
+          1705,
+          50
+        ],
+        "maximum_channel_difference": 238
+      },
+      "battery_icon": {
+        "different_pixels": 0,
+        "bbox": null,
+        "maximum_channel_difference": 0
+      }
+    },
+    "final.png": {
+      "full": {
+        "different_pixels": 1362,
+        "bbox": [
+          140,
+          21,
+          1705,
+          51
+        ],
+        "maximum_channel_difference": 238
+      },
+      "left_status": {
+        "different_pixels": 234,
+        "bbox": [
+          140,
+          26,
+          156,
+          49
+        ],
+        "maximum_channel_difference": 238
+      },
+      "right_status": {
+        "different_pixels": 1128,
+        "bbox": [
+          1585,
+          21,
+          1705,
+          51
+        ],
+        "maximum_channel_difference": 238
+      },
+      "body": {
+        "different_pixels": 0,
+        "bbox": null,
+        "maximum_channel_difference": 0
+      },
+      "wifi": {
+        "different_pixels": 335,
+        "bbox": [
+          1585,
+          21,
+          1623,
+          51
+        ],
+        "maximum_channel_difference": 238
+      },
+      "battery_label": {
+        "different_pixels": 793,
+        "bbox": [
+          1642,
+          26,
+          1705,
+          50
+        ],
+        "maximum_channel_difference": 238
+      },
+      "battery_icon": {
+        "different_pixels": 0,
+        "bbox": null,
+        "maximum_channel_difference": 0
+      }
+    }
+  },
+  "within_arm_native_matches_renderer": {
+    "baseline": {
+      "different_pixels": 0,
+      "bbox": null,
+      "maximum_channel_difference": 0
+    },
+    "candidate": {
+      "different_pixels": 0,
+      "bbox": null,
+      "maximum_channel_difference": 0
+    }
+  },
+  "wifi_icon": {
+    "arms": {
+      "baseline": {
+        "bbox": [
+          1585,
+          21,
+          1621,
+          51
+        ],
+        "foreground_pixels": 376
+      },
+      "candidate": {
+        "bbox": [
+          1587,
+          21,
+          1623,
+          51
+        ],
+        "foreground_pixels": 376
+      }
+    },
+    "candidate_translation_px": [
+      2,
+      0
+    ],
+    "aligned_comparison": {
+      "different_pixels": 0,
+      "bbox": null,
+      "maximum_channel_difference": 0
+    }
+  },
+  "battery_display_ocr": {
+    "baseline": [
+      {
+        "crop_bbox": [
+          1630,
+          10,
+          1715,
+          62
+        ],
+        "observations": [
+          {
+            "displayed_label_ocr": "28%",
+            "ocr_confidence": 93.209198
+          }
+        ]
+      },
+      {
+        "crop_bbox": [
+          1640,
+          10,
+          1715,
+          62
+        ],
+        "observations": [
+          {
+            "displayed_label_ocr": "28%",
+            "ocr_confidence": 93.209198
+          }
+        ]
+      }
+    ],
+    "candidate": [
+      {
+        "crop_bbox": [
+          1630,
+          10,
+          1715,
+          62
+        ],
+        "observations": [
+          {
+            "displayed_label_ocr": "27%",
+            "ocr_confidence": 67.878326
+          }
+        ]
+      },
+      {
+        "crop_bbox": [
+          1640,
+          10,
+          1715,
+          62
+        ],
+        "observations": [
+          {
+            "displayed_label_ocr": "27%",
+            "ocr_confidence": 67.878326
+          }
+        ]
+      }
+    ]
+  },
+  "status_sidecar_evidence": "The retained sidecars and toolbar trace events do not contain the actual firmware battery or Wi-Fi result values. They cannot independently establish a physical battery decrease.",
+  "interpretation": "The two application captures show different battery labels, read as 28% and 27%. The identical Wi-Fi glyph moves horizontally with the preferred width of the battery label, as specified by ui/widgets.slint. Each native capture equals its corresponding application screenshot. This explains the retained pixel failure; it does not convert the original qualification into a pass.",
+  "scope": "Host-only analysis of retained images. Only difference counts, bounding boxes, numeric OCR observations, and status interpretation are exported. User pixels, image hashes, private fixture identifiers, and device identifiers are excluded. Wi-Fi alignment is diagnostic only and does not change the strict right-toolbar comparison."
+}

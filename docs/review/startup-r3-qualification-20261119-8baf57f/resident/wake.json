@@ -1,0 +1,396 @@
+{
+  "schema_version": 1,
+  "revision": "R3",
+  "scope_name": "wake",
+  "phase": "qualify",
+  "verification_environment": "test-env",
+  "valid": true,
+  "qualified": true,
+  "qualification_passed": true,
+  "latency_gate_passed": null,
+  "programs": {
+    "application_sha256": "1b1c508e1ee84a4be3bd0c15bcf6d42bdd492d688f3fa81b065fb256e00dd3af",
+    "launcher_sha256": "412163f1e84a4ce0ae869439555f80bea8c0ac6b56dcd54b0cd3bccf68804675",
+    "native_query_sha256": "84c2f27d8233d8695001aa86d880e29454fe188deb9884aca1c6694c82a5887d",
+    "portrait_helper_sha256": "bde28cd5953d26b0dc3bfebe16fcfe1cde329021c17449edae7c59470376ed50"
+  },
+  "frozen_plan_sha256": "a4f64929744a49b3b20a59981739e7fe00384643591c39aa86743fd3e20896f8",
+  "replay_sha256": "02f54508f3d2d8721d9df036ca5a5479327f901770f8ea46e2e3ca5cf8bebfc1",
+  "batches": [
+    {
+      "scenario": "immediate",
+      "mode": "qualify",
+      "batch_guards": {
+        "success": true,
+        "lease_released": true,
+        "same_boot": true,
+        "native_restored": true,
+        "entry_restored": true,
+        "installed_and_user_unchanged": true,
+        "input_roster_unchanged": true
+      },
+      "protected_snapshots_match": true,
+      "release_verified": true
+    }
+  ],
+  "cases": [
+    {
+      "case": "baseline-warmup",
+      "status": "ok",
+      "mechanism": "ordinary_exit",
+      "options_verified": true,
+      "new_gui_process_for_each_visit": true,
+      "native_home_after_both_visits": true,
+      "actions": {
+        "prime": {
+          "selection": {
+            "portrait": "shell",
+            "prewarm": "0",
+            "last_cover_grace": "off",
+            "import_thumbnail": "off",
+            "first_layout": "optimized",
+            "resident": "off"
+          },
+          "published": 0,
+          "unavailable": 0,
+          "reclaimed": 0,
+          "rejected": 0,
+          "pixel_hits": 0,
+          "explicit_exit": true,
+          "publish_after_shutdown_start_ms": null
+        },
+        "second": {
+          "selection": {
+            "portrait": "shell",
+            "prewarm": "0",
+            "last_cover_grace": "off",
+            "import_thumbnail": "off",
+            "first_layout": "optimized",
+            "resident": "off"
+          },
+          "published": 0,
+          "unavailable": 0,
+          "reclaimed": 0,
+          "rejected": 0,
+          "pixel_hits": 0,
+          "explicit_exit": true,
+          "publish_after_shutdown_start_ms": null
+        }
+      },
+      "resources": {
+        "points": {
+          "between": {
+            "state": "absent",
+            "rss_kib": 0,
+            "pss_kib": 0,
+            "sampling_window_ms": 20.0
+          },
+          "pre_second": {
+            "state": "absent",
+            "rss_kib": 0,
+            "pss_kib": 0,
+            "sampling_window_ms": 30.0
+          },
+          "after_second": {
+            "state": "absent",
+            "rss_kib": 0,
+            "pss_kib": 0,
+            "sampling_window_ms": 30.0
+          }
+        },
+        "same_keeper_in_home": false,
+        "home_cpu_ticks": null,
+        "home_cpu_window_ms": null,
+        "total_observation_ms": 80.0,
+        "home_gap_observation_ms": 50.0
+      }
+    },
+    {
+      "case": "candidate-warmup",
+      "status": "ok",
+      "mechanism": "retained_pixels_used",
+      "options_verified": true,
+      "new_gui_process_for_each_visit": true,
+      "native_home_after_both_visits": true,
+      "actions": {
+        "prime": {
+          "selection": {
+            "portrait": "shell",
+            "prewarm": "0",
+            "last_cover_grace": "off",
+            "import_thumbnail": "off",
+            "first_layout": "optimized",
+            "resident": "45"
+          },
+          "published": 1,
+          "unavailable": 0,
+          "reclaimed": 0,
+          "rejected": 0,
+          "pixel_hits": 0,
+          "explicit_exit": true,
+          "publish_after_shutdown_start_ms": 101.738
+        },
+        "second": {
+          "selection": {
+            "portrait": "shell",
+            "prewarm": "0",
+            "last_cover_grace": "off",
+            "import_thumbnail": "off",
+            "first_layout": "optimized",
+            "resident": "45"
+          },
+          "published": 0,
+          "unavailable": 0,
+          "reclaimed": 1,
+          "rejected": 0,
+          "pixel_hits": 6,
+          "explicit_exit": true,
+          "publish_after_shutdown_start_ms": null
+        }
+      },
+      "resources": {
+        "points": {
+          "between": {
+            "state": "held",
+            "rss_kib": 2348,
+            "pss_kib": 2336,
+            "sampling_window_ms": 100.0
+          },
+          "pre_second": {
+            "state": "held",
+            "rss_kib": 2348,
+            "pss_kib": 2336,
+            "sampling_window_ms": 90.0
+          },
+          "after_second": {
+            "state": "absent",
+            "rss_kib": 0,
+            "pss_kib": 0,
+            "sampling_window_ms": 30.0
+          }
+        },
+        "same_keeper_in_home": true,
+        "home_cpu_ticks": 0,
+        "home_cpu_window_ms": 8570.0,
+        "total_observation_ms": 220.0,
+        "home_gap_observation_ms": 190.0
+      }
+    },
+    {
+      "case": "baseline-qualify",
+      "status": "ok",
+      "mechanism": "ordinary_exit",
+      "options_verified": true,
+      "new_gui_process_for_each_visit": true,
+      "native_home_after_both_visits": true,
+      "actions": {
+        "prime": {
+          "selection": {
+            "portrait": "shell",
+            "prewarm": "0",
+            "last_cover_grace": "off",
+            "import_thumbnail": "off",
+            "first_layout": "optimized",
+            "resident": "off"
+          },
+          "published": 0,
+          "unavailable": 0,
+          "reclaimed": 0,
+          "rejected": 0,
+          "pixel_hits": 0,
+          "explicit_exit": true,
+          "publish_after_shutdown_start_ms": null
+        },
+        "second": {
+          "selection": {
+            "portrait": "shell",
+            "prewarm": "0",
+            "last_cover_grace": "off",
+            "import_thumbnail": "off",
+            "first_layout": "optimized",
+            "resident": "off"
+          },
+          "published": 0,
+          "unavailable": 0,
+          "reclaimed": 0,
+          "rejected": 0,
+          "pixel_hits": 0,
+          "explicit_exit": true,
+          "publish_after_shutdown_start_ms": null
+        }
+      },
+      "resources": {
+        "points": {
+          "between": {
+            "state": "absent",
+            "rss_kib": 0,
+            "pss_kib": 0,
+            "sampling_window_ms": 20.0
+          },
+          "pre_second": {
+            "state": "absent",
+            "rss_kib": 0,
+            "pss_kib": 0,
+            "sampling_window_ms": 30.0
+          },
+          "after_second": {
+            "state": "absent",
+            "rss_kib": 0,
+            "pss_kib": 0,
+            "sampling_window_ms": 30.0
+          }
+        },
+        "same_keeper_in_home": false,
+        "home_cpu_ticks": null,
+        "home_cpu_window_ms": null,
+        "total_observation_ms": 80.0,
+        "home_gap_observation_ms": 50.0
+      }
+    },
+    {
+      "case": "candidate-qualify",
+      "status": "ok",
+      "mechanism": "retained_pixels_used",
+      "options_verified": true,
+      "new_gui_process_for_each_visit": true,
+      "native_home_after_both_visits": true,
+      "actions": {
+        "prime": {
+          "selection": {
+            "portrait": "shell",
+            "prewarm": "0",
+            "last_cover_grace": "off",
+            "import_thumbnail": "off",
+            "first_layout": "optimized",
+            "resident": "45"
+          },
+          "published": 1,
+          "unavailable": 0,
+          "reclaimed": 0,
+          "rejected": 0,
+          "pixel_hits": 0,
+          "explicit_exit": true,
+          "publish_after_shutdown_start_ms": 99.084
+        },
+        "second": {
+          "selection": {
+            "portrait": "shell",
+            "prewarm": "0",
+            "last_cover_grace": "off",
+            "import_thumbnail": "off",
+            "first_layout": "optimized",
+            "resident": "45"
+          },
+          "published": 0,
+          "unavailable": 0,
+          "reclaimed": 1,
+          "rejected": 0,
+          "pixel_hits": 6,
+          "explicit_exit": true,
+          "publish_after_shutdown_start_ms": null
+        }
+      },
+      "resources": {
+        "points": {
+          "between": {
+            "state": "held",
+            "rss_kib": 2348,
+            "pss_kib": 2336,
+            "sampling_window_ms": 100.0
+          },
+          "pre_second": {
+            "state": "held",
+            "rss_kib": 2348,
+            "pss_kib": 2336,
+            "sampling_window_ms": 80.0
+          },
+          "after_second": {
+            "state": "absent",
+            "rss_kib": 0,
+            "pss_kib": 0,
+            "sampling_window_ms": 20.0
+          }
+        },
+        "same_keeper_in_home": true,
+        "home_cpu_ticks": 0,
+        "home_cpu_window_ms": 8560.0,
+        "total_observation_ms": 200.0,
+        "home_gap_observation_ms": 180.0
+      }
+    }
+  ],
+  "qualification_by_scenario": {
+    "immediate": true
+  },
+  "residency_resources": {
+    "baseline": {
+      "episodes_observed": 1,
+      "keepers_observed": 0,
+      "keeper_rss_kib_when_present": null,
+      "keeper_pss_kib_when_available": null,
+      "keeper_pss_unavailable": 0,
+      "idle_cpu_ticks_on_same_keeper": null,
+      "same_keeper_observation_ms": null,
+      "observer_wall_ms": {
+        "n": 1,
+        "min": 80.0,
+        "median": 80.0,
+        "max": 80.0
+      }
+    },
+    "candidate": {
+      "episodes_observed": 1,
+      "keepers_observed": 1,
+      "keeper_rss_kib_when_present": {
+        "n": 1,
+        "min": 2348,
+        "median": 2348,
+        "max": 2348
+      },
+      "keeper_pss_kib_when_available": {
+        "n": 1,
+        "min": 2336,
+        "median": 2336,
+        "max": 2336
+      },
+      "keeper_pss_unavailable": 0,
+      "idle_cpu_ticks_on_same_keeper": {
+        "n": 1,
+        "min": 0,
+        "median": 0,
+        "max": 0
+      },
+      "same_keeper_observation_ms": {
+        "n": 1,
+        "min": 8560.0,
+        "median": 8560.0,
+        "max": 8560.0
+      },
+      "observer_wall_ms": {
+        "n": 1,
+        "min": 200.0,
+        "median": 200.0,
+        "max": 200.0
+      }
+    }
+  },
+  "scope": "Independent host replay of completed device observations. Each open uses a fresh GUI; only validated cover pixels can survive native Home. Qualification cases are not latency samples. RSS and PSS are observed process memory, not the decoded payload bound, peak memory, or battery use. Private identities, absolute clocks, pixels and image digests are excluded.",
+  "short_sleep_visual": {
+    "baseline": {
+      "same_second_gui": true,
+      "active_input_handles": 2,
+      "parked_input_handles": 1,
+      "woken_input_handles": 2,
+      "visible_library_matches": true,
+      "right_toolbar_matches": true
+    },
+    "candidate": {
+      "same_second_gui": true,
+      "active_input_handles": 2,
+      "parked_input_handles": 1,
+      "woken_input_handles": 2,
+      "visible_library_matches": true,
+      "right_toolbar_matches": true
+    }
+  }
+}

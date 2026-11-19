@@ -1,0 +1,224 @@
+{
+  "schema_version": 1,
+  "trial": "all-options",
+  "attempt": "independent_requalification",
+  "revision": "R3",
+  "source_commit": "8baf57ffb64d74000abef49111baf6e726d4d425",
+  "exported_at_utc": "2026-11-19T02:35:26.451618+00:00",
+  "valid": true,
+  "qualification_passed": true,
+  "all_options_functional_passed": true,
+  "qualification_only": true,
+  "performance_claim": false,
+  "latency_gate_passed": null,
+  "issues": [],
+  "input_failures": [],
+  "source_evidence": {
+    "source_report_name": "all-options-requalification.json",
+    "source_report_sha256": "194908d7a2665725f989d319087f030c9aa50877d28856e52dc19a0d763cd234",
+    "operation_report_name": "report.json",
+    "operation_report_sha256": "1e9b13a47c6a62e51daee8b4af409d375e5e61d61a24d95cb69158f9d08afa9e",
+    "lease_release_receipt_name": "lease-released.json",
+    "lease_release_receipt_sha256": "b36da906b39fbb7becb41f3c781bc14359d056e1de062ca5593417e67025840d",
+    "frozen_plan_sha256": "171045fb408ed6e190cc39651550b6b8450e3368dbec7a764ab9095aac497f76",
+    "build_receipt_sha256": "516d572640a5f04b3243180b42b5f792f80687664febdac182f2bc8dc6e083c8",
+    "analyzer_sha256": "00e747b04dbadb3d0681d754f6643a4a678da461dd5aaabcf0aa23219037ce4b",
+    "runner_sha256": "8e37f622fa9ccb681f374a138ed1eb741edf6b3c52cfbc45e16701705e6dd1f3",
+    "device_script_sha256": "b8c1b11917ec03f8be66e7327571e35841b24b20e6e00fe8619bcd2bf7621230"
+  },
+  "retained_first_attempt": {
+    "summary_file": "all-options-first-attempt.json",
+    "summary_sha256": "0c2a1ccad403847bcc2728ca47dc4be4070e59ee292975c1b18f1d082ab6462a",
+    "source_report_sha256": "919adda6d7013ec295818985b98cffe3343e9f06774588733124d99639ae0f20",
+    "valid": false,
+    "qualification_passed": false,
+    "all_options_functional_passed": false,
+    "issues": [
+      "right_toolbar_unverified_or_different"
+    ],
+    "preserved_unchanged": true
+  },
+  "comparison_with_first_attempt": {
+    "same_runner_bytes": true,
+    "same_device_script_bytes": true,
+    "same_variants": true,
+    "same_cases": true,
+    "same_analyzer_digest": true,
+    "same_right_status_region": true,
+    "same_status_bar_exclusion": true,
+    "new_run_identity": true,
+    "new_owner_hash": true,
+    "new_acquisition_owner": true,
+    "new_lease_token": true,
+    "acquisition_release_owner_matches": true,
+    "acquisition_release_run_matches": true,
+    "acquisition_release_token_matches": true,
+    "original_failure_report_unchanged": true
+  },
+  "program_sha256": {
+    "baseline": {
+      "application_sha256": "1b1c508e1ee84a4be3bd0c15bcf6d42bdd492d688f3fa81b065fb256e00dd3af",
+      "launcher_sha256": "412163f1e84a4ce0ae869439555f80bea8c0ac6b56dcd54b0cd3bccf68804675",
+      "portrait_helper_sha256": "bde28cd5953d26b0dc3bfebe16fcfe1cde329021c17449edae7c59470376ed50",
+      "native_query_sha256": "84c2f27d8233d8695001aa86d880e29454fe188deb9884aca1c6694c82a5887d"
+    },
+    "candidate": {
+      "application_sha256": "1b1c508e1ee84a4be3bd0c15bcf6d42bdd492d688f3fa81b065fb256e00dd3af",
+      "launcher_sha256": "412163f1e84a4ce0ae869439555f80bea8c0ac6b56dcd54b0cd3bccf68804675",
+      "portrait_helper_sha256": "bde28cd5953d26b0dc3bfebe16fcfe1cde329021c17449edae7c59470376ed50",
+      "native_query_sha256": "84c2f27d8233d8695001aa86d880e29454fe188deb9884aca1c6694c82a5887d"
+    }
+  },
+  "case_count": 4,
+  "completed_case_count": 4,
+  "cases": [
+    {
+      "case": "baseline-warmup",
+      "status": "ok",
+      "six_actual_options": {
+        "portrait": "shell",
+        "prewarm": "0",
+        "last_cover_grace": "off",
+        "first_layout": "optimized",
+        "import_thumbnail": "off",
+        "resident": "off"
+      },
+      "actual_option_events_verified": true,
+      "portrait_engine": "shell",
+      "ordinary_exit_verified": true,
+      "ordered_shutdown": true,
+      "shutdown_event_counts": {
+        "shutdown_started": 1,
+        "shutdown_complete": 1,
+        "process_finished": 1
+      },
+      "keeper_published_event_count": 0,
+      "keeper_reclaimed_event_count": 0,
+      "case_ok_verified": true
+    },
+    {
+      "case": "candidate-warmup",
+      "status": "ok",
+      "six_actual_options": {
+        "portrait": "native",
+        "prewarm": "2",
+        "last_cover_grace": "on",
+        "first_layout": "optimized",
+        "import_thumbnail": "idle",
+        "resident": "45"
+      },
+      "actual_option_events_verified": true,
+      "portrait_engine": "native",
+      "ordinary_exit_verified": true,
+      "ordered_shutdown": true,
+      "shutdown_event_counts": {
+        "shutdown_started": 1,
+        "shutdown_complete": 1,
+        "process_finished": 1
+      },
+      "keeper_published_event_count": 0,
+      "keeper_reclaimed_event_count": 0,
+      "case_ok_verified": true
+    },
+    {
+      "case": "baseline-qualify",
+      "status": "ok",
+      "six_actual_options": {
+        "portrait": "shell",
+        "prewarm": "0",
+        "last_cover_grace": "off",
+        "first_layout": "optimized",
+        "import_thumbnail": "off",
+        "resident": "off"
+      },
+      "actual_option_events_verified": true,
+      "portrait_engine": "shell",
+      "ordinary_exit_verified": true,
+      "ordered_shutdown": true,
+      "shutdown_event_counts": {
+        "shutdown_started": 1,
+        "shutdown_complete": 1,
+        "process_finished": 1
+      },
+      "keeper_published_event_count": 0,
+      "keeper_reclaimed_event_count": 0,
+      "case_ok_verified": true
+    },
+    {
+      "case": "candidate-qualify",
+      "status": "ok",
+      "six_actual_options": {
+        "portrait": "native",
+        "prewarm": "2",
+        "last_cover_grace": "on",
+        "first_layout": "optimized",
+        "import_thumbnail": "idle",
+        "resident": "45"
+      },
+      "actual_option_events_verified": true,
+      "portrait_engine": "native",
+      "ordinary_exit_verified": true,
+      "ordered_shutdown": true,
+      "shutdown_event_counts": {
+        "shutdown_started": 1,
+        "shutdown_complete": 1,
+        "process_finished": 1
+      },
+      "keeper_published_event_count": 0,
+      "keeper_reclaimed_event_count": 0,
+      "case_ok_verified": true
+    }
+  ],
+  "operations": {
+    "recorded": 16,
+    "failed": 0,
+    "case_exception_absent": true
+  },
+  "restoration": {
+    "operation_report": {
+      "success": true,
+      "cases_completed": true,
+      "same_boot": true,
+      "native_restored": true,
+      "entry_restored": true,
+      "installed_and_user_unchanged": true,
+      "input_roster_unchanged": true,
+      "temporary_stage_absent": true,
+      "lease_released": true
+    },
+    "lease_release_receipt": {
+      "ok": true,
+      "owner_and_token_checked": true,
+      "native_restored_and_connections_closed": true,
+      "only_owned_owner_json_removed_then_rmdir": true,
+      "lease_directory_absent_after_release": true
+    },
+    "protected_before_after_bytes_equal": true,
+    "completed_cases_match_plan": true
+  },
+  "pixels": {
+    "width": 1860,
+    "height": 2480,
+    "status_bar_excluded_pixels": 72,
+    "identical_below_status_bar": true,
+    "right_status_bar_region": {
+      "x": 930,
+      "y": 0,
+      "width": 930,
+      "height": 72
+    },
+    "right_status_bar_observable": true,
+    "identical_right_status_bar": true
+  },
+  "evidence_fields": {
+    "case_options": "outputs/out/<case>/application.json: $.events[*].name; source report: $.batches[0].cases[*].application_selection.values",
+    "portrait_engine": "outputs/out/<case>/portrait-engine",
+    "ordered_shutdown_and_keeper_events": "outputs/out/<case>/application.json: $.events[*].name",
+    "operation_counts": "report.json: $.commands[*].returncode",
+    "protected_snapshot_equality": "before.stdout compared byte for byte with after.stdout",
+    "restoration": "report.json: native_restored, entry_restored, installed_and_user_unchanged, input_roster_unchanged, temporary_stage_absent, lease_released",
+    "lease_checks": "lease-released.json: owner_and_token_checked, native_restored_and_connections_closed, lease_directory_absent_after_release",
+    "fresh_lease": "Acquisition owner, run identity, and token digest compared with the first attempt; acquisition and release identity equality checked without exporting their values."
+  },
+  "scope": "A new independent All-options qualification passed the unchanged exact body and right-status pixel checks. The first failed result remains separately retained. Runner, device script, variants, case order, analyzer digest, and pixel regions did not change. All six settings were observed on entry and ordinary exit; this does not establish import economics, keeper reacquisition, or startup speed. No private fixture identity, user pixel or image hash, native identifier, or token is included."
+}

@@ -1,0 +1,98 @@
+{
+  "schema_version": 1,
+  "environment": "test-env",
+  "revision": "R3",
+  "scope_name": "import",
+  "unique_application_process_id_count": 8,
+  "completed_stage_count": 8,
+  "cases": [
+    {
+      "case": "baseline-warmup-ingest",
+      "complete_trace": true,
+      "ordered_shutdown": true,
+      "one_catalog_notification_and_successful_worker_exit": true
+    },
+    {
+      "case": "baseline-warmup-reopen",
+      "complete_trace": true,
+      "ordered_shutdown": true,
+      "one_catalog_notification_and_successful_worker_exit": true
+    },
+    {
+      "case": "baseline-qualify-ingest",
+      "complete_trace": true,
+      "ordered_shutdown": true,
+      "one_catalog_notification_and_successful_worker_exit": true
+    },
+    {
+      "case": "baseline-qualify-reopen",
+      "complete_trace": true,
+      "ordered_shutdown": true,
+      "one_catalog_notification_and_successful_worker_exit": true
+    },
+    {
+      "case": "candidate-warmup-ingest",
+      "complete_trace": true,
+      "ordered_shutdown": true,
+      "one_catalog_notification_and_successful_worker_exit": true
+    },
+    {
+      "case": "candidate-warmup-reopen",
+      "complete_trace": true,
+      "ordered_shutdown": true,
+      "one_catalog_notification_and_successful_worker_exit": true
+    },
+    {
+      "case": "candidate-qualify-ingest",
+      "complete_trace": true,
+      "ordered_shutdown": true,
+      "one_catalog_notification_and_successful_worker_exit": true
+    },
+    {
+      "case": "candidate-qualify-reopen",
+      "complete_trace": true,
+      "ordered_shutdown": true,
+      "one_catalog_notification_and_successful_worker_exit": true
+    }
+  ],
+  "ingest_reopen_pairs": [
+    {
+      "side": "baseline",
+      "cohort": "warmup",
+      "checks": {
+        "different_application_process_ids": true,
+        "first_shutdown_complete_before_next_native_request": true,
+        "first_native_home_before_next_native_request": true
+      }
+    },
+    {
+      "side": "baseline",
+      "cohort": "qualify",
+      "checks": {
+        "different_application_process_ids": true,
+        "first_shutdown_complete_before_next_native_request": true,
+        "first_native_home_before_next_native_request": true
+      }
+    },
+    {
+      "side": "candidate",
+      "cohort": "warmup",
+      "checks": {
+        "different_application_process_ids": true,
+        "first_shutdown_complete_before_next_native_request": true,
+        "first_native_home_before_next_native_request": true
+      }
+    },
+    {
+      "side": "candidate",
+      "cohort": "qualify",
+      "checks": {
+        "different_application_process_ids": true,
+        "first_shutdown_complete_before_next_native_request": true,
+        "first_native_home_before_next_native_request": true
+      }
+    }
+  ],
+  "identity_source": "The process_id field in each complete application.json trace. Raw values are withheld. No independent kernel PID birth witness was collected.",
+  "scope": "Host-only retained process and native-entry evidence for the new GUI used by every reopening. Each prior GUI completed shutdown and returned to native Home before the next indexed open. No process identity, absolute device timestamp, user metadata, or token is exported."
+}

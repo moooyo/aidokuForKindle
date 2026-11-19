@@ -1,0 +1,245 @@
+{
+  "all_options_admission_sha256": "592b0faf9c4818e65736735291ea75b0bc3baa37d461a6a35b3f255eed8862bd",
+  "audit_method": "Independent host-side review of retained installation outputs, frozen plan, transaction backup bytes, and owner/token release receipts. No device commands or validation-suite reruns.",
+  "checks": {
+    "bindings": {
+      "all_admission_is_functional_only": true,
+      "all_admission_matches_programs": true,
+      "all_admission_matches_selection": true,
+      "all_admission_matches_source": true,
+      "exact_three_changes": true,
+      "frozen_release_plan_matches": true,
+      "report_run_matches": true
+    },
+    "lease": {
+      "acquire_and_release_succeeded": true,
+      "lease_directory_absent_at_release": true,
+      "native_restored_and_connections_closed": true,
+      "only_owned_lease_removed": true,
+      "owner_and_token_checked": true,
+      "owner_matches_reviewed_transport_rule": true,
+      "private_token_file_binding_matches": true,
+      "private_token_matches_both_receipts": true,
+      "project_matches": true,
+      "released_after_acquired": true,
+      "released_state": true,
+      "run_matches": true
+    },
+    "operations": {
+      "all_exit_codes_zero": true,
+      "all_output_files_retained": true,
+      "baseline_marker": true,
+      "candidate_marker": true,
+      "expected_operation_count": true,
+      "installation_marker": true,
+      "no_timeouts": true
+    },
+    "protection": {
+      "initial_lighting_restored": true,
+      "native_state_and_logical_library_projection_unchanged": true,
+      "nonempty_transaction_storage_unchanged": true,
+      "protection_assertion_outputs_empty": true,
+      "shared_registration_hash_assertions_succeeded": true
+    },
+    "rollback_backup": {
+      "all_members_regular": true,
+      "change_journal_matches_frozen_plan": true,
+      "exact_member_set": true,
+      "new_helper_had_no_old_copy": true,
+      "old_application_bytes_match": true,
+      "old_launcher_bytes_match": true,
+      "transaction_owner_and_journal_markers_match": true
+    }
+  },
+  "date_local": "2026-11-19",
+  "independent_record_checks_passed": true,
+  "installation_report_sha256": "97e46114542ac49e6e5ba1ae6997c97983fb92acaec92636c0a390ac4d09a36d",
+  "installation_report_status": {
+    "catalog_notifications_complete": true,
+    "installed_default_document": true,
+    "lease_released": true,
+    "matching_observable_right_toolbar": true,
+    "native_and_lighting_restored": true,
+    "original_program_backup_reverified_after_release": true,
+    "original_shared_registration_preserved": true,
+    "pixels_match_before_after_and_wake": true,
+    "private_raw_captures_preserved": true,
+    "qualified": true,
+    "same_process_short_sleep_wake": true,
+    "success": true,
+    "transaction_user_database_and_cache_unchanged": true
+  },
+  "installed_program_sha256": {
+    "aidoku/app/aidoku": "1b1c508e1ee84a4be3bd0c15bcf6d42bdd492d688f3fa81b065fb256e00dd3af",
+    "aidoku/app/aidoku-startup-portrait": "bde28cd5953d26b0dc3bfebe16fcfe1cde329021c17449edae7c59470376ed50",
+    "aidoku/launch.sh": "412163f1e84a4ce0ae869439555f80bea8c0ac6b56dcd54b0cd3bccf68804675"
+  },
+  "limitations": [
+    "Installed hashes are supported by the recorded successful transaction and post-install hash assertions and their frozen plan/journal. This audit did not reconnect to read the current device files.",
+    "The verify-program output is empty; call records retain operation, exit status and timeout, not each shell script or its digest.",
+    "Storage equality covers the stopped-program replacement interval. Normal application logging, cache access and navigation updates are separate from that interval.",
+    "Physical frame checks cover the image body below 72 status rows and the independently checked nonuniform right toolbar. They are digital capture evidence, not optical display timing.",
+    "Same-process sleep/wake is the bounded installed-entry smoke; no extended suspend, independent battery-drain measurement or actual rollback is claimed.",
+    "No private device identity, credential, raw token, private image, image checksum or user-storage checksum is exported."
+  ],
+  "new_helper_previous_state": "absent",
+  "operations": [
+    {
+      "exit_code": 0,
+      "operation": "native-before",
+      "timed_out": false
+    },
+    {
+      "exit_code": 0,
+      "operation": "protection-before",
+      "timed_out": false
+    },
+    {
+      "exit_code": 0,
+      "operation": "lighting-before",
+      "timed_out": false
+    },
+    {
+      "exit_code": 0,
+      "operation": "create-stage",
+      "timed_out": false
+    },
+    {
+      "exit_code": 0,
+      "operation": "upload",
+      "timed_out": false
+    },
+    {
+      "exit_code": 0,
+      "operation": "verify-helpers",
+      "timed_out": false
+    },
+    {
+      "exit_code": 0,
+      "operation": "baseline-smoke",
+      "timed_out": false
+    },
+    {
+      "exit_code": 0,
+      "operation": "baseline-restored",
+      "timed_out": false
+    },
+    {
+      "exit_code": 0,
+      "operation": "pre-install-check",
+      "timed_out": false
+    },
+    {
+      "exit_code": 0,
+      "operation": "pre-transaction-storage",
+      "timed_out": false
+    },
+    {
+      "exit_code": 0,
+      "operation": "install",
+      "timed_out": false
+    },
+    {
+      "exit_code": 0,
+      "operation": "verify-program",
+      "timed_out": false
+    },
+    {
+      "exit_code": 0,
+      "operation": "post-transaction-storage",
+      "timed_out": false
+    },
+    {
+      "exit_code": 0,
+      "operation": "verified-program-backup",
+      "timed_out": false
+    },
+    {
+      "exit_code": 0,
+      "operation": "installed-smoke",
+      "timed_out": false
+    },
+    {
+      "exit_code": 0,
+      "operation": "right-toolbar-observations",
+      "timed_out": false
+    },
+    {
+      "exit_code": 0,
+      "operation": "private-evidence",
+      "timed_out": false
+    },
+    {
+      "exit_code": 0,
+      "operation": "light-before-restore",
+      "timed_out": false
+    },
+    {
+      "exit_code": 0,
+      "operation": "restore-flIntensity",
+      "timed_out": false
+    },
+    {
+      "exit_code": 0,
+      "operation": "restore-currentAmberLevel",
+      "timed_out": false
+    },
+    {
+      "exit_code": 0,
+      "operation": "light-after-restore",
+      "timed_out": false
+    },
+    {
+      "exit_code": 0,
+      "operation": "restored",
+      "timed_out": false
+    },
+    {
+      "exit_code": 0,
+      "operation": "protection-after",
+      "timed_out": false
+    },
+    {
+      "exit_code": 0,
+      "operation": "final-native",
+      "timed_out": false
+    },
+    {
+      "exit_code": 0,
+      "operation": "remove-stage",
+      "timed_out": false
+    }
+  ],
+  "original_program_sha256": {
+    "aidoku/app/aidoku": "9d92dc4cd01005a6ba2f48fe61786e5df5570c43feb5709fe3159bb164807d0f",
+    "aidoku/launch.sh": "10432125b74ab5b69c8a0ec54a34abd5a74dc4a3cc9ed9b9d5cc8d03bbd75296"
+  },
+  "physical_acceptance": {
+    "body_pixels_match": true,
+    "excluded_status_rows": 72,
+    "height": 2480,
+    "native_p6_count": 3,
+    "right_toolbar_observable": true,
+    "right_toolbar_pixels_match": true,
+    "width": 1860
+  },
+  "product_commit": "8baf57ffb64d74000abef49111baf6e726d4d425",
+  "program_hash_evidence": {
+    "asserted_hashes_match_frozen_change_journal": true,
+    "fresh_live_device_readback_performed": false,
+    "recorded_three_file_hash_assertions_succeeded": true,
+    "verify_program_stdout_empty": true
+  },
+  "release_plan_sha256": "a4036ef7599e73e7303da6c5274d407b6b9456c85d78785b58c7127b2765dc7f",
+  "rollback": {
+    "actual_rollback_performed": false,
+    "backup_retained_at_installation": true,
+    "backup_verified": true,
+    "current_device_backup_presence_requeried": false
+  },
+  "run_id": "promote-fd7ff9aa8576",
+  "schema_version": 1,
+  "selection_sha256": "0409dc728b91ede66bd8f2a1dc5a5c8677854760a7674437ad1e0d98a7d44076",
+  "source_manifest_sha256": "28c1bb314e12fe5689b401ca23cf932a91c138f5763c4c1ea18d454f41c990cf",
+  "verification_environment": "test-env"
+}

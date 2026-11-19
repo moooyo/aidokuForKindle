@@ -1,5 +1,48 @@
 # Handoff: Kindle Library startup and reopening
 
+## Continuation completed on 2026-11-19
+
+R3 is installed and qualified. Continue from the
+[final qualification and release report](docs/review/startup-r3-qualification-20261119-8baf57f/README.md),
+not the historical pending list below. The continuation branch is
+`codex/startup-r3-handoff`, based on the original `23a3640` handoff. Product
+sources remain the measured `8baf57f` implementation. No merge or push to
+`main` was performed.
+
+The installed tuple is application `1b1c508e...`, launcher `412163f1...`, and
+portrait helper `bde28cd5...`. The existing Library document, app cover and
+shared catalog registration were preserved. The normal installed entry,
+same-process short sleep/wake, body and right-toolbar pixels, notifications,
+ordinary exit and native/light restoration passed. The program transaction
+preserved the user database and cache storage. Exact previous program copies
+were retained and reverified; no actual rollback was performed.
+
+All six controls are available in Settings > Startup & reopening. Only the
+first Library layout is enabled by the frozen recommended policy, as a
+functional default with no speed claim. The other five remain off by default.
+No R3 individual screen met the prespecified speed rule, so no confirmation
+cohort was added. Original negative results and both first right-toolbar
+qualification failures remain recorded; fresh strict picture batches passed.
+
+The ZIP and KPM passed 216 checks and are saved under
+`dist/library-startup-20261119-r3/`. See the
+[package identities](docs/review/startup-r3-qualification-20261119-8baf57f/release/packages.json)
+and [installation receipt](docs/review/startup-r3-qualification-20261119-8baf57f/release/installation.json).
+The 50-test corrected release-tool suite passed. The inherited PW5 dark
+sleep-screen assertion remains documented as a pre-existing failed check.
+
+All device batches are complete, their owned native state is restored and
+their leases are released. No further run is scheduled. Earlier plans were
+consumed and still bind the previous installed control; future device work
+needs new plans and lease identities against the verified R3 tuple. The
+original plans, raw observations and original tools remain preserved.
+
+## Historical stop record
+
+The text below records the state before this continuation. Its pending items
+have now been completed or replaced by the explicitly documented fresh
+qualifications in the final report above.
+
 **Stopped on 2026-11-19 (Asia/Shanghai), at the operator's request.** The
 implementation is committed, and the final candidate passed both default timing
 checks. **R3 is not installed or packaged for release.** No device work is
