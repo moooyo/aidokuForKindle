@@ -123,6 +123,7 @@ impl FirstScene {
 pub struct Startup {
     options: Option<AppOptions>,
     profile: DeviceProfile,
+    cover_warm: Option<(u8, Arc<AtomicBool>)>,
     import: Option<PathBuf>,
     sender: Sender<StartupEvent>,
     receiver: Receiver<StartupEvent>,
@@ -151,12 +152,14 @@ impl Startup {
         profile: DeviceProfile,
         import: Option<PathBuf>,
         submitted_baseline: u64,
+        warm_limit: u8,
     ) -> Self {
         let (sender, receiver) = mpsc::channel();
         let (completion_sender, completed) = mpsc::channel();
         Self {
             options: Some(options),
             profile,
+            cover_warm: (warm_limit > 0).then(|| (warm_limit, Arc::new(AtomicBool::new(false)))),
             import,
             sender,
             receiver,
@@ -184,6 +187,12 @@ impl Startup {
 
     pub fn failed(&self) -> bool {
         self.failed
+    }
+
+    pub fn close_cover_warm_window(&self) {
+        if let Some((_, closed)) = &self.cover_warm {
+            closed.store(true, Ordering::Release);
+        }
     }
 
     /// Prepare bytes and metadata while the accepted initial full frame settles.
@@ -392,6 +401,10 @@ impl Startup {
             .take()
             .context("Startup preparation was already started")?;
         let profile = self.profile;
+        let warm_window = self
+            .cover_warm
+            .clone()
+            .map(|(limit, closed)| (limit, closed, Instant::now() + Duration::from_millis(300)));
         self.spawn("aidoku-fonts", |cancelled, sender, wake| {
             Fonts::prepare_faces(cancelled, |face| {
                 publish(sender, wake, StartupEvent::Font(face))
@@ -401,13 +414,28 @@ impl Startup {
             if cancelled.load(Ordering::Acquire) {
                 return Ok(());
             }
-            let prepared = App::prepare(options, profile)?;
+            let allow_warm = || {
+                warm_window.as_ref().is_some_and(|(_, closed, deadline)| {
+                    Instant::now() < *deadline
+                        && !cancelled.load(Ordering::Acquire)
+                        && !closed.load(Ordering::Acquire)
+                        && crate::bootstrap_lifecycle::startup_speculation_allowed()
+                })
+            };
+            let limit = warm_window.as_ref().map_or(0, |(limit, _, _)| *limit);
+            let (prepared, warm) =
+                App::prepare_with_cover_hints(options, profile, limit, &allow_warm)?;
             if cancelled.load(Ordering::Acquire) {
                 prepared.shutdown();
                 let _ = prepared.finish_shutdown(Duration::from_secs(2));
                 return Ok(());
             }
-            publish(sender, wake, StartupEvent::State(prepared))
+            publish(sender, wake, StartupEvent::State(prepared))?;
+            // External image I/O happens only after the prepared state is available.
+            if let Some(warm) = warm {
+                warm.run(allow_warm);
+            }
+            Ok(())
         })?;
         aidoku_kindle::reader_timing::mark("startup_workers_started");
         Ok(())

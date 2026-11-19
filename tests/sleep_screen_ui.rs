@@ -793,6 +793,7 @@ fn sleep_screen_preserves_complete_covers_text_and_retained_reader_at_all_layout
 
             let options = AppOptions {
                 data_dir: directory.path().join(&layout),
+                startup_options: Default::default(),
                 demo: true,
                 offline: true,
                 initial_screen: "reader".into(),

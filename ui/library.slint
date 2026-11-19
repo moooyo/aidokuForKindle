@@ -50,6 +50,8 @@ component LibraryCategory inherits Rectangle {
 
 component LibraryBookCaption inherits Rectangle {
     in property <BookItem> book;
+    property <bool> same-label: State.optimized-library-projection
+        && (root.book.display-title == "" || root.book.display-title == root.book.title);
     property <length> badge-width: max(State.large-screen ? 22px : 20px, unread-label.preferred-width + (State.large-screen ? 12px : 10px));
     property <length> item-gap: State.large-screen ? 6px : 5px;
     property <length> download-width: State.large-screen ? 16px : 15px;
@@ -63,7 +65,8 @@ component LibraryBookCaption inherits Rectangle {
     accessible-role: button;
     accessible-label: root.book.title;
     title-fit := IdentityTextFit { x: 0px; y: 0px;
-        full-text: root.book.title; compact-text: root.book.display-title;
+        // A width measurement cannot change the choice when both labels are identical.
+        full-text: root.same-label ? "" : root.book.title; compact-text: root.book.display-title;
         available-width: title-label.width;
         font-family: title-label.font-family; font-size: title-label.font-size;
         font-weight: title-label.font-weight; letter-spacing: title-label.letter-spacing;
@@ -71,7 +74,7 @@ component LibraryBookCaption inherits Rectangle {
     title-label := BodyText {
         x: 0px; y: 0px;
         width: max(0px, parent.width - (root.has-unread ? root.badge-width + root.item-gap : 0px) - (root.has-download ? root.download-width + root.item-gap : 0px));
-        height: parent.height; text: title-fit.display-text; accessible-label: root.book.title;
+        height: parent.height; text: root.same-label ? root.book.title : title-fit.display-text; accessible-label: root.book.title;
         font-size: State.large-screen ? 16px : 15px; font-weight: 500;
         color: touch.pressed ? Theme.paper : Theme.ink;
     }

@@ -20,7 +20,9 @@ pub mod platform;
 pub mod reader;
 pub mod reader_timing;
 pub mod render_cache;
+pub mod resident;
 pub mod sources;
+pub mod startup_options;
 pub mod store;
 pub mod tracking;
 

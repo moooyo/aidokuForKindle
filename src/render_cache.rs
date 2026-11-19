@@ -8,10 +8,12 @@
 //! decoding. Network scheduling and raw-file validation belong to the source
 //! manager, while this module coalesces identical cold renders.
 
+pub mod resident;
+
 use std::{
     collections::HashMap,
     fs::{self, File, OpenOptions},
-    io::{BufReader, BufWriter, Read, Write},
+    io::{BufRead, BufReader, BufWriter, Cursor, Read, Seek, Write},
     path::{Path, PathBuf},
     sync::{Arc, Mutex, MutexGuard, OnceLock, TryLockError, Weak},
     time::Duration,
@@ -266,6 +268,11 @@ pub struct RenderStats {
     pub alias_requests: u64,
     pub memory_hits: u64,
     pub prefetch_memory_hits: u64,
+    /// Covers adopted only after the new foreground request validated its source and derivative.
+    pub resident_cover_hits: u64,
+    /// Temporary handoff pixels are bounded separately from the decoded LRU.
+    pub resident_staged_bytes: u64,
+    pub resident_staged_entries: u64,
     pub disk_hits: u64,
     pub cold_renders: u64,
     pub raster_requests: u64,
@@ -320,6 +327,8 @@ struct SourceEntry {
 #[derive(Clone, Copy, PartialEq, Eq)]
 enum RenderPurpose {
     Foreground,
+    LocalCover,
+    ImportThumbnail,
     Prefetch,
 }
 
@@ -388,6 +397,7 @@ struct DecodedEntry {
     bytes: usize,
     access: u64,
     prefetched: bool,
+    used_as_local_cover: bool,
 }
 
 struct LiveOutput {
@@ -398,6 +408,7 @@ struct LiveOutput {
 #[derive(Default)]
 struct DecodedCache {
     entries: HashMap<DecodedKey, DecodedEntry>,
+    staged_covers: Option<resident::Staged>,
     sources: HashMap<SourceKey, SourceEntry>,
     bytes: usize,
     access: u64,
@@ -528,7 +539,10 @@ impl DecodedCache {
         self.access = self.access.saturating_add(1);
         entry.access = self.access;
         self.stats.memory_hits += 1;
-        if entry.prefetched && purpose == RenderPurpose::Foreground {
+        entry.used_as_local_cover |= purpose == RenderPurpose::LocalCover;
+        if entry.prefetched
+            && matches!(purpose, RenderPurpose::Foreground | RenderPurpose::LocalCover)
+        {
             self.stats.prefetch_memory_hits += 1;
             #[cfg(test)]
             count_work(|work| work.prefetch_memory_hits += 1);
@@ -563,6 +577,9 @@ impl DecodedCache {
         checksum: String,
         purpose: RenderPurpose,
     ) {
+        if purpose == RenderPurpose::ImportThumbnail {
+            return;
+        }
         self.remove(&key);
         let bytes = page.image.as_raw().capacity();
         if bytes > DECODED_CACHE_BYTES {
@@ -592,6 +609,7 @@ impl DecodedCache {
                 bytes,
                 access: self.access,
                 prefetched: purpose == RenderPurpose::Prefetch,
+                used_as_local_cover: purpose == RenderPurpose::LocalCover,
             },
         );
     }
@@ -621,6 +639,9 @@ impl DecodedCache {
     fn snapshot(&mut self) -> RenderStats {
         let live_bytes = self.live_output_bytes();
         let mut stats = self.stats.clone();
+        if let Some(staged) = &self.staged_covers {
+            (stats.resident_staged_entries, stats.resident_staged_bytes) = staged.usage();
+        }
         stats.memory_bytes = self.bytes as u64;
         stats.memory_entries = (self.entries.len() + self.sources.len()) as u64;
         stats.source_memory_entries = self.sources.len() as u64;
@@ -646,6 +667,7 @@ pub fn stats() -> RenderStats {
 /// remain valid, and no disk artifact or download pin is changed.
 pub fn clear_memory(cache: &CacheManager) {
     decoded(|state| {
+        resident::discard_namespace(state, cache.namespace());
         let keys = state
             .entries
             .keys()
@@ -822,10 +844,147 @@ pub(crate) fn render_local_cover(
         false,
         0,
         1.0,
-        RenderPurpose::Foreground,
+        RenderPurpose::LocalCover,
         RenderMode::LocalCover,
         read_source,
     )
+}
+
+/// A durable thumbnail for an imported book. Its key and pixels must be
+/// identical to those of a Library cover; offscreen work needs no resident slot.
+pub(crate) fn render_import_thumbnail(
+    cache: &CacheManager,
+    page: &Page,
+    raw: &Path,
+    options: &ImageOptions,
+) -> Result<RenderedPage> {
+    render_for_purpose(
+        cache, page, raw, options, false, 0, 1.0,
+        RenderPurpose::ImportThumbnail, RenderMode::LocalCover, read_source,
+    )
+}
+
+/// Warm only an existing local cover derivative. No source decoder, cache
+/// repair, alias publication or persistent access update runs on this path.
+/// The regular foreground lookup proves the source and derivative again.
+pub(crate) fn warm_cached_local_cover(
+    cache: &CacheManager,
+    path: PathBuf,
+    options: &ImageOptions,
+    allowed: &impl Fn() -> bool,
+) -> Result<bool> {
+    const MAX_SOURCE: u64 = 2 * 1024 * 1024;
+    const MAX_DERIVATIVE: u64 = 512 * 1024;
+    if !allowed() || options.width > 376 || options.height > 514 {
+        return Ok(false);
+    }
+    let raw = fs::canonicalize(&path)?;
+    let Some(source) = small_warm_snapshot(&raw, MAX_SOURCE, allowed)? else {
+        return Ok(false);
+    };
+    let page = Page {
+        local_path: Some(path),
+        ..Page::default()
+    };
+    let checksum = format!("{:x}", Sha256::digest(&source));
+    drop(source);
+    let key = viewport_key(
+        format!("{}:{checksum}", CacheManager::page_key(&page)),
+        options,
+        false,
+        0,
+        1000,
+    );
+    if !allowed() {
+        return Ok(false);
+    }
+    let Some((artifact, expected)) = cache.processed_read_hint(&key, MAX_DERIVATIVE)? else {
+        return Ok(false);
+    };
+    let resident_pending = || resident::warm_hint(cache.namespace(), &key, &artifact, &expected);
+    if resident_pending() {
+        return Ok(false);
+    }
+    let Some(bytes) = small_warm_snapshot(&artifact, MAX_DERIVATIVE, allowed)? else {
+        return Ok(false);
+    };
+    if format!("{:x}", Sha256::digest(&bytes)) != expected || !allowed() || resident_pending() {
+        return Ok(false);
+    }
+    // Decode the same bounded snapshot we just verified, even if a concurrent
+    // cache clear or replacement changes the pathname before foreground reuse.
+    let Some(_permit) = imaging::try_spare_decode_permit() else {
+        return Ok(false);
+    };
+    let (reader, metadata) = processed_input(Cursor::new(bytes), Some(&key), 2 * 1024 * 1024)?;
+    let image = read_processed_frame(&artifact, reader, metadata)?;
+    if !allowed() {
+        return Ok(false);
+    }
+    let key = DecodedKey {
+        namespace: cache.namespace().to_path_buf(),
+        render: key,
+    };
+    decoded(|state| state.remember(key, &image, expected, RenderPurpose::Prefetch));
+    Ok(true)
+}
+
+fn small_warm_snapshot(
+    path: &Path,
+    limit: u64,
+    allowed: &impl Fn() -> bool,
+) -> Result<Option<Vec<u8>>> {
+    use std::io::ErrorKind;
+    if !allowed() {
+        return Ok(None);
+    }
+    let mut options = OpenOptions::new();
+    options.read(true);
+    #[cfg(unix)]
+    {
+        use std::os::unix::fs::OpenOptionsExt;
+        options.custom_flags(libc::O_NONBLOCK | libc::O_NOFOLLOW);
+    }
+    let file = options.open(path)?;
+    let meta = file.metadata()?;
+    if !meta.is_file() || !(1..=limit).contains(&meta.len()) {
+        return Ok(None);
+    }
+    let mut input = file.take(meta.len() + 1);
+    let mut bytes = Vec::with_capacity(meta.len() as usize);
+    let mut chunk = [0; 16384];
+    while allowed() {
+        match input.read(&mut chunk) {
+            Ok(0) => return Ok((bytes.len() as u64 == meta.len()).then_some(bytes)),
+            Ok(n) => bytes.extend_from_slice(&chunk[..n]),
+            Err(e) if e.kind() == ErrorKind::Interrupted => continue,
+            Err(e) => return Err(e.into()),
+        }
+    }
+    Ok(None)
+}
+
+fn viewport_key(
+    source_key: String,
+    options: &ImageOptions,
+    vertical: bool,
+    offset: u32,
+    zoom_milli: u32,
+) -> RenderKey {
+    RenderKey {
+        source_key,
+        media_acceleration: options.media_acceleration,
+        width: options.width,
+        height: options.height,
+        crop_borders: options.crop_borders,
+        dither: options.dither,
+        hardware_dither: options.hardware_dither,
+        spatial_dither: options.spatial_dither,
+        contrast: options.contrast,
+        vertical,
+        offset,
+        zoom_milli,
+    }
 }
 
 /// Prepare the Reader's BiliComics Raster in memory. The canonical source and a
@@ -1028,8 +1187,12 @@ fn render_for_purpose(
 ) -> Result<RenderedPage> {
     imaging::check_decode_cancelled()?;
     decoded(|state| match purpose {
-        RenderPurpose::Foreground => state.stats.foreground_requests += 1,
-        RenderPurpose::Prefetch => state.stats.prefetch_requests += 1,
+        RenderPurpose::Foreground | RenderPurpose::LocalCover => {
+            state.stats.foreground_requests += 1
+        }
+        RenderPurpose::Prefetch | RenderPurpose::ImportThumbnail => {
+            state.stats.prefetch_requests += 1
+        }
     });
     if mode.is_reader() {
         decoded(|state| state.stats.raster_requests += 1);
@@ -1045,26 +1208,14 @@ fn render_for_purpose(
     let source_checksum = cache.fingerprint(raw)?;
     let source_proof = SourceProof::for_source(page, raw, &source_checksum, metadata.len())?;
     let source_key = format!("{}:{source_checksum}", CacheManager::page_key(page));
-    let key = RenderKey {
-        media_acceleration: options.media_acceleration,
-        source_key: if let Some(fit) = mode.fit() {
-            format!("{READER_RASTER_VERSION}:fit-v1:{}:{source_key}", fit.key())
-        } else if mode.is_reader() {
-            format!("{READER_RASTER_VERSION}:{source_key}")
-        } else {
-            source_key
-        },
-        width: options.width,
-        height: options.height,
-        crop_borders: options.crop_borders,
-        dither: options.dither,
-        hardware_dither: options.hardware_dither,
-        spatial_dither: options.spatial_dither,
-        contrast: options.contrast,
-        vertical,
-        offset,
-        zoom_milli,
+    let source_key = if let Some(fit) = mode.fit() {
+        format!("{READER_RASTER_VERSION}:fit-v1:{}:{source_key}", fit.key())
+    } else if mode.is_reader() {
+        format!("{READER_RASTER_VERSION}:{source_key}")
+    } else {
+        source_key
     };
+    let key = viewport_key(source_key, options, vertical, offset, zoom_milli);
     let decoded_key = DecodedKey {
         namespace: cache.namespace().to_path_buf(),
         render: key.clone(),
@@ -1238,8 +1389,16 @@ fn render_for_purpose(
     // Completing a bounded, valid output is useful even if the original reader
     // moved to that page meanwhile. Finish its durable publication without the
     // obsolete caller's fence, then let that caller stop before its next frame.
-    let (cache_path, persisted) =
-        match imaging::without_decode_cancellation(|| persist(cache, &key, &image, &metadata)) {
+    let write = || persist(cache, &key, &image, &metadata);
+    let (cache_path, persisted) = if purpose == RenderPurpose::ImportThumbnail {
+        imaging::check_decode_cancelled()?;
+        ensure!(
+            cache.has_idle_thumbnail_headroom()?,
+            "Insufficient room for optional thumbnail"
+        );
+        (write()?, true)
+    } else {
+        match imaging::without_decode_cancellation(write) {
             Ok(path) => (path, true),
             Err(error) => {
                 // A derivative is an optimization, never a prerequisite for reading
@@ -1249,7 +1408,8 @@ fn render_for_purpose(
                 );
                 (raw.to_path_buf(), false)
             }
-        };
+        }
+    };
     let rendered = RenderedPage {
         image,
         cache_path,
@@ -1260,7 +1420,7 @@ fn render_for_purpose(
         source_proof: Some(source_proof),
         retained_raster: None,
     };
-    if persisted {
+    if persisted && purpose != RenderPurpose::ImportThumbnail {
         remember(cache, decoded_key, &rendered, purpose);
     }
     Ok(rendered)
@@ -1320,6 +1480,7 @@ fn persist(
     // Validate the final chunks, grayscale depth, bounded allocation, and
     // in-band metadata before the atomic publication boundary.
     validate_processed(write.temp_path(), key, image.dimensions())?;
+    imaging::check_decode_cancelled()?;
     write.commit()
 }
 
@@ -1377,7 +1538,21 @@ fn lookup(
             }
         },
     };
-    if let Some(page) = decoded(|state| state.lookup(key, &path, &checksum, purpose)) {
+    if let Some(page) = decoded(|state| {
+        if purpose == RenderPurpose::ImportThumbnail {
+            state.peek(key, &path, &checksum)
+        } else {
+            state.lookup(key, &path, &checksum, purpose)
+        }
+    }) {
+        return Ok(Some(page));
+    }
+    // The calling local-cover request has already fingerprinted its current
+    // source. The indexed derivative above is valid and leased for this key.
+    if purpose == RenderPurpose::LocalCover
+        && let Some(page) = resident::take_verified(key, &path, &checksum)
+    {
+        crate::reader_timing::mark("cover_resident_pixels_hit");
         return Ok(Some(page));
     }
     let decoded_page = decode_processed(&path, &key.render);
@@ -1558,10 +1733,18 @@ fn processed_reader(
         file.metadata()?.len() <= MAX_PAGE_BYTES,
         "The processed PNG exceeds the compressed-image limit"
     );
+    processed_input(BufReader::new(file), expected, MAX_DECODE_BYTES as usize)
+}
+
+fn processed_input<R: BufRead + Seek>(
+    input: R,
+    expected: Option<&RenderKey>,
+    allocation_limit: usize,
+) -> Result<(png::Reader<R>, Metadata)> {
     let decoder = png::Decoder::new_with_limits(
-        BufReader::new(file),
+        input,
         png::Limits {
-            bytes: MAX_DECODE_BYTES as usize,
+            bytes: allocation_limit,
         },
     );
     let reader = decoder
@@ -1686,7 +1869,15 @@ fn decode_processed(path: &Path, key: &RenderKey) -> Result<RenderedPage> {
 }
 
 fn decode_processed_inner(path: &Path, key: &RenderKey) -> Result<RenderedPage> {
-    let (mut reader, metadata) = processed_reader(path, Some(key))?;
+    let (reader, metadata) = processed_reader(path, Some(key))?;
+    read_processed_frame(path, reader, metadata)
+}
+
+fn read_processed_frame<R: BufRead + Seek>(
+    path: &Path,
+    mut reader: png::Reader<R>,
+    metadata: Metadata,
+) -> Result<RenderedPage> {
     let size = reader
         .output_buffer_size()
         .context("The processed PNG output size overflowed")?;
@@ -1736,7 +1927,7 @@ mod tests {
     };
     use tempfile::TempDir;
 
-    static TEST_RENDER_LOCK: Mutex<()> = Mutex::new(());
+    pub(super) static TEST_RENDER_LOCK: Mutex<()> = Mutex::new(());
 
     struct Fixture {
         _render_guard: MutexGuard<'static, ()>,
@@ -1958,6 +2149,99 @@ mod tests {
         }
         assert_eq!(cache.stats().external_validations, 6);
         clear_memory(&cache);
+    }
+
+    #[test]
+    fn startup_warm_reuses_only_verified_pixels_without_generating_a_missing_derivative() {
+        let mut fixture = Fixture::new(artwork());
+        fixture.page.url.clear();
+        let allowed = || true;
+        let warm = || {
+            warm_cached_local_cover(&fixture.cache, fixture.raw.clone(), &options(), &allowed)
+                .unwrap()
+        };
+        let key = fixture.key(&options(), false, 0, 1.0);
+        assert!(!warm());
+        assert!(
+            fixture
+                .cache
+                .processed_read_hint(&key, u64::MAX)
+                .unwrap()
+                .is_none()
+        );
+        let fresh =
+            render_local_cover(&fixture.cache, &fixture.page, &fixture.raw, &options()).unwrap();
+        clear_memory(&fixture.cache);
+        let deadline = Instant::now() + Duration::from_secs(5);
+        while !warm() {
+            assert!(
+                Instant::now() < deadline,
+                "A spare decode slot never became available"
+            );
+            std::thread::yield_now();
+        }
+        let displayed =
+            render_local_cover(&fixture.cache, &fixture.page, &fixture.raw, &options()).unwrap();
+        assert!(displayed.memory_hit);
+        assert_eq!(fresh.image, displayed.image);
+        fs::write(&fresh.cache_path, b"replaced processed image").unwrap();
+        assert!(!warm());
+        assert_eq!(
+            fs::read(&fresh.cache_path).unwrap(),
+            b"replaced processed image"
+        );
+        let repaired =
+            render_local_cover(&fixture.cache, &fixture.page, &fixture.raw, &options()).unwrap();
+        assert!(!repaired.memory_hit);
+        assert_eq!(fresh.image, repaired.image);
+        // Mutable local files may have their timestamps restored after an edit.
+        let modified = fs::metadata(&fixture.raw).unwrap().modified().unwrap();
+        let mut bytes = fs::read(&fixture.raw).unwrap();
+        bytes[0] = 0;
+        fs::write(&fixture.raw, bytes).unwrap();
+        File::options()
+            .write(true)
+            .open(&fixture.raw)
+            .unwrap()
+            .set_times(fs::FileTimes::new().set_modified(modified))
+            .unwrap();
+        assert!(!warm());
+        assert!(
+            render_local_cover(&fixture.cache, &fixture.page, &fixture.raw, &options()).is_err()
+        );
+    }
+
+    #[test]
+    fn startup_warm_can_skip_busy_or_oversized_images_and_stops_reading_after_cancellation() {
+        let mut fixture = Fixture::new(artwork());
+        fixture.page.url.clear();
+        let _ =
+            render_local_cover(&fixture.cache, &fixture.page, &fixture.raw, &options()).unwrap();
+        clear_memory(&fixture.cache);
+        let permit = imaging::decode_permit().unwrap();
+        assert!(
+            !warm_cached_local_cover(&fixture.cache, fixture.raw.clone(), &options(), &|| true)
+                .unwrap()
+        );
+        drop(permit);
+        let source = fixture.directory.path().join("warm-bounds");
+        fs::write(&source, vec![0; 128 * 1024]).unwrap();
+        let permits = Cell::new(0);
+        let allowed = || {
+            permits.set(permits.get() + 1);
+            permits.get() < 4
+        };
+        assert!(
+            small_warm_snapshot(&source, 128 * 1024, &allowed)
+                .unwrap()
+                .is_none()
+        );
+        assert_eq!(permits.get(), 4);
+        assert!(
+            small_warm_snapshot(&source, 128 * 1024 - 1, &|| true)
+                .unwrap()
+                .is_none()
+        );
     }
 
     #[test]

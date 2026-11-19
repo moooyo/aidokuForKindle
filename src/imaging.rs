@@ -15,7 +15,7 @@ pub use decode_scheduler::{
     DecodeCancellation, check_decode_cancelled, is_decode_cancelled, with_background_decode,
 };
 pub(crate) use decode_scheduler::{
-    decode_permit, with_decode_cancellation, without_decode_cancellation,
+    decode_permit, try_spare_decode_permit, with_decode_cancellation, without_decode_cancellation,
 };
 
 use std::{

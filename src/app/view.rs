@@ -187,7 +187,9 @@ impl App {
         let mut library_page_count = 1;
         if show_library {
             let library_page_size = if large { 15 } else { 8 };
-            let visible = self.store.library_view_page(
+            let batched = state.get_optimized_library_projection();
+            crate::reader_timing::mark("library_page_projection_started");
+            let visible = self.store.project_library_grid(
                 LibraryQuery {
                     category: self.library_filter,
                     unread_only: false,
@@ -200,21 +202,26 @@ impl App {
                 },
                 self.page,
                 library_page_size,
+                batched,
+                |mut book, metadata| {
+                    if self.options.demo
+                        && let Some(path) = crate::demo::library_cover(&self.data_dir, &book, large)
+                    {
+                        book.cover = path.to_string_lossy().into_owned();
+                    }
+                    self.book_item(&book, &metadata, true)
+                },
             )?;
             self.page = visible.page;
             library_page_count = visible.total.div_ceil(library_page_size).max(1);
-            let mut rows = Vec::with_capacity(visible.items.len());
-            for book in &visible.items {
-                let mut display_book = book.clone();
-                if self.options.demo {
-                    if let Some(path) = crate::demo::library_cover(&self.data_dir, book, large) {
-                        display_book.cover = path.to_string_lossy().into_owned();
-                    }
-                }
-                rows.push(self.view_book(&display_book, true)?);
-            }
+            let mut rows = visible.items;
             resolve_book_title_collisions(&mut rows);
             state.set_books(model(rows));
+            crate::reader_timing::mark(if batched {
+                "library_page_projection_batched"
+            } else {
+                "library_page_projection_rowwise"
+            });
         }
 
         if show_library && large {
@@ -785,6 +792,7 @@ impl App {
 
         let settings_page_count = 1;
         if show_settings {
+            state.set_quick_return_available(self.quick_return_available());
             if self.interactions.settings_section == "storage" {
                 self.sync_storage_details_view(&state);
             }
@@ -1491,6 +1499,12 @@ impl App {
                     "general",
                 ),
                 item("about", "about", String::new(), "general"),
+                item(
+                    "startup-options",
+                    "startup_options",
+                    String::new(),
+                    "general",
+                ),
             ],
             Vec::new(),
         ))

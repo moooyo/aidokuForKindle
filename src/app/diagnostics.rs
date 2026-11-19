@@ -76,7 +76,7 @@ impl App {
 
     /// A completed cover may still await the throttled view publication.
     pub fn capture_projection_pending(&self) -> bool {
-        self.cover_work_pending() || self.background_ui_dirty
+        self.cover_work_pending() || self.background_ui_dirty || self.cover_ui_dirty
     }
 
     /// Count projected Library image slots without reading storage or book IDs.
@@ -185,6 +185,10 @@ impl App {
         snapshot["last_book_removal"] = json!(self.last_book_removal);
         snapshot["large_screen"] = json!(state.get_large_screen());
         snapshot["settings_section"] = json!(state.get_settings_section().to_string());
+        if self.route == "settings" && state.get_settings_section() == "startup-options" {
+            snapshot["active_startup_options"] = json!(self.active_startup_values());
+            snapshot["quick_return_available"] = json!(state.get_quick_return_available());
+        }
         snapshot["detail_filter"] = json!(state.get_detail_filter());
         snapshot["bookmark_edit"] = json!(state.get_bookmark_edit());
         snapshot["detail_bookmarks"] =

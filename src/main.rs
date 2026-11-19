@@ -66,6 +66,10 @@ struct Arguments {
     #[arg(long, hide = true)]
     startup_eager_covers: bool,
 
+    /// Print the six startup settings without opening the library or accessing the display.
+    #[arg(long)]
+    print_startup_options: bool,
+
     /// Select a design profile, not a declaration of hardware compatibility.
     #[arg(long, default_value = "pw5")]
     device: DeviceProfile,
@@ -157,8 +161,28 @@ struct CaptureMetadata {
 }
 
 fn main() -> std::process::ExitCode {
+    if let Some(code) = aidoku_kindle::resident::keeper_entry() {
+        return code;
+    }
     let process_entry = Instant::now();
     let arguments = Arguments::parse();
+    if arguments.print_startup_options {
+        let directory = arguments
+            .data_dir
+            .clone()
+            .map(Ok)
+            .unwrap_or_else(|| default_data_dir(arguments.kindle));
+        return match directory {
+            Ok(directory) => {
+                print!("{}", read_startup_options(&directory, arguments.demo));
+                std::process::ExitCode::SUCCESS
+            }
+            Err(error) => {
+                eprintln!("aidoku: {error:#}");
+                std::process::ExitCode::FAILURE
+            }
+        };
+    }
     let result =
         aidoku_kindle::reader_timing::enable(arguments.performance_trace.as_deref(), process_entry)
             .and_then(|()| run(arguments));
@@ -228,6 +252,8 @@ fn run(arguments: Arguments) -> Result<()> {
         .map(Ok)
         .unwrap_or_else(|| default_data_dir(arguments.kindle))?;
     fs::create_dir_all(&data_dir).context("Create the application data directory")?;
+    let startup_options = read_startup_options(&data_dir, arguments.demo);
+    startup_options.record_selection();
     bootstrap_lifecycle::install_signal_wakeup(None)?;
     let platform = Rc::new(Platform::new(arguments.device, arguments.kindle)?);
     let prepare_library_toolbar = arguments.kindle
@@ -235,6 +261,8 @@ fn run(arguments: Arguments) -> Result<()> {
         && !arguments.resume
         && arguments.screen == "library"
         && !arguments.startup_serial_preparation;
+    let ordinary_library =
+        prepare_library_toolbar && arguments.import.is_none() && !arguments.startup_eager_covers;
     platform.set_startup_render_priority(
         arguments.kindle
             && arguments.screen == "library"
@@ -251,6 +279,8 @@ fn run(arguments: Arguments) -> Result<()> {
     aidoku_kindle::reader_timing::mark("startup_backend_installed");
     bootstrap_lifecycle::install_signal_wakeup(platform.signal_wakeup_fd())?;
     let ui = AppWindow::new().context("Create the application window")?;
+    ui.global::<State>()
+        .set_optimized_library_projection(startup_options.first_layout_optimized);
     aidoku_kindle::reader_timing::mark("startup_window_constructed");
     Fonts::register_bootstrap(&ui)?;
     aidoku_kindle::reader_timing::mark("startup_bootstrap_font_registered");
@@ -267,6 +297,7 @@ fn run(arguments: Arguments) -> Result<()> {
         &ui,
         AppOptions {
             data_dir,
+            startup_options,
             demo: arguments.demo,
             offline: arguments.offline,
             initial_screen: arguments.screen,
@@ -276,6 +307,11 @@ fn run(arguments: Arguments) -> Result<()> {
         arguments.device,
         arguments.import,
         platform.sleep_status().frame_send_count,
+        if ordinary_library {
+            startup_options.prewarm
+        } else {
+            0
+        },
     )));
     {
         let ui_weak = ui.as_weak();
@@ -323,6 +359,7 @@ fn run(arguments: Arguments) -> Result<()> {
         &lifecycle,
         !arguments.startup_serial_preparation,
         prepare_library_toolbar,
+        ordinary_library && startup_options.last_cover_grace,
     );
     let advance_startup: Rc<RefCell<dyn FnMut() -> bool>> = {
         let ui = ui.as_weak();
@@ -694,6 +731,15 @@ fn run(arguments: Arguments) -> Result<()> {
         }
     }
     let startup_shutdown_finished = startup.borrow_mut().finish();
+    if let Some(controller) = app.borrow().as_ref() {
+        controller.borrow_mut().finish_quick_return(
+            application_shutdown_finished
+                && startup_shutdown_finished
+                && event_loop_result.is_ok()
+                && failures.borrow().is_empty()
+                && bootstrap_lifecycle::display_activity_allowed(),
+        );
+    }
     if !startup_shutdown_finished {
         eprintln!("aidoku: a bounded startup preparation is still stopping");
     }
@@ -1044,6 +1090,18 @@ fn request_quit(quitting: &Cell<bool>, failures: &RefCell<Vec<String>>) {
         failures
             .borrow_mut()
             .push(format!("Stop the event loop failed: {error}"));
+    }
+}
+
+fn read_startup_options(
+    directory: &Path,
+    demo: bool,
+) -> aidoku_kindle::startup_options::StartupOptions {
+    use aidoku_kindle::startup_options::StartupOptions;
+    if demo {
+        StartupOptions::load(&directory.join("demo"))
+    } else {
+        StartupOptions::load(directory)
     }
 }
 

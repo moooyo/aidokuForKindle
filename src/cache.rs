@@ -377,6 +377,16 @@ impl CacheManager {
         available_bytes(&self.inner.root)
     }
 
+    /// Optional work must not start by reclaiming room used by ordinary books.
+    pub(crate) fn has_idle_thumbnail_headroom(&self) -> Result<bool> {
+        const MARGIN: u64 = 1024 * 1024;
+        let free = self.available_bytes()?;
+        let mut state = self.lock()?;
+        let (projected, remaining) = projected_usage(&mut state)?;
+        Ok(projected.saturating_add(MARGIN) <= state.config.max_unpinned_bytes
+            && free >= state.config.min_free_bytes.saturating_add(remaining).saturating_add(MARGIN))
+    }
+
     /// Copy at most 128 indexed artifacts after the last returned ID. Each page
     /// is a separate snapshot; concurrent publications can change later pages.
     /// Invalid or missing artifacts remain visible for real file accounting.
@@ -686,6 +696,22 @@ impl CacheManager {
         key: &RenderKey,
     ) -> Result<Option<(PathBuf, String)>> {
         self.lookup_with_fingerprint(Kind::Processed, &render_key(key)?)
+    }
+
+    /// A hint for speculative reads only. It grants neither a lease nor proof
+    /// of the current bytes; the caller must hash the exact snapshot it uses.
+    pub(crate) fn processed_read_hint(
+        &self,
+        key: &RenderKey,
+        byte_limit: u64,
+    ) -> Result<Option<(PathBuf, String)>> {
+        let key = render_key(key)?;
+        let entry = self.lock()?.load_entry(&cache_id(Kind::Processed, &key))?;
+        let Some(entry) = entry.filter(|e| e.valid && (1..=byte_limit).contains(&e.size)) else {
+            return Ok(None);
+        };
+        let path = generated_path(&self.inner.root, Kind::Processed, &key, false)?;
+        Ok(Some((path, entry.checksum)))
     }
 
     pub fn begin_processed(&self, key: &RenderKey, expected_bytes: u64) -> Result<CacheWrite> {

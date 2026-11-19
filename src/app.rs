@@ -9,6 +9,7 @@ mod display_modes;
 mod dither_preview;
 mod download_usage;
 mod extended_preferences;
+mod import_thumbnails;
 mod interaction_models;
 mod lifecycle;
 mod logging;
@@ -75,6 +76,7 @@ use crate::{
 #[derive(Debug, Clone)]
 pub struct AppOptions {
     pub data_dir: PathBuf,
+    pub startup_options: crate::startup_options::StartupOptions,
     pub demo: bool,
     pub offline: bool,
     pub initial_screen: String,
@@ -143,6 +145,7 @@ enum JobResult {
         uri: String,
         path: PathBuf,
         image: prepared_pixels::PreparedPixels,
+        local_derivative_hit: bool,
     },
     SleepCover {
         identity: sleep_screen::CoverIdentity,
@@ -268,6 +271,7 @@ pub struct App {
     suspend_checkpoint_ready: bool,
     suspend_checkpoint_started: bool,
     sleep_screen: sleep_screen::SleepScreenState,
+    import_thumbnails: import_thumbnails::ImportThumbnails,
     pub(crate) cover_cache: HashMap<(String, PathBuf), Image>,
     pub(crate) cover_paths: HashMap<String, PathBuf>,
     pub(crate) cover_uris: HashMap<String, String>,
@@ -314,6 +318,7 @@ pub struct App {
     tracking_accounts: tracking_accounts::TrackingAccounts,
     metadata_restore: runtime_restore::RestoreRuntime,
     background_ui_dirty: bool,
+    cover_ui_dirty: bool,
     download_ui_dirty: bool,
     next_background_ui: Instant,
     lifecycle_generation: u64,
@@ -340,6 +345,8 @@ pub struct App {
     search_generation: u64,
     catalog_generation: u64,
     shutting_down: bool,
+    quick_return_requested: bool,
+    quick_return_disabled: bool,
     startup_stage: Option<startup::AttachStage>,
 }
 
@@ -454,6 +461,7 @@ impl App {
             suspend_checkpoint_ready: false,
             suspend_checkpoint_started: false,
             sleep_screen: sleep_screen::SleepScreenState::default(),
+            import_thumbnails: import_thumbnails::ImportThumbnails::default(),
             cover_cache: HashMap::new(),
             cover_paths: HashMap::new(),
             cover_uris: HashMap::new(),
@@ -500,6 +508,7 @@ impl App {
             tracking_accounts: tracking_accounts::TrackingAccounts::default(),
             metadata_restore: runtime_restore::RestoreRuntime::default(),
             background_ui_dirty: false,
+            cover_ui_dirty: false,
             download_ui_dirty: false,
             next_background_ui: Instant::now(),
             lifecycle_generation: 0,
@@ -526,6 +535,8 @@ impl App {
             search_generation: 0,
             catalog_generation: 0,
             shutting_down: false,
+            quick_return_requested: false,
+            quick_return_disabled: false,
             startup_stage: Some(startup::AttachStage::Route),
         };
         if app.options.demo {
@@ -724,7 +735,7 @@ impl App {
                 }
             }
             if matches!(&message.context.kind, JobKind::Cover(_)) {
-                self.background_ui_dirty = true;
+                self.mark_cover_dirty();
                 self.invalidate_storage_details();
             } else if !prefetch_job
                 && !matches!(
@@ -859,8 +870,12 @@ impl App {
             self.message_until = None;
             changed = true;
         }
+        if changed || self.background_ui_dirty {
+            self.cancel_startup_cover_grace();
+        }
         let startup_cover_due = self.startup_cover_publication_due();
-        let background_due = Instant::now() >= self.next_background_ui;
+        let now = Instant::now();
+        let background_due = now >= self.next_background_ui;
         if background_due && self.download_ui_dirty {
             if self.modal == "downloads" {
                 if let Err(error) = self.refresh_download_rows() {
@@ -870,7 +885,16 @@ impl App {
             }
             self.download_ui_dirty = false;
         }
-        if changed || (background_due || startup_cover_due) && self.background_ui_dirty {
+        let due = background_due || startup_cover_due;
+        let publish = changed || due && (self.background_ui_dirty || self.cover_ui_dirty);
+        let defer_cover = publish
+            && !changed
+            && !self.background_ui_dirty
+            && !startup_cover_due
+            && self.defer_last_startup_cover(now);
+        if publish && !defer_cover {
+            self.import_thumbnails.yield_to_publication();
+            self.cancel_startup_cover_grace();
             if startup_cover_due {
                 crate::reader_timing::mark("startup_final_cover_publication");
             }
@@ -888,11 +912,12 @@ impl App {
             self.platform
                 .refresh(self.frame_refresh.take().unwrap_or(RefreshKind::Ui));
             self.background_ui_dirty = false;
+            self.cover_ui_dirty = false;
             self.next_background_ui = Instant::now() + Duration::from_millis(300);
         }
         match self.refresh_visible_covers() {
             Ok(true) => {
-                self.background_ui_dirty = true;
+                self.mark_cover_dirty();
             }
             Ok(false) => {}
             Err(error) => eprintln!("aidoku: queue visible covers: {error:#}"),
@@ -918,6 +943,7 @@ impl App {
         if let Err(error) = self.poll_storage_details() {
             eprintln!("aidoku: queue storage details accounting: {error:#}");
         }
+        self.poll_import_thumbnails();
     }
 
     fn fail_search_group(&mut self, context: &JobContext, error: &str) {
@@ -969,6 +995,8 @@ impl App {
     }
 
     pub(crate) fn source_images_changed(&mut self) {
+        self.import_thumbnails.cancel();
+        self.cancel_startup_cover_grace();
         self.clear_sleep_screen();
         self.pending_wide_navigation = 0;
         self.cancel_pending_user_network();
@@ -1241,7 +1269,8 @@ impl App {
                 uri,
                 path,
                 image,
-            } => self.accept_cover(context, id, uri, path, image)?,
+                local_derivative_hit,
+            } => self.accept_cover(context, id, uri, path, image, local_derivative_hit)?,
             JobResult::SleepCover { identity, image } => self.accept_sleep_cover(identity, image),
             JobResult::DownloadUsage(result) => {
                 if self.accept_download_usage(result) && self.route == "settings" {
@@ -1297,13 +1326,18 @@ impl App {
                     for (id, pages) in imported.pages {
                         self.store.save_pages(&id, &pages)?;
                     }
+                    if self.options.startup_options.import_thumbnail_idle {
+                        self.import_thumbnails.enqueue(&imported.book, Instant::now());
+                    }
                 }
                 self.invalidate_download_usage();
+                self.import_thumbnails.imported(first.is_some());
                 self.current_book_id = first;
                 self.route = "library".into();
                 self.page = 1;
                 self.modal.clear();
                 self.notify(tr("saved"));
+                crate::reader_timing::mark("import_library_published");
             }
             JobResult::Repository(repository) => {
                 self.record_repository(&repository)?;
@@ -1719,6 +1753,8 @@ impl App {
     }
 
     pub fn shutdown(&mut self) {
+        self.import_thumbnails.cancel();
+        self.cancel_startup_cover_grace();
         self.clear_sleep_screen();
         self.pending_wide_navigation = 0;
         self.cancel_pending_user_network();
@@ -1750,12 +1786,15 @@ impl App {
 
     pub fn finish_shutdown(&self) -> bool {
         self.downloads.wait_stopped(Duration::from_secs(2))
+            && self.import_thumbnails.drained()
             && self.platform.device_policies_restored()
     }
 
     /// Observe shutdown without blocking the event loop that presents feedback.
     pub fn shutdown_ready(&self) -> bool {
-        self.downloads.is_stopped() && self.platform.device_policies_restored()
+        self.downloads.is_stopped()
+            && self.import_thumbnails.drained()
+            && self.platform.device_policies_restored()
     }
 }
 
@@ -1911,6 +1950,7 @@ mod tests {
                 ui: slint::Weak::default(),
                 options: AppOptions {
                     data_dir: directory.path().to_path_buf(),
+                    startup_options: Default::default(),
                     demo,
                     offline: true,
                     initial_screen: route.into(),
@@ -1973,6 +2013,7 @@ mod tests {
                 suspend_checkpoint_ready: false,
                 suspend_checkpoint_started: false,
                 sleep_screen: sleep_screen::SleepScreenState::default(),
+                import_thumbnails: import_thumbnails::ImportThumbnails::default(),
                 cover_cache: HashMap::new(),
                 cover_paths: HashMap::new(),
                 cover_uris: HashMap::new(),
@@ -2019,6 +2060,7 @@ mod tests {
                 tracking_accounts: tracking_accounts::TrackingAccounts::default(),
                 metadata_restore: runtime_restore::RestoreRuntime::default(),
                 background_ui_dirty: false,
+                cover_ui_dirty: false,
                 download_ui_dirty: false,
                 next_background_ui: Instant::now(),
                 lifecycle_generation: 0,
@@ -2045,6 +2087,8 @@ mod tests {
                 search_generation: 0,
                 catalog_generation: 0,
                 shutting_down: false,
+                quick_return_requested: false,
+                quick_return_disabled: false,
                 startup_stage: None,
             };
             app.prepare_demo_catalog_route().unwrap();

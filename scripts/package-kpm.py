@@ -122,6 +122,7 @@ def main() -> None:
     parser.add_argument("--version", help="Override CARGO_PKG_VERSION or the package version in Cargo.toml")
     parser.add_argument("--sample-cbz", type=Path, help="Optionally include a public, redistributable sample archive")
     parser.add_argument("--native-query-helper", type=Path, help="Include the prebuilt optional firmware-ABI query helper")
+    parser.add_argument("--startup-portrait-helper", type=Path, help="Include the optional bounded startup portrait supervisor")
     parser.add_argument("--native-catalog-dir", type=Path, help="Include a prebuilt qualified catalog runtime")
     arguments = parser.parse_args()
     if os.name == "nt" or platform.system() != "Linux":
@@ -137,6 +138,8 @@ def main() -> None:
         inputs = production_inputs(root, arguments.application)
         if arguments.native_query_helper is not None:
             inputs["aidoku/app/aidoku-native-query"] = arguments.native_query_helper
+        if arguments.startup_portrait_helper is not None:
+            inputs["aidoku/app/aidoku-startup-portrait"] = arguments.startup_portrait_helper
         if arguments.native_catalog_dir is not None:
             for name in ("aidoku-library-dispatch", "aidoku-entry-hooks.so", "aidoku-catalog-client", "SHA256SUMS"):
                 inputs["aidoku/native-catalog/" + name] = arguments.native_catalog_dir / name
@@ -146,7 +149,7 @@ def main() -> None:
         records = []
         for name, path in sorted(inputs.items()):
             checked_relative(name)
-            executable = name.endswith(".sh") or name in ("aidoku/app/aidoku", "aidoku/app/aidoku-native-query", "aidoku/native-catalog/aidoku-library-dispatch", "aidoku/native-catalog/aidoku-catalog-client")
+            executable = name.endswith(".sh") or name in ("aidoku/app/aidoku", "aidoku/app/aidoku-native-query", "aidoku/app/aidoku-startup-portrait", "aidoku/native-catalog/aidoku-library-dispatch", "aidoku/native-catalog/aidoku-catalog-client")
             content = shell_file(path) if name.endswith(".sh") else read_file(path)
             mode = 0o755 if executable else 0o644
             payload[name] = (content, mode)
@@ -160,6 +163,13 @@ def main() -> None:
                     or int.from_bytes(query[18:20], "little") != 40
                     or int.from_bytes(query[36:40], "little") & 0x600 != 0x400):
                 raise ValueError("The query helper must be a prebuilt ELF32 ARM hard-float executable")
+        if arguments.startup_portrait_helper is not None:
+            helper = payload["aidoku/app/aidoku-startup-portrait"][0]
+            if (len(helper) < 52 or helper[:7] != b"\x7fELF\x01\x01\x01"
+                    or int.from_bytes(helper[16:18], "little") not in (2, 3)
+                    or int.from_bytes(helper[18:20], "little") != 40
+                    or int.from_bytes(helper[36:40], "little") & 0x600 != 0x400):
+                raise ValueError("The portrait supervisor must be a prebuilt ELF32 ARM hard-float executable")
         if arguments.native_catalog_dir is not None:
             for name in ("aidoku-library-dispatch", "aidoku-entry-hooks.so", "aidoku-catalog-client"):
                 content = payload["aidoku/native-catalog/" + name][0]

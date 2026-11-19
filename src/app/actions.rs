@@ -1,4 +1,6 @@
 use super::*;
+#[path = "startup_settings.rs"]
+mod startup_settings;
 #[path = "text_pagination.rs"]
 mod text_pagination;
 use crate::{
@@ -20,7 +22,48 @@ pub(super) struct PendingUserNetwork {
 }
 
 impl App {
+    /// Only a live native Library session may hand optional pixels to its successor.
+    pub(crate) fn quick_return_available(&self) -> bool {
+        self.options.startup_options.resident_seconds == 45
+            && !self.quick_return_disabled
+            && self.platform.is_kindle()
+            && !self.options.demo
+            && !self.options.resume
+            && self.options.initial_screen == "library"
+            && !self.is_starting()
+            && !self.shutting_down
+            && !self.suspended
+            && !self.resume_frame_pending
+            && !self.metadata_restore_active()
+            && crate::resident::library_session()
+    }
+
+    pub(crate) fn disable_quick_return(&mut self) {
+        self.quick_return_disabled = true;
+        self.quick_return_requested = false;
+        if self.platform.is_kindle() && !self.options.demo {
+            crate::resident::discard(&self.data_dir);
+        }
+    }
+
+    /// Publish only once, after normal shutdown has drained all owned application workers.
+    pub fn finish_quick_return(&mut self, completed: bool) {
+        let requested = std::mem::take(&mut self.quick_return_requested);
+        if self.options.startup_options.resident_seconds != 45 || !crate::resident::library_session() {
+            return;
+        }
+        if requested && !self.quick_return_disabled && completed
+            && crate::startup_options::StartupOptions::load(&self.data_dir).resident_seconds == 45
+        {
+            crate::resident::finish(&self.data_dir);
+        } else {
+            crate::resident::discard(&self.data_dir);
+        }
+    }
+
     pub fn dispatch(&mut self, section: &str, action: &str, value: &str) -> Result<()> {
+        self.import_thumbnails.note_activity();
+        self.cancel_startup_cover_grace();
         match self.dispatch_action(section, action, value) {
             Err(error)
                 if self.route == "reader"
@@ -50,10 +93,18 @@ impl App {
         {
             return Ok(());
         }
-        if section == "app" && action == "exit"
+        let quick = section == "app" && action == "quick-return"
+            || section == "panel" && action == "choose" && value == "quick-return";
+        if quick && (!self.quick_return_available()
+            || crate::startup_options::StartupOptions::load(&self.data_dir).resident_seconds != 45)
+        {
+            return Ok(());
+        }
+        if quick || section == "app" && action == "exit"
             || section == "panel" && action == "choose" && value == "exit"
         {
             self.platform.announce_exit_intent()?;
+            self.quick_return_requested = quick;
             crate::reader_timing::cancel_action("shutdown");
             crate::reader_timing::cancel_native("not_visible");
             self.platform.cancel_reader_frame();
@@ -601,6 +652,7 @@ impl App {
             },
             "settings" => match action {
                 "open" => self.open_setting(value)?,
+                "startup-set" | "startup-preset" => self.save_startup_choice(action, value)?,
                 "back" => {
                     self.close_page_jump();
                     self.interactions.settings_section.clear();
@@ -2034,6 +2086,7 @@ impl App {
     }
 
     pub(crate) fn import_local(&mut self, path: &Path) -> Result<()> {
+        crate::reader_timing::mark("import_started");
         let path = path.to_path_buf();
         let root = self.data_dir.clone();
         self.spawn_job(true, move |_| {
@@ -2118,6 +2171,7 @@ impl App {
             enabled,
         };
         let (rows, status) = match self.interactions.settings_section.as_str() {
+            "startup-options" => (self.startup_setting_rows(), String::new()),
             "storage" => {
                 let cache = self.disk_cache.stats();
                 (
@@ -3168,6 +3222,13 @@ impl App {
         if !self.platform.profile().is_scribe() {
             rows.insert(0, ("refresh".into(), tr("refresh_library"), String::new()));
         }
+        if self.quick_return_available() {
+            rows.push((
+                "quick-return".into(),
+                tr("startup_return_kindle"),
+                String::new(),
+            ));
+        }
         self.show_choices(&tr("more"), "library-more", rows)
     }
 
@@ -3478,6 +3539,7 @@ impl App {
             && matches!(
                 id,
                 "screen-refresh"
+                    | "startup-options"
                     | "hardware-acceleration"
                     | "frontlight-warmth"
                     | "wifi-sleep-exit"
@@ -3901,7 +3963,11 @@ impl App {
             "downloads" => self.open_downloads()?,
             "clear-cache" => {
                 self.modal.clear();
-                self.spawn_job(true, |manager| {
+                let outstanding = self.import_thumbnails.cancel_for_clear();
+                self.spawn_job(true, move |manager| {
+                    let _import_io = outstanding.as_ref().map(|lock| {
+                        lock.lock().unwrap_or_else(std::sync::PoisonError::into_inner)
+                    });
                     manager.cache().clear_unpinned()?;
                     Ok(JobResult::CacheCleared)
                 })?;

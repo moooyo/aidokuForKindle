@@ -25,6 +25,7 @@ pub fn observe(
     lifecycle: &Rc<RefCell<bootstrap_lifecycle::Coordinator>>,
     overlap: bool,
     prepare_toolbar: bool,
+    last_cover_grace: bool,
 ) {
     let ui = ui.as_weak();
     let startup = Rc::downgrade(startup);
@@ -61,6 +62,9 @@ pub fn observe(
             return;
         }
         if frame.initial && !frame.submitted && !frame.input_blocked {
+            if let Some(startup) = startup.upgrade() {
+                startup.borrow().close_cover_warm_window();
+            }
             reader_timing::startup_frame("startup_initial_input_ready", frame, None);
         }
         let Some(ui) = ui.upgrade() else { return };
@@ -70,7 +74,7 @@ pub fn observe(
         if frame.submitted && platform.release_startup_render_priority() {
             reader_timing::mark("startup_background_covers_admitted");
             if let Some(app) = application.upgrade().and_then(|slot| slot.borrow().clone()) {
-                app.borrow_mut().begin_startup_cover_publication();
+                app.borrow_mut().begin_startup_cover_publication(last_cover_grace);
             }
             let ui = ui.as_weak();
             // Return to the regular lifecycle-gated dispatcher before starting work.
@@ -80,12 +84,18 @@ pub fn observe(
                 }
             });
         }
-        if !reader_timing::enabled() || (covers_settled.get() && library_input_ready.get()) {
+        if !reader_timing::enabled() {
             return;
         }
         let Some(app) = application.upgrade().and_then(|slot| slot.borrow().clone()) else {
             return;
         };
+        if frame.submitted {
+            app.borrow_mut().observe_import_presentation(frame);
+        }
+        if covers_settled.get() && library_input_ready.get() {
+            return;
+        }
         let Some(covers) = app.borrow().startup_cover_projection() else {
             return;
         };

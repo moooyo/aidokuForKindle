@@ -81,7 +81,7 @@ def main() -> None:
             if path.is_symlink() or "data" in path.relative_to(staging).parts:
                 raise ValueError(f"Runtime state or a symlink is not a package input: {relative}")
             content = path.read_bytes()
-            executable_file = path.suffix == ".sh" or relative in ("aidoku/app/aidoku", "aidoku/app/kindle-jpeg-worker", "aidoku/app/aidoku-native-query", "aidoku/native-catalog/aidoku-library-dispatch", "aidoku/native-catalog/aidoku-catalog-client")
+            executable_file = path.suffix == ".sh" or relative in ("aidoku/app/aidoku", "aidoku/app/kindle-jpeg-worker", "aidoku/app/aidoku-native-query", "aidoku/app/aidoku-startup-portrait", "aidoku/native-catalog/aidoku-library-dispatch", "aidoku/native-catalog/aidoku-catalog-client")
             info = zipfile.ZipInfo(relative, date_time=(2026, 11, 4, 0, 0, 0))
             info.create_system = 3
             info.compress_type = zipfile.ZIP_DEFLATED

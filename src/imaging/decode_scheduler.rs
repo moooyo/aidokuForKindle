@@ -148,6 +148,18 @@ pub(crate) fn decode_permit() -> Result<DecodePermit<'static>> {
     SCHEDULER.acquire(context.background, context.cancellation.as_ref())
 }
 
+/// Startup speculation must never queue in front of real image work.
+pub(crate) fn try_spare_decode_permit() -> Option<DecodePermit<'static>> {
+    let mut state = SCHEDULER.state.try_lock().ok()?;
+    if state.active || !state.waiters.is_empty() {
+        return None;
+    }
+    state.active = true;
+    Some(DecodePermit {
+        scheduler: &SCHEDULER,
+    })
+}
+
 struct Waiter {
     ticket: u64,
     background: bool,

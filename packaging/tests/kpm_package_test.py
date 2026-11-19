@@ -40,6 +40,7 @@ class KpmPackageTests(unittest.TestCase):
     def package(self, name: str, *, sample: bool = False, version: str | None = "2.3.4",
                 environment: dict[str, str] | None = None,
                 query_helper: Path | None = None,
+                portrait_helper: Path | None = None,
                 catalog_dir: Path | None = None) -> tuple[Path, subprocess.CompletedProcess[str]]:
         output = self.root / name
         command = [sys.executable, str(BUILDER), "--application", str(self.application),
@@ -50,6 +51,8 @@ class KpmPackageTests(unittest.TestCase):
             command.extend(("--sample-cbz", str(self.sample)))
         if query_helper is not None:
             command.extend(("--native-query-helper", str(query_helper)))
+        if portrait_helper is not None:
+            command.extend(("--startup-portrait-helper", str(portrait_helper)))
         if catalog_dir is not None:
             command.extend(("--native-catalog-dir", str(catalog_dir)))
         result = subprocess.run(command, env=environment, capture_output=True, text=True, timeout=30)
@@ -78,6 +81,26 @@ class KpmPackageTests(unittest.TestCase):
         _, result = self.package("bad-query.kpkg", query_helper=helper)
         self.assertNotEqual(result.returncode, 0)
         self.assertIn("hard-float", result.stderr)
+
+    def test_optional_portrait_supervisor_binds_executable_content_and_mode(self) -> None:
+        helper = self.root / "portrait"
+        content = bytearray(self.application.read_bytes())
+        content[16:18] = (3).to_bytes(2, "little")
+        content[36:40] = (0x5000400).to_bytes(4, "little")
+        helper.write_bytes(content)
+        output, result = self.package("portrait.kpkg", portrait_helper=helper)
+        self.require_success(result)
+        with tarfile.open(output, "r:gz") as archive:
+            member = archive.getmember("payload/aidoku/app/aidoku-startup-portrait")
+            self.assertEqual(member.mode, 0o755)
+            self.assertEqual(archive.extractfile(member).read(), content)
+            self.assertIn(f"{sha256(content)}|{len(content)}|755|aidoku/app/aidoku-startup-portrait\n",
+                          archive.extractfile("payload.tsv").read().decode("ascii"))
+        content[16:18] = (1).to_bytes(2, "little")
+        helper.write_bytes(content)
+        bad, result = self.package("bad-portrait.kpkg", portrait_helper=helper)
+        self.assertNotEqual(result.returncode, 0)
+        self.assertFalse(bad.exists())
 
     def test_catalog_runtime_is_explicit_and_preserves_modes(self) -> None:
         directory = self.root / "catalog"
@@ -186,6 +209,7 @@ class KpmPackageTests(unittest.TestCase):
         self.assertEqual(first.read_bytes(), second.read_bytes())
         with tarfile.open(first, "r:gz") as archive:
             self.assertNotIn("payload/aidoku/samples/Aidoku-Sample.cbz", archive.getnames())
+            self.assertNotIn("payload/aidoku/app/aidoku-startup-portrait", archive.getnames())
 
     def test_environment_version_is_used_without_an_explicit_override(self) -> None:
         environment = os.environ | {"CARGO_PKG_VERSION": "5.6.7"}

@@ -91,6 +91,7 @@ impl App {
         // the controller's SQLite connection have been dropped.
         if !matches!(self.metadata_restore, RestoreRuntime::Draining(_))
             || !self.active_jobs.is_empty()
+            || !self.import_thumbnails.drained()
             || !self.downloads.is_stopped()
         {
             return;

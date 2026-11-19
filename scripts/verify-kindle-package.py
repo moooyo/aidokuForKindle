@@ -19,7 +19,7 @@ import zipfile
 
 SOURCE_FILES = ("Cargo.toml", "Cargo.lock", "build.rs", "rust-toolchain.toml", ".cargo/config.toml",
                 "scripts/native-codec-probe.c", "scripts/native-codec-bench.h", "scripts/build-native-query.sh",
-                "scripts/build-native-catalog-entry.sh")
+                "scripts/build-native-catalog-entry.sh", "scripts/build-startup-portrait.sh")
 SOURCE_DIRECTORIES = ("src", "ui", "assets", "vendor", "examples")
 SOURCE_ALGORITHM = "sha256-of-canonical-sorted-relative-file-records-v1"
 
@@ -121,6 +121,7 @@ def main() -> int:
     parser.add_argument("--expected-application-sha256", required=True)
     parser.add_argument("--expected-helper-sha256", required=True)
     parser.add_argument("--expected-native-query-sha256", required=True)
+    parser.add_argument("--expected-startup-portrait-sha256")
     parser.add_argument("--expected-catalog-dir", type=Path)
     parser.add_argument("--output", type=Path, required=True)
     arguments = parser.parse_args()
@@ -159,6 +160,8 @@ def main() -> int:
                 "The package manifest binds the exact verified production source", manifest.get("source_sha256"))
         inputs = expected_inputs(root)
         expected_names = set(inputs) | {"aidoku/app/aidoku", "aidoku/app/kindle-jpeg-worker", "aidoku/app/aidoku-native-query"}
+        if arguments.expected_startup_portrait_sha256 is not None:
+            expected_names.add("aidoku/app/aidoku-startup-portrait")
         catalog_names = ("aidoku-library-dispatch", "aidoku-entry-hooks.so", "aidoku-catalog-client", "SHA256SUMS")
         if arguments.expected_catalog_dir is not None:
             expected_names.update("aidoku/native-catalog/" + name for name in catalog_names)
@@ -182,7 +185,7 @@ def main() -> int:
                         and "\\" not in name and not info.is_dir(),
                         f"The package member has a safe runtime-free path: {name}")
                 mode = info.external_attr >> 16
-                expected_mode = 0o755 if name.endswith(".sh") or name in ("aidoku/app/aidoku", "aidoku/app/kindle-jpeg-worker", "aidoku/app/aidoku-native-query", "aidoku/native-catalog/aidoku-library-dispatch", "aidoku/native-catalog/aidoku-catalog-client") else 0o644
+                expected_mode = 0o755 if name.endswith(".sh") or name in ("aidoku/app/aidoku", "aidoku/app/kindle-jpeg-worker", "aidoku/app/aidoku-native-query", "aidoku/app/aidoku-startup-portrait", "aidoku/native-catalog/aidoku-library-dispatch", "aidoku/native-catalog/aidoku-catalog-client") else 0o644
                 require(info.create_system == 3 and stat.S_ISREG(mode) and stat.S_IMODE(mode) == expected_mode,
                         f"The member has correct Unix file permissions: {name}", oct(mode))
                 content = archive.read(info)
@@ -208,6 +211,13 @@ def main() -> int:
                     "The native query helper matches the frozen executable", sha256(query_helper))
             query_identity = elf_identity(query_helper, static=False)
             require(query_identity["static"] is False, "The query helper uses the native firmware loader", query_identity)
+            if arguments.expected_startup_portrait_sha256 is not None:
+                portrait = archive.read("aidoku/app/aidoku-startup-portrait")
+                require(sha256(portrait) == arguments.expected_startup_portrait_sha256,
+                        "The startup portrait supervisor matches the frozen executable", sha256(portrait))
+                require(elf_identity(portrait, static=False)["static"] is False,
+                        "The startup portrait supervisor uses the native firmware loader")
+                report["startup_portrait_sha256"] = sha256(portrait)
             if arguments.expected_catalog_dir is not None:
                 for name in catalog_names:
                     payload = archive.read("aidoku/native-catalog/" + name)

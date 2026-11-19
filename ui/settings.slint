@@ -9,7 +9,7 @@ export component SettingsPage inherits Rectangle {
     property <bool> root-list: !State.large-screen && State.settings-section == "";
     property <string> section: State.settings-section == "" ? "default-direction" : State.settings-section;
     property <length> sidebar-width: State.large-screen ? 320px : root.width;
-    property <string> section-title: root.section == "default-direction" ? Strings.turn-and-zoom : root.section == "frontlight-warmth" ? Strings.frontlight-warmth : root.section == "screen-refresh" ? Strings.screen-refresh : root.section == "hardware-acceleration" ? Strings.hardware-acceleration : root.section == "storage" ? Strings.download-management : root.section == "categories" ? Strings.category : root.section == "backup" ? Strings.backup-restore : root.section == "language" ? Strings.interface-language : Strings.about;
+    property <string> section-title: root.section == "default-direction" ? Strings.turn-and-zoom : root.section == "frontlight-warmth" ? Strings.frontlight-warmth : root.section == "screen-refresh" ? Strings.screen-refresh : root.section == "hardware-acceleration" ? Strings.hardware-acceleration : root.section == "storage" ? Strings.download-management : root.section == "categories" ? Strings.category : root.section == "backup" ? Strings.backup-restore : root.section == "language" ? Strings.interface-language : root.section == "startup-options" ? Strings.startup-options : Strings.about;
     if root.root-list || State.large-screen: Rectangle { x: 0px; y: 0px;
         width: root.sidebar-width; height: parent.height;
         if State.large-screen: Rectangle { x: parent.width - 1px; y: 20px; width: 1px; height: parent.height - 40px; background: Theme.line; }

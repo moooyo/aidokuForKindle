@@ -27,6 +27,7 @@ component MoreMenuGlyph inherits Path {
     accessible-role: none;
     commands: root.action-id == "refresh" || root.action-id == "reload" ? "M21 4v6h-6M3 20v-6h6M5 9a8 8 0 0 1 13.5-3L21 9M3 15l2.5 3A8 8 0 0 0 19 15" :
         root.action-id == "downloads" ? "M12 4v11M7 11l5 5 5-5M5 20h14" :
+        root.action-id == "quick-return" ? "M20 12H4m6-6-6 6 6 6" :
         root.action-id == "selection" ? "M4 4h16v16H4zM8 12l3 3 5-6" :
         root.action-id == "manage-categories" || root.action-id == "category" ? (State.large-screen ? "M3 7h7l2 2h9v10H3z" : "M8 6h13M8 12h13M8 18h13M3.5 6h.01M3.5 12h.01M3.5 18h.01") :
         root.action-id == "migrate" ? "M17 3l4 4-4 4M3 7h18M7 21l-4-4 4-4M21 17H3" :

@@ -5,6 +5,7 @@ import { Strings } from "strings.slint";
 import { ActionButton, BodyText, Caption, GroupLabel, Icon, RadioCard, ToggleRow, TitleText } from "widgets.slint";
 import { SettingsChoice, SettingsSlider, SettingsValueRow } from "settings-controls.slint";
 import { HardwareOptions } from "hardware-options.slint";
+import { StartupSettings } from "settings-startup.slint";
 import { TapLayoutCard } from "settings-tap-card.slint";
 import { StorageSettings, CategoriesSettings, DownloadSettings, SourceListsSettings } from "settings-data.slint";
 
@@ -47,6 +48,7 @@ export component SettingsBody inherits Rectangle {
     property <length> group-height: State.large-screen ? 21px : 18px;
     property <length> section-gap: State.large-screen ? 12px : 10px;
 
+    if root.section == "startup-options": StartupSettings { x: 0px; y: 0px; width: root.width; height: root.height; }
     if root.section == "screen-refresh": Flickable {
         x: 0px; y: 0px; width: parent.width; height: parent.height;
         viewport-width: self.width; viewport-height: refresh-options.height;

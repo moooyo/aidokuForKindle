@@ -21,6 +21,7 @@ use crate::{
 
 static SUSPEND_REQUESTED: AtomicBool = AtomicBool::new(false);
 static RESUME_REQUESTED: AtomicBool = AtomicBool::new(false);
+static STARTUP_INTERRUPTED: AtomicBool = AtomicBool::new(false);
 static SIGNAL_WAKE_FD: AtomicI32 = AtomicI32::new(-1);
 
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -607,6 +608,7 @@ fn write_atomic(directory: &Path, name: &str, bytes: &[u8]) -> Result<()> {
 
 #[cfg(unix)]
 extern "C" fn lifecycle_signal(signal: libc::c_int) {
+    STARTUP_INTERRUPTED.store(true, Ordering::Release);
     if signal == libc::SIGUSR1 {
         SUSPEND_REQUESTED.store(true, Ordering::Release);
     }
@@ -663,6 +665,10 @@ pub fn display_activity_allowed() -> bool {
     !SUSPEND_REQUESTED.load(Ordering::Acquire)
         && !RESUME_REQUESTED.load(Ordering::Acquire)
         && !crate::STOP_REQUESTED.load(Ordering::Acquire)
+}
+
+pub fn startup_speculation_allowed() -> bool {
+    !STARTUP_INTERRUPTED.load(Ordering::Acquire) && display_activity_allowed()
 }
 
 pub fn clear_signal_wakeup() {

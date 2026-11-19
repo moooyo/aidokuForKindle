@@ -1,4 +1,4 @@
-use std::collections::HashMap;
+use std::{collections::HashMap, sync::LazyLock};
 
 use anyhow::{Result, ensure};
 use chrono::Datelike;
@@ -42,6 +42,33 @@ pub(crate) struct BookViewMetadata {
     pub book: Option<Book>,
     pub progress: Option<Progress>,
     pub downloaded: bool,
+}
+
+const BOOK_VIEW_COLUMNS: &str = "b.document,
+    EXISTS(SELECT 1 FROM chapters c WHERE c.book_id = b.id
+           AND json_extract(c.document, '$.downloaded') = 1),
+    p.book_id, p.chapter_id, p.page, p.total, p.updated_at, p.completed";
+const BOOK_VIEW_PROGRESS: &str = "LEFT JOIN progress p ON p.rowid = (
+    SELECT r.rowid FROM progress r WHERE r.book_id = b.id
+    ORDER BY r.updated_at DESC, r.rowid DESC LIMIT 1)";
+static BOOK_VIEW_BY_ID: LazyLock<String> = LazyLock::new(|| {
+    format!("SELECT {BOOK_VIEW_COLUMNS} FROM books b {BOOK_VIEW_PROGRESS} WHERE b.id = ?1")
+});
+
+fn book_view_row(row: &rusqlite::Row<'_>) -> rusqlite::Result<(String, bool, Option<Progress>)> {
+    let progress = if let Some(chapter_id) = row.get::<_, Option<String>>(3)? {
+        Some(Progress {
+            book_id: row.get(2)?,
+            chapter_id,
+            page: row.get(4)?,
+            total: row.get(5)?,
+            updated_at: row.get(6)?,
+            completed: row.get(7)?,
+        })
+    } else {
+        None
+    };
+    Ok((row.get(0)?, row.get(1)?, progress))
 }
 
 #[derive(Debug, Default)]
@@ -350,6 +377,65 @@ impl Store {
         page: usize,
         page_size: usize,
     ) -> Result<ViewPage<Book>> {
+        self.library_page_with(query, page, page_size, "b.document", "", |row| {
+            decode(row.get(0)?)
+        })
+    }
+
+    pub(crate) fn project_library_grid<T>(
+        &self,
+        query: LibraryQuery,
+        page: usize,
+        page_size: usize,
+        batched: bool,
+        mut project: impl FnMut(Book, BookViewMetadata) -> T,
+    ) -> Result<ViewPage<T>> {
+        if !batched {
+            let page = self.library_view_page(query, page, page_size)?;
+            return Ok(ViewPage {
+                total: page.total,
+                page: page.page,
+                items: page
+                    .items
+                    .into_iter()
+                    .map(|book| {
+                        let metadata = self.book_view_metadata(&book.id)?;
+                        Ok(project(book, metadata))
+                    })
+                    .collect::<Result<_>>()?,
+            });
+        }
+        // The visible index window is already materialized before obtaining
+        // per-book state. Its document is authoritative; decode it just once.
+        self.library_page_with(
+            query,
+            page,
+            page_size,
+            BOOK_VIEW_COLUMNS,
+            BOOK_VIEW_PROGRESS,
+            |row| {
+                let (document, downloaded, progress) = book_view_row(row)?;
+                Ok(project(
+                    decode(document)?,
+                    BookViewMetadata {
+                        book: None,
+                        downloaded,
+                        progress,
+                    },
+                ))
+            },
+        )
+    }
+
+    fn library_page_with<T>(
+        &self,
+        query: LibraryQuery,
+        page: usize,
+        page_size: usize,
+        columns: &str,
+        join: &str,
+        mut project: impl FnMut(&rusqlite::Row<'_>) -> Result<T>,
+    ) -> Result<ViewPage<T>> {
         ensure!(
             query.filters.iter().all(|value| (-1..=1).contains(value)),
             "Unknown three-state library filter"
@@ -433,60 +519,30 @@ impl Store {
             "WITH visible AS MATERIALIZED (
                  SELECT {selection} FROM books b WHERE {filter}
                  ORDER BY {order} LIMIT ?9 OFFSET ?10)
-             SELECT b.document FROM visible v JOIN books b ON b.id = v.id
+             SELECT {columns} FROM visible v JOIN books b ON b.id = v.id {join}
              ORDER BY {visible_order}"
         ))?;
-        let items = statement
-            .query_map(
-                params![
-                    query.category,
-                    legacy_unread_only,
-                    legacy_downloaded_only,
-                    query.filters[0],
-                    query.filters[1],
-                    query.filters[2],
-                    query.filters[3],
-                    completed_status,
-                    page_size,
-                    offset
-                ],
-                |row| row.get::<_, String>(0),
-            )?
-            .map(|row| decode(row?))
-            .collect::<Result<Vec<Book>>>()?;
+        let mut rows = statement.query(params![
+            query.category,
+            legacy_unread_only,
+            legacy_downloaded_only,
+            query.filters[0],
+            query.filters[1],
+            query.filters[2],
+            query.filters[3],
+            completed_status,
+            page_size,
+            offset
+        ])?;
+        let mut items = Vec::with_capacity(page_size.min(total));
+        while let Some(row) = rows.next()? {
+            items.push(project(row)?);
+        }
         Ok(ViewPage { total, page, items })
     }
 
     pub(crate) fn book_view_metadata(&self, id: &str) -> Result<BookViewMetadata> {
-        let row = self
-            .connection
-            .query_row(
-                "SELECT b.document,
-                    EXISTS(SELECT 1 FROM chapters c WHERE c.book_id = b.id
-                           AND json_extract(c.document, '$.downloaded') = 1),
-                    p.book_id, p.chapter_id, p.page, p.total, p.updated_at, p.completed
-             FROM books b LEFT JOIN progress p ON p.rowid = (
-                 SELECT r.rowid FROM progress r WHERE r.book_id = b.id
-                 ORDER BY r.updated_at DESC, r.rowid DESC LIMIT 1)
-             WHERE b.id = ?1",
-                [id],
-                |row| {
-                    let progress = if let Some(chapter_id) = row.get::<_, Option<String>>(3)? {
-                        Some(Progress {
-                            book_id: row.get(2)?,
-                            chapter_id,
-                            page: row.get(4)?,
-                            total: row.get(5)?,
-                            updated_at: row.get(6)?,
-                            completed: row.get(7)?,
-                        })
-                    } else {
-                        None
-                    };
-                    Ok((row.get::<_, String>(0)?, row.get::<_, bool>(1)?, progress))
-                },
-            )
-            .optional()?;
+        let row = self.connection.query_row(&BOOK_VIEW_BY_ID, [id], book_view_row).optional()?;
         let Some((document, downloaded, progress)) = row else {
             return Ok(BookViewMetadata::default());
         };
@@ -961,6 +1017,49 @@ mod tests {
         }
         transaction.commit()?;
         Ok((store, records))
+    }
+
+    #[test]
+    fn joined_library_grid_keeps_the_visible_order_badges_and_latest_progress() -> Result<()> {
+        let (store, records) = fixture(37)?;
+        let (book, chapter, progress) = &records[0];
+        // A tie must choose the newer row, including when both chapters belong to this book.
+        let mut newer = chapter.clone();
+        newer.id.push_str("-next");
+        newer.remote_id.push_str("-next");
+        insert_chapter(&store, &newer)?;
+        store.connection.execute(
+            "INSERT INTO progress (chapter_id,book_id,page,total,completed,updated_at) VALUES (?1,?2,7,18,0,?3)",
+            params![newer.id, book.id, progress.updated_at],
+        )?;
+        store.connection.execute("DELETE FROM progress WHERE book_id=?1", [&records[1].0.id])?;
+        for query in [
+            LibraryQuery::default(),
+            LibraryQuery { sort_key: Some("recent-read"), ascending: true, ..Default::default() },
+            LibraryQuery { sort_key: Some("title"), filters: [1, 0, 0, 0], ..Default::default() },
+            LibraryQuery { demo_order: true, ..Default::default() },
+        ] {
+            for r in [1, 2, 100] {
+                let keep = |book, metadata| (book, metadata);
+                let rowwise = store.project_library_grid(query, r, 15, false, keep)?;
+                let joined = store.project_library_grid(query, r, 15, true, keep)?;
+                assert_eq!((joined.total, joined.page), (rowwise.total, rowwise.page));
+                assert_eq!(joined.items.len(), rowwise.items.len());
+                for ((b, meta), (old, prior)) in joined.items.iter().zip(rowwise.items) {
+                    assert_eq!(b, &old);
+                    assert_eq!(prior.book.as_ref(), Some(b));
+                    assert!(meta.book.is_none(), "The joined grid already owns its document");
+                    assert_eq!(meta.downloaded, prior.downloaded);
+                    assert_eq!(meta.progress, prior.progress);
+                    if b.id == book.id {
+                        assert_eq!(meta.progress.as_ref().unwrap().chapter_id, newer.id);
+                    } else if b.id == records[1].0.id {
+                        assert!(meta.progress.is_none());
+                    }
+                }
+            }
+        }
+        Ok(())
     }
 
     #[test]

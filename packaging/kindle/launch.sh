@@ -125,13 +125,32 @@ set_phase() { APP_PHASE=$1; write_record phase "$APP_PHASE"; }
 case "$AIDOKU_HOME:$LOCK_DIR" in /*:/*) ;; *) fail 'Application and lock directories must be absolute.' ;; esac
 [ -x "$APP_DIR/aidoku" ] || fail 'The ARM application executable is missing.'
 [ -c "$FRAMEBUFFER" ] || fail 'A native Kindle framebuffer is required.'
-mkdir -p "$DATA_DIR/logs" "$DATA_DIR/imports"
+if [ ! -d "$DATA_DIR/logs" ] || [ ! -d "$DATA_DIR/imports" ]; then
+    mkdir -p "$DATA_DIR/logs" "$DATA_DIR/imports"
+fi
 PROFILE=pw5
-if [ -r "$DATA_DIR/device-profile" ]; then PROFILE=$(sed -n '1{s/\r$//;p;}' "$DATA_DIR/device-profile"); fi
+if [ -r "$DATA_DIR/device-profile" ]; then
+    PROFILE=''
+    if [ -f "$DATA_DIR/device-profile" ]; then
+        IFS= read -r PROFILE <"$DATA_DIR/device-profile" || :
+    fi
+    case "$PROFILE" in
+        ''|*[!a-z0-9-])
+            # Retain read errors and CR handling even if the shell discarded a NUL.
+            PROFILE=$(sed -n '1{s/\r$//;p;q;}' "$DATA_DIR/device-profile") ;;
+    esac
+fi
 case "$PROFILE" in pw5|pw6|scribe|scribe2|scribe3|scribe3-nofrontlight) ;; *) fail 'Unknown device profile.' ;; esac
-SCRIPT_PATH=$(CDPATH= cd "$(dirname "$0")" && pwd)/$(basename "$0")
 if [ "${1:-}" != '--foreground' ]; then
+    if [ "$0" = "$AIDOKU_HOME/launch.sh" ]; then
+        SCRIPT_PATH=$0
+    else
+        SCRIPT_PATH=$(CDPATH= cd "$(dirname "$0")" && pwd)/$(basename "$0")
+    fi
     export AIDOKU_HOME
+    # Only the managed Library path can offer its next open a short pixel handoff.
+    unset AIDOKU_MANAGED_LIBRARY
+    if [ "${1:-}" = --library ]; then AIDOKU_MANAGED_LIBRARY=1; export AIDOKU_MANAGED_LIBRARY; fi
     if command -v setsid >/dev/null 2>&1; then
         setsid sh "$SCRIPT_PATH" --foreground >>"$DATA_DIR/logs/launcher.log" 2>&1 </dev/null &
     else
@@ -217,9 +236,54 @@ stop_native_read() {
     rm -f "$LOCK_DIR/native-read-done" "$LOCK_DIR/native-read-done.pending" "$LOCK_DIR/native-read-command" "$LOCK_DIR/native-read-command.pending" "$LOCK_DIR/native-read-go" "$LOCK_DIR/native-read-go.pending"
 }
 
+startup_portrait_native() (
+    # An explicit diagnostic override wins. No configuration is sourced.
+    case "${AIDOKU_STARTUP_PORTRAIT:-}" in native) return 0;; '') ;; *) return 1;; esac
+    portrait_options=$DATA_DIR/startup-options
+    [ -f "$portrait_options" ] && [ ! -L "$portrait_options" ] || return 1
+    # Read one byte past the same limit as the Rust parser. Decimal bytes
+    # ensure that an embedded NUL cannot disappear in a shell variable.
+    portrait_bytes=$(LC_ALL=C od -An -v -tu1 -N 1025 "$portrait_options") || return 1
+    printf '%s\n' "$portrait_bytes" | LC_ALL=C awk '
+        function row() {
+            if (index(line, "portrait=") == 1) { matches++; native = (line == "portrait=native") }
+            line = ""
+        }
+        {
+            for (i = 1; i <= NF; i++) {
+                c = $i + 0
+                if (++size > 1024 || (c != 10 && (c < 32 || c > 126))) { bad = 1; exit }
+                if (c == 10) row(); else line = line sprintf("%c", c)
+            }
+        }
+        END { row(); exit !(bad == 0 && matches == 1 && native) }
+    '
+)
+
 native_read_command() {
     rm -f "$LOCK_DIR/native-read-output" "$LOCK_DIR/native-read-done" "$LOCK_DIR/native-read-done.pending" "$LOCK_DIR/native-read-command" "$LOCK_DIR/native-read-command.pending" "$LOCK_DIR/native-read-go" "$LOCK_DIR/native-read-go.pending" || return 1
     NATIVE_READ_SEQUENCE=$((NATIVE_READ_SEQUENCE + 1))
+    native_portrait_mode=''
+    if [ "$1" = "$APP_DIR/aidoku" ] && [ "${2:-}" = --kindle ] && [ "${3:-}" = --device ] &&
+        [ "${4:-}" = "$PROFILE" ] && [ "${5:-}" = --capture-native-portrait ] &&
+        { [ "$#" -eq 5 ] || { [ "$#" -eq 6 ] && [ "$6" = --capture-sleep-capability ]; }; }; then
+        native_portrait_mode=shell
+        if [ -x "$APP_DIR/aidoku-startup-portrait" ] &&
+            { [ -n "${AIDOKU_STARTUP_PORTRAIT:-}" ] || [ -s "$DATA_DIR/startup-options" ]; } &&
+            startup_portrait_native; then native_portrait_mode=native; fi
+    fi
+    if [ "$native_portrait_mode" = native ]; then
+        "$APP_DIR/aidoku-startup-portrait" "$ROOT_PID" "$NATIVE_READ_SEQUENCE" "$PROFILE" ${6:+"$6"} >"$LOCK_DIR/native-read-output" 2>/dev/null 3>&- 4>&- &
+    else
+        start_legacy_native_read "$@"
+    fi
+    NATIVE_READ_PID=$!
+    finish_native_read || return 1
+    if [ -n "$native_portrait_mode" ]; then printf 'aidoku: Startup portrait supervisor: %s.\n' "$native_portrait_mode" >&2; fi
+    return 0
+}
+
+start_legacy_native_read() {
     setsid sh -c '
         completed=$1
         permission=$2
@@ -267,7 +331,9 @@ native_read_command() {
         mv -f "$completed.pending" "$completed"
         while :; do sleep 1; done
     ' sh "$LOCK_DIR/native-read-done" "$LOCK_DIR/native-read-go" "$NATIVE_READ_SEQUENCE" "$NONCE" "$LOCK_DIR/native-read-command" "$@" >"$LOCK_DIR/native-read-output" 2>/dev/null 3>&- 4>&- &
-    NATIVE_READ_PID=$!
+}
+
+finish_native_read() {
     NATIVE_READ_BIRTH=$(process_birth "$NATIVE_READ_PID" 2>/dev/null || :)
     # Keep the same two-second sleep budget, with earlier completion detection.
     native_read_checks=100

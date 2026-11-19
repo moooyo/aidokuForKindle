@@ -21,6 +21,8 @@ cd "$REPO_ROOT"
 cargo zigbuild --locked --release --no-default-features --features kindle --target "$TARGET"
 NATIVE_QUERY_HELPER=$CARGO_TARGET_DIR/native-query/aidoku-native-query
 sh "$SCRIPT_DIR/build-native-query.sh" "$NATIVE_QUERY_HELPER"
+STARTUP_PORTRAIT_HELPER=$CARGO_TARGET_DIR/native-query/aidoku-startup-portrait
+sh "$SCRIPT_DIR/build-startup-portrait.sh" "$STARTUP_PORTRAIT_HELPER"
 NATIVE_CATALOG_DIR=$CARGO_TARGET_DIR/native-catalog
 sh "$SCRIPT_DIR/build-native-catalog-entry.sh" "$NATIVE_CATALOG_DIR"
 
@@ -33,6 +35,7 @@ mkdir -p "$STAGING_ROOT/aidoku/app" "$STAGING_ROOT/aidoku/assets" \
 install -m 755 "$CARGO_TARGET_DIR/$TARGET/release/aidoku" "$STAGING_ROOT/aidoku/app/aidoku"
 install -m 755 "$CARGO_TARGET_DIR/$TARGET/release/kindle-jpeg-worker" "$STAGING_ROOT/aidoku/app/kindle-jpeg-worker"
 install -m 755 "$NATIVE_QUERY_HELPER" "$STAGING_ROOT/aidoku/app/aidoku-native-query"
+install -m 755 "$STARTUP_PORTRAIT_HELPER" "$STAGING_ROOT/aidoku/app/aidoku-startup-portrait"
 install -m 755 packaging/kindle/launch.sh "$STAGING_ROOT/aidoku/launch.sh"
 install -m 755 packaging/kindle/install-catalog-entry.sh "$STAGING_ROOT/aidoku/install-catalog-entry.sh"
 install -m 755 "$NATIVE_CATALOG_DIR/aidoku-library-dispatch" "$NATIVE_CATALOG_DIR/aidoku-catalog-client" "$STAGING_ROOT/aidoku/native-catalog/"

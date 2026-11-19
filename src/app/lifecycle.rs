@@ -6,6 +6,8 @@ impl App {
     /// Close application and transport admission, then project prepared memory.
     /// The caller must return to the event loop before checkpointing a cover.
     pub fn begin_sleep_transition(&mut self, show_cover: bool) -> Result<bool> {
+        self.import_thumbnails.cancel();
+        self.cancel_startup_cover_grace();
         if self.suspended {
             if show_cover && self.sleep_cover_enabled() {
                 self.show_sleep_cover()?;
@@ -124,6 +126,7 @@ impl App {
     pub fn suspend_ready(&mut self) -> Result<bool> {
         Ok(self.suspended
             && self.suspend_checkpoint_ready
+            && self.import_thumbnails.drained()
             && self.downloads.suspend_ready()
             && self.platform.device_policies_restored())
     }

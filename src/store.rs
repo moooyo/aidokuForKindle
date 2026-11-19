@@ -175,12 +175,45 @@ impl Store {
 
     /// Background observers must not run schema migration or startup recovery.
     pub fn open_read_only(path: impl AsRef<Path>) -> Result<Self> {
+        Self::open_read_only_with_timeout(path, Duration::from_secs(5))
+    }
+
+    pub(crate) fn open_read_only_with_timeout(
+        path: impl AsRef<Path>,
+        timeout: Duration,
+    ) -> Result<Self> {
         let connection = Connection::open_with_flags(path, OpenFlags::SQLITE_OPEN_READ_ONLY)
             .context("Open application database read-only")?;
-        connection.busy_timeout(Duration::from_secs(5))?;
+        connection.busy_timeout(timeout)?;
         connection.pragma_update(None, "query_only", "ON")?;
         connection.pragma_update(None, "mmap_size", 0)?;
         Ok(Self { connection })
+    }
+
+    /// Skip speculative sorting on large databases, including saved source
+    /// listings. This capped probe does not count or sort the whole collection.
+    pub(crate) fn small_library_for_startup_warm(&self) -> Result<bool> {
+        Ok(!self.connection.query_row(
+            "SELECT EXISTS(SELECT 1 FROM books LIMIT 1 OFFSET 64)",
+            [],
+            |row| row.get::<_, bool>(0),
+        )?)
+    }
+
+    /// Optional cover selection shares an already-required metadata read, in
+    /// one rollback-journal snapshot. No second connection or busy timeout is
+    /// introduced; failure to start an optional snapshot skips the extra reads.
+    pub(crate) fn with_startup_read_snapshot<T>(
+        &self,
+        read: impl FnOnce(bool) -> Result<T>,
+    ) -> Result<T> {
+        let Ok(tx) = Transaction::new_unchecked(&self.connection, TransactionBehavior::Deferred)
+        else {
+            return read(false);
+        };
+        let result = read(true)?;
+        tx.commit()?;
+        Ok(result)
     }
 
     /// Connect only after the application's primary Store has initialized its
