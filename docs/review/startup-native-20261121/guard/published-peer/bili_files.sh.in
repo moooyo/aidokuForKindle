@@ -1,0 +1,52 @@
+    bili_home=$media/bilicomics
+    for path in "$bili_home" "$bili_home/app" "$bili_home/data" "$bili_home/notices"; do
+        directory "$path" && attributes=$(stat -c '%d:%i:%a' "$path") || return 1
+        printf 'install_dir %s %s\n' "$path" "$attributes"
+    done
+    for path in "$bili_home/app/bilicomics" "$bili_home/app/kindle-jpeg-worker" "$bili_home/launch.sh" \
+        "$bili_home/data/device-profile" "$bili_home/data/device-allowlist" \
+        "$bili_home/README.md" "$bili_home/THIRD_PARTY_NOTICES.md" "$bili_home/notices/Cargo.lock"; do
+        file_state "$path" || return 1
+    done
+    for pair in app/bilicomics:74340832 app/kindle-jpeg-worker:426672 launch.sh:80185; do
+        path=$bili_home/${pair%:*}
+        [ -x "$path" ] && [ "$(stat -c %s "$path")" = "${pair#*:}" ] || return 1
+    done
+    documents=$media/documents
+    lower=$documents/bilicomics.sh
+    upper=$documents/BiliComics.sh
+    directory "$documents" && [ -r "$documents" ] && [ -x "$documents" ] || return 1
+    count=0
+    for entry in "$documents"/[Bb][Ii][Ll][Ii][Cc][Oo][Mm][Ii][Cc][Ss].*; do
+        absent "$entry" && continue
+        case "${entry##*/}" in
+            [Bb][Ii][Ll][Ii][Cc][Oo][Mm][Ii][Cc][Ss].[Ss][Hh])
+                [ "$entry" = "$lower" ] || return 1
+                count=$((count + 1));;
+            [Bb][Ii][Ll][Ii][Cc][Oo][Mm][Ii][Cc][Ss].[Ss][Dd][Rr]|[Bb][Ii][Ll][Ii][Cc][Oo][Mm][Ii][Cc][Ss].[Ss][Hh].[Ss][Dd][Rr])
+                return 1;;
+        esac
+    done
+    volume=$(stat -c %d "$documents") && number "$volume" && [ "$count" = 1 ] && file_state "$lower" && [ -x "$lower" ] || return 1
+    lookup_id() {
+        leaf "$1" && identity=$(stat -c '%d:%i:%h' "$1") || return 1
+        case "$identity" in "$volume":*:1) ;; *) return 1;; esac
+        inode=${identity#*:}; inode=${inode%:*}
+        number "$inode" && [ "$inode" != 0 ] || return 1
+        printf '%s\n' "$identity"
+    }
+    original_lower=$(lookup_id "$lower") || return 1
+    public_doc() {
+        printf '%s\n' '#!/bin/sh' '# Name: BiliComics for Kindle' 'set -eu' \
+            'exec sh /mnt/us/bilicomics/launch.sh --library' | cmp -s - "$1"
+    }
+    public_doc "$lower" || return 1
+    case '@ALIAS_MODE@' in
+        absent) absent "$upper" || return 1;;
+        same-inode|casefold-proven)
+            original_upper=$(lookup_id "$upper") && public_doc "$upper" &&
+                [ "$(lookup_id "$upper")" = "$original_upper" ] || return 1
+            if [ '@ALIAS_MODE@' = same-inode ]; then [ "$original_upper" = "$original_lower" ] || return 1; fi;;
+        *) return 1;;
+    esac
+    [ "$(lookup_id "$lower")" = "$original_lower" ]

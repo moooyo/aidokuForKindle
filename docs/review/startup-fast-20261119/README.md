@@ -1,7 +1,12 @@
 # Library startup candidate: qualification pending
 
-**Candidate `61fe3e1` is not installed. No candidate speedup has been measured on the Kindle.** The
-latest on-device baseline remains [installed R3](../startup-entry-timing-20261119/README.md):
+**The startup candidate is not installed as the daily driver.** New
+[physical staged-foreground pilots](PHYSICAL.md) report both improvements and
+regressions. The [November 21 independent confirmation](../startup-followup-20261121/README.md)
+found a 681 ms empty-cache cover saving in ten new pairs. These studies do
+not measure a tap on the stock Library tile. The [November 21 native tile
+comparison](../startup-native-20261121/README.md) records separate ordinary
+opens and the failed visual qualification. The [November 19 R3 baseline](../startup-entry-timing-20261119/README.md) measured
 about 2.15 s from pressing its native Library tile to book text, and 2.52 s
 to all visible covers on repeated visits. An isolated R3 test without local
 thumbnails took 8.20 s from an indexed open *request* to complete covers;
@@ -37,6 +42,11 @@ its starting event is different. See the [prospective trial rules](PLAN.md).
   quantization for the next physical profile.
 
 ## Verification state
+
+The table below is the original pre-rebuild handoff. See the [2026-11-20
+worker report](REBUILD.md) for the integrated cross-build failure, corrective
+change and subsequent independent checks. They use a fresh target and do not
+replay the old private trial.
 
 | Scope | Last observed result on `test-env` |
 | --- | --- |

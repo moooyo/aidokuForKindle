@@ -1,0 +1,61 @@
+#!/bin/bash
+set -euo pipefail
+
+shared=/opt/kindle-toolchain
+if [[ ${1:-} == --build ]]; then
+    shift
+    exec flock --exclusive --close --timeout 1800 "$shared/build.lock" "$0" "$@"
+fi
+if [[ ${1:-} != --mounted ]]; then
+    if (( $# < 2 )); then
+        echo 'Usage: ubuntu-run [--build] PROJECT_DIR COMMAND [ARG...]' >&2
+        exit 64
+    fi
+    project=$(realpath -e -- "$1")
+    shift
+    if [[ ! -d $project || $project == / || $project == "$shared" || $project == "$shared/"* || $shared == "$project/"* ]]; then
+        echo 'Pass a project directory separate from the shared toolchain.' >&2
+        exit 64
+    fi
+    exec unshare --mount --pid --fork --kill-child --propagation private "$0" --mounted "$project" "$@"
+fi
+if (( $$ != 1 )); then
+    echo 'The mount stage requires a fresh PID namespace.' >&2
+    exit 64
+fi
+shift
+project=$1
+shift
+jail=$shared/ubuntu
+mount --bind "$jail" "$jail"
+mount -o remount,bind,ro "$jail"
+mount -t proc -o nosuid,nodev,noexec proc "$jail/proc"
+mount -t tmpfs -o mode=755,nosuid tmpfs "$jail/dev"
+for node in null zero random urandom full tty; do
+    touch "$jail/dev/$node"
+    mount --bind "/dev/$node" "$jail/dev/$node"
+done
+mkdir "$jail/dev/shm" "$jail/dev/pts"
+mount -t tmpfs -o mode=1777,nosuid,nodev tmpfs "$jail/dev/shm"
+mount -t devpts -o newinstance,mode=620,ptmxmode=666,gid=5 devpts "$jail/dev/pts"
+ln -s pts/ptmx "$jail/dev/ptmx"
+ln -s /proc/self/fd "$jail/dev/fd"
+for descriptor in stdin:0 stdout:1 stderr:2; do
+    ln -s "/proc/self/fd/${descriptor#*:}" "$jail/dev/${descriptor%:*}"
+done
+mount -t tmpfs -o mode=1777,nosuid,nodev tmpfs "$jail/tmp"
+mount -t tmpfs -o mode=755,nosuid,nodev tmpfs "$jail/run"
+for item in tools cache env.sh build.lock; do
+    mount --bind "$shared/$item" "$jail$shared/$item"
+done
+mount -o remount,bind,ro "$jail$shared/env.sh"
+mount --bind "$project" "$jail/work"
+chroot "$jail" /usr/bin/env -i HOME=/work/.home LC_ALL=C.UTF-8 \
+    PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin \
+    CARGO_TARGET_DIR=/work/target PYTHONDONTWRITEBYTECODE=1 /bin/bash -ec '
+        . /opt/kindle-toolchain/env.sh
+        cd /work
+        (umask 077; mkdir -p "$HOME")
+        exec "$@"
+    ' ubuntu-run "$@"
+exit $?
