@@ -1,3 +1,4 @@
+mod cover_kernels;
 mod decode_scheduler;
 mod grayscale;
 pub mod spatial_dither;
@@ -194,6 +195,10 @@ pub fn decode_page(bytes: &[u8], options: &ImageOptions) -> Result<GrayImage> {
     decode_page_with_algorithm(bytes, options, RasterAlgorithm::Lanczos3)
 }
 
+pub(crate) fn decode_local_cover(bytes: &[u8], options: &ImageOptions) -> Result<GrayImage> {
+    decode_raster(bytes, options, RasterAlgorithm::Lanczos3, true)
+}
+
 /// A cover rendition already reads every source pixel with the bounded image
 /// decoder, or every row of a large noninterlaced PNG with a final finish().
 /// Normal PNG decoders may stop at the last pixel, so verify all chunk CRCs
@@ -250,6 +255,15 @@ fn decode_page_with_algorithm(
     options: &ImageOptions,
     algorithm: RasterAlgorithm,
 ) -> Result<GrayImage> {
+    decode_raster(bytes, options, algorithm, false)
+}
+
+fn decode_raster(
+    bytes: &[u8],
+    options: &ImageOptions,
+    algorithm: RasterAlgorithm,
+    local_cover: bool,
+) -> Result<GrayImage> {
     let _decode_guard = decode_permit()?;
     check_decode_cancelled()?;
     check_options(options)?;
@@ -271,7 +285,20 @@ fn decode_page_with_algorithm(
             return Ok(output);
         }
     }
-    let mut gray = if matches!(algorithm, RasterAlgorithm::BiliTriangle) {
+    let kernels = if local_cover { cover_kernels::available() } else { None };
+    let mut gray = if local_cover {
+        crate::reader_timing::mark(if kernels.is_some() {
+            "cover_cpu_neon_started"
+        } else {
+            "cover_cpu_scalar_started"
+        });
+        let image = decode_bounded_image(bytes)?;
+        crate::reader_timing::mark("cover_cpu_source_decoded");
+        match (image, kernels) {
+            (image::DynamicImage::ImageRgb8(rgb), Some(kernels)) => kernels.grayscale(rgb)?,
+            (image, _) => grayscale::into_grayscale(image),
+        }
+    } else if matches!(algorithm, RasterAlgorithm::BiliTriangle) {
         decode_reader_grayscale_with_acceleration(bytes, options.media_acceleration)?
     } else {
         decode_grayscale_for_algorithm(bytes, algorithm)?
@@ -281,9 +308,22 @@ fn decode_page_with_algorithm(
     }
     let (width, height) =
         fit_dimensions(gray.width(), gray.height(), options.width, options.height);
-    let mut output = resize_raster(&gray, width, height, algorithm)?;
+    if local_cover {
+        crate::reader_timing::mark("cover_cpu_gray_ready");
+    }
+    let mut output = if let Some(kernels) = kernels {
+        row_resize::resize_with_kernels(&gray, width, height, Some(kernels))?
+    } else {
+        resize_raster(&gray, width, height, algorithm)?
+    };
+    if local_cover {
+        crate::reader_timing::mark("cover_cpu_resize_finished");
+    }
     apply_contrast(&mut output, options.contrast);
     quantize_raster(&mut output, options, algorithm)?;
+    if local_cover {
+        crate::reader_timing::mark("cover_cpu_quantized");
+    }
     Ok(output)
 }
 
@@ -1200,6 +1240,32 @@ mod tests {
             spatial_dither: None,
             contrast: 0,
         }
+    }
+
+    #[test]
+    fn local_cover_matches_existing_lanczos_pixels_after_dithering() {
+        let rgb = image::RgbImage::from_fn(81, 57, |x, y| {
+            image::Rgb([(x * 19 + y) as u8, (x + y * 31) as u8, (x * y) as u8])
+        });
+        let rgba = RgbaImage::from_fn(81, 57, |x, y| {
+            Rgba([(x * 47) as u8, (y * 17) as u8, (x + y) as u8, (x * y) as u8])
+        });
+        let mut jpeg = Cursor::new(Vec::new());
+        DynamicImage::ImageRgb8(rgb.clone())
+            .write_to(&mut jpeg, ImageFormat::Jpeg)
+            .unwrap();
+        for bytes in [png(rgb), png(rgba), jpeg.into_inner()] {
+            for (w, h) in [(1, 1), (23, 31), (376, 514)] {
+                let options = ImageOptions { dither: true, ..options(w, h) };
+                assert_eq!(decode_local_cover(&bytes, &options).unwrap(), decode_page(&bytes, &options).unwrap());
+            }
+        }
+        assert!(decode_local_cover(b"not an image", &options(376, 514)).is_err());
+        let cancel = DecodeCancellation::new();
+        cancel.cancel();
+        assert!(is_decode_cancelled(&with_background_decode(Some(&cancel), || {
+            decode_local_cover(b"not an image", &options(376, 514))
+        }).unwrap_err()));
     }
 
     pub(super) fn reference_crop_white_borders(image: GrayImage) -> GrayImage {

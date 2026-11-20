@@ -1,4 +1,4 @@
-//! Show a real scene before preparing fonts and metadata on background workers.
+//! Present a loading scene while background workers prepare fonts and metadata.
 //!
 //! This follows BiliComics' prepare/attach boundary, coalesced wake token, and
 //! one-turn continuation. Existing Aidoku native ownership gates remain intact.
@@ -195,9 +195,8 @@ impl Startup {
         }
     }
 
-    /// Prepare bytes and metadata while the accepted initial full frame settles.
-    /// UI attachment still requires FirstScene and the normal event-loop turn.
-    pub fn prepare_after_submission(&mut self) {
+    /// Only dormant application services and immutable font bytes are prepared here.
+    pub fn prepare_in_background(&mut self) {
         if self.ready || self.failed || self.cancelled.load(Ordering::Acquire) {
             return;
         }
@@ -208,6 +207,56 @@ impl Startup {
                 StartupEvent::Failed(format!("{error:#}")),
             );
         }
+    }
+
+    /// Only register immutable, delivered faces while the accepted full frame
+    /// settles. In particular, never attach the controller (which applies native
+    /// lighting), wait for a worker or dispatch inputs from this checkpoint.
+    pub fn prime_fonts_during_initial_frame(&mut self, ui: &AppWindow) {
+        let deadline = Instant::now() + Duration::from_millis(140);
+        let allowed = || {
+            Instant::now() < deadline && crate::bootstrap_lifecycle::startup_speculation_allowed()
+        };
+        if let Err(error) = self.prime_available_fonts(ui, allowed) {
+            let _ = publish(
+                &self.sender,
+                &self.wake,
+                StartupEvent::Failed(format!("{error:#}")),
+            );
+        }
+    }
+
+    fn prime_available_fonts(&mut self, ui: &AppWindow, allowed: impl Fn() -> bool) -> Result<()> {
+        if self.cancelled.load(Ordering::Acquire) || !allowed() {
+            return Ok(());
+        }
+        self.collect_preparation()?;
+        while !self.fonts_registered && self.fonts.can_register_next() && allowed() {
+            self.register_next_font(ui)?;
+        }
+        if self.fonts_registered {
+            aidoku_kindle::reader_timing::mark("startup_fence_fonts_ready");
+        }
+        Ok(())
+    }
+
+    fn collect_preparation(&mut self) -> Result<()> {
+        while let Ok(event) = self.receiver.try_recv() {
+            match event {
+                StartupEvent::Font(font) => self.fonts.accept(font)?,
+                StartupEvent::State(prepared) => self.prepared = Some(prepared),
+                StartupEvent::Failed(error) => return Err(anyhow!(error)),
+            }
+        }
+        Ok(())
+    }
+
+    fn register_next_font(&mut self, ui: &AppWindow) -> Result<()> {
+        self.fonts_registered = self.fonts.register_next()?;
+        if self.fonts_registered {
+            self.fonts.finish(ui)?;
+        }
+        Ok(())
     }
 
     /// Called only while the native lifecycle allows active application work.
@@ -240,19 +289,10 @@ impl Startup {
             self.start_workers()?;
             self.started = true;
         }
-        while let Ok(event) = self.receiver.try_recv() {
-            match event {
-                StartupEvent::Font(font) => self.fonts.accept(font)?,
-                StartupEvent::State(prepared) => self.prepared = Some(prepared),
-                StartupEvent::Failed(error) => return Err(anyhow!(error)),
-            }
-        }
+        self.collect_preparation()?;
         if !self.fonts_registered {
             if self.fonts.can_register_next() {
-                self.fonts_registered = self.fonts.register_next()?;
-                if self.fonts_registered {
-                    self.fonts.finish(ui)?;
-                }
+                self.register_next_font(ui)?;
             }
             if !self.fonts_registered {
                 self.update_activity(ui, platform);
@@ -493,6 +533,75 @@ fn publish(sender: &Sender<StartupEvent>, wake: &StartupWake, event: StartupEven
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    struct TestDisplay(Rc<slint::platform::software_renderer::MinimalSoftwareWindow>);
+
+    impl slint::platform::Platform for TestDisplay {
+        fn create_window_adapter(
+            &self,
+        ) -> std::result::Result<Rc<dyn slint::platform::WindowAdapter>, slint::PlatformError> {
+            Ok(self.0.clone())
+        }
+    }
+
+    #[test]
+    fn in_flight_resources_never_publish_the_library_or_activate_normal_work() -> Result<()> {
+        std::thread::spawn(|| -> Result<()> {
+            use slint::platform::software_renderer::{MinimalSoftwareWindow, RepaintBufferType};
+            slint::platform::set_platform(Box::new(TestDisplay(MinimalSoftwareWindow::new(
+                RepaintBufferType::ReusedBuffer,
+            ))))?;
+            let ui = AppWindow::new()?;
+            ui.global::<State>().set_booting(true);
+            let dir = tempfile::tempdir()?;
+            let profile = DeviceProfile::Scribe;
+            let platform = Rc::new(Platform::new(profile, false)?);
+            let options = AppOptions {
+                data_dir: dir.path().into(),
+                startup_options: Default::default(),
+                demo: false,
+                offline: true,
+                initial_screen: "library".into(),
+                landscape: false,
+                resume: false,
+            };
+            let mut startup = Startup::new(&ui, options, profile, None, 2, 0);
+            let app = Rc::new(RefCell::new(None));
+            // Nothing delivered: no blocking or implicit preparation from this hook.
+            startup.prime_available_fonts(&ui, || true)?;
+            assert!(!startup.workers_started && !startup.fonts_registered);
+            assert!(app.borrow().is_none());
+
+            let prepared = App::prepare(startup.options.take().unwrap(), profile)?;
+            startup.workers_started = true;
+            assert!(startup.sender.send(StartupEvent::State(prepared)).is_ok());
+            Fonts::prepare_faces(&AtomicBool::new(false), |face| {
+                assert!(startup.sender.send(StartupEvent::Font(face)).is_ok());
+                Ok(())
+            })?;
+            assert!(!startup.first_scene.submitted(true, 3, false, false));
+            startup.prime_available_fonts(&ui, || false)?;
+            assert!(!startup.fonts_registered, "an interrupted turn defers all work");
+            startup.prime_available_fonts(&ui, || true)?;
+            assert!(startup.fonts_registered && startup.prepared.is_some());
+            assert!(app.borrow().is_none() && ui.global::<State>().get_booting());
+            assert!(!startup.advance(&ui, &platform, &app, true, true)?);
+            let attached = app.borrow().clone().expect("normal advance must attach");
+            assert!(attached.borrow().is_starting() && ui.global::<State>().get_booting());
+            for _ in 0..16 {
+                if startup.advance(&ui, &platform, &app, true, true)? {
+                    break;
+                }
+            }
+            assert!(startup.ready && !attached.borrow().is_starting());
+            assert!(!ui.global::<State>().get_booting());
+            attached.borrow_mut().shutdown();
+            assert!(startup.finish());
+            Ok(())
+        })
+        .join()
+        .expect("headless startup projection")
+    }
 
     #[test]
     fn startup_attachment_requires_a_new_native_send_and_a_yielded_turn() {

@@ -1,5 +1,38 @@
 # Handoff: Kindle Library startup and reopening
 
+## Start here: 2026-11-20
+
+**The startup candidate is in Git, not on the Kindle.** The last verified
+installation is R3, product `8baf57f`, with application `1b1c508e...`, launcher
+`412163f1...` and portrait helper `bde28cd5...`. No candidate performance result,
+release package, installation or open device lease is being handed over.
+
+| What the next session needs | Source of truth |
+| --- | --- |
+| Installed R3 baseline | [`ed35c8b`: actual native Library tile study](docs/review/startup-entry-timing-20261119/README.md). On repeated opens, about **2.15 s** to book text and navigation, **2.52 s** to all covers. This is framebuffer timing, not optical settling. |
+| Candidate to build | `61fe3e1329bb4da22ca4301b20cb8eb3965f987d` (based on the R3 product tree at `3d8f0d7`). [Changes and verification status](docs/review/startup-fast-20261119/README.md). |
+| Acceptance decision | [Trial rules](docs/review/startup-fast-20261119/PLAN.md). The **300 ms** warm first-screen and **1 s** empty-cache complete-cover reductions are targets, not measured gains. |
+| Installed version to protect | [R3 installation and rollback receipt](docs/review/startup-r3-qualification-20261119-8baf57f/release/installation.json). Do not use the historical plans below for this candidate. |
+
+**First action is host-only:** confirm `ssh test-env` is reachable and its
+retained build inputs survived the restart. It was unreachable on the last
+build attempt; availability was not rechecked for this Git handoff. From a
+fresh checkout, follow the [operator instructions](docs/review/startup-fast-20261119/operator/README.md)
+to freeze the exact candidate from Git, build for ARM and host with six Cargo
+jobs, and finish the final parity, launcher and startup checks. The 854 library
+and 22 startup passes belong to an earlier isolated subset; the 90 launcher
+passes and ARM kernel prototype are also partial. The known PW5 dark-sleep
+assertion remains recorded. None qualifies the integrated candidate.
+
+Only after host verification, freeze **new** matched warm and empty-thumbnail
+plans. Use one operator and a fresh lease per continuous batch; after the
+worker reboot, verify that any prior ownership or recovery is resolved before
+touching the device. Restore the original launcher and native state, then
+release before analysis. No job is scheduled and no deployment is requested.
+
+<details>
+<summary>Historical R3 handoffs (read-only context; the old plans are not next steps)</summary>
+
 ## Continuation completed on 2026-11-19
 
 R3 is installed and qualified. Continue from the
@@ -163,3 +196,5 @@ The host release-tool suite previously reported 48 passing checks. Two final
 source/trace integrity checks were added after that run. Recheck the release
 tooling before packaging; do not describe that earlier suite as verification
 of these last edits. This does not invalidate either completed timing batch.
+
+</details>

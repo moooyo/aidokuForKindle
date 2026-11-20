@@ -263,6 +263,11 @@ fn run(arguments: Arguments) -> Result<()> {
         && !arguments.startup_serial_preparation;
     let ordinary_library =
         prepare_library_toolbar && arguments.import.is_none() && !arguments.startup_eager_covers;
+    // Keep a configured prewarm's original post-SEND admission window. Other
+    // routes and unmanaged launches continue to use the normal yielded startup.
+    let prime_library = ordinary_library
+        && startup_options.prewarm == 0
+        && std::env::var_os("AIDOKU_MANAGED_LIBRARY").as_deref() == Some("1".as_ref());
     platform.set_startup_render_priority(
         arguments.kindle
             && arguments.screen == "library"
@@ -359,6 +364,7 @@ fn run(arguments: Arguments) -> Result<()> {
         &lifecycle,
         !arguments.startup_serial_preparation,
         prepare_library_toolbar,
+        prime_library,
         ordinary_library && startup_options.last_cover_grace,
     );
     let advance_startup: Rc<RefCell<dyn FnMut() -> bool>> = {
@@ -514,6 +520,8 @@ fn run(arguments: Arguments) -> Result<()> {
         let app = Rc::downgrade(&app);
         let platform_weak = Rc::downgrade(&platform);
         let lifecycle = lifecycle.clone();
+        let startup = Rc::downgrade(&startup);
+        let mut prepare_on_control = prime_library;
         let quitting = quitting.clone();
         let failures = failures.clone();
         platform.install_control_callback(move || {
@@ -540,6 +548,18 @@ fn run(arguments: Arguments) -> Result<()> {
                     .borrow_mut()
                     .push(format!("Lifecycle control failed: {error:#}"));
                 request_quit(&quitting, &failures);
+                return;
+            }
+            // The first native control turn checks pending ownership signals
+            // before starting dormant metadata work alongside the loading paint.
+            if prepare_on_control {
+                prepare_on_control = false;
+                if lifecycle.borrow().application_work_allowed()
+                    && bootstrap_lifecycle::startup_speculation_allowed()
+                    && let Some(startup) = startup.upgrade()
+                {
+                    startup.borrow_mut().prepare_in_background();
+                }
             }
         })?;
     }

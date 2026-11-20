@@ -18,6 +18,15 @@ struct HorizontalSample {
 
 /// Resize inside the caller's existing decode permit and cancellation scope.
 pub(super) fn resize_gray(source: &GrayImage, width: u32, height: u32) -> Result<GrayImage> {
+    resize_with_kernels(source, width, height, None)
+}
+
+pub(super) fn resize_with_kernels(
+    source: &GrayImage,
+    width: u32,
+    height: u32,
+    kernels: Option<super::cover_kernels::Kernels>,
+) -> Result<GrayImage> {
     check_decode_cancelled()?;
     let (source_width, source_height) = source.dimensions();
     if source_width == 0 || source_height == 0 || width == 0 || height == 0 {
@@ -56,12 +65,16 @@ pub(super) fn resize_gray(source: &GrayImage, width: u32, height: u32) -> Result
 
         // Iterate complete source rows for locality. For each pixel, the
         // additions still occur in the same source-y order as image::resize.
-        for (index, weight) in vertical_weights[weights].iter().enumerate() {
-            check_decode_cancelled()?;
-            let start = (first + index) * source_width;
-            let source_row = &source.as_raw()[start..start + source_width];
-            for (sample, value) in row.iter_mut().zip(source_row) {
-                *sample += f32::from(*value) * weight;
+        let weights = &vertical_weights[weights];
+        let source_rows = &source.as_raw()[first * source_width..(first + weights.len()) * source_width];
+        if let Some(kernels) = kernels {
+            kernels.accumulate(&mut row, source_rows, weights)?;
+        } else {
+            for (source_row, weight) in source_rows.chunks_exact(source_width).zip(weights) {
+                check_decode_cancelled()?;
+                for (sample, value) in row.iter_mut().zip(source_row) {
+                    *sample += f32::from(*value) * weight;
+                }
             }
         }
 

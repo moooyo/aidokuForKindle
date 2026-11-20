@@ -763,6 +763,23 @@ esac
         self.stop_launcher()
         self.assert_recovered()
 
+    def test_interrupted_ownership_check_cannot_adopt_another_childs_stat(self) -> None:
+        source = self.fixture_launcher.read_text()
+        functions = source[source.index('valid_pid()'):source.index('signal_child()')]
+        bind = '    set -- "$1" "$2" "$owned_stat"'
+        self.assertEqual(functions.count(bind), 1)
+        # Simulate another child's complete stat landing in the shell scratch
+        # variable after the read, as a second helper-cancellation trap could.
+        functions = functions.replace(bind, '    IFS= read -r owned_stat <"/proc/$own_child/stat"\n' + bind)
+        check = '''
+sleep 10 & own_child=$!
+trap 'kill "$own_child" 2>/dev/null || :; wait "$own_child" 2>/dev/null || :' 0
+owned_pid "$own_child" "$$" || exit 3
+if owned_pid "$AIDOKU_FAKE_WM" "$$"; then exit 4; fi
+'''
+        result = subprocess.run(['sh', '-ec', functions + check], env=self.environment, capture_output=True, timeout=5)
+        self.assertEqual(result.returncode, 0, result.stderr)
+
     def test_startup_portrait_failure_does_not_repaint_untaken_display(self) -> None:
         (self.root / "reject-portrait-startup").touch()
         self.spawn_launcher()
@@ -775,11 +792,23 @@ esac
 
     def test_native_startup_waits_for_owned_observer_command(self) -> None:
         original = 'HELPER_COMMAND=$!; write_record observer-command "$HELPER_COMMAND"'
-        delayed = 'HELPER_COMMAND=$!; usleep 1500000; write_record observer-command "$HELPER_COMMAND"'
+        delayed = '''HELPER_COMMAND=$!; : >"$AIDOKU_TEST_ROOT/observer-at-publication"
+    while [ ! -e "$AIDOKU_TEST_ROOT/admit-observer" ] && [ "$HELPER_STOPPING" -eq 0 ]; do usleep 10000; done
+    write_record observer-command "$HELPER_COMMAND"'''
         source = self.fixture_launcher.read_text()
         self.assertEqual(source.count(original), 1)
         self.fixture_launcher.write_text(source.replace(original, delayed))
-        self.start_launcher()
+        self.spawn_launcher()
+        try:
+            wait_for(lambda: (self.root / "observer-at-publication").exists() and self.phase() == "starting",
+                     description="generation preparation during observer admission")
+            self.assertFalse((self.lock / "observer-command").exists())
+            self.assertTrue((self.lock / "generation").is_file())
+            self.assertEqual(self.portrait_queries(), [])
+            self.assertEqual(self.operations.read_text(), "")
+        finally:
+            (self.root / "admit-observer").touch()
+        wait_for(lambda: self.phase() == "active" and self.traces("started"), description="initialized app")
         observations = self.portrait_queries("started", action="startup")
         self.assertEqual(len(observations), 1)
         self.assertTrue(observations[0]["observer_command_published"])
@@ -787,6 +816,18 @@ esac
         self.assertEqual(observations[0]["statusbar"], "running")
         self.stop_launcher()
         self.assert_recovered()
+
+    def test_partial_or_multiline_observer_identity_cannot_authorize_native_reads(self) -> None:
+        original = 'write_record observer-command "$HELPER_COMMAND"'
+        corrupt = '''printf '%s\\n%s' "$HELPER_COMMAND" junk >"$LOCK_DIR/observer-command"'''
+        source = self.fixture_launcher.read_text()
+        self.assertEqual(source.count(original), 1)
+        self.fixture_launcher.write_text(source.replace(original, corrupt))
+        self.spawn_launcher()
+        self.assertEqual(self.complete(), 1)
+        self.assertEqual(self.portrait_queries(), [])
+        self.assertEqual(self.operations.read_text(), "")
+        self.assertFalse(self.lock.exists())
 
     def test_observer_failure_before_publication_prevents_takeover(self) -> None:
         original = 'helper_setup observer\n'
