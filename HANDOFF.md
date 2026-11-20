@@ -1,34 +1,145 @@
 # Handoff: Kindle Library startup and reopening
 
-## Start here: 2026-11-20
+## Start here: 2026-11-21 (Asia/Shanghai)
 
-**The startup candidate is in Git, not on the Kindle.** The last verified
+**The startup candidate is not installed as the daily driver.** The last verified
 installation is R3, product `8baf57f`, with application `1b1c508e...`, launcher
-`412163f1...` and portrait helper `bde28cd5...`. No candidate performance result,
-release package, installation or open device lease is being handed over.
+`412163f1...` and portrait helper `bde28cd5...`. The source being handed off
+is the tested **post-SEND** candidate: start preparation after the first
+successful full-frame submission, and enable the required ARM features only
+for the Clang-compiled NEON cover kernel. Merging this code does not install
+it on the Kindle. The rejected warm-start experiment is not included.
+
+### First action: close the interrupted repeat
+
+At 06:07 the `test-env` host still verified the original Aidoku lease owner
+and token. No release receipt existed for this repeat. This was a **host-only**
+check, not a new observation of the Kindle. The new R3 reference had closed
+normally at 05:08:18; the subsequent pictures-first repeat stopped at native
+tile admission, **before its first document click and before any candidate
+selection**. It produced no timing samples. Pinned SSH last reported
+`No route to host` at 05:22:33; the cause is unknown.
+
+1. When the Kindle is reachable, the **original operator** uses the private
+   `work`, `plan` and `batch` paths in
+   `test-env:/var/tmp/kindle-build-coordination/aidoku-operator-recovery-20261121.json`.
+   Keep the existing owner, token and trusted SSH configuration. Do not
+   substitute a new thread ID, reclaim the lock, or copy scripts from this
+   checkout over the frozen worker. If the device is asleep, it only needs
+   to be awake and on Wi-Fi; no one needs to open Aidoku.
+2. With the original operator's authenticated transport on the `test-env`
+   **host**, run `python3 -B "$WORK/operator/run_study.py" "$WORK" recover "$PLAN" "$ORIGINAL_OWNER"`.
+   Use `recover`, never `run`: it only closes the owned batch; it cannot
+   retry the tile press. The new idle-timer guard is for future plans only.
+3. Before handing the device back, check the **new** `recovery-*.json` for
+   `device_closed`, `native_restored_and_connections_closed`,
+   `owner_and_token_checked` and `lease_directory_absent_after_release`.
+   Notify the other operators. The failed study receipt stays failed even
+   after a successful recovery. If close is refused, retain the original
+   lease and do not start a new batch or claim restoration.
+
+### Measured results and next optimization
+
+A newly scoped [normal Library tile comparison](docs/review/startup-native-20261121/README.md)
+uses real stock pointer presses and the original six-book Aidoku shelf. Its
+separate check of the untouched R3 measured 2.090–2.166 s to text/navigation
+and 2.915–2.993 s to all seven covers. That single visit verifies the entry
+and timing path; it is not the repeated-open median or a candidate A/B.
+
+**Actual repeated opens, six new pairs:** R3 took **2.238–2.314 s** to book
+text/navigation and **2.635–2.712 s** to all covers; the post-SEND candidate
+took **2.232–2.309 s** and **2.607–2.684 s**. Paired midpoint savings were
+**16.5 ms** and **140.0 ms**, with four wins in six on each endpoint. These
+are descriptive framebuffer measurements, **not an accepted warm speedup**.
+The two final bodies and right toolbars matched each other exactly; both
+failed the frozen full-toolbar comparison against the older, 91% battery
+reference (both showed 89%). This study restored R3 and released at
+05:06:00 Asia/Shanghai. Do not mix its samples with the staged study or
+replace a failed picture with another one.
+
+**Next optimization, after recovery:** measure power-observer readiness,
+portrait calibration and display takeover separately. The observed interval
+from launcher process creation to application process creation was
+**825–845 ms on R3** and **830–850 ms on the candidate**. This identifies
+where to look, not 0.83 s of removable work. Keep the first-frame/input,
+native exit and restoration checks intact. Use a new plan and lease for
+any later device test; do not promote this candidate on those timings.
+
+The [November 21 follow-up](docs/review/startup-followup-20261121/README.md)
+independently confirmed the post-SEND candidate's **empty-cache** cover gain
+on the Scribe: **4.657 → 3.980 s**, a paired **681 ms** saving (10/10).
+The first usable frame did not consistently improve (2 ms, 5/10). The
+[November 20 screen](docs/review/startup-fast-20261119/PHYSICAL.md) had
+found 709 ms on empty-cache covers and just 3 ms on warm first usable (3/6).
+These are staged managed launches, not native Library tile presses. The
+original private tile experiment has not been restored. A fresh warm candidate
+eliminated an intermediate frame but was **38 ms slower** to first usable and
+**53 ms slower** to all covers (two wins out of six on each). Its source
+changes were reverted; do not install that binary. See the same follow-up for
+the retained original program bytes and modes, collected separately after
+the trials. No user-data backup or change was involved.
 
 | What the next session needs | Source of truth |
 | --- | --- |
-| Installed R3 baseline | [`ed35c8b`: actual native Library tile study](docs/review/startup-entry-timing-20261119/README.md). On repeated opens, about **2.15 s** to book text and navigation, **2.52 s** to all covers. This is framebuffer timing, not optical settling. |
-| Candidate to build | `61fe3e1329bb4da22ca4301b20cb8eb3965f987d` (based on the R3 product tree at `3d8f0d7`). [Changes and verification status](docs/review/startup-fast-20261119/README.md). |
+| Historical R3 baseline | [November 19 native Library tile study](docs/review/startup-entry-timing-20261119/README.md): **2.15 s** to book text/navigation, **2.52 s** to all covers. Separate from the November 21 pairs; neither measures optical settling. |
+| Candidate source | `bea63d4` contains the Clang NEON build correction and post-SEND scheduling change on top of `61fe3e1`. Both product files matched the measured worker sources byte-for-byte; the retained ARM program matched the candidate used in the tile study. See the [cross-build record](docs/review/startup-fast-20261119/REBUILD.md) and [separate outcomes](docs/review/startup-fast-20261119/PHYSICAL.md). |
 | Acceptance decision | [Trial rules](docs/review/startup-fast-20261119/PLAN.md). The **300 ms** warm first-screen and **1 s** empty-cache complete-cover reductions are targets, not measured gains. |
 | Installed version to protect | [R3 installation and rollback receipt](docs/review/startup-r3-qualification-20261119-8baf57f/release/installation.json). Do not use the historical plans below for this candidate. |
 
-**First action is host-only:** confirm `ssh test-env` is reachable and its
-retained build inputs survived the restart. It was unreachable on the last
-build attempt; availability was not rechecked for this Git handoff. From a
-fresh checkout, follow the [operator instructions](docs/review/startup-fast-20261119/operator/README.md)
-to freeze the exact candidate from Git, build for ARM and host with six Cargo
-jobs, and finish the final parity, launcher and startup checks. The 854 library
-and 22 startup passes belong to an earlier isolated subset; the 90 launcher
-passes and ARM kernel prototype are also partial. The known PW5 dark-sleep
-assertion remains recorded. None qualifies the integrated candidate.
+**Shared Kindle — WeRead protection baseline (owner report, 2026-11-20).**
+After the Aidoku screens, the WeRead operator deployed the tested 95,137,176-byte
+app and its two packaged helpers. `/mnt/us/documents/weread.sh` is now the
+packaged `document-launcher.sh`; `/mnt/us/weread/launch.sh` is the production
+supervisor and must be preserved. Do not expect the historical single-file
+launcher or an absent supervisor. The operator reported a successful normal
+entry and exit, restored lighting, unchanged Aidoku, BiliComics and shared
+registration, and an owner/token-checked release. This is not an independent
+Aidoku inventory; use the WeRead deployment package for exact file comparisons.
 
-Only after host verification, freeze **new** matched warm and empty-thumbnail
-plans. Use one operator and a fresh lease per continuous batch; after the
-worker reboot, verify that any prior ownership or recovery is resolved before
-touching the device. Restore the original launcher and native state, then
-release before analysis. No job is scheduled and no deployment is requested.
+**BiliComics protection baseline (owner report, 2026-11-21).** BiliComics
+retained its normal installation after a successful Library tile launch and
+reported an owner/token-checked release at 04:47:08 Asia/Shanghai. Protect
+the single lowercase `documents/bilicomics.sh` and its catalog row, and the
+installed launcher, 74,340,832-byte application and 426,672-byte JPEG worker.
+An uppercase lookup can yield a different virtual inode for the same lowercase
+directory entry; it is not a second file. Do not expect the historical absence.
+The owner's record on `test-env` is
+`/var/tmp/kindle-build-coordination/bilicomics-production-20261121.txt`.
+
+Exact locations of the retained control, measured candidate, private trial
+archives and original reports are indexed on the `test-env` host in
+`/var/tmp/kindle-build-coordination/aidoku-startup-evidence-20261121.json`.
+The repository includes the operator sources and aggregate results, not
+device credentials, user pictures, program archives or live lease records.
+
+`ssh test-env` is reachable but was completely rebuilt. The old build layers,
+sealed fixtures, native view references and ownership records were not present.
+Independent host checks now use the [shared toolchain and clean-worker
+procedure](docs/review/startup-fast-20261119/operator/clean-worker/README.md).
+The corrected ARM build, pixel parity, launcher and both desktop profiles
+passed; the known PW5 dark-sleep assertion still fails. These results cannot
+replace private input recovery or qualify R3-vs-candidate timings.
+
+For this handoff, the retained ARM program was rechecked under QEMU with
+NEON available and with NEON/D32 disabled: version and all six default
+startup settings passed in both configurations without creating app data.
+The earlier release build and 23 startup tests apply to the byte-matched
+product sources; neither a fresh release build nor a device rollout was
+performed for this merge.
+
+Pre-merge fixture verification on `ssh test-env` passed 93 Python tests
+(70 native-entry and 23 clean-worker/staged/retained-control), shell syntax
+checks, two native C fixtures and two ARM/QEMU + Xvfb input suites. These
+checks used isolated inputs and no physical lease; they do not qualify the
+failed visual comparison or restore the interrupted device session.
+
+**Historical protocol:** reproducing the November 19 native-tile study itself
+still requires its original private lab. The separately scoped November 21
+comparison above obtained new reference images, verified the real stock tile,
+and bound every visit to a new device-clock anchor. The
+[ordinary installed-entry checks](docs/review/startup-fast-20261119/operator/normal-entry/README.md)
+are separate from timing; the confirmed empty-cache result does not qualify
+the normal entry or replace a rollback check.
 
 <details>
 <summary>Historical R3 handoffs (read-only context; the old plans are not next steps)</summary>

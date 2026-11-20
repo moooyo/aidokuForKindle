@@ -5,6 +5,11 @@ of `main`, read the root [handoff](../../../../HANDOFF.md) and [repository
 instructions](../../../../AGENTS.md). Use the existing `test-env` worker;
 this Git directory contains operator source, not a copy of the lab.
 
+**After the 2026-11-20 worker rebuild:** the retained lab directories are
+absent. Use the [clean-worker procedure](clean-worker/README.md) for independent
+host checks. The historical procedure below requires the original private
+inputs; do not make empty directories to get past its preflight.
+
 ## Worker prerequisites
 
 - Confirm `ssh test-env` is reachable. The isolated build root is
@@ -64,7 +69,9 @@ from the **same build receipt**; verify the portrait helper as well. If the
 native tile cannot be identified, an explicitly labelled `--entry uri` study
 is a different measurement. Never combine the two. The freezer defaults to
 `uri`, so spell out the entry. Only the two-pair pilot and six-pair screen
-are implemented; the [ten-pair confirmation gate](../PLAN.md) is not.
+are implemented in that historical indexed-entry freezer. After the rebuild,
+the [separate staged study](../../startup-followup-20261121/README.md) implemented
+the ten-pair empty-cache confirmation; its timestamps are not indexed-entry timings.
 
 Do not take the Kindle lease until all host work is ready. If the worker
 rebooted, resolve any previous owner/recovery before touching the Kindle.

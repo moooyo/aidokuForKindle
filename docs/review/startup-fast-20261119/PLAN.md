@@ -34,3 +34,7 @@ is context, not the control arm for a new candidate. Product code is based on
   parity or faster individual kernels alone do not establish device speed.
   Do not change validation, input gating, image quality, or release policy to
   make a timing test pass. No automatic daily-driver promotion.
+
+The [November 21 follow-up](../startup-followup-20261121/README.md) adds a
+separate ten-pair confirmation plan and analyzer for the eligible staged
+empty-cache candidate. It does not change this original screen or its clocks.
