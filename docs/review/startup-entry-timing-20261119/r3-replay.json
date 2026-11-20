@@ -1,0 +1,241 @@
+{
+  "source": "R3 product 8baf57f; original indexed-request default protection trials, replayed on test-env.",
+  "sample_columns_ms": [
+    "ready",
+    "first",
+    "usable",
+    "first_with_any_cover",
+    "covers"
+  ],
+  "scope": [
+    "Each cache regime uses the six R3 arms of previously qualified balanced pairs. No new launches, warmups, captures, reboot, cover downloads or optical measurement contribute.",
+    "Start: device shell marker immediately before native indexed file-URI dispatch, not a screen tap. End: driver SEND acceptance, not optical settling. Usable=max(first Library SEND, software input readiness). First with any cover requires at least one populated image slot in a submitted frame.",
+    "Separate benchmark data: six distinct local covers, seven displayed slots. Every first Library frame has zero cover images. Cold means empty thumbnail cache, not cold OS boot.",
+    "Shell clock is /proc/uptime (10 ms granularity); app endpoints are CLOCK_BOOTTIME. Rust entry is estimated from initial SEND boottime minus its elapsed process time. Means of the six disjoint intervals add to mean request-to-covers; medians and nested diagnostics are not additive.",
+    "The combined cold validation marker interval includes byte identity checks, decoding, resizing and validation, not just decoder CPU. These are elapsed work budgets, not achievable savings or charge/energy measurements."
+  ],
+  "warm": {
+    "source_report_sha256": "97d039593fd3549dfbbd66631fef7e71daa99d35eb015fa1900c8afdcbab3147",
+    "sample_count": 6,
+    "derivative_hits_of_six_per_trial": 6,
+    "submitted_library_frames_per_trial": [
+      3,
+      3,
+      3,
+      3,
+      3,
+      3
+    ],
+    "image_slots_at_first_nonempty_frame_per_trial": [
+      5,
+      5,
+      5,
+      4,
+      4,
+      5
+    ],
+    "samples_ms": [
+      [
+        1927.505,
+        2120.119,
+        2120.142,
+        2532.901,
+        2845.708
+      ],
+      [
+        2014.304,
+        2227.095,
+        2227.124,
+        2647.45,
+        2959.438
+      ],
+      [
+        1965.906,
+        2157.185,
+        2157.241,
+        2579.267,
+        2892.359
+      ],
+      [
+        1912.304,
+        2105.259,
+        2105.339,
+        2493.33,
+        2818.114
+      ],
+      [
+        1962.787,
+        2152.315,
+        2152.34,
+        2541.141,
+        2850.958
+      ],
+      [
+        1892.965,
+        2070.981,
+        2071.007,
+        2471.8,
+        2783.662
+      ]
+    ],
+    "endpoint_medians_ms": {
+      "ready": 1945.146,
+      "first": 2136.217,
+      "usable": 2136.241,
+      "first_with_any_cover": 2537.021,
+      "covers": 2848.333
+    },
+    "disjoint_means_ms": {
+      "request_to_rust_entry": 1217.118,
+      "rust_entry_to_initial_send": 230.645,
+      "checked_initial_send_to_input": 366.453,
+      "initial_input_to_ready": 131.746,
+      "ready_to_first_library_send": 192.864,
+      "first_library_send_to_all_covers": 719.548
+    },
+    "disjoint_medians_ms": {
+      "request_to_rust_entry": 1212.824,
+      "rust_entry_to_initial_send": 231.668,
+      "checked_initial_send_to_input": 366.255,
+      "initial_input_to_ready": 130.523,
+      "ready_to_first_library_send": 191.947,
+      "first_library_send_to_all_covers": 719.222
+    },
+    "nested_phase_medians_ms": {
+      "request_to_launcher_bridge": 530.0,
+      "portrait_outer": 280.0,
+      "display_takeover": 100.0,
+      "first_library_view": 32.123,
+      "first_render": 167.865
+    },
+    "serial_job_medians_ms_by_ordinal": [
+      80.247,
+      74.619,
+      54.703,
+      46.106,
+      102.047,
+      85.074
+    ],
+    "cover_budget_medians_ms": {
+      "six_serial_jobs": 458.1,
+      "cover_preparation_started_to_cover_local_derivative_reused": 291.764,
+      "cover_local_derivative_reused_to_cover_render_ready": 155.322,
+      "cover_render_ready_to_cover_preparation_finished": 10.552,
+      "last_job_to_final_publication": 1.258,
+      "final_publication_to_submitted": 185.748
+    }
+  },
+  "cold": {
+    "source_report_sha256": "a42cb65f6b717320b7ea74e85e4e7452ea03435391c0db819d67f00a6b8fc02a",
+    "sample_count": 6,
+    "derivative_hits_of_six_per_trial": 0,
+    "submitted_library_frames_per_trial": [
+      8,
+      8,
+      8,
+      8,
+      8,
+      8
+    ],
+    "image_slots_at_first_nonempty_frame_per_trial": [
+      2,
+      2,
+      2,
+      2,
+      2,
+      2
+    ],
+    "samples_ms": [
+      [
+        1997.399,
+        2250.174,
+        2250.199,
+        3417.17,
+        8264.868
+      ],
+      [
+        1883.604,
+        2074.368,
+        2074.43,
+        3253.83,
+        7990.952
+      ],
+      [
+        1956.152,
+        2145.664,
+        2145.698,
+        3343.361,
+        8127.874
+      ],
+      [
+        1874.797,
+        2070.317,
+        2070.372,
+        3235.267,
+        7977.669
+      ],
+      [
+        2682.775,
+        2946.831,
+        2946.907,
+        4171.228,
+        9037.885
+      ],
+      [
+        2031.083,
+        2299.401,
+        2299.431,
+        3474.475,
+        8301.862
+      ]
+    ],
+    "endpoint_medians_ms": {
+      "ready": 1976.775,
+      "first": 2197.919,
+      "usable": 2197.948,
+      "first_with_any_cover": 3380.265,
+      "covers": 8196.371
+    },
+    "disjoint_means_ms": {
+      "request_to_rust_entry": 1307.028,
+      "rust_entry_to_initial_send": 258.581,
+      "checked_initial_send_to_input": 368.156,
+      "initial_input_to_ready": 137.204,
+      "ready_to_first_library_send": 226.824,
+      "first_library_send_to_all_covers": 5985.726
+    },
+    "disjoint_medians_ms": {
+      "request_to_rust_entry": 1227.129,
+      "rust_entry_to_initial_send": 260.765,
+      "checked_initial_send_to_input": 366.5,
+      "initial_input_to_ready": 130.002,
+      "ready_to_first_library_send": 224.148,
+      "first_library_send_to_all_covers": 5992.336
+    },
+    "nested_phase_medians_ms": {
+      "request_to_launcher_bridge": 450.0,
+      "portrait_outer": 365.0,
+      "display_takeover": 100.0,
+      "first_library_view": 32.968,
+      "first_render": 197.728
+    },
+    "serial_job_medians_ms_by_ordinal": [
+      1059.441,
+      2307.797,
+      716.5,
+      470.967,
+      727.766,
+      490.702
+    ],
+    "cover_budget_medians_ms": {
+      "six_serial_jobs": 5785.904,
+      "cover_preparation_started_to_cover_cold_validation_combined_started": 313.112,
+      "cover_cold_validation_combined_started_to_cover_cold_decode_validated": 4805.492,
+      "cover_cold_decode_validated_to_cover_local_derivative_prepared": 546.762,
+      "cover_local_derivative_prepared_to_cover_render_ready": 88.703,
+      "cover_render_ready_to_cover_preparation_finished": 12.18,
+      "last_job_to_final_publication": 1.23,
+      "final_publication_to_submitted": 71.286
+    }
+  }
+}
