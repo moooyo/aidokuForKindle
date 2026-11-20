@@ -25,6 +25,7 @@ pub fn observe(
     lifecycle: &Rc<RefCell<bootstrap_lifecycle::Coordinator>>,
     overlap: bool,
     prepare_toolbar: bool,
+    prime_library: bool,
     last_cover_grace: bool,
 ) {
     let ui = ui.as_weak();
@@ -51,11 +52,17 @@ pub fn observe(
         if frame.initial && frame.full && frame.submitted {
             reader_timing::startup_frame("startup_initial_frame_submitted", frame, None);
             if overlap && let Some(startup) = startup.upgrade() {
-                startup.borrow_mut().prepare_after_submission();
+                startup.borrow_mut().prepare_in_background();
             }
             if prepare_toolbar && frame.input_blocked {
                 platform
                     .prepare_startup_toolbar(|| !bootstrap_lifecycle::display_activity_allowed());
+            }
+            if prime_library
+                && frame.input_blocked
+                && let (Some(startup), Some(ui)) = (startup.upgrade(), ui.upgrade())
+            {
+                startup.borrow_mut().prime_fonts_during_initial_frame(&ui);
             }
         }
         if !reader_timing::enabled() && !platform.startup_render_pending() {

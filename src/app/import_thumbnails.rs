@@ -259,7 +259,7 @@ fn prepare(
     let Some(alias) = cover_jobs::local_cover_render_alias(&book, &raw, &rendered, &options) else {
         return Ok(Outcome::Skipped);
     };
-    cover_jobs::ensure_processed_cover_alias(cache, &alias, &rendered.cache_path)?;
+    cache.ensure_processed_cover_alias(&alias, &rendered.cache_path)?;
     Ok(if rendered.cache_hit {
         Outcome::Hit
     } else {

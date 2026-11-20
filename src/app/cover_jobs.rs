@@ -894,20 +894,9 @@ fn publish_rendered_cover_alias(
 }
 
 fn publish_processed_cover_alias(cache: &crate::cache::CacheManager, alias: &str, path: &Path) {
-    if let Err(error) = ensure_processed_cover_alias(cache, alias, path) {
+    if let Err(error) = cache.ensure_processed_cover_alias(alias, path) {
         eprintln!("aidoku: cover rendered alias: {error:#}");
     }
-}
-
-pub(super) fn ensure_processed_cover_alias(
-    cache: &crate::cache::CacheManager,
-    alias: &str,
-    path: &Path,
-) -> Result<()> {
-    if cache.lookup_alias(alias).ok().flatten().as_deref() == Some(path) {
-        return Ok(());
-    }
-    cache.set_alias(alias, path)
 }
 
 #[cfg(test)]

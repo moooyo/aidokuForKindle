@@ -743,6 +743,50 @@ impl CacheManager {
         Ok(())
     }
 
+    /// Associate a cover that the renderer just read or published. A matching
+    /// in-process verification avoids reopening the same derivative by alias.
+    pub(crate) fn ensure_processed_cover_alias(&self, alias: &str, path: &Path) -> Result<()> {
+        ensure!(
+            alias.starts_with("cover-render-v2:"),
+            "Expected a rendered cover alias"
+        );
+        let Some((Kind::Processed, key)) = self.managed_id(path) else {
+            bail!("A rendered cover alias must target a managed derivative");
+        };
+        let id = cache_id(Kind::Processed, &key);
+        if let Some(fingerprint) = safe_file_fingerprint(&self.inner.root, path)? {
+            let state = self.lock()?;
+            if let Some(entry) = state.entries.get(&id).filter(|entry| {
+                entry.valid && entry.verified && entry.fingerprint == fingerprint
+            }) {
+                let alias = alias_key(alias);
+                let bound = state.database.query_row(
+                    "SELECT EXISTS(SELECT 1 FROM aliases AS l JOIN artifacts AS a ON a.id=l.artifact_id
+                     WHERE l.alias_key=?1 AND l.artifact_id=?2 AND l.cover=1 AND a.valid=1 AND a.checksum=?3)",
+                    params![alias, id, entry.checksum],
+                    |row| row.get::<_, bool>(0),
+                )?;
+                if bound {
+                    return Ok(());
+                }
+                // Guard the write itself: a clear or replacement must not
+                // publish an alias for an artifact other than the verified one.
+                let changed = state.database.execute(
+                    "INSERT INTO aliases(alias_key,artifact_id,cover)
+                     SELECT ?1,id,1 FROM artifacts WHERE id=?2 AND valid=1 AND checksum=?3
+                     ON CONFLICT(alias_key) DO UPDATE SET artifact_id=excluded.artifact_id,cover=1",
+                    params![alias, id, entry.checksum],
+                )?;
+                ensure!(
+                    changed == 1,
+                    "The verified cover changed before alias publication"
+                );
+                return Ok(());
+            }
+        }
+        self.set_alias(alias, path)
+    }
+
     pub fn lookup_alias(&self, alias: &str) -> Result<Option<PathBuf>> {
         let artifact = {
             let state = self.lock()?;
@@ -4058,6 +4102,58 @@ mod tests {
             .unwrap();
         assert_eq!(stored, alias_key(alias));
         assert!(!stored.contains("private-alias-token"));
+    }
+
+    #[test]
+    fn verified_cover_alias_is_bound_once_and_repaired_after_reassignment() {
+        let directory = tempfile::tempdir().unwrap();
+        let cache = manager(&directory, 4096);
+        let key = render("verified-cover");
+        let write = cache.begin_processed(&key, 8).unwrap();
+        fs::write(write.temp_path(), b"original").unwrap();
+        let path = write.commit().unwrap();
+        let alias = "cover-render-v2:verified";
+        let hits = cache.stats().processed_hits;
+        cache.ensure_processed_cover_alias(alias, &path).unwrap();
+        cache
+            .lock()
+            .unwrap()
+            .database
+            .execute_batch("PRAGMA query_only=ON")
+            .unwrap();
+        cache.ensure_processed_cover_alias(alias, &path).unwrap();
+        cache
+            .lock()
+            .unwrap()
+            .database
+            .execute_batch("PRAGMA query_only=OFF")
+            .unwrap();
+        assert_eq!(cache.stats().processed_hits, hits);
+
+        let other = publish(&cache, &page("wrong-cover-target"), b"raw", None);
+        cache.set_alias(alias, &other).unwrap();
+        cache.ensure_processed_cover_alias(alias, &path).unwrap();
+        assert_eq!(cache.lookup_alias(alias).unwrap().as_ref(), Some(&path));
+        assert!(cache.ensure_processed_cover_alias(alias, &other).is_err());
+        cache.clear_unpinned().unwrap();
+        assert!(cache.ensure_processed_cover_alias(alias, &path).is_err());
+        assert!(cache.lookup_alias(alias).unwrap().is_none());
+    }
+
+    #[test]
+    fn cover_alias_fast_path_does_not_accept_a_changed_derivative() {
+        let directory = tempfile::tempdir().unwrap();
+        let cache = manager(&directory, 4096);
+        let key = render("changed-cover");
+        let write = cache.begin_processed(&key, 8).unwrap();
+        fs::write(write.temp_path(), b"original").unwrap();
+        let path = write.commit().unwrap();
+        let alias = "cover-render-v2:changed";
+        cache.ensure_processed_cover_alias(alias, &path).unwrap();
+        fs::write(&path, b"changed derivative").unwrap();
+        assert!(cache.ensure_processed_cover_alias(alias, &path).is_err());
+        assert!(cache.lookup_alias(alias).unwrap().is_none());
+        assert!(cache.stats().corruptions > 0);
     }
 
     #[test]

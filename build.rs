@@ -45,6 +45,18 @@ fn main() {
             .opt_level(2)
             .warnings(true)
             .compile("aidoku_jpeg_worker");
+        if env::var("CARGO_CFG_TARGET_ARCH").is_ok_and(|arch| arch == "arm") {
+            println!("cargo:rerun-if-changed=src/imaging/cover_neon.c");
+            // Only this object may use NEON. Rust dispatches after checking AT_HWCAP.
+            cc::Build::new()
+                .file("src/imaging/cover_neon.c")
+                .std("c11")
+                .opt_level(3)
+                .flag("-mfpu=neon")
+                .flag("-fno-fast-math")
+                .flag("-ffp-contract=off")
+                .compile("aidoku_cover_neon");
+        }
     }
     if env::var_os("CARGO_FEATURE_NATIVE_MEDIA_BENCH").is_some() {
         assert_eq!(

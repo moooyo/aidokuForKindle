@@ -1267,6 +1267,9 @@ fn render_for_purpose(
         cache.validate_path(raw)?;
     }
     let mut bytes = source(raw)?;
+    if mode == RenderMode::LocalCover {
+        crate::reader_timing::mark("cover_cpu_original_read");
+    }
     let combined = if external_cover && imaging::single_decode_cover_source(&bytes)? {
         crate::reader_timing::mark("cover_cold_validation_combined_started");
         true
@@ -1288,10 +1291,18 @@ fn render_for_purpose(
         format!("{:x}", Sha256::digest(&bytes)) == source_checksum,
         "The decoded source bytes do not match the prepared image identity"
     );
-    ensure!(
-        cache.fingerprint(raw)? == source_checksum,
-        "The source image changed while preparing the rendered page"
-    );
+    // A combined local cover decodes the hash-checked owned bytes above and
+    // must recheck the *named* file, metadata and digest after decoding, before
+    // publishing. Other paths have no equivalent post-decode proof.
+    if !combined {
+        ensure!(
+            cache.fingerprint(raw)? == source_checksum,
+            "The source image changed while preparing the rendered page"
+        );
+    }
+    if mode == RenderMode::LocalCover {
+        crate::reader_timing::mark("cover_cpu_source_bytes_verified");
+    }
     let mut retained_source = None;
     let (image, scaled_height, viewport_height) = if vertical {
         let window = if mode.is_reader() {
@@ -1332,6 +1343,8 @@ fn render_for_purpose(
             } else {
                 imaging::decode_reader_raster(&bytes, options)?
             }
+        } else if mode == RenderMode::LocalCover {
+            imaging::decode_local_cover(&bytes, options)?
         } else {
             imaging::decode_page(&bytes, options)?
         };
@@ -2071,6 +2084,34 @@ mod tests {
                 .is_err()
         );
         assert_eq!(fixture.cache.stats().external_validations, 0);
+    }
+
+    #[test]
+    fn combined_cover_rejects_replaced_source_and_different_owned_bytes() {
+        for replace_disk_file in [true, false] {
+            let fixture = Fixture::new(artwork());
+            let key = fixture.key(&options(), false, 0, 1.0);
+            let error = render_for_purpose(
+                &fixture.cache, &fixture.page, &fixture.raw, &options(), false, 0, 1.0,
+                RenderPurpose::LocalCover, RenderMode::LocalCover, |raw| {
+                    let mut owned = read_source(raw)?;
+                    if replace_disk_file {
+                        // Same bytes under the same name, but a different file identity.
+                        let other = raw.with_extension("replacement");
+                        fs::write(&other, &owned)?;
+                        fs::rename(other, raw)?;
+                    } else {
+                        let mut other = Cursor::new(Vec::new());
+                        GrayImage::new(7, 9).write_to(&mut other, ImageFormat::Png)?;
+                        owned = other.into_inner();
+                    }
+                    Ok(owned)
+                },
+            ).unwrap_err();
+            assert!(error.to_string().contains(if replace_disk_file { "cover changed" } else { "source bytes" }));
+            assert!(fixture.cache.lookup_processed(&key).unwrap().is_none());
+            assert_eq!(fixture.cache.stats().external_validations, 0);
+        }
     }
 
     #[test]

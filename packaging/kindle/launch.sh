@@ -103,8 +103,14 @@ process_birth() {
     printf '%s\n' "$1"
 }
 owned_pid() {
-    valid_pid "$1" && [ "$(parent_pid "$1")" = "$2" ] || return 1
-    case "$(process_state "$1")" in ''|Z*|X*) return 1 ;; esac
+    valid_pid "$1" && { IFS= read -r owned_stat <"/proc/$1/stat"; } 2>/dev/null || return 1
+    # A cancellation trap can also check a child. Bind and recheck the PID
+    # before decoding the state and parent from this one kernel snapshot.
+    set -- "$1" "$2" "$owned_stat"
+    case "$3" in "$1 ("*') '*) ;; *) return 1 ;; esac
+    set -- "$1" "$2" ${3##*) }
+    [ "$#" -ge 4 ] && [ "$4" = "$2" ] || return 1
+    case "$3" in ''|Z*|X*|x*) return 1 ;; esac
     kill -0 "$1" 2>/dev/null
 }
 signal_child() { owned_pid "$1" "$2" || return 1; kill "-$3" "$1" 2>/dev/null; }
@@ -609,12 +615,14 @@ run_observer() {
 }
 start_observer() {
     run_observer & OBSERVER_PID=$!
-    # Admit native observation as soon as the current observer owns its source.
+}
+wait_for_observer() {
     observer_checks=100
     while [ "$observer_checks" -gt 0 ]; do
-        observer_command=$(cat "$LOCK_DIR/observer-command" 2>/dev/null || :)
-        if owned_pid "$OBSERVER_PID" "$ROOT_PID" && owned_pid "$observer_command" "$OBSERVER_PID"; then return 0; fi
         owned_pid "$OBSERVER_PID" "$ROOT_PID" || fail 'Power event observation ended before startup.'
+        if [ -f "$LOCK_DIR/observer-command" ] && [ ! -L "$LOCK_DIR/observer-command" ] &&
+            { IFS= read -r observer_command && ! IFS= read -r extra && [ -z "$extra" ]; } 2>/dev/null <"$LOCK_DIR/observer-command" &&
+            owned_pid "$observer_command" "$OBSERVER_PID"; then return 0; fi
         observer_checks=$((observer_checks - 1))
         usleep 20000
     done
@@ -647,6 +655,9 @@ start_application() {
     # Every ELF generation has its own native WM/GETVAR anchor. The bounded
     # reader publishes its typed private record before awesome is stopped.
     if [ "$DISPLAY_OWNED" -eq 1 ]; then release_display 0; fi
+    # Generation setup may overlap observer startup. No native getter or
+    # display takeover is admitted before the owned power source is confirmed.
+    if [ "$APP_GENERATION" -eq 1 ]; then wait_for_observer; fi
     startup_capability_argument=''
     if [ "$COVER_SLEEP_CHECKED" -eq 0 ]; then startup_capability_argument=--capture-sleep-capability; fi
     native_read_command "$APP_DIR/aidoku" --kindle --device "$PROFILE" --capture-native-portrait $startup_capability_argument || fail 'The native startup portrait calibration is unavailable.'
@@ -866,13 +877,13 @@ command -v setsid >/dev/null 2>&1 && command -v usleep >/dev/null 2>&1 || fail '
 NONCE=$(tr -d '\n-' </proc/sys/kernel/random/uuid)
 case "$NONCE" in ''|*[!0-9a-fA-F]*) fail 'The launcher nonce is invalid.' ;; esac
 [ "${#NONCE}" -eq 32 ] || fail 'The launcher nonce has an invalid length.'
-write_record nonce "$NONCE"; write_record epoch 0
 AIDOKU_LAUNCHER_DIR=$LOCK_DIR; AIDOKU_LAUNCH_NONCE=$NONCE
 export AIDOKU_HOME AIDOKU_LAUNCHER_DIR AIDOKU_LAUNCH_NONCE
 mkfifo "$LOCK_DIR/power-events"
 # Keep both ends open so transitions cannot drop queued wake or exit events.
 exec 3<>"$LOCK_DIR/power-events"; EVENT_FD_OPEN=1
 start_observer
+write_record nonce "$NONCE"; write_record epoch 0
 start_application 0
 
 while IFS= read -r event <&3; do
