@@ -486,6 +486,258 @@ fn boottime_us() -> Option<u64> {
     None
 }
 
+#[cfg(feature = "startup-stage-diagnostics")]
+#[derive(Clone, Copy)]
+pub enum StartupTransition {
+    MetadataReady,
+    MetadataReceived,
+    FontsReady,
+    FontsReceived,
+    FontsRegistered,
+    AttachEnter,
+    AttachExit,
+    ViewEnter,
+    ViewExit,
+    SceneRequested,
+}
+
+#[cfg(feature = "startup-stage-diagnostics")]
+#[derive(Clone, Copy, Debug)]
+struct InitialSubmission {
+    sequence: u64,
+    marker: Option<u32>,
+    timestamp: Option<u64>,
+}
+
+#[cfg(feature = "startup-stage-diagnostics")]
+#[derive(Default)]
+struct StartupStages {
+    main: OnceLock<Option<u64>>,
+    initial: OnceLock<InitialSubmission>,
+    fence: OnceLock<Option<u64>>,
+    transition: [OnceLock<Option<u64>>; 10],
+}
+
+#[cfg(feature = "startup-stage-diagnostics")]
+static STARTUP_STAGES: StartupStages = StartupStages {
+    main: OnceLock::new(),
+    initial: OnceLock::new(),
+    fence: OnceLock::new(),
+    transition: [const { OnceLock::new() }; 10],
+};
+
+#[cfg(feature = "startup-stage-diagnostics")]
+impl StartupStages {
+    fn initial_frame(
+        &self,
+        frame: crate::platform::FrameCheckpoint,
+        clock: impl FnOnce() -> Option<u64>,
+    ) {
+        if frame.active
+            && frame.initial
+            && frame.full
+            && frame.submitted
+            && frame.sequence > 0
+            && frame.marker.is_some_and(|marker| marker > 0)
+        {
+            self.initial.get_or_init(|| InitialSubmission {
+                sequence: frame.sequence,
+                marker: frame.marker,
+                timestamp: clock(),
+            });
+        }
+    }
+
+    fn input_frame(
+        &self,
+        frame: crate::platform::FrameCheckpoint,
+        clock: impl FnOnce() -> Option<u64>,
+    ) {
+        if frame.active && frame.initial && frame.full && !frame.submitted && !frame.input_blocked
+            && self.initial.get().is_some_and(|initial| {
+                initial.timestamp.is_some_and(|time| time > 0)
+                    && initial.sequence == frame.sequence && initial.marker == frame.marker
+            })
+        {
+            self.fence.get_or_init(clock);
+        }
+    }
+
+    fn report(&self, output: &mut impl Write, submitted: u64) -> std::io::Result<bool> {
+        let Some(main) = self.main.get().copied().flatten() else {
+            return Ok(false);
+        };
+        if main == 0 || main > submitted {
+            return Ok(false);
+        }
+        match self.initial.get().and_then(|initial| initial.timestamp) {
+            Some(initial) if (main..=submitted).contains(&initial) => writeln!(
+                output,
+                "aidoku: startup_stage_diag main_us={main} initial_us={initial} submitted_us={submitted}"
+            ),
+            None => writeln!(
+                output,
+                "aidoku: startup_stage_diag main_us={main} initial_us=none submitted_us={submitted}"
+            ),
+            Some(_) => return Ok(false),
+        }?;
+        Ok(true)
+    }
+
+    fn write_transition(
+        &self,
+        output: &mut impl Write,
+        submitted: u64,
+        frame: crate::platform::FrameCheckpoint,
+        costs: Option<[u64; 4]>,
+    ) -> std::io::Result<()> {
+        use StartupTransition::*;
+        write!(output, "aidoku: startup_transition sequence={} marker={} submitted_us={submitted}",
+            frame.sequence, frame.marker.unwrap_or(0))?;
+        for (field, value) in [
+            ("fence_us", &self.fence),
+            ("metadata_ready_us", &self.transition[MetadataReady as usize]),
+            ("metadata_received_us", &self.transition[MetadataReceived as usize]),
+            ("fonts_ready_us", &self.transition[FontsReady as usize]),
+            ("fonts_received_us", &self.transition[FontsReceived as usize]),
+            ("fonts_registered_us", &self.transition[FontsRegistered as usize]),
+            ("attach_enter_us", &self.transition[AttachEnter as usize]),
+            ("attach_exit_us", &self.transition[AttachExit as usize]),
+            ("view_enter_us", &self.transition[ViewEnter as usize]),
+            ("view_exit_us", &self.transition[ViewExit as usize]),
+            ("scene_requested_us", &self.transition[SceneRequested as usize]),
+        ] {
+            match value.get().copied().flatten() {
+                Some(time) => write!(output, " {field}={time}")?,
+                None => write!(output, " {field}=none")?,
+            }
+        }
+        for (index, field) in ["render_us", "settle_us", "write_us", "send_us"].into_iter().enumerate() {
+            match costs {
+                Some(costs) => write!(output, " {field}={}", costs[index])?,
+                None => write!(output, " {field}=none")?,
+            }
+        }
+        writeln!(output)
+    }
+}
+
+#[cfg(feature = "startup-stage-diagnostics")]
+pub fn startup_stage_main_entry() {
+    let timestamp = boottime_us();
+    let _ = STARTUP_STAGES.main.set(timestamp);
+}
+
+#[cfg(feature = "startup-stage-diagnostics")]
+pub fn startup_stage_initial_frame(frame: crate::platform::FrameCheckpoint) {
+    STARTUP_STAGES.initial_frame(frame, boottime_us);
+}
+
+#[cfg(feature = "startup-stage-diagnostics")]
+pub fn startup_stage_input_frame(frame: crate::platform::FrameCheckpoint) {
+    STARTUP_STAGES.input_frame(frame, boottime_us);
+}
+
+#[cfg(feature = "startup-stage-diagnostics")]
+pub fn startup_transition(stage: StartupTransition) {
+    STARTUP_STAGES.transition[stage as usize].get_or_init(boottime_us);
+    #[cfg(all(feature = "startup-draw-diagnostics", target_os = "linux"))]
+    if matches!(stage, StartupTransition::SceneRequested) {
+        slint_backend_kindle::draw_diagnostics::scene_requested();
+    }
+}
+
+fn write_startup_library_submitted(
+    output: &mut impl Write,
+    timestamp: u64,
+    frame: crate::platform::FrameCheckpoint,
+    projection: (bool, bool, bool),
+) -> std::io::Result<()> {
+    let (large, library_nonempty, grid_nonempty) = projection;
+    writeln!(
+        output,
+        "aidoku: startup_library_submitted boottime_us={} sequence={} marker={} layout={} library={} grid={}",
+        timestamp,
+        frame.sequence,
+        frame.marker.unwrap_or(0),
+        if large { "large" } else { "compact" },
+        if library_nonempty { "nonempty" } else { "empty" },
+        if grid_nonempty { "nonempty" } else { "empty" },
+    )
+}
+
+pub fn startup_library_submitted(
+    frame: crate::platform::FrameCheckpoint,
+    projection: (bool, bool, bool),
+) {
+    emit_startup_library(
+        frame,
+        projection,
+        #[cfg(feature = "startup-stage-diagnostics")]
+        false,
+    );
+}
+
+#[cfg(feature = "startup-stage-diagnostics")]
+pub fn startup_library_submitted_with_costs(
+    frame: crate::platform::FrameCheckpoint,
+    projection: (bool, bool, bool),
+) {
+    emit_startup_library(frame, projection, true);
+}
+
+fn emit_startup_library(
+    frame: crate::platform::FrameCheckpoint,
+    projection: (bool, bool, bool),
+    #[cfg(feature = "startup-stage-diagnostics")] measured: bool,
+) {
+    let timestamp = boottime_us();
+    #[cfg(all(feature = "startup-draw-diagnostics", target_os = "linux"))]
+    slint_backend_kindle::draw_diagnostics::close();
+    let Some(timestamp) = timestamp else {
+        return;
+    };
+    let mut stderr = std::io::stderr().lock();
+    if write_startup_library_submitted(&mut stderr, timestamp, frame, projection).is_err() {
+        return;
+    }
+    #[cfg(feature = "startup-stage-diagnostics")]
+    if let Ok(true) = STARTUP_STAGES.report(&mut stderr, timestamp) {
+        let costs = measured.then(|| [frame.render, frame.settle, frame.write, frame.submit].map(micros));
+        let mut line = Vec::with_capacity(512);
+        if STARTUP_STAGES.write_transition(&mut line, timestamp, frame, costs).is_ok() {
+            #[cfg(all(feature = "startup-draw-diagnostics", target_os = "linux"))]
+            if measured {
+                let _ = write_startup_draw(&mut line, timestamp, frame);
+            }
+            let _ = stderr.write_all(&line);
+        }
+    }
+}
+
+#[cfg(all(feature = "startup-draw-diagnostics", target_os = "linux"))]
+fn write_startup_draw(output: &mut impl Write, submitted: u64, frame: crate::platform::FrameCheckpoint) -> std::io::Result<()> {
+    let (Some(draw), Some(marker)) = (frame.draw, frame.marker) else { return Ok(()) };
+    if !frame.active || !frame.submitted || frame.initial || frame.sequence == 0 || marker == 0 || submitted == 0
+        || !(1..=8192).contains(&draw.width) || !(1..=8192).contains(&draw.height)
+    {
+        return Ok(());
+    }
+    write!(output, "aidoku: startup_draw_cpu sequence={} marker={marker} submitted_us={submitted} wall_us={}",
+           frame.sequence, micros(frame.render))?;
+    for (name, value) in [
+        ("thread_us", draw.thread.map(micros)), ("minflt", draw.counters.map(|entry| entry.minor_faults)),
+        ("majflt", draw.counters.map(|entry| entry.major_faults)), ("nvcsw", draw.counters.map(|entry| entry.voluntary_switches)),
+        ("nivcsw", draw.counters.map(|entry| entry.involuntary_switches)),
+    ] {
+        match value {
+            Some(value) => write!(output, " {name}={value}")?,
+            None => write!(output, " {name}=none")?,
+        }
+    }
+    writeln!(output, " width={} height={} format={}", draw.width, draw.height, if draw.gray { "gray8" } else { "rgb8" })
+}
+
 /// The cost array is render, prior-buffer settle, pixel write, then SEND.
 pub fn startup_frame(
     name: &'static str,
@@ -788,6 +1040,171 @@ pub fn finish(success: bool) -> Result<()> {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    fn submitted_library_frame() -> crate::platform::FrameCheckpoint {
+        crate::platform::FrameCheckpoint {
+            #[cfg(all(feature = "startup-draw-diagnostics", target_os = "linux"))]
+            draw: None,
+            submitted: true,
+            sequence: 4,
+            marker: Some(5),
+            initial: false,
+            full: false,
+            active: true,
+            input_blocked: true,
+            render: std::time::Duration::ZERO,
+            settle: std::time::Duration::ZERO,
+            write: std::time::Duration::ZERO,
+            submit: std::time::Duration::ZERO,
+        }
+    }
+
+    #[cfg(all(feature = "startup-draw-diagnostics", target_os = "linux"))]
+    #[test]
+    fn cpu_line_requires_a_measured_active_business_frame_and_valid_marker() {
+        use slint_backend_kindle::draw_diagnostics::DrawAccounting;
+        use std::time::Duration;
+        let frame = crate::platform::FrameCheckpoint {
+            draw: Some(DrawAccounting { thread: Some(Duration::ZERO), counters: None, width: 1860, height: 2480, gray: true }),
+            ..submitted_library_frame()
+        };
+        let mut line = Vec::new();
+        for rejected in [
+            crate::platform::FrameCheckpoint { marker: None, ..frame },
+            crate::platform::FrameCheckpoint { marker: Some(0), ..frame },
+            crate::platform::FrameCheckpoint { sequence: 0, ..frame },
+            crate::platform::FrameCheckpoint { active: false, ..frame },
+            crate::platform::FrameCheckpoint { submitted: false, ..frame },
+            crate::platform::FrameCheckpoint { initial: true, ..frame },
+            crate::platform::FrameCheckpoint { draw: None, ..frame },
+        ] {
+            write_startup_draw(&mut line, 7, rejected).unwrap();
+            assert!(line.is_empty());
+        }
+        write_startup_draw(&mut line, 7, frame).unwrap();
+        assert_eq!(line, b"aidoku: startup_draw_cpu sequence=4 marker=5 submitted_us=7 wall_us=0 thread_us=0 minflt=none majflt=none nvcsw=none nivcsw=none width=1860 height=2480 format=gray8\n");
+    }
+
+    #[cfg(feature = "startup-stage-diagnostics")]
+    #[test]
+    fn startup_stage_diagnostics_only_sample_the_first_accepted_initial_full_frame() {
+        use crate::platform::FrameCheckpoint;
+        let stages = StartupStages::default();
+        let full = FrameCheckpoint {
+            initial: true,
+            full: true,
+            ..submitted_library_frame()
+        };
+        for rejected in [
+            FrameCheckpoint { active: false, ..full },
+            FrameCheckpoint { initial: false, ..full },
+            FrameCheckpoint { full: false, ..full },
+            FrameCheckpoint { submitted: false, ..full },
+            FrameCheckpoint { sequence: 0, ..full },
+            FrameCheckpoint { marker: None, ..full },
+            FrameCheckpoint { marker: Some(0), ..full },
+        ] {
+            stages.initial_frame(rejected, || panic!("Invalid frame read the clock"));
+        }
+        stages.initial_frame(full, || Some(202));
+        stages.initial_frame(full, || panic!("Repeated initial frame read the clock"));
+        stages.main.set(Some(101)).unwrap();
+        let mut output = Vec::new();
+        stages.report(&mut output, 303).unwrap();
+        assert_eq!(output, b"aidoku: startup_stage_diag main_us=101 initial_us=202 submitted_us=303\n");
+    }
+
+    #[cfg(feature = "startup-stage-diagnostics")]
+    #[test]
+    fn startup_stage_diagnostics_never_invent_missing_or_misordered_times() {
+        fn report(main: Option<u64>, initial: Option<u64>, submitted: u64) -> Vec<u8> {
+            let stages = StartupStages::default();
+            stages.main.set(main).unwrap();
+            stages.initial.set(InitialSubmission { sequence: 1, marker: Some(1), timestamp: initial }).unwrap();
+            let mut output = Vec::new();
+            stages.report(&mut output, submitted).unwrap();
+            output
+        }
+        assert_eq!(report(Some(12), None, 12), b"aidoku: startup_stage_diag main_us=12 initial_us=none submitted_us=12\n");
+        assert_eq!(report(Some(12), Some(12), 12), b"aidoku: startup_stage_diag main_us=12 initial_us=12 submitted_us=12\n");
+        assert!(report(None, Some(12), 13).is_empty());
+        assert!(report(Some(0), Some(12), 13).is_empty());
+        assert!(report(Some(12), None, 11).is_empty());
+        assert!(report(Some(12), Some(11), 13).is_empty());
+        assert!(report(Some(12), Some(14), 13).is_empty());
+    }
+
+    #[cfg(feature = "startup-stage-diagnostics")]
+    #[test]
+    fn startup_transition_fence_requires_the_accepted_initial_frame_identity() {
+        use crate::platform::FrameCheckpoint;
+        let stages = StartupStages::default();
+        let accepted = FrameCheckpoint { initial: true, full: true, ..submitted_library_frame() };
+        let input = FrameCheckpoint { submitted: false, input_blocked: false, ..accepted };
+        stages.input_frame(input, || panic!("Unbound input marker read the clock"));
+        stages.initial_frame(accepted, || Some(120));
+        for wrong in [
+            FrameCheckpoint { marker: Some(6), ..input },
+            FrameCheckpoint { sequence: 7, ..input },
+            FrameCheckpoint { full: false, ..input },
+            FrameCheckpoint { initial: false, ..input },
+            FrameCheckpoint { active: false, ..input },
+            FrameCheckpoint { input_blocked: true, ..input },
+            FrameCheckpoint { submitted: true, ..input },
+        ] {
+            stages.input_frame(wrong, || panic!("Invalid input fence read the clock"));
+        }
+        stages.input_frame(input, || Some(160));
+        stages.input_frame(input, || panic!("Repeated input fence read the clock"));
+        assert_eq!(stages.fence.get(), Some(&Some(160)));
+    }
+
+    #[cfg(feature = "startup-stage-diagnostics")]
+    #[test]
+    fn startup_transition_keeps_worker_overlap_and_distinguishes_absent_from_zero_cost() {
+        use StartupTransition::*;
+        let stages = StartupStages::default();
+        stages.fence.set(Some(145)).unwrap();
+        for (field, time) in [(MetadataReady, 109), (MetadataReceived, 175), (FontsReady, 105),
+                              (FontsReceived, 114), (FontsRegistered, 138), (AttachEnter, 181),
+                              (AttachExit, 197), (ViewEnter, 199), (ViewExit, 209), (SceneRequested, 210)] {
+            stages.transition[field as usize].set(Some(time)).unwrap();
+        }
+        let mut line = Vec::new();
+        let frame = submitted_library_frame();
+        stages.write_transition(&mut line, 320, frame, Some([30, 0, 41, 2])).unwrap();
+        assert_eq!(line, b"aidoku: startup_transition sequence=4 marker=5 submitted_us=320 fence_us=145 metadata_ready_us=109 metadata_received_us=175 fonts_ready_us=105 fonts_received_us=114 fonts_registered_us=138 attach_enter_us=181 attach_exit_us=197 view_enter_us=199 view_exit_us=209 scene_requested_us=210 render_us=30 settle_us=0 write_us=41 send_us=2\n");
+        line.clear();
+        StartupStages::default().write_transition(&mut line, 320, frame, None).unwrap();
+        let text = std::str::from_utf8(&line).unwrap();
+        assert_eq!(text.matches("=none").count(), 15);
+    }
+
+    #[test]
+    fn startup_library_log_is_one_structured_line_without_private_content() {
+        let frame = submitted_library_frame();
+        let mut output = Vec::new();
+        write_startup_library_submitted(&mut output, 123456, frame, (true, true, false)).unwrap();
+        assert_eq!(
+            String::from_utf8(output).unwrap(),
+            "aidoku: startup_library_submitted boottime_us=123456 sequence=4 marker=5 layout=large library=nonempty grid=empty\n"
+        );
+        let mut output = Vec::new();
+        write_startup_library_submitted(
+            &mut output,
+            7,
+            crate::platform::FrameCheckpoint {
+                marker: None,
+                ..frame
+            },
+            (false, false, false),
+        )
+        .unwrap();
+        assert_eq!(
+            String::from_utf8(output).unwrap(),
+            "aidoku: startup_library_submitted boottime_us=7 sequence=4 marker=0 layout=compact library=empty grid=empty\n"
+        );
+    }
 
     #[test]
     fn bounded_records_report_loss_without_replacing_earlier_evidence() {

@@ -1,0 +1,21 @@
+{
+  "scope": "Kindle Scribe; candidate visits 01 through 06 of the closed warm staged screen, using six synthetic books. This is the rejected progress-frame revision, not the new JPEG admission candidate or the installed R3 card.",
+  "source": "Use the rejected_warm_revision entry in the test-env startup evidence index, then its warm-*/attempt-* directory. Warmups, pictures and the R3 arm are excluded; the R3 trace does not time this probe separately.",
+  "reproduction": "python3 -B docs/review/startup-followup-20261121/jpeg-probe-admission/replay.py CLOSED_ATTEMPT --check",
+  "clock": "Microseconds relative to the same process's Rust main entry (at_us). Ordering is also checked on each visit's device CLOCK_BOOTTIME; no absolute timestamps are published.",
+  "qualification": "Every trace completed successfully without dropped events. Hardware JPEG was reported available, the Reader acceleration setting was off and no hardware decode was attempted. All six thumbnails were cache hits. The first Library submission matched its cover-frame record, with seven slots, no cover images and covers pending.",
+  "interpretation": "A synchronous capability check finished before platform initialization, initial full-frame submission and first Library SEND in all six visits. The interval is time spent in that check, not the measured saving of a change. None of these starts is a stock Library card release; SEND is not optical settling or a successful tap.",
+  "observations": {
+    "columns": ["visit", "probe_start_us", "probe_finish_us", "platform_initialized_us", "initial_full_submitted_us", "first_library_submitted_us", "probe_elapsed_us"],
+    "rows": [
+      [1, 21191, 45950, 46042, 223538, 931152, 24759],
+      [2, 21248, 46333, 46419, 222177, 938107, 25085],
+      [3, 14266, 32201, 32251, 203927, 977070, 17935],
+      [4, 24434, 50384, 50478, 240452, 1052382, 25950],
+      [5, 28648, 62932, 63034, 306583, 1104978, 34284],
+      [6, 21802, 47629, 47721, 232362, 938459, 25827]
+    ],
+    "median_probe_us": 25456,
+    "range_probe_us": [17935, 34284]
+  }
+}

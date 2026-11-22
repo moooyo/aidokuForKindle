@@ -25,6 +25,8 @@ use anyhow::{Context, Result, anyhow};
 use slint::ComponentHandle;
 
 use crate::bootstrap_fonts::{Fonts, PreparedFont};
+#[cfg(feature = "startup-stage-diagnostics")]
+use aidoku_kindle::reader_timing::{StartupTransition, startup_transition};
 
 pub type Application = Rc<RefCell<App>>;
 pub type ApplicationSlot = Rc<RefCell<Option<Application>>>;
@@ -244,7 +246,11 @@ impl Startup {
         while let Ok(event) = self.receiver.try_recv() {
             match event {
                 StartupEvent::Font(font) => self.fonts.accept(font)?,
-                StartupEvent::State(prepared) => self.prepared = Some(prepared),
+                StartupEvent::State(prepared) => {
+                    self.prepared = Some(prepared);
+                    #[cfg(feature = "startup-stage-diagnostics")]
+                    startup_transition(StartupTransition::MetadataReceived);
+                }
                 StartupEvent::Failed(error) => return Err(anyhow!(error)),
             }
         }
@@ -312,8 +318,12 @@ impl Startup {
             // Keep the current loading scene until the business view is ready.
             // A separate attachment label would add an update just before it.
             aidoku_kindle::reader_timing::mark("startup_attachment_started");
+            #[cfg(feature = "startup-stage-diagnostics")]
+            startup_transition(StartupTransition::AttachEnter);
             let app = App::attach_prepared(ui, prepared, platform.clone())?;
             *application.borrow_mut() = Some(app);
+            #[cfg(feature = "startup-stage-diagnostics")]
+            startup_transition(StartupTransition::AttachExit);
             aidoku_kindle::reader_timing::mark("application_attached");
             self.schedule();
             return Ok(false);
@@ -336,6 +346,8 @@ impl Startup {
         ui.global::<State>().set_booting(false);
         ui.window().request_redraw();
         platform.refresh(RefreshKind::Ui);
+        #[cfg(feature = "startup-stage-diagnostics")]
+        startup_transition(StartupTransition::SceneRequested);
         aidoku_kindle::reader_timing::mark("application_ready");
         aidoku_kindle::reader_timing::mark("startup_ready");
         eprintln!(
@@ -470,6 +482,8 @@ impl Startup {
                 let _ = prepared.finish_shutdown(Duration::from_secs(2));
                 return Ok(());
             }
+            #[cfg(feature = "startup-stage-diagnostics")]
+            startup_transition(StartupTransition::MetadataReady);
             publish(sender, wake, StartupEvent::State(prepared))?;
             // External image I/O happens only after the prepared state is available.
             if let Some(warm) = warm {
@@ -588,6 +602,7 @@ mod tests {
             assert!(!startup.advance(&ui, &platform, &app, true, true)?);
             let attached = app.borrow().clone().expect("normal advance must attach");
             assert!(attached.borrow().is_starting() && ui.global::<State>().get_booting());
+            assert!(attached.borrow().startup_library_log_projection().is_none());
             for _ in 0..16 {
                 if startup.advance(&ui, &platform, &app, true, true)? {
                     break;
@@ -595,6 +610,10 @@ mod tests {
             }
             assert!(startup.ready && !attached.borrow().is_starting());
             assert!(!ui.global::<State>().get_booting());
+            assert_eq!(
+                attached.borrow().startup_library_log_projection(),
+                Some((true, false, false))
+            );
             attached.borrow_mut().shutdown();
             assert!(startup.finish());
             Ok(())

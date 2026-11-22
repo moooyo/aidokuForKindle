@@ -39,6 +39,7 @@ impl Acceleration {
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 #[repr(u8)]
 pub enum Availability {
+    NotProbed = 0,
     Available = 1,
     UnsupportedPlatform = 2,
     UnverifiedDevice = 3,
@@ -64,6 +65,7 @@ impl Availability {
             Self::MissingDiagnostics => "diagnostics",
             Self::Busy => "busy",
             Self::Failed => "failed",
+            Self::NotProbed => "not_probed",
         }
     }
 
@@ -82,7 +84,7 @@ impl Availability {
 }
 
 static INITIALIZE: Once = Once::new();
-static STATUS: AtomicU8 = AtomicU8::new(Availability::UnsupportedPlatform as u8);
+static STATUS: AtomicU8 = AtomicU8::new(Availability::NotProbed as u8);
 static IN_FLIGHT: AtomicBool = AtomicBool::new(false);
 static ATTEMPTS: AtomicU64 = AtomicU64::new(0);
 static COMPLETED: AtomicU64 = AtomicU64::new(0);
@@ -107,7 +109,10 @@ pub fn statistics() -> Statistics {
 }
 
 pub fn availability() -> Availability {
-    Availability::from_code(STATUS.load(Ordering::Acquire))
+    match STATUS.load(Ordering::Acquire) {
+        0 => Availability::NotProbed,
+        code => Availability::from_code(code),
+    }
 }
 
 fn helper_path() -> Option<PathBuf> {
@@ -129,17 +134,21 @@ pub fn initialize(native: bool) -> Availability {
         let status = if !qualification.available() {
             qualification
         } else if let Some(path) = helper_path().filter(|p| p.is_file()) {
-            match exchange(&path, 0, &[], 0, 0, Duration::from_secs(2)) {
-                Ok(response) if response.status == 0 => Availability::Available,
-                Ok(response) => Availability::from_code(response.status as u8),
-                Err(_) => Availability::Failed,
-            }
+            probe_helper(&path)
         } else {
             Availability::MissingHelper
         };
         STATUS.store(status as u8, Ordering::Release);
     });
     availability()
+}
+
+pub(crate) fn probe_helper(path: &Path) -> Availability {
+    match exchange(path, 0, &[], 0, 0, Duration::from_secs(2)) {
+        Ok(response) if response.status == 0 => Availability::Available,
+        Ok(response) => Availability::from_code(response.status as u8),
+        Err(_) => Availability::Failed,
+    }
 }
 
 fn qualified_device() -> Availability {

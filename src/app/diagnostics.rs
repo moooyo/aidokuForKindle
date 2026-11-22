@@ -68,6 +68,21 @@ fn projected_source(item: SourceItem) -> Value {
     })
 }
 
+fn startup_library_state(state: &State<'_>) -> Option<(bool, bool, bool)> {
+    if state.get_booting()
+        || state.get_route() != "library"
+        || !state.get_modal().is_empty()
+    {
+        return None;
+    }
+    let count = state.get_library_count();
+    let grid_nonempty = state.get_books().row_count() > 0;
+    if count < 0 || count == 0 && grid_nonempty {
+        return None;
+    }
+    Some((state.get_large_screen(), count > 0, grid_nonempty))
+}
+
 impl App {
     /// Report outstanding cover work without touching storage or loading assets.
     pub fn cover_work_pending(&self) -> bool {
@@ -77,6 +92,20 @@ impl App {
     /// A completed cover may still await the throttled view publication.
     pub fn capture_projection_pending(&self) -> bool {
         self.cover_work_pending() || self.background_ui_dirty || self.cover_ui_dirty
+    }
+
+    pub fn startup_library_log_projection(&self) -> Option<(bool, bool, bool)> {
+        if self.options.demo
+            || self.options.resume
+            || self.options.initial_screen != "library"
+            || self.route != "library"
+            || !self.modal.is_empty()
+            || self.is_starting()
+        {
+            return None;
+        }
+        let ui = self.ui.upgrade()?;
+        startup_library_state(&ui.global::<State>())
     }
 
     /// Count projected Library image slots without reading storage or book IDs.
@@ -416,5 +445,78 @@ impl App {
             "server_configuration_implemented": true,
             "pairing_endpoint_running": self.pairing.is_some(),
         });
+    }
+}
+
+#[cfg(test)]
+mod startup_library_log_tests {
+    use super::*;
+
+    struct CountOnlyBooks;
+
+    impl slint::Model for CountOnlyBooks {
+        type Data = BookItem;
+
+        fn row_count(&self) -> usize {
+            1
+        }
+
+        fn row_data(&self, _: usize) -> Option<Self::Data> {
+            panic!("Startup logging must not read book rows")
+        }
+
+        fn model_tracker(&self) -> &dyn slint::ModelTracker {
+            &()
+        }
+    }
+
+    struct TestDisplay(Rc<slint::platform::software_renderer::MinimalSoftwareWindow>);
+
+    impl slint::platform::Platform for TestDisplay {
+        fn create_window_adapter(
+            &self,
+        ) -> std::result::Result<Rc<dyn slint::platform::WindowAdapter>, slint::PlatformError> {
+            Ok(self.0.clone())
+        }
+    }
+
+    #[test]
+    fn projected_library_log_uses_the_rendered_state_without_cover_reads() -> Result<()> {
+        std::thread::spawn(|| -> Result<()> {
+            use slint::platform::software_renderer::{MinimalSoftwareWindow, RepaintBufferType};
+            slint::platform::set_platform(Box::new(TestDisplay(MinimalSoftwareWindow::new(
+                RepaintBufferType::ReusedBuffer,
+            ))))?;
+            let ui = AppWindow::new()?;
+            let state = ui.global::<State>();
+            state.set_booting(true);
+            assert_eq!(startup_library_state(&state), None);
+            state.set_booting(false);
+            state.set_route("catalog".into());
+            assert_eq!(startup_library_state(&state), None);
+            state.set_route("library".into());
+            state.set_modal("choices".into());
+            assert_eq!(startup_library_state(&state), None);
+            state.set_modal("".into());
+            state.set_busy(true);
+            assert_eq!(startup_library_state(&state), Some((false, false, false)));
+            state.set_busy(false);
+            state.set_selection_mode(true);
+            assert_eq!(startup_library_state(&state), Some((false, false, false)));
+            state.set_selection_mode(false);
+            state.set_large_screen(true);
+            assert_eq!(startup_library_state(&state), Some((true, false, false)));
+            state.set_library_count(1);
+            assert_eq!(startup_library_state(&state), Some((true, true, false)));
+            state.set_books(Rc::new(CountOnlyBooks).into());
+            assert_eq!(startup_library_state(&state), Some((true, true, true)));
+            state.set_large_screen(false);
+            assert_eq!(startup_library_state(&state), Some((false, true, true)));
+            state.set_library_count(0);
+            assert_eq!(startup_library_state(&state), None);
+            Ok(())
+        })
+        .join()
+        .expect("headless Library projection")
     }
 }

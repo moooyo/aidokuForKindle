@@ -1,5 +1,13 @@
 # Library startup follow-up, 2026-11-21
 
+Current acceptance measures [normal card release to the rendered Library](rendered-library/README.md), without a click or complete covers. The cohort decisions below retain their original endpoints. Their cover result is not the new headline startup result.
+
+## Optional JPEG capability at startup
+
+The [completed November 22 Scribe ordinary-card test](../startup-jpeg-native-20261122/README.md) found **no consistent improvement**: B was earlier in two of six pairs, with a paired median A−B of −31.223 ms. R3 was restored and left installed. The earlier host result below is a different endpoint.
+
+The [JPEG admission comparison](jpeg-probe-admission/README.md) targets an operation that six earlier Scribe traces located before the first Library submission: a successful **25.456 ms median** check for a decoder that none of those Library frames used. The new product path moves qualification to the first actual consumer, not to a background thread. In the [two-profile host experiment](jpeg-probe-admission/HOST-TRIAL.md) the complete software frame arrived **13.83 ms earlier on the Scribe layout and 14.63 ms earlier on PW6**, at the paired median (8/8 each with identical pixels). Keep this source change; it is not a measurement of the ordinary installed card. The control for a later native A/B must have the same submission log as the candidate. Keep installed R3 unchanged.
+
 ## Confirmed: complete covers with an empty thumbnail cache
 
 The post-SEND candidate submitted all covers in **3.980 s**, versus **4.657 s** for the installed control (separate medians). The median of within-pair savings was **680.849 ms**, about **14.6%** of the control median. All ten new pairs were faster. The other endpoint, first usable Library, improved by only **2.114 ms at the paired median** (5/10). The confirmation passed; the 1 s practical target did not. This is a result for the staged entry with six missing thumbnails, not a 0.68 s reduction in daily icon latency.

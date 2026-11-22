@@ -37,6 +37,8 @@ pub struct PointerInput {
 /// A driver-accepted frame boundary, not an optical panel-completion claim.
 #[derive(Clone, Copy, Debug)]
 pub struct FrameCheckpoint {
+    #[cfg(all(feature = "startup-draw-diagnostics", target_os = "linux"))]
+    pub draw: Option<slint_backend_kindle::draw_diagnostics::DrawAccounting>,
     pub submitted: bool,
     pub sequence: u64,
     pub marker: Option<u32>,
@@ -260,6 +262,8 @@ pub struct Platform {
     hardware_y4_available_override: Cell<Option<bool>>,
     #[cfg(test)]
     hardware_media_available_override: Cell<Option<crate::native_media::Availability>>,
+    #[cfg(test)]
+    jpeg_probe_override: RefCell<Option<Rc<dyn Fn() -> crate::native_media::Availability>>>,
     sleep_requested: Cell<bool>,
     pointer_observer: RefCell<Option<PointerObserver>>,
     device_policies: RefCell<Option<device_policy::DevicePolicyWorker>>,
@@ -282,7 +286,6 @@ impl Platform {
         } else {
             profile.native_size()
         };
-        crate::native_media::initialize(kindle);
         Ok(Self {
             profile,
             kindle,
@@ -306,6 +309,8 @@ impl Platform {
             hardware_y4_available_override: Cell::new(None),
             #[cfg(test)]
             hardware_media_available_override: Cell::new(None),
+            #[cfg(test)]
+            jpeg_probe_override: RefCell::new(None),
             sleep_requested: Cell::new(false),
             pointer_observer: RefCell::new(None),
             device_policies: RefCell::new(None),
@@ -339,12 +344,22 @@ impl Platform {
         self.startup_render_pending.replace(false)
     }
 
-    pub fn set_checkpoint_observer(&self, observer: impl Fn(FrameCheckpoint) + 'static) {
+    pub fn set_checkpoint_observer(
+        &self,
+        startup_costs: bool,
+        observer: impl Fn(FrameCheckpoint) + 'static,
+    ) {
         #[cfg(all(feature = "kindle", target_os = "linux"))]
         if let Some(backend) = self.backend.borrow().as_ref() {
+            #[cfg(feature = "startup-draw-diagnostics")]
+            if startup_costs {
+                slint_backend_kindle::draw_diagnostics::permit_managed_start();
+            }
             backend.set_checkpoint_observer(
                 move |frame| {
                     observer(FrameCheckpoint {
+                        #[cfg(feature = "startup-draw-diagnostics")]
+                        draw: frame.draw,
                         submitted: frame.phase
                             == slint_backend_kindle::NativeCheckpointPhase::Submitted,
                         sequence: frame.frame_sequence,
@@ -359,11 +374,11 @@ impl Platform {
                         submit: frame.submit_elapsed,
                     });
                 },
-                crate::reader_timing::enabled(),
+                crate::reader_timing::enabled() || startup_costs,
             );
             return;
         }
-        let _ = observer;
+        let _ = (startup_costs, observer);
     }
 
     pub fn hardware_media_availability(&self) -> crate::native_media::Availability {
@@ -376,6 +391,31 @@ impl Platform {
         } else {
             crate::native_media::Availability::UnsupportedPlatform
         }
+    }
+
+    pub(crate) fn probe_hardware_media(&self) -> crate::native_media::Availability {
+        #[cfg(test)]
+        if let Some(status) = self.hardware_media_available_override.get() {
+            if status == crate::native_media::Availability::NotProbed
+                && let Some(probe) = self.jpeg_probe_override.borrow_mut().take()
+            {
+                let status = probe();
+                self.hardware_media_available_override.set(Some(status));
+                return status;
+            }
+            return status;
+        }
+        crate::native_media::initialize(self.kindle)
+    }
+
+    #[cfg(test)]
+    pub(crate) fn set_test_jpeg_probe(
+        &self,
+        probe: Rc<dyn Fn() -> crate::native_media::Availability>,
+    ) {
+        self.hardware_media_available_override
+            .set(Some(crate::native_media::Availability::NotProbed));
+        self.jpeg_probe_override.replace(Some(probe));
     }
 
     #[cfg(test)]

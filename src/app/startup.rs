@@ -5,6 +5,8 @@
 
 use super::*;
 use crate::platform::DeviceProfile;
+#[cfg(feature = "startup-stage-diagnostics")]
+use crate::reader_timing::{StartupTransition, startup_transition};
 
 pub struct PreparedApp {
     pub(super) options: AppOptions,
@@ -311,7 +313,11 @@ impl App {
             }
             AttachStage::View => {
                 crate::reader_timing::mark("startup_view_started");
+                #[cfg(feature = "startup-stage-diagnostics")]
+                startup_transition(StartupTransition::ViewEnter);
                 self.sync_view()?;
+                #[cfg(feature = "startup-stage-diagnostics")]
+                startup_transition(StartupTransition::ViewExit);
                 self.startup_stage = Some(AttachStage::Settings);
                 crate::reader_timing::mark("startup_view_attached");
             }

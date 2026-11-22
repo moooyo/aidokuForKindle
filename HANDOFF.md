@@ -1,24 +1,57 @@
 # Handoff: Kindle Library startup and reopening
 
-## Start here: 2026-11-21 (Asia/Shanghai)
+## Start here: 2026-11-22 (Asia/Shanghai)
+
+**Current decision: keep the daily R3, existing Library paper fill and glyph cache.** A new [ordinary-card draw-accounting study](docs/review/startup-release-draw-20261122/README.md) measured **2.960 s** at the card-to-complete-Library median (one warmup excluded, three formal openings). The first business draw was **623.075 ms elapsed** at the median, but only **96.852 ms of GUI CPU**; the median within-visit CPU share was **15.6%**. All three draws recorded 140 major faults. The elapsed difference is not a measured I/O or scheduler delay; these visits unpacked a new executable file each time. In the separate [release Gray8 A/B](docs/review/startup-release-draw-20261122/composition/README.md), removing a provable 4.18 / 1.87 MB redundant fill did not speed up either layout. Do not add a second [glyph cache](docs/review/startup-release-draw-20261122/glyph/README.md). Keep the new optional same-frame logger; the tested diagnostic was not installed. All four independent leases were returned and the last release was at **07:36:47**. The next discriminating comparison is [ordinary opens with controlled executable identity](docs/review/startup-release-draw-20261122/device/INTERPRETATION.md), not a speculative renderer rewrite or blanket prefetch.
+
+**WeRead protection baseline — November 22, 07:42:22 Asia/Shanghai (WeRead operator report).** After Aidoku's 07:36:47 return, WeRead reported that all 38 deployed public files matched on readback and its ordinary stock card opened the existing grid Library. It restored native state, removed its staging files, closed its connections and released its original lease. The reported sizes are **95,228,264 bytes** for `/mnt/us/weread/app/weread` and **137,236 bytes** for `/mnt/us/weread/launch.sh`. The original `/mnt/us/documents/weread.sh` remains **43,102 bytes**; the two WeRead helpers, Aidoku and the shared entry were reported unchanged. Aidoku did not independently inspect the device. Neither project's return is a claim of current availability.
+
+The consumed Aidoku guard pins the previous **95,137,176-byte** WeRead executable and will reject the reported update. Leave that historical guard and its receipts intact: do not bypass the check or restore old WeRead files. Qualify a **new** guard against the updated WeRead deployment for the next batch, retaining the card, helper, shared-entry and within-visit checks; file size alone is not proof of file identity.
+
+**Earlier modification decision: keep R3 and upstream Slint.** Reusing same-frame text shaping before line breaks eliminated 18 / 17 actual reshapes on the six-book host fixture, but [optimized Gray8 A/B against stock Slint](docs/review/startup-library-transition-20261122/first-draw-profile/release-gray/README.md) saved only **0.198 ms on Scribe (6/6)** and **0.060 ms on PW6 (4/6)** at the paired draw median. Neither passed the 1 ms screen. Do not install it, add the private cache, or call the encouraging debug RGB result a card speedup. The [subsequent release CPU profile](docs/review/startup-release-draw-20261122/profile/README.md) distinguishes drawing stages on the host; it does not apportion a Scribe frame's native elapsed time between them.
+
+**Latest diagnosis:** the [four-visit ordinary-card transition study](docs/review/startup-library-transition-20261122/README.md) found that the **first complete Library software draw** took **637 ms** at the median and **91–96%** of the interval between scene-ready and the accepted Library frame. One warmup was excluded; the three formal card-release-to-Library midpoints had a median of **3.081 s**. Of the **163 ms** difference between the slowest and fastest *initial-full-to-Library transition*, **147 ms** was after the scene was ready. The protected initial fence barely varied. Do not remove it or change the launcher. All four visits restored R3 and native state, and the last lease was released at **06:22:08**. A [same-frame text shaping experiment](docs/review/startup-library-transition-20261122/first-draw-profile/PRELINE-TRIAL.md) tests reuse before line breaks; host improvements are not a stock-card speedup.
+
+**Preceding study:** five independent [ordinary-card stage visits](docs/review/startup-card-stages-20261122/README.md) all closed on the Scribe. Excluding one warmup, the median card-release-to-Library interval midpoint was **3.203 s**. The largest main stage was Rust `main` to Library (**1.685 s** median); the initial full frame to Library alone took **1.207 s** median. The slowest launch exceeded the fastest by **1.071 s**, with **763 ms** of that difference inside the application (including **479 ms** after the initial full frame), and **319 ms** between foreground launcher birth and `main`. These are different visits and do not constitute a before/after comparison. The diagnostic build was not deployed; original R3 and native state were restored at **05:10:25**.
+
+**Latest normal-card decision:** the [physical JPEG-admission A/B](docs/review/startup-jpeg-native-20261122/README.md) completed all 14 Scribe visits. Excluding warmups, on-demand qualification was earlier in **2/6** pairs; the paired median A−B was **−31.223 ms**. Order-specific medians had opposite signs. Keep the demand policy for avoiding unnecessary work, not as a demonstrated first-screen speedup. Do not deploy either test build; the last visit restored the original R3 and released the device at **04:15:47**. Investigate the card-to-launcher and launcher-to-application intervals before choosing the next optimization.
 
 **The startup candidate is not installed as the daily driver.** The last verified
 installation is R3, product `8baf57f`, with application `1b1c508e...`, launcher
-`412163f1...` and portrait helper `bde28cd5...`. The source being handed off
-is the tested **post-SEND** candidate: start preparation after the first
+`412163f1...` and portrait helper `bde28cd5...`. The measured source merged
+in `1976df8` is the tested **post-SEND** candidate: start preparation after the first
 successful full-frame submission, and enable the required ARM features only
 for the Clang-compiled NEON cover kernel. Merging this code does not install
 it on the Kindle. The rejected warm-start experiment is not included.
 
+### Shared Kindle: cleanup complete; ordinary acquisition reopened
+
+At 09:56:42 Asia/Shanghai on November 21, after the user confirmed the former Aidoku session had ended, an administrator retired its specific **host lease**. The unchanged ownership record was moved into private quarantine in an atomic exchange with a maintenance gate; there was no interval for a new acquisition and no old token was used. This action did not connect to the Kindle. Its host-only receipt is `test-env:/var/tmp/kindle-build-coordination/aidoku-orphan-retired-20261121.json`. **Do not run the original-owner recovery command below against this retired lease.**
+
+The user subsequently reported seeing the stock native page. This is separate evidence (`aidoku-admin-visual-observation-20261121.json` in the same coordination directory), not proof about hidden stage directories, program mounts, lighting or the saved navigation pointer. Do not retry the icon visit, reinterpret the administrator's retirement as an ordinary release, or enter a password in chat.
+
+At 10:09 the administrator's first authenticated close returned `not_closed / refused_mount_or_file_changed`. Its connection ended and the host maintenance gate returned. The frozen program selector uses that single refusal for its mount, journal and file-identity checks. The outer check had just compared all three installed programs to their control bytes and found no direct overlay; the refusal does not establish a changed executable. The visit recovery precedes this program check, so the first `close-only` command is no longer the correct entry. Do not retry it, edit its record, or force an unmount.
+
+The subsequent `--repair` attempt returned `not_repaired / refused_guard_state_changed`. Its pre-repair snapshot found no program mounts or live readers; all three installed files matched their control bytes. `app.source_meta` is the first **old journal** comparison that failed in that snapshot (candidate inode and modification time). It is not the reason the later guard refused, and no specific guard field was reported. Neither command should be repeated.
+
+The user authorized **discarding this batch's leftovers without restoring historical settings**. Cleanup is limited to the two tagged study directories and any independently identifiable lock belonging to them. It must not replace applications, change navigation or lighting, or touch a peer's lock. Only a separate, verified cleanup-only receipt and the end of the maintenance hold permit a new operator to acquire a fresh lease. This is not a historical native restoration and does not change the failed study result.
+
+The one-time cleanup completed at **10:50:15 Asia/Shanghai on November 21**. The host independently verified the private completion and retirement records through `ssh test-env /var/tmp/kindle-build-coordination/aidoku-cleanup --status`; the separate public receipt is `test-env:/var/tmp/kindle-build-coordination/aidoku-admin-cleanup-20261121.json`. `resolved_by_admin_cleanup: true` and `restoration_verified: false` are both expected. The shared lease was observed free at handoff. Do not rerun cleanup; acquire a new lease only when ready to start. This receipt is not a reservation.
+
 ### First action: close the interrupted repeat
 
-At 06:07 the `test-env` host still verified the original Aidoku lease owner
-and token. No release receipt existed for this repeat. This was a **host-only**
+The following instructions record the **superseded original-owner procedure** and explain why closing the study was necessary.
+
+At 06:07 and again at 08:46 the `test-env` host verified that the original
+Aidoku lease was still held by the matching owner and token. There was no
+recovery receipt or verified release for this repeat. This was a **host-only**
 check, not a new observation of the Kindle. The new R3 reference had closed
 normally at 05:08:18; the subsequent pictures-first repeat stopped at native
 tile admission, **before its first document click and before any candidate
 selection**. It produced no timing samples. Pinned SSH last reported
 `No route to host` at 05:22:33; the cause is unknown.
+
+At 09:39 the [new single-visit launcher diagnostic](docs/review/startup-followup-20261121/launcher-visit/README.md) was sealed on `test-env`; all 67 worker tests passed. Its device-free preflight verified the package and SSH host-key pin but found no verified predecessor close and a non-free lease. No new attempt was created. At 09:40 the indexed original batch still had zero recovery receipts. WeRead has a ready two-launch pilot and BiliComics reported desktop-only work; no one has been promised a time slot. If the original chat is unavailable on the current desktop, ask the user to reopen it on its original host; do not impersonate its operator.
 
 1. When the Kindle is reachable, the **original operator** uses the private
    `work`, `plan` and `batch` paths in
@@ -40,6 +73,12 @@ selection**. It produced no timing samples. Pinned SSH last reported
 
 ### Measured results and next optimization
 
+**Current primary metric: normal stock Library card release → first rendered application Library.** The first screen must contain the Library layout, its entries (or its correct empty state) and navigation; covers may still be placeholders. Do not wait for input readiness or all covers. No sort action, recording or manual step is required. The operator runs the test and interprets its logs. See the [render-only protocol and results](docs/review/startup-followup-20261121/rendered-library/README.md).
+
+Keep the observation method explicit. A qualifying application frame submission is a software event, not an optical ink measurement. For the unmodified installed R3, whose normal launcher does not request the application trace, use the same visit's device-clock release bracket and a timestamped text log from a live, non-cover framebuffer predicate. Report its conservative observation upper bound, not an exact submission time. A staged launcher clock is not a card release, a single installed visit is not a paired improvement, and older measures retain their original anchors and names. The superseded touch pilot closed and released without tapping the card or producing any sample.
+
+**New baseline, installed R3 on a Scribe:** all three automatic ordinary card opens gave rendered-Library upper bounds of **3,599.788 / 2,305.229 / 2,398.630 ms**; median **2,398.630 ms**. None of the visits waited for cover completion. Normal exit, installation checks, close, absence and owner/token-checked release passed at **11:59:01**. No candidate was installed. Separately, reanalysis of historical staged submissions showed no consistent first-Library gain for post-SEND: **+2.139 ms (5/10) cold, +3.431 ms (3/6) warm** at the paired median. Keep R3 as the daily driver; the confirmed cold cover speedup is secondary. [Result and per-visit bounds](docs/review/startup-followup-20261121/rendered-library/stock-r3.json).
+
 A newly scoped [normal Library tile comparison](docs/review/startup-native-20261121/README.md)
 uses real stock pointer presses and the original six-book Aidoku shelf. Its
 separate check of the untouched R3 measured 2.090–2.166 s to text/navigation
@@ -57,13 +96,32 @@ reference (both showed 89%). This study restored R3 and released at
 05:06:00 Asia/Shanghai. Do not mix its samples with the staged study or
 replace a failed picture with another one.
 
-**Next optimization, after recovery:** measure power-observer readiness,
+**Current first-screen change:** [defer the optional JPEG capability check](docs/review/startup-followup-20261121/jpeg-probe-admission/README.md) until the first opted-in Reader image job, explicit enable or hardware settings view. Six historical Scribe traces showed this successful check took a median **25.456 ms** before a shelf that did not use it. On `test-env` the [software-render A/B](docs/review/startup-followup-20261121/jpeg-probe-admission/HOST-TRIAL.md) removed **13.83 ms on the Scribe layout and 14.63 ms on PW6** at the paired median (8/8 each, identical pixels); the full library suite had 862 passes and no failures. The [subsequent normal-card comparison](docs/review/startup-jpeg-native-20261122/README.md) used identical submission logging in both arms, with solely the eager probe line added to A. It did not show a consistent card gain. Leave R3 installed; do not reuse a consumed device plan or subtract the historical probe duration from its baseline.
+
+**Separate launcher investigation:** measure power-observer readiness,
 portrait calibration and display takeover separately. The observed interval
 from launcher process creation to application process creation was
 **825–845 ms on R3** and **830–850 ms on the candidate**. This identifies
 where to look, not 0.83 s of removable work. Keep the first-frame/input,
 native exit and restoration checks intact. Use a new plan and lease for
 any later device test; do not promote this candidate on those timings.
+
+The [next diagnostic workflow and verified cost breakdown](docs/review/startup-followup-20261121/DIAGNOSTICS.md)
+adds opt-in launcher timing and a one-snapshot window-manager takeover candidate.
+The `test-env` lifecycle fixtures passed. Offline replay of all ten closed cold
+pairs placed the candidate's six JPEG decodes at 948 ms and the mixed
+post-validation derivative stage at 581 ms (per-visit medians). Reusing the
+JPEG decoder for the header check preserved pixels but missed the host trial
+threshold (0.734%, 8/10). Keep the decoder unchanged. The [completed derivative
+trial](docs/review/startup-followup-20261121/DERIVATIVE.md#decision-keep-adaptive-filtering)
+also rejected disabling PNG row filters: the original shelf wrote 33.9% slower
+(0/10 faster pairs) and the structured shelf saved only 6.4% (9/10; 10%
+required). Keep adaptive PNGs; among those earlier trials, retain only the
+one-snapshot launcher change as a production optimization candidate (two live-WM stat reads reduced to
+one, not a measured launch-time saving). The largest default write stage on
+Linux/XFS was durable commit; separate its sync and index time before changing
+I/O policy. No new device timing or rollout took place in those experiments; the
+separate automated render-only stock-card visit must pass its own admission and release checks.
 
 The [November 21 follow-up](docs/review/startup-followup-20261121/README.md)
 independently confirmed the post-SEND candidate's **empty-cache** cover gain
@@ -72,7 +130,7 @@ The first usable frame did not consistently improve (2 ms, 5/10). The
 [November 20 screen](docs/review/startup-fast-20261119/PHYSICAL.md) had
 found 709 ms on empty-cache covers and just 3 ms on warm first usable (3/6).
 These are staged managed launches, not native Library tile presses. The
-original private tile experiment has not been restored. A fresh warm candidate
+original interrupted tile experiment was closed by cleanup only, not by verifying its historical snapshot. A fresh warm candidate
 eliminated an intermediate frame but was **38 ms slower** to first usable and
 **53 ms slower** to all covers (two wins out of six on each). Its source
 changes were reverted; do not install that binary. See the same follow-up for
@@ -86,7 +144,7 @@ the trials. No user-data backup or change was involved.
 | Acceptance decision | [Trial rules](docs/review/startup-fast-20261119/PLAN.md). The **300 ms** warm first-screen and **1 s** empty-cache complete-cover reductions are targets, not measured gains. |
 | Installed version to protect | [R3 installation and rollback receipt](docs/review/startup-r3-qualification-20261119-8baf57f/release/installation.json). Do not use the historical plans below for this candidate. |
 
-**Shared Kindle — WeRead protection baseline (owner report, 2026-11-20).**
+**Historical WeRead protection baseline (owner report, 2026-11-20; superseded November 22).**
 After the Aidoku screens, the WeRead operator deployed the tested 95,137,176-byte
 app and its two packaged helpers. `/mnt/us/documents/weread.sh` is now the
 packaged `document-launcher.sh`; `/mnt/us/weread/launch.sh` is the production

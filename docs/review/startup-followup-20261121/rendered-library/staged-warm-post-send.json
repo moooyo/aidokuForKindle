@@ -1,0 +1,34 @@
+{
+  "measurement": "Historical staged foreground request to first submitted Library frame",
+  "cohort": "warm-post-send",
+  "regime": "warm",
+  "mode": "screen",
+  "pairs": 6,
+  "endpoint": "startup_library_frame_submitted, not input-ready or all-covers-ready",
+  "origin": "staged_foreground_requested immediately before the foreground launcher invocation",
+  "clock": "Device CLOCK_BOOTTIME; origin from /proc/uptime at 10 ms resolution; frame timestamp in microseconds",
+  "scope": "Closed prior Scribe staged synthetic-shelf experiment; no new device visit",
+  "limitations": [
+    "Not measured from a native card release or indexed entry",
+    "Software submission is not proof of optical panel completion or interaction readiness",
+    "The 10 ms origin resolution limits interpretation of small differences and pair wins",
+    "Regimes and candidate builds are distinct cohorts and must not be pooled",
+    "Cohort label is supplied by the operator and must be matched to the historical evidence index",
+    "The original cohort qualification additionally checked cover completion and input readiness; these are not the replay endpoint"
+  ],
+  "reproduction": "python3 -B docs/review/startup-followup-20261121/rendered-library/replay.py CLOSED_ATTEMPT --cohort COHORT",
+  "unit": "microseconds",
+  "savings_convention": "baseline minus candidate",
+  "baseline_median_us": 1399821.0,
+  "candidate_median_us": 1395058.0,
+  "median_paired_saving_us": 3431.0,
+  "candidate_faster_pairs": 3,
+  "results": [
+    {"pair": 1, "order": "AB", "baseline_us": 1394819, "candidate_us": 1421688, "baseline_minus_candidate_us": -26869},
+    {"pair": 2, "order": "BA", "baseline_us": 1396379, "candidate_us": 1362648, "baseline_minus_candidate_us": 33731},
+    {"pair": 3, "order": "AB", "baseline_us": 1403263, "candidate_us": 1323363, "baseline_minus_candidate_us": 79900},
+    {"pair": 4, "order": "BA", "baseline_us": 1461934, "candidate_us": 1489546, "baseline_minus_candidate_us": -27612},
+    {"pair": 5, "order": "AB", "baseline_us": 1419204, "candidate_us": 1368428, "baseline_minus_candidate_us": 50776},
+    {"pair": 6, "order": "BA", "baseline_us": 1378023, "candidate_us": 1511983, "baseline_minus_candidate_us": -133960}
+  ]
+}

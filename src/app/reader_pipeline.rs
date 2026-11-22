@@ -373,6 +373,9 @@ impl App {
     }
 
     pub(super) fn begin_reader_image_job(&mut self) -> Result<()> {
+        if self.reader.is_some() && self.prefs.hardware_acceleration {
+            self.platform.probe_hardware_media();
+        }
         let timing =
             crate::reader_timing::request(self.reader_generation, self.lifecycle_generation);
         if self.begin_prepared_reader_image_job(timing)? {
@@ -406,6 +409,7 @@ impl App {
         );
         let offline =
             self.options.offline || self.options.demo || self.platform.network_policy_blocked();
+        let requested_hardware_media = effective.hardware_acceleration;
         let cancellation = imaging::DecodeCancellation::new();
         let worker_cancellation = cancellation.clone();
         let id = self.spawn_job_kind(true, JobKind::Reader, move |manager| {
@@ -524,6 +528,7 @@ impl App {
             })
         })?;
         self.reader_inflight = Some(id);
+        self.reader_requested_hardware_media = requested_hardware_media;
         self.reader_image_cancel = Some(cancellation);
         self.reader_image_jobs_started = self.reader_image_jobs_started.saturating_add(1);
         self.reader_dirty = false;
@@ -548,6 +553,7 @@ impl App {
             _ => return Ok(false),
         };
         let cache = self.disk_cache.clone();
+        let requested_hardware_media = frame.key.preferences.hardware_acceleration;
         let cancellation = imaging::DecodeCancellation::new();
         let worker_cancellation = cancellation.clone();
         crate::reader_timing::record("prepared_frame_candidate", timing);
@@ -585,6 +591,7 @@ impl App {
             },
         )?;
         self.reader_inflight = Some(id);
+        self.reader_requested_hardware_media = requested_hardware_media;
         self.reader_image_cancel = Some(cancellation);
         self.reader_image_jobs_started = self.reader_image_jobs_started.saturating_add(1);
         self.reader_dirty = false;
@@ -3688,6 +3695,240 @@ mod tests {
             assert_eq!(actual.rendered.image, expected.image);
             assert_eq!(actual.rendered.scaled_height, expected.scaled_height);
             assert_eq!(actual.rendered.viewport_height, expected.viewport_height);
+        }
+    }
+
+    mod jpeg_probe {
+        use super::*;
+        use crate::native_media::{Acceleration, Availability};
+        use std::cell::Cell;
+
+        fn count_probes(platform: &Platform, outcome: Availability) -> Rc<Cell<usize>> {
+            let calls = Rc::new(Cell::new(0));
+            let count = calls.clone();
+            platform.set_test_jpeg_probe(Rc::new(move || {
+                count.set(count.get() + 1);
+                outcome
+            }));
+            calls
+        }
+
+        #[test]
+        fn library_keeps_saved_opt_in_and_section_dormant_until_visible() -> Result<()> {
+            for profile in [DeviceProfile::Scribe, DeviceProfile::Pw6] {
+                let directory = tempfile::tempdir()?;
+                let store = Store::open(directory.path().join("library.sqlite3"))?;
+                let mut prefs = store.preferences()?;
+                prefs.hardware_acceleration = true;
+                store.save_preferences(&prefs)?;
+                let mut interactions = InteractionState::load(&store)?;
+                interactions.settings_section = "hardware-acceleration".into();
+                interactions.save(&store)?;
+                drop(store);
+
+                let ui = reader_test_window();
+                let platform = Rc::new(Platform::new(profile, false)?);
+                let calls = count_probes(&platform, Availability::Available);
+                let application = App::attach(
+                    &ui,
+                    AppOptions {
+                        data_dir: directory.path().into(),
+                        startup_options: Default::default(),
+                        demo: false,
+                        offline: true,
+                        initial_screen: "library".into(),
+                        landscape: false,
+                        resume: false,
+                    },
+                    platform,
+                )?;
+                let mut app = application.borrow_mut();
+                let state = ui.global::<State>();
+                assert_eq!(state.get_route(), "library");
+                assert_eq!(state.get_large_screen(), profile.is_scribe());
+                assert!(app.prefs.hardware_acceleration);
+                app.sync_view()?;
+                app.poll();
+                assert_eq!(app.snapshot()["hardware_media_reason"], "not_probed");
+                assert_eq!(app.effective_reader_preferences().media_acceleration(), Acceleration::Off);
+                assert_eq!(calls.get(), 0);
+
+                app.store.save_session(&NavigationSession {
+                    route: "settings".into(),
+                    ..Default::default()
+                })?;
+                app.restore_saved_session()?;
+                app.sync_view()?;
+                assert_eq!(state.get_route(), "settings");
+                assert_eq!(state.get_settings_section(), "hardware-acceleration");
+                assert!(state.get_hardware_media_available() && state.get_hardware_acceleration());
+                assert_eq!(calls.get(), 1);
+                app.dispatch("settings", "back", "")?;
+                app.dispatch("settings", "open", "hardware-acceleration")?;
+                app.poll();
+                assert_eq!(calls.get(), 1);
+                app.shutdown();
+                assert!(app.finish_shutdown());
+            }
+            Ok(())
+        }
+
+        #[test]
+        fn direct_enable_checks_capability_but_disable_and_invalid_values_do_not() -> Result<()> {
+            for outcome in [Availability::Available, Availability::MissingDriver] {
+                let ui = reader_test_window();
+                let mut fixture = DemoRouteFixture::new("settings", DeviceProfile::Pw6, false);
+                let app = &mut fixture.app;
+                app.ui = ui.as_weak();
+                let calls = count_probes(&app.platform, outcome);
+                app.prefs.hardware_acceleration = true;
+                app.dispatch("settings", "set", "hardware-acceleration=false")?;
+                assert!(app.dispatch("settings", "set", "hardware-acceleration=invalid").is_err());
+                assert!(!app.store.preferences()?.hardware_acceleration);
+                app.dispatch("settings", "open", "screen-refresh")?;
+                assert_eq!(calls.get(), 0);
+
+                for spelling in ["hardware-acceleration=true", "hardware_acceleration=true"] {
+                    let result = app.dispatch("settings", "set", spelling);
+                    assert_eq!(result.is_ok(), outcome.available());
+                    assert_eq!(app.store.preferences()?.hardware_acceleration, outcome.available());
+                    assert_eq!(calls.get(), 1);
+                }
+                app.dispatch("settings", "open", "hardware-acceleration")?;
+                let state = ui.global::<State>();
+                assert_eq!(state.get_hardware_media_reason(), outcome.reason());
+                assert_eq!(state.get_hardware_media_available(), outcome.available());
+                assert_eq!(state.get_hardware_acceleration(), outcome.available());
+                assert_eq!(calls.get(), 1);
+            }
+            Ok(())
+        }
+
+        fn first_reader_job(
+            ui: &AppWindow,
+            opted_in: bool,
+            outcome: Availability,
+        ) -> Result<(DemoRouteFixture, Rc<Cell<usize>>)> {
+            let mut fixture = DemoRouteFixture::new("library", DeviceProfile::Pw6, false);
+            let app = &mut fixture.app;
+            app.ui = ui.as_weak();
+            let calls = count_probes(&app.platform, outcome);
+            let book = Book {
+                id: "probe-book".into(),
+                source_id: "local".into(),
+                remote_id: "probe-book".into(),
+                title: "Reader probe fixture".into(),
+                ..Default::default()
+            };
+            let chapter = Chapter {
+                id: "probe-chapter".into(),
+                book_id: book.id.clone(),
+                source_id: book.source_id.clone(),
+                remote_id: "probe-chapter".into(),
+                ..Default::default()
+            };
+            app.store.upsert_book(&book)?;
+            app.store.save_chapters(&book.id, std::slice::from_ref(&chapter))?;
+            let mut pages = Vec::new();
+            for (index, gray) in [68, 170].into_iter().enumerate() {
+                let path = app.data_dir.join(format!("page-{index}.jpg"));
+                GrayImage::from_pixel(16, 24, image::Luma([gray])).save(&path)?;
+                pages.push(Page { local_path: Some(path), ..Default::default() });
+            }
+            app.store.save_pages(&chapter.id, &pages)?;
+            app.prefs.hardware_acceleration = opted_in;
+            app.prefs.crop_borders = false;
+            app.prefs.dither = false;
+            app.store.save_preferences(&app.prefs)?;
+            app.sync_interaction_state();
+            assert!(!ui.global::<State>().get_hardware_media_available());
+            assert_eq!(calls.get(), 0);
+            app.enter_reader(&chapter.id, 1)?;
+            assert_eq!(app.reader_image_jobs_started, 1);
+            Ok((fixture, calls))
+        }
+
+        fn queued_first_policy(app: &App) -> Acceleration {
+            let message = app.job_rx.recv_timeout(Duration::from_secs(10)).unwrap();
+            assert_eq!(Some(message.id), app.reader_inflight);
+            let JobResult::ReaderImage { preferences, .. } = message.result.as_ref().unwrap() else {
+                panic!("Expected the first Reader image");
+            };
+            let policy = preferences.media_acceleration();
+            app.job_tx.send(message).unwrap();
+            policy
+        }
+
+        fn finish_images_and_read_ahead(app: &mut App) {
+            while app.reader_inflight.is_some() || app.prefetch_inflight.is_some() {
+                let message = app.job_rx.recv_timeout(Duration::from_secs(10)).unwrap();
+                app.job_tx.send(message).unwrap();
+                app.poll();
+            }
+        }
+
+        fn assert_frame_policies(app: &App, expected: Acceleration) {
+            let displayed = app.displayed_reader.as_ref().unwrap();
+            assert_eq!(displayed.session.page, 1);
+            assert_eq!(displayed.preferences.media_acceleration(), expected);
+            let NextFrameSlot::Ready(frame) = &app.reader_next_frame else {
+                panic!("Expected the second page to be prepared");
+            };
+            assert_eq!(frame.key.preferences.media_acceleration(), expected);
+            assert_eq!(frame.image.preferences.media_acceleration(), expected);
+        }
+
+        #[test]
+        fn reader_qualifies_once_for_the_first_image_and_its_prepared_successor() -> Result<()> {
+            let _publication = READER_PUBLICATION_TESTS.lock().unwrap();
+            for (opted_in, outcome, expected) in [
+                (false, Availability::Available, Acceleration::Off),
+                (true, Availability::MissingDriver, Acceleration::Off),
+                (true, Availability::Available, Acceleration::DecodeAndResize),
+            ] {
+                let ui = reader_test_window();
+                let (mut fixture, calls) = first_reader_job(&ui, opted_in, outcome)?;
+                let app = &mut fixture.app;
+                let generation = app.reader_generation;
+                let first = app.reader_image_cancel.as_ref().unwrap().clone();
+                assert_eq!(queued_first_policy(app), expected);
+                assert_eq!(calls.get(), usize::from(opted_in));
+                finish_images_and_read_ahead(app);
+                assert_eq!(app.reader_generation, generation);
+                assert_eq!(app.reader_image_jobs_started, 1);
+                assert!(!first.is_cancelled());
+                assert_frame_policies(app, expected);
+                assert_eq!(app.store.preferences()?.hardware_acceleration, opted_in);
+
+                app.dispatch("reader", "next", "")?;
+                finish_images_and_read_ahead(app);
+                assert_eq!(app.displayed_reader.as_ref().unwrap().session.page, 2);
+                assert_eq!(app.reader_next_frame_hits, 1);
+                assert_eq!(calls.get(), usize::from(opted_in));
+            }
+            Ok(())
+        }
+
+        #[test]
+        fn revocation_before_the_first_poll_replaces_accelerated_work_with_software() -> Result<()> {
+            let _publication = READER_PUBLICATION_TESTS.lock().unwrap();
+            let ui = reader_test_window();
+            let (mut fixture, calls) = first_reader_job(&ui, true, Availability::Available)?;
+            let app = &mut fixture.app;
+            let generation = app.reader_generation;
+            let first = app.reader_image_cancel.as_ref().unwrap().clone();
+            assert_eq!(queued_first_policy(app), Acceleration::DecodeAndResize);
+            app.platform.set_test_hardware_media_availability(Availability::Failed);
+            app.sync_interaction_state();
+            assert!(!ui.global::<State>().get_hardware_media_available());
+            finish_images_and_read_ahead(app);
+            assert!(first.is_cancelled());
+            assert_ne!(app.reader_generation, generation);
+            assert_eq!(app.reader_image_jobs_started, 2);
+            assert_frame_policies(app, Acceleration::Off);
+            assert!(app.store.preferences()?.hardware_acceleration);
+            assert_eq!(calls.get(), 1);
+            Ok(())
         }
     }
 }

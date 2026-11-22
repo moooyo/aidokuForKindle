@@ -1,0 +1,50 @@
+{
+  "scope": "ARM/QEMU CLI + source-linked event formatting with supplied inputs; no device sample",
+  "bytes": 53738400,
+  "two_cli_profiles": [
+    "scribe",
+    "pw6"
+  ],
+  "cases": [
+    {
+      "case": "scribe",
+      "event_count": 4,
+      "draw_line": "aidoku: startup_draw_cpu sequence=4 marker=5 submitted_us=143557707694 wall_us=19 thread_us=20 minflt=0 majflt=1 nvcsw=2 nivcsw=3 width=1860 height=2480 format=gray8"
+    },
+    {
+      "case": "pw6",
+      "event_count": 4,
+      "draw_line": "aidoku: startup_draw_cpu sequence=4 marker=5 submitted_us=143557714209 wall_us=19 thread_us=20 minflt=0 majflt=1 nvcsw=2 nivcsw=3 width=1264 height=1680 format=rgb8"
+    },
+    {
+      "case": "cpu-missing",
+      "event_count": 4,
+      "draw_line": "aidoku: startup_draw_cpu sequence=4 marker=5 submitted_us=143557722556 wall_us=19 thread_us=none minflt=0 majflt=1 nvcsw=2 nivcsw=3 width=1264 height=1680 format=rgb8"
+    },
+    {
+      "case": "counters-missing",
+      "event_count": 4,
+      "draw_line": "aidoku: startup_draw_cpu sequence=4 marker=5 submitted_us=143557729664 wall_us=19 thread_us=20 minflt=none majflt=none nvcsw=none nivcsw=none width=1264 height=1680 format=rgb8"
+    },
+    {
+      "case": "both-missing",
+      "event_count": 4,
+      "draw_line": "aidoku: startup_draw_cpu sequence=4 marker=5 submitted_us=143557735520 wall_us=19 thread_us=none minflt=none majflt=none nvcsw=none nivcsw=none width=1264 height=1680 format=rgb8"
+    },
+    {
+      "case": "missing-frame",
+      "event_count": 3,
+      "draw_line": null
+    },
+    {
+      "case": "bad-marker",
+      "event_count": 3,
+      "draw_line": null
+    },
+    {
+      "case": "initial",
+      "event_count": 3,
+      "draw_line": null
+    }
+  ]
+}

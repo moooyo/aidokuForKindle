@@ -1,0 +1,324 @@
+{
+  "study": "Ordinary Kindle Scribe Library submission: GUI-thread CPU versus wall time in the accepted software draw",
+  "receipts": [
+    {
+      "cohort": "1e5478e0c639da81",
+      "slot": 1,
+      "configuration": "diagnostic",
+      "result": "measured",
+      "interval": {
+        "start": "stock_card_release",
+        "end": "library_frame_submission_callback",
+        "lower_us": 3450818,
+        "upper_us": 3451641,
+        "layout": "large",
+        "library": "nonempty",
+        "grid": "nonempty"
+      },
+      "draw": {
+        "wall_us": 815480,
+        "cpu_us": 96188,
+        "minor_faults": 292,
+        "major_faults": 140,
+        "voluntary_switches": 141,
+        "involuntary_switches": 75,
+        "width": 1860,
+        "height": 2480,
+        "format": "gray8"
+      },
+      "closeout": {
+        "ordinary_exit": true,
+        "native_restored": true,
+        "close": true,
+        "absent": true,
+        "connections_closed": true,
+        "owner_and_token_checked": true,
+        "released": true
+      }
+    },
+    {
+      "cohort": "1e5478e0c639da81",
+      "slot": 2,
+      "configuration": "diagnostic",
+      "result": "measured",
+      "interval": {
+        "start": "stock_card_release",
+        "end": "library_frame_submission_callback",
+        "lower_us": 3190427,
+        "upper_us": 3191637,
+        "layout": "large",
+        "library": "nonempty",
+        "grid": "nonempty"
+      },
+      "draw": {
+        "wall_us": 777871,
+        "cpu_us": 95772,
+        "minor_faults": 336,
+        "major_faults": 140,
+        "voluntary_switches": 142,
+        "involuntary_switches": 100,
+        "width": 1860,
+        "height": 2480,
+        "format": "gray8"
+      },
+      "closeout": {
+        "ordinary_exit": true,
+        "native_restored": true,
+        "close": true,
+        "absent": true,
+        "connections_closed": true,
+        "owner_and_token_checked": true,
+        "released": true
+      }
+    },
+    {
+      "cohort": "1e5478e0c639da81",
+      "slot": 3,
+      "configuration": "diagnostic",
+      "result": "measured",
+      "interval": {
+        "start": "stock_card_release",
+        "end": "library_frame_submission_callback",
+        "lower_us": 2959577,
+        "upper_us": 2960765,
+        "layout": "large",
+        "library": "nonempty",
+        "grid": "nonempty"
+      },
+      "draw": {
+        "wall_us": 623075,
+        "cpu_us": 97219,
+        "minor_faults": 310,
+        "major_faults": 140,
+        "voluntary_switches": 138,
+        "involuntary_switches": 78,
+        "width": 1860,
+        "height": 2480,
+        "format": "gray8"
+      },
+      "closeout": {
+        "ordinary_exit": true,
+        "native_restored": true,
+        "close": true,
+        "absent": true,
+        "connections_closed": true,
+        "owner_and_token_checked": true,
+        "released": true
+      }
+    },
+    {
+      "cohort": "1e5478e0c639da81",
+      "slot": 4,
+      "configuration": "diagnostic",
+      "result": "measured",
+      "interval": {
+        "start": "stock_card_release",
+        "end": "library_frame_submission_callback",
+        "lower_us": 2427984,
+        "upper_us": 2429231,
+        "layout": "large",
+        "library": "nonempty",
+        "grid": "nonempty"
+      },
+      "draw": {
+        "wall_us": 418275,
+        "cpu_us": 96852,
+        "minor_faults": 317,
+        "major_faults": 140,
+        "voluntary_switches": 141,
+        "involuntary_switches": 100,
+        "width": 1860,
+        "height": 2480,
+        "format": "gray8"
+      },
+      "closeout": {
+        "ordinary_exit": true,
+        "native_restored": true,
+        "close": true,
+        "absent": true,
+        "connections_closed": true,
+        "owner_and_token_checked": true,
+        "released": true
+      }
+    }
+  ],
+  "analysis": {
+    "cohort": "1e5478e0c639da81",
+    "configuration": "diagnostic",
+    "warmup_excluded": [
+      {
+        "slot": 1,
+        "stock_to_library_us": [
+          3450818,
+          3451641
+        ],
+        "stock_midpoint_us": 3451229.5,
+        "wall_us": 815480,
+        "cpu_us": 96188,
+        "minor_faults": 292,
+        "major_faults": 140,
+        "voluntary_switches": 141,
+        "involuntary_switches": 75,
+        "width": 1860,
+        "height": 2480,
+        "format": "gray8",
+        "cpu_share_percent": 11.795261686368764,
+        "wall_minus_thread_cpu_us": 719292,
+        "cpu_exceeds_wall": false
+      }
+    ],
+    "formal_visits": [
+      {
+        "slot": 2,
+        "stock_to_library_us": [
+          3190427,
+          3191637
+        ],
+        "stock_midpoint_us": 3191032.0,
+        "wall_us": 777871,
+        "cpu_us": 95772,
+        "minor_faults": 336,
+        "major_faults": 140,
+        "voluntary_switches": 142,
+        "involuntary_switches": 100,
+        "width": 1860,
+        "height": 2480,
+        "format": "gray8",
+        "cpu_share_percent": 12.312067167949442,
+        "wall_minus_thread_cpu_us": 682099,
+        "cpu_exceeds_wall": false
+      },
+      {
+        "slot": 3,
+        "stock_to_library_us": [
+          2959577,
+          2960765
+        ],
+        "stock_midpoint_us": 2960171.0,
+        "wall_us": 623075,
+        "cpu_us": 97219,
+        "minor_faults": 310,
+        "major_faults": 140,
+        "voluntary_switches": 138,
+        "involuntary_switches": 78,
+        "width": 1860,
+        "height": 2480,
+        "format": "gray8",
+        "cpu_share_percent": 15.603097540424507,
+        "wall_minus_thread_cpu_us": 525856,
+        "cpu_exceeds_wall": false
+      },
+      {
+        "slot": 4,
+        "stock_to_library_us": [
+          2427984,
+          2429231
+        ],
+        "stock_midpoint_us": 2428607.5,
+        "wall_us": 418275,
+        "cpu_us": 96852,
+        "minor_faults": 317,
+        "major_faults": 140,
+        "voluntary_switches": 141,
+        "involuntary_switches": 100,
+        "width": 1860,
+        "height": 2480,
+        "format": "gray8",
+        "cpu_share_percent": 23.15510130894746,
+        "wall_minus_thread_cpu_us": 321423,
+        "cpu_exceeds_wall": false
+      }
+    ],
+    "planned_formal": 3,
+    "measured_formal_draws": 3,
+    "complete_endpoints": true,
+    "complete_draws": true,
+    "complete_usage_counters": true,
+    "formal_distributions": {
+      "stock_midpoint_us": {
+        "count": 3,
+        "median": 2960171.0,
+        "range": [
+          2428607.5,
+          3191032.0
+        ]
+      },
+      "wall_us": {
+        "count": 3,
+        "median": 623075,
+        "range": [
+          418275,
+          777871
+        ]
+      },
+      "cpu_us": {
+        "count": 3,
+        "median": 96852,
+        "range": [
+          95772,
+          97219
+        ]
+      },
+      "cpu_share_percent": {
+        "count": 3,
+        "median": 15.603097540424507,
+        "range": [
+          12.312067167949442,
+          23.15510130894746
+        ]
+      },
+      "wall_minus_thread_cpu_us": {
+        "count": 3,
+        "median": 525856,
+        "range": [
+          321423,
+          682099
+        ]
+      },
+      "minor_faults": {
+        "count": 3,
+        "median": 317,
+        "range": [
+          310,
+          336
+        ]
+      },
+      "major_faults": {
+        "count": 3,
+        "median": 140,
+        "range": [
+          140,
+          140
+        ]
+      },
+      "voluntary_switches": {
+        "count": 3,
+        "median": 141,
+        "range": [
+          138,
+          142
+        ]
+      },
+      "involuntary_switches": {
+        "count": 3,
+        "median": 100,
+        "range": [
+          78,
+          100
+        ]
+      }
+    },
+    "formal_cpu_above_wall_count": 0,
+    "render_window": "Same accepted first Library frame; elapsed wall time and CPU consumed by its GUI thread, in microseconds.",
+    "scope": "Thread usage snapshots bracket thread CPU stamps, which bracket the existing render wall interval. CPU can slightly exceed the inner wall. The line is associated by the scoped GUI log and matching submitted frame; it has no independent writer PID.",
+    "geometry": "Width and height are unrotated framebuffer/retained-surface pixels. Format is the retained draw target, not panel bits per pixel.",
+    "ratio": "Per-visit 100 * thread_cpu_us / wall_us. No clipping; unavailable CPU or a zero wall denominator gives no ratio.",
+    "interpretation": "Signed wall minus thread CPU is not an identified runnable wait or I/O interval. Faults and context switches are thread counts, not causes or durations. No speedup comparison."
+  },
+  "audit": {
+    "checked_visits": 4,
+    "replayed_endpoints": 4,
+    "replayed_draw_records": 4,
+    "no_card_attempts_excluded": 0
+  }
+}

@@ -161,6 +161,8 @@ struct CaptureMetadata {
 }
 
 fn main() -> std::process::ExitCode {
+    #[cfg(feature = "startup-stage-diagnostics")]
+    aidoku_kindle::reader_timing::startup_stage_main_entry();
     if let Some(code) = aidoku_kindle::resident::keeper_entry() {
         return code;
     }

@@ -993,6 +993,13 @@ impl App {
     pub(crate) fn sync_interaction_state(&self) {
         if let Some(ui) = self.ui.upgrade() {
             let state = ui.global::<State>();
+            let media = if self.route == "settings"
+                && self.interactions.settings_section == "hardware-acceleration"
+            {
+                self.platform.probe_hardware_media()
+            } else {
+                self.platform.hardware_media_availability()
+            };
             state.set_modal_context(self.modal_context.clone().into());
             state.set_reverse_landscape(self.prefs.reverse_landscape);
             state.set_global_reading_direction(self.prefs.reading_direction.clone().into());
@@ -1019,7 +1026,6 @@ impl App {
             state.set_dither(self.prefs.dither);
             state.set_dither_method(self.prefs.spatial_dither().key().into());
             state.set_hardware_dither_available(self.platform.hardware_y4_available());
-            let media = self.platform.hardware_media_availability();
             state.set_hardware_media_available(media.available());
             state.set_hardware_media_reason(media.reason().into());
             state.set_hardware_acceleration(media.available() && self.prefs.hardware_acceleration);
@@ -4369,7 +4375,7 @@ impl App {
         let before = self.effective_reader_preferences();
         if key.replace('-', "_") == "hardware_acceleration" && value == "true" {
             anyhow::ensure!(
-                self.platform.hardware_media_availability().available(),
+                self.platform.probe_hardware_media().available(),
                 "JPEG hardware acceleration is unavailable on this device"
             );
         }

@@ -1,0 +1,62 @@
+{
+  "study": "Ordinary Scribe stock-card startup, one diagnostic configuration; same-visit stage attribution",
+  "receipts": [
+    {"cohort":"0fd075eb62fa9440","configuration":"diagnostic","slot":1,"result":"measured","interval":{"start":"stock_card_release","end":"library_frame_submission_callback","lower_us":3479407,"upper_us":3480562,"layout":"large","library":"nonempty","grid":"nonempty"},"stages":{"hz":100,"worker":[488445,499600],"gui":[1518445,1529600],"main":[1555368,1556523],"initial":[2022539,2023694],"send":[3479407,3480562]},"closeout":{"ordinary_exit":true,"native_restored":true,"close":true,"absent":true,"connections_closed":true,"owner_and_token_checked":true,"released":true}},
+    {"cohort":"0fd075eb62fa9440","configuration":"diagnostic","slot":2,"result":"measured","interval":{"start":"stock_card_release","end":"library_frame_submission_callback","lower_us":3612589,"upper_us":3613822,"layout":"large","library":"nonempty","grid":"nonempty"},"stages":{"hz":100,"worker":[517706,528939],"gui":[1467706,1478939],"main":[1487653,1488886],"initial":[2080206,2081439],"send":[3612589,3613822]},"closeout":{"ordinary_exit":true,"native_restored":true,"close":true,"absent":true,"connections_closed":true,"owner_and_token_checked":true,"released":true}},
+    {"cohort":"0fd075eb62fa9440","configuration":"diagnostic","slot":3,"result":"measured","interval":{"start":"stock_card_release","end":"library_frame_submission_callback","lower_us":3062614,"upper_us":3063829,"layout":"large","library":"nonempty","grid":"nonempty"},"stages":{"hz":100,"worker":[480312,491527],"gui":[1400312,1411527],"main":[1423261,1424476],"initial":[1862081,1863296],"send":[3062614,3063829]},"closeout":{"ordinary_exit":true,"native_restored":true,"close":true,"absent":true,"connections_closed":true,"owner_and_token_checked":true,"released":true}},
+    {"cohort":"0fd075eb62fa9440","configuration":"diagnostic","slot":4,"result":"measured","interval":{"start":"stock_card_release","end":"library_frame_submission_callback","lower_us":3342430,"upper_us":3343643,"layout":"large","library":"nonempty","grid":"nonempty"},"stages":{"hz":100,"worker":[446751,457964],"gui":[1586751,1597964],"main":[1612700,1613913],"initial":[2129416,2130629],"send":[3342430,3343643]},"closeout":{"ordinary_exit":true,"native_restored":true,"close":true,"absent":true,"connections_closed":true,"owner_and_token_checked":true,"released":true}},
+    {"cohort":"0fd075eb62fa9440","configuration":"diagnostic","slot":5,"result":"measured","interval":{"start":"stock_card_release","end":"library_frame_submission_callback","lower_us":2542074,"upper_us":2542684,"layout":"large","library":"nonempty","grid":"nonempty"},"stages":{"hz":100,"worker":[528757,539367],"gui":[1158757,1169367],"main":[1179665,1180275],"initial":[1488269,1488879],"send":[2542074,2542684]},"closeout":{"ordinary_exit":true,"native_restored":true,"close":true,"absent":true,"connections_closed":true,"owner_and_token_checked":true,"released":true}}
+  ],
+  "analysis": {
+    "cohort": "0fd075eb62fa9440",
+    "configuration": "diagnostic",
+    "clock": "same-visit device CLOCK_BOOTTIME, microseconds",
+    "proc_tick_bins": "With rate H and start tick T: [floor(T*1e6/H), ceil((T+1)*1e6/H)]; not exec or Rust main.",
+    "midpoints": "Differences of same-visit milestone centers; a birth bin overlapping UP may give a negative release-relative bound, not a proven pre-release worker.",
+    "warmup_excluded": [
+      {"slot":1,"total":{"lower_us":3479407,"upper_us":3480562,"midpoint_us":3479984.5},"tick_hz":100,"release_relative_milestones_us":{"worker":[488445,499600],"gui":[1518445,1529600],"main":[1555368,1556523],"initial":[2022539,2023694],"send":[3479407,3480562]},"segments":{"release_to_worker":{"lower_us":488445,"upper_us":499600,"midpoint_us":494022.5},"worker_to_main":{"lower_us":1056923,"upper_us":1066923,"midpoint_us":1061923.0},"main_to_send":{"lower_us":1924039,"upper_us":1924039,"midpoint_us":1924039.0},"worker_to_gui":{"lower_us":1020000,"upper_us":1040000,"midpoint_us":1030000.0},"gui_to_main":{"lower_us":26923,"upper_us":36923,"midpoint_us":31923.0},"main_to_initial":{"lower_us":467171,"upper_us":467171,"midpoint_us":467171.0},"initial_to_send":{"lower_us":1456868,"upper_us":1456868,"midpoint_us":1456868.0}}}
+    ],
+    "formal_visits": [
+      {"slot":2,"total":{"lower_us":3612589,"upper_us":3613822,"midpoint_us":3613205.5},"tick_hz":100,"release_relative_milestones_us":{"worker":[517706,528939],"gui":[1467706,1478939],"main":[1487653,1488886],"initial":[2080206,2081439],"send":[3612589,3613822]},"segments":{"release_to_worker":{"lower_us":517706,"upper_us":528939,"midpoint_us":523322.5},"worker_to_main":{"lower_us":959947,"upper_us":969947,"midpoint_us":964947.0},"main_to_send":{"lower_us":2124936,"upper_us":2124936,"midpoint_us":2124936.0},"worker_to_gui":{"lower_us":940000,"upper_us":960000,"midpoint_us":950000.0},"gui_to_main":{"lower_us":9947,"upper_us":19947,"midpoint_us":14947.0},"main_to_initial":{"lower_us":592553,"upper_us":592553,"midpoint_us":592553.0},"initial_to_send":{"lower_us":1532383,"upper_us":1532383,"midpoint_us":1532383.0}}},
+      {"slot":3,"total":{"lower_us":3062614,"upper_us":3063829,"midpoint_us":3063221.5},"tick_hz":100,"release_relative_milestones_us":{"worker":[480312,491527],"gui":[1400312,1411527],"main":[1423261,1424476],"initial":[1862081,1863296],"send":[3062614,3063829]},"segments":{"release_to_worker":{"lower_us":480312,"upper_us":491527,"midpoint_us":485919.5},"worker_to_main":{"lower_us":932949,"upper_us":942949,"midpoint_us":937949.0},"main_to_send":{"lower_us":1639353,"upper_us":1639353,"midpoint_us":1639353.0},"worker_to_gui":{"lower_us":910000,"upper_us":930000,"midpoint_us":920000.0},"gui_to_main":{"lower_us":12949,"upper_us":22949,"midpoint_us":17949.0},"main_to_initial":{"lower_us":438820,"upper_us":438820,"midpoint_us":438820.0},"initial_to_send":{"lower_us":1200533,"upper_us":1200533,"midpoint_us":1200533.0}}},
+      {"slot":4,"total":{"lower_us":3342430,"upper_us":3343643,"midpoint_us":3343036.5},"tick_hz":100,"release_relative_milestones_us":{"worker":[446751,457964],"gui":[1586751,1597964],"main":[1612700,1613913],"initial":[2129416,2130629],"send":[3342430,3343643]},"segments":{"release_to_worker":{"lower_us":446751,"upper_us":457964,"midpoint_us":452357.5},"worker_to_main":{"lower_us":1155949,"upper_us":1165949,"midpoint_us":1160949.0},"main_to_send":{"lower_us":1729730,"upper_us":1729730,"midpoint_us":1729730.0},"worker_to_gui":{"lower_us":1130000,"upper_us":1150000,"midpoint_us":1140000.0},"gui_to_main":{"lower_us":15949,"upper_us":25949,"midpoint_us":20949.0},"main_to_initial":{"lower_us":516716,"upper_us":516716,"midpoint_us":516716.0},"initial_to_send":{"lower_us":1213014,"upper_us":1213014,"midpoint_us":1213014.0}}},
+      {"slot":5,"total":{"lower_us":2542074,"upper_us":2542684,"midpoint_us":2542379.0},"tick_hz":100,"release_relative_milestones_us":{"worker":[528757,539367],"gui":[1158757,1169367],"main":[1179665,1180275],"initial":[1488269,1488879],"send":[2542074,2542684]},"segments":{"release_to_worker":{"lower_us":528757,"upper_us":539367,"midpoint_us":534062.0},"worker_to_main":{"lower_us":640908,"upper_us":650908,"midpoint_us":645908.0},"main_to_send":{"lower_us":1362409,"upper_us":1362409,"midpoint_us":1362409.0},"worker_to_gui":{"lower_us":620000,"upper_us":640000,"midpoint_us":630000.0},"gui_to_main":{"lower_us":10908,"upper_us":20908,"midpoint_us":15908.0},"main_to_initial":{"lower_us":308604,"upper_us":308604,"midpoint_us":308604.0},"initial_to_send":{"lower_us":1053805,"upper_us":1053805,"midpoint_us":1053805.0}}}
+    ],
+    "planned_formal": 4,
+    "measured_formal": 4,
+    "complete_endpoints": true,
+    "complete_stage_protocol": true,
+    "complete_initial_diagnostics": true,
+    "primary_segments": ["release_to_worker", "worker_to_main", "main_to_send"],
+    "nested_diagnostics_not_additive": ["worker_to_gui", "gui_to_main", "main_to_initial", "initial_to_send"],
+    "total_distribution": {"count":4,"median_midpoint_us":3203129.0,"midpoint_range_us":[2542379.0,3613205.5],"median_bounds_us":[3202522.0,3203736.0],"observed_envelope_us":[2542074,3613822]},
+    "segment_distributions": {
+      "release_to_worker": {"count":4,"median_midpoint_us":504621.0,"midpoint_range_us":[452357.5,534062.0],"median_bounds_us":[499009.0,510233.0],"observed_envelope_us":[446751,539367]},
+      "worker_to_main": {"count":4,"median_midpoint_us":951448.0,"midpoint_range_us":[645908.0,1160949.0],"median_bounds_us":[946448.0,956448.0],"observed_envelope_us":[640908,1165949]},
+      "main_to_send": {"count":4,"median_midpoint_us":1684541.5,"midpoint_range_us":[1362409.0,2124936.0],"median_bounds_us":[1684541.5,1684541.5],"observed_envelope_us":[1362409,2124936]},
+      "worker_to_gui": {"count":4,"median_midpoint_us":935000.0,"midpoint_range_us":[630000.0,1140000.0],"median_bounds_us":[925000.0,945000.0],"observed_envelope_us":[620000,1150000]},
+      "gui_to_main": {"count":4,"median_midpoint_us":16928.5,"midpoint_range_us":[14947.0,20949.0],"median_bounds_us":[11928.5,21928.5],"observed_envelope_us":[9947,25949]},
+      "main_to_initial": {"count":4,"median_midpoint_us":477768.0,"midpoint_range_us":[308604.0,592553.0],"median_bounds_us":[477768.0,477768.0],"observed_envelope_us":[308604,592553]},
+      "initial_to_send": {"count":4,"median_midpoint_us":1206773.5,"midpoint_range_us":[1053805.0,1532383.0],"median_bounds_us":[1206773.5,1206773.5],"observed_envelope_us":[1053805,1532383]}
+    },
+    "largest_separated_usual_primary_segment": "main_to_send",
+    "extreme_comparison": {
+      "fast_slot": 5,
+      "slow_slot": 2,
+      "unambiguous_extremes": true,
+      "slow_minus_fast_total_us": {"lower_us":1069905,"upper_us":1071748,"midpoint_us":1070826.5},
+      "contributions_us": {
+        "release_to_worker": {"lower_us":-21661,"upper_us":182,"midpoint_us":-10739.5},
+        "worker_to_main": {"lower_us":309039,"upper_us":329039,"midpoint_us":319039.0},
+        "main_to_send": {"lower_us":762527,"upper_us":762527,"midpoint_us":762527.0},
+        "worker_to_gui": {"lower_us":300000,"upper_us":340000,"midpoint_us":320000.0},
+        "gui_to_main": {"lower_us":-10961,"upper_us":9039,"midpoint_us":-961.0},
+        "main_to_initial": {"lower_us":283949,"upper_us":283949,"midpoint_us":283949.0},
+        "initial_to_send": {"lower_us":478578,"upper_us":478578,"midpoint_us":478578.0}
+      },
+      "largest_separated_primary_contribution": "main_to_send"
+    },
+    "interpretation": "Descriptive only for this diagnostic cohort; no causal or speedup claim."
+  },
+  "audit": {"closed_card_visits":5,"replayed_endpoint_archives":5,"visits_with_stages":5,"visits_with_initial":5,"no_card_attempts_excluded":0}
+}

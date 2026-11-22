@@ -128,6 +128,18 @@ ordinary_exit() {
 }
 set_phase() { APP_PHASE=$1; write_record phase "$APP_PHASE"; }
 
+LAUNCHER_DIAG_ENABLED=0
+launcher_diag_mark() {
+    [ "$LAUNCHER_DIAG_ENABLED" -eq 1 ] || return 0
+    { IFS=' ' read -r launcher_diag_uptime launcher_diag_idle </proc/uptime; } 2>/dev/null || return 0
+    printf 'aidoku: launcher-diag v1 %s %s\n' "$1" "$launcher_diag_uptime" >&2 || :
+}
+if [ "${1:-}" = '--foreground' ]; then
+    if [ "${AIDOKU_LAUNCHER_DIAGNOSTICS:-}" = launcher-v1 ]; then LAUNCHER_DIAG_ENABLED=1; fi
+    unset AIDOKU_LAUNCHER_DIAGNOSTICS
+    launcher_diag_mark worker_enter
+fi
+
 case "$AIDOKU_HOME:$LOCK_DIR" in /*:/*) ;; *) fail 'Application and lock directories must be absolute.' ;; esac
 [ -x "$APP_DIR/aidoku" ] || fail 'The ARM application executable is missing.'
 [ -c "$FRAMEBUFFER" ] || fail 'A native Kindle framebuffer is required.'
@@ -494,9 +506,13 @@ take_display() {
     if command -v pidof >/dev/null 2>&1; then
         for wm_pid in $(pidof awesome 2>/dev/null || :); do
             valid_pid "$wm_pid" || continue
-            case "$(process_state "$wm_pid")" in ''|T*|t*|Z*) continue ;; esac
-            wm_birth=$(process_birth "$wm_pid")
-            [ -n "$wm_birth" ] || continue
+            process_stat_fields "$wm_pid" || continue
+            set -- $process_fields
+            [ "$#" -ge 20 ] || continue
+            case "$1" in T*|t*|Z*|X*|x*) continue ;; esac
+            shift 19
+            wm_birth=$1
+            case "$wm_birth" in ''|*[!0-9]*) continue ;; esac
             if kill -STOP "$wm_pid" 2>/dev/null; then PAUSED_WM_RECORDS="$PAUSED_WM_RECORDS $wm_pid:$wm_birth"; fi
         done
     fi
@@ -614,15 +630,17 @@ run_observer() {
     if [ "$HELPER_STOPPING" -eq 0 ]; then printf 'observer-exited %s %s\n' "$NONCE" "$HELPER_STATUS" >&3; fi
 }
 start_observer() {
+    launcher_diag_mark observer_start
     run_observer & OBSERVER_PID=$!
 }
 wait_for_observer() {
+    launcher_diag_mark observer_wait_begin
     observer_checks=100
     while [ "$observer_checks" -gt 0 ]; do
         owned_pid "$OBSERVER_PID" "$ROOT_PID" || fail 'Power event observation ended before startup.'
         if [ -f "$LOCK_DIR/observer-command" ] && [ ! -L "$LOCK_DIR/observer-command" ] &&
             { IFS= read -r observer_command && ! IFS= read -r extra && [ -z "$extra" ]; } 2>/dev/null <"$LOCK_DIR/observer-command" &&
-            owned_pid "$observer_command" "$OBSERVER_PID"; then return 0; fi
+            owned_pid "$observer_command" "$OBSERVER_PID"; then launcher_diag_mark observer_ready; return 0; fi
         observer_checks=$((observer_checks - 1))
         usleep 20000
     done
@@ -631,12 +649,14 @@ wait_for_observer() {
 run_application() {
     runner_generation=$1; runner_resume=$2
     helper_setup runner
+    launcher_diag_mark app_spawn_begin
     if [ "$runner_resume" -eq 1 ]; then
         "$APP_DIR/aidoku" --kindle --device "$PROFILE" --data-dir "$DATA_DIR" --resume 3>&- &
     else
         "$APP_DIR/aidoku" --kindle --device "$PROFILE" --data-dir "$DATA_DIR" 3>&- &
     fi
     HELPER_COMMAND=$!; runner_application=$HELPER_COMMAND
+    launcher_diag_mark app_spawn_returned
     write_record application-pid "$runner_application"; write_record runner-command "$runner_application"
     printf 'app-started %s %s %s\n' "$runner_generation" "$runner_application" "$NONCE" >&3
     if [ "$HELPER_STOPPING" -eq 1 ]; then signal_child "$HELPER_COMMAND" "$HELPER_SELF" TERM || :; fi
@@ -646,6 +666,7 @@ run_application() {
 }
 start_application() {
     APP_GENERATION=$((APP_GENERATION + 1)); APP_PID=''
+    if [ "$APP_GENERATION" -gt 1 ]; then LAUNCHER_DIAG_ENABLED=0; fi
     clear_sleep_cover_records
     rm -f "$LOCK_DIR/application-pid" "$LOCK_DIR/sleep-request" "$LOCK_DIR/sleep-ready" "$LOCK_DIR/resume-request" "$LOCK_DIR/resume-ready" "$LOCK_DIR/fallback-sleep" "$LOCK_DIR/ordinary-exit" "$LOCK_DIR/native-portrait-calibration" "$LOCK_DIR/native-portrait-calibration.pending" "$LOCK_DIR/resume-native-portrait-calibration" "$LOCK_DIR/resume-native-portrait-calibration.pending"
     rm -f "$LOCK_DIR"/resume-native-portrait-calibration-*.pending
@@ -660,6 +681,7 @@ start_application() {
     if [ "$APP_GENERATION" -eq 1 ]; then wait_for_observer; fi
     startup_capability_argument=''
     if [ "$COVER_SLEEP_CHECKED" -eq 0 ]; then startup_capability_argument=--capture-sleep-capability; fi
+    launcher_diag_mark portrait_begin
     native_read_command "$APP_DIR/aidoku" --kindle --device "$PROFILE" --capture-native-portrait $startup_capability_argument || fail 'The native startup portrait calibration is unavailable.'
     case "$(native_read_hex)" in
         5055424c495348454420310a) COVER_SLEEP_SUPPORTED=1 ;;
@@ -668,8 +690,11 @@ start_application() {
             if [ "$COVER_SLEEP_CHECKED" -eq 0 ]; then configure_cover_sleep; fi ;;
         *) fail 'The native startup portrait publication is invalid.' ;;
     esac
+    launcher_diag_mark portrait_ready
     COVER_SLEEP_CHECKED=1
+    launcher_diag_mark display_begin
     take_display
+    launcher_diag_mark display_ready
     run_application "$APP_GENERATION" "$1" & RUNNER_PID=$!
 }
 stop_application() {

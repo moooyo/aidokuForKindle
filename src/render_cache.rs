@@ -10,6 +10,9 @@
 
 pub mod resident;
 
+#[cfg(all(test, target_os = "linux"))]
+mod cover_persistence_trial;
+
 use std::{
     collections::HashMap,
     fs::{self, File, OpenOptions},
@@ -692,6 +695,7 @@ pub fn clear_memory(cache: &CacheManager) {
 }
 
 #[derive(Debug, Serialize, Deserialize)]
+#[cfg_attr(all(test, target_os = "linux"), derive(Clone, PartialEq, Eq))]
 #[serde(deny_unknown_fields)]
 struct Metadata {
     version: u8,
@@ -1689,15 +1693,23 @@ impl Write for ReservedWriter<'_> {
     }
 }
 
-fn encode(write: &mut CacheWrite, image: &GrayImage, metadata: &Metadata) -> Result<()> {
-    encode_with_compression(write, image, metadata, None)
+enum PngEncoding {
+    Default,
+    #[cfg(test)]
+    Fastest,
+    #[cfg(all(test, target_os = "linux"))]
+    NoFilter,
 }
 
-fn encode_with_compression(
+fn encode(write: &mut CacheWrite, image: &GrayImage, metadata: &Metadata) -> Result<()> {
+    encode_with_policy(write, image, metadata, PngEncoding::Default)
+}
+
+fn encode_with_policy(
     write: &mut CacheWrite,
     image: &GrayImage,
     metadata: &Metadata,
-    compression: Option<png::Compression>,
+    policy: PngEncoding,
 ) -> Result<()> {
     let file = OpenOptions::new()
         .write(true)
@@ -1713,11 +1725,12 @@ fn encode_with_compression(
     let mut encoder = png::Encoder::new(&mut output, image.width(), image.height());
     encoder.set_color(png::ColorType::Grayscale);
     encoder.set_depth(png::BitDepth::Eight);
-    // Cover and download derivatives retain their established durable codec.
-    // Reader Raster frames never enter this encoder. The optional compression
-    // parameter supports an isolated, lossless comparison in the opt-in profile.
-    if let Some(compression) = compression {
-        encoder.set_compression(compression);
+    match policy {
+        PngEncoding::Default => {}
+        #[cfg(test)]
+        PngEncoding::Fastest => encoder.set_compression(png::Compression::Fastest),
+        #[cfg(all(test, target_os = "linux"))]
+        PngEncoding::NoFilter => encoder.set_filter(png::Filter::NoFilter),
     }
     encoder
         .add_text_chunk(METADATA_KEY.into(), serde_json::to_string(metadata)?)
@@ -3040,7 +3053,7 @@ mod tests {
         if previous {
             encode(&mut write, image, metadata)?;
         } else {
-            encode_with_compression(&mut write, image, metadata, Some(png::Compression::Fastest))?;
+            encode_with_policy(&mut write, image, metadata, PngEncoding::Fastest)?;
         }
         let encode_ns = elapsed_ns(started);
         let started = Instant::now();

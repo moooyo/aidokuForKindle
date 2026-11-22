@@ -26,6 +26,8 @@ default = ["desktop"]
 desktop = ["slint/backend-winit", "slint/renderer-software", "slint/unstable-winit-030"]
 kindle = ["dep:slint-backend-kindle"]
 native-media-bench = []
+startup-stage-diagnostics = []
+startup-draw-diagnostics = ["kindle", "startup-stage-diagnostics", "slint-backend-kindle/startup-draw-diagnostics"]
 
 [dependencies]
 anyhow = "1"

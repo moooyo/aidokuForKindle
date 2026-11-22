@@ -1,0 +1,77 @@
+{
+  "scope": "ARM QEMU user-mode CLI and production emitter with controlled callback inputs; not device timings",
+  "bytes": 53755296,
+  "elf": "static ARMv7 EABI5 hard-float",
+  "version": "aidoku 0.1.3",
+  "no_neon_cli": true,
+  "profiles": [
+    "scribe",
+    "pw6"
+  ],
+  "supplied_frame_costs_us": [
+    19,
+    0,
+    3,
+    2
+  ],
+  "cases": [
+    {
+      "case": "scribe",
+      "layout": "large",
+      "shelf": "nonempty",
+      "records": [
+        "aidoku: startup_library_submitted boottime_us=136988626398 sequence=4 marker=5 layout=large library=nonempty grid=nonempty",
+        "aidoku: startup_stage_diag main_us=136988625748 initial_us=136988626103 submitted_us=136988626398",
+        "aidoku: startup_transition sequence=4 marker=5 submitted_us=136988626398 fence_us=136988626300 metadata_ready_us=136988626349 metadata_received_us=136988626351 fonts_ready_us=136988626354 fonts_received_us=136988626356 fonts_registered_us=136988626358 attach_enter_us=136988626360 attach_exit_us=136988626362 view_enter_us=136988626364 view_exit_us=136988626366 scene_requested_us=136988626369 render_us=19 settle_us=0 write_us=3 send_us=2"
+      ]
+    },
+    {
+      "case": "pw6-empty",
+      "layout": "compact",
+      "shelf": "empty",
+      "records": [
+        "aidoku: startup_library_submitted boottime_us=136988633913 sequence=4 marker=5 layout=compact library=empty grid=empty",
+        "aidoku: startup_stage_diag main_us=136988633564 initial_us=136988633762 submitted_us=136988633913",
+        "aidoku: startup_transition sequence=4 marker=5 submitted_us=136988633913 fence_us=136988633855 metadata_ready_us=136988633881 metadata_received_us=136988633883 fonts_ready_us=136988633885 fonts_received_us=136988633886 fonts_registered_us=136988633888 attach_enter_us=136988633889 attach_exit_us=136988633891 view_enter_us=136988633892 view_exit_us=136988633893 scene_requested_us=136988633895 render_us=19 settle_us=0 write_us=3 send_us=2"
+      ]
+    },
+    {
+      "case": "no-initial",
+      "layout": "large",
+      "shelf": "nonempty",
+      "records": [
+        "aidoku: startup_library_submitted boottime_us=136988643729 sequence=4 marker=5 layout=large library=nonempty grid=nonempty",
+        "aidoku: startup_stage_diag main_us=136988643313 initial_us=none submitted_us=136988643729",
+        "aidoku: startup_transition sequence=4 marker=5 submitted_us=136988643729 fence_us=none metadata_ready_us=136988643652 metadata_received_us=136988643682 fonts_ready_us=136988643684 fonts_received_us=136988643687 fonts_registered_us=136988643689 attach_enter_us=136988643691 attach_exit_us=136988643693 view_enter_us=136988643695 view_exit_us=136988643698 scene_requested_us=136988643700 render_us=19 settle_us=0 write_us=3 send_us=2"
+      ]
+    },
+    {
+      "case": "wrong-fence",
+      "layout": "large",
+      "shelf": "nonempty",
+      "records": [
+        "aidoku: startup_library_submitted boottime_us=136988651431 sequence=4 marker=5 layout=large library=nonempty grid=nonempty",
+        "aidoku: startup_stage_diag main_us=136988650902 initial_us=136988651148 submitted_us=136988651431",
+        "aidoku: startup_transition sequence=4 marker=5 submitted_us=136988651431 fence_us=none metadata_ready_us=136988651348 metadata_received_us=136988651374 fonts_ready_us=136988651376 fonts_received_us=136988651378 fonts_registered_us=136988651380 attach_enter_us=136988651382 attach_exit_us=136988651384 view_enter_us=136988651392 view_exit_us=136988651396 scene_requested_us=136988651398 render_us=19 settle_us=0 write_us=3 send_us=2"
+      ]
+    },
+    {
+      "case": "unavailable",
+      "layout": "compact",
+      "shelf": "empty",
+      "records": [
+        "aidoku: startup_library_submitted boottime_us=136988660343 sequence=4 marker=5 layout=compact library=empty grid=empty",
+        "aidoku: startup_stage_diag main_us=136988659377 initial_us=136988660023 submitted_us=136988660343",
+        "aidoku: startup_transition sequence=4 marker=5 submitted_us=136988660343 fence_us=136988660267 metadata_ready_us=none metadata_received_us=none fonts_ready_us=none fonts_received_us=none fonts_registered_us=none attach_enter_us=none attach_exit_us=none view_enter_us=none view_exit_us=none scene_requested_us=none render_us=none settle_us=none write_us=none send_us=none"
+      ]
+    },
+    {
+      "case": "no-main",
+      "layout": "large",
+      "shelf": "nonempty",
+      "records": [
+        "aidoku: startup_library_submitted boottime_us=136988669510 sequence=4 marker=5 layout=large library=nonempty grid=nonempty"
+      ]
+    }
+  ]
+}

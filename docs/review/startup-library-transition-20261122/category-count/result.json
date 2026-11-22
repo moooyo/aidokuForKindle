@@ -1,0 +1,280 @@
+{
+  "schema": 1,
+  "scope": "test-env x86_64 dev software renderer; no physical card, framebuffer or panel",
+  "schedule": "one excluded warmup pair, six measured alternating pairs per profile",
+  "clock": "monotonic wall time; first complete renderer.render excludes buffer and framebuffer I/O",
+  "cpu_affinity": [
+    2
+  ],
+  "profiles": {
+    "scribe": {
+      "visits": [
+        {
+          "pair": 0,
+          "order": [
+            "without_empty_text",
+            "control"
+          ],
+          "without_empty_text": {
+            "render_us": 70143.539,
+            "entry_to_library_us": 140089
+          },
+          "control": {
+            "render_us": 58359.563,
+            "entry_to_library_us": 116156
+          },
+          "frame_pixels_equal": true
+        },
+        {
+          "pair": 1,
+          "order": [
+            "control",
+            "without_empty_text"
+          ],
+          "control": {
+            "render_us": 57803.067,
+            "entry_to_library_us": 115376
+          },
+          "without_empty_text": {
+            "render_us": 67286.975,
+            "entry_to_library_us": 128361
+          },
+          "frame_pixels_equal": true
+        },
+        {
+          "pair": 2,
+          "order": [
+            "without_empty_text",
+            "control"
+          ],
+          "without_empty_text": {
+            "render_us": 57128.546,
+            "entry_to_library_us": 117476
+          },
+          "control": {
+            "render_us": 59102.613,
+            "entry_to_library_us": 116897
+          },
+          "frame_pixels_equal": true
+        },
+        {
+          "pair": 3,
+          "order": [
+            "control",
+            "without_empty_text"
+          ],
+          "control": {
+            "render_us": 58092.401,
+            "entry_to_library_us": 115119
+          },
+          "without_empty_text": {
+            "render_us": 56392.395,
+            "entry_to_library_us": 115518
+          },
+          "frame_pixels_equal": true
+        },
+        {
+          "pair": 4,
+          "order": [
+            "without_empty_text",
+            "control"
+          ],
+          "without_empty_text": {
+            "render_us": 57957.455,
+            "entry_to_library_us": 116404
+          },
+          "control": {
+            "render_us": 58433.932,
+            "entry_to_library_us": 115939
+          },
+          "frame_pixels_equal": true
+        },
+        {
+          "pair": 5,
+          "order": [
+            "control",
+            "without_empty_text"
+          ],
+          "control": {
+            "render_us": 57398.6,
+            "entry_to_library_us": 113814
+          },
+          "without_empty_text": {
+            "render_us": 57030.519,
+            "entry_to_library_us": 115394
+          },
+          "frame_pixels_equal": true
+        },
+        {
+          "pair": 6,
+          "order": [
+            "without_empty_text",
+            "control"
+          ],
+          "without_empty_text": {
+            "render_us": 64052.992,
+            "entry_to_library_us": 135967
+          },
+          "control": {
+            "render_us": 59044.325,
+            "entry_to_library_us": 116739
+          },
+          "frame_pixels_equal": true
+        }
+      ],
+      "summary": {
+        "render_us": {
+          "control_median_us": 58263.1665,
+          "candidate_median_us": 57543.0005,
+          "paired_median_saving_us": 422.27899999999863,
+          "faster_pairs": 4,
+          "control_first_median_saving_us": 368.0809999999983,
+          "candidate_first_median_saving_us": 476.47699999999895
+        },
+        "entry_to_library_us": {
+          "control_median_us": 115657.5,
+          "candidate_median_us": 116940.0,
+          "paired_median_saving_us": -1079.5,
+          "faster_pairs": 0,
+          "control_first_median_saving_us": -1580,
+          "candidate_first_median_saving_us": -579
+        }
+      }
+    },
+    "pw6": {
+      "visits": [
+        {
+          "pair": 0,
+          "order": [
+            "without_empty_text",
+            "control"
+          ],
+          "without_empty_text": {
+            "render_us": 50903.672,
+            "entry_to_library_us": 93592
+          },
+          "control": {
+            "render_us": 48581.044,
+            "entry_to_library_us": 91849
+          },
+          "frame_pixels_equal": true
+        },
+        {
+          "pair": 1,
+          "order": [
+            "control",
+            "without_empty_text"
+          ],
+          "control": {
+            "render_us": 46537.899,
+            "entry_to_library_us": 86190
+          },
+          "without_empty_text": {
+            "render_us": 45754.979,
+            "entry_to_library_us": 86376
+          },
+          "frame_pixels_equal": true
+        },
+        {
+          "pair": 2,
+          "order": [
+            "without_empty_text",
+            "control"
+          ],
+          "without_empty_text": {
+            "render_us": 47080.854,
+            "entry_to_library_us": 91357
+          },
+          "control": {
+            "render_us": 48320.172,
+            "entry_to_library_us": 87946
+          },
+          "frame_pixels_equal": true
+        },
+        {
+          "pair": 3,
+          "order": [
+            "control",
+            "without_empty_text"
+          ],
+          "control": {
+            "render_us": 46255.326,
+            "entry_to_library_us": 99068
+          },
+          "without_empty_text": {
+            "render_us": 46321.974,
+            "entry_to_library_us": 86933
+          },
+          "frame_pixels_equal": true
+        },
+        {
+          "pair": 4,
+          "order": [
+            "without_empty_text",
+            "control"
+          ],
+          "without_empty_text": {
+            "render_us": 45752.07,
+            "entry_to_library_us": 85997
+          },
+          "control": {
+            "render_us": 46230.596,
+            "entry_to_library_us": 85501
+          },
+          "frame_pixels_equal": true
+        },
+        {
+          "pair": 5,
+          "order": [
+            "control",
+            "without_empty_text"
+          ],
+          "control": {
+            "render_us": 45819.488,
+            "entry_to_library_us": 84926
+          },
+          "without_empty_text": {
+            "render_us": 74528.613,
+            "entry_to_library_us": 115858
+          },
+          "frame_pixels_equal": true
+        },
+        {
+          "pair": 6,
+          "order": [
+            "without_empty_text",
+            "control"
+          ],
+          "without_empty_text": {
+            "render_us": 62272.349,
+            "entry_to_library_us": 102555
+          },
+          "control": {
+            "render_us": 46396.082,
+            "entry_to_library_us": 89850
+          },
+          "frame_pixels_equal": true
+        }
+      ],
+      "summary": {
+        "render_us": {
+          "control_median_us": 46325.704,
+          "candidate_median_us": 46701.414000000004,
+          "paired_median_saving_us": 205.9389999999985,
+          "faster_pairs": 3,
+          "control_first_median_saving_us": -66.64800000000105,
+          "candidate_first_median_saving_us": 478.525999999998
+        },
+        "entry_to_library_us": {
+          "control_median_us": 87068.0,
+          "candidate_median_us": 89145.0,
+          "paired_median_saving_us": -1953.5,
+          "faster_pairs": 1,
+          "control_first_median_saving_us": -186,
+          "candidate_first_median_saving_us": -3411
+        }
+      }
+    }
+  },
+  "status": "complete"
+}

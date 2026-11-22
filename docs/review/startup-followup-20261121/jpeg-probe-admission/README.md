@@ -1,0 +1,36 @@
+# Keep the optional JPEG probe off the Library startup path
+
+## Why this change
+
+Aidoku's ordinary Library uses the software cover path even when the Reader's optional hardware JPEG setting is on. Nevertheless, constructing the native `Platform` used to synchronously qualify the device and, on a qualified device, exchange a metadata request with `kindle-jpeg-worker`. This happened before creating the window, whether or not a book would ever be opened.
+
+In [six closed Scribe traces](historical.json) the probe took **17.935–34.284 ms, median 25.456 ms**. It finished before the first full submission and before the first actual Library submission in each same-process trace. The helper qualified successfully, Reader acceleration was off, and there were no hardware decode attempts. The first Library frame had all seven expected slots and no cover images. These are old controlled warm launches of the rejected progress-frame revision, not a new candidate test, an ordinary card experiment or a measured 25 ms improvement. From `test-env`, `replay.py CLOSED_ATTEMPT --check` verifies the published table against the events and state.
+
+We also checked two alternatives. The regular calibrated Kindle backend already bypasses the legacy event-loop orientation query: skipping the calibration checks would be a different and unsafe change. The large-screen Library builds an unused list of three recent updates, but all 32 historical six-book state records had zero chapters updated that day. In those workloads the entire post-grid portion of the first Library projection, **including other work**, had medians of only 3.8–4.2 ms. We did not change either path. The [WeRead findings](https://github.com/moooyo/weread/blob/074a4d2/docs/review/startup-orientation-20261121/README.md#what-to-apply-from-these-tests) motivated looking for unnecessary waits, not copying a pose cache or borrowing another app's measured gain.
+
+## What changed
+
+- Constructing a platform and rendering the Library no longer launches a JPEG helper. Polling, snapshots and unrelated views read cached capability without performing I/O. `not_probed` is distinct from a checked failure or an unsupported device; desktop still reports `platform`.
+- A real Reader image job requests the one-time synchronous qualification before choosing cache keys if the saved acceleration preference is on. The hardware settings section requests it before displaying the switch, including when returning to that section. An explicit request to enable acceleration cannot bypass qualification; turning it off needs no probe.
+- The underlying qualification, timeout, worker lifetime and software fallback are unchanged. The first consumer can still wait up to two seconds for the metadata worker; this change avoids the check on the shelf, not when it is actually needed. Failure does not alter the persisted preference. Reader work records the policy that was actually dispatched: if acceleration fails before the first poll, software work replaces it even if the UI never showed it as available. The initial successful probe does not restart the first job. There is no new model list, background probe or orientation policy.
+
+## Result and decision
+
+**Keep the on-demand implementation in source; leave the daily installation unchanged.** On `test-env`, we timed immediately before platform construction to the return of the first complete six-book Library software draw. The two arms used the same Linux Kindle-feature test executable, the same preloaded fonts and the production metadata IPC, with an immediate fixture reply instead of a hardware driver. Each viewport had one excluded warmup pair and eight balanced AB/BA pairs. These are component timings, not from launching the app binary or tapping a card.
+
+| Software viewport | Eager median | On-demand median | Median paired saving | Earlier |
+| --- | ---: | ---: | ---: | ---: |
+| Scribe (930 × 1240) | 81.289 ms | 67.657 ms | **13.830 ms** | 8/8 |
+| Paperwhite 6 (632 × 840) | 70.633 ms | 56.081 ms | **14.632 ms** | 8/8 |
+
+The pre-frame helper count went from one to zero. The candidate still ran it once when Hardware Acceleration was opened, never on the second visit. All 16 pairs matched byte for byte across the full software frame, including the six entries and navigation with covers still placeholders. A normal software pointer action on the shelf worked after timing; this was a guard, not the endpoint. [Per-arm measurements](host-result.json) and the [reproduction procedure](HOST-TRIAL.md) are retained. This runner installs its test hook after constructing the non-native platform; the absence of the native constructor call is established by the product source, not a simulated device syscall trace.
+
+The same final test executable passed **862 library tests, 0 failed, 8 ignored** in 25.76 s. That total includes all four new consumer regressions (also run separately: 4/4), covering a saved opt-in on both Library layouts, settings restoration and explicit enable/disable, reuse of the first Reader policy and its prepared successor, and revocation before the first poll. The ignored timing harness was run separately for all 36 processes including warmups. No driver or physical Kindle was used in these tests.
+
+## Device comparison follow-up
+
+The [November 22 ordinary-card comparison](../../startup-jpeg-native-20261122/README.md) subsequently completed all six Scribe pairs. On-demand B was earlier in two; the paired median A−B was **−31.223 ms**. This does not support promoting a card speedup. Both experimental apps were distinct from installed R3. The following describes the pre-study measurement rationale.
+
+The verified daily-driver baseline remains the [installed R3 on the Scribe](../rendered-library/stock-r3.json), with a median **2,398.630 ms observation upper bound** across three normal opens. It is not the control arm of this change. To claim an ordinary-card gain, compare the same two builds differing only in JPEG admission, with the same shelf, launcher and marker on both arms. Use actual stock-card release brackets and the first complete Library frame, not a process start, splash frame, complete covers or input readiness. Keep the machine-independent scheduling change separate from claims about a tested device. Do not subtract the old probe duration or a host fixture difference from the R3 result.
+
+The installed framebuffer observer samples every 120 ms and has no candidate arm. This is too coarse to resolve a single saving of the historical probe's order. A later normal-entry comparison should use two instrumented apps with the same one-line `startup_library_submitted` callback, leaving the card, launcher, JPEG worker, shelf and cache regime unchanged. Record the log inode, offset and boot before dispatch, bind each visit to the launched process and its exit, bracket the card release on the same device clock, and use [the interval parser](../rendered-library/submitted_interval.py) on just that visit's log. The parser is not a two-arm runner. Prepare and test app selection and rollback off-device before taking a lease; use fresh launches in counterbalanced order and report the per-pair differences and their spread, not just an arm median. No hardware reservation, rollout or extra orientation trial is part of this decision.

@@ -11,6 +11,8 @@ mod download_usage;
 mod extended_preferences;
 mod import_thumbnails;
 mod interaction_models;
+#[cfg(all(test, target_os = "linux"))]
+mod jpeg_probe_trial;
 mod lifecycle;
 mod logging;
 mod migration;
@@ -332,6 +334,7 @@ pub struct App {
     reader_generation: u64,
     chapter_inflight: Option<u64>,
     reader_inflight: Option<u64>,
+    reader_requested_hardware_media: bool,
     reader_image_cancel: Option<imaging::DecodeCancellation>,
     reader_next_frame: reader_pipeline::NextFrameSlot,
     reader_next_frame_hits: u64,
@@ -522,6 +525,7 @@ impl App {
             reader_generation: 0,
             chapter_inflight: None,
             reader_inflight: None,
+            reader_requested_hardware_media: false,
             reader_image_cancel: None,
             reader_next_frame: reader_pipeline::NextFrameSlot::default(),
             reader_next_frame_hits: 0,
@@ -1502,7 +1506,12 @@ impl App {
         {
             self.sync_interaction_state();
         }
-        if media_changed && self.prefs.hardware_acceleration && self.route == "reader" {
+        if self.reader_requested_hardware_media
+            && !media.available()
+            && self.prefs.hardware_acceleration
+            && self.route == "reader"
+        {
+            self.reader_requested_hardware_media = false;
             self.invalidate_reader_work();
             if let Err(error) = self.request_reader_images() {
                 self.show_error(error);
@@ -1680,12 +1689,10 @@ impl App {
                 .uses_hardware_dither(self.platform.hardware_y4_available())
         );
         snapshot["dither_pending"] = json!(self.reader_dither_pending());
-        snapshot["hardware_media_available"] =
-            json!(self.platform.hardware_media_availability().available());
-        snapshot["hardware_media_reason"] =
-            json!(self.platform.hardware_media_availability().reason());
-        snapshot["hardware_acceleration"] =
-            json!(self.effective_reader_preferences().hardware_acceleration);
+        let media = self.platform.hardware_media_availability();
+        snapshot["hardware_media_available"] = json!(media.available());
+        snapshot["hardware_media_reason"] = json!(media.reason());
+        snapshot["hardware_acceleration"] = json!(media.available() && self.prefs.hardware_acceleration);
         snapshot["native_media"] = json!(crate::native_media::statistics());
         snapshot["cache"] = json!(self.disk_cache.stats());
         snapshot["render_cache"] = json!(crate::render_cache::stats());
@@ -2074,6 +2081,7 @@ mod tests {
                 reader_generation: 0,
                 chapter_inflight: None,
                 reader_inflight: None,
+                reader_requested_hardware_media: false,
                 reader_image_cancel: None,
                 reader_next_frame: reader_pipeline::NextFrameSlot::default(),
                 reader_next_frame_hits: 0,

@@ -19,6 +19,8 @@
 
 mod clipboard;
 mod dithering;
+#[cfg(feature = "startup-draw-diagnostics")]
+pub mod draw_diagnostics;
 mod frame_observer;
 mod framebuffer;
 mod gray_target;

@@ -6,6 +6,8 @@ use std::sync::{
 };
 
 use aidoku_kindle::ui::{AppWindow, Theme};
+#[cfg(feature = "startup-stage-diagnostics")]
+use aidoku_kindle::reader_timing::{StartupTransition, startup_transition};
 use anyhow::{Result, ensure};
 use slint::{ComponentHandle, fontique_010::fontique};
 
@@ -94,10 +96,15 @@ impl Fonts {
             if cancelled.load(Ordering::Acquire) {
                 return Ok(());
             }
-            deliver(PreparedFont {
+            let face = PreparedFont {
                 index,
                 bytes: Arc::new(*bytes),
-            })?;
+            };
+            #[cfg(feature = "startup-stage-diagnostics")]
+            if index + 1 == BUNDLED_FONTS.len() {
+                startup_transition(StartupTransition::FontsReady);
+            }
+            deliver(face)?;
         }
         aidoku_kindle::reader_timing::mark("fonts_loaded");
         Ok(())
@@ -109,6 +116,10 @@ impl Fonts {
             "Bundled font faces arrived out of order"
         );
         self.faces.push(face.bytes);
+        #[cfg(feature = "startup-stage-diagnostics")]
+        if self.faces.len() == BUNDLED_FONTS.len() {
+            startup_transition(StartupTransition::FontsReceived);
+        }
         Ok(())
     }
 
@@ -137,6 +148,8 @@ impl Fonts {
         ui.global::<Theme>().set_serif("Noto Serif CJK SC".into());
         ui.global::<Theme>().set_numbers("Literata".into());
         crate::FONT_INITIALIZATIONS.fetch_add(1, Ordering::AcqRel);
+        #[cfg(feature = "startup-stage-diagnostics")]
+        startup_transition(StartupTransition::FontsRegistered);
         aidoku_kindle::reader_timing::mark("fonts_registered");
         Ok(())
     }

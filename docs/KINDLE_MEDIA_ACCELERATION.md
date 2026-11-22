@@ -13,6 +13,14 @@ dithering selector is also available there. Y4 and the four display presets are
 independent of JPEG decoding: see [display modes](DISPLAY_MODES_20261115.md)
 and [the Y4 audit](HARDWARE_Y4_DITHERING.md).
 
+Opening the Library does not probe JPEG hardware, even with acceleration saved
+as on. The first Reader image job that requests it, displaying the hardware
+settings section, or an explicit request to enable it runs the cached
+qualification. Before that point native diagnostics report `not_probed`.
+The first consumer can wait up to two seconds for the metadata worker; a
+timeout or a later hardware failure keeps software decoding available without
+rewriting the saved preference. See the [startup comparison](review/startup-followup-20261121/jpeg-probe-admission/README.md).
+
 ## Device admission
 
 Model admission does not read or compare firmware, software-build or kernel

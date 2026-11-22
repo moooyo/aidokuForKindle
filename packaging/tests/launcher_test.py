@@ -14,6 +14,7 @@ import hashlib
 import json
 import os
 from pathlib import Path
+import re
 import signal
 import subprocess
 import sys
@@ -24,6 +25,11 @@ import unittest
 
 REPOSITORY = Path(__file__).resolve().parents[2]
 LAUNCHER = REPOSITORY / "packaging/kindle/launch.sh"
+LAUNCHER_DIAG_PHASES = [
+    "worker_enter", "observer_start", "observer_wait_begin", "observer_ready",
+    "portrait_begin", "portrait_ready", "display_begin", "display_ready",
+    "app_spawn_begin", "app_spawn_returned",
+]
 MEMORY_STATE = {"route": "reader", "book": "fixture-book", "chapter": "fixture-chapter", "page": 12, "offset": 29}
 
 FAKE_APP = r'''
@@ -528,6 +534,16 @@ cat "$AIDOKU_TEST_ROOT/power-state"
         except FileNotFoundError:
             return "closed"
 
+    def launcher_diag_rows(self, path: Path | None = None) -> list[tuple[str, int]]:
+        rows = []
+        for line in (path or self.root / "launcher.log").read_text().splitlines():
+            if not line.startswith("aidoku: launcher-diag "):
+                continue
+            match = re.fullmatch(r"aidoku: launcher-diag v1 ([a-z_]+) ([0-9]+)\.([0-9]{2})", line)
+            self.assertIsNotNone(match, line)
+            rows.append((match[1], int(match[2]) * 100 + int(match[3])))
+        return rows
+
     @staticmethod
     def process_state(pid: int) -> str:
         try:
@@ -790,6 +806,54 @@ if owned_pid "$AIDOKU_FAKE_WM" "$$"; then exit 4; fi
         self.assertEqual(self.statusbar.read_text(), "running")
         self.assertEqual(self.operations.read_text(), "")
 
+    def test_launcher_diag_library_waiter_forwards_opt_in_only_to_worker(self) -> None:
+        self.environment["AIDOKU_LAUNCHER_DIAGNOSTICS"] = "launcher-v1"
+        application = self.start_library_entry()
+        self.assertFalse(any(entry.startswith(b"AIDOKU_LAUNCHER_DIAGNOSTICS=")
+                             for entry in Path(f"/proc/{application}/environ").read_bytes().split(b"\0")))
+        self.stop_launcher()
+        self.assertEqual(self.launcher_diag_rows(), [])
+        rows = self.launcher_diag_rows(self.home / "data/logs/launcher.log")
+        self.assertEqual([phase for phase, _ in rows], LAUNCHER_DIAG_PHASES)
+        stamps = [stamp for _, stamp in rows]
+        self.assertEqual(stamps, sorted(stamps))
+        self.assert_recovered()
+
+    def test_launcher_diag_is_silent_when_opt_in_is_missing_or_unknown(self) -> None:
+        for value in (None, "", "launcher-v2"):
+            with self.subTest(value=value):
+                self.environment["AIDOKU_FAKE_EXIT_AFTER"] = "0.2"
+                if value is None:
+                    self.environment.pop("AIDOKU_LAUNCHER_DIAGNOSTICS", None)
+                else:
+                    self.environment["AIDOKU_LAUNCHER_DIAGNOSTICS"] = value
+                self.start_launcher()
+                self.assertEqual(self.complete(), 0)
+                self.assertEqual(self.launcher_diag_rows(), [])
+
+    def test_launcher_diag_stops_after_portrait_begin_on_startup_failure(self) -> None:
+        self.environment["AIDOKU_LAUNCHER_DIAGNOSTICS"] = "launcher-v1"
+        (self.root / "reject-portrait-startup").touch()
+        self.spawn_launcher()
+        self.assertEqual(self.complete(), 1)
+        self.assertEqual([phase for phase, _ in self.launcher_diag_rows()], LAUNCHER_DIAG_PHASES[:5])
+        self.assertFalse(self.lock.exists())
+        self.assertEqual(self.operations.read_text(), "")
+        self.assertEqual(self.traces("started"), [])
+
+    def test_launcher_diag_does_not_repeat_after_sleep_fallback_restart(self) -> None:
+        self.environment.update(AIDOKU_LAUNCHER_DIAGNOSTICS="launcher-v1", AIDOKU_FAKE_NO_ACK="1")
+        self.start_launcher()
+        self.event("goingToScreenSaver", state="screenSaver")
+        wait_for(lambda: self.phase() == "fallback", seconds=14, description="bounded ACK fallback")
+        self.event("outOfScreenSaver", state="active")
+        self.event("exitingScreenSaver")
+        wait_for(lambda: len(self.traces("started")) == 2 and self.phase() == "active", description="checkpoint restart")
+        self.stop_launcher()
+        phases = [phase for phase, _ in self.launcher_diag_rows()]
+        self.assertEqual(phases, LAUNCHER_DIAG_PHASES)
+        self.assert_recovered()
+
     def test_native_startup_waits_for_owned_observer_command(self) -> None:
         original = 'HELPER_COMMAND=$!; write_record observer-command "$HELPER_COMMAND"'
         delayed = '''HELPER_COMMAND=$!; : >"$AIDOKU_TEST_ROOT/observer-at-publication"
@@ -864,6 +928,38 @@ if owned_pid "$AIDOKU_FAKE_WM" "$$"; then exit 4; fi
         self.assertEqual(self.statusbar.read_text(), "stopped")
         self.assertNotIn("start:statusbar", self.operations.read_text())
         self.assertFalse(self.lock.exists())
+
+    def test_takeover_restores_only_the_window_manager_it_stopped(self) -> None:
+        source = self.fixture_launcher.read_text()
+        anchor = '    { IFS= read -r process_stat_record <"/proc/$1/stat"; } 2>/dev/null || return 1'
+        self.assertEqual(source.count(anchor), 1)
+        probe = '''    if [ "$1" = "$AIDOKU_FAKE_WM" ] || [ "${AIDOKU_TEST_PAUSED_WM:-}" = "$1" ]; then
+        { printf '%s\\n' "$1" >>"$AIDOKU_TEST_ROOT/wm-stat-counts"; } 2>/dev/null || :
+    fi
+'''
+        self.fixture_launcher.write_text(source.replace(anchor, probe + anchor))
+        paused = subprocess.Popen(["sleep", "120"], start_new_session=True)
+        try:
+            wm_stat_counts = self.root / "wm-stat-counts"
+            wm_stat_counts.write_text("")
+            self.environment["AIDOKU_TEST_PAUSED_WM"] = str(paused.pid)
+            os.kill(paused.pid, signal.SIGSTOP)
+            wait_for(lambda: self.process_state(paused.pid).startswith("T"))
+            self.shell(self.bin / "pidof", f'[ "$1" = awesome ] && printf "%s\\n" {paused.pid} "$AIDOKU_FAKE_WM"')
+            self.start_launcher()
+            startup_reads = [int(value) for value in wm_stat_counts.read_text().splitlines() if value.strip()]
+            self.assertTrue(self.process_state(self.wm.pid).startswith("T"))
+            self.stop_launcher()
+            self.assertTrue(self.process_state(paused.pid).startswith("T"))
+            self.assert_recovered()
+            self.assertEqual(
+                (startup_reads.count(self.wm.pid), startup_reads.count(paused.pid)),
+                (1, 1),
+                startup_reads,
+            )
+        finally:
+            paused.kill()
+            paused.wait(timeout=3)
 
     def test_preexisting_stopped_resources_are_preserved_across_sleep_and_wake(self) -> None:
         self.statusbar.write_text("stopped")

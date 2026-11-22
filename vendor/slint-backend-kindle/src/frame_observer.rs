@@ -70,6 +70,8 @@ pub enum NativeCheckpointPhase {
 
 #[derive(Debug, Clone, Copy)]
 pub struct NativeFrameCheckpoint {
+    #[cfg(feature = "startup-draw-diagnostics")]
+    pub draw: Option<crate::draw_diagnostics::DrawAccounting>,
     pub phase: NativeCheckpointPhase,
     pub frame_sequence: u64,
     pub marker: Option<u32>,
@@ -343,6 +345,8 @@ mod tests {
         );
         assert!(state.checkpoint_timing());
         let checkpoint = NativeFrameCheckpoint {
+            #[cfg(feature = "startup-draw-diagnostics")]
+            draw: None,
             phase: NativeCheckpointPhase::Submitted,
             frame_sequence: 1,
             marker: Some(1),

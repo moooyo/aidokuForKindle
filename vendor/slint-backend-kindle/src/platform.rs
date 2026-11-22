@@ -669,6 +669,10 @@ impl Platform for KindlePlatform {
             }
             let ownership_paused = self.lifecycle.applied_paused.load(Ordering::Acquire);
             let sleep_token = self.pending_sleep_presentation()?;
+            #[cfg(feature = "startup-draw-diagnostics")]
+            if ownership_paused || sleep_token.is_some() {
+                crate::draw_diagnostics::close();
+            }
             if !ownership_paused
                 && !portrait.is_blocked()
                 && !input_epoch.is_blocked()
@@ -955,6 +959,12 @@ impl Platform for KindlePlatform {
             // rendering and later menu/wake redraws cannot consume it again.
             let mut observed_frame = self.frame_observer.begin();
             let measure_frame = observed_frame.is_some() || self.frame_observer.checkpoint_timing();
+            #[cfg(feature = "startup-draw-diagnostics")]
+            let draw_before = if measure_frame && sleep_token.is_none() {
+                crate::draw_diagnostics::begin()
+            } else {
+                None
+            };
             let render_started = measure_frame.then(Instant::now);
             let mut dirty_region = None;
             let mut did_draw = false;
@@ -1004,6 +1014,10 @@ impl Platform for KindlePlatform {
                 });
             }
             let render_elapsed = render_started.map_or(Duration::ZERO, |start| start.elapsed());
+            #[cfg(feature = "startup-draw-diagnostics")]
+            let draw = draw_before.filter(|_| did_draw).map(|before| before.finish(
+                panel_width, panel_height, || matches!(scene.pixels(), crate::gray_target::ScenePixels::Gray(_)),
+            ));
             // SEND queues MDP work asynchronously even on monochrome MTK.
             // Keep its input stable until the previous owned update settles.
             let settle_started = measure_frame.then(Instant::now);
@@ -1157,6 +1171,8 @@ impl Platform for KindlePlatform {
             drawn_render_rotation = render_rotation;
             if accepted {
                 let checkpoint = NativeFrameCheckpoint {
+                    #[cfg(feature = "startup-draw-diagnostics")]
+                    draw: draw.filter(|_| frame_sequence.is_some() && rewritten_sequence.is_none()),
                     phase: NativeCheckpointPhase::Submitted,
                     frame_sequence: rewritten_sequence.or(frame_sequence).unwrap_or(0),
                     marker: frame_buffer.last_submitted_marker(),
