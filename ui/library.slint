@@ -2,7 +2,7 @@ import { CompactPager } from "native-controls.slint";
 import { State, Commands, BookItem } from "state.slint";
 import { Theme } from "theme.slint";
 import { Strings } from "strings.slint";
-import { BodyText, Caption, TitleText, Icon, IconButton, ActionButton, Tab, Cover, EmptyState } from "widgets.slint";
+import { BodyText, Caption, TitleText, Icon, IconButton, ActionButton, Tab, Cover } from "widgets.slint";
 import { IdentityTextFit } from "identity-text.slint";
 
 component LibraryBookCaption inherits Rectangle {
@@ -10,7 +10,7 @@ component LibraryBookCaption inherits Rectangle {
     property <bool> same-label: State.optimized-library-projection
         && (root.book.display-title == "" || root.book.display-title == root.book.title);
     property <length> download-width: State.large-screen ? 16px : 15px;
-    property <bool> has-download: !State.selection-mode && root.book.downloaded;
+    property <bool> has-download: root.book.downloaded;
     height: State.large-screen ? 28px : 24px;
     title-fit := IdentityTextFit {
         x: 0px; y: 0px;
@@ -51,7 +51,7 @@ export component LibraryPage inherits Rectangle {
     property <length> cell-width: (root.width - Theme.margin * 2 - root.column-gap * (root.columns - 1)) / root.columns;
     property <length> grid-height: root.height - root.grid-top;
     property <length> cover-height: max(1px, min(round(root.cell-width / 1px * 1.55) * 1px, (root.grid-height - root.base-row-gap * (root.rows - 1)) / root.rows - root.caption-height - 8px));
-    property <length> row-gap: root.continuation-visible
+    property <length> row-gap: !State.selection-mode
         ? max(root.base-row-gap, (root.grid-height - 28px - root.rows * (root.cover-height + root.caption-height)) / (root.rows - 1))
         : root.base-row-gap;
     property <length> tile-height: root.cover-height + root.caption-height;
@@ -125,7 +125,7 @@ export component LibraryPage inherits Rectangle {
             x: parent.text-left; y: State.large-screen ? 92px : 85px;
             width: resume.x - self.x - 14px; height: 24px;
             track := Rectangle {
-                x: 0px; y: (parent.height - self.height) / 2; width: min(parent.width * 0.53, State.large-screen ? 150px : 120px); height: 3px;
+                x: 0px; y: (parent.height - self.height) / 2; width: min(parent.width * 0.53, State.large-screen ? 200px : 120px); height: 3px;
                 background: Theme.line;
                 Rectangle { x: 0px; y: 0px; height: parent.height; width: parent.width * clamp(State.reader-page / max(1.0, State.reader-total), 0, 1); background: Theme.ink; }
             }
@@ -135,23 +135,35 @@ export component LibraryPage inherits Rectangle {
                 font-size: State.large-screen ? 18px : 16px; color: Theme.ink; vertical-alignment: center; overflow: elide;
             }
         }
+        TouchArea {
+            x: parent.text-left; y: 0px; width: max(0px, resume.x - self.x - 10px); height: parent.height - 1px;
+            accessible-role: button; accessible-label: State.current-book.title;
+            clicked => { Commands.action("library", "open", State.current-book.id); }
+        }
         resume := ActionButton {
             x: parent.width - self.width; y: (parent.height - self.height) / 2;
-            width: self.preferred-width; horizontal-padding: State.large-screen ? 28px : 22px;
+            width: self.preferred-width; horizontal-padding: State.large-screen ? 30px : 22px;
             text: Strings.continue-reading; primary: true;
             clicked => { Commands.action("library", "continue", ""); }
         }
         Rectangle { x: 0px; y: parent.height - 1px; width: parent.width; height: 1px; background: Theme.line; }
     }
-    if State.books.length == 0: EmptyState {
-        x: 0px; y: (State.large-screen ? 400px : 300px) - Theme.status-height; width: parent.width; height: 222px;
-        icon: "";
-        title: State.library-count == 0 ? Strings.empty-library : Strings.no-results;
-        action: State.library-count == 0 ? Strings.browse-sources : Strings.clear-filters;
-        primary: false;
-        clicked => {
-            if State.library-count == 0 { Commands.action("navigation", "open", "1"); }
-            else { Commands.action("library", "clear-filters", ""); }
+    if State.books.length == 0: Rectangle {
+        x: Theme.margin; y: (State.large-screen ? 420px : 300px) - Theme.status-height;
+        width: parent.width - Theme.margin * 2; height: message.height + 20px + Theme.touch;
+        message := BodyText {
+            x: 0px; y: 0px; width: parent.width; height: State.large-screen ? 32px : 26px;
+            text: State.library-count == 0 ? Strings.empty-library : Strings.no-results;
+            color: Theme.secondary; horizontal-alignment: center;
+        }
+        ActionButton {
+            x: (parent.width - self.width) / 2; y: message.height + 20px;
+            width: self.preferred-width; horizontal-padding: 28px;
+            text: State.library-count == 0 ? Strings.browse-sources : Strings.clear-filters;
+            clicked => {
+                if State.library-count == 0 { Commands.action("navigation", "open", "1"); }
+                else { Commands.action("library", "clear-filters", ""); }
+            }
         }
     }
     for book[index] in State.books: Rectangle {
@@ -161,7 +173,7 @@ export component LibraryPage inherits Rectangle {
         LibraryBookCaption { x: 0px; y: root.cover-height + 8px; width: parent.width; book: book; }
         Cover {
             x: 0px; y: 0px; width: parent.width; height: root.cover-height; hit-height: root.tile-height;
-            book: book; selected: book.selected; selection-mode: State.selection-mode; show-badge: !State.selection-mode;
+            book: book; selected: book.selected; selection-mode: State.selection-mode; show-badge: true;
             opened => { Commands.action("library", State.selection-mode ? "select" : "open", book.id); }
             held => { Commands.action("library", "select", book.id); }
         }

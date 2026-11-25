@@ -94,6 +94,7 @@ export component DetailPage inherits Rectangle {
     property <length> chapter-top: root.chapter-header-top + 96px;
     property <length> chapter-row-height: State.large-screen ? 80px : 70px;
     property <bool> bookmarks: State.detail-filter == 3;
+    property <bool> can-read: State.current-chapter-id != "";
     IconButton { y: 0px; x: Theme.margin - 8px; icon: "back"; label: Strings.back; clicked => { Commands.action("detail", "back", ""); } }
     IconButton { y: 0px; x: parent.width - Theme.margin + 8px - Theme.touch; icon: "more"; label: Strings.more; clicked => { Commands.action("detail", "more", ""); } }
     Rectangle {
@@ -109,9 +110,9 @@ export component DetailPage inherits Rectangle {
             BodyText { text: Strings.chapter-prefix + State.current-chapter-number + Strings.chapter-suffix + " ·"; font-size: Theme.caption; }
             BodyText { text: State.reader-page + " / " + State.reader-total; font-family: Theme.numbers; font-size: Theme.caption; }
         }
-        ActionButton { x: parent.text-left; y: State.large-screen ? 440px : 128px; width: State.large-screen ? parent.width : parent.width - self.x - Theme.touch - 8px; text: Strings.continue-reading; primary: !State.chapter-selection-mode; clicked => { Commands.action("detail", "continue", ""); } }
+        ActionButton { x: parent.text-left; y: State.large-screen ? 440px : 128px; width: State.large-screen ? parent.width : parent.width - self.x - Theme.touch - 8px; text: Strings.continue-reading; primary: !State.chapter-selection-mode; enabled: root.can-read; clicked => { Commands.action("detail", "continue", ""); } }
         IconButton { x: State.large-screen ? 0px : parent.width - Theme.touch; y: State.large-screen ? 506px : 128px; icon: State.current-book.in-library ? "check" : "plus"; filled: true; checkable: true; checked: State.current-book.in-library; label: State.current-book.in-library ? Strings.in-library : Strings.add-to-library; clicked => { Commands.action("detail", "favorite", ""); } }
-        if State.large-screen: IconButton { x: 64px; y: 506px; width: parent.width - self.x; icon: "download"; text: Strings.batch-download-menu; filled: true; clicked => { Commands.action("detail", "batch-download", ""); } }
+        if State.large-screen: IconButton { x: 64px; y: 506px; width: parent.width - self.x; icon: "download"; text: Strings.batch-download-menu; filled: true; enabled: root.can-read; clicked => { Commands.action("detail", "batch-download", ""); } }
         if State.large-screen && State.book-description != "": Rectangle {
             x: 0px; y: 580px; width: parent.width; height: max(0px, parent.height - self.y);
             Caption { x: 0px; y: 0px; width: parent.width; height: 30px; text: Strings.description; letter-spacing: 2px; }
@@ -147,14 +148,25 @@ export component DetailPage inherits Rectangle {
                 clicked => { Commands.action("detail", "filter", index); }
             }
         }
-        if !State.chapter-selection-mode && !root.bookmarks: IconButton { x: parent.width - Theme.touch * 2; y: 40px; icon: "bookmark"; label: Strings.locate-chapter; clicked => { Commands.action("detail", "locate", ""); } }
-        if !State.chapter-selection-mode && !root.bookmarks: IconButton { x: parent.width - Theme.touch; y: 40px; icon: "sort"; label: Strings.sort; clicked => { Commands.action("detail", "sort", ""); } }
-        if !State.chapter-selection-mode && root.bookmarks: ActionButton { x: parent.width - self.width; y: 40px; width: self.preferred-width; text: State.bookmark-edit ? Strings.keyboard-done : Strings.edit; quiet: true; clicked => { Commands.action("detail", "bookmark-edit", ""); } }
-        if State.chapter-selection-mode: HorizontalLayout {
-            x: 0px; y: 40px; width: parent.width; height: Theme.touch; spacing: 8px;
-            ActionButton { text: Strings.select-all; clicked => { Commands.action("detail", "select-all-chapters", ""); } }
-            ActionButton { text: Strings.download + " " + State.selected-chapter-count + " " + Strings.chapters-unit; horizontal-stretch: 1; primary: true; clicked => { Commands.action("detail", "download-selected", ""); } }
-            ActionButton { text: Strings.cancel; clicked => { Commands.action("detail", "cancel-selection", ""); } }
+        if !State.chapter-selection-mode && !root.bookmarks: IconButton { x: parent.width - Theme.touch * 2; y: 40px; icon: "bookmark"; label: Strings.locate-chapter; enabled: State.can-locate-chapter; clicked => { Commands.action("detail", "locate", ""); } }
+        if !State.chapter-selection-mode && !root.bookmarks: IconButton { x: parent.width - Theme.touch; y: 40px; icon: "sort"; label: Strings.sort; enabled: State.chapters.length > 1 || State.page-count > 1; clicked => { Commands.action("detail", "sort", ""); } }
+        if !State.chapter-selection-mode && root.bookmarks: ActionButton { x: parent.width - self.width; y: 40px; width: self.preferred-width; text: State.bookmark-edit ? Strings.keyboard-done : Strings.edit; quiet: true; visible: State.detail-bookmarks.length > 0; clicked => { Commands.action("detail", "bookmark-edit", ""); } }
+        if State.chapter-selection-mode: Rectangle {
+            x: 0px; y: 40px; width: parent.width; height: Theme.touch;
+            select-all := ActionButton {
+                x: 0px; y: 0px; width: self.preferred-width; horizontal-padding: 18px;
+                text: Strings.select-all; clicked => { Commands.action("detail", "select-all-chapters", ""); }
+            }
+            ActionButton {
+                x: select-all.width + 8px; y: 0px; width: max(0px, cancel.x - self.x - 8px);
+                text: Strings.download + " " + State.selected-chapter-count + " " + Strings.chapters-unit;
+                primary: true; enabled: State.selected-chapter-count > 0;
+                clicked => { Commands.action("detail", "download-selected", ""); }
+            }
+            cancel := ActionButton {
+                x: parent.width - self.width; y: 0px; width: self.preferred-width; horizontal-padding: 18px;
+                text: Strings.cancel; clicked => { Commands.action("detail", "cancel-selection", ""); }
+            }
         }
         Rectangle { x: 0px; y: parent.height - 1px; width: parent.width; height: 1px; background: Theme.line; }
     }

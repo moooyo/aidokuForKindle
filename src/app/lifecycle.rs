@@ -414,7 +414,8 @@ impl App {
                 .collect(),
             selection_mode: self.selection_mode,
             selected: self.selected.iter().cloned().collect(),
-            selected_chapters: self.selected_chapters.iter().cloned().collect(),
+            chapter_selection_mode: self.selected_chapters.is_some(),
+            selected_chapters: self.selected_chapters.iter().flatten().cloned().collect(),
             panel_route: if private_reader {
                 String::new()
             } else {
@@ -487,7 +488,9 @@ impl App {
         }
         self.selection_mode = saved.selection_mode;
         self.selected = saved.selected.into_iter().collect();
-        self.selected_chapters = saved.selected_chapters.into_iter().collect();
+        self.selected_chapters = saved
+            .chapter_selection_mode
+            .then(|| saved.selected_chapters.into_iter().collect());
         if let Some(ui) = self.ui.upgrade() {
             ui.global::<State>().set_newest_first(saved.newest_first);
         }

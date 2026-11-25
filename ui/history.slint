@@ -16,7 +16,7 @@ component HistoryTab inherits Rectangle {
     accessible-checked: root.selected;
     label := BodyText {
         x: 2px; y: 0px; width: max(0px, parent.width - 4px - (root.count > 0 ? count-label.width + 6px : 0px)); height: parent.height - 3px;
-        text: root.text; font-size: State.large-screen ? 20px : 17px; font-weight: root.selected ? 700 : 400;
+        text: root.text; font-size: State.large-screen ? 20px : 18px; font-weight: root.selected ? 700 : 400;
         color: root.selected ? Theme.ink : Theme.secondary;
     }
     count-label := Text {
@@ -37,11 +37,7 @@ component HistoryEntry inherits Rectangle {
     property <length> text-top: (root.height - (State.large-screen ? 78px : 66px)) / 2;
     property <bool> has-progress: State.history-filter == 0 && !root.entry.completed && root.entry.fraction > 0;
     property <length> bar-width: State.large-screen ? 100px : 90px;
-    property <string> metadata: State.history-filter == 0 ? root.entry.progress :
-        root.entry.download-state == "completed" || root.entry.download-state == "done" ? Strings.downloaded :
-        root.entry.download-state == "downloading" || root.entry.download-state == "active" ? Strings.downloading + " " + round(clamp(root.entry.download-progress, 0, 1) * 100) + "%" :
-        root.entry.download-state == "queued" ? Strings.queued : root.entry.download-state == "paused" ? Strings.paused :
-        root.entry.download-state == "failed" ? Strings.download-failed : root.entry.progress;
+    property <string> metadata: root.entry.progress;
     height: State.large-screen ? 118px : 80px;
     Rectangle {
         x: 0px; y: 0px; width: parent.width - Theme.touch - 6px; height: parent.height;
@@ -95,6 +91,13 @@ export component HistoryPage inherits Rectangle {
     property <length> row-height: State.large-screen ? 118px : 80px;
     property <length> toolbar-inset: State.large-screen ? 28px : 14px;
     property <bool> reading: State.history-filter == 0;
+    property <length> content-height: max(0px, root.height - Theme.toolbar-height);
+    property <HistoryItem> last-entry: State.history.length > 0 ? State.history[State.history.length - 1] : { };
+    property <length> used-height: root.last-entry.group-offset * 1px + root.group-height + root.last-entry.group-row-count * root.row-height;
+    // The taller compact viewport can spread a full page without resizing its rows.
+    property <length> row-spacing: !State.large-screen && State.page < State.page-count && State.history.length > 1
+        ? max(0px, min(root.height - 724px, root.content-height - root.used-height - 28px)) / (State.history.length - 1)
+        : 0px;
     Rectangle {
         x: 0px; y: 0px; width: parent.width; height: Theme.toolbar-height;
         Rectangle { x: 0px; y: parent.height - 1px; width: parent.width; height: 1px; background: Theme.line; }
@@ -131,23 +134,23 @@ export component HistoryPage inherits Rectangle {
     }
     Rectangle {
         x: Theme.margin; y: Theme.toolbar-height; width: parent.width - Theme.margin * 2;
-        height: max(0px, parent.height - self.y); clip: true;
+        height: root.content-height; clip: true;
         property <length> column-width: State.large-screen ? (self.width - 32px) / 2 : self.width;
-        for entry in State.history: Rectangle {
-            x: 0px; y: entry.group-offset * 1px; width: parent.width; height: root.group-height;
+        for entry[index] in State.history: Rectangle {
+            x: 0px; y: entry.group-offset * 1px + index * root.row-spacing; width: parent.width; height: root.group-height;
             visible: entry.group-start;
             date-label := TitleText {
                 x: 0px; y: parent.height - self.height - 6px; width: self.preferred-width; height: State.large-screen ? 27px : 23px;
-                text: entry.date-label; font-size: State.large-screen ? 19px : 16px; font-weight: 700; letter-spacing: 2px;
+                text: entry.date-label; font-size: State.large-screen ? 18px : 16px; font-weight: 700; letter-spacing: 2px;
             }
             Caption {
                 x: date-label.width + 10px; y: parent.height - self.height - 6px; width: max(0px, parent.width - self.x); height: State.large-screen ? 24px : 20px;
                 text: entry.date-value; font-family: Theme.numbers; font-size: State.large-screen ? 16px : 14px;
             }
         }
-        for entry in State.history: HistoryEntry {
+        for entry[index] in State.history: HistoryEntry {
             x: entry.column * (parent.column-width + 32px);
-            y: entry.group-offset * 1px + root.group-height + entry.row-index * root.row-height;
+            y: entry.group-offset * 1px + root.group-height + entry.row-index * root.row-height + index * root.row-spacing;
             width: parent.column-width; entry: entry;
         }
         if State.history.length == 0: Rectangle {

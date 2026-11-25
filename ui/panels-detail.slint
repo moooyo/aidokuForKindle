@@ -180,11 +180,14 @@ export component ConfirmationPanel inherits Rectangle {
     background: Theme.paper; border-width: State.large-screen ? Theme.popup-border : 0px; border-color: Theme.ink; border-radius: Theme.control-radius;
     if !State.large-screen: Rectangle { x: 0px; y: 0px; width: parent.width; height: Theme.popup-border; background: Theme.ink; }
     TouchArea { x: 0px; y: 0px; width: parent.width; height: parent.height; }
-    question := TitleText {
+    question := BodyText {
         x: root.pad-x; y: root.pad-top; width: parent.width - root.pad-x * 2;
         height: root.title-height;
-        text: State.modal-context == "clear-history" ? Strings.clear-all-history-question : (State.modal-items.length > 0 ? State.modal-items[0].title : State.modal-title);
-        font-size: State.large-screen ? 28px : 22px; letter-spacing: 1px; wrap: word-wrap;
+        text: root.history-clear ? Strings.clear-all-history-question : (State.modal-items.length > 0 ? State.modal-items[0].title : State.modal-title);
+        font-family: root.history-clear ? Theme.serif : Theme.sans;
+        font-size: root.history-clear ? (State.large-screen ? 26px : 21px) : Theme.body;
+        font-weight: root.history-clear ? 700 : 400;
+        wrap: word-wrap;
     }
     explanation := Caption {
         visible: root.history-clear;
@@ -201,7 +204,7 @@ export component ConfirmationPanel inherits Rectangle {
         x: parent.width / 2 + root.action-gap / 2; y: root.action-top;
         width: (parent.width - root.pad-x * 2 - root.action-gap) / 2;
         height: root.action-height; text-size: root.action-text-size;
-        text: State.modal-context == "clear-history" ? Strings.history-clear-action : Strings.remove; primary: true;
+        text: root.history-clear ? Strings.history-clear-action : State.modal-context == "remove-selected" ? Strings.confirm : Strings.remove; primary: true;
         enabled: State.modal-items.length > 0 && State.modal-items[0].enabled;
         clicked => { Commands.action("panel", "choose", State.modal-items[0].id); }
     }

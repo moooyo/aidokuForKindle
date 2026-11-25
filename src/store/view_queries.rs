@@ -86,11 +86,15 @@ pub(crate) struct HistoryViewRow {
 }
 
 #[derive(Debug)]
-pub(crate) struct HistoryLayoutPage {
+pub(crate) struct HistoryLayoutPage<T> {
     pub total: usize,
     pub page: usize,
     pub page_count: usize,
-    pub items: Vec<HistoryViewRow>,
+    pub items: Vec<T>,
+}
+
+pub(crate) fn history_update_days(today: chrono::NaiveDate) -> [chrono::NaiveDate; 2] {
+    [today, today - chrono::Duration::days(1)]
 }
 
 #[derive(Debug, Clone, Copy, Default)]
@@ -116,6 +120,14 @@ pub(crate) fn history_layout_metrics(large: bool, logical_height: u32) -> (u32, 
 
 pub(crate) fn detail_page_size(large: bool) -> usize {
     if large { 12 } else { 5 }
+}
+
+fn detail_chapter_predicate(filter: i32) -> &'static str {
+    match filter {
+        1 => "AND COALESCE(json_extract(document, '$.read'), 0) = 0",
+        2 => "AND json_extract(document, '$.downloaded') = 1",
+        _ => "",
+    }
 }
 
 struct HistoryLayoutPlanner {
@@ -703,6 +715,20 @@ impl Store {
         Ok(ViewPage { total, page, items })
     }
 
+    pub(crate) fn chapter_ids_for_filter(
+        &self,
+        book_id: &str,
+        filter: i32,
+    ) -> Result<std::collections::HashSet<String>> {
+        let predicate = detail_chapter_predicate(filter);
+        let mut statement = self.connection.prepare(&format!(
+            "SELECT id FROM chapters WHERE book_id = ?1 {predicate}"
+        ))?;
+        Ok(statement
+            .query_map([book_id], |row| row.get(0))?
+            .collect::<rusqlite::Result<_>>()?)
+    }
+
     pub(crate) fn filtered_chapters_view_page(
         &self,
         book_id: &str,
@@ -711,11 +737,7 @@ impl Store {
         page: usize,
         page_size: usize,
     ) -> Result<ViewPage<Chapter>> {
-        let predicate = match filter {
-            1 => "AND COALESCE(json_extract(document, '$.read'), 0) = 0",
-            2 => "AND json_extract(document, '$.downloaded') = 1",
-            _ => "",
-        };
+        let predicate = detail_chapter_predicate(filter);
         let total: usize = self.connection.query_row(
             &format!("SELECT COUNT(*) FROM chapters WHERE book_id = ?1 {predicate}"),
             [book_id],
@@ -813,6 +835,21 @@ impl Store {
             |row| row.get::<_, usize>(0),
         )?;
         let (page, offset) = page_bounds(total, page, page_size)?;
+        let items =
+            self.daily_updates_view_window(days, demo_order, unique_books, offset, page_size)?;
+        Ok(ViewPage { total, page, items })
+    }
+
+    fn daily_updates_view_window(
+        &self,
+        days: [String; 4],
+        demo_order: bool,
+        unique_books: bool,
+        offset: usize,
+        limit: usize,
+    ) -> Result<Vec<(Book, Chapter)>> {
+        let filter = "b.in_library = 1 AND json_extract(c.document, '$.read') = 0
+                      AND substr(json_extract(c.document, '$.date'), 1, 10) IN (?1, ?2, ?3, ?4)";
         let priority = if demo_order {
             "CASE remote_id WHEN 'demo-09' THEN 0 WHEN 'demo-22' THEN 1 WHEN 'demo-20' THEN 2 ELSE 3 END,"
         } else {
@@ -848,7 +885,7 @@ impl Store {
         ))?;
         let items = statement
             .query_map(
-                params![days[0], days[1], days[2], days[3], page_size, offset],
+                params![days[0], days[1], days[2], days[3], limit, offset],
                 |row| Ok((row.get::<_, String>(0)?, row.get::<_, String>(1)?)),
             )?
             .map(|row| {
@@ -856,7 +893,52 @@ impl Store {
                 Ok((decode(book)?, decode(chapter)?))
             })
             .collect::<Result<Vec<_>>>()?;
-        Ok(ViewPage { total, page, items })
+        Ok(items)
+    }
+
+    pub(crate) fn history_updates_view_page(
+        &self,
+        today: chrono::NaiveDate,
+        page: usize,
+        large: bool,
+        logical_height: u32,
+        demo: bool,
+    ) -> Result<HistoryLayoutPage<(chrono::NaiveDate, Book, Chapter)>> {
+        let mut planner = HistoryLayoutPlanner::new(page, large, logical_height);
+        let mut groups = Vec::with_capacity(2);
+        for date in history_update_days(today) {
+            let day = date.to_string();
+            let count = self.daily_update_count(&day)?;
+            planner.add_group(count);
+            groups.push((date, day_prefixes(&day), count));
+        }
+        let (total, page, page_count, window) = planner.finish();
+        let mut skip = window.offset;
+        let mut remaining = window.len;
+        let mut items = Vec::with_capacity(remaining);
+        for (date, days, count) in groups {
+            if skip >= count {
+                skip -= count;
+                continue;
+            }
+            let take = remaining.min(count - skip);
+            items.extend(
+                self.daily_updates_view_window(days, demo, false, skip, take)?
+                    .into_iter()
+                    .map(|(book, chapter)| (date, book, chapter)),
+            );
+            skip = 0;
+            remaining -= take;
+            if remaining == 0 {
+                break;
+            }
+        }
+        Ok(HistoryLayoutPage {
+            total,
+            page,
+            page_count,
+            items,
+        })
     }
 
     pub(crate) fn weekly_read_count(&self, start: i64, end: i64) -> Result<usize> {
@@ -890,7 +972,7 @@ impl Store {
         logical_height: u32,
         demo: bool,
         recent_start: Option<&str>,
-    ) -> Result<HistoryLayoutPage> {
+    ) -> Result<HistoryLayoutPage<HistoryViewRow>> {
         let modifier = if demo { "+8 hours" } else { "localtime" };
         let mut planner = HistoryLayoutPlanner::new(page, large, logical_height);
         let mut statement = self.connection.prepare(
@@ -2179,6 +2261,50 @@ mod tests {
         assert_eq!(
             store.library_continuation(Some("missing"))?,
             Some(records[0].0.id.clone())
+        );
+        Ok(())
+    }
+
+    #[test]
+    fn history_update_pages_account_for_each_date_heading() -> Result<()> {
+        let (store, records) = fixture(12)?;
+        for (index, (_, chapter, _)) in records.iter().enumerate() {
+            let mut chapter = chapter.clone();
+            chapter.read = false;
+            chapter.date = match index {
+                0..=3 => "2026-11-04T11:00:00Z",
+                4..=10 => "2026-11-03",
+                _ => "2026-11-02",
+            }
+            .into();
+            store.save_chapters(&chapter.book_id, std::slice::from_ref(&chapter))?;
+            store.set_chapter_read(&chapter.id, false)?;
+        }
+        let today = chrono::NaiveDate::from_ymd_opt(2026, 11, 4).unwrap();
+        let [_, yesterday] = history_update_days(today);
+        let first = store.history_updates_view_page(today, 1, false, 824, false)?;
+        let second = store.history_updates_view_page(today, 99, false, 824, false)?;
+        assert_eq!((first.total, first.page, first.page_count), (10, 1, 2));
+        assert_eq!((second.total, second.page, second.page_count), (10, 2, 2));
+        let dates = |items: &[(chrono::NaiveDate, Book, Chapter)]| {
+            items.iter().map(|(date, _, _)| *date).collect::<Vec<_>>()
+        };
+        assert_eq!(
+            dates(&first.items),
+            [vec![today; 4], vec![yesterday; 3]].concat()
+        );
+        assert_eq!(dates(&second.items), vec![yesterday; 3]);
+        let scribe = store.history_updates_view_page(today, 1, true, 1240, false)?;
+        assert_eq!((scribe.total, scribe.page_count), (10, 1));
+        let ids = |items: Vec<(chrono::NaiveDate, Book, Chapter)>| {
+            items
+                .into_iter()
+                .map(|(_, _, chapter)| chapter.id)
+                .collect::<Vec<_>>()
+        };
+        assert_eq!(
+            ids(scribe.items),
+            [ids(first.items), ids(second.items)].concat()
         );
         Ok(())
     }

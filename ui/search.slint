@@ -16,7 +16,7 @@ component ScopeChip inherits Rectangle {
     in property <length> width-limit;
     callback clicked();
     property <length> frame-height: State.large-screen ? 46px : 40px;
-    property <length> horizontal-padding: 14px;
+    property <length> horizontal-padding: root.more && root.selected ? 8px : 14px;
     property <length> arrow-space: root.more ? 20px : 0px;
     min-width: Theme.touch;
     preferred-width: min(root.width-limit, max(Theme.touch, fit.preferred-width + root.horizontal-padding * 2 + root.arrow-space));
@@ -119,7 +119,7 @@ component SearchGroupView inherits Rectangle {
         TouchArea { x: 0px; y: 0px; width: parent.width; height: parent.height; clicked => { Commands.action("search", "all", root.group.id); } }
     }
     status := Caption {
-        visible: !root.has-books || root.group.error || root.group.pending;
+        visible: !root.has-books;
         x: parent.width - self.width - (root.retryable ? retry.width + 12px : 0px); y: 0px;
         width: min(parent.width * 0.55, self.preferred-width); height: root.heading-height;
         text: root.group.status; horizontal-alignment: right;
@@ -209,8 +209,9 @@ export component SearchPage inherits Rectangle {
             clicked => { Commands.action("search", "source", State.search-sources[index].id); }
         }
         if !State.large-screen || State.search-sources.length > root.shortcut-count || root.more-selected: ScopeChip {
-            text: root.more-selected ? State.search-scope-name : Strings.more; compact-text: Strings.more;
-            width-limit: State.large-screen ? 110px : 107px; more: true; selected: root.more-selected;
+            text: root.more-selected ? State.search-scope-name : Strings.more;
+            width-limit: State.large-screen ? 110px : 107px; more: true;
+            preserve-tail: root.more-selected; selected: root.more-selected;
             clicked => { Commands.action("search", "source-picker", ""); }
         }
     }

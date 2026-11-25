@@ -578,7 +578,7 @@ impl App {
         }
         self.current_book_id = Some(report.book.id.clone());
         self.current_source = report.book.source_id;
-        self.selected_chapters.clear();
+        self.selected_chapters = None;
         self.page = 1;
         self.cover_view.clear();
         self.cancel_migration();

@@ -249,7 +249,7 @@ pub struct App {
     pub(crate) catalog_downloaded_only: bool,
     pub(crate) selection_mode: bool,
     pub(crate) selected: HashSet<String>,
-    pub(crate) selected_chapters: HashSet<String>,
+    pub(crate) selected_chapters: Option<HashSet<String>>,
     pub(crate) current_book_id: Option<String>,
     pub(crate) current_source: String,
     pub(crate) catalog: Vec<Book>,
@@ -263,6 +263,7 @@ pub struct App {
     pub(crate) query: String,
     pub(crate) search_scope: String,
     pub(crate) search_results: Vec<SearchResult>,
+    search_navigation: search_scope::SearchNavigation,
     pub(crate) reader: Option<ReaderState>,
     pub(crate) displayed_reader: Option<DisplayedReader>,
     dither_preview_key: Option<(u32, u32, imaging::SpatialDither)>,
@@ -437,7 +438,7 @@ impl App {
             catalog_downloaded_only: false,
             selection_mode: false,
             selected: HashSet::new(),
-            selected_chapters: HashSet::new(),
+            selected_chapters: None,
             current_book_id,
             current_source: "mangadex".into(),
             catalog: Vec::new(),
@@ -455,6 +456,7 @@ impl App {
             query: String::new(),
             search_scope: "all".into(),
             search_results: Vec::new(),
+            search_navigation: search_scope::SearchNavigation::default(),
             reader: None,
             displayed_reader: None,
             dither_preview_key: None,
@@ -1077,8 +1079,10 @@ impl App {
                 }
                 self.catalog_remote_page = remote_page;
                 self.catalog_has_more = has_next;
-                self.catalog_listings = listings;
-                if !self.options.demo {
+                if self.catalog_query.is_none() {
+                    self.catalog_listings = listings;
+                }
+                if !self.options.demo && self.catalog_query.is_none() {
                     if let Some(mut config) = self.store.source(&source)? {
                         config
                             .options
@@ -1295,7 +1299,7 @@ impl App {
                 if context.search_generation != self.search_generation
                     || context.query != self.query
                     || context.search_scope != self.search_scope
-                    || self.route != "search"
+                    || !self.search_result_context_active()
                 {
                     return Ok(());
                 }
@@ -1675,13 +1679,13 @@ impl App {
             "library_count": self.store.books().unwrap_or_default().iter().filter(|book| book.in_library).count(),
             "history_count": self.store.history().unwrap_or_default().len(), "bookmark_count": self.current_book_id.as_ref().map(|id| self.store.bookmarks(id).unwrap_or_default().len()).unwrap_or(0),
             "preferences": self.prefs, "downloads": self.store.downloads().unwrap_or_default(), "modal": self.modal,
-            "query": self.query, "search_scope": self.search_scope, "busy": self.busy, "message": self.message,
+            "query": self.query, "search_scope": self.visible_search_scope(), "busy": self.busy, "message": self.message,
             "catalog_count": self.catalog.len(), "catalog_has_more": self.catalog_has_more, "catalog_remote_page": self.catalog_remote_page,
             "search_result_count": self.search_results.iter().map(|group| group.books.len()).sum::<usize>(), "search_group_count": self.search_results.len(),
             "visible_setting_ids": visible_setting_ids, "has_frontlight": profile.has_frontlight(), "has_warmth": profile.has_warmth(), "has_orientation": profile.has_orientation(),
             "demo": self.options.demo, "offline": self.options.offline, "database": self.data_dir.join("library.sqlite3"),
             "selected": self.selected, "source_id": self.current_source, "cover_count": self.cover_paths.len(),
-            "selected_chapters": self.selected_chapters,
+            "selected_chapters": self.selected_chapters.iter().flatten().collect::<Vec<_>>(),
         });
         snapshot["hardware_y4_available"] = json!(self.platform.hardware_y4_available());
         snapshot["display_mode"] = json!(self.prefs.display_mode);
@@ -2000,7 +2004,7 @@ mod tests {
                 catalog_downloaded_only: false,
                 selection_mode: false,
                 selected: HashSet::new(),
-                selected_chapters: HashSet::new(),
+                selected_chapters: None,
                 current_book_id: demo.then(crate::demo::primary_id),
                 current_source: "mangadex".into(),
                 catalog: Vec::new(),
@@ -2022,6 +2026,7 @@ mod tests {
                 query: String::new(),
                 search_scope: "all".into(),
                 search_results: Vec::new(),
+                search_navigation: search_scope::SearchNavigation::default(),
                 reader: None,
                 displayed_reader: None,
                 dither_preview_key: None,

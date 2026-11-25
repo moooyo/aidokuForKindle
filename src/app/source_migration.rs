@@ -76,7 +76,7 @@ impl App {
         self.resume_frame_pending = false;
         self.selection_mode = false;
         self.selected.clear();
-        self.selected_chapters.clear();
+        self.selected_chapters = None;
         self.cover_view.clear();
         if let Some(ui) = self.ui.upgrade() {
             let state = ui.global::<State>();

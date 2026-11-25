@@ -464,15 +464,28 @@ impl ReaderState {
     }
 
     pub fn previous_chapter(&mut self) -> ReaderUpdate {
+        self.enter_previous_chapter(true)
+    }
+
+    /// The chapter control opens the beginning; a backward page turn crosses to the end.
+    pub(crate) fn previous_chapter_start(&mut self) -> ReaderUpdate {
+        self.enter_previous_chapter(false)
+    }
+
+    fn enter_previous_chapter(&mut self, at_end: bool) -> ReaderUpdate {
         if self.chapter_index == 0 {
             return ReaderUpdate::unchanged();
         }
         self.chapter_index -= 1;
         self.total = self.current_chapter().page_count.max(1);
-        self.page = self.page_layout().last_index(self.total as usize) as u32 + 1;
+        self.page = if at_end {
+            self.page_layout().last_index(self.total as usize) as u32 + 1
+        } else {
+            1
+        };
         self.reset_page_geometry();
-        self.pending_vertical_bottom = self.direction == ReadingDirection::Vertical;
-        self.wide_half = u8::from(self.wide_split_enabled());
+        self.pending_vertical_bottom = at_end && self.direction == ReadingDirection::Vertical;
+        self.wide_half = u8::from(at_end && self.wide_split_enabled());
         self.turns_since_full = 0;
         ReaderUpdate::new(ReaderAction::ChapterChanged, self.chapter_refresh())
     }

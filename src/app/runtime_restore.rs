@@ -206,7 +206,7 @@ impl App {
         self.current_book_id = self.store.library_continuation(None)?;
         self.page = 1;
         self.selected.clear();
-        self.selected_chapters.clear();
+        self.selected_chapters = None;
         self.selection_mode = false;
         self.search_results.clear();
         self.catalog.clear();

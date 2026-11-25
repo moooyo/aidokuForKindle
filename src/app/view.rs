@@ -1,9 +1,11 @@
+use super::server_configuration::{is_server, source_needs_setup, source_requires_address};
 use super::storage_details::StorageDetailsSnapshot;
 use super::*;
 
 use crate::domain::DownloadJob;
 use crate::store::view_queries::{
     BookViewMetadata, LibraryCounts, LibraryQuery, detail_page_size, history_layout_metrics,
+    history_update_days,
 };
 use crate::ui::{BookItem, ChapterItem, HistoryItem, SearchGroup, SettingItem, SourceItem};
 use chrono::{Datelike, TimeZone};
@@ -107,6 +109,7 @@ impl App {
         state.set_source_filter(self.source_filter);
         state.set_catalog_filter(self.catalog_filter);
         state.set_catalog_has_more(self.catalog_has_more);
+        state.set_catalog_search_results(self.showing_all_search_results());
         let catalog_tabs: Vec<_> = if self.options.demo {
             ["popular", "latest", "new"]
                 .into_iter()
@@ -121,8 +124,10 @@ impl App {
         state.set_catalog_tabs(model(catalog_tabs));
         state.set_history_filter(self.history_filter);
         state.set_selection_mode(self.selection_mode);
-        state.set_chapter_selection_mode(!self.selected_chapters.is_empty());
-        state.set_selected_chapter_count(self.selected_chapters.len() as i32);
+        state.set_chapter_selection_mode(self.selected_chapters.is_some());
+        state.set_selected_chapter_count(
+            self.selected_chapters.as_ref().map_or(0, HashSet::len) as i32
+        );
         let mut selected: Vec<_> = self.selected.iter().cloned().collect();
         selected.sort();
         state.set_selected_books(model(selected.into_iter().map(Into::into)));
@@ -218,7 +223,12 @@ impl App {
             library_page_count = visible.total.div_ceil(library_page_size).max(1);
             let mut rows = visible.items;
             resolve_book_title_collisions(&mut rows);
-            sync_library_rows(&state, rows);
+            sync_visible_rows(
+                state.get_books(),
+                rows,
+                |left, right| left.id == right.id,
+                |rows| state.set_books(rows),
+            );
             crate::reader_timing::mark(if batched {
                 "library_page_projection_batched"
             } else {
@@ -406,6 +416,9 @@ impl App {
                     .into(),
             );
             state.set_source_available(source.is_some_and(|source| source.enabled));
+            state.set_catalog_source_searchable(
+                source.is_some_and(|source| self.searchable_source(source)),
+            );
             state.set_source_builtin(source.is_some_and(source_is_builtin));
             state.set_source_needs_setup(source.is_some_and(source_needs_setup));
             state.set_source_title(
@@ -429,9 +442,11 @@ impl App {
         let mut catalog_page_count = 1;
         if show_catalog {
             let mut catalog: Vec<&Book> = self.catalog.iter().collect();
-            let mut active_filters =
-                usize::from(self.catalog_unread_only) + usize::from(self.catalog_downloaded_only);
-            let flags = if self.catalog_unread_only || self.catalog_downloaded_only {
+            let use_browse_filters = !self.showing_all_search_results();
+            let unread_only = use_browse_filters && self.catalog_unread_only;
+            let downloaded_only = use_browse_filters && self.catalog_downloaded_only;
+            let mut active_filters = usize::from(unread_only) + usize::from(downloaded_only);
+            let flags = if unread_only || downloaded_only {
                 self.store.catalog_book_flags(
                     &catalog
                         .iter()
@@ -441,7 +456,7 @@ impl App {
             } else {
                 HashMap::new()
             };
-            if self.catalog_unread_only {
+            if unread_only {
                 catalog.retain(|book| {
                     flags
                         .get(&book.id)
@@ -450,10 +465,15 @@ impl App {
                         > 0
                 });
             }
-            if self.catalog_downloaded_only {
+            if downloaded_only {
                 catalog.retain(|book| flags.get(&book.id).is_some_and(|entry| entry.downloaded));
             }
-            if let Some(filters) = self.interactions.catalog_filters.get(&self.current_source) {
+            if let Some(filters) = self
+                .interactions
+                .catalog_filters
+                .get(&self.current_source)
+                .filter(|_| use_browse_filters)
+            {
                 catalog.retain(|book| filters.matches(book));
                 filters.sort_books(&mut catalog);
                 active_filters += usize::from(filters.sort != "relevance")
@@ -493,8 +513,6 @@ impl App {
                 .platform
                 .runtime_logical_size(self.display_landscape())
                 .1;
-            let (available, header, row, columns) = history_layout_metrics(large, height);
-            let history_page_size = ((available - header) / row) as usize * columns;
             let mut rows = Vec::new();
             if self.history_filter == 0 {
                 let recent_start = today - chrono::Duration::days(3);
@@ -559,17 +577,17 @@ impl App {
                     rows.push((item, book));
                 }
             } else {
-                let visible = self.store.daily_updates_view_page(
-                    &today.format("%Y-%m-%d").to_string(),
-                    self.options.demo,
-                    false,
+                let visible = self.store.history_updates_view_page(
+                    today,
                     self.page,
-                    history_page_size,
+                    large,
+                    height,
+                    self.options.demo,
                 )?;
                 self.page = visible.page;
-                history_page_count = visible.total.div_ceil(history_page_size).max(1);
+                history_page_count = visible.page_count;
                 let mut source_names = HashMap::new();
-                for (book, chapter) in visible.items {
+                for (date, book, chapter) in visible.items {
                     let download = load_chapter_download_projection(&self.store, &chapter)?;
                     let source_name = match source_names.entry(book.source_id.clone()) {
                         std::collections::hash_map::Entry::Occupied(entry) => entry.into_mut(),
@@ -581,7 +599,7 @@ impl App {
                     };
                     let status = format!(
                         "{} · {source_name}",
-                        history_date_label(today, self.options.demo)
+                        history_date_label(date, self.options.demo)
                     );
                     let item = HistoryItem {
                         id: book.id.clone().into(),
@@ -589,9 +607,9 @@ impl App {
                         title: book.title.clone().into(),
                         subtitle: chapter_label(&chapter).into(),
                         progress: status.into(),
-                        date: history_date(today, self.options.demo).into(),
-                        date_label: history_date_label(today, self.options.demo).into(),
-                        date_value: today.format("%m · %d").to_string().into(),
+                        date: history_date(date, self.options.demo).into(),
+                        date_label: history_date_label(date, self.options.demo).into(),
+                        date_value: date.format("%m · %d").to_string().into(),
                         cover: Image::default(),
                         fraction: 0.0,
                         completed: false,
@@ -617,26 +635,20 @@ impl App {
             state.set_history(model(visible_history));
         }
         state.set_query(self.query.clone().into());
-        state.set_search_scope(self.search_scope.clone().into());
+        let scope = self.visible_search_scope();
+        state.set_search_scope(scope.into());
         let eligible: Vec<_> = sources
             .iter()
-            .filter(|source| {
-                source.enabled
-                    && (source.kind == "local"
-                        || (self.options.offline && !self.options.demo)
-                        || source.kind == "mangadex"
-                        || source.kind == "wasm"
-                        || !source.base_url.is_empty())
-            })
+            .filter(|source| self.searchable_source(source))
             .collect();
-        state.set_search_scope_name(if self.search_scope == "library" {
+        state.set_search_scope_name(if scope == "library" {
             tr("library").into()
         } else {
             eligible
                 .iter()
-                .find(|source| source.id == self.search_scope)
+                .find(|source| source.id == scope)
                 .map(|source| source.name.as_str())
-                .unwrap_or_else(|| self.search_scope.as_str())
+                .unwrap_or(scope)
                 .into()
         });
         let searched = self
@@ -932,6 +944,7 @@ impl App {
         state.set_route(self.route.clone().into());
         state.set_reader_image_ready(self.displayed_reader.is_some());
         state.set_active_tab(match self.route.as_str() {
+            "catalog" if self.showing_all_search_results() => 2,
             "sources" | "catalog" => 1,
             "search" => 2,
             "history" => 3,
@@ -1011,6 +1024,7 @@ impl App {
             state.set_book_details(model(Vec::<SettingItem>::new()));
             state.set_chapters(model(Vec::<ChapterItem>::new()));
             state.set_chapter_count(0);
+            state.set_can_locate_chapter(false);
             state.set_unread_count(0);
             state.set_downloaded_count(0);
             clear_current_chapter_view(state);
@@ -1027,6 +1041,7 @@ impl App {
         state.set_book_tags(book.tags.join(" · ").into());
         state.set_book_tag_items(model(book.tags.iter().cloned().map(Into::into)));
         let progress = metadata.progress.as_ref();
+        state.set_can_locate_chapter(progress.is_some());
         let mut selected_chapter = self
             .reader
             .as_ref()
@@ -1199,7 +1214,10 @@ impl App {
                 download_progress: download.progress,
                 current,
                 is_new,
-                selected: self.selected_chapters.contains(&chapter.id),
+                selected: self
+                    .selected_chapters
+                    .as_ref()
+                    .is_some_and(|selected| selected.contains(&chapter.id)),
                 progress: if current {
                     progress
                         .map(|progress| format!("{} / {}", progress.page, progress.total))
@@ -1210,7 +1228,12 @@ impl App {
                 },
             });
         }
-        state.set_chapters(model(rows));
+        sync_visible_rows(
+            state.get_chapters(),
+            rows,
+            |left, right| left.id == right.id,
+            |rows| state.set_chapters(rows),
+        );
         Ok(visible.total.div_ceil(page_size).max(1))
     }
 
@@ -1856,21 +1879,25 @@ fn chapter_download_projection(
     }
 }
 
-fn sync_library_rows(state: &State<'_>, rows: Vec<BookItem>) {
-    let current = state.get_books();
+fn sync_visible_rows<T: Clone + 'static>(
+    current: slint::ModelRc<T>,
+    rows: Vec<T>,
+    same_identity: impl Fn(&T, &T) -> bool,
+    replace: impl FnOnce(slint::ModelRc<T>),
+) {
     // Artwork and download updates must not discard the widget handling a hold.
     if current.row_count() == rows.len()
         && rows.iter().enumerate().all(|(index, row)| {
             current
                 .row_data(index)
-                .is_some_and(|item| item.id == row.id)
+                .is_some_and(|item| same_identity(&item, row))
         })
     {
         for (index, row) in rows.into_iter().enumerate() {
             current.set_row_data(index, row);
         }
     } else {
-        state.set_books(model(rows));
+        replace(model(rows));
     }
 }
 
@@ -1916,8 +1943,13 @@ fn load_non_reader_context(
     }
     if route == "history" || route == "library" && large {
         let today = view_today(demo);
-        context.daily_update_count =
-            store.daily_update_count(&today.format("%Y-%m-%d").to_string())?;
+        if route == "history" {
+            for date in history_update_days(today) {
+                context.daily_update_count += store.daily_update_count(&date.to_string())?;
+            }
+        } else {
+            context.daily_update_count = store.daily_update_count(&today.to_string())?;
+        }
         if route == "history" {
             let (start, end) = view_week_bounds(today, demo);
             context.weekly_read_count = store.weekly_read_count(start, end)?;
@@ -2525,17 +2557,6 @@ fn resolve_book_title_collisions(rows: &mut [BookItem]) {
     }
 }
 
-fn source_needs_setup(source: &SourceConfig) -> bool {
-    matches!(source.kind.as_str(), "komga" | "kavita" | "suwayomi")
-        && (source.base_url.trim().is_empty()
-            || (source.options.get("demo").and_then(Value::as_bool) != Some(true)
-                && source
-                    .options
-                    .get("_connection_verified")
-                    .and_then(Value::as_bool)
-                    != Some(true)))
-}
-
 fn source_language_summary(languages: &[String]) -> String {
     if languages.is_empty() {
         return tr("multilingual");
@@ -2586,7 +2607,7 @@ fn source_compact_status(source: &SourceConfig, subtitle: &str) -> String {
             format!("{label} · {subtitle}")
         };
     }
-    if matches!(source.kind.as_str(), "komga" | "kavita" | "suwayomi") {
+    if is_server(source) {
         // Explicit fixture records retain their authored connection state.
         if source.options.get("demo").and_then(Value::as_bool) == Some(true)
             && source.options.get("connected").and_then(Value::as_bool) == Some(true)
@@ -2641,7 +2662,7 @@ fn source_row(source: &SourceConfig, available: &[RepositorySource]) -> SourceIt
         installed: true,
         update,
         builtin,
-        needs_setup: builtin && source.kind != "local" && source.base_url.trim().is_empty(),
+        needs_setup: source_requires_address(source),
     }
 }
 

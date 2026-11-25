@@ -120,11 +120,20 @@ impl ServerFailure {
     }
 }
 
-fn is_server(config: &SourceConfig) -> bool {
+pub(super) fn is_server(config: &SourceConfig) -> bool {
     matches!(
         config.kind.to_ascii_lowercase().as_str(),
         "komga" | "kavita" | "suwayomi"
     )
+}
+
+pub(super) fn source_requires_address(config: &SourceConfig) -> bool {
+    is_server(config) && config.base_url.trim().is_empty()
+}
+
+pub(super) fn source_needs_setup(config: &SourceConfig) -> bool {
+    is_server(config)
+        && (source_requires_address(config) || !is_fixture(config) && !verified(config))
 }
 
 fn is_fixture(config: &SourceConfig) -> bool {
@@ -304,11 +313,7 @@ impl App {
         state.set_source_server_address(config.base_url.clone().into());
         state.set_source_server_credential(credential_mask(config).into());
         state.set_source_connection_status(self.server_connection_status(config).into());
-        state.set_source_needs_setup(
-            !self.options.demo
-                && !is_fixture(config)
-                && (config.base_url.is_empty() || !verified(config)),
-        );
+        state.set_source_needs_setup(source_needs_setup(config));
     }
 
     fn server_connection_status(&self, config: &SourceConfig) -> String {

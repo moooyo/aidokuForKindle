@@ -3,6 +3,7 @@ use super::*;
 mod startup_settings;
 #[path = "text_pagination.rs"]
 mod text_pagination;
+use super::server_configuration::{is_server, source_requires_address};
 use crate::{
     domain::Bookmark,
     ui::{DownloadItem, FilterOption, SettingItem, SourcePreferenceGroup},
@@ -248,6 +249,13 @@ impl App {
                 }
                 self.clear_reader_recovery();
                 self.invalidate_reader_work();
+                let remain_in_catalog =
+                    value == "1" && self.platform.profile().is_scribe() && self.route == "catalog";
+                if !remain_in_catalog {
+                    self.return_to_search_results();
+                    self.return_to_catalog_from_search();
+                }
+                self.finish_search_draft(false);
                 self.invalidate_search_work();
                 for group in &mut self.search_results {
                     if group.pending {
@@ -260,7 +268,7 @@ impl App {
                 self.close_page_jump();
                 self.selection_mode = false;
                 self.selected.clear();
-                self.selected_chapters.clear();
+                self.selected_chapters = None;
                 self.source_management_from_catalog = false;
                 if let Some(ui) = self.ui.upgrade() {
                     ui.global::<State>().set_installed_source_page(1);
@@ -287,15 +295,7 @@ impl App {
                     let ready = self
                         .store
                         .source(&self.current_source)?
-                        .is_some_and(|source| {
-                            source.enabled
-                                && (self.options.demo
-                                    || !matches!(
-                                        source.kind.as_str(),
-                                        "komga" | "kavita" | "suwayomi"
-                                    )
-                                    || !source.base_url.is_empty())
-                        });
+                        .is_some_and(|source| source.enabled && !source_requires_address(&source));
                     if ready {
                         self.fetch_catalog(false)?;
                     }
@@ -339,7 +339,7 @@ impl App {
                 }
                 "batch-read" => self.mark_selected_books_read()?,
                 "batch-download" => self.download_selected_books()?,
-                "batch-category" => self.choose_panel("category")?,
+                "batch-category" if !self.selected.is_empty() => self.choose_panel("category")?,
                 "batch-remove" if !self.selected.is_empty() => {
                     let message = if self.selected.len() == 1 {
                         tr("remove_book_confirm")
@@ -360,7 +360,10 @@ impl App {
                 _ => {}
             },
             "detail" => match action {
-                "back" => self.back()?,
+                "back" => {
+                    self.selected_chapters = None;
+                    self.back()?;
+                }
                 "filter" => {
                     let filter = value.parse::<i32>()?.clamp(0, 3);
                     if let Some(ui) = self.ui.upgrade() {
@@ -421,19 +424,21 @@ impl App {
                     if chapter.book_id != self.current_book()?.id {
                         bail!("The chapter belongs to another manga");
                     }
-                    if !self.selected_chapters.insert(value.into()) {
-                        self.selected_chapters.remove(value);
+                    let selected = self.selected_chapters.get_or_insert_with(Default::default);
+                    if !selected.insert(value.into()) {
+                        selected.remove(value);
                     }
                 }
-                "select-all-chapters" => {
-                    self.selected_chapters = self
-                        .store
-                        .chapters(&self.current_book()?.id)?
-                        .into_iter()
-                        .map(|chapter| chapter.id)
-                        .collect();
+                "select-all-chapters" if self.selected_chapters.is_some() => {
+                    let filter = self
+                        .ui
+                        .upgrade()
+                        .map_or(0, |ui| ui.global::<State>().get_detail_filter());
+                    let book = self.current_book()?;
+                    self.selected_chapters =
+                        Some(self.store.chapter_ids_for_filter(&book.id, filter)?);
                 }
-                "cancel-selection" => self.selected_chapters.clear(),
+                "cancel-selection" => self.selected_chapters = None,
                 "download-selected" => self.download_selected_chapters()?,
                 "track" => self.open_tracking_choices()?,
                 "migrate" => {
@@ -544,12 +549,14 @@ impl App {
             "catalog" => match action {
                 "open" => self.open_book(value)?,
                 "back" => {
-                    self.source_management_from_catalog = true;
-                    self.route = "sources".into();
-                    self.source_filter = 0;
-                    self.page = 1;
+                    if !self.return_to_search_results() {
+                        self.source_management_from_catalog = true;
+                        self.route = "sources".into();
+                        self.source_filter = 0;
+                        self.page = 1;
+                    }
                 }
-                "filter" => {
+                "filter" if !self.showing_all_search_results() => {
                     self.catalog_filter = value
                         .parse::<i32>()?
                         .clamp(0, self.catalog_listings.len().saturating_sub(1) as i32);
@@ -557,13 +564,7 @@ impl App {
                     self.page = 1;
                     self.fetch_catalog(false)?;
                 }
-                "search" => {
-                    self.invalidate_catalog_work();
-                    self.search_scope = self.current_source.clone();
-                    self.route = "search".into();
-                    let query = self.catalog_query.clone().unwrap_or_default();
-                    self.open_keyboard("search", &query)?;
-                }
+                "search" if !self.showing_all_search_results() => self.open_catalog_search()?,
                 "load-more" => {
                     if self.catalog_has_more && !self.busy {
                         self.fetch_catalog(true)?;
@@ -621,11 +622,14 @@ impl App {
                     }
                 }
                 "cancel" => {
-                    self.invalidate_search_work();
+                    if !self.return_to_catalog_from_search() {
+                        self.invalidate_search_work();
+                        self.query.clear();
+                        self.search_results.clear();
+                        self.page = 1;
+                    }
                     self.modal.clear();
-                    self.query.clear();
-                    self.search_results.clear();
-                    self.page = 1;
+                    self.modal_context.clear();
                 }
                 "source" => self.choose_search_scope(value)?,
                 "all" => {
@@ -650,21 +654,16 @@ impl App {
                             .unwrap_or_default();
                         self.show_choices(&tr("library_matches"), "library-matches", rows)?;
                     } else {
-                        if let Some(group) =
-                            self.search_results.iter().find(|group| group.id == value)
-                        {
-                            self.catalog = group.books.clone();
-                            self.current_source = group.id.clone();
-                            self.catalog_remote_page = 1;
-                            self.catalog_has_more = group.has_next;
-                            self.catalog_query = Some(self.query.clone());
-                            self.route = "catalog".into();
-                            self.page = 1;
-                        }
+                        self.open_all_search_results(value);
                     }
                 }
                 "retry" => self.search_one(value)?,
                 "open" => {
+                    if self.keyboard_target == "search" {
+                        self.finish_search_draft(false);
+                        self.keyboard.set_text("");
+                        self.keyboard_target.clear();
+                    }
                     self.modal.clear();
                     self.modal_context.clear();
                     self.open_book(value)?;
@@ -810,11 +809,6 @@ impl App {
                         } else {
                             self.modal.clear();
                             self.modal_context.clear();
-                        }
-                        if self.route == "reader" {
-                            if let Some(reader) = &mut self.reader {
-                                reader.menu_open = true;
-                            }
                         }
                     }
                 }
@@ -1267,6 +1261,7 @@ impl App {
         self.selected.clear();
         self.selection_mode = false;
         self.modal.clear();
+        self.modal_context.clear();
         Ok(())
     }
 
@@ -1304,39 +1299,52 @@ impl App {
         if self.options.offline && !self.options.demo {
             bail!("{}", tr("offline_help"));
         }
-        let day = if self.options.demo {
+        let today = if self.options.demo {
             crate::demo::fixture_date()
         } else {
             chrono::Local::now().date_naive()
-        }
-        .format("%Y-%m-%d")
-        .to_string();
-        let mut page = 1;
-        loop {
-            let visible =
-                self.store
-                    .daily_updates_view_page(&day, self.options.demo, false, page, 100)?;
-            let page_count = visible.total.div_ceil(100).max(1);
-            let mut books: std::collections::BTreeMap<String, (Book, Vec<Chapter>)> =
-                Default::default();
-            for (book, chapter) in visible.items {
-                if !chapter.downloaded {
-                    books
-                        .entry(book.id.clone())
-                        .or_insert_with(|| (book, Vec::new()))
-                        .1
-                        .push(chapter);
+        };
+        let mut submitted = false;
+        for date in crate::store::view_queries::history_update_days(today) {
+            let day = date.format("%Y-%m-%d").to_string();
+            let mut page = 1;
+            loop {
+                let visible = self.store.daily_updates_view_page(
+                    &day,
+                    self.options.demo,
+                    false,
+                    page,
+                    100,
+                )?;
+                let mut books: std::collections::BTreeMap<String, (Book, Vec<Chapter>)> =
+                    Default::default();
+                for (book, chapter) in visible.items {
+                    if !chapter.downloaded
+                        && !self.store.download(&chapter.id)?.is_some_and(|job| {
+                            matches!(job.state.as_str(), "queued" | "downloading" | "paused")
+                        })
+                    {
+                        books
+                            .entry(book.id.clone())
+                            .or_insert_with(|| (book, Vec::new()))
+                            .1
+                            .push(chapter);
+                    }
                 }
+                for (book, chapters) in books.into_values() {
+                    self.downloads.enqueue_many(&book, &chapters)?;
+                    submitted = true;
+                }
+                if page >= visible.total.div_ceil(100).max(1) {
+                    break;
+                }
+                page += 1;
             }
-            for (book, chapters) in books.into_values() {
-                self.downloads.enqueue_many(&book, &chapters)?;
-            }
-            if page >= page_count {
-                break;
-            }
-            page += 1;
         }
-        self.open_downloads()
+        if !submitted {
+            self.notify(tr("no_downloads_needed"));
+        }
+        Ok(())
     }
 
     fn confirm_remove_read_downloads(&mut self, current_book: bool) -> Result<()> {
@@ -1400,7 +1408,7 @@ impl App {
         self.close_page_jump();
         self.selection_mode = false;
         self.selected.clear();
-        self.selected_chapters.clear();
+        self.selected_chapters = None;
         self.current_book_id = Some(book.id);
         self.return_route = "settings".into();
         self.route = "detail".into();
@@ -1469,7 +1477,7 @@ impl App {
         }
         self.invalidate_reader_work();
         self.clear_reader_recovery();
-        self.selected_chapters.clear();
+        self.selected_chapters = None;
         let book = self
             .store
             .book(id)?
@@ -1763,7 +1771,7 @@ impl App {
             }
             "previous-chapter" => {
                 reader.menu_open = false;
-                reader.previous_chapter()
+                reader.previous_chapter_start()
             }
             "seek" => {
                 reader.menu_open = false;
@@ -1888,11 +1896,6 @@ impl App {
         if !self.modal.is_empty() {
             self.modal.clear();
             self.modal_context.clear();
-            if self.route == "reader" {
-                if let Some(reader) = &mut self.reader {
-                    reader.menu_open = true;
-                }
-            }
             return Ok(());
         }
         if self.route == "settings"
@@ -1903,11 +1906,19 @@ impl App {
             self.interactions.save(&self.store)?;
             return Ok(());
         }
+        if self.route == "detail" && self.selected_chapters.take().is_some() {
+            return Ok(());
+        }
         if self.route == "reader" {
             if self.reader.as_ref().is_some_and(|reader| reader.menu_open) {
                 return self.reader_action("menu", "");
             }
             return self.reader_action("back", "");
+        }
+        if self.route == "catalog" && self.return_to_search_results()
+            || self.route == "search" && self.return_to_catalog_from_search()
+        {
+            return Ok(());
         }
         self.invalidate_reader_work();
         self.route = match self.route.as_str() {
@@ -1948,6 +1959,7 @@ impl App {
             .store
             .source(id)?
             .context("This source is not installed")?;
+        self.return_to_search_results();
         if !source.enabled {
             self.current_source = id.into();
             self.route = "catalog".into();
@@ -1958,10 +1970,7 @@ impl App {
             self.page = 1;
             return Ok(());
         }
-        if !self.options.demo
-            && matches!(source.kind.as_str(), "komga" | "kavita" | "suwayomi")
-            && source.base_url.is_empty()
-        {
+        if source_requires_address(&source) {
             self.current_source = id.into();
             if self.platform.profile().is_scribe() {
                 self.route = "catalog".into();
@@ -2049,20 +2058,23 @@ impl App {
             1
         };
         self.spawn_catalog_job(move |manager| {
-            let listings = manager.listings(&source)?;
-            let sort = if rating_order {
-                "rating"
+            let (result, listings) = if let Some(query) = query {
+                (
+                    manager.search_page(&source, &query, remote_page)?,
+                    Vec::new(),
+                )
             } else {
-                listings
-                    .get(listing_index)
-                    .or_else(|| listings.first())
-                    .map(|listing| listing.0.as_str())
-                    .unwrap_or("popular")
-            };
-            let result = if let Some(query) = query {
-                manager.search_page(&source, &query, remote_page)?
-            } else {
-                manager.browse_page(&source, remote_page, sort)?
+                let listings = manager.listings(&source)?;
+                let sort = if rating_order {
+                    "rating"
+                } else {
+                    listings
+                        .get(listing_index)
+                        .or_else(|| listings.first())
+                        .map(|listing| listing.0.as_str())
+                        .unwrap_or("popular")
+                };
+                (manager.browse_page(&source, remote_page, sort)?, listings)
             };
             Ok(JobResult::Catalog {
                 source,
@@ -2108,11 +2120,15 @@ impl App {
             return Ok(());
         }
         let scope = self.search_scope.clone();
-        let configs = self.store.sources()?;
-        for source in configs
+        let configs: Vec<_> = self
+            .store
+            .sources()?
             .into_iter()
-            .filter(|source| source.enabled && (scope == "all" || source.id == scope))
-        {
+            .filter(|source| {
+                self.searchable_source(source) && (scope == "all" || source.id == scope)
+            })
+            .collect();
+        for source in configs {
             if source.kind == "local" || self.options.offline {
                 let books = self
                     .store
@@ -2125,10 +2141,7 @@ impl App {
                     pending: false,
                     has_next: false,
                 });
-            } else if source.kind == "mangadex"
-                || source.kind == "wasm"
-                || !source.base_url.is_empty()
-            {
+            } else {
                 self.search_one(&source.id)?;
             }
         }
@@ -2447,7 +2460,7 @@ impl App {
             .store
             .source(id)?
             .context("This source is not installed")?;
-        if matches!(source.kind.as_str(), "komga" | "kavita" | "suwayomi") {
+        if is_server(&source) {
             return self.server_action("settings", id);
         }
         self.source_settings_source = id.into();
@@ -2592,6 +2605,9 @@ impl App {
     }
 
     fn download_selected_chapters(&mut self) -> Result<()> {
+        let Some(selected) = &self.selected_chapters else {
+            return Ok(());
+        };
         if self.options.offline && !self.options.demo {
             bail!("{}", tr("offline_help"));
         }
@@ -2600,7 +2616,7 @@ impl App {
             .store
             .chapters(&book.id)?
             .into_iter()
-            .filter(|chapter| self.selected_chapters.contains(&chapter.id))
+            .filter(|chapter| selected.contains(&chapter.id))
             .collect();
         chapters.sort_by(|left, right| left.number.total_cmp(&right.number));
         if chapters.is_empty() {
@@ -2608,7 +2624,7 @@ impl App {
             return Ok(());
         }
         self.downloads.enqueue_many(&book, &chapters)?;
-        self.selected_chapters.clear();
+        self.selected_chapters = None;
         Ok(())
     }
 
@@ -2956,6 +2972,9 @@ impl App {
         if !target.starts_with("server-") {
             self.clear_server_keyboard();
         }
+        if target == "search" {
+            self.begin_search_draft();
+        }
         self.keyboard.set_text(value);
         self.keyboard
             .set_mode(if matches!(target, "search" | "source-query") {
@@ -3014,6 +3033,12 @@ impl App {
                 if self.cancel_server_keyboard()? {
                     return Ok(());
                 }
+                if self.keyboard_target == "search" {
+                    self.finish_search_draft(false);
+                    if self.query.is_empty() {
+                        self.return_to_catalog_from_search();
+                    }
+                }
                 self.modal.clear();
                 self.modal_context.clear();
                 self.keyboard.set_text("");
@@ -3044,6 +3069,7 @@ impl App {
                 self.keyboard_target.clear();
                 match target.as_str() {
                     "search" => {
+                        self.finish_search_draft(true);
                         self.query = text.trim().into();
                         self.run_search()?;
                     }
@@ -4363,9 +4389,12 @@ impl App {
                     .collect();
                 self.show_choices(&tr("bookmark"), "bookmarks", rows)?;
             }
-            "clear-history-confirm" => {
+            "clear-history-confirm" if self.modal_context == "clear-history" => {
                 self.store.clear_history()?;
+                self.page = 1;
                 self.modal.clear();
+                self.modal_context.clear();
+                self.notify(tr("history_cleared"));
             }
             "job-pause" | "job-resume" | "job-cancel" => {
                 if let Some(chapter) = self.modal_context.strip_prefix("job:") {

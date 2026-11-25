@@ -27,7 +27,7 @@ export component LibrarySortPanel inherits Rectangle {
     }
     sorting := SegmentedControl {
         x: root.pad; y: sort-label.y + sort-label.height + 8px; width: parent.width - self.x * 2;
-        cell-height: State.large-screen ? 48px : 40px; columns: 2; selected: root.sort-index;
+        cell-height: State.large-screen ? 50px : 44px; columns: 2; selected: root.sort-index;
         labels: [Strings.sort-title, Strings.sort-recent, Strings.sort-recent-open, Strings.sort-recent-update, Strings.sort-added-at, Strings.sort-latest-chapter, Strings.sort-unread-count, Strings.sort-chapter-count];
         chosen(index) => { Commands.action("library", "sort", root.keys[index]); }
     }
@@ -35,7 +35,7 @@ export component LibrarySortPanel inherits Rectangle {
         x: root.pad; y: sorting.y + sorting.height + 12px; width: parent.width - self.x * 2;
         labels: State.library-sort == "title" ? [Strings.descending, Strings.ascending] : [Strings.new-to-old, Strings.old-to-new];
         selected: State.library-ascending ? 1 : 0;
-        cell-height: State.large-screen ? 46px : 40px;
+        cell-height: State.large-screen ? 50px : 44px;
         chosen(index) => { Commands.action("library", "sort-direction", index == 1 ? "ascending" : "descending"); }
     }
     Caption {
@@ -54,7 +54,7 @@ export component LibrarySortPanel inherits Rectangle {
         }
     }
     if State.large-screen: PanelAction {
-        x: root.pad; y: filters.y + filters.height + 12px; width: parent.width - self.x * 2; height: Theme.touch;
+        x: root.pad; y: filters.y + filters.height + 22px; width: parent.width - self.x * 2; height: Theme.touch;
         text: Strings.keyboard-done; primary: true; text-size: 18px;
         clicked => { Commands.action("panel", "close", ""); }
     }
@@ -63,13 +63,12 @@ export component LibrarySortPanel inherits Rectangle {
 export component DownloadQueuePanel inherits Rectangle {
     x: 0px;
     y: 0px;
-    property <length> pad-x: State.large-screen ? 32px : 22px;
-    property <length> pad-top: State.large-screen ? 30px : 20px;
+    property <length> pad-x: State.large-screen ? 28px : 22px;
+    property <length> pad-top: State.large-screen ? 26px : 20px;
     property <length> header-height: State.large-screen ? 50px : 44px;
-    property <length> row-height: State.large-screen ? 95px : 77px;
-    property <length> row-gap: State.large-screen ? 12px : 10px;
-    property <length> list-top: root.pad-top + root.header-height + root.row-gap;
-    property <length> list-height: State.download-queue.length == 0 ? 77px : State.download-queue.length * root.row-height + max(0, State.download-queue.length - 1) * root.row-gap;
+    property <length> row-height: State.large-screen ? 96px : 80px;
+    property <length> list-top: root.pad-top + root.header-height + 10px;
+    property <length> list-height: max(1, State.download-queue.length) * root.row-height;
     property <length> surface-inset: State.large-screen ? 2px : 0px;
     property <length> pad-bottom: State.large-screen ? 28px : 24px;
     property <length> pager-height: State.panel-page-count > 1 ? Theme.pager-height : 0px;
@@ -98,25 +97,32 @@ export component DownloadQueuePanel inherits Rectangle {
         clicked => { Commands.action("panel", "close", ""); }
     }
     for item[index] in State.download-queue: Rectangle {
-        x: root.pad-x; y: root.list-top + index * (root.row-height + root.row-gap);
+        x: root.pad-x; y: root.list-top + index * root.row-height;
         width: parent.width - root.pad-x * 2; height: root.row-height;
-        background: Theme.paper;
         accessible-role: button;
         accessible-label: item.title + " " + item.chapter + " " + item.status;
-        Rectangle {
-            x: 0px; y: State.large-screen ? 14px : 12px;
-            width: State.large-screen ? 48px : 38px; height: State.large-screen ? 66px : 52px;
-            border-width: 1px; border-color: Theme.secondary;
-            background: Theme.paper; clip: true;
+        thumbnail := Rectangle {
+            x: 0px; y: (parent.height - self.height) / 2;
+            width: State.large-screen ? 54px : 44px; height: State.large-screen ? 76px : 62px;
+            border-width: 1px; border-color: Theme.ink; clip: true;
             if item.cover.width == 0: TitleText { x: 2px; y: 2px; width: parent.width - 4px; height: parent.height - 4px; text: item.title; font-size: State.large-screen ? 10px : 9px; wrap: word-wrap; horizontal-alignment: center; }
-            Image { x: 1px; y: 1px; width: parent.width - 2px; height: parent.height - 2px; source: item.cover; image-fit: cover; }
+            Image { x: 1px; y: 1px; width: parent.width - 2px; height: parent.height - 2px; source: item.cover; image-fit: cover; accessible-role: none; }
         }
-        content := Rectangle {
-            x: State.large-screen ? 64px : 52px; y: State.large-screen ? 24px : 21px;
-            width: parent.width - self.x; height: State.large-screen ? 44px : 34px;
-            BodyText { x: 0px; y: 0px; width: max(0px, parent.width - status.width - 12px); height: State.large-screen ? 27px : 24px; text: item.title + (item.chapter == "" ? "" : " · " + item.chapter); font-size: State.large-screen ? 18px : 16px; font-weight: 500; color: Theme.ink; }
-            status := Caption { x: parent.width - self.width; y: 0px; width: min(parent.width * 0.35, self.preferred-width); height: State.large-screen ? 27px : 24px; text: item.total > 0 && (item.state == "downloading" || item.state == "completed") ? item.completed + " / " + item.total + " " + Strings.pages-unit : item.status; font-size: State.large-screen ? 15px : 14px; color: Theme.secondary; horizontal-alignment: right; }
-            Rectangle { x: 0px; y: State.large-screen ? 37px : 32px; width: parent.width; height: State.large-screen ? 5px : 4px; background: Theme.line;
+        Rectangle {
+            x: thumbnail.width + 14px; y: (parent.height - self.height) / 2;
+            width: parent.width - self.x; height: State.large-screen ? 67px : 58px;
+            title := BodyText {
+                x: 0px; y: 0px; width: max(0px, parent.width - status.width - 10px); height: State.large-screen ? 30px : 26px;
+                text: item.title; font-weight: 700;
+            }
+            status := Caption {
+                x: parent.width - self.width; y: 0px; width: min(parent.width * 0.4, self.preferred-width); height: title.height;
+                text: item.total > 0 && (item.state == "downloading" || item.state == "completed") ? item.completed + " / " + item.total + " " + Strings.pages-unit : item.status;
+                horizontal-alignment: right;
+            }
+            Caption { x: 0px; y: title.height + 3px; width: parent.width; height: State.large-screen ? 24px : 22px; text: item.chapter; }
+            Rectangle {
+                x: 0px; y: parent.height - self.height; width: parent.width; height: 3px; background: Theme.line;
                 Rectangle { x: 0px; y: 0px; width: parent.width * clamp(item.progress, 0, 1); height: parent.height; background: Theme.ink; }
             }
         }

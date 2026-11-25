@@ -14,10 +14,9 @@ import { SearchScopePanel } from "search.slint";
 import { SourceSettingsPanel, ServerConfigurationPanel } from "panels-source-settings.slint";
 
 component MoreMenu inherits Rectangle {
-    property <bool> detail: State.modal-context == "detail-more";
-    property <length> inset: State.large-screen ? 22px : (root.detail ? 20px : 18px);
-    property <length> pad-y: State.large-screen ? 10px : 8px;
-    property <length> row-height: State.large-screen ? 62px : (root.detail ? 52px : 54px);
+    property <length> inset: 18px;
+    property <length> pad-y: 4px;
+    property <length> row-height: State.large-screen ? 62px : 56px;
     height: root.pad-y * 2 + State.modal-items.length * root.row-height;
     background: Theme.paper;
     border-width: 2px; border-color: Theme.ink; border-radius: Theme.control-radius;
@@ -113,7 +112,11 @@ export component Panels inherits Rectangle {
         State.modal != "summary" && State.modal != "pairing" && !root.menu && !root.sort && !root.batch &&
         !root.tracking && !root.repository-list && !root.source-picker && !root.catalog-filter && !root.source-settings && !root.server-configuration && !root.migration && !root.confirmation;
 
-    if root.scope && State.modal-context == "search-scope:typing": KeyboardPanel {
+    if State.modal == "keyboard" && State.keyboard-target != "search" && State.keyboard-target != "source-query": TouchArea {
+        x: 0px; y: 0px; width: parent.width; height: parent.height;
+        clicked => { Commands.action("keyboard", "cancel", ""); }
+    }
+    if State.modal == "keyboard" || (root.scope && State.modal-context == "search-scope:typing"): KeyboardPanel {
         x: 0px; y: parent.height - self.height; width: parent.width;
     }
     if State.modal != "keyboard" && !root.reader-panel: TouchArea {
@@ -130,11 +133,6 @@ export component Panels inherits Rectangle {
         height: max(0px, root.height - ReaderMetrics.header-height - ReaderMetrics.bottom-height);
         clicked => { Commands.action("panel", "close", ""); }
     }
-    if State.modal == "keyboard" && State.keyboard-target != "search" && State.keyboard-target != "source-query": TouchArea {
-        x: 0px; y: 0px; width: parent.width; height: parent.height;
-        clicked => { Commands.action("keyboard", "cancel", ""); }
-    }
-
     if root.reader-choice: ReaderChoicePanel {
         x: State.large-screen ? (parent.width - self.width) / 2 : 0px;
         y: State.large-screen ? min(240px, parent.height - self.height) : parent.height - self.height;
@@ -147,8 +145,8 @@ export component Panels inherits Rectangle {
     }
     if root.menu: MoreMenu {
         x: parent.width - self.width - (State.large-screen ? (State.modal-context == "detail-more" ? 24px : 28px) : 14px);
-        y: State.large-screen ? (State.modal-context == "detail-more" ? 90px : 102px) : (State.modal-context == "detail-more" ? 74px : 84px);
-        width: State.large-screen ? 344px : State.modal-context == "detail-more" ? 264px : 276px;
+        y: State.large-screen ? (State.modal-context == "detail-more" ? 90px : 96px) : (State.modal-context == "detail-more" ? 74px : 80px);
+        width: State.large-screen ? (State.modal-context == "detail-more" ? 344px : 320px) : (State.modal-context == "detail-more" ? 264px : 250px);
     }
     if root.sort: LibrarySortPanel {
         x: State.large-screen ? parent.width - self.width - 28px : 0px;
@@ -157,7 +155,7 @@ export component Panels inherits Rectangle {
     }
     if State.modal == "downloads": DownloadQueuePanel {
         x: State.large-screen ? (parent.width - self.width) / 2 : 0px;
-        y: State.large-screen ? min(300px, parent.height - self.height - Theme.status-height) : parent.height - self.height;
+        y: State.large-screen ? min(240px, parent.height - self.height - Theme.status-height) : parent.height - self.height;
         width: State.large-screen ? 640px : parent.width;
     }
     if State.modal == "summary": SummaryPanel {
@@ -176,9 +174,9 @@ export component Panels inherits Rectangle {
         width: State.large-screen ? 640px : parent.width;
     }
     if root.confirmation: ConfirmationPanel {
-        x: State.large-screen ? (parent.width - self.width) / 2 : 0px;
-        y: State.large-screen ? min(State.modal-context == "clear-history" ? 470px : 360px, parent.height - self.height - Theme.status-height) : parent.height - self.height;
-        width: State.large-screen ? 520px : parent.width;
+        x: (parent.width - self.width) / 2;
+        y: State.large-screen ? min(State.modal-context == "clear-history" ? 470px : (State.modal-context == "remove-selected" ? 380px : 360px), parent.height - self.height - Theme.status-height) : parent.height - self.height;
+        width: State.large-screen ? (State.modal-context == "remove-selected" ? 560px : 520px) : parent.width;
     }
     if State.modal == "pairing": PairingPanel {
         x: State.large-screen ? (parent.width - self.width) / 2 : 0px;
@@ -223,9 +221,6 @@ export component Panels inherits Rectangle {
         x: State.large-screen ? (State.modal-context == "source-settings" ? parent.width - self.width - 28px : (parent.width - self.width) / 2) : 0px;
         y: State.large-screen ? min(State.modal-context == "source-settings" ? 112px : State.modal-context == "migration" ? 220px : 240px, parent.height - self.height - Theme.status-height) : parent.height - self.height;
         width: State.large-screen ? (State.modal-context == "source-settings" ? 540px : State.modal-context == "migration" ? 680px : 640px) : parent.width;
-    }
-    if State.modal == "keyboard": KeyboardPanel {
-        x: 0px; y: parent.height - self.height; width: parent.width;
     }
 }
 

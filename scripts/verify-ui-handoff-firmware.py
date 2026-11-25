@@ -110,10 +110,13 @@ class Walkthrough(firmware.Verifier):
             payload=gzip.compress(self.binary.read_bytes(), compresslevel=1),
             timeout=420,
         )
-        for source, target in ((self.wrapper, "app/aidoku"), (self.launcher, "launch.sh")):
-            self.put(source, f"{self.guest_root}/{target}", "755")
-        if self.arguments.native_portrait:
-            self.put(self.arguments.native_portrait, f"{self.guest_root}/app/aidoku-startup-portrait", "755")
+        for source, target in (
+            (self.wrapper, "app/aidoku"), (self.launcher, "launch.sh"),
+            (self.arguments.native_portrait, "app/aidoku-startup-portrait"),
+            (self.arguments.native_query, "app/aidoku-native-query"),
+        ):
+            if source is not None:
+                self.put(source, f"{self.guest_root}/{target}", "755")
 
     def require_stock_services(self):
         state = self.service_state()
@@ -511,6 +514,8 @@ class Walkthrough(firmware.Verifier):
         write_json(report, {
             "passed": not errors, "errors": errors, "profile": self.arguments.profile, "emulator": self.environment,
             "binary": str(self.binary), "launcher": str(self.launcher), "guest_fixture": self.guest_root,
+            "native_portrait": str(self.arguments.native_portrait) if self.arguments.native_portrait else None,
+            "native_query": str(self.arguments.native_query) if self.arguments.native_query else None,
             "prototype_logical_size": PROFILES[self.arguments.profile][0],
             "native_logical_size": getattr(self, "logical_size", None), "native_frame_size": getattr(self, "native_size", None),
             "scale_factor": SCALE, "duration_seconds": round(time.monotonic() - started, 3),
@@ -535,6 +540,7 @@ def main():
     parser.add_argument("--guest-ssh", type=Path, help="Local helper for SSH to the selected isolated guest")
     parser.add_argument("--binary", type=Path, required=True, help="Built 32-bit ARM Aidoku ELF")
     parser.add_argument("--native-portrait", type=Path, help="Optional built startup portrait supervisor")
+    parser.add_argument("--native-query", type=Path, help="Optional built firmware LIPC query helper")
     parser.add_argument("--output-dir", type=Path, required=True, help="Parent for a fresh run directory")
     parser.add_argument("--firmware", default="5.20.1")
     parser.add_argument("--startup-seconds", type=float, default=180)

@@ -55,6 +55,7 @@ export component SettingsEntry inherits Rectangle {
         height: root.sidebar ? root.height : 21px;
         text: root.entry.title; font-size: root.sidebar ? 20px : 18px;
         font-weight: root.selected ? 700 : root.sidebar ? 400 : 500;
+        wrap: root.sidebar ? word-wrap : no-wrap;
     }
     if !root.sidebar: Caption {
         x: 0px; y: 64px; width: root.width - 8px; height: 20px;
@@ -72,6 +73,7 @@ export component SettingsEntry inherits Rectangle {
 export component SettingsValueRow inherits Rectangle {
     in property <string> text;
     in property <string> value;
+    in property <string> value-unit;
     in property <string> detail;
     in property <string> action;
     in property <bool> enabled: true;
@@ -84,7 +86,7 @@ export component SettingsValueRow inherits Rectangle {
 
     BodyText {
         x: 0px; y: root.detail == "" ? 0px : (root.height - 48px) / 2;
-        width: max(0px, root.width - (root.value != "" ? value-label.width + 12px : 0px) - (root.action != "" ? button.width + 12px : 0px));
+        width: max(0px, root.value != "" ? value-label.x - 12px : root.action != "" ? button.x - 12px : root.width);
         height: root.detail == "" ? root.height : 26px;
         text: root.text; font-family: root.title-family; font-size: root.title-size; font-weight: root.title-weight;
     }
@@ -94,9 +96,15 @@ export component SettingsValueRow inherits Rectangle {
         text: root.detail;
     }
     value-label := Caption {
-        x: root.width - self.width - (root.action == "" ? 0px : button.width + 12px); y: 0px;
-        width: min(root.width * 0.68, self.preferred-width); height: root.height;
+        x: unit-label.x - self.width - (root.value-unit == "" ? 0px : 4px); y: 0px;
+        width: min(max(0px, unit-label.x), min(root.width * 0.68, self.preferred-width)); height: root.height;
         text: root.value; font-family: root.value-family; horizontal-alignment: right;
+    }
+    unit-label := Caption {
+        x: root.width - self.width - (root.action == "" ? 0px : button.width + 12px); y: 0px;
+        width: root.value-unit == "" ? 0px : self.preferred-width; height: root.height;
+        text: root.value-unit;
+        visible: root.value-unit != "";
     }
     button := InlineAction {
         visible: root.action != "";
