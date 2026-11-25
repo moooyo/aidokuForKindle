@@ -27,6 +27,11 @@ cross-compilation additionally needs Zig, cargo-zigbuild, and the
 `armv7-unknown-linux-musleabihf` target. Kindle firmware verification needs a
 separately prepared, isolated Aidoku emulator instance and its guest SSH helper.
 Firmware images are not distributed in this repository or development ZIP.
+Check the [current firmware emulator status](FIRMWARE_EMULATOR.md) before
+using historical worker paths or starting a firmware build.
+The [November 22–23 performance follow-up](review/performance-followup-20261123.md)
+records separate historical Reader and Library measurements, not verification
+of the current checkout.
 
 Keep this task's workspace, build output, captures, emulator disks, and guest
 paths separate from the active sibling WeRead session. Shared read-only compiler
@@ -48,7 +53,10 @@ The wrapper synchronizes files and invokes commands remotely. Its defaults use
 outputs. It checks formatting, runs Rust tests and launcher tests, builds the
 desktop application, checks shell syntax, and, unless skipped, runs the desktop
 UI harness. `-Kindle` builds/packages ARM; `-Firmware` also runs the native
-firmware harness using the isolated `aidoku-pw6-5201` instance.
+firmware harness when an isolated Aidoku guest has been provisioned and is
+running. The rebuilt worker now has separate Scribe and PW6 guests. Use the
+[instance and helper table](FIRMWARE_EMULATOR.md#instances) to select the
+profile and confirm readiness; the script defaults select PW6.
 
 Use the script's `RemoteDirectory`, `RemoteTargetDirectory`, `EmulatorRoot`,
 `GuestSsh`, and `Machine` parameters when the prepared environment differs.

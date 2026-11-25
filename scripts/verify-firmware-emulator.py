@@ -10,6 +10,7 @@ evidence. Synthetic panel waveforms cannot establish physical Kindle quality.
 from __future__ import annotations
 
 import argparse
+from contextlib import closing
 import dataclasses
 import datetime as dt
 import hashlib
@@ -18,12 +19,23 @@ import os
 from pathlib import Path
 import re
 import shlex
+import sqlite3
 import subprocess
 import sys
 import time
 from typing import Any
 
 from PIL import Image, ImageChops
+
+
+STARTUP_CASE = "startup-library"
+STARTUP_GEOMETRY = {"scribe": (1860, 2480), "pw6": (1272, 1696)}
+STARTUP_BOOKS = ("Firmware fixture one", "Firmware fixture two")
+SNAPSHOT_EVENTS = ["startup_toolbar_probe_started", "startup_toolbar_probe_ready", "startup_toolbar_snapshot_used"]
+LIBRARY_SUBMISSION = re.compile(
+    r"^aidoku: startup_library_submitted boottime_us=(\d+) sequence=(\d+) marker=(\d+) "
+    r"layout=(large|compact) library=nonempty grid=nonempty$", re.MULTILINE
+)
 
 
 @dataclasses.dataclass
@@ -52,17 +64,74 @@ def difference(first: Path, second: Path) -> float:
         return sum(histogram[17:]) / (left.width * left.height)
 
 
+def startup_library_fixture() -> bytes:
+    with closing(sqlite3.connect(":memory:")) as database:
+        database.executescript("""
+            CREATE TABLE books (
+                id TEXT PRIMARY KEY, source_id TEXT NOT NULL, remote_id TEXT NOT NULL,
+                title TEXT NOT NULL, in_library INTEGER NOT NULL, category TEXT NOT NULL,
+                updated_at INTEGER NOT NULL, document TEXT NOT NULL, UNIQUE(source_id, remote_id)
+            );
+            CREATE TABLE preferences (key TEXT PRIMARY KEY, document TEXT NOT NULL);
+            INSERT INTO preferences VALUES ('application', '{"language":"en"}');
+        """)
+        for index, title in enumerate(STARTUP_BOOKS, 1):
+            remote_id = f"firmware-{index}"
+            book = dict(id=f"5:local:{remote_id}", source_id="local", remote_id=remote_id,
+                        title=title, author="Fixture", description="", status="", cover="",
+                        chapter_count=0, unread=0, category="", in_library=True,
+                        updated_at=1700000000 + index)
+            database.execute("INSERT INTO books VALUES (?, ?, ?, ?, 1, '', ?, ?)",
+                             (book["id"], "local", remote_id, title, book["updated_at"], json.dumps(book)))
+        database.commit()
+        return database.serialize()
+
+
+def startup_evidence(log: str, trace: dict[str, Any], profile: str) -> dict[str, Any]:
+    stages = ("observer_start", "observer_wait_begin", "observer_ready", "portrait_begin",
+              "portrait_ready", "display_begin", "display_ready", "app_spawn_begin", "app_spawn_returned")
+    launcher = re.findall(r"^aidoku: launcher-diag v1 (\w+) (\d+\.\d+)$", log, re.MULTILINE)
+    require([stage for stage, _ in launcher if stage in stages] == list(stages),
+            "Launcher evidence did not put observer admission before portrait, display and GUI")
+    require(trace["success"] is True and trace["finished"] is True and trace["dropped_events"] == 0,
+            "The native app did not complete and flush its whole startup trace")
+    events = trace["events"]
+    stages = ("startup_initial_frame_submitted", "startup_initial_input_ready",
+              "startup_ready", "startup_library_frame_submitted")
+    checkpoints = [event for event in events if event["name"] in stages]
+    require([event["name"] for event in checkpoints] == list(stages),
+            "The startup trace is missing, repeats or reorders a Library checkpoint")
+    initial, fence, ready, library = checkpoints
+    require(initial["full"] is True and initial["frame_sequence"] == fence["frame_sequence"]
+            and initial["marker"] > 0 and initial["marker"] == fence["marker"]
+            and initial["at_us"] <= fence["at_us"] <= ready["at_us"] <= library["at_us"]
+            and initial["frame_sequence"] < library["frame_sequence"],
+            "Native Library submission did not follow the initial full-frame/input barrier")
+    submissions = LIBRARY_SUBMISSION.findall(log)
+    expected_layout = "large" if profile == "scribe" else "compact"
+    require(len(submissions) == 1 and submissions[0][1:] == (str(library["frame_sequence"]),
+                                                             str(library["marker"]), expected_layout),
+            "The populated Library submission did not match the trace and expected screen layout")
+    toolbar = [event for event in events if event["name"].startswith("startup_toolbar_")]
+    snapshot_used = [event["name"] for event in toolbar] == SNAPSHOT_EVENTS and (
+        initial["at_us"] <= toolbar[0]["at_us"] <= toolbar[1]["at_us"] <= toolbar[2]["at_us"] <= ready["at_us"]
+    )
+    return {"launcher_uptime_seconds": dict(launcher), "layout": expected_layout, "initial_frame": initial,
+            "input_ready": fence, "library_frame": library, "toolbar_events": toolbar,
+            "toolbar_snapshot_used": snapshot_used}
+
+
 class Verifier:
     def __init__(self, arguments: argparse.Namespace) -> None:
         self.arguments = arguments
         self.repository = Path(__file__).resolve().parents[1]
         self.binary = arguments.binary.resolve(strict=True)
-        header = self.binary.read_bytes()[:20]
+        with self.binary.open("rb") as binary:
+            header = binary.read(20)
         require(len(header) == 20 and header[:6] == b"\x7fELF\x01\x01", "A 32-bit little-endian ELF is required")
         require(int.from_bytes(header[18:20], "little") == 40, "The executable is not ARM")
-        self.binary_sha256 = hashlib.sha256(self.binary.read_bytes()).hexdigest()
-        self.launcher_sha256 = hashlib.sha256((self.repository / "packaging/kindle/launch.sh").read_bytes()).hexdigest()
-        self.wrapper_sha256 = hashlib.sha256((self.repository / "packaging/tests/emulator-wrapper.sh").read_bytes()).hexdigest()
+        self.launcher = self.repository / "packaging/kindle/launch.sh"
+        self.wrapper = self.repository / "packaging/tests/emulator-wrapper.sh"
         self.guest_ssh = arguments.guest_ssh.resolve(strict=True)
         self.emulator_root = arguments.emulator_root.resolve(strict=True)
         self.qmp_script = self.emulator_root / "scripts/eink-qmp.py"
@@ -111,33 +180,44 @@ class Verifier:
         destination.parent.mkdir(parents=True, exist_ok=True)
         destination.write_bytes(self.guest(f"cat {shlex.quote(guest_path)}", timeout=60))
 
-    def prepare(self) -> None:
+    def inspect_guest(self) -> None:
         marker = self.guest("cat /var/local/aidoku-emulator-id").decode().strip()
         require(marker == self.arguments.machine, "The guest identity marker does not match the selected Aidoku QMP machine")
         firmware = self.guest("cat /etc/prettyversion.txt").decode().strip()
         require(re.search(rf"\b{re.escape(self.arguments.firmware)}\b", firmware) is not None, f"Unexpected guest firmware: {firmware}")
         require(self.qmp("status").get("running") is True, "The isolated emulator is not running")
+        mount = self.guest("awk '$2 == \"/mnt/us\" { mount = $0 } END { print mount }' /proc/mounts").decode().strip()
+        require(len(mount.split()) >= 4 and "noexec" not in mount.split()[3].split(","),
+                "The effective guest userstore mount is missing or not executable")
         self.environment = {
             "machine": marker,
             "firmware": firmware,
             "kernel": self.guest("uname -a").decode().strip(),
-            "mount": self.guest("cat /proc/mounts | awk '$2 == \"/mnt/us\" {print}'").decode().strip(),
+            "mount": mount,
             "identity_marker": "/var/local/aidoku-emulator-id",
             "qmp": self.qmp("display"),
         }
-        require("noexec" not in self.environment["mount"], "The guest userstore is not executable")
         require(self.guest("if [ -e /tmp/aidoku-launcher.lock ]; then printf busy; else printf free; fi").decode() == "free", "An existing Aidoku launcher owns the display; it will not be interrupted")
-        self.guest(f"mkdir -p {shlex.quote(self.guest_root + '/app')} {shlex.quote(self.guest_root + '/data/logs')}")
-        self.put(self.binary, self.guest_root + "/app/aidoku.native", "755")
-        self.put(self.repository / "packaging/tests/emulator-wrapper.sh", self.guest_root + "/app/aidoku", "755")
-        self.put(self.repository / "packaging/kindle/launch.sh", self.guest_root + "/launch.sh", "755")
-        self.guest(f"printf '%s\\n' {shlex.quote(self.arguments.profile)} >{shlex.quote(self.guest_root + '/data/device-profile')}")
-        observed_hash = self.guest(f"sha256sum {shlex.quote(self.guest_root + '/app/aidoku.native')}").decode().split()[0]
-        require(observed_hash == self.binary_sha256, "The deployed ARM binary hash does not match the tested artifact")
+
+    def capture_stock(self) -> None:
         self.qmp("screendump", str(self.output / "stock-before.png"))
         with Image.open(self.output / "stock-before.png") as frame:
             self.native_size = frame.size
         self.logical_size = (self.native_size[0] // 2, self.native_size[1] // 2)
+
+    def prepare(self) -> None:
+        self.inspect_guest()
+        self.binary_sha256 = hashlib.sha256(self.binary.read_bytes()).hexdigest()
+        self.launcher_sha256 = hashlib.sha256(self.launcher.read_bytes()).hexdigest()
+        self.wrapper_sha256 = hashlib.sha256(self.wrapper.read_bytes()).hexdigest()
+        self.guest(f"mkdir -p {shlex.quote(self.guest_root + '/app')} {shlex.quote(self.guest_root + '/data/logs')}")
+        self.put(self.binary, self.guest_root + "/app/aidoku.native", "755")
+        self.put(self.wrapper, self.guest_root + "/app/aidoku", "755")
+        self.put(self.launcher, self.guest_root + "/launch.sh", "755")
+        self.guest(f"printf '%s\\n' {shlex.quote(self.arguments.profile)} >{shlex.quote(self.guest_root + '/data/device-profile')}")
+        observed_hash = self.guest(f"sha256sum {shlex.quote(self.guest_root + '/app/aidoku.native')}").decode().split()[0]
+        require(observed_hash == self.binary_sha256, "The deployed ARM binary hash does not match the tested artifact")
+        self.capture_stock()
 
     def touch(self, name: str, default: tuple[float, float]) -> None:
         logical = self.tap_map.get(name, default)
@@ -194,7 +274,7 @@ class Verifier:
             "if [ -r /tmp/aidoku-launcher.lock/pid ]; then "
             "aidoku_pid=$(cat /tmp/aidoku-launcher.lock/pid); "
             "case \"$aidoku_pid\" in ''|*[!0-9]*) exit 0;; esac; "
-            f"if tr '\\000' ' ' </proc/$aidoku_pid/cmdline | grep -F {root} >/dev/null; then "
+            f"if tr '\\000' '\\n' </proc/$aidoku_pid/cmdline | grep -Fx {root} >/dev/null; then "
             "kill -TERM \"$aidoku_pid\"; fi; fi"
         )
         try:
@@ -214,6 +294,161 @@ class Verifier:
             "statusbar_running": "start/running" in raw,
             "awesome_stopped": any(re.search(r"^AWESOME=\d+:[Tt]", line) for line in raw.splitlines()),
         }
+
+    def run_startup_case(self, helper: bool) -> Result:
+        name = f"{STARTUP_CASE}-with-helper" if helper else STARTUP_CASE
+        result = Result(name=name)
+        started = time.monotonic()
+        root = shlex.quote(self.guest_root)
+        log_path = self.output / f"{name}.log"
+        result.artifacts.append(str(log_path))
+        process: subprocess.Popen[bytes] | None = None
+        paths = {label: self.output / f"{name}.{label}" for label in ("trace.json", "metadata.json", "state.json", "app.png")}
+        guest_artifacts = {"trace.json": "startup-trace.json", "metadata.json": "native-library.metadata.json",
+                           "state.json": "native-library.state.json", "app.png": "native-library.png"}
+        try:
+            baseline_services = self.service_state()
+            require(baseline_services["statusbar_running"] and not baseline_services["awesome_stopped"]
+                    and "AWESOME=" in baseline_services["raw"], "The stock guest desktop is not ready")
+            profile = shlex.quote(self.arguments.profile)
+            self.guest(f"set -eu; mkdir {root}/data; mkdir {root}/data/logs; "
+                       f"printf '%s\\n' {profile} > {root}/data/device-profile; "
+                       f"printf '%s\\n' {self.arguments.duration_ms} > {root}/data/logs/test-duration-ms; "
+                       f": > {root}/data/logs/test-startup-library")
+            self.guest(f"cat > {root}/data/library.sqlite3", payload=startup_library_fixture())
+            stock = self.output / f"{name}.stock-before.png"
+            self.qmp("screendump", str(stock))
+            result.artifacts.append(str(stock))
+            command = ("unset AIDOKU_LOCK_DIR AIDOKU_FRAMEBUFFER AIDOKU_CATALOG_NOTIFY_HELPER AIDOKU_CATALOG_NOTIFY_SHA256; "
+                       f"export AIDOKU_HOME={root} AIDOKU_MANAGED_LIBRARY=1 AIDOKU_LAUNCHER_DIAGNOSTICS=launcher-v1; "
+                       f"exec sh {root}/launch.sh --foreground")
+            with log_path.open("wb") as log:
+                process = subprocess.Popen([str(self.guest_ssh), command], stdout=log, stderr=subprocess.STDOUT)
+                deadline = time.monotonic() + self.arguments.startup_seconds
+                while not LIBRARY_SUBMISSION.search(log_path.read_text(errors="replace")):
+                    require(process.poll() is None, "The launcher exited before the populated Library submitted a frame")
+                    require(time.monotonic() < deadline, "Timed out waiting for the populated Library submission")
+                    time.sleep(0.1)
+                frame = self.output / f"{name}.framebuffer.png"
+                capture_deadline = time.monotonic() + 5
+                while True:
+                    self.qmp("screendump", str(frame))
+                    changed = difference(stock, frame)
+                    if changed > 0.0005 or time.monotonic() >= capture_deadline or process.poll() is not None:
+                        break
+                    time.sleep(0.1)
+                result.artifacts.append(str(frame))
+                require(process.poll() is None, "The launcher exited before QMP captured the app framebuffer")
+                require(process.wait(timeout=self.arguments.duration_ms / 1000 + 15) == 0,
+                        "The launcher did not exit successfully after the controlled application deadline")
+            for label, path in paths.items():
+                self.retrieve(f"{self.guest_root}/data/logs/{guest_artifacts[label]}", path)
+                result.artifacts.append(str(path))
+            metadata = read_json(paths["metadata.json"])
+            state = read_json(paths["state.json"])
+            trace = read_json(paths["trace.json"])
+            require(metadata["backend"] == "kindle" and metadata["profile"] == self.arguments.profile
+                    and tuple(metadata["window_size"]) == self.native_size and metadata["scale_factor"] == 2
+                    and tuple(metadata["logical_size"]) == self.logical_size
+                    and metadata["process_id"] == trace["process_id"],
+                    "The application capture does not match the native guest geometry and traced process")
+            require(state["route"] == "library" and state["demo"] is False and state["offline"] is True
+                    and state["database"] == f"{self.guest_root}/data/library.sqlite3"
+                    and state["library_count"] == len(STARTUP_BOOKS)
+                    and sorted(book["title"] for book in state["visible_books"]) == sorted(STARTUP_BOOKS),
+                    "The native app did not project the isolated non-demo Library fixture")
+            with Image.open(frame) as scanout, Image.open(paths["app.png"]) as snapshot:
+                require(scanout.size == self.native_size and scanout.convert("L").getextrema()[0] < 85
+                        and snapshot.size == tuple(metadata["snapshot_size"]), "Invalid native framebuffer or app snapshot")
+            require(changed > 0.0005, "QMP did not observe a visible change from the stock framebuffer")
+            result.checks = startup_evidence(log_path.read_text(errors="replace"), trace, self.arguments.profile)
+            result.checks.update({"baseline_services": baseline_services, "metadata": metadata,
+                                  "framebuffer_change_ratio": changed, "visible_books": state["visible_books"]})
+            if helper and self.arguments.require_toolbar_snapshot:
+                require(result.checks["toolbar_snapshot_used"], "The first Library did not use a toolbar snapshot")
+        except Exception as error:
+            result.error = str(error)
+        finally:
+            if process is not None and process.poll() is None:
+                self.stop_owned_launcher()
+                try:
+                    process.wait(timeout=15)
+                except subprocess.TimeoutExpired:
+                    process.terminate()
+                    try:
+                        process.wait(timeout=5)
+                    except subprocess.TimeoutExpired:
+                        process.kill()
+                        process.wait(timeout=5)
+            if process is not None and result.error:
+                paths["portrait.stderr"] = self.output / f"{name}.portrait.stderr"
+                guest_artifacts["portrait.stderr"] = "native-portrait.stderr"
+                for label, path in paths.items():
+                    if not path.exists():
+                        try:
+                            self.retrieve(f"{self.guest_root}/data/logs/{guest_artifacts[label]}", path)
+                        except Exception:
+                            continue
+                        result.artifacts.append(str(path))
+            try:
+                self.guest(f"test ! -e /tmp/aidoku-launcher.lock && rm -rf {root}/data")
+                result.checks["launcher_lock_removed"] = True
+                after = self.service_state()
+                result.checks["restored_services"] = after
+                require(after["statusbar_running"] and not after["awesome_stopped"] and "AWESOME=" in after["raw"],
+                        "The launcher did not restore the stock guest desktop")
+                result.checks["desktop_restored"] = True
+            except Exception as error:
+                result.error = "; ".join(filter(None, (result.error, f"Cleanup verification: {error}")))
+        result.passed = result.error is None
+        result.duration_seconds = round(time.monotonic() - started, 3)
+        print(f"{'PASS' if result.passed else 'FAIL'} {name}" + (f": {result.error}" if result.error else ""), flush=True)
+        return result
+
+    def run_startup_library(self) -> int:
+        self.inspect_guest()
+        self.capture_stock()
+        require(self.native_size == STARTUP_GEOMETRY[self.arguments.profile],
+                f"Unexpected visible firmware framebuffer: {self.native_size}")
+        root = shlex.quote(self.guest_root)
+        self.guest(f"set -eu; umask 077; mkdir -p /mnt/us/aidoku-native-tests; "
+                   f"test ! -L /mnt/us/aidoku-native-tests; mkdir {root}")
+        cleaned = False
+        error = None
+        try:
+            self.guest(f"mkdir {root}/app")
+            files = [(self.binary, "app/aidoku.native"), (self.wrapper, "app/aidoku"), (self.launcher, "launch.sh")]
+            for source, target in files:
+                destination = f"{self.guest_root}/{target}"
+                self.put(source, destination, "755")
+                self.guest(f"cmp -s - {shlex.quote(destination)}", payload=source.read_bytes(), timeout=120)
+            self.guest(f"test ! -e {root}/app/aidoku-native-query")
+            baseline = self.run_startup_case(False)
+            self.results.append(baseline)
+            if self.arguments.native_query and baseline.checks.get("desktop_restored"):
+                destination = f"{self.guest_root}/app/aidoku-native-query"
+                self.put(self.arguments.native_query, destination, "755")
+                self.guest(f"cmp -s - {shlex.quote(destination)}", payload=self.arguments.native_query.read_bytes())
+                self.results.append(self.run_startup_case(True))
+        except Exception as failure:
+            error = str(failure)
+        finally:
+            try:
+                self.guest(f"test ! -e /tmp/aidoku-launcher.lock && rm -rf {root} && test ! -e {root}")
+                cleaned = True
+            except Exception as failure:
+                error = "; ".join(filter(None, (error, f"Fixture cleanup: {failure}")))
+        passed = sum(result.passed for result in self.results)
+        required = 2 if self.arguments.native_query else 1
+        report = {"environment": self.environment, "binary": str(self.binary), "profile": self.arguments.profile,
+                  "launcher": str(self.launcher), "guest_fixture_cleaned": cleaned, "error": error,
+                  "native_size": self.native_size, "logical_size": self.logical_size,
+                  "passed": passed, "failed": required - passed, "cases": [dataclasses.asdict(result) for result in self.results],
+                  "scope": "Managed foreground launcher in full-system QEMU; no stock card tap or physical timing."}
+        report_path = self.output / "report.json"
+        report_path.write_text(json.dumps(report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+        print(json.dumps({"report": str(report_path), "passed": passed, "required": required, "error": error}), flush=True)
+        return 0 if passed == required and error is None and cleaned else 1
 
     def run_case(self, name: str, screen: str, touches: list[tuple[str, tuple[float, float]]], expected_route: str, *, menu: bool | None = None, page_advance: bool = False, drags: list[tuple[str, tuple[float, float], tuple[float, float]]] = (), expected_page: int | None = None) -> None:
         result = Result(name=name)
@@ -399,7 +634,9 @@ def main() -> int:
     parser.add_argument("--output-dir", type=Path, default=Path("artifacts/native"))
     parser.add_argument("--duration-ms", type=int, default=18000)
     parser.add_argument("--startup-seconds", type=float, default=90)
-    parser.add_argument("--cases", help="Comma-separated native case names")
+    parser.add_argument("--cases", help="Comma-separated demo case names, or startup-library by itself")
+    parser.add_argument("--native-query", type=Path, help="Repeat startup-library with this native AQ1 helper")
+    parser.add_argument("--require-toolbar-snapshot", action="store_true", help="Require snapshot use in the startup-library run with --native-query")
     parser.add_argument("--include-pagination", action="store_true", help="Add hardware list drags; requires the unified input-observer ARM build")
     parser.add_argument("--tap-map", type=Path, help="Optional logical-coordinate overrides keyed by touch name")
     arguments = parser.parse_args()
@@ -409,8 +646,18 @@ def main() -> int:
         parser.error("The native case duration must be between 1200 and 180000 milliseconds")
     if not 1 <= arguments.startup_seconds <= 90:
         parser.error("The native startup deadline must be between 1 and 90 seconds")
+    startup = arguments.cases == STARTUP_CASE
+    if arguments.cases and STARTUP_CASE in arguments.cases.split(",") and not startup:
+        parser.error("Run startup-library separately from the other firmware cases")
+    if arguments.native_query and not startup:
+        parser.error("--native-query requires --cases startup-library")
+    if arguments.require_toolbar_snapshot and not arguments.native_query:
+        parser.error("--require-toolbar-snapshot requires --native-query")
+    if startup and (arguments.profile not in STARTUP_GEOMETRY or arguments.duration_ms < 4000):
+        parser.error("startup-library requires scribe or pw6 and at least 4000 milliseconds for QMP capture")
     try:
-        return Verifier(arguments).run()
+        verifier = Verifier(arguments)
+        return verifier.run_startup_library() if startup else verifier.run()
     except Exception as error:
         print(f"Native verification setup failed: {error}", file=sys.stderr)
         return 2

@@ -24,5 +24,13 @@ case "$DURATION" in
 esac
 [ "$DURATION" -ge 1200 ] && [ "$DURATION" -le 180000 ] || exit 1
 [ -x "$NATIVE" ] || { printf '%s\n' 'The immutable native test executable is missing.' >&2; exit 1; }
+if [ -f "$LOG_DIR/test-startup-library" ]; then
+    case " $* " in
+        *' --capture-native-portrait '*) exec "$NATIVE" "$@" 2>"$LOG_DIR/native-portrait.stderr" ;;
+        *' --authorize-native-portrait-resume '*|*' --native-power-state '*) exec "$NATIVE" "$@" ;;
+    esac
+    exec "$NATIVE" "$@" --offline --screen library --capture "$LOG_DIR/native-library.png" \
+        --performance-trace "$LOG_DIR/startup-trace.json" --exit-after-ms "$DURATION"
+fi
 exec "$NATIVE" "$@" --demo --offline --screen "$SCREEN" \
     --capture "$LOG_DIR/native-$SCREEN.png" --exit-after-ms "$DURATION"
