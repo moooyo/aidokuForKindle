@@ -805,6 +805,9 @@ fn pagination_observer(
                 pagination.cancel();
                 return false;
             };
+            if input.phase == PointerPhase::Release {
+                app.borrow_mut().dismiss_toast();
+            }
             let enabled = {
                 let application = app.borrow();
                 let (route, modal) = application.gesture_context();
@@ -859,7 +862,7 @@ fn pagination_observer(
                 .is_some_and(|app| {
                     let application = app.borrow();
                     let (route, modal) = application.gesture_context();
-                    route != "reader" && modal.is_empty()
+                    modal.is_empty() && (route != "reader" || application.has_toast())
                 })
         },
     )

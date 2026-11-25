@@ -10,6 +10,8 @@ pub(crate) struct ServerState {
     configurations: HashMap<String, SourceConfig>,
     connections: HashMap<String, ConnectionState>,
     editing_source: String,
+    draft: Option<SourceConfig>,
+    draft_status: String,
     keyboard: Option<ServerKeyboard>,
     next_attempt: u64,
 }
@@ -28,6 +30,7 @@ struct ConnectionAttempt {
     network_epoch: u64,
     catalog_generation: u64,
     catalog_filter: i32,
+    preview: bool,
 }
 
 struct ServerKeyboard {
@@ -329,14 +332,14 @@ impl App {
     }
 
     fn refresh_server_test_choice(&mut self) {
-        let Some(config) = self
-            .server_configuration
-            .configurations
-            .get(&self.current_source)
-        else {
+        let Some(config) = self.server_configuration.draft.as_ref().or_else(|| {
+            self.server_configuration
+                .configurations
+                .get(&self.server_configuration.editing_source)
+        }) else {
             return;
         };
-        let status = self.server_connection_status(config);
+        let status = self.server_form_status(config);
         if self.modal == "choices" && self.modal_context == "server-configuration" {
             if let Some((_, _, value)) = self
                 .choice_rows
@@ -346,6 +349,32 @@ impl App {
                 *value = status;
             }
             self.sync_choice_rows();
+        }
+    }
+
+    fn server_form_status(&self, config: &SourceConfig) -> String {
+        if self.server_configuration.draft_status.is_empty() {
+            self.server_connection_status(config)
+        } else {
+            self.server_configuration.draft_status.clone()
+        }
+    }
+
+    pub(crate) fn cancel_server_configuration(&mut self) {
+        self.server_configuration.draft = None;
+        self.server_configuration.draft_status.clear();
+        let source = std::mem::take(&mut self.server_configuration.editing_source);
+        if let Some(connection) = self.server_configuration.connections.get_mut(&source) {
+            if connection
+                .attempt
+                .as_ref()
+                .is_some_and(|attempt| attempt.preview)
+            {
+                if let Some(attempt) = connection.attempt.take() {
+                    self.pending.remove(&attempt.job);
+                    self.busy = !self.pending.is_empty();
+                }
+            }
         }
     }
 
@@ -359,18 +388,77 @@ impl App {
         } else {
             value.to_owned()
         };
-        if source != self.current_source {
+        if action == "settings" {
+            self.cancel_server_configuration();
+            let config = self
+                .store
+                .source(&source)?
+                .filter(is_server)
+                .context("The native server configuration is unavailable")?;
+            self.server_configuration
+                .configurations
+                .insert(source.clone(), config.clone());
+            self.server_configuration.editing_source = source.clone();
+            self.server_configuration.draft = Some(config);
+            return self.show_server_panel(&source, ServerPanel::Settings);
+        }
+        let form_open = self.modal == "choices"
+            && matches!(
+                self.modal_context.as_str(),
+                "server-configuration" | "server-credentials"
+            )
+            && source == self.server_configuration.editing_source;
+        if source != self.current_source && !form_open {
             bail!("{}", tr("request_superseded"));
         }
         let config = self
             .server_configuration
-            .configurations
-            .get(&source)
+            .draft
+            .as_ref()
+            .filter(|config| form_open && config.id == source)
+            .or_else(|| self.server_configuration.configurations.get(&source))
             .cloned()
             .context("The native server configuration is unavailable")?;
         self.server_configuration.editing_source = source.clone();
         match action {
-            "settings" => self.show_server_panel(&source, ServerPanel::Settings),
+            "back" => self.show_server_panel(&source, ServerPanel::Settings),
+            "preview" => {
+                if let Err(error) = self.test_server_connection(&source, true) {
+                    self.server_configuration.draft_status = error.to_string();
+                    self.refresh_server_test_choice();
+                }
+                Ok(())
+            }
+            "save" => {
+                let mut refresh_catalog = false;
+                if let Some(draft) = self.server_configuration.draft.clone() {
+                    let previous = self.server_configuration.configurations.get(&source);
+                    if previous.is_none_or(|previous| {
+                        !same_server_settings(previous, &draft)
+                            || verified(previous) != verified(&draft)
+                            || previous.options.get("_cached_listings")
+                                != draft.options.get("_cached_listings")
+                    }) {
+                        refresh_catalog = self.route == "catalog"
+                            && source == self.current_source
+                            && verified(&draft);
+                        self.persist_server_configuration(draft)?;
+                    }
+                }
+                self.cancel_server_configuration();
+                self.modal.clear();
+                self.modal_context.clear();
+                if refresh_catalog {
+                    self.fetch_catalog(false)?;
+                }
+                Ok(())
+            }
+            "pair" => {
+                self.cancel_server_configuration();
+                self.modal.clear();
+                self.modal_context.clear();
+                self.open_pairing()
+            }
             "edit-credential" => self.show_server_panel(&source, ServerPanel::Credentials),
             "edit-address" => {
                 self.open_server_keyboard("server-address", &config.base_url, &source)
@@ -420,7 +508,7 @@ impl App {
                         "session"
                     }),
                 );
-                self.persist_server_configuration(config)?;
+                self.stage_server_configuration(config)?;
                 self.show_server_panel(&source, ServerPanel::Credentials)
             }
             "clear-credential" => {
@@ -429,10 +517,10 @@ impl App {
                 config.password.clear();
                 config.token.clear();
                 config.options.remove("api_key");
-                self.persist_server_configuration(config)?;
+                self.stage_server_configuration(config)?;
                 self.show_server_panel(&source, ServerPanel::Credentials)
             }
-            "test-connect" => self.test_server_connection(&source),
+            "test-connect" => self.test_server_connection(&source, false),
             _ => Ok(()),
         }
     }
@@ -440,15 +528,17 @@ impl App {
     fn show_server_panel(&mut self, source: &str, panel: ServerPanel) -> Result<()> {
         let config = self
             .server_configuration
-            .configurations
-            .get(source)
+            .draft
+            .as_ref()
+            .filter(|config| config.id == source)
+            .or_else(|| self.server_configuration.configurations.get(source))
             .context("The native server configuration is unavailable")?;
         let row = |action: &str, label: &str, value: String| {
             (format!("server-config:{action}"), tr(label), value)
         };
         let (title, context, mut rows) = match panel {
             ServerPanel::Settings => (
-                "source_preferences",
+                "server_configuration_title",
                 "server-configuration",
                 vec![
                     row("edit-address", "server_url", config.base_url.clone()),
@@ -519,10 +609,11 @@ impl App {
             rows.push(row(
                 "test-connect",
                 "test_and_connect",
-                self.server_connection_status(config),
+                self.server_form_status(config),
             ));
         }
-        self.show_choices(&tr(title), context, rows)
+        let title = tr(title).replace("{source}", &config.name);
+        self.show_choices(&title, context, rows)
     }
 
     fn open_server_keyboard(&mut self, target: &str, text: &str, source: &str) -> Result<()> {
@@ -587,74 +678,119 @@ impl App {
             .take()
             .context("The native server input is no longer active")?;
         if keyboard.source != self.current_source
+            && keyboard.source != self.server_configuration.editing_source
             || keyboard.source_revision != self.source_revision
         {
             bail!("{}", tr("request_superseded"));
         }
         let mut config = self
             .server_configuration
-            .configurations
-            .get(&keyboard.source)
+            .draft
+            .as_ref()
+            .filter(|draft| keyboard.return_panel.is_some() && draft.id == keyboard.source)
+            .or_else(|| {
+                self.server_configuration
+                    .configurations
+                    .get(&keyboard.source)
+            })
             .cloned()
             .context("The native server configuration is unavailable")?;
-        match target {
-            "server-address" => config.base_url = server_address(text)?,
-            "server-username" => {
-                config.username = credential_text(text, 1024, true)?;
-                config.token.clear();
-                config.options.remove("api_key");
-            }
-            "server-password" => {
-                config.password = credential_text(text, 4096, false)?;
-                config.token.clear();
-                config.options.remove("api_key");
-            }
-            "server-api-key" => {
-                let key = credential_text(text, 16384, true)?;
-                config.username.clear();
-                config.password.clear();
-                if config.kind.eq_ignore_ascii_case("kavita") {
+        let validated = (|| -> Result<()> {
+            match target {
+                "server-address" => config.base_url = server_address(text)?,
+                "server-username" => {
+                    config.username = credential_text(text, 1024, true)?;
                     config.token.clear();
-                    config.options.insert("api_key".into(), json!(key));
-                } else if config.kind.eq_ignore_ascii_case("komga") {
-                    config.token = key;
                     config.options.remove("api_key");
-                } else {
-                    bail!("{}", tr("server_invalid_credential"));
                 }
-            }
-            "server-token" => {
-                if config.kind.eq_ignore_ascii_case("komga") {
-                    bail!("{}", tr("server_invalid_credential"));
+                "server-password" => {
+                    config.password = credential_text(text, 4096, false)?;
+                    config.token.clear();
+                    config.options.remove("api_key");
                 }
-                config.token = credential_text(text, 16384, true)?;
-                config.username.clear();
-                config.password.clear();
-                config.options.remove("api_key");
-            }
-            "server-source-id" => {
-                let id = text.trim();
-                if !config.kind.eq_ignore_ascii_case("suwayomi")
-                    || id.len() > 128
-                    || (!id.is_empty() && id.parse::<i64>().is_err())
-                {
-                    bail!("{}", tr("server_invalid_source_id"));
+                "server-api-key" => {
+                    let key = credential_text(text, 16384, true)?;
+                    config.username.clear();
+                    config.password.clear();
+                    if config.kind.eq_ignore_ascii_case("kavita") {
+                        config.token.clear();
+                        config.options.insert("api_key".into(), json!(key));
+                    } else if config.kind.eq_ignore_ascii_case("komga") {
+                        config.token = key;
+                        config.options.remove("api_key");
+                    } else {
+                        bail!("{}", tr("server_invalid_credential"));
+                    }
                 }
-                config.options.insert("source_id".into(), json!(id));
+                "server-token" => {
+                    if config.kind.eq_ignore_ascii_case("komga") {
+                        bail!("{}", tr("server_invalid_credential"));
+                    }
+                    config.token = credential_text(text, 16384, true)?;
+                    config.username.clear();
+                    config.password.clear();
+                    config.options.remove("api_key");
+                }
+                "server-source-id" => {
+                    let id = text.trim();
+                    if !config.kind.eq_ignore_ascii_case("suwayomi")
+                        || id.len() > 128
+                        || (!id.is_empty() && id.parse::<i64>().is_err())
+                    {
+                        bail!("{}", tr("server_invalid_source_id"));
+                    }
+                    config.options.insert("source_id".into(), json!(id));
+                }
+                _ => unreachable!(),
             }
-            _ => unreachable!(),
+            Ok(())
+        })();
+        if let Err(error) = validated {
+            if keyboard.return_panel.is_some() && self.server_configuration.draft.is_some() {
+                self.server_configuration.draft_status = error.to_string();
+                self.show_server_panel(&keyboard.source, ServerPanel::Settings)?;
+                return Ok(true);
+            }
+            return Err(error);
         }
-        self.persist_server_configuration(config)?;
+        self.stage_server_configuration(config)?;
         if let Some(panel) = keyboard.return_panel {
             self.show_server_panel(&keyboard.source, panel)?;
         }
         Ok(true)
     }
 
-    fn persist_server_configuration(&mut self, mut config: SourceConfig) -> Result<()> {
+    fn stage_server_configuration(&mut self, mut config: SourceConfig) -> Result<()> {
         config
             .options
             .insert(VERIFIED_OPTION.into(), Value::Bool(false));
+        if self
+            .server_configuration
+            .draft
+            .as_ref()
+            .is_some_and(|draft| draft.id == config.id)
+        {
+            self.server_configuration.draft = Some(config);
+            self.server_configuration.draft_status.clear();
+            Ok(())
+        } else {
+            self.persist_server_configuration(config)
+        }
+    }
+
+    pub(crate) fn cancel_server_keyboard(&mut self) -> Result<bool> {
+        let Some(keyboard) = self.server_configuration.keyboard.take() else {
+            return Ok(false);
+        };
+        self.clear_server_keyboard();
+        self.modal.clear();
+        if let Some(panel) = keyboard.return_panel {
+            self.show_server_panel(&keyboard.source, panel)?;
+        }
+        Ok(true)
+    }
+
+    fn persist_server_configuration(&mut self, config: SourceConfig) -> Result<()> {
         self.store.save_source(&config)?;
         self.source_images_changed();
         if config.id == self.current_source {
@@ -675,15 +811,19 @@ impl App {
         Ok(())
     }
 
-    fn test_server_connection(&mut self, source: &str) -> Result<()> {
+    fn test_server_connection(&mut self, source: &str, preview: bool) -> Result<()> {
         if self.options.offline || self.options.demo {
             bail!("{}", tr("offline_help"));
         }
-        let config = self
-            .server_configuration
-            .configurations
-            .get(source)
-            .context("The native server configuration is unavailable")?;
+        let config = if preview {
+            self.server_configuration
+                .draft
+                .as_ref()
+                .filter(|draft| draft.id == source)
+        } else {
+            self.server_configuration.configurations.get(source)
+        }
+        .context("The native server configuration is unavailable")?;
         if is_fixture(config) {
             bail!("{}", tr("offline_help"));
         }
@@ -720,15 +860,23 @@ impl App {
             .get(self.catalog_filter.max(0) as usize)
             .map(|(id, _)| id.clone())
             .unwrap_or_else(|| "popular".into());
+        let preview_config = preview.then(|| config.clone());
+        let data_dir = self.data_dir.clone();
         let job = self.spawn_job_kind(true, JobKind::ServerConnection, move |manager| {
-            let result = manager
-                .browse_page(&source_id, 1, &sort)
-                .map(|page| ConnectedCatalog {
-                    books: page.books,
-                    has_next: page.has_next,
-                    listings: manager.listings(&source_id).unwrap_or_default(),
-                })
-                .map_err(|error| ServerFailure::from_error(&error));
+            let result = (|| -> Result<ConnectedCatalog> {
+                let manager = match preview_config {
+                    Some(config) => Arc::new(SourceManager::new(&data_dir, &[config])?),
+                    None => manager,
+                };
+                manager
+                    .browse_page(&source_id, 1, &sort)
+                    .map(|page| ConnectedCatalog {
+                        books: page.books,
+                        has_next: page.has_next,
+                        listings: manager.listings(&source_id).unwrap_or_default(),
+                    })
+            })()
+            .map_err(|error| ServerFailure::from_error(&error));
             Ok(JobResult::ServerConnected(ServerConnection {
                 source: source_id,
                 sequence,
@@ -743,6 +891,7 @@ impl App {
             network_epoch: self.network_control.epoch(),
             catalog_generation: self.catalog_generation,
             catalog_filter: self.catalog_filter,
+            preview,
         };
         self.server_configuration.connections.insert(
             source.into(),
@@ -751,6 +900,9 @@ impl App {
                 failure: None,
             },
         );
+        if preview {
+            self.server_configuration.draft_status = tr("server_connecting");
+        }
         self.sync_server_configuration_state();
         self.refresh_server_test_choice();
         Ok(())
@@ -778,6 +930,13 @@ impl App {
                     || attempt.network_epoch != epoch
                     || !self.pending.contains(&attempt.job)
             }) {
+                if connection
+                    .attempt
+                    .as_ref()
+                    .is_some_and(|attempt| attempt.preview)
+                {
+                    self.server_configuration.draft_status = tr("server_connection_cancelled");
+                }
                 connection.attempt = None;
                 connection.failure = None;
                 changed = true;
@@ -797,15 +956,27 @@ impl App {
                 .as_ref()
                 .is_some_and(|attempt| attempt.job == job)
             {
-                connection.attempt = None;
+                let preview = connection
+                    .attempt
+                    .take()
+                    .is_some_and(|attempt| attempt.preview);
                 connection.failure = None;
-                source = Some(id.clone());
+                source = Some((id.clone(), preview));
                 break;
             }
         }
-        let Some(source) = source else {
+        let Some((source, preview)) = source else {
             return false;
         };
+        if preview {
+            self.server_configuration.draft_status = if source_jobs::is_superseded(error) {
+                tr("server_connection_cancelled")
+            } else {
+                ServerFailure::from_error(error).label()
+            };
+            self.refresh_server_test_choice();
+            return true;
+        }
         if !source_jobs::is_superseded(error) {
             let failure = ServerFailure::from_error(error);
             if self.record_server_failure(&source, failure).is_err() {
@@ -870,6 +1041,34 @@ impl App {
         if !self.server_attempt_is_current(&attempt) {
             return Ok(());
         }
+        if attempt.preview {
+            if let Some(draft) = self
+                .server_configuration
+                .draft
+                .as_mut()
+                .filter(|draft| draft.id == connection.source)
+            {
+                self.server_configuration.draft_status = match connection.result {
+                    Ok(catalog) => {
+                        draft
+                            .options
+                            .insert(VERIFIED_OPTION.into(), Value::Bool(true));
+                        draft
+                            .options
+                            .insert("_cached_listings".into(), json!(catalog.listings));
+                        tr("connected")
+                    }
+                    Err(failure) => {
+                        draft
+                            .options
+                            .insert(VERIFIED_OPTION.into(), Value::Bool(false));
+                        failure.label()
+                    }
+                };
+                self.refresh_server_test_choice();
+            }
+            return Ok(());
+        }
         let Some(mut config) = self
             .server_configuration
             .configurations
@@ -894,10 +1093,7 @@ impl App {
                 self.server_configuration
                     .configurations
                     .insert(config.id.clone(), config);
-                let showing_catalog = self.route == "catalog"
-                    || (self.route == "sources"
-                        && self.platform.profile().is_scribe()
-                        && self.source_filter == 0);
+                let showing_catalog = self.route == "catalog";
                 if showing_catalog
                     && self.current_source == connection.source
                     && self.catalog_generation == attempt.catalog_generation
@@ -921,7 +1117,9 @@ impl App {
                             "server-configuration" | "server-credentials"
                         )
                     {
+                        self.cancel_server_configuration();
                         self.modal.clear();
+                        self.modal_context.clear();
                     }
                 }
                 self.sync_server_configuration_state();

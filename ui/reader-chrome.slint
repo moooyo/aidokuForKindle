@@ -1,24 +1,197 @@
 import { State, Commands } from "state.slint";
 import { Theme } from "theme.slint";
 import { Strings } from "strings.slint";
-import { BodyText, ActionButton } from "widgets.slint";
-import { NativeSlider } from "native-controls.slint";
+import { BodyText, Caption } from "widgets.slint";
+import { NativeChevron, NativeSlider } from "native-controls.slint";
+
+component ReaderGlyph inherits Path {
+    in property <string> kind;
+    in property <bool> active;
+    in property <bool> marked;
+    in property <color> foreground: Theme.ink;
+    width: State.large-screen ? 26px : 22px;
+    height: self.width;
+    viewbox-width: 24;
+    viewbox-height: 24;
+    fill: root.marked ? root.foreground : transparent;
+    stroke: root.foreground;
+    stroke-width: root.kind == "back" ? 1.9px : root.active ? 2.3px : 1.8px;
+    stroke-line-cap: round;
+    stroke-line-join: round;
+    accessible-role: none;
+    commands: root.kind == "back" ? "M20 12H5M11 6l-6 6 6 6" :
+        root.kind == "bookmark" ? "M6 3h12v18l-6-4.5L6 21z" :
+        root.kind == "toc" ? "M9 6h11M9 12h11M9 18h11M4.5 6h.01M4.5 12h.01M4.5 18h.01" :
+        root.kind == "mode" ? "M3 5h6a3 3 0 0 1 3 3v12a2.5 2.5 0 0 0-2.5-2.5H3zM21 5h-6a3 3 0 0 0-3 3v12a2.5 2.5 0 0 1 2.5-2.5H21z" :
+        root.kind == "picture" ? "M19.5 10A8 8 0 0 0 5.3 7.2M4.5 3.5v4h4M4.5 14a8 8 0 0 0 14.2 2.8M19.5 20.5v-4h-4" :
+        "M12 8a4 4 0 1 0 0 8a4 4 0 1 0 0-8zM12 2.5v2M12 19.5v2M2.5 12h2M19.5 12h2M5.3 5.3l1.4 1.4M17.3 17.3l1.4 1.4M5.3 18.7l1.4-1.4M17.3 6.7l1.4-1.4";
+}
+
+component ReaderHeaderAction inherits Rectangle {
+    in property <string> action;
+    in property <string> label;
+    in property <bool> marked;
+    in property <bool> enabled: true;
+    width: Theme.touch;
+    height: Theme.touch;
+    accessible-role: button;
+    accessible-label: root.label;
+    accessible-enabled: root.enabled;
+    accessible-checkable: root.action == "bookmark";
+    accessible-checked: root.marked;
+    ReaderGlyph {
+        x: (parent.width - self.width) / 2;
+        y: (parent.height - self.height) / 2;
+        width: root.action == "back" ? (State.large-screen ? 28px : 26px) : (State.large-screen ? 26px : 22px);
+        kind: root.action;
+        marked: root.marked;
+        foreground: root.enabled ? Theme.ink : Theme.line;
+    }
+    TouchArea {
+        x: 0px; y: 0px; width: parent.width; height: parent.height;
+        enabled: root.enabled;
+        clicked => { Commands.action("reader", root.action, ""); }
+    }
+}
+
+export component ReaderHeader inherits Rectangle {
+    property <length> inset: State.large-screen ? 20px : 10px;
+    property <string> chapter-number: State.current-chapter-number == "" ? "" : Strings.chapter-prefix + State.current-chapter-number + Strings.chapter-suffix;
+    background: Theme.paper;
+    Rectangle { x: 0px; y: parent.height - self.height; width: parent.width; height: Theme.control-border; background: Theme.ink; }
+    ReaderHeaderAction {
+        x: root.inset; y: (parent.height - Theme.control-border - self.height) / 2;
+        action: "back"; label: Strings.return-library;
+    }
+    Rectangle {
+        x: root.inset + Theme.touch + 6px; y: (parent.height - Theme.control-border - self.height) / 2;
+        width: max(0px, parent.width - 2 * self.x); height: book.height + 2px + chapter.height;
+        book := Caption {
+            x: 0px; y: 0px; width: parent.width; height: State.large-screen ? 22px : 19px;
+            text: State.current-book.title;
+            font-family: Theme.serif;
+            font-size: State.large-screen ? 15px : 13px;
+            font-weight: 700;
+        }
+        chapter := BodyText {
+            x: 0px; y: book.height + 2px; width: parent.width; height: State.large-screen ? 28px : 25px;
+            text: root.chapter-number == "" ? State.current-chapter : State.current-chapter == "" ? root.chapter-number :
+                root.chapter-number + " · " + State.current-chapter;
+            font-size: State.large-screen ? 21px : 18px;
+            font-weight: 700;
+        }
+    }
+    ReaderHeaderAction {
+        x: parent.width - root.inset - self.width; y: (parent.height - Theme.control-border - self.height) / 2;
+        action: "bookmark"; label: Strings.bookmark;
+        marked: State.reader-bookmarked; enabled: State.reader-image-ready;
+    }
+}
 
 export component NativeReaderTool inherits Rectangle {
     in property <string> action;
     in property <string> text;
     in property <bool> active;
-    background: touch.pressed ? Theme.fill : Theme.paper;
+    property <length> label-height: State.large-screen ? 22px : 20px;
     accessible-role: button;
     accessible-label: root.text;
-    BodyText { x: 0px; y: 0px; width: parent.width; height: parent.height; text: root.text; horizontal-alignment: center; font-size: State.large-screen ? 22px : 20px; font-weight: root.active ? 700 : 500; }
-    if root.active: Rectangle { x: (parent.width - 42px) / 2; y: parent.height - 11px; width: 42px; height: 3px; background: Theme.ink; }
-    touch := TouchArea { x: 0px; y: 0px; clicked => { Commands.action("reader", root.action, ""); } }
+    accessible-checkable: root.action != "toc";
+    accessible-checked: root.active;
+    if root.active: Rectangle { x: (parent.width - self.width) / 2; y: 0px; width: 56px; height: 4px; background: Theme.ink; }
+    glyph := ReaderGlyph {
+        x: (parent.width - self.width) / 2;
+        y: (parent.height - self.height - 3px - root.label-height) / 2;
+        kind: root.action;
+        active: root.active;
+    }
+    BodyText {
+        x: 0px; y: glyph.y + glyph.height + 3px; width: parent.width; height: root.label-height;
+        text: root.text;
+        font-size: State.large-screen ? 16px : 14px;
+        font-weight: root.active ? 700 : 500;
+        horizontal-alignment: center;
+    }
+    TouchArea {
+        x: 0px; y: 0px; width: parent.width; height: parent.height;
+        clicked => { Commands.action("reader", root.action, ""); }
+    }
+}
+
+component ReaderChapterButton inherits Rectangle {
+    in property <bool> forward;
+    in property <bool> enabled;
+    property <string> label: root.forward ? Strings.next-chapter : Strings.previous-chapter;
+    property <color> foreground: root.enabled ? Theme.ink : Theme.line;
+    preferred-width: label-text.preferred-width + chevron.width + 2px;
+    height: Theme.touch;
+    accessible-role: button;
+    accessible-label: root.label;
+    accessible-enabled: root.enabled;
+    chevron := NativeChevron {
+        x: root.forward ? parent.width - self.width : 0px;
+        y: (parent.height - self.height) / 2;
+        forward: root.forward;
+        foreground: root.foreground;
+    }
+    label-text := BodyText {
+        x: root.forward ? 0px : chevron.width + 2px; y: 0px;
+        width: max(0px, parent.width - chevron.width - 2px); height: parent.height;
+        text: root.label;
+        font-size: Theme.caption;
+        font-weight: 700;
+        color: root.foreground;
+        horizontal-alignment: root.forward ? right : left;
+    }
+    TouchArea {
+        x: 0px; y: 0px; width: parent.width; height: parent.height;
+        enabled: root.enabled;
+        clicked => { Commands.action("reader", root.forward ? "next-chapter" : "previous-chapter", ""); }
+    }
 }
 
 export component NativeReaderProgress inherits Rectangle {
-    ActionButton { x: Theme.margin; y: 12px; width: 124px; height: Theme.touch; text: Strings.previous-chapter; quiet: true; enabled: State.reader-has-previous-chapter; clicked => { Commands.action("reader", "previous-chapter", ""); } }
-    BodyText { x: 152px; y: 12px; width: parent.width - 304px; height: Theme.touch; text: State.reader-page + " / " + State.reader-total + " " + Strings.pages-unit; horizontal-alignment: center; font-size: Theme.body; }
-    ActionButton { x: parent.width - Theme.margin - 124px; y: 12px; width: 124px; height: Theme.touch; text: Strings.next-chapter; quiet: true; enabled: State.reader-has-next-chapter; clicked => { Commands.action("reader", "next-chapter", ""); } }
-    NativeSlider { x: Theme.margin; y: State.large-screen ? 48px : 40px; width: parent.width - Theme.margin * 2; label: Strings.pages-unit; show-label: false; show-value: false; show-buttons: false; minimum: 1; maximum: max(1, State.reader-total); value: State.reader-page; committed(value) => { Commands.action("reader", "seek", "" + value); } }
+    property <length> inset: State.large-screen ? 32px : 20px;
+    property <length> inset-top: Theme.control-border + (State.large-screen ? 14px : 12px);
+    property <length> number-height: State.large-screen ? 38px : 32px;
+    property <length> chapter-width: State.large-screen ? 110px : 88px;
+    property <length> slider-top: root.inset-top + root.number-height;
+    background: Theme.paper;
+    Rectangle { x: 0px; y: 0px; width: parent.width; height: Theme.control-border; background: Theme.ink; }
+    Rectangle {
+        x: (parent.width - self.width) / 2; y: root.inset-top;
+        width: page-label.preferred-width + total-label.preferred-width + 6px;
+        height: root.number-height;
+        page-label := BodyText {
+            x: 0px; y: 0px; width: self.preferred-width; height: parent.height;
+            text: slider.shown-value;
+            font-family: Theme.numbers;
+            font-size: State.large-screen ? 26px : 22px;
+            font-weight: 700;
+        }
+        total-label := Caption {
+            x: page-label.width + 6px; y: State.large-screen ? 3px : 2px;
+            width: self.preferred-width; height: parent.height;
+            text: "/ " + State.reader-total;
+            font-family: Theme.numbers;
+        }
+    }
+    previous := ReaderChapterButton {
+        x: root.inset; y: root.slider-top; width: max(root.chapter-width, self.preferred-width);
+        enabled: State.reader-has-previous-chapter;
+    }
+    next := ReaderChapterButton {
+        x: parent.width - root.inset - self.width; y: root.slider-top; width: max(root.chapter-width, self.preferred-width);
+        forward: true;
+        enabled: State.reader-has-next-chapter;
+    }
+    slider := NativeSlider {
+        x: previous.x + previous.width; y: root.slider-top;
+        width: max(0px, next.x - self.x); height: Theme.touch;
+        label: Strings.jump-to-page;
+        show-label: false; show-value: false; show-buttons: false;
+        minimum: 1; maximum: max(1, State.reader-total); value: State.reader-page;
+        enabled: State.reader-image-ready && State.reader-total > 1;
+        commit-unchanged: true;
+        committed(value) => { Commands.action("reader", "seek", "" + value); }
+    }
 }

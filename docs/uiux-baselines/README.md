@@ -36,6 +36,10 @@ the viewer and image links resolve within the baseline directory.
 
 ## Scene index
 
+The [2026-11-25 portrait UI handoff](../UI_HANDOFF_20261125.md) describes the
+new design, paired Scribe/Paperwhite comparison procedure, and replay scripts.
+It does not replace the frozen baseline above.
+
 The [2026-11-16 Tab-feedback and Perf05 candidate](2026-11-16-a53b9716-tab-perf05/README.md)
 removes transient Tab fills and redundant press/release updates. It retains
 14 final desktop cases and seven final native snapshots, with separate earlier

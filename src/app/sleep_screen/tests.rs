@@ -17,6 +17,7 @@ fn book() -> Book {
     Book {
         id: "sleep:book".into(),
         source_id: "local".into(),
+        remote_id: "sleep-book".into(),
         title: "Synthetic Comic".into(),
         author: "Synthetic Author".into(),
         cover: "https://example.test/synthetic-sleep-cover.png".into(),
@@ -46,7 +47,8 @@ fn select_book(app: &mut App, book: &Book) {
 #[test]
 fn active_reading_defers_optional_cover_work_and_keeps_its_ready_preview() -> Result<()> {
     with_ui(|ui| {
-        let mut fixture = super::super::tests::DemoRouteFixture::new("settings", DeviceProfile::Scribe, true);
+        let mut fixture =
+            super::super::tests::DemoRouteFixture::new("settings", DeviceProfile::Scribe, true);
         let app = &mut fixture.app;
         app.ui = ui.as_weak();
         select_book(app, &book());
@@ -55,7 +57,11 @@ fn active_reading_defers_optional_cover_work_and_keeps_its_ready_preview() -> Re
         app.sleep_screen.cover_bytes = 16 * 24 * 3;
         let identity = app.sleep_screen.identity.clone().unwrap();
         let cancellation = imaging::DecodeCancellation::new();
-        app.sleep_screen.job = Some(CoverJob { id: 99, identity, cancellation: cancellation.clone() });
+        app.sleep_screen.job = Some(CoverJob {
+            id: 99,
+            identity,
+            cancellation: cancellation.clone(),
+        });
         app.defer_sleep_cover_for_reader();
         assert!(cancellation.is_cancelled());
         assert!(app.sleep_screen.job.is_some());
@@ -76,6 +82,31 @@ fn active_reading_defers_optional_cover_work_and_keeps_its_ready_preview() -> Re
         assert_eq!(ui.global::<SleepScreenModel>().get_cover().size().width, 16);
         Ok(())
     })
+}
+
+#[test]
+fn selected_sleep_book_survives_navigation_and_is_saved() -> Result<()> {
+    let mut fixture =
+        super::super::tests::DemoRouteFixture::new("detail", DeviceProfile::Scribe, true);
+    let app = &mut fixture.app;
+    let selected = book();
+    app.store.upsert_book(&selected)?;
+    app.current_book_id = Some(selected.id.clone());
+    app.dispatch("detail", "more", "")?;
+    app.dispatch("panel", "choose", "screensaver")?;
+    assert_eq!(
+        app.store.preferences()?.sleep_cover_book_id.as_deref(),
+        Some(selected.id.as_str())
+    );
+    app.dispatch("navigation", "open", "0")?;
+    app.observe_sleep_book(None);
+    let identity = app
+        .sleep_screen
+        .identity
+        .as_ref()
+        .expect("The pinned book is retained");
+    assert!(app.sleep_cover_is_current(identity));
+    Ok(())
 }
 
 struct HeadlessPlatform {

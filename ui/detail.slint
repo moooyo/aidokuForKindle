@@ -1,111 +1,49 @@
 import { State, Commands, ChapterItem } from "state.slint";
 import { Theme } from "theme.slint";
 import { Strings } from "strings.slint";
-import { BodyText, Caption, TitleText, Icon, IconButton, ActionButton, PageBar, Cover, EmptyState } from "widgets.slint";
-import { IdentityTextFit } from "identity-text.slint";
-import { TagFlow } from "tag-flow.slint";
-
-component ChapterDownload inherits Rectangle {
-    in property <ChapterItem> chapter;
-    property <bool> completed: root.chapter.downloaded || root.chapter.download-state == "completed" || root.chapter.download-state == "done";
-    property <bool> active: root.chapter.download-state == "downloading" || root.chapter.download-state == "active";
-    property <bool> queued: root.chapter.download-state == "queued" || root.chapter.download-state == "paused";
-    property <bool> pw-available: !State.large-screen && !root.completed && !root.active && !root.queued && root.chapter.download-state == "available";
-    property <length> state-size: State.large-screen ? 34px : 30px;
-    background: touch.pressed ? Theme.ink : transparent;
-    border-radius: 4px;
-    accessible-role: button;
-    accessible-label: root.completed ? Strings.remove-download : root.active || root.queued ? Strings.cancel-download : Strings.download;
-    Rectangle {
-        x: (parent.width - self.width) / 2; y: (parent.height - self.height) / 2;
-        width: root.state-size; height: root.state-size;
-        border-width: root.queued ? 0px : 1.5px;
-        border-color: root.completed || root.active ? Theme.ink : Theme.disabled;
-        border-radius: 4px; clip: true;
-        background: root.completed != touch.pressed ? Theme.ink : Theme.paper;
-        if root.queued: Rectangle { x: 0px; y: 0px;
-            width: parent.width; height: parent.height; background: transparent;
-            for step in ceil(root.state-size / 6px): Rectangle {
-                x: step * 6px; y: 0px; width: 4px; height: 1.5px; background: Theme.ink;
-            }
-            for step in ceil(root.state-size / 6px): Rectangle {
-                x: step * 6px; y: parent.height - 1.5px; width: 4px; height: 1.5px; background: Theme.ink;
-            }
-            for step in ceil(root.state-size / 6px): Rectangle {
-                x: 0px; y: step * 6px; width: 1.5px; height: 4px; background: Theme.ink;
-            }
-            for step in ceil(root.state-size / 6px): Rectangle {
-                x: parent.width - 1.5px; y: step * 6px; width: 1.5px; height: 4px; background: Theme.ink;
-            }
-        }
-        if !root.active && !root.pw-available: Icon {
-            x: (parent.width - self.width) / 2; y: (parent.height - self.height) / 2;
-            width: State.large-screen ? 16px : 15px; height: self.width;
-            kind: root.completed ? "check" : root.queued ? "history" : "download";
-            inverted: root.completed != touch.pressed;
-        }
-        if root.pw-available: Path {
-            x: (parent.width - self.width) / 2; y: (parent.height - self.height) / 2;
-            width: 15px; height: self.width;
-            viewbox-width: 24; viewbox-height: 24;
-            fill: transparent; stroke: touch.pressed ? Theme.paper : Theme.ink;
-            stroke-width: 2.8px;
-            stroke-line-cap: round; stroke-line-join: round;
-            accessible-role: none;
-            commands: "M12 5v12M7 12l5 5 5-5";
-        }
-        if root.active: Rectangle {
-            x: (parent.width - 9px) / 2; y: (parent.height - 9px) / 2 - 1px;
-            width: 9px; height: 9px; background: touch.pressed ? Theme.paper : Theme.ink;
-        }
-        if root.active: Rectangle {
-            x: 3px; y: parent.height - 5px;
-            width: (parent.width - 6px) * clamp(root.chapter.download-progress, 0, 1);
-            height: 2px; background: touch.pressed ? Theme.paper : Theme.ink;
-        }
-    }
-    touch := TouchArea { x: 0px; y: 0px;
-        pointer-event(event) => {
-            if event.kind == PointerEventKind.down { Commands.refresh("ui"); }
-            else if event.kind == PointerEventKind.up || event.kind == PointerEventKind.cancel { Commands.refresh("ui"); }
-        }
-        clicked => {
-            Commands.action("detail", root.completed ? "remove-download" : root.active || root.queued ? "cancel-download" : "download", root.chapter.id);
-        }
-    }
-}
+import { BodyText, Caption, TitleText, Icon, IconButton, ActionButton, InlineAction, Tab, PageBar, Cover, EmptyState, ChapterDownloadButton } from "widgets.slint";
 
 component ChapterRow inherits Rectangle {
     in property <ChapterItem> chapter;
-    property <bool> inverted: touch.pressed || root.chapter.selected;
     property <bool> suppress-click: false;
     property <length> press-x;
     property <length> press-y;
-    property <length> download-width: State.large-screen ? 56px : 52px;
-    background: root.inverted ? Theme.ink : root.chapter.current ? Theme.fill : Theme.paper;
-    border-radius: State.large-screen ? 4px : 0px;
-    height: State.large-screen ? 60px : 52px;
+    property <length> action-width: State.large-screen ? 60px : 52px;
+    property <length> title-left: State.large-screen ? 66px : 58px;
+    property <length> text-top: (root.height - (State.large-screen ? 54px : 48px)) / 2;
+    background: root.chapter.current ? Theme.fill : Theme.paper;
+    height: State.large-screen ? 80px : 70px;
     accessible-role: button;
     accessible-label: root.chapter.number + " " + root.chapter.title;
     accessible-checkable: State.chapter-selection-mode;
     accessible-checked: root.chapter.selected;
-    BodyText {
-        x: 8px; y: 0px; width: 48px; height: parent.height; text: root.chapter.number;
-        font-size: State.large-screen ? 21px : 18px; horizontal-alignment: center;
-        color: root.inverted ? Theme.paper : root.chapter.current ? Theme.ink : Theme.secondary;
+    Text {
+        x: 10px; y: 0px; width: State.large-screen ? 42px : 34px; height: parent.height;
+        text: root.chapter.number; font-family: Theme.numbers; font-size: State.large-screen ? 22px : 18px;
+        font-weight: root.chapter.current ? 700 : 400; vertical-alignment: center; overflow: elide;
+        color: root.chapter.read && !root.chapter.current ? Theme.secondary : Theme.ink;
     }
-    BodyText {
-        x: 68px; y: 6px; width: parent.width - self.x - root.download-width - 12px; height: parent.height / 2;
-        text: root.chapter.title; font-size: State.large-screen ? 21px : 18px; font-weight: root.chapter.current ? 700 : 400;
-        color: root.inverted ? Theme.paper : Theme.ink;
+    title := BodyText {
+        x: root.title-left; y: root.text-top;
+        width: min(self.preferred-width, parent.width - self.x - root.action-width - (root.chapter.is-new ? badge.width + 8px : 0px));
+        height: State.large-screen ? 29px : 26px;
+        text: root.chapter.title; font-weight: root.chapter.current ? 700 : 400;
+        color: root.chapter.read && !root.chapter.current ? Theme.secondary : Theme.ink;
+    }
+    badge := Rectangle {
+        visible: root.chapter.is-new; x: title.x + title.width + 8px; y: title.y + (title.height - self.height) / 2;
+        width: new-label.preferred-width + 10px; height: 18px; background: Theme.ink;
+        new-label := BodyText { x: 0px; y: 0px; width: parent.width; height: parent.height; text: Strings.chapter-new; font-size: 12px; font-weight: 700; color: Theme.paper; horizontal-alignment: center; }
     }
     Caption {
-        x: 68px; y: parent.height / 2 + 3px; width: parent.width - self.x - root.download-width - 12px; height: 24px;
+        x: root.title-left; y: title.y + title.height + 2px;
+        width: parent.width - self.x - root.action-width; height: 22px;
         text: root.chapter.current ? root.chapter.progress : root.chapter.read ? Strings.read : Strings.unread;
-        color: root.inverted ? Theme.paper : Theme.secondary;
+        font-family: root.chapter.current ? Theme.numbers : Theme.sans;
     }
-    Rectangle { x: 0px; y: parent.height - 1px; width: parent.width; height: 1px; background: Theme.line; }    touch := TouchArea { x: 0px; y: 0px;
-        width: State.chapter-selection-mode ? parent.width : parent.width - root.download-width;
+    touch := TouchArea {
+        x: 0px; y: 0px;
+        width: State.chapter-selection-mode ? parent.width : parent.width - root.action-width; height: parent.height;
         moved => {
             if self.pressed && (abs(self.mouse-x - root.press-x) >= 12px || abs(self.mouse-y - root.press-y) >= 12px) {
                 root.suppress-click = true; hold.running = false;
@@ -114,13 +52,10 @@ component ChapterRow inherits Rectangle {
         pointer-event(event) => {
             if event.kind == PointerEventKind.down {
                 root.press-x = self.mouse-x; root.press-y = self.mouse-y;
-                root.suppress-click = false; hold.running = true;
-                Commands.refresh("ui");
-            } else if event.kind == PointerEventKind.cancel {
-                root.suppress-click = true; hold.running = false;
-                Commands.refresh("ui");
-            } else if event.kind == PointerEventKind.up {
-                hold.running = false; Commands.refresh("ui");
+                root.suppress-click = false; hold.running = !State.chapter-selection-mode;
+            } else if event.kind == PointerEventKind.up || event.kind == PointerEventKind.cancel {
+                hold.running = false;
+                if event.kind == PointerEventKind.cancel { root.suppress-click = true; }
             }
         }
         clicked => {
@@ -137,20 +72,16 @@ component ChapterRow inherits Rectangle {
             }
         }
     }
-    if !State.chapter-selection-mode: ChapterDownload {
-        x: parent.width - root.download-width; y: (parent.height - self.height) / 2;
-        width: root.download-width; height: State.large-screen ? 56px : 52px;
-        chapter: root.chapter;
+    if !State.chapter-selection-mode: ChapterDownloadButton {
+        x: parent.width - root.action-width; y: 0px; width: root.action-width; height: parent.height;
+        state: root.chapter.download-state; progress: root.chapter.download-progress; downloaded: root.chapter.downloaded;
+        clicked => { Commands.action("detail", self.command, root.chapter.id); }
     }
     if State.chapter-selection-mode: Rectangle {
-        x: parent.width - root.download-width + (root.download-width - 28px) / 2;
-        y: (parent.height - 28px) / 2; width: 28px; height: 28px;
-        border-width: 1.5px; border-radius: 3px;
-        border-color: root.inverted ? Theme.paper : Theme.ink;
+        x: parent.width - (root.action-width + self.width) / 2; y: (parent.height - self.height) / 2;
+        width: 28px; height: 28px; border-width: Theme.control-border; border-color: Theme.ink;
         background: root.chapter.selected ? Theme.ink : Theme.paper;
-        if root.chapter.selected: Icon {
-            x: 4px; y: 4px; width: 20px; height: 20px; kind: "check"; inverted: true;
-        }
+        if root.chapter.selected: Icon { x: 4px; y: 4px; width: 20px; height: 20px; kind: "check"; inverted: true; }
     }
 }
 
@@ -164,56 +95,86 @@ export component DetailPage inherits Rectangle {
     property <length> chapter-row-height: State.large-screen ? 80px : 70px;
     property <bool> bookmarks: State.detail-filter == 3;
     IconButton { y: 0px; x: Theme.margin - 8px; icon: "back"; label: Strings.back; clicked => { Commands.action("detail", "back", ""); } }
-    IconButton { y: 0px; x: parent.width - Theme.margin - Theme.touch; icon: "more"; label: Strings.more; clicked => { Commands.action("detail", "more", ""); } }
+    IconButton { y: 0px; x: parent.width - Theme.margin + 8px - Theme.touch; icon: "more"; label: Strings.more; clicked => { Commands.action("detail", "more", ""); } }
     Rectangle {
-        x: Theme.margin; y: Theme.touch + 8px; width: State.large-screen ? 240px : parent.width - Theme.margin * 2; height: State.large-screen ? parent.height - self.y : 220px;
-        Cover { x: 0px; y: 0px; width: State.large-screen ? 200px : 102px; height: State.large-screen ? 272px : 138px; book: State.current-book; show-badge: false; show-progress: false; }
-        BodyText { x: State.large-screen ? 0px : 120px; y: State.large-screen ? 288px : 0px; width: parent.width - self.x; height: 34px; text: State.current-book.title; font-size: State.large-screen ? 26px : 23px; font-weight: 700; }
-        Caption { x: State.large-screen ? 0px : 120px; y: State.large-screen ? 328px : 38px; width: parent.width - self.x; height: 24px; text: State.current-book.author; }
-        Caption { x: State.large-screen ? 0px : 120px; y: State.large-screen ? 358px : 66px; width: parent.width - self.x; height: 24px; text: State.current-book.status; }
-        Caption { x: State.large-screen ? 0px : 120px; y: State.large-screen ? 396px : 94px; width: parent.width - self.x; height: 24px; text: Strings.chapter-prefix + State.current-chapter-number + Strings.chapter-suffix + " · " + State.reader-page + " / " + State.reader-total; }
-        ActionButton { x: State.large-screen ? 0px : 120px; y: State.large-screen ? 434px : 128px; width: State.large-screen ? parent.width : parent.width - self.x - Theme.touch - 8px; text: Strings.continue-reading; primary: true; clicked => { Commands.action("detail", "continue", ""); } }
-        IconButton { x: State.large-screen ? 0px : parent.width - Theme.touch; y: State.large-screen ? 500px : 128px; icon: State.current-book.in-library ? "check" : "plus"; label: State.current-book.in-library ? Strings.in-library : Strings.add-to-library; clicked => { Commands.action("detail", "favorite", ""); } }
-        if State.large-screen: ActionButton { x: 64px; y: 500px; width: parent.width - 64px; text: Strings.download; quiet: true; clicked => { Commands.action("detail", "batch-download", ""); } }
-        BodyText { x: 0px; y: State.large-screen ? 580px : 190px; width: parent.width; height: State.large-screen ? 180px : 26px; text: State.book-description; font-size: Theme.caption; wrap: word-wrap; vertical-alignment: top; }
-        TouchArea { x: 0px; y: State.large-screen ? 580px : 182px; width: parent.width; height: State.large-screen ? 180px : Theme.touch; clicked => { Commands.action("detail", "summary", ""); } }
+        x: Theme.margin; y: Theme.toolbar-height; width: State.large-screen ? 240px : parent.width - Theme.margin * 2;
+        height: State.large-screen ? parent.height - self.y : 222px;
+        property <length> text-left: State.large-screen ? 0px : 120px;
+        Cover { x: 0px; y: 0px; width: State.large-screen ? 200px : 102px; height: State.large-screen ? 272px : 138px; book: State.current-book; }
+        TitleText { x: parent.text-left; y: State.large-screen ? 288px : 0px; width: parent.width - self.x; height: State.large-screen ? 36px : 34px; text: State.current-book.title; font-size: State.large-screen ? 27px : 23px; font-weight: 700; }
+        Caption { x: parent.text-left; y: State.large-screen ? 330px : 38px; width: parent.width - self.x; height: 24px; text: State.current-book.author; }
+        Caption { x: parent.text-left; y: State.large-screen ? 360px : 66px; width: parent.width - self.x; height: 24px; text: State.book-metadata; }
+        if State.current-chapter-number != "": HorizontalLayout {
+            x: parent.text-left; y: State.large-screen ? 396px : 94px; width: parent.width - self.x; height: 24px; spacing: 4px; alignment: start;
+            BodyText { text: Strings.chapter-prefix + State.current-chapter-number + Strings.chapter-suffix + " ·"; font-size: Theme.caption; }
+            BodyText { text: State.reader-page + " / " + State.reader-total; font-family: Theme.numbers; font-size: Theme.caption; }
+        }
+        ActionButton { x: parent.text-left; y: State.large-screen ? 440px : 128px; width: State.large-screen ? parent.width : parent.width - self.x - Theme.touch - 8px; text: Strings.continue-reading; primary: !State.chapter-selection-mode; clicked => { Commands.action("detail", "continue", ""); } }
+        IconButton { x: State.large-screen ? 0px : parent.width - Theme.touch; y: State.large-screen ? 506px : 128px; icon: State.current-book.in-library ? "check" : "plus"; filled: true; checkable: true; checked: State.current-book.in-library; label: State.current-book.in-library ? Strings.in-library : Strings.add-to-library; clicked => { Commands.action("detail", "favorite", ""); } }
+        if State.large-screen: IconButton { x: 64px; y: 506px; width: parent.width - self.x; icon: "download"; text: Strings.batch-download-menu; filled: true; clicked => { Commands.action("detail", "batch-download", ""); } }
+        if State.large-screen && State.book-description != "": Rectangle {
+            x: 0px; y: 580px; width: parent.width; height: max(0px, parent.height - self.y);
+            Caption { x: 0px; y: 0px; width: parent.width; height: 30px; text: Strings.description; letter-spacing: 2px; }
+            BodyText { x: 0px; y: 36px; width: parent.width; height: parent.height - self.y; text: State.book-description; font-size: Theme.caption; wrap: word-wrap; vertical-alignment: top; }
+            TouchArea { x: 0px; y: 0px; width: parent.width; height: parent.height; clicked => { Commands.action("detail", "summary", ""); } }
+        }
+        if !State.large-screen: Rectangle {
+            x: 0px; y: 186px; width: parent.width; height: 36px;
+            BodyText { x: 0px; y: 0px; width: summary.x - 8px; height: parent.height; text: State.book-description; font-size: Theme.caption; }
+            summary := Caption { x: parent.width - self.width; y: 0px; width: self.preferred-width; height: parent.height; text: Strings.description + " ›"; }
+            TouchArea { x: 0px; y: (parent.height - Theme.touch) / 2; width: parent.width; height: Theme.touch; clicked => { Commands.action("detail", "summary", ""); } }
+        }
     }
     Rectangle {
         x: root.chapter-left; y: root.chapter-header-top; width: root.chapter-width; height: 96px;
-        BodyText { x: 0px; y: 0px; width: parent.width; height: 36px; text: Strings.chapters + "  " + State.chapter-count; font-size: State.large-screen ? 26px : 22px; font-weight: 700; }
-        HorizontalLayout { x: 0px;
-            y: 40px; height: Theme.touch; width: parent.width - Theme.touch * 2 - 12px; spacing: 12px; alignment: start;
-            for label[index] in [Strings.all, Strings.unread, Strings.downloaded, Strings.bookmark]: ActionButton {
-                text: label; quiet: true; selected: false; horizontal-padding: 2px;
-                clicked => { Commands.action("detail", "filter", "" + index); }
-                if State.detail-filter == index: Rectangle { x: 2px; y: parent.height - 4px; width: parent.width - 4px; height: 2px; background: Theme.ink; }
+        Heading := HorizontalLayout {
+            x: 0px; y: 0px; width: parent.width; height: 36px; spacing: 10px; alignment: start;
+            BodyText { text: Strings.chapters; font-size: State.large-screen ? 26px : 22px; font-weight: 700; }
+            BodyText { text: State.chapter-count; font-family: Theme.numbers; font-size: State.large-screen ? 26px : 22px; font-weight: 600; }
+        }
+        if !State.large-screen && !State.chapter-selection-mode && !root.bookmarks: InlineAction {
+            x: parent.width - self.width; y: -8px;
+            text: Strings.batch-download-menu;
+            enabled: State.chapter-count > 0;
+            clicked => { Commands.action("detail", "batch-download", ""); }
+        }
+        if !State.chapter-selection-mode: HorizontalLayout {
+            x: 0px; y: 40px; height: Theme.touch; width: parent.width - Theme.touch * 2 - 12px;
+            spacing: State.large-screen ? 18px : 14px; alignment: start;
+            for label[index] in [Strings.all, Strings.unread, Strings.downloaded, Strings.bookmark]: Tab {
+                text: label; height: parent.height; text-size: Theme.body;
+                selected: State.detail-filter == index;
+                clicked => { Commands.action("detail", "filter", index); }
             }
         }
-        IconButton { x: parent.width - Theme.touch * 2; y: 40px; icon: root.bookmarks ? (State.bookmark-edit ? "check" : "more") : "bookmark"; label: root.bookmarks ? Strings.edit : Strings.continue-reading; clicked => { Commands.action("detail", root.bookmarks ? "bookmark-edit" : "locate", ""); } }
-        IconButton { x: parent.width - Theme.touch; y: 40px; icon: root.bookmarks ? "back" : "sort"; label: root.bookmarks ? Strings.back : Strings.sort; clicked => { Commands.action("detail", root.bookmarks ? "filter" : "sort", "0"); } }
-        Rectangle { x: 0px; y: parent.height - 1px; width: parent.width; height: 1px; background: Theme.ink; }
-    }
-    if State.chapter-selection-mode: HorizontalLayout {
-        x: root.chapter-left; y: root.chapter-header-top; width: root.chapter-width; height: 36px; spacing: 8px;
-        ActionButton { text: Strings.select-all; clicked => { Commands.action("detail", "select-all-chapters", ""); } }
-        ActionButton { text: Strings.download + " " + State.selected-chapter-count; primary: true; clicked => { Commands.action("detail", "download-selected", ""); } }
-        ActionButton { text: Strings.cancel; clicked => { Commands.action("detail", "cancel-selection", ""); } }
+        if !State.chapter-selection-mode && !root.bookmarks: IconButton { x: parent.width - Theme.touch * 2; y: 40px; icon: "bookmark"; label: Strings.locate-chapter; clicked => { Commands.action("detail", "locate", ""); } }
+        if !State.chapter-selection-mode && !root.bookmarks: IconButton { x: parent.width - Theme.touch; y: 40px; icon: "sort"; label: Strings.sort; clicked => { Commands.action("detail", "sort", ""); } }
+        if !State.chapter-selection-mode && root.bookmarks: ActionButton { x: parent.width - self.width; y: 40px; width: self.preferred-width; text: State.bookmark-edit ? Strings.keyboard-done : Strings.edit; quiet: true; clicked => { Commands.action("detail", "bookmark-edit", ""); } }
+        if State.chapter-selection-mode: HorizontalLayout {
+            x: 0px; y: 40px; width: parent.width; height: Theme.touch; spacing: 8px;
+            ActionButton { text: Strings.select-all; clicked => { Commands.action("detail", "select-all-chapters", ""); } }
+            ActionButton { text: Strings.download + " " + State.selected-chapter-count + " " + Strings.chapters-unit; horizontal-stretch: 1; primary: true; clicked => { Commands.action("detail", "download-selected", ""); } }
+            ActionButton { text: Strings.cancel; clicked => { Commands.action("detail", "cancel-selection", ""); } }
+        }
+        Rectangle { x: 0px; y: parent.height - 1px; width: parent.width; height: 1px; background: Theme.line; }
     }
     if !root.bookmarks && State.chapters.length == 0: EmptyState {
-        x: root.chapter-left; y: root.chapter-top + 16px; width: root.chapter-width; height: 270px; title: State.busy ? Strings.loading : Strings.chapters-empty; action: State.detail-filter == 0 ? Strings.retry : Strings.all;
+        x: root.chapter-left; y: root.chapter-top + 48px; width: root.chapter-width;
+        icon: ""; title: State.busy ? Strings.loading : Strings.chapters-empty;
+        action: State.busy ? "" : State.detail-filter == 0 ? Strings.retry : Strings.all; primary: false;
         clicked => { Commands.action("detail", State.detail-filter == 0 ? "reload" : "filter", "0"); }
     }
     for chapter[index] in State.chapters: ChapterRow { x: root.chapter-left; y: root.chapter-top + index * root.chapter-row-height; width: root.chapter-width; height: root.chapter-row-height; chapter: chapter; }
     if root.bookmarks && State.detail-bookmarks.length == 0: EmptyState {
-        x: root.chapter-left; y: root.chapter-top + 20px; width: root.chapter-width; height: 270px; title: Strings.no-bookmarks; action: Strings.continue-reading; clicked => { Commands.action("detail", "continue", ""); }
+        x: root.chapter-left; y: root.chapter-top + 48px; width: root.chapter-width;
+        icon: ""; title: Strings.no-bookmarks; action: Strings.continue-reading; primary: false;
+        clicked => { Commands.action("detail", "continue", ""); }
     }
     for item[index] in State.detail-bookmarks: Rectangle {
         x: root.chapter-left; y: root.chapter-top + index * root.chapter-row-height; width: root.chapter-width; height: root.chapter-row-height;
-        background: hit.pressed ? Theme.fill : Theme.paper;
-        BodyText { y: 0px; x: 8px; width: parent.width - Theme.touch - 24px; height: parent.height * 0.6; text: item.title; font-size: State.large-screen ? 21px : 18px; }
-        Caption { x: 8px; y: parent.height * 0.6; width: parent.width - Theme.touch - 24px; height: parent.height * 0.35; text: item.value; }
-        Rectangle { x: 0px; y: parent.height - 1px; width: parent.width; height: 1px; background: Theme.line; }
-        hit := TouchArea { x: 0px; y: 0px; width: parent.width - Theme.touch; clicked => { Commands.action("panel", "choose", "bookmark:" + item.id); } }
+        BodyText { x: 10px; y: (parent.height - 48px) / 2; width: parent.width - Theme.touch - 20px; height: 26px; text: item.title; }
+        Caption { x: 10px; y: (parent.height - 48px) / 2 + 26px; width: parent.width - Theme.touch - 20px; height: 22px; text: item.value; }
+        TouchArea { x: 0px; y: 0px; width: parent.width - Theme.touch; height: parent.height; clicked => { if !State.bookmark-edit { Commands.action("panel", "choose", "bookmark:" + item.id); } } }
         IconButton { x: parent.width - Theme.touch; y: (parent.height - Theme.touch) / 2; icon: State.bookmark-edit ? "trash" : "chevron-right"; label: State.bookmark-edit ? Strings.delete : Strings.open; clicked => { if State.bookmark-edit { Commands.action("detail", "bookmark-remove", item.id); } else { Commands.action("panel", "choose", "bookmark:" + item.id); } } }
     }
     if State.page-count > 1: PageBar { x: root.chapter-left; y: parent.height - self.height; width: root.chapter-width; page: State.page; count: State.page-count; turn(delta) => { Commands.action("page", "turn", delta); } }

@@ -349,6 +349,15 @@ impl Store {
         )
     }
 
+    pub(crate) fn book_count_for_source(&self, source_id: &str) -> Result<usize> {
+        let count: i64 = self.connection.query_row(
+            "SELECT COUNT(*) FROM books WHERE source_id = ?1",
+            [source_id],
+            |row| row.get(0),
+        )?;
+        Ok(count as usize)
+    }
+
     pub fn book(&self, id: &str) -> Result<Option<Book>> {
         query_document(
             &self.connection,

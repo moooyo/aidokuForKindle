@@ -55,7 +55,7 @@ binary dictionary are not included.
 
 | Family | Upstream and copyright | License text |
 | --- | --- | --- |
-| Noto Sans CJK SC | [Noto CJK](https://github.com/notofonts/noto-cjk), Copyright 2014-2021 Adobe | `assets/fonts/NotoSansCJK-LICENSE.txt` |
+| Noto Sans CJK SC and Aidoku Locale Fallback | [Noto CJK](https://github.com/notofonts/noto-cjk), Copyright 2014-2021 Adobe | `assets/fonts/NotoSansCJK-LICENSE.txt` |
 | Noto Serif CJK SC | [Noto CJK](https://github.com/notofonts/noto-cjk), Copyright 2017-2024 Adobe | `assets/fonts/NotoSerifCJK-LICENSE.txt` |
 | Literata | [Literata](https://github.com/googlefonts/literata), Copyright 2017 The Literata Project Authors | `assets/fonts/Literata-OFL.txt` |
 

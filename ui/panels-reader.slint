@@ -1,15 +1,53 @@
-import { State } from "state.slint";
+import { State, Commands } from "state.slint";
 import { Theme } from "theme.slint";
+import { Strings } from "strings.slint";
+import { ReaderMetrics } from "reader.slint";
 import { ReadingOptions, LightOptions, RefreshOptions } from "native-controls.slint";
+import { TitleText } from "widgets.slint";
+import { PanelAction, ChoiceRow } from "panels-common.slint";
 
 export component ReaderPanel inherits Rectangle {
     in property <string> context: State.modal-context;
-    out property <length> content-height: context == "reader-mode" ? (State.large-screen ? 300px : 268px) : context == "reader-brightness" ? (State.large-screen ? 346px : 302px) : (State.large-screen ? 368px : 336px);
-    height: root.content-height + 48px;
+    property <length> top-padding: Theme.control-border + (State.large-screen ? 16px : 12px);
+    height: ReaderMetrics.panel-height;
     background: Theme.paper;
-    Rectangle { x: 0px; y: 0px; width: parent.width; height: 1px; background: Theme.ink; }
+    Rectangle { x: 0px; y: 0px; width: parent.width; height: Theme.control-border; background: Theme.ink; }
     TouchArea { x: 0px; y: 0px; width: parent.width; height: parent.height; }
-    if root.context == "reader-mode": ReadingOptions { x: Theme.margin; y: 24px; width: parent.width - Theme.margin * 2; }
-    if root.context == "reader-brightness": LightOptions { x: Theme.margin; y: 24px; width: parent.width - Theme.margin * 2; }
-    if root.context == "reader-picture": RefreshOptions { x: Theme.margin; y: 24px; width: parent.width - Theme.margin * 2; }
+    if root.context == "reader-mode": ReadingOptions { x: Theme.margin; y: root.top-padding; width: parent.width - Theme.margin * 2; reader: true; }
+    if root.context == "reader-brightness": LightOptions { x: Theme.margin; y: root.top-padding; width: parent.width - Theme.margin * 2; reader: true; }
+    if root.context == "reader-picture": RefreshOptions { x: Theme.margin; y: root.top-padding; width: parent.width - Theme.margin * 2; reader: true; }
+}
+
+export component ReaderChoicePanel inherits Rectangle {
+    property <length> side-padding: State.large-screen ? 28px + Theme.popup-border : 22px;
+    property <length> top-padding: Theme.popup-border + (State.large-screen ? 26px : 20px);
+    property <length> header-height: State.large-screen ? 50px : 44px;
+    property <length> row-height: State.large-screen ? 60px : 52px;
+    property <length> list-top: root.top-padding + root.header-height + 12px;
+    height: root.list-top + State.modal-items.length * root.row-height + (State.large-screen ? 30px : 24px);
+    background: Theme.paper;
+    border-width: State.large-screen ? Theme.popup-border : 0px;
+    border-color: Theme.ink;
+    if !State.large-screen: Rectangle { x: 0px; y: 0px; width: parent.width; height: Theme.popup-border; background: Theme.ink; }
+    TouchArea { x: 0px; y: 0px; width: parent.width; height: parent.height; }
+    TitleText {
+        x: root.side-padding; y: root.top-padding; width: max(0px, done.x - self.x - 16px); height: root.header-height;
+        text: State.modal-title;
+        font-size: State.large-screen ? 28px : 23px;
+        letter-spacing: 2px;
+    }
+    done := PanelAction {
+        x: parent.width - root.side-padding - self.width; y: root.top-padding;
+        width: self.preferred-width; height: root.header-height;
+        text: Strings.keyboard-done; primary: true; text-size: Theme.body;
+        clicked => { Commands.action("panel", "choose", State.modal-context == "reader-recovery" ? "reader-recovery-back" : "close"); }
+    }
+    for item[index] in State.modal-items: ChoiceRow {
+        x: root.side-padding; y: root.list-top + index * root.row-height;
+        width: parent.width - root.side-padding * 2; height: root.row-height;
+        item: item;
+        text-size: Theme.body;
+        line: index + 1 < State.modal-items.length;
+        chosen => { Commands.action("panel", "choose", item.id); }
+    }
 }

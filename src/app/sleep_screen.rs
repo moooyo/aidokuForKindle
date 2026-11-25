@@ -341,13 +341,29 @@ impl App {
         self.hide_sleep_cover();
     }
 
-    /// Capture metadata during the existing awake Reader projection, without a new query.
+    /// Capture metadata during the existing awake projection, without a new query.
     pub(super) fn observe_sleep_book(&mut self, book: Option<Book>) {
-        let book = book.filter(|_| {
-            self.route == "reader"
-                && self.prefs.sleep_cover
-                && self.prefs.screensaver_mode == "cover"
-        });
+        let enabled = self.prefs.sleep_cover && self.prefs.screensaver_mode == "cover";
+        let book = if enabled && let Some(id) = self.prefs.sleep_cover_book_id.as_deref() {
+            // Unrelated Reader/shelf projections cannot replace a pinned cover.
+            let book = book.filter(|book| book.id == id);
+            if book.is_none()
+                && self.sleep_screen.identity.as_ref().is_some_and(|identity| {
+                    identity.book_id == id && identity.source_revision == self.source_revision
+                })
+            {
+                return;
+            }
+            book.or_else(|| {
+                self.sleep_screen
+                    .book
+                    .as_ref()
+                    .filter(|book| book.id == id)
+                    .cloned()
+            })
+        } else {
+            book.filter(|_| enabled && self.route == "reader")
+        };
         let identity = book
             .as_ref()
             .and_then(|book| CoverIdentity::new(book, self.source_revision));
@@ -386,7 +402,7 @@ impl App {
     }
 
     fn sleep_cover_is_current(&self, identity: &CoverIdentity) -> bool {
-        if self.route != "reader"
+        if (self.route != "reader" && self.prefs.sleep_cover_book_id.is_none())
             || identity.source_revision != self.source_revision
             || self.sleep_screen.identity.as_ref() != Some(identity)
         {
@@ -403,6 +419,9 @@ impl App {
     }
 
     fn active_sleep_book_id(&self) -> Option<&str> {
+        if let Some(id) = self.prefs.sleep_cover_book_id.as_deref() {
+            return Some(id);
+        }
         (self.route == "reader")
             .then(|| {
                 self.displayed_reader
@@ -428,9 +447,31 @@ impl App {
         {
             return Ok(());
         }
-        if !self.sleep_cover_enabled() || self.route != "reader" {
+        if !self.sleep_cover_enabled()
+            || (self.route != "reader" && self.prefs.sleep_cover_book_id.is_none())
+        {
             self.observe_sleep_book(None);
             return Ok(());
+        }
+        if let Some(id) = self.prefs.sleep_cover_book_id.as_ref()
+            && self
+                .sleep_screen
+                .book
+                .as_ref()
+                .is_none_or(|book| &book.id != id)
+        {
+            if self
+                .sleep_screen
+                .retry_at
+                .is_some_and(|at| Instant::now() < at)
+            {
+                return Ok(());
+            }
+            let book = self.store.book(id)?;
+            self.observe_sleep_book(book);
+            if self.sleep_screen.book.is_none() {
+                self.defer_sleep_cover();
+            }
         }
         let Some(identity) = self
             .sleep_screen
@@ -442,7 +483,10 @@ impl App {
         };
         if self.sleep_screen.full_resolution
             || self.sleep_screen.job.is_some()
-            || self.sleep_screen.reader_idle_until.is_some_and(|until| Instant::now() < until)
+            || self
+                .sleep_screen
+                .reader_idle_until
+                .is_some_and(|until| Instant::now() < until)
             || self
                 .sleep_screen
                 .retry_at

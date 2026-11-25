@@ -1,47 +1,36 @@
 import { State, Commands } from "state.slint";
 import { Strings } from "strings.slint";
 import { Theme } from "theme.slint";
-import { ActionButton, Caption, ToggleRow } from "widgets.slint";
+import { ActionButton, ToggleRow } from "widgets.slint";
+import { SettingsSectionLabel } from "settings-controls.slint";
 
-export component StartupSettings inherits Flickable {
-    viewport-width: self.width;
-    viewport-height: max(self.height, form.height);
-    form := Rectangle {
-        x: 0px; y: 0px; width: root.width;
-        height: reopen-hint.y + reopen-hint.height + (State.quick-return-available ? Theme.touch + 12px : 0px);
-        property <length> row-height: State.large-screen ? 60px : 54px;
-        Caption {
-            x: 0px; y: 0px; width: form.width; height: Theme.touch;
-            text: Strings.startup-apply-hint; wrap: word-wrap;
+export component StartupSettings inherits Rectangle {
+    property <length> row-height: State.large-screen ? 60px : 54px;
+    property <length> controls-top: heading.height + 8px;
+    height: presets.y + presets.height + 10px + Theme.touch;
+
+    heading := SettingsSectionLabel { x: 0px; y: 0px; width: root.width; text: Strings.setting-startup; }
+    for item[index] in State.settings-details: ToggleRow {
+        x: 0px; y: root.controls-top + index * root.row-height;
+        width: root.width; height: root.row-height;
+        text: item.title; enabled: item.enabled; value: item.value == "on";
+        toggled => { Commands.action("settings", "startup-set", item.id + (self.value ? "=off" : "=on")); }
+    }
+    presets := HorizontalLayout {
+        x: 0px; y: root.controls-top + State.settings-details.length * root.row-height + 14px;
+        width: root.width; height: Theme.touch; spacing: 10px;
+        ActionButton {
+            preferred-width: 1px; horizontal-stretch: 1; text: Strings.startup-enable-all;
+            clicked => { Commands.action("settings", "startup-preset", "all"); }
         }
-        for item[index] in State.settings-details: ToggleRow {
-            x: 0px; y: Theme.touch + index * form.row-height;
-            width: form.width; height: form.row-height;
-            text: item.title; enabled: item.enabled; value: item.value == "on";
-            toggled => { Commands.action("settings", "startup-set", item.id + (self.value ? "=off" : "=on")); }
+        ActionButton {
+            preferred-width: 1px; horizontal-stretch: 1; text: Strings.startup-restore-recommended;
+            clicked => { Commands.action("settings", "startup-preset", "recommended"); }
         }
-        presets := Rectangle {
-            x: 0px; y: Theme.touch + State.settings-details.length * form.row-height + 16px;
-            width: form.width; height: Theme.touch;
-            ActionButton {
-                x: 0px; y: 0px; width: (presets.width - 12px) / 2; height: presets.height;
-                text: Strings.startup-enable-all;
-                clicked => { Commands.action("settings", "startup-preset", "all"); }
-            }
-            ActionButton {
-                x: (presets.width + 12px) / 2; y: 0px; width: (presets.width - 12px) / 2; height: presets.height;
-                text: Strings.startup-restore-recommended;
-                clicked => { Commands.action("settings", "startup-preset", "recommended"); }
-            }
-        }
-        reopen-hint := Caption {
-            x: 0px; y: presets.y + presets.height + 16px; width: form.width; height: self.preferred-height;
-            text: Strings.startup-reopen-hint; wrap: word-wrap;
-        }
-        if State.quick-return-available: ActionButton {
-            x: 0px; y: reopen-hint.y + reopen-hint.height + 12px; width: form.width; height: Theme.touch;
-            text: Strings.startup-return-kindle;
-            clicked => { Commands.action("app", "quick-return", ""); }
-        }
+    }
+    ActionButton {
+        x: 0px; y: presets.y + presets.height + 10px; width: root.width;
+        text: Strings.startup-return-kindle; primary: true; enabled: State.quick-return-available;
+        clicked => { Commands.action("app", "quick-return", ""); }
     }
 }

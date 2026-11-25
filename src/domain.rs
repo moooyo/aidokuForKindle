@@ -128,7 +128,6 @@ pub struct Preferences {
     pub reverse_taps: bool,
     pub refresh_every: u32,
     pub display_mode: crate::display::DisplayMode,
-    pub flash_on_close: bool,
     pub crop_borders: bool,
     pub dither: bool,
     #[serde(deserialize_with = "deserialize_dither_method")]
@@ -158,6 +157,7 @@ pub struct Preferences {
     pub reading_wifi_off: bool,
     pub screensaver_mode: String,
     pub sleep_cover: bool,
+    pub sleep_cover_book_id: Option<String>,
     pub stylus_navigation: bool,
     pub palm_rejection: bool,
     pub split_wide: bool,
@@ -175,7 +175,6 @@ impl Default for Preferences {
             reverse_taps: false,
             refresh_every: 6,
             display_mode: crate::display::DisplayMode::Normal,
-            flash_on_close: true,
             crop_borders: true,
             dither: true,
             dither_method: "bayer8".into(),
@@ -204,6 +203,7 @@ impl Default for Preferences {
             reading_wifi_off: false,
             screensaver_mode: "cover".into(),
             sleep_cover: true,
+            sleep_cover_book_id: None,
             stylus_navigation: false,
             palm_rejection: false,
             split_wide: false,
@@ -259,7 +259,8 @@ fn deserialize_dither_method<'de, D: serde::Deserializer<'de>>(
         "floyd" | "floyd_steinberg" => "floyd_steinberg",
         // Persisted Y4/software choices migrate to the requested software menu.
         _ => "bayer8",
-    }.into())
+    }
+    .into())
 }
 
 /// A durable navigation checkpoint deliberately excludes credentials, keyboard
@@ -421,7 +422,8 @@ mod tests {
             for legacy in ["software", "hardware", "future-method"] {
                 let migrated: Preferences = serde_json::from_value(serde_json::json!({
                     "dither": enabled, "dither_method": legacy
-                })).unwrap();
+                }))
+                .unwrap();
                 assert_eq!(migrated, preferences);
             }
         }
@@ -458,8 +460,8 @@ mod tests {
                 dither_method: method.into(),
                 ..Preferences::default()
             };
-            let restored: Preferences = serde_json::from_slice(
-                &serde_json::to_vec(&preferences).unwrap()).unwrap();
+            let restored: Preferences =
+                serde_json::from_slice(&serde_json::to_vec(&preferences).unwrap()).unwrap();
             assert_eq!(restored, preferences);
             assert_eq!(restored.spatial_dither(), expected);
             assert!(!restored.uses_hardware_dither(true));

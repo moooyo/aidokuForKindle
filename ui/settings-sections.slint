@@ -1,42 +1,128 @@
-import { ReadingOptions, LightOptions, RefreshOptions } from "native-controls.slint";
 import { State, Commands } from "state.slint";
 import { Theme } from "theme.slint";
 import { Strings } from "strings.slint";
-import { ActionButton, BodyText, Caption, GroupLabel, Icon, RadioCard, ToggleRow, TitleText } from "widgets.slint";
-import { SettingsChoice, SettingsSlider, SettingsValueRow } from "settings-controls.slint";
+import { ActionButton, BodyText, Caption, Icon, InlineAction, SegmentedControl, ToggleRow, TitleText } from "widgets.slint";
+import { ReadingOptions, LightOptions, RefreshOptions } from "native-controls.slint";
+import { SettingsSectionLabel, SettingsValueRow } from "settings-controls.slint";
 import { HardwareOptions } from "hardware-options.slint";
+import { DitherSelector } from "dither-controls.slint";
+import { GrayscaleTest } from "grayscale-test.slint";
 import { StartupSettings } from "settings-startup.slint";
-import { TapLayoutCard } from "settings-tap-card.slint";
+import { TapLayoutSelector } from "settings-tap-card.slint";
 import { StorageSettings, CategoriesSettings, DownloadSettings, SourceListsSettings } from "settings-data.slint";
+
+component ReadingSettings inherits Rectangle {
+    property <length> section-gap: State.large-screen ? 26px : 20px;
+    height: reverse.y + reverse.height;
+    heading := SettingsSectionLabel { x: 0px; y: 0px; width: root.width; text: Strings.setting-page-turn; }
+    reading := ReadingOptions { x: 0px; y: heading.height + 8px; width: root.width; }
+    tap-heading := SettingsSectionLabel {
+        x: 0px; y: reading.y + reading.height + root.section-gap; width: root.width;
+        text: Strings.tap-regions;
+    }
+    tap-options := TapLayoutSelector { x: 0px; y: tap-heading.y + tap-heading.height + 8px; width: root.width; }
+    reverse := ToggleRow {
+        x: 0px; y: tap-options.y + tap-options.height + 12px; width: root.width;
+        text: Strings.reverse-tap; value: State.reverse-taps;
+        toggled => { Commands.action("settings", "set", "reverse-taps=" + (self.value ? "false" : "true")); }
+    }
+}
+
+component LanguageSettings inherits Rectangle {
+    property <length> row-height: State.large-screen ? 60px : 54px;
+    height: heading.height + 8px + root.row-height * 4;
+    heading := SettingsSectionLabel { x: 0px; y: 0px; width: root.width; text: Strings.setting-choose-language; }
+    for label[index] in [Strings.chinese, Strings.traditional-chinese, Strings.english, Strings.japanese]: Rectangle {
+        property <string> code: index == 0 ? "zh-CN" : index == 1 ? "zh-TW" : index == 2 ? "en" : "ja";
+        property <bool> selected: State.language == self.code;
+        x: 0px; y: heading.height + 8px + index * root.row-height;
+        width: root.width; height: root.row-height;
+        accessible-role: radio-button; accessible-label: label; accessible-checkable: true; accessible-checked: self.selected;
+        BodyText {
+            x: 0px; y: 0px; width: parent.width - 34px; height: parent.height;
+            text: label; font-weight: parent.selected ? 700 : 400;
+            font-family: parent.code == "zh-TW" || parent.code == "ja" ? Theme.locale-fallback : Theme.sans;
+        }
+        if self.selected: Icon {
+            x: parent.width - 22px; y: (parent.height - 22px) / 2;
+            width: 22px; height: 22px; kind: "check";
+        }
+        TouchArea {
+            x: 0px; y: 0px; width: parent.width; height: parent.height;
+            clicked => { if !parent.selected { Commands.action("settings", "set", "language=" + parent.code); } }
+        }
+    }
+}
+
+component AboutSettings inherits Rectangle {
+    property <length> row-height: State.large-screen ? 60px : 54px;
+    height: heading.height + 8px + State.settings-details.length * root.row-height;
+    heading := SettingsSectionLabel { x: 0px; y: 0px; width: root.width; text: "Aidoku for Kindle"; }
+    for item[index] in State.settings-details: SettingsValueRow {
+        x: 0px; y: heading.height + 8px + index * root.row-height; width: root.width;
+        text: item.title; value: item.id == "license" ? "" : item.value;
+        value-family: item.id == "version" ? Theme.numbers : Theme.sans;
+        action: item.id == "license" ? Strings.view : ""; enabled: item.enabled && !State.busy;
+        clicked => { Commands.action("settings", "detail", item.id); }
+    }
+}
+
+component BackupSettings inherits Rectangle {
+    property <length> row-height: State.large-screen ? 72px : 64px;
+    height: heading.y + heading.height + 8px + max(1, State.settings-details.length) * root.row-height;
+    actions := HorizontalLayout {
+        x: 0px; y: 0px; width: root.width; height: Theme.touch; spacing: 10px;
+        ActionButton {
+            preferred-width: 1px; horizontal-stretch: 1;
+            text: Strings.backup-now; primary: true; enabled: !State.busy;
+            clicked => { Commands.action("settings", "backup-create", ""); }
+        }
+        ActionButton {
+            preferred-width: 1px; horizontal-stretch: 1;
+            text: Strings.restore-backup; enabled: !State.busy;
+            clicked => { Commands.action("settings", "backup-restore", ""); }
+        }
+    }
+    heading := SettingsSectionLabel {
+        x: 0px; y: actions.height + (State.large-screen ? 26px : 20px); width: root.width;
+        text: Strings.recent-backups;
+    }
+    for item[index] in State.settings-details: Rectangle {
+        x: 0px; y: heading.y + heading.height + 8px + index * root.row-height;
+        width: root.width; height: root.row-height;
+        BodyText {
+            x: 0px; y: (parent.height - 48px) / 2; width: restore.x - 12px; height: 26px;
+            text: item.title; font-family: item.group == "backup-auto" ? Theme.sans : Theme.numbers;
+        }
+        HorizontalLayout {
+            x: 0px; y: (parent.height - 48px) / 2 + 26px; width: restore.x - 12px; height: 22px;
+            spacing: 6px; alignment: start;
+            Caption { text: Strings.metadata-backup-counts; }
+            Caption { text: item.value; font-family: Theme.numbers; }
+        }
+        restore := InlineAction {
+            x: parent.width - self.width; y: (parent.height - self.height) / 2;
+            text: Strings.setting-restore; enabled: item.enabled && !State.busy;
+            clicked => { Commands.action("settings", item.id, ""); }
+        }
+    }
+    if State.settings-details.length == 0: Caption {
+        x: 0px; y: heading.y + heading.height + 8px; width: root.width; height: root.row-height;
+        text: State.busy ? Strings.loading : State.settings-status != "" ? State.settings-status : Strings.metadata-backup-empty;
+    }
+}
 
 component AccountCard inherits Rectangle {
     in property <string> service;
     in property <string> service-id;
-    in property <string> initial;
-    in property <bool> connected: false;
+    in property <bool> connected;
     in property <string> status;
-    x: 0px; y: 0px;
-    height: State.large-screen ? 84px : 74px;
-    border-width: Theme.control-border;
-    border-color: Theme.ink;
-    border-radius: Theme.control-radius;
-    background: Theme.paper;
-    Rectangle {
-        x: State.large-screen ? 18px : 16px;
-        y: (parent.height - self.height) / 2;
-        width: State.large-screen ? 50px : 44px;
-        height: self.width;
-        border-width: Theme.control-border;
-        border-color: Theme.ink;
-        border-radius: Theme.control-radius;
-        background: Theme.paper;
-        Text { x: 0px; y: 0px; width: parent.width; height: parent.height; text: root.initial; font-family: Theme.numbers; font-size: State.large-screen ? 18px : 16px; font-weight: 700; color: Theme.ink; horizontal-alignment: center; vertical-alignment: center; }
-    }
-    BodyText { x: State.large-screen ? 84px : 74px; y: State.large-screen ? 16px : 13px; width: max(0px, parent.width - self.x - 112px); height: 28px; text: root.service; font-size: State.large-screen ? 18px : 17px; font-weight: 700; }
-    Caption { x: State.large-screen ? 84px : 74px; y: State.large-screen ? 46px : 41px; width: max(0px, parent.width - self.x - 112px); height: 22px; text: root.status != "" ? root.status : root.connected ? Strings.connected : Strings.not-configured; font-size: State.large-screen ? 14px : 13px; }
-    ActionButton {
-        x: parent.width - self.width - (State.large-screen ? 18px : 16px); y: (parent.height - self.height) / 2;
-        height: 44px; width: 80px; text: root.connected ? Strings.logout : Strings.login;
+    height: State.large-screen ? 60px : 54px;
+    SettingsValueRow {
+        x: 0px; y: 0px; width: root.width; height: root.height;
+        text: root.service;
+        detail: root.status != "" ? root.status : root.connected ? Strings.connected : Strings.not-configured;
+        action: root.connected ? Strings.logout : Strings.login;
         enabled: !State.busy && !State.tracking-busy;
         clicked => { Commands.action("settings", root.connected ? "tracking-disconnect" : "tracking-connect", root.service-id); }
     }
@@ -45,159 +131,115 @@ component AccountCard inherits Rectangle {
 export component SettingsBody inherits Rectangle {
     in property <string> section;
     property <length> row-height: State.large-screen ? 60px : 54px;
-    property <length> group-height: State.large-screen ? 21px : 18px;
-    property <length> section-gap: State.large-screen ? 12px : 10px;
+    property <length> section-gap: State.large-screen ? 26px : 20px;
+    clip: true;
 
-    if root.section == "startup-options": StartupSettings { x: 0px; y: 0px; width: root.width; height: root.height; }
-    if root.section == "screen-refresh": Flickable {
-        x: 0px; y: 0px; width: parent.width; height: parent.height;
-        viewport-width: self.width; viewport-height: refresh-options.height;
-        refresh-options := RefreshOptions { x: 0px; y: 0px; width: parent.width; show-grayscale-test: true; }
-    }
-    if root.section == "hardware-acceleration": Flickable {
-        x: 0px; y: 0px; width: parent.width; height: parent.height;
-        viewport-width: self.width; viewport-height: hardware-options.height;
-        hardware-options := HardwareOptions { x: 0px; y: 0px; width: parent.width; }
-    }
-    if root.section == "frontlight-warmth": LightOptions { x: 0px; y: 0px; width: parent.width; }
-    if root.section == "wifi-sleep-exit": Rectangle {
-        x: 0px; y: 0px; width: parent.width; height: parent.height;
-        property <length> saver-label-top: State.large-screen ? 202px : root.row-height * 3 + root.section-gap + 8px;
-        property <length> saver-label-height: State.large-screen ? root.group-height : 17.5px;
-        property <length> saver-grid-top: self.saver-label-top + self.saver-label-height + root.section-gap;
-        property <length> saver-card-height: State.large-screen ? 201px : 179px;
-        property <string> saver-mode: State.screensaver-mode == "cover" && !State.sleep-cover ? "system" : State.screensaver-mode;
-        ToggleRow { x: 0px; y: 0px; width: parent.width; text: Strings.keep-awake; value: State.keep-awake; toggled => { Commands.action("settings", "set", "keep-awake=" + (State.keep-awake ? "false" : "true")); } }
-        ToggleRow { x: 0px; y: root.row-height; width: parent.width; text: Strings.charging-updates; value: State.charging-updates; enabled: State.charging-status-supported; toggled => { Commands.action("settings", "set", "charging-updates=" + (State.charging-updates ? "false" : "true")); } }
-        ToggleRow { x: 0px; y: root.row-height * 2; width: parent.width; text: Strings.reading-wifi-off; value: State.reading-wifi-off; enabled: State.wifi-policy-supported; toggled => { Commands.action("settings", "set", "reading-wifi-off=" + (State.reading-wifi-off ? "false" : "true")); } }
-        GroupLabel { x: 0px; y: parent.saver-label-top; width: parent.width; height: parent.saver-label-height; text: Strings.screensaver; font-size: State.large-screen ? 14px : 12px; }
-        for label[index] in [Strings.saver-cover, Strings.saver-progress, Strings.saver-system]: Rectangle {
-            property <string> mode: index == 0 ? "cover" : index == 1 ? "progress" : "system";
-            property <bool> selected: parent.saver-mode == self.mode;
-            property <bool> available: self.mode != "progress" || State.screensaver-supported;
-            x: index * (parent.width + (State.large-screen ? 14px : 12px)) / 3;
-            y: parent.saver-grid-top;
-            width: (parent.width - (State.large-screen ? 28px : 24px)) / 3;
-            height: parent.saver-card-height;
-            accessible-role: radio-button; accessible-label: label; accessible-enabled: self.available; accessible-checkable: true; accessible-checked: self.selected;
-            Rectangle {
-                x: 0px; y: 0px; width: parent.width; height: State.large-screen ? 170px : 150px;
-                background: Theme.paper; border-width: parent.selected ? 2px : 1px; border-color: parent.selected ? Theme.ink : parent.available ? Theme.secondary : Theme.disabled; border-radius: Theme.control-radius; clip: true;
-                if index == 0 && State.current-book.cover.width > 0: Image { x: 1px; y: 1px; width: parent.width - 2px; height: parent.height - 2px; source: State.current-book.cover; image-fit: contain; }
-                if index == 0 && State.current-book.cover.width == 0: TitleText { x: 8px; y: 12px; width: parent.width - 16px; height: parent.height - 24px; text: State.current-book.title != "" ? State.current-book.title : Strings.sleep-neutral; font-size: State.large-screen ? 17px : 15px; horizontal-alignment: center; wrap: word-wrap; }
-                if index == 1: Text { x: 8px; y: 0px; width: parent.width - 16px; height: parent.height; text: !State.screensaver-supported ? Strings.unavailable : State.reader-image-ready ? State.reader-page + " / " + State.reader-total : "—"; font-family: State.screensaver-supported ? Theme.numbers : Theme.sans; font-size: State.screensaver-supported ? (State.large-screen ? 19px : 17px) : Theme.caption; font-weight: 700; color: Theme.secondary; horizontal-alignment: center; vertical-alignment: center; wrap: word-wrap; }
-                if index == 2 && State.large-screen: Text { x: 0px; y: 0px; width: parent.width; height: parent.height; text: "Kindle"; font-family: Theme.numbers; font-size: State.large-screen ? 19px : 17px; font-weight: 700; color: Theme.secondary; horizontal-alignment: center; vertical-alignment: center; }
-                if index == 2 && !State.large-screen: Rectangle {
-                    x: (parent.width - self.width) / 2; y: parent.height - self.height - 10px;
-                    width: kindle-caption.preferred-width + 20px; height: kindle-caption.preferred-height + 4px;
-                    background: Theme.paper; border-radius: 4px;
-                    kindle-caption := Text { x: 10px; y: 2px; width: self.preferred-width; height: self.preferred-height; text: "Kindle"; font-family: Theme.serif; font-size: 12px; font-weight: 900; color: Theme.secondary; horizontal-alignment: center; vertical-alignment: center; }
+    Rectangle {
+        x: 0px; y: root.section-gap; width: root.width; height: root.height - self.y;
+        if root.section == "default-direction": ReadingSettings { x: 0px; y: 0px; width: root.width; }
+        if root.section == "frontlight-warmth": Rectangle {
+            x: 0px; y: 0px; width: root.width; height: heading.height + 8px + light.height;
+            heading := SettingsSectionLabel { x: 0px; y: 0px; width: root.width; text: Strings.setting-frontlight-picture; }
+            light := LightOptions { x: 0px; y: heading.height + 8px; width: root.width; }
+        }
+        if root.section == "screen-refresh": Rectangle {
+            x: 0px; y: 0px; width: root.width; height: test.y + test.height;
+            refresh := RefreshOptions { x: 0px; y: 0px; width: root.width; }
+            dither := DitherSelector { x: 0px; y: refresh.height + root.section-gap; width: root.width; }
+            test := GrayscaleTest { x: 0px; y: dither.y + dither.height + root.section-gap; width: root.width; }
+        }
+        if root.section == "hardware-acceleration": HardwareOptions { x: 0px; y: 0px; width: root.width; }
+        if root.section == "storage": StorageSettings { x: 0px; y: 0px; width: root.width; }
+        if root.section == "categories": CategoriesSettings { x: 0px; y: 0px; width: root.width; }
+        if root.section == "backup": BackupSettings { x: 0px; y: 0px; width: root.width; }
+        if root.section == "language": LanguageSettings { x: 0px; y: 0px; width: root.width; }
+        if root.section == "about": AboutSettings { x: 0px; y: 0px; width: root.width; }
+        if root.section == "startup-options": StartupSettings { x: 0px; y: 0px; width: root.width; }
+
+        if root.section == "downloads": DownloadSettings { x: 0px; y: 0px; width: root.width; }
+        if root.section == "source-lists": SourceListsSettings { x: 0px; y: 0px; width: root.width; }
+        if root.section == "wifi-sleep-exit": Rectangle {
+            x: 0px; y: 0px; width: root.width; height: parent.height;
+            property <string> saver-mode: State.screensaver-mode == "cover" && !State.sleep-cover ? "system" : State.screensaver-mode;
+            property <length> heading-top: 3 * root.row-height + root.section-gap;
+            ToggleRow { x: 0px; y: 0px; width: parent.width; text: Strings.keep-awake; value: State.keep-awake; toggled => { Commands.action("settings", "set", "keep-awake=" + (self.value ? "false" : "true")); } }
+            ToggleRow { x: 0px; y: root.row-height; width: parent.width; text: Strings.charging-updates; value: State.charging-updates; enabled: State.charging-status-supported; toggled => { Commands.action("settings", "set", "charging-updates=" + (self.value ? "false" : "true")); } }
+            ToggleRow { x: 0px; y: 2 * root.row-height; width: parent.width; text: Strings.reading-wifi-off; value: State.reading-wifi-off; enabled: State.wifi-policy-supported; toggled => { Commands.action("settings", "set", "reading-wifi-off=" + (self.value ? "false" : "true")); } }
+            saver-heading := SettingsSectionLabel { x: 0px; y: parent.heading-top; width: parent.width; text: Strings.screensaver; }
+            for label[index] in [Strings.saver-cover, Strings.saver-progress, Strings.saver-system]: Rectangle {
+                property <string> mode: index == 0 ? "cover" : index == 1 ? "progress" : "system";
+                property <bool> selected: parent.saver-mode == self.mode;
+                property <bool> available: index != 1 || State.screensaver-supported;
+                x: index * (parent.width + 12px) / 3; y: saver-heading.y + saver-heading.height + 8px;
+                width: (parent.width - 24px) / 3; height: State.large-screen ? 201px : 179px;
+                accessible-role: radio-button; accessible-label: label; accessible-enabled: self.available; accessible-checkable: true; accessible-checked: self.selected;
+                preview := Rectangle {
+                    x: 0px; y: 0px; width: parent.width; height: State.large-screen ? 170px : 150px;
+                    background: Theme.paper; border-width: parent.selected ? 2px : 1px;
+                    border-color: parent.selected ? Theme.ink : parent.available ? Theme.secondary : Theme.disabled;
+                    clip: true;
+                    if index == 0 && State.current-book.cover.width > 0: Image {
+                        x: 2px; y: 2px; width: parent.width - 4px; height: parent.height - 4px;
+                        source: State.current-book.cover; image-fit: contain;
+                    }
+                    if index == 0 && State.current-book.cover.width == 0: TitleText {
+                        x: 8px; y: 0px; width: parent.width - 16px; height: parent.height;
+                        text: State.current-book.title != "" ? State.current-book.title : Strings.sleep-neutral;
+                        font-size: Theme.caption; horizontal-alignment: center; wrap: word-wrap;
+                    }
+                    if index != 0: Caption {
+                        x: 8px; y: 0px; width: parent.width - 16px; height: parent.height;
+                        text: index == 2 ? "Kindle" : !State.screensaver-supported ? Strings.unavailable : State.reader-image-ready ? State.reader-page + " / " + State.reader-total : "—";
+                        horizontal-alignment: center; wrap: word-wrap;
+                    }
+                }
+                BodyText {
+                    x: 0px; y: preview.height; width: parent.width; height: parent.height - self.y;
+                    text: label; font-size: Theme.caption; color: parent.available ? Theme.ink : Theme.disabled;
+                    font-weight: parent.selected ? 700 : 400; horizontal-alignment: center;
+                }
+                TouchArea {
+                    x: 0px; y: 0px; width: parent.width; height: parent.height; enabled: parent.available;
+                    clicked => { if !parent.selected { Commands.action("settings", "set", "screensaver-mode=" + parent.mode); } }
                 }
             }
-            if State.large-screen: BodyText { x: 0px; y: 178px; width: parent.width; height: 23px; text: label; font-size: 15px; color: parent.available ? Theme.ink : Theme.disabled; font-weight: parent.selected ? 700 : 400; horizontal-alignment: center; }
-            if !State.large-screen: BodyText { x: 0px; y: 158px; width: parent.width; height: 21px; text: label; font-size: 14px; font-weight: parent.selected ? 700 : 500; color: parent.available ? Theme.ink : Theme.disabled; horizontal-alignment: center; }
-            TouchArea {
-                x: 0px; y: 0px; width: parent.width; height: parent.height; enabled: parent.available;
-                pointer-event(event) => {
-                    if event.kind == PointerEventKind.down { Commands.refresh("ui"); }
-                    else if event.kind == PointerEventKind.up || event.kind == PointerEventKind.cancel { Commands.refresh("ui"); }
-                }
-                clicked => { if !parent.selected { Commands.action("settings", "set", "screensaver-mode=" + parent.mode); } }
+        }
+        if root.section == "auto-update": Rectangle {
+            x: 0px; y: 0px; width: root.width; height: parent.height;
+            update-heading := SettingsSectionLabel { x: 0px; y: 0px; width: root.width; text: Strings.update-frequency; }
+            interval := SegmentedControl {
+                x: 0px; y: update-heading.height + 8px; width: parent.width;
+                labels: [Strings.off, Strings.daily, Strings.weekly];
+                selected: State.auto-update-interval == "daily" ? 1 : State.auto-update-interval == "weekly" ? 2 : 0;
+                chosen(index) => { Commands.action("settings", "set", "auto-update-interval=" + (index == 0 ? "off" : index == 1 ? "daily" : "weekly")); }
             }
+            wifi := ToggleRow { x: 0px; y: interval.y + interval.height + 12px; width: parent.width; text: Strings.wifi-only; value: State.update-wifi-only; toggled => { Commands.action("settings", "set", "update-wifi-only=" + (self.value ? "false" : "true")); } }
+            ToggleRow { x: 0px; y: wifi.y + root.row-height; width: parent.width; text: Strings.charging-only; value: State.update-charging-only; enabled: State.charging-status-supported; toggled => { Commands.action("settings", "set", "update-charging-only=" + (self.value ? "false" : "true")); } }
+            ToggleRow { x: 0px; y: wifi.y + 2 * root.row-height; width: parent.width; text: Strings.skip-completed; value: State.update-skip-completed; toggled => { Commands.action("settings", "set", "update-skip-completed=" + (self.value ? "false" : "true")); } }
         }
-    }
-
-    if root.section == "default-direction": ReadingOptions { x: 0px; y: 0px; width: parent.width; }
-    if root.section == "auto-update": Rectangle {
-        x: 0px; y: 0px; width: parent.width; height: parent.height;
-        GroupLabel { x: 0px; y: State.large-screen ? 10px : 0px; width: parent.width - 110px; height: root.group-height; text: Strings.update-frequency; font-size: State.large-screen ? 14px : 12px; }
-        for label[index] in [Strings.off, Strings.daily, Strings.weekly]: SettingsChoice {
-            property <string> interval: index == 0 ? "off" : index == 1 ? "daily" : "weekly";
-            x: index * (parent.width + 8px) / 3; y: State.large-screen ? 43px : 28px; width: (parent.width - 16px) / 3; text: label;
-            selected: State.auto-update-interval == self.interval;
-            clicked => { Commands.action("settings", "set", "auto-update-interval=" + self.interval); }
+        if root.section == "tracking": Rectangle {
+            x: 0px; y: 0px; width: root.width; height: parent.height;
+            AccountCard { x: 0px; y: 0px; width: parent.width; service: "AniList"; service-id: "anilist"; connected: State.anilist-connected; status: State.anilist-status; }
+            AccountCard { x: 0px; y: root.row-height; width: parent.width; service: "MyAnimeList"; service-id: "myanimelist"; connected: State.myanimelist-connected; status: State.myanimelist-status; }
+            ToggleRow { x: 0px; y: 2 * root.row-height; width: parent.width; text: Strings.auto-sync-chapter; value: State.tracking-auto-sync; toggled => { Commands.action("settings", "set", "tracking-auto-sync=" + (self.value ? "false" : "true")); } }
+            ToggleRow { x: 0px; y: 3 * root.row-height; width: parent.width; text: Strings.queue-offline-tracking; value: State.tracking-queue-offline; toggled => { Commands.action("settings", "set", "tracking-queue-offline=" + (self.value ? "false" : "true")); } }
         }
-        ToggleRow { x: 0px; y: State.large-screen ? 105px : 84px; width: parent.width; text: Strings.wifi-only; value: State.update-wifi-only; toggled => { Commands.action("settings", "set", "update-wifi-only=" + (State.update-wifi-only ? "false" : "true")); } }
-        ToggleRow { x: 0px; y: (State.large-screen ? 105px : 84px) + root.row-height; width: parent.width; text: Strings.charging-only; value: State.update-charging-only; enabled: State.charging-status-supported; toggled => { Commands.action("settings", "set", "update-charging-only=" + (State.update-charging-only ? "false" : "true")); } }
-        ToggleRow { x: 0px; y: (State.large-screen ? 105px : 84px) + root.row-height * 2; width: parent.width; text: Strings.skip-completed; value: State.update-skip-completed; toggled => { Commands.action("settings", "set", "update-skip-completed=" + (State.update-skip-completed ? "false" : "true")); } }
-    }
-
-    if root.section == "downloads": DownloadSettings { x: 0px; y: 0px; width: root.width; height: root.height; }
-
-    if root.section == "storage": StorageSettings { x: 0px; y: 0px; width: root.width; height: root.height; }
-
-    if root.section == "categories": CategoriesSettings { x: 0px; y: 0px; width: root.width; height: root.height; }
-
-    if root.section == "source-lists": SourceListsSettings { x: 0px; y: 0px; width: root.width; height: root.height; }
-
-    if root.section == "tracking": Rectangle {
-        x: 0px; y: 0px; width: parent.width; height: parent.height;
-        AccountCard { x: 0px; y: 0px; width: parent.width; service: "AniList"; service-id: "anilist"; initial: "AL"; connected: State.anilist-connected; status: State.anilist-status; }
-        AccountCard { x: 0px; y: State.large-screen ? 96px : 86px; width: parent.width; service: "MyAnimeList"; service-id: "myanimelist"; initial: "MAL"; connected: State.myanimelist-connected; status: State.myanimelist-status; }
-        ToggleRow { x: 0px; y: State.large-screen ? 192px : 172px; width: parent.width; text: Strings.auto-sync-chapter; value: State.tracking-auto-sync; toggled => { Commands.action("settings", "set", "tracking-auto-sync=" + (State.tracking-auto-sync ? "false" : "true")); } }
-        ToggleRow { x: 0px; y: (State.large-screen ? 192px : 172px) + root.row-height; width: parent.width; text: Strings.queue-offline-tracking; value: State.tracking-queue-offline; toggled => { Commands.action("settings", "set", "tracking-queue-offline=" + (State.tracking-queue-offline ? "false" : "true")); } }
-    }
-
-    if root.section == "backup" || root.section == "logs" || root.section == "about": Rectangle {
-        x: 0px; y: 0px; width: parent.width; height: parent.height;
-        property <length> list-top: root.section == "backup" ? (State.large-screen ? 105px : 96px) : root.section == "logs" ? root.row-height + (State.large-screen ? 116px : 110px) : 0px;
-        if root.section == "backup": HorizontalLayout {
-            x: 0px; y: 0px; width: parent.width; height: State.large-screen ? 54px : 48px; spacing: 12px; alignment: start;
-            ActionButton { text: Strings.backup-now; horizontal-padding: 24px; primary: true; enabled: !State.busy; clicked => { Commands.action("settings", "backup-create", ""); } }
-            ActionButton { text: Strings.restore-backup; horizontal-padding: 24px; enabled: !State.busy; clicked => { Commands.action("settings", "backup-restore", ""); } }
-        }
-        if root.section == "backup": GroupLabel { x: 0px; y: State.large-screen ? 72px : 64px; width: parent.width; height: root.group-height; text: Strings.recent-backups; font-size: State.large-screen ? 14px : 12px; }
-        if root.section == "logs": ToggleRow { x: 0px; y: 0px; width: parent.width; text: Strings.write-logs; value: State.write-logs; toggled => { Commands.action("settings", "set", "write-logs=" + (State.write-logs ? "false" : "true")); } }
         if root.section == "logs": Rectangle {
-            x: 0px; y: root.row-height + 12px; width: parent.width; height: State.large-screen ? 54px : 48px;
-            ActionButton { x: 0px; y: 0px; width: 118px; height: parent.height; text: Strings.export-logs; enabled: !State.busy; clicked => { Commands.action("settings", "logs-export", ""); } }
-            ActionButton { x: 130px; y: 0px; width: 118px; height: parent.height; text: Strings.clear-logs; enabled: !State.busy; clicked => { Commands.action("settings", "logs-clear", ""); } }
-        }
-        if root.section == "logs": Caption {
-            x: 0px;
-            y: root.row-height + (State.large-screen ? 78px : 72px);
-            width: parent.width;
-            height: 26px;
-            text: State.settings-status == "" ? (State.write-logs ? Strings.on : Strings.off) : State.settings-status;
-            font-size: State.large-screen ? 15px : 13px;
-        }
-        if State.settings-details.length > 0: Rectangle { x: 0px; y: parent.list-top; width: parent.width; height: 1px; background: Theme.line; }
-        for item[index] in State.settings-details: SettingsValueRow {
-            x: 0px;
-            y: parent.list-top + index * root.row-height;
-            width: parent.width;
-            text: item.title;
-            value: root.section == "source-lists" ? "" : item.value;
-            detail: root.section == "source-lists" ? item.value : "";
-            action: item.enabled ? root.section == "backup" ? Strings.restore-backup : item.id == "license" ? Strings.view : Strings.configure : "";
-            enabled: item.enabled && !State.busy;
-            clicked => { Commands.action("settings", root.section == "backup" ? item.id : "detail", root.section == "backup" ? "" : item.id); }
-        }
-        if State.settings-details.length == 0 && root.section != "logs": Caption { x: 0px; y: parent.list-top; width: parent.width; height: 32px; text: root.section == "backup" ? Strings.metadata-backup-empty : State.settings-status == "" ? "—" : State.settings-status; }
-    }
-
-    if root.section == "language": Rectangle {
-        x: 0px; y: 0px; width: parent.width; height: parent.height;
-        Rectangle { x: 0px; y: 0px; width: parent.width; height: 1px; background: Theme.line; }
-        for label[index] in [Strings.chinese, Strings.traditional-chinese, "English", Strings.japanese]: Rectangle {
-            property <string> code: index == 0 ? "zh-CN" : index == 1 ? "zh-TW" : index == 2 ? "en" : "ja";
-            property <bool> selected: State.language == self.code;
-            x: 0px;
-            y: index * root.row-height;
-            width: parent.width; height: root.row-height;
-            accessible-role: radio-button; accessible-label: label; accessible-enabled: true; accessible-checkable: true; accessible-checked: self.selected;
-            BodyText { x: 0px; y: 0px; width: parent.width - 40px; height: parent.height; text: label; font-size: State.large-screen ? 17px : 16px; font-weight: parent.selected ? 700 : 400; color: Theme.ink; }
-            if self.selected: Icon { x: parent.width - 22px; y: (parent.height - 22px) / 2; width: 22px; height: 22px; kind: "check"; }
-            Rectangle { x: 0px; y: parent.height - 1px; width: parent.width; height: 1px; background: Theme.line; }
-            TouchArea {
-                x: 0px; y: 0px; width: parent.width; height: parent.height;
-                pointer-event(event) => {
-                    if event.kind == PointerEventKind.down { Commands.refresh("ui"); }
-                    else if event.kind == PointerEventKind.up || event.kind == PointerEventKind.cancel { Commands.refresh("ui"); }
-                }
-                clicked => { if !parent.selected { Commands.action("settings", "set", "language=" + parent.code); } }
+            x: 0px; y: 0px; width: root.width; height: parent.height;
+            ToggleRow { x: 0px; y: 0px; width: parent.width; text: Strings.write-logs; value: State.write-logs; toggled => { Commands.action("settings", "set", "write-logs=" + (self.value ? "false" : "true")); } }
+            log-actions := HorizontalLayout {
+                x: 0px; y: root.row-height + 12px; width: parent.width; height: Theme.touch; spacing: 10px; alignment: start;
+                ActionButton { text: Strings.export-logs; enabled: !State.busy; clicked => { Commands.action("settings", "logs-export", ""); } }
+                ActionButton { text: Strings.clear-logs; enabled: !State.busy; clicked => { Commands.action("settings", "logs-clear", ""); } }
+            }
+            log-status := Caption {
+                x: 0px; y: log-actions.y + log-actions.height + 12px; width: parent.width; height: 26px;
+                text: State.settings-status == "" ? (State.write-logs ? Strings.on : Strings.off) : State.settings-status;
+            }
+            for item[index] in State.settings-details: SettingsValueRow {
+                x: 0px; y: log-status.y + log-status.height + index * root.row-height; width: parent.width;
+                text: item.title; value: item.value;
             }
         }
     }
 }
-

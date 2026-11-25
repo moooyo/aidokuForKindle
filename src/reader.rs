@@ -174,7 +174,6 @@ pub struct ReaderState {
     refresh_every: u32,
     display_mode: crate::display::DisplayMode,
     turns_since_full: u32,
-    flash_on_close: bool,
     tap_layout: TapLayout,
     reverse_taps: bool,
     double_tap_zoom: bool,
@@ -222,7 +221,6 @@ impl ReaderState {
             refresh_every: preferences.refresh_every,
             display_mode: preferences.display_mode,
             turns_since_full: 0,
-            flash_on_close: preferences.flash_on_close,
             tap_layout: TapLayout::from_preference(&preferences.tap_layout),
             reverse_taps: preferences.reverse_taps
                 || matches!(preferences.tap_layout.as_str(), "reverse" | "reversed"),
@@ -310,7 +308,6 @@ impl ReaderState {
             self.turns_since_full = 0;
         }
         self.display_mode = preferences.display_mode;
-        self.flash_on_close = preferences.flash_on_close;
         self.tap_layout = TapLayout::from_preference(&preferences.tap_layout);
         self.reverse_taps = preferences.reverse_taps
             || matches!(preferences.tap_layout.as_str(), "reverse" | "reversed");
@@ -399,14 +396,7 @@ impl ReaderState {
             return ReaderUpdate::unchanged();
         }
         self.menu_open = false;
-        ReaderUpdate::new(
-            ReaderAction::MenuClosed,
-            if self.flash_on_close {
-                RefreshRequest::Full
-            } else {
-                RefreshRequest::Ui
-            },
-        )
+        ReaderUpdate::new(ReaderAction::MenuClosed, RefreshRequest::Ui)
     }
 
     pub fn toggle_menu(&mut self) -> ReaderUpdate {
@@ -1010,7 +1000,9 @@ mod tests {
         let mut state = reader(single_page_preferences());
         assert!(!state.menu_open);
         assert_eq!(state.tap(0.5, 0.5).action, ReaderAction::MenuOpened);
-        assert_eq!(state.tap(0.96, 0.98).action, ReaderAction::MenuClosed);
+        let close = state.tap(0.96, 0.98);
+        assert_eq!(close.action, ReaderAction::MenuClosed);
+        assert_eq!(close.refresh, RefreshRequest::Ui);
         assert_eq!(state.page, 4);
         assert!(!state.menu_open);
         assert_eq!(

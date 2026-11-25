@@ -8,6 +8,7 @@ font registry at startup without runtime gzip expansion or full font copies.
 | Asset | Family to request | Weight |
 | --- | --- | --- |
 | `StartupSansSC.otf` | `BiliComics Startup` | 400 |
+| `LocaleFallback.otf` | `Aidoku Locale Fallback` | 400 |
 | `NotoSansSC-Regular.otf.gz` | `Noto Sans CJK SC` | 400 |
 | `NotoSansSC-Medium.otf.gz` | `Noto Sans CJK SC` | 500 |
 | `NotoSansSC-Bold.otf.gz` | `Noto Sans CJK SC` | 700 |
@@ -28,7 +29,15 @@ from the sibling BiliComics project. It installs the backend before background
 workers start. Existing four-locale grayscale startup labels remain independent
 of its small glyph set. `bootstrap-provenance.json` records its exact source,
 digest, original family, transformation, and retained OFL terms. Normal UI
-families switch only after all nine full faces have been registered.
+families switch only after all interface faces have been registered.
+
+`LocaleFallback.otf` is a renamed subset of the official [Noto Sans CJK SC
+Regular](https://github.com/notofonts/noto-cjk/blob/main/Sans/OTF/SimplifiedChinese/NotoSansCJKsc-Regular.otf).
+It retains the Adobe copyright and uses the same SIL OFL 1.1 terms as the other
+Sans assets. `prepare-locale-fallback.py --source NotoSansCJKsc-Regular.otf
+--output assets/fonts/LocaleFallback.otf` derives the missing glyphs from the
+four supported locale files and supplies the native language names. The primary
+Sans, Serif, and numeral outline files are unchanged.
 
 The regular serif asset adds 3,342,333 compressed bytes and 4,140,532 bytes of raw
 font data. Startup registers the build-expanded payload; parser allocations and

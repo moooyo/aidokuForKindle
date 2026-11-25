@@ -320,7 +320,6 @@ impl App {
         self.invalidate_reader_work();
         self.busy = false;
         self.message.clear();
-        self.message_until = None;
         // A detail screen can still retain a hidden texture from another book.
         // Only a frame that was visible in Reader is a valid rollback surface.
         if self.route == "reader" {

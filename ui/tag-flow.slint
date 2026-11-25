@@ -10,34 +10,23 @@ component TagFlowChip inherits Rectangle {
     in property <length> text-size;
     in property <int> text-weight: 500;
     in property <length> horizontal-padding;
-    in property <length> marker-width;
     callback chosen();
-    property <bool> interaction-pressed: false;
-    property <bool> inverted: root.interactive && (root.state == 1 || root.interaction-pressed);
+    property <bool> inverted: root.interactive && root.state == 1;
     property <color> foreground: root.inverted ? Theme.paper : root.state == -1 ? Theme.secondary : Theme.ink;
-    // Keep the flow's capacity budget separate from each chip's visible marker.
-    property <length> effective-marker-width: root.interactive && root.state != 0 ? root.marker-width : 0px;
     property <bool> label-overflowed: label.preferred-width > label-box.width;
-    preferred-width: max(Theme.touch, label.preferred-width + root.horizontal-padding * 2 + root.effective-marker-width);
+    preferred-width: max(Theme.touch, label.preferred-width + root.horizontal-padding * 2);
     background: root.inverted ? Theme.ink : Theme.paper;
     border-radius: Theme.control-radius;
     border-width: root.state == -1 ? 0px : root.interactive ? Theme.control-border : 1px;
-    border-color: root.interactive ? (root.state == 0 ? Theme.disabled : Theme.ink) : Theme.secondary;
+    border-color: root.interactive ? Theme.ink : Theme.secondary;
     accessible-role: none;
-    changed interactive => { root.interaction-pressed = false; }
     if root.state == -1: DashedFrame {
         x: 0px; y: 0px; width: parent.width; height: parent.height;
-        line-color: root.foreground;
-    }
-    if root.interactive: Text {
-        x: root.horizontal-padding; y: 0px; width: root.effective-marker-width; height: parent.height;
-        text: root.state == 1 ? "✓" : root.state == -1 ? "✕" : "";
-        font-family: Theme.sans; font-size: root.text-size; font-weight: root.text-weight;
-        color: root.foreground; vertical-alignment: center;
+        line-color: Theme.ink;
     }
     label-box := Rectangle {
-        x: root.horizontal-padding + root.effective-marker-width; y: 0px;
-        width: max(0px, parent.width - root.horizontal-padding * 2 - root.effective-marker-width);
+        x: root.horizontal-padding; y: 0px;
+        width: max(0px, parent.width - root.horizontal-padding * 2);
         height: parent.height; clip: true;
         label := Text {
             // An oversized single label keeps its distinguishing suffix inside its own chip.
@@ -73,11 +62,6 @@ component TagFlowChip inherits Rectangle {
         TouchArea {
             x: 0px; width: parent.width;
             y: (parent.height - max(parent.height, Theme.touch)) / 2; height: max(parent.height, Theme.touch);
-            changed pressed => { root.interaction-pressed = self.pressed; }
-            pointer-event(event) => {
-                if event.kind == PointerEventKind.down { Commands.refresh("ui"); }
-                else if event.kind == PointerEventKind.up || event.kind == PointerEventKind.cancel { Commands.refresh("ui"); }
-            }
             clicked => { root.chosen(); }
         }
     }
@@ -99,8 +83,7 @@ export component TagFlow inherits Rectangle {
     callback chosen(int);
     property <bool> interactive: root.filter-options.length > 0;
     property <int> item-count: root.interactive ? root.filter-options.length : root.labels.length;
-    property <length> marker-width: root.interactive ? max(include-marker.preferred-width, exclude-marker.preferred-width) + 4px : 0px;
-    property <length> item-preferred-width: max(Theme.touch, measurements.preferred-width + root.horizontal-padding * 2 + root.marker-width);
+    property <length> item-preferred-width: max(Theme.touch, measurements.preferred-width + root.horizontal-padding * 2);
     property <length> available-width: max(1px, root.width);
     property <int> columns: min(max(1, root.item-count), max(1, floor((root.available-width + root.gap) / (min(root.available-width, root.item-preferred-width) + root.gap))));
     property <int> page-size: root.columns * max(1, root.rows-per-page);
@@ -121,14 +104,6 @@ export component TagFlow inherits Rectangle {
             opacity: 0; accessible-role: none;
         }
     }
-    include-marker := Text {
-        text: "✓"; font-family: Theme.sans; font-size: root.text-size; font-weight: root.text-weight;
-        opacity: 0; accessible-role: none;
-    }
-    exclude-marker := Text {
-        text: "✕"; font-family: Theme.sans; font-size: root.text-size; font-weight: root.text-weight;
-        opacity: 0; accessible-role: none;
-    }
     for row in root.visible-rows: HorizontalLayout {
         x: 0px; y: row * (root.item-height + root.gap); width: parent.width; height: root.item-height;
         spacing: root.gap; padding: 0px; alignment: start;
@@ -142,7 +117,7 @@ export component TagFlow inherits Rectangle {
             text: root.interactive ? root.filter-options[self.item-index].title : root.labels[self.item-index];
             state: root.interactive ? root.filter-options[self.item-index].state : 0;
             interactive: root.interactive; text-size: root.text-size; text-weight: root.text-weight;
-            horizontal-padding: root.horizontal-padding; marker-width: root.marker-width;
+            horizontal-padding: root.horizontal-padding;
             chosen => { root.chosen(self.item-index); }
         }
     }

@@ -62,7 +62,7 @@ export component StartupActivity inherits Rectangle {
         width: max(132px, State.startup-exit.width * 0.5px + 32px); height: 48px;
         border-width: 1.5px;
         border-color: root.ink;
-        background: exit-touch.pressed ? root.ink : root.background;
+        background: root.background;
         accessible-role: button;
         accessible-label: Strings.exit;
         Image {
@@ -71,7 +71,7 @@ export component StartupActivity inherits Rectangle {
             width: State.startup-exit.width * 0.5px;
             height: State.startup-exit.height * 0.5px;
             source: State.startup-exit;
-            colorize: exit-touch.pressed ? root.background : root.ink;
+            colorize: root.ink;
         }
         exit-touch := TouchArea {
             clicked => { Commands.exit-requested(); }

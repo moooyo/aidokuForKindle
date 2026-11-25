@@ -69,10 +69,7 @@ fn projected_source(item: SourceItem) -> Value {
 }
 
 fn startup_library_state(state: &State<'_>) -> Option<(bool, bool, bool)> {
-    if state.get_booting()
-        || state.get_route() != "library"
-        || !state.get_modal().is_empty()
-    {
+    if state.get_booting() || state.get_route() != "library" || !state.get_modal().is_empty() {
         return None;
     }
     let count = state.get_library_count();
@@ -251,7 +248,7 @@ impl App {
                 "read": item.read, "downloaded": item.downloaded,
                 "download_state": item.download_state.to_string(),
                 "download_progress": item.download_progress,
-                "current": item.current, "progress": item.progress.to_string(),
+                "current": item.current, "is_new": item.is_new, "progress": item.progress.to_string(),
                 "selected": item.selected,
             })
         });
@@ -475,7 +472,8 @@ mod startup_library_log_tests {
     impl slint::platform::Platform for TestDisplay {
         fn create_window_adapter(
             &self,
-        ) -> std::result::Result<Rc<dyn slint::platform::WindowAdapter>, slint::PlatformError> {
+        ) -> std::result::Result<Rc<dyn slint::platform::WindowAdapter>, slint::PlatformError>
+        {
             Ok(self.0.clone())
         }
     }

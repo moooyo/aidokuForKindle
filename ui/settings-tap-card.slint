@@ -1,78 +1,70 @@
 import { State, Commands } from "state.slint";
 import { Theme } from "theme.slint";
+import { Strings } from "strings.slint";
 import { BodyText } from "widgets.slint";
 
-export component TapLayoutCard inherits Rectangle {
-    in property <string> text;
+component TapLayoutCard inherits Rectangle {
+    in property <string> label;
     in property <string> layout;
     in property <bool> selected;
     callback clicked();
-    property <bool> inverted: root.selected || hit.pressed;
-    property <color> foreground: root.inverted ? Theme.paper : Theme.ink;
-    x: 0px;
-    y: 0px;
-    height: State.large-screen ? 63px : 52px;
-    border-width: Theme.control-border;
-    border-color: root.selected ? Theme.ink : Theme.dotted;
-    border-radius: Theme.control-radius;
-    background: root.inverted ? Theme.ink : Theme.paper;
+    height: State.large-screen ? 104px : 92px;
+    background: root.selected ? Theme.ink : Theme.paper;
     accessible-role: radio-button;
-    accessible-label: root.text;
+    accessible-label: root.label;
     accessible-checkable: true;
     accessible-checked: root.selected;
-    Rectangle {
-        x: State.large-screen ? 18px : 16px;
-        y: (parent.height - self.height) / 2;
-        width: State.large-screen ? 24px : 22px;
-        height: self.width;
-        border-width: 2px;
-        border-color: root.foreground;
-        border-radius: 3px;
-        background: transparent;
-        if root.selected: Rectangle {
-            x: (parent.width - 10px) / 2;
-            y: (parent.height - 10px) / 2;
-            width: 10px;
-            height: 10px;
-            background: root.foreground;
+
+    preview := Rectangle {
+        x: (root.width - self.width) / 2; y: (root.height - 46px - 8px - label-text.height) / 2;
+        width: 34px; height: 46px;
+        background: Theme.paper; border-width: Theme.control-border; border-color: Theme.ink;
+        Rectangle {
+            x: Theme.control-border; y: Theme.control-border;
+            width: parent.width - 2 * Theme.control-border; height: parent.height - 2 * Theme.control-border;
+            if root.layout != "swipe-only": Rectangle {
+                x: 0px; y: 0px; width: parent.width * 0.3;
+                height: root.layout == "l-shaped" ? parent.height * 2 / 3 : parent.height;
+                background: Theme.line;
+            }
+            if root.layout != "swipe-only": Rectangle {
+                x: parent.width - self.width; y: 0px; width: parent.width * 0.3;
+                height: root.layout == "l-shaped" ? parent.height * 2 / 3 : parent.height;
+                background: Theme.secondary;
+            }
+            if root.layout == "l-shaped": Rectangle {
+                x: 0px; y: parent.height - self.height; width: parent.width; height: parent.height / 3;
+                background: Theme.secondary;
+            }
+            if root.layout == "swipe-only": BodyText {
+                x: 0px; y: 0px; width: parent.width; height: parent.height;
+                text: "⇆"; font-size: 16px; horizontal-alignment: center;
+            }
         }
     }
-    BodyText {
-        x: State.large-screen ? 58px : 52px;
-        y: 0px;
-        width: max(0px, parent.width - self.x - 72px);
-        height: parent.height;
-        text: root.text;
-        font-size: State.large-screen ? 17px : 16px;
-        font-weight: State.large-screen ? 700 : 400;
-        color: root.foreground;
+    label-text := BodyText {
+        x: 4px; y: preview.y + preview.height + 8px; width: root.width - 8px;
+        height: State.large-screen ? 26px : 23px;
+        text: root.label; font-size: State.large-screen ? 19px : 17px;
+        font-weight: root.selected ? 700 : 400; color: root.selected ? Theme.paper : Theme.ink;
+        horizontal-alignment: center;
     }
-    Path {
-        x: parent.width - 48px;
-        y: (parent.height - 40px) / 2;
-        width: 30px;
-        height: 40px;
-        viewbox-width: 30;
-        viewbox-height: 40;
-        fill: transparent;
-        stroke: root.foreground;
-        stroke-width: 1.6px;
-        stroke-line-cap: round;
-        stroke-line-join: round;
-        // Merge adjacent turn regions and mirror the horizontal Reader mapping for RTL.
-        commands: root.layout == "thirds" ? "M1.5 1.5h27v37h-27zM10.5 1.5v37M19.5 1.5v37" :
-            root.layout == "l-shaped" ? (State.reading-direction == "rtl" ? "M1.5 1.5h27v37h-27zM10.5 27h18M19.5 1.5V27M10.5 1.5v37" : "M1.5 1.5h27v37h-27zM1.5 27h18M10.5 1.5V27M19.5 1.5v37") :
-            "M1.5 1.5h27v37h-27zM9 20h12M12 17l-3 3 3 3M18 17l3 3-3 3";
+    TouchArea {
+        x: 0px; y: 0px; width: root.width; height: root.height;
+        clicked => { if !root.selected { root.clicked(); } }
     }
-    hit := TouchArea {
-        x: 0px;
-        y: 0px;
-        width: parent.width;
-        height: parent.height;
-        pointer-event(event) => {
-            if event.kind == PointerEventKind.down { Commands.refresh("ui"); }
-            else if event.kind == PointerEventKind.up || event.kind == PointerEventKind.cancel { Commands.refresh("ui"); }
-        }
-        clicked => { root.clicked(); }
+}
+
+export component TapLayoutSelector inherits Rectangle {
+    property <length> edge: Theme.control-border;
+    property <length> cell-width: (root.width - root.edge * 2 - 2px) / 3;
+    height: (State.large-screen ? 104px : 92px) + 2 * root.edge;
+    background: Theme.ink;
+    for label[index] in [Strings.setting-tap-thirds, Strings.tap-l-shape, Strings.swipe-only]: TapLayoutCard {
+        x: root.edge + index * (root.cell-width + 1px); y: root.edge; width: root.cell-width;
+        label: label;
+        layout: index == 0 ? "thirds" : index == 1 ? "l-shaped" : "swipe-only";
+        selected: index == 0 ? State.tap-layout != "l-shaped" && State.tap-layout != "swipe-only" : State.tap-layout == self.layout;
+        clicked => { Commands.action("settings", "set", "tap-layout=" + self.layout); }
     }
 }

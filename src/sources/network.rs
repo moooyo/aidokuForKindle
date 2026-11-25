@@ -691,6 +691,9 @@ fn mangadex_list(
             "title" | "alphabetical" => {
                 params.append_pair("order[title]", "asc");
             }
+            "rating" => {
+                params.append_pair("order[rating]", "desc");
+            }
             _ => {
                 params.append_pair("order[followedCount]", "desc");
             }

@@ -157,7 +157,7 @@ impl App {
         self.spawn_source_job(foreground, kind, reader_target, None, operation)
     }
 
-    fn spawn_source_job(
+    pub(super) fn spawn_source_job(
         &mut self,
         foreground: bool,
         kind: JobKind,

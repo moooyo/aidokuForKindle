@@ -1,50 +1,105 @@
 import { State, Commands } from "state.slint";
 import { Theme } from "theme.slint";
 import { Strings } from "strings.slint";
-import { BodyText, Caption, ActionButton, IconButton, Icon } from "widgets.slint";
+import { IconButton, TitleText } from "widgets.slint";
+import { CompactPager } from "native-controls.slint";
+import { SettingsEntry, SettingsSectionLabel } from "settings-controls.slint";
 import { SettingsBody } from "settings-sections.slint";
 
 export component SettingsPage inherits Rectangle {
     background: Theme.paper;
-    property <bool> root-list: !State.large-screen && State.settings-section == "";
+    property <bool> home: !State.large-screen && State.settings-section == "";
     property <string> section: State.settings-section == "" ? "default-direction" : State.settings-section;
-    property <length> sidebar-width: State.large-screen ? 320px : root.width;
-    property <string> section-title: root.section == "default-direction" ? Strings.turn-and-zoom : root.section == "frontlight-warmth" ? Strings.frontlight-warmth : root.section == "screen-refresh" ? Strings.screen-refresh : root.section == "hardware-acceleration" ? Strings.hardware-acceleration : root.section == "storage" ? Strings.download-management : root.section == "categories" ? Strings.category : root.section == "backup" ? Strings.backup-restore : root.section == "language" ? Strings.interface-language : root.section == "startup-options" ? Strings.startup-options : Strings.about;
-    if root.root-list || State.large-screen: Rectangle { x: 0px; y: 0px;
-        width: root.sidebar-width; height: parent.height;
-        if State.large-screen: Rectangle { x: parent.width - 1px; y: 20px; width: 1px; height: parent.height - 40px; background: Theme.line; }
-        VerticalLayout {
-            x: Theme.margin; y: 8px; width: parent.width - Theme.margin * 2; height: parent.height - Theme.touch - 36px;
-            alignment: start; spacing: 0px;
-            for item[index] in State.settings: Rectangle {
-                property <bool> starts-group: index == 0 || item.group != State.settings[index - 1].group;
-                property <length> heading: self.starts-group ? (State.large-screen ? 40px : 30px) : 0px;
-                min-height: Theme.touch + self.heading; max-height: Theme.touch + self.heading;
-                if self.starts-group: BodyText { x: 0px; y: 0px; width: parent.width; height: parent.heading; text: item.group == "reading" ? Strings.reading-group : item.group == "device" ? Strings.device : item.group == "library" ? Strings.content : Strings.general; font-size: Theme.caption; font-weight: 700; }
-                Rectangle { x: 0px;
-                    y: parent.heading; width: parent.width; height: Theme.touch;
-                    background: hit.pressed ? Theme.fill : Theme.paper;
-                    accessible-role: button; accessible-label: item.title;
-                    BodyText { x: 0px; y: 0px; width: parent.width - 24px - (State.large-screen ? 0px : 120px); height: parent.height; text: item.title; font-size: State.large-screen ? 20px : 18px; font-weight: root.section == item.id && State.large-screen ? 700 : 400; }
-                    if !State.large-screen: Caption { y: 0px; x: parent.width - 144px; width: 120px; height: parent.height; text: item.value; horizontal-alignment: right; }
-                    Icon { x: parent.width - 18px; y: (parent.height - 16px) / 2; width: 16px; height: 16px; kind: "chevron-right"; }
-                    if State.large-screen && root.section == item.id: Rectangle { x: 0px; y: parent.height - 7px; width: 64px; height: 2px; background: Theme.ink; }
-                    if !State.large-screen: Rectangle { x: 0px; y: parent.height - 1px; width: parent.width; height: 1px; background: Theme.line; }
-                    hit := TouchArea { x: 0px; y: 0px; clicked => { Commands.action("settings", "open", item.id); } }
-                }
+    property <string> section-title: root.section == "default-direction" ? Strings.turn-and-zoom :
+        root.section == "frontlight-warmth" ? Strings.frontlight-warmth :
+        root.section == "screen-refresh" ? Strings.screen-refresh :
+        root.section == "hardware-acceleration" ? Strings.hardware-acceleration :
+        root.section == "storage" ? Strings.download-management :
+        root.section == "categories" ? Strings.category :
+        root.section == "backup" ? Strings.backup-restore :
+        root.section == "language" ? Strings.interface-language :
+        root.section == "startup-options" ? Strings.startup-options :
+        root.section == "downloads" ? Strings.downloads :
+        root.section == "source-lists" ? Strings.source-list :
+        root.section == "tracking" ? Strings.tracking :
+        root.section == "auto-update" ? Strings.automatic-updates :
+        root.section == "wifi-sleep-exit" ? Strings.wifi-sleep-exit :
+        root.section == "logs" ? Strings.logs-diagnostics : Strings.about;
+    property <bool> details-paged: (root.section == "backup" || root.section == "categories" || root.section == "source-lists") && State.settings-details-page-count > 1;
+    property <length> sidebar-width: 320px;
+    property <length> title-height: State.large-screen ? 76px : Theme.toolbar-height;
+    property <length> group-heading-height: State.large-screen ? 44px : 34px;
+    property <length> entry-height: State.large-screen ? 60px : 90px;
+    property <int> entries-per-group: 4;
+    property <int> columns: State.large-screen ? 1 : 2;
+    property <length> column-gap: State.large-screen ? 0px : 16px;
+    property <length> group-height: root.group-heading-height + root.entry-height * root.entries-per-group / root.columns;
+
+    if root.home || State.large-screen: Rectangle {
+        x: 0px; y: 0px; width: State.large-screen ? root.sidebar-width : root.width; height: root.height;
+
+        TitleText {
+            x: Theme.margin; y: 0px; width: parent.width - Theme.margin * 2;
+            height: root.title-height - (State.large-screen ? 6px : 0px);
+            text: Strings.settings; font-size: State.large-screen ? 30px : 24px; letter-spacing: 4px;
+            vertical-alignment: State.large-screen ? bottom : center;
+        }
+        if State.large-screen: Rectangle {
+            x: parent.width - 1px; y: 24px; width: 1px; height: max(0px, parent.height - 48px);
+            background: Theme.line;
+        }
+        if !State.large-screen: Rectangle {
+            x: 0px; y: root.title-height - 1px; width: parent.width; height: 1px; background: Theme.line;
+        }
+
+        Rectangle {
+            x: Theme.margin; y: root.title-height;
+            width: parent.width - Theme.margin * 2; height: parent.height - self.y;
+            for heading[group] in [Strings.setting-reading-display, Strings.content, Strings.general]: SettingsSectionLabel {
+                x: 0px; y: group * root.group-height; width: parent.width;
+                height: root.group-heading-height - 8px; text: heading; vertical-alignment: bottom;
+            }
+            for item[index] in State.settings: SettingsEntry {
+                property <int> slot: mod(index, root.entries-per-group);
+                x: mod(self.slot, root.columns) * (self.width + root.column-gap);
+                y: floor(index / root.entries-per-group) * root.group-height + root.group-heading-height + floor(self.slot / root.columns) * root.entry-height;
+                width: (parent.width - (root.columns - 1) * root.column-gap) / root.columns;
+                height: root.entry-height;
+                entry: item;
+                sidebar: State.large-screen;
+                selected: self.sidebar && root.section == item.id;
             }
         }
-        Rectangle { x: Theme.margin; y: parent.height - Theme.touch - 16px; width: parent.width - Theme.margin * 2; height: 1px; background: Theme.ink; }
-        ActionButton { x: Theme.margin; y: parent.height - Theme.touch - 8px; width: parent.width - Theme.margin * 2; text: Strings.exit-app; quiet: true; clicked => { Commands.action("app", "exit", ""); } }
     }
-    if !root.root-list: Rectangle { y: 0px;
-        x: State.large-screen ? root.sidebar-width : 0px; width: parent.width - self.x; height: parent.height;
-        if !State.large-screen: Rectangle { x: 0px; y: 0px;
-            width: parent.width; height: Theme.touch + 8px;
-            IconButton { y: 0px; x: Theme.margin - 8px; icon: "back"; label: Strings.settings; clicked => { Commands.action("settings", "back", ""); } }
-            BodyText { y: 0px; x: Theme.margin + Theme.touch; width: parent.width - self.x - Theme.margin; height: Theme.touch; text: root.section-title; font-size: 20px; font-weight: 700; }
-            Rectangle { x: 0px; y: parent.height - 1px; width: parent.width; height: 1px; background: Theme.line; }
+
+    if !root.home: Rectangle {
+        x: State.large-screen ? root.sidebar-width : 0px; y: 0px;
+        width: root.width - self.x; height: root.height;
+        property <length> left-inset: State.large-screen ? 48px : Theme.margin;
+        if !State.large-screen: IconButton {
+            x: 14px; y: (root.title-height - self.height) / 2;
+            icon: "back"; label: Strings.settings;
+            clicked => { Commands.action("settings", "back", ""); }
         }
-        SettingsBody { x: Theme.margin; y: State.large-screen ? 28px : Theme.touch + 32px; width: parent.width - Theme.margin * 2; height: parent.height - self.y - 20px; section: root.section; }
+        TitleText {
+            x: State.large-screen ? parent.left-inset : 68px; y: 0px;
+            width: parent.width - self.x - Theme.margin - (root.details-paged ? Theme.touch * 2 + 56px : 0px);
+            height: root.title-height - (State.large-screen ? 6px : 0px);
+            text: root.section-title; font-size: State.large-screen ? 26px : 22px; letter-spacing: 2px;
+            vertical-alignment: State.large-screen ? bottom : center;
+        }
+        if root.details-paged: CompactPager {
+            x: parent.width - Theme.margin - self.width; y: (root.title-height - self.height) / 2;
+            page: State.settings-details-page; count: State.settings-details-page-count;
+            turn(delta) => { Commands.action("settings", "detail-page", delta); }
+        }
+        if !State.large-screen: Rectangle {
+            x: 0px; y: root.title-height - 1px; width: parent.width; height: 1px; background: Theme.line;
+        }
+        SettingsBody {
+            x: parent.left-inset; y: root.title-height;
+            width: parent.width - self.x - Theme.margin; height: parent.height - self.y;
+            section: root.section;
+        }
     }
 }

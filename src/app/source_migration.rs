@@ -86,8 +86,12 @@ impl App {
             state.set_reader_image_ready(false);
         }
         self.current_book_id = Some(book.id);
-        self.current_source = source_id;
-        self.return_route = "catalog".into();
+        if self.route == "sources" {
+            self.return_route = "sources".into();
+        } else {
+            self.current_source = source_id;
+            self.return_route = "catalog".into();
+        }
         self.route = "detail".into();
         self.page = 1;
         self.open_migration()

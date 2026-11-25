@@ -5,13 +5,14 @@ use std::sync::{
     atomic::{AtomicBool, Ordering},
 };
 
-use aidoku_kindle::ui::{AppWindow, Theme};
 #[cfg(feature = "startup-stage-diagnostics")]
 use aidoku_kindle::reader_timing::{StartupTransition, startup_transition};
+use aidoku_kindle::ui::{AppWindow, Theme};
 use anyhow::{Result, ensure};
 use slint::{ComponentHandle, fontique_010::fontique};
 
 const STARTUP_FAMILY: &str = "BiliComics Startup";
+const LOCALE_FALLBACK_FAMILY: &str = "Aidoku Locale Fallback";
 static BUNDLED_FONTS: &[(&str, f32, &[u8])] = &[
     (
         "Noto Sans CJK SC",
@@ -57,6 +58,11 @@ static BUNDLED_FONTS: &[(&str, f32, &[u8])] = &[
         "Literata",
         700.0,
         include_bytes!(concat!(env!("OUT_DIR"), "/fonts/Literata-Bold.ttf")),
+    ),
+    (
+        LOCALE_FALLBACK_FAMILY,
+        400.0,
+        include_bytes!("../assets/fonts/LocaleFallback.otf"),
     ),
 ];
 
@@ -144,6 +150,19 @@ impl Fonts {
             self.registered == BUNDLED_FONTS.len(),
             "Bundled font registration is not complete"
         );
+        {
+            let mut collection = slint::fontique_010::shared_collection();
+            let fallback = collection.family_id(LOCALE_FALLBACK_FAMILY);
+            if let Some(fallback) = fallback {
+                for tag in [*b"Hani", *b"Hira", *b"Kana", *b"Latn", *b"Zyyy"] {
+                    let script = fontique::Script::from_bytes(tag);
+                    collection.append_fallbacks(script, std::iter::once(fallback));
+                    for locale in ["zh-CN", "zh-TW", "ja"] {
+                        collection.append_fallbacks((script, locale), std::iter::once(fallback));
+                    }
+                }
+            }
+        }
         ui.global::<Theme>().set_sans("Noto Sans CJK SC".into());
         ui.global::<Theme>().set_serif("Noto Serif CJK SC".into());
         ui.global::<Theme>().set_numbers("Literata".into());

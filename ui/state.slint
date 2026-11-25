@@ -25,6 +25,7 @@ export struct ChapterItem {
     download-state: string,
     download-progress: float,
     current: bool,
+    is-new: bool,
     progress: string,
     selected: bool,
 }
@@ -41,6 +42,7 @@ export struct SourceItem {
     installed: bool,
     update: bool,
     builtin: bool,
+    needs-setup: bool,
 }
 
 export struct HistoryItem {
@@ -72,6 +74,7 @@ export struct SearchGroup {
     pending: bool,
     error-detail: string,
     count: int,
+    has-more: bool,
     books: [BookItem],
 }
 
@@ -108,6 +111,8 @@ export struct SourcePreferenceGroup {
     kind: string,
     value: string,
     options: [SettingItem],
+    labels: [string],
+    selected-option: int,
     enabled: bool,
 }
 
@@ -172,6 +177,9 @@ export global State {
     in-out property <[SourceItem]> installed-sources;
     in-out property <int> installed-source-page: 1;
     in-out property <int> installed-source-page-count: 1;
+    in-out property <int> installed-page-builtin-count: 0;
+    in-out property <bool> source-management-back: false;
+    in-out property <string> source-update-summary;
     in-out property <[HistoryItem]> history;
     in-out property <[SearchGroup]> search-groups;
     in-out property <[SourceItem]> search-sources;
@@ -226,11 +234,14 @@ export global State {
     in-out property <int> library-filter: 0;
     in-out property <int> source-filter: 0;
     in-out property <string> source-language: "all";
+    in-out property <bool> source-has-traditional: false;
     in-out property <int> source-language-index: 0;
     in-out property <int> catalog-filter: 0;
     in-out property <[string]> catalog-tabs;
     in-out property <bool> catalog-has-more: false;
     in-out property <[SettingItem]> catalog-sort-options;
+    in-out property <int> catalog-sort-index: 0;
+    in-out property <bool> catalog-rating-available: false;
     in-out property <[SettingItem]> catalog-status-options;
     in-out property <[FilterOption]> catalog-tag-options;
     in-out property <int> catalog-filter-result-count: 0;
@@ -303,7 +314,6 @@ export global State {
     in-out property <bool> incognito: false;
     in-out property <bool> night-mode: false;
     in-out property <bool> native-scene-inverted: false;
-    in-out property <bool> flash-on-close: true;
     in-out property <bool> crop-borders: true;
     in-out property <bool> dither: true;
     in-out property <string> display-mode: "normal";
@@ -353,6 +363,8 @@ export global State {
     in-out property <string> source-title: "MangaDex";
     in-out property <string> source-subtitle;
     in-out property <[SourcePreferenceGroup]> source-preference-groups;
+    in-out property <string> source-settings-id;
+    in-out property <bool> source-settings-can-remove: false;
     in-out property <string> source-initial;
     in-out property <bool> source-available: true;
     in-out property <bool> source-builtin: false;
@@ -361,6 +373,10 @@ export global State {
     in-out property <string> source-server-credential;
     in-out property <string> source-connection-status;
     in-out property <string> search-scope: "all";
+    in-out property <string> search-scope-name;
+    in-out property <bool> search-has-results: false;
+    in-out property <bool> search-has-errors: false;
+    in-out property <bool> search-pending: false;
     in-out property <int> search-source-count: 0;
     in-out property <string> query;
     in-out property <string> search-status;

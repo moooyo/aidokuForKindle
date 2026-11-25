@@ -2,7 +2,9 @@ use super::storage_details::StorageDetailsSnapshot;
 use super::*;
 
 use crate::domain::DownloadJob;
-use crate::store::view_queries::{BookViewMetadata, LibraryCounts, LibraryQuery};
+use crate::store::view_queries::{
+    BookViewMetadata, LibraryCounts, LibraryQuery, detail_page_size, history_layout_metrics,
+};
 use crate::ui::{BookItem, ChapterItem, HistoryItem, SearchGroup, SettingItem, SourceItem};
 use chrono::{Datelike, TimeZone};
 use slint::Model;
@@ -216,7 +218,7 @@ impl App {
             library_page_count = visible.total.div_ceil(library_page_size).max(1);
             let mut rows = visible.items;
             resolve_book_title_collisions(&mut rows);
-            state.set_books(model(rows));
+            sync_library_rows(&state, rows);
             crate::reader_timing::mark(if batched {
                 "library_page_projection_batched"
             } else {
@@ -262,9 +264,35 @@ impl App {
             state.set_builtin_source_count(builtin_count as i32);
             state.set_extension_source_count(sources.len().saturating_sub(builtin_count) as i32);
             state.set_source_update_count(source_update_count as i32);
+            state.set_source_management_back(self.source_management_from_catalog || large);
+            state.set_source_update_summary(
+                if source_update_count == 0 {
+                    tr("sources_up_to_date")
+                } else {
+                    tr("source_updates_summary")
+                        .replace("{count}", &source_update_count.to_string())
+                }
+                .into(),
+            );
+            let local_count = if self.route == "sources" && self.source_filter == 0 {
+                Some(self.store.book_count_for_source("local")?)
+            } else {
+                None
+            };
             let installed_rows: Vec<_> = sources
                 .iter()
-                .map(|source| source_row(source, &self.available))
+                .map(|source| {
+                    let mut row = source_row(source, &self.available);
+                    if source.id == "local" {
+                        row.compact_status = local_count
+                            .map(|count| {
+                                tr("source_imported_count").replace("{count}", &count.to_string())
+                            })
+                            .unwrap_or_default()
+                            .into();
+                    }
+                    row
+                })
                 .collect();
             let installed_window = installed_source_window(
                 installed_rows.len(),
@@ -275,13 +303,19 @@ impl App {
                 large,
                 state.get_installed_source_page().max(1) as usize,
             );
-            state.set_installed_sources(model(
-                installed_rows
+            let installed_page = installed_rows
+                .iter()
+                .skip(installed_window.offset)
+                .take(installed_window.limit)
+                .cloned()
+                .collect::<Vec<_>>();
+            state.set_installed_page_builtin_count(
+                installed_page
                     .iter()
-                    .skip(installed_window.offset)
-                    .take(installed_window.limit)
-                    .cloned(),
-            ));
+                    .filter(|source| source.builtin)
+                    .count() as i32,
+            );
+            state.set_installed_sources(model(installed_page));
             state.set_installed_source_page(installed_window.page as i32);
             state.set_installed_source_page_count(installed_window.page_count as i32);
             let update_rows = installed_rows
@@ -289,14 +323,30 @@ impl App {
                 .filter(|source| source.update)
                 .cloned()
                 .collect::<Vec<_>>();
-            source_page_count = update_rows.len().div_ceil(7).max(1);
+            let logical_height = self
+                .platform
+                .runtime_logical_size(self.display_landscape())
+                .1;
+            let update_page_size =
+                source_row_capacity(logical_height, large, if large { 80 } else { 72 });
+            source_page_count = update_rows.len().div_ceil(update_page_size).max(1);
             state.set_sources(model(
                 if self.route == "sources" && self.source_filter == 2 {
-                    page_window(&update_rows, self.page.clamp(1, source_page_count), 7).to_vec()
+                    page_window(
+                        &update_rows,
+                        self.page.clamp(1, source_page_count),
+                        update_page_size,
+                    )
+                    .to_vec()
                 } else {
                     installed_rows
                 },
             ));
+            state.set_source_has_traditional(
+                self.available
+                    .iter()
+                    .any(|source| source_matches_language(&source.languages, "zh-Hant")),
+            );
             let available_rows: Vec<_> = self
                 .available
                 .iter()
@@ -306,20 +356,16 @@ impl App {
                 .map(|source| {
                     let installed = sources.iter().find(|installed| installed.id == source.id);
                     let subtitle = format!(
-                        "{} · v{}",
-                        language_label(&source.languages),
-                        source.version
+                        "v{} · {}",
+                        source.version,
+                        source_language_summary(&source.languages)
                     );
-                    let compact_status = installed
-                        .filter(|installed| !installed.enabled || source_is_builtin(installed))
-                        .map(|installed| source_compact_status(installed, &subtitle))
-                        .unwrap_or_else(|| subtitle.clone());
                     SourceItem {
                         id: source.id.clone().into(),
                         name: source.name.clone().into(),
                         display_name: source_display_name(&source.name, true).into(),
+                        compact_status: subtitle.clone().into(),
                         subtitle: subtitle.into(),
-                        compact_status: compact_status.into(),
                         update_subtitle: installed
                             .map(|installed| source_update_subtitle(installed, &self.available))
                             .unwrap_or_default()
@@ -331,21 +377,15 @@ impl App {
                             source_update(installed, std::slice::from_ref(source))
                         }),
                         builtin: false,
+                        needs_setup: false,
                     }
                 })
                 .collect();
             state.set_available_count(available_rows.len() as i32);
-            let available_rows = if large && self.source_filter == 2 {
-                available_rows
-                    .into_iter()
-                    .filter(|source| source.update)
-                    .collect::<Vec<_>>()
-            } else {
-                available_rows
-            };
-            let available_page_size = if large { 10 } else { 7 };
+            let available_page_size =
+                source_row_capacity(logical_height, large, if large { 77 } else { 71 });
             available_page_count = available_rows.len().div_ceil(available_page_size).max(1);
-            let available_page = if self.route == "sources" && (self.source_filter == 1 || large) {
+            let available_page = if self.route == "sources" && self.source_filter == 1 {
                 self.page.clamp(1, available_page_count)
             } else {
                 1
@@ -367,21 +407,7 @@ impl App {
             );
             state.set_source_available(source.is_some_and(|source| source.enabled));
             state.set_source_builtin(source.is_some_and(source_is_builtin));
-            state.set_source_needs_setup(source.is_some_and(|source| {
-                matches!(source.kind.as_str(), "komga" | "kavita" | "suwayomi")
-                    && !self.options.demo
-                    && !source
-                        .options
-                        .get("demo")
-                        .and_then(Value::as_bool)
-                        .unwrap_or(false)
-                    && (source.base_url.trim().is_empty()
-                        || !source
-                            .options
-                            .get("_connection_verified")
-                            .and_then(Value::as_bool)
-                            .unwrap_or(false))
-            }));
+            state.set_source_needs_setup(source.is_some_and(source_needs_setup));
             state.set_source_title(
                 source
                     .map(|source| source.name.as_str())
@@ -391,12 +417,9 @@ impl App {
             state.set_source_subtitle(
                 source
                     .map(|source| {
-                        let row = source_row(source, &self.available);
-                        if large && row.update {
-                            format!("{} · {}", row.subtitle, tr("updates_available"))
-                        } else {
-                            row.subtitle.to_string()
-                        }
+                        source_row(source, &self.available)
+                            .compact_status
+                            .to_string()
                     })
                     .unwrap_or_default()
                     .into(),
@@ -439,22 +462,25 @@ impl App {
             }
             state.set_catalog_active_filter_count(active_filters as i32);
             state.set_catalog_result_count(catalog.len() as i32);
+            if self.modal_context == "catalog-filter" {
+                state.set_catalog_filter_result_count(catalog.len() as i32);
+            }
             let catalog_page_size = if large { 15 } else { 6 };
-            catalog_page_count = catalog.len().div_ceil(catalog_page_size).max(1)
-                + usize::from(self.catalog_has_more);
-            let catalog_page = if self.route == "catalog"
-                || self.route == "sources" && large && self.source_filter == 0
-            {
-                self.page.clamp(1, catalog_page_count)
-            } else {
-                1
-            };
+            let loaded_page_count = catalog.len().div_ceil(catalog_page_size).max(1);
+            catalog_page_count = loaded_page_count + usize::from(self.catalog_has_more);
+            let catalog_page = self.page.clamp(1, loaded_page_count);
+            if !self.busy {
+                self.page = catalog_page;
+            }
             let mut catalog_rows = Vec::new();
             for book in page_window(&catalog, catalog_page, catalog_page_size) {
                 let mut row = self.view_book(*book, true)?;
-                if let Some(relative) = relative_date(book.updated_at, self.options.demo) {
-                    row.status = format!("{} · {relative}", row.status).into();
-                }
+                row.subtitle = [book.author.trim(), status_label(&book.status).as_str()]
+                    .into_iter()
+                    .filter(|value| !value.is_empty())
+                    .collect::<Vec<_>>()
+                    .join(" · ")
+                    .into();
                 catalog_rows.push(row);
             }
             resolve_book_title_collisions(&mut catalog_rows);
@@ -463,16 +489,22 @@ impl App {
 
         let mut history_page_count = 1;
         if show_history {
-            let history_page_size = if large { 8 } else { 5 };
+            let height = self
+                .platform
+                .runtime_logical_size(self.display_landscape())
+                .1;
+            let (available, header, row, columns) = history_layout_metrics(large, height);
+            let history_page_size = ((available - header) / row) as usize * columns;
             let mut rows = Vec::new();
             if self.history_filter == 0 {
+                let recent_start = today - chrono::Duration::days(3);
+                let cutoff = recent_start.format("%Y-%m-%d").to_string();
                 let visible = self.store.history_layout_view_page(
                     self.page,
                     large,
-                    self.platform
-                        .runtime_logical_size(self.display_landscape())
-                        .1,
+                    height,
                     self.options.demo,
+                    Some(&cutoff),
                 )?;
                 self.page = visible.page;
                 history_page_count = visible.page_count;
@@ -482,6 +514,9 @@ impl App {
                     let chapter = entry.chapter;
                     let download = load_chapter_download_projection(&self.store, &chapter)?;
                     let instant = local_instant(progress.updated_at, self.options.demo);
+                    let date = instant.date_naive();
+                    let older = date < recent_start;
+                    let time = instant.format(if older { "%m · %d %H:%M" } else { "%H:%M" });
                     let progress_text = if progress.completed {
                         tr("finished_reading")
                     } else {
@@ -497,11 +532,23 @@ impl App {
                         chapter_id: chapter.id.clone().into(),
                         title: book.title.clone().into(),
                         subtitle: chapter_label(&chapter).into(),
-                        progress: format!("{progress_text} · {}", instant.format("%H:%M")).into(),
-                        date: history_date(instant.date_naive(), self.options.demo).into(),
-                        date_label: history_date_label(instant.date_naive(), self.options.demo)
-                            .into(),
-                        date_value: instant.format("%m · %d").to_string().into(),
+                        progress: format!("{progress_text} · {time}").into(),
+                        date: if older {
+                            "older".into()
+                        } else {
+                            history_date(date, self.options.demo).into()
+                        },
+                        date_label: if older {
+                            tr("history_older")
+                        } else {
+                            history_date_label(date, self.options.demo)
+                        }
+                        .into(),
+                        date_value: if older {
+                            Default::default()
+                        } else {
+                            instant.format("%m · %d").to_string().into()
+                        },
                         cover: Image::default(),
                         fraction: progress.page as f32 / progress.total.max(1) as f32,
                         completed: progress.completed,
@@ -521,14 +568,27 @@ impl App {
                 )?;
                 self.page = visible.page;
                 history_page_count = visible.total.div_ceil(history_page_size).max(1);
+                let mut source_names = HashMap::new();
                 for (book, chapter) in visible.items {
                     let download = load_chapter_download_projection(&self.store, &chapter)?;
+                    let source_name = match source_names.entry(book.source_id.clone()) {
+                        std::collections::hash_map::Entry::Occupied(entry) => entry.into_mut(),
+                        std::collections::hash_map::Entry::Vacant(entry) => entry.insert(
+                            self.store
+                                .source(&book.source_id)?
+                                .map_or_else(|| book.source_id.clone(), |source| source.name),
+                        ),
+                    };
+                    let status = format!(
+                        "{} · {source_name}",
+                        history_date_label(today, self.options.demo)
+                    );
                     let item = HistoryItem {
                         id: book.id.clone().into(),
                         chapter_id: chapter.id.clone().into(),
                         title: book.title.clone().into(),
                         subtitle: chapter_label(&chapter).into(),
-                        progress: tr("unread").into(),
+                        progress: status.into(),
                         date: history_date(today, self.options.demo).into(),
                         date_label: history_date_label(today, self.options.demo).into(),
                         date_value: today.format("%m · %d").to_string().into(),
@@ -569,6 +629,16 @@ impl App {
                         || !source.base_url.is_empty())
             })
             .collect();
+        state.set_search_scope_name(if self.search_scope == "library" {
+            tr("library").into()
+        } else {
+            eligible
+                .iter()
+                .find(|source| source.id == self.search_scope)
+                .map(|source| source.name.as_str())
+                .unwrap_or_else(|| self.search_scope.as_str())
+                .into()
+        });
         let searched = self
             .search_results
             .iter()
@@ -580,34 +650,48 @@ impl App {
             .filter(|result| !result.books.is_empty())
             .count();
         state.set_search_source_count(eligible.len() as i32);
-        let mut search_sources = eligible
+        state.set_search_has_results(found > 0);
+        state.set_search_has_errors(
+            self.search_results
+                .iter()
+                .any(|result| result.error.is_some()),
+        );
+        state.set_search_pending(self.search_results.iter().any(|result| result.pending));
+        let mut shortcut_sources = eligible;
+        shortcut_sources.sort_by_key(|source| match source.id.as_str() {
+            "mangadex" => 0,
+            "komga" => 1,
+            "local" => 2,
+            _ => 3,
+        });
+        let shortcut_count = shortcut_sources.len().min(if large { 3 } else { 2 });
+        let mut search_sources = shortcut_sources
             .iter()
             .enumerate()
             .map(|(index, source)| {
                 let mut row = source_row(source, &self.available);
-                if large && index < 3 {
+                if index < shortcut_count {
                     row.display_name =
                         source_display_name_with_budget(&source.name, 14 * 4, 4).into();
                 }
                 row
             })
             .collect::<Vec<_>>();
-        if large {
-            let shortcut_count = search_sources.len().min(3);
-            resolve_source_name_collisions(&mut search_sources[..shortcut_count], 14 * 4);
-        }
+        resolve_source_name_collisions(&mut search_sources[..shortcut_count], 14 * 4);
         state.set_search_sources(model(search_sources));
-        let mut local_matches = Vec::new();
-        if show_search
-            && large
-            && (self.modal == "keyboard" || self.modal_context == "search-scope:typing")
+        let typing = show_search
             && self.keyboard_target == "search"
-            && !self.keyboard.text().trim().is_empty()
-        {
-            for book in self
-                .store
-                .library_search_matches(self.keyboard.text().trim(), 2)?
-            {
+            && (self.modal == "keyboard" || self.modal_context == "search-scope:typing");
+        let mut local_matches = Vec::new();
+        if typing {
+            let query = self.keyboard.text().trim();
+            let limit = if large { 3 } else { 2 };
+            let books = if query.is_empty() {
+                Vec::new()
+            } else {
+                self.store.library_search_matches(query, limit)?
+            };
+            for book in books {
                 let metadata = self.store.book_view_metadata(&book.id)?;
                 let mut row = self.book_item(&book, &metadata, true);
                 row.subtitle = if let Some(progress) = metadata.progress.as_ref() {
@@ -678,24 +762,15 @@ impl App {
             .into(),
         );
         let mut search_page_count = 1;
-        if show_search {
-            let results = self.search_results.clone();
+        if show_search && !typing {
             let mut groups = Vec::new();
-            for result in results {
-                let mut books = Vec::new();
-                for book in result.books.iter().take(if large { 6 } else { 3 }) {
-                    // Off-page search groups need layout data, not database or image work.
-                    let mut row = self.book_item(book, &BookViewMetadata::default(), false);
-                    row.subtitle = if status_label(&book.status) == tr("completed") {
-                        tr("completed")
-                    } else if book.status.contains('\u{5377}') {
-                        book.status.clone()
-                    } else {
-                        format!("{} {}", book.chapter_count, tr("chapters_unit"))
-                    }
-                    .into();
-                    books.push(row);
-                }
+            for result in &self.search_results {
+                let books = result
+                    .books
+                    .iter()
+                    .take(2)
+                    .map(|book| self.book_item(book, &BookViewMetadata::default(), false))
+                    .collect::<Vec<_>>();
                 let unsupported = result.error.as_ref().is_some_and(|error| {
                     let error = error.to_ascii_lowercase();
                     error.contains("unsupported")
@@ -705,11 +780,15 @@ impl App {
                 });
                 let timeout = result.error.as_ref().is_some_and(|error| {
                     let error = error.to_ascii_lowercase();
-                    error.contains("timeout") || error.contains("timed out")
+                    error.contains("timeout")
+                        || error.contains("timed out")
+                        || error.contains("超时")
+                        || error.contains("逾時")
+                        || error.contains("タイムアウト")
                 });
                 groups.push(SearchGroup {
-                    id: result.id.into(),
-                    title: result.title.into(),
+                    id: result.id.clone().into(),
+                    title: result.title.clone().into(),
                     status: if result.pending {
                         tr("searching")
                     } else {
@@ -720,7 +799,7 @@ impl App {
                                 tr(if unsupported {
                                     "source_unsupported"
                                 } else if timeout {
-                                    "request_timeout"
+                                    "search_timeout_short"
                                 } else {
                                     "error"
                                 })
@@ -743,6 +822,7 @@ impl App {
                     }
                     .into(),
                     count: result.books.len() as i32,
+                    has_more: result.has_next,
                     books: model(books),
                 });
             }
@@ -778,8 +858,26 @@ impl App {
                         })
                         .cloned();
                     if let Some(book) = book {
-                        let mut visible = self.view_book(&book, true)?;
-                        visible.subtitle = item.subtitle;
+                        let metadata = self.store.book_view_metadata(&book.id)?;
+                        let mut visible = self.book_item(&book, &metadata, true);
+                        let status = status_label(&book.status);
+                        let chapters = book.chapter_count.max(
+                            metadata
+                                .book
+                                .as_ref()
+                                .map_or(0, |stored| stored.chapter_count),
+                        );
+                        let chapter_label = if chapters > 0 {
+                            format!("{chapters} {}", tr("chapters_unit"))
+                        } else {
+                            String::new()
+                        };
+                        visible.subtitle = [book.author.trim(), &status, &chapter_label]
+                            .into_iter()
+                            .filter(|value| !value.is_empty())
+                            .collect::<Vec<_>>()
+                            .join(" · ")
+                            .into();
                         item = visible;
                     }
                     books.push(item);
@@ -809,7 +907,6 @@ impl App {
             "detail" => detail_page_count,
             "sources" if self.source_filter == 1 => available_page_count,
             "sources" if self.source_filter == 2 => source_page_count,
-            "sources" if large => available_page_count,
             "sources" => 1,
             "catalog" => catalog_page_count,
             "history" => history_page_count,
@@ -929,39 +1026,6 @@ impl App {
         state.set_book_description(description_preview(&book.description).into());
         state.set_book_tags(book.tags.join(" · ").into());
         state.set_book_tag_items(model(book.tags.iter().cloned().map(Into::into)));
-        if self.route == "detail" {
-            let source = sources.iter().find(|source| source.id == book.source_id);
-            let source_name = source
-                .map(|source| source.name.as_str())
-                .unwrap_or(&book.source_id);
-            let language = if self.options.demo {
-                tr(if large { "chinese_short" } else { "chinese" })
-            } else {
-                source
-                    .map(|source| language_label(&source.languages))
-                    .unwrap_or_default()
-            };
-            state.set_book_metadata(
-                if large {
-                    format!(
-                        "{} · {} {} · {} · {}",
-                        status_label(&book.status),
-                        book.chapter_count,
-                        tr("chapters_unit"),
-                        source_name,
-                        language
-                    )
-                } else {
-                    format!(
-                        "{} · {} · {}",
-                        status_label(&book.status),
-                        source_name,
-                        language
-                    )
-                }
-                .into(),
-            );
-        }
         let progress = metadata.progress.as_ref();
         let mut selected_chapter = self
             .reader
@@ -1032,43 +1096,42 @@ impl App {
                 .filter(|progress| !progress.completed)
                 .map(|progress| progress.chapter_id.as_str()),
         )?;
-        state.set_chapter_count(book.chapter_count.max(summary.total as u32) as i32);
+        let chapter_count = book.chapter_count.max(summary.total as u32);
+        state.set_chapter_count(chapter_count as i32);
         state.set_downloaded_count(summary.downloaded as i32);
         state.set_unread_count(summary.unread as i32);
         let source = sources.iter().find(|source| source.id == book.source_id);
+        let source_name = source
+            .map(|source| source.name.as_str())
+            .unwrap_or(&book.source_id);
+        let language = source
+            .map(|source| language_label(&source.languages))
+            .unwrap_or_default();
+        let chapter_status = format!(
+            "{} · {} {}",
+            status_label(&book.status),
+            chapter_count,
+            tr("chapters_unit")
+        );
+        state.set_book_metadata(format!("{chapter_status} · {source_name}").into());
         let detail = |title: &str, value: String| SettingItem {
             title: tr(title).into(),
             value: value.into(),
             ..SettingItem::default()
         };
         state.set_book_details(model([
+            detail("author_credit", book.author.clone()),
+            detail("status", chapter_status),
             detail(
                 "source",
-                source
-                    .map(|source| source.name.clone())
-                    .unwrap_or_else(|| book.source_id.clone()),
-            ),
-            detail(
-                "latest_update",
-                if book.updated_at > 0
-                    && chrono::Utc
-                        .timestamp_opt(book.updated_at, 0)
-                        .single()
-                        .is_some()
-                {
-                    local_instant(book.updated_at, self.options.demo)
-                        .format("%Y · %m · %d")
-                        .to_string()
+                if language.is_empty() {
+                    source_name.to_owned()
                 } else {
-                    "—".into()
+                    format!("{source_name} · {language}")
                 },
             ),
-            detail(
-                "local_usage",
-                format!("{} {} · —", summary.downloaded, tr("chapters_unit")),
-            ),
         ]));
-        let page_size = if large { 11 } else { 5 };
+        let page_size = detail_page_size(large);
         if state.get_detail_filter() == 3 {
             let bookmarks = self.store.bookmarks(&book.id)?;
             let count = bookmarks.len().div_ceil(page_size).max(1);
@@ -1117,6 +1180,14 @@ impl App {
             let current = progress
                 .is_some_and(|progress| progress.chapter_id == chapter.id && !progress.completed);
             let download = load_chapter_download_projection(&self.store, chapter)?;
+            let is_new = if self.options.demo && book.id == crate::demo::primary_id() {
+                chapter.number >= 85.0
+            } else {
+                !chapter.read
+                    && chapter_day(&chapter.date).is_some_and(|day| {
+                        (0..=1).contains(&(view_today(self.options.demo) - day).num_days())
+                    })
+            };
             rows.push(ChapterItem {
                 id: chapter.id.clone().into(),
                 number: number(chapter.number).into(),
@@ -1127,6 +1198,7 @@ impl App {
                 download_state: download.state.into(),
                 download_progress: download.progress,
                 current,
+                is_new,
                 selected: self.selected_chapters.contains(&chapter.id),
                 progress: if current {
                     progress
@@ -1452,41 +1524,79 @@ impl App {
             group: group.into(),
             enabled: true,
         };
-        let refresh = if self.prefs.refresh_every == 0 {
-            tr("only_chapter")
+        let direction = tr(match self.prefs.reading_direction.as_str() {
+            "rtl" => "setting_rtl",
+            "ltr" => "setting_ltr",
+            _ => "vertical",
+        });
+        let fit = tr(match self.prefs.reader_fit.as_str() {
+            "original" => "fit_original",
+            "height" => "fit_height",
+            "width" => "fit_width",
+            _ => "fit_screen",
+        });
+        let profile = self.platform.profile();
+        let light = if !profile.has_frontlight() {
+            tr("unavailable")
         } else {
             format!(
-                "{} {} {}",
-                tr("every"),
-                self.prefs.refresh_every,
-                tr("pages_unit")
+                "{} {} · {} {}",
+                tr("brightness"),
+                self.prefs.brightness,
+                tr("warmth"),
+                self.prefs.warmth,
             )
+        };
+        let (refresh, display) = match self.prefs.display_mode.as_str() {
+            "fast" => (tr("refresh_manual"), tr("display_fast")),
+            "high_quality" => (tr("refresh_each"), tr("display_high_quality")),
+            mode => (
+                match self.prefs.refresh_every {
+                    0 => tr("only_chapter"),
+                    1 => tr("refresh_each"),
+                    pages => format!("{} {pages} {}", tr("every"), tr("pages_unit")),
+                },
+                tr(if mode == "kindle" {
+                    "display_kindle"
+                } else {
+                    "display_normal"
+                }),
+            ),
+        };
+        let acceleration = if self.prefs.hardware_acceleration {
+            match self.platform.hardware_media_availability() {
+                crate::native_media::Availability::Available => tr("setting_enabled"),
+                crate::native_media::Availability::NotProbed => "—".into(),
+                _ => tr("unavailable"),
+            }
+        } else {
+            tr("off")
         };
         Ok((
             vec![
                 item(
                     "default-direction",
                     "turn_and_zoom",
-                    String::new(),
+                    format!("{direction} · {fit}"),
+                    "reading",
+                ),
+                item("frontlight-warmth", "frontlight_warmth", light, "reading"),
+                item(
+                    "screen-refresh",
+                    "screen_refresh",
+                    format!("{refresh} · {display}"),
                     "reading",
                 ),
                 item(
-                    "frontlight-warmth",
-                    "frontlight_warmth",
-                    String::new(),
-                    "device",
-                ),
-                item("screen-refresh", "screen_refresh", refresh, "device"),
-                item(
                     "hardware-acceleration",
                     "hardware_acceleration",
-                    String::new(),
-                    "device",
+                    acceleration,
+                    "reading",
                 ),
                 item("manage-sources", "manage_sources", String::new(), "library"),
                 item("storage", "download_management", String::new(), "library"),
                 item("categories", "category", String::new(), "library"),
-                item("backup", "backup_restore", String::new(), "general"),
+                item("backup", "backup_restore", String::new(), "library"),
                 item(
                     "language",
                     "interface_language",
@@ -1498,13 +1608,19 @@ impl App {
                     }),
                     "general",
                 ),
-                item("about", "about", String::new(), "general"),
+                item(
+                    "about",
+                    "about",
+                    env!("CARGO_PKG_VERSION").into(),
+                    "general",
+                ),
                 item(
                     "startup-options",
                     "startup_options",
                     String::new(),
                     "general",
                 ),
+                item("exit", "exit_app", String::new(), "general"),
             ],
             Vec::new(),
         ))
@@ -1592,7 +1708,7 @@ fn storage_view_projection(
             snapshot
                 .books
                 .iter()
-                .take(5)
+                .take(6)
                 .map(|book| SettingItem {
                     id: format!("storage-book:{}", book.id).into(),
                     title: book.title.clone().into(),
@@ -1649,33 +1765,41 @@ fn installed_source_window(
     large: bool,
     requested_page: usize,
 ) -> InstalledSourceWindow {
-    // Double design pixels preserve the half-pixel header boundary exactly.
-    let (reserved, top, group_height, row_height, helper_height, pager_height) = if large {
-        (555, 16, 92, 136, 158, 136)
-    } else {
-        (449, 0, 76, 116, 178, 104)
-    };
-    let pane_height = (u64::from(logical_height) * 2).saturating_sub(reserved);
-    let groups = u64::from(builtin_count > 0) + u64::from(total > builtin_count);
-    let fixed_height = top + groups * group_height + helper_height;
-    let all_height = fixed_height.saturating_add((total as u64).saturating_mul(row_height));
-    let limit = if all_height <= pane_height {
-        total
-    } else {
-        (pane_height.saturating_sub(fixed_height + pager_height) / row_height).max(1) as usize
-    };
-    let page_count = if limit == 0 {
-        1
-    } else {
-        total.div_ceil(limit).max(1)
-    };
+    let group_height = if large { 44 } else { 36 };
+    let mut windows = Vec::new();
+    let mut offset = 0;
+    while offset < total {
+        let one_group = source_row_capacity(logical_height, large, group_height);
+        let builtins_left = builtin_count.saturating_sub(offset);
+        let limit = if builtins_left > 0 && total > builtin_count && builtins_left < one_group {
+            let two_groups = source_row_capacity(logical_height, large, group_height * 2);
+            // Do not allocate a group heading if only built-ins fit on the page.
+            two_groups.max(builtins_left)
+        } else {
+            one_group
+        }
+        .min(total - offset);
+        windows.push((offset, limit));
+        offset += limit;
+    }
+    let page_count = windows.len().max(1);
     let page = requested_page.clamp(1, page_count);
+    let (offset, limit) = windows.get(page - 1).copied().unwrap_or_default();
     InstalledSourceWindow {
         page,
         page_count,
-        offset: (page - 1) * limit,
+        offset,
         limit,
     }
+}
+
+fn source_row_capacity(logical_height: u32, large: bool, reserved_content: u32) -> usize {
+    let (chrome_height, row_height) = if large {
+        (36 + 64 + 80, 80)
+    } else {
+        (28 + 56 + 72, 72)
+    };
+    (logical_height.saturating_sub(chrome_height + reserved_content) / row_height).max(1) as usize
 }
 
 fn clear_current_chapter_view(state: &State<'_>) {
@@ -1732,9 +1856,26 @@ fn chapter_download_projection(
     }
 }
 
+fn sync_library_rows(state: &State<'_>, rows: Vec<BookItem>) {
+    let current = state.get_books();
+    // Artwork and download updates must not discard the widget handling a hold.
+    if current.row_count() == rows.len()
+        && rows.iter().enumerate().all(|(index, row)| {
+            current
+                .row_data(index)
+                .is_some_and(|item| item.id == row.id)
+        })
+    {
+        for (index, row) in rows.into_iter().enumerate() {
+            current.set_row_data(index, row);
+        }
+    } else {
+        state.set_books(model(rows));
+    }
+}
+
 fn apply_history_layout(rows: &mut [HistoryItem], large: bool) {
-    let columns = if large { 2 } else { 1 };
-    let (header_height, row_height) = if large { (60, 124) } else { (44, 76) };
+    let (_, header_height, row_height, columns) = history_layout_metrics(large, 0);
     let mut group_start = 0;
     let mut group_offset = 0;
     while group_start < rows.len() {
@@ -1749,7 +1890,7 @@ fn apply_history_layout(rows: &mut [HistoryItem], large: bool) {
             row.group_row_count = group_rows as i32;
             row.group_offset = group_offset;
         }
-        group_offset += header_height + row_height * group_rows as i32;
+        group_offset += header_height as i32 + row_height as i32 * group_rows as i32;
         group_start = group_end;
     }
 }
@@ -2000,14 +2141,10 @@ fn listing_label(id: &str, original: &str) -> String {
 }
 
 fn source_update(source: &SourceConfig, available: &[RepositorySource]) -> bool {
-    source
-        .options
-        .get("update_available")
-        .and_then(Value::as_bool)
-        .unwrap_or(false)
-        || available
-            .iter()
-            .any(|candidate| candidate.id == source.id && candidate.version > source.version)
+    available
+        .iter()
+        .find(|candidate| candidate.id == source.id)
+        .is_some_and(|candidate| candidate.version > source.version)
 }
 
 fn source_is_builtin(source: &SourceConfig) -> bool {
@@ -2388,6 +2525,40 @@ fn resolve_book_title_collisions(rows: &mut [BookItem]) {
     }
 }
 
+fn source_needs_setup(source: &SourceConfig) -> bool {
+    matches!(source.kind.as_str(), "komga" | "kavita" | "suwayomi")
+        && (source.base_url.trim().is_empty()
+            || (source.options.get("demo").and_then(Value::as_bool) != Some(true)
+                && source
+                    .options
+                    .get("_connection_verified")
+                    .and_then(Value::as_bool)
+                    != Some(true)))
+}
+
+fn source_language_summary(languages: &[String]) -> String {
+    if languages.is_empty() {
+        return tr("multilingual");
+    }
+    let mut labels = Vec::new();
+    for language in languages {
+        let label = [
+            ("zh-Hans", "chinese"),
+            ("zh-Hant", "traditional_chinese"),
+            ("en", "english"),
+            ("ja", "japanese"),
+        ]
+        .into_iter()
+        .find(|(code, _)| source_matches_language(std::slice::from_ref(language), code))
+        .map(|(_, key)| tr(key))
+        .unwrap_or_else(|| language.clone());
+        if !labels.contains(&label) {
+            labels.push(label);
+        }
+    }
+    labels.join(" / ")
+}
+
 fn source_compact_status(source: &SourceConfig, subtitle: &str) -> String {
     if !source.enabled {
         let label = tr("unavailable");
@@ -2399,6 +2570,15 @@ fn source_compact_status(source: &SourceConfig, subtitle: &str) -> String {
             .unwrap_or(subtitle);
         if subtitle.trim().is_empty() || subtitle == label {
             return label;
+        }
+        let reason = subtitle.to_ascii_lowercase();
+        if reason.contains("browser verification")
+            || reason.contains("web verification")
+            || reason.contains("captcha")
+            || reason.contains("人机验证")
+            || reason.contains("人機驗證")
+        {
+            return format!("{label} · {}", tr("source_browser_verification"));
         }
         return if subtitle.starts_with(label.as_str()) {
             subtitle.to_owned()
@@ -2439,44 +2619,29 @@ fn source_row(source: &SourceConfig, available: &[RepositorySource]) -> SourceIt
             .and_then(Value::as_str)
             .map(str::to_owned)
             .unwrap_or_else(|| tr("unavailable"))
-    } else if source.kind == "local" {
-        tr("local_formats")
     } else if builtin {
-        format!(
-            "{} · {}",
-            tr("self_hosted"),
-            if source
-                .options
-                .get("connected")
-                .and_then(Value::as_bool)
-                .unwrap_or(false)
-            {
-                tr("connected")
-            } else if source.base_url.is_empty() {
-                tr("not_configured")
-            } else {
-                tr("configured")
-            }
-        )
+        String::new()
     } else {
         format!(
-            "{} · v{}",
-            language_label(&source.languages),
-            source.version
+            "v{} · {}",
+            source.version,
+            source_language_summary(&source.languages)
         )
     };
+    let compact_status = source_compact_status(source, &subtitle);
     SourceItem {
         id: source.id.clone().into(),
         name: source.name.clone().into(),
         display_name: source_display_name(&source.name, source.enabled).into(),
-        compact_status: source_compact_status(source, &subtitle).into(),
         subtitle: subtitle.into(),
+        compact_status: compact_status.into(),
         update_subtitle: source_update_subtitle(source, available).into(),
         initial: source_initial(&source.id, &source.name).into(),
         available: source.enabled,
         installed: true,
         update,
         builtin,
+        needs_setup: builtin && source.kind != "local" && source.base_url.trim().is_empty(),
     }
 }
 
@@ -2491,21 +2656,8 @@ fn chapter_date(value: &str, large: bool) -> String {
     value.to_owned()
 }
 
-#[cfg(test)]
 fn chapter_day(value: &str) -> Option<chrono::NaiveDate> {
     chrono::NaiveDate::parse_from_str(value.get(..10).unwrap_or(value), "%Y-%m-%d").ok()
-}
-
-fn relative_date(timestamp: i64, demo: bool) -> Option<String> {
-    if timestamp <= 0 || chrono::Utc.timestamp_opt(timestamp, 0).single().is_none() {
-        return None;
-    }
-    let days = (view_today(demo) - local_instant(timestamp, demo).date_naive()).num_days();
-    match days {
-        0 => Some(tr("today")),
-        1.. => Some(format!("{days} {}", tr("days_ago"))),
-        _ => None,
-    }
 }
 
 fn local_instant(timestamp: i64, demo: bool) -> chrono::DateTime<chrono::FixedOffset> {
@@ -2552,35 +2704,40 @@ fn view_today(demo: bool) -> chrono::NaiveDate {
 }
 
 fn search_pages(groups: &[SearchGroup], height: u32, large: bool) -> Vec<Vec<SearchGroup>> {
-    let content = height as f32
-        - if large {
-            36.0 + 159.0 + 50.0 + 80.0
-        } else {
-            28.0 + 119.0 + 36.0 + 72.0
-        };
+    let (chrome, summary, pager, heading, row, status) = if large {
+        (36 + 80 + 66 + 80, 52, 56, 52, 112, 60)
+    } else {
+        (28 + 64 + 56 + 72, 40, 48, 44, 98, 52)
+    };
+    let shows_error_footer = groups.iter().any(|group| group.error)
+        && groups
+            .iter()
+            .all(|group| group.books.row_count() == 0 && !group.pending);
+    let footer = if shows_error_footer {
+        pager * 2 + 18
+    } else {
+        0
+    };
+    let content = (height.saturating_sub(chrome) as usize).saturating_sub(footer);
     let cost = |group: &SearchGroup| {
-        if group.books.row_count() > 0 {
-            if large {
-                64.0 + group.books.row_count().min(2) as f32 * 112.0
-            } else {
-                56.0 + group.books.row_count().min(2) as f32 * 98.0
-            }
+        if group.books.row_count() == 0 {
+            status
         } else {
-            if large { 68.0 } else { 52.0 }
+            heading + group.books.row_count().min(2) * row + 16
         }
     };
-    if groups.iter().map(cost).sum::<f32>() <= content {
+    if groups.iter().map(cost).sum::<usize>() <= content.saturating_sub(summary) {
         return vec![groups.to_vec()];
     }
-    let limit = (content - if large { 68.0 } else { 52.0 }).max(100.0);
+    let limit = content.saturating_sub(pager);
     let mut pages = Vec::new();
     let mut page = Vec::new();
-    let mut used = 0.0;
+    let mut used = 0;
     for group in groups {
         let next = cost(group);
         if !page.is_empty() && used + next > limit {
             pages.push(std::mem::take(&mut page));
-            used = 0.0;
+            used = 0;
         }
         page.push(group.clone());
         used += next;
@@ -2684,33 +2841,33 @@ mod localization_tests {
             }
         );
         assert_eq!(
-            installed_source_window(8, 4, 824, false, 2),
+            installed_source_window(9, 4, 824, false, 2),
             InstalledSourceWindow {
                 page: 2,
                 page_count: 2,
-                offset: 6,
-                limit: 6,
+                offset: 8,
+                limit: 1,
             }
         );
         assert_eq!(installed_source_window(8, 8, 824, false, 2).page_count, 1);
-        assert_eq!(installed_source_window(11, 4, 1240, true, 1).page_count, 1);
+        assert_eq!(installed_source_window(12, 4, 1240, true, 1).page_count, 1);
         assert_eq!(
-            installed_source_window(12, 4, 1240, true, usize::MAX),
+            installed_source_window(13, 4, 1240, true, usize::MAX),
             InstalledSourceWindow {
                 page: 2,
                 page_count: 2,
-                offset: 10,
-                limit: 10,
+                offset: 12,
+                limit: 1,
             }
         );
         assert_eq!(installed_source_window(12, 12, 1240, true, 1).page_count, 1);
         assert_eq!(
-            installed_source_window(12, 4, 1320, true, 2),
+            installed_source_window(13, 4, 1320, true, 2),
             InstalledSourceWindow {
                 page: 1,
                 page_count: 1,
                 offset: 0,
-                limit: 12,
+                limit: 13,
             }
         );
         assert_eq!(installed_source_window(0, 0, 824, false, 0).page_count, 1);
@@ -2744,7 +2901,7 @@ mod localization_tests {
                 .iter()
                 .map(|row| row.group_offset)
                 .collect::<Vec<_>>(),
-            vec![0, 0, 0, 308, 308]
+            vec![0, 0, 0, 292, 292]
         );
         assert_eq!(
             (scribe[0].group_row_count, scribe[3].group_row_count),
@@ -2761,7 +2918,7 @@ mod localization_tests {
                 .collect::<Vec<_>>(),
             vec![0, 1, 2, 0, 1]
         );
-        assert_eq!(paperwhite[3].group_offset, 272);
+        assert_eq!(paperwhite[3].group_offset, 280);
     }
 
     #[test]
@@ -2837,7 +2994,7 @@ mod localization_tests {
         assert_eq!(source_update_subtitle(&installed, &available), "v12 → v13");
         let row = source_row(&installed, &available);
         assert_eq!(row.update_subtitle.as_str(), "v12 → v13");
-        assert!(row.subtitle.as_str().ends_with("v12"));
+        assert!(row.subtitle.as_str().starts_with("v12 · "));
         for first_version in [11, 12] {
             assert!(
                 source_update_subtitle(
@@ -3210,10 +3367,13 @@ mod localization_tests {
                 .as_str()
                 .starts_with(tr("unavailable").as_str())
         );
-        assert!(
-            row.compact_status
-                .as_str()
-                .contains("Browser verification required")
+        assert_eq!(
+            row.compact_status.as_str(),
+            format!(
+                "{} · {}",
+                tr("unavailable"),
+                tr("source_browser_verification")
+            )
         );
     }
 }

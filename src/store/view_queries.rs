@@ -99,6 +99,25 @@ struct HistoryWindow {
     len: usize,
 }
 
+pub(crate) fn history_layout_metrics(large: bool, logical_height: u32) -> (u32, u32, u32, usize) {
+    // Status, toolbar, bottom navigation and a four-pixel inset.
+    let (reserved, header, row, columns) = if large {
+        (184, 56, 118, 2)
+    } else {
+        (160, 40, 80, 1)
+    };
+    (
+        logical_height.saturating_sub(reserved).max(header + row),
+        header,
+        row,
+        columns,
+    )
+}
+
+pub(crate) fn detail_page_size(large: bool) -> usize {
+    if large { 12 } else { 5 }
+}
+
 struct HistoryLayoutPlanner {
     available_height: u64,
     header_height: u64,
@@ -115,15 +134,13 @@ struct HistoryLayoutPlanner {
 
 impl HistoryLayoutPlanner {
     fn new(page: usize, large: bool, logical_height: u32) -> Self {
-        // Half-pixel layout edges are represented with doubled design pixels.
-        let (reserved, header_height, row_height, columns) = if large {
-            (723, 120, 248, 2)
-        } else {
-            (553, 88, 152, 1)
-        };
-        let available_height = (u64::from(logical_height) * 2)
-            .saturating_sub(reserved)
-            .max(header_height + row_height);
+        let (available_height, header_height, row_height, columns) =
+            history_layout_metrics(large, logical_height);
+        let (available_height, header_height, row_height) = (
+            u64::from(available_height),
+            u64::from(header_height),
+            u64::from(row_height),
+        );
         Self {
             available_height,
             header_height,
@@ -542,7 +559,10 @@ impl Store {
     }
 
     pub(crate) fn book_view_metadata(&self, id: &str) -> Result<BookViewMetadata> {
-        let row = self.connection.query_row(&BOOK_VIEW_BY_ID, [id], book_view_row).optional()?;
+        let row = self
+            .connection
+            .query_row(&BOOK_VIEW_BY_ID, [id], book_view_row)
+            .optional()?;
         let Some((document, downloaded, progress)) = row else {
             return Ok(BookViewMetadata::default());
         };
@@ -719,6 +739,24 @@ impl Store {
         Ok(ViewPage { total, page, items })
     }
 
+    pub(crate) fn chapter_rank(
+        &self,
+        book_id: &str,
+        chapter_id: &str,
+        newest_first: bool,
+    ) -> Result<usize> {
+        let order = if newest_first { ">" } else { "<" };
+        Ok(self.connection.query_row(
+            &format!(
+                "SELECT COUNT(*) FROM chapters c JOIN chapters target
+                      ON target.id = ?2 AND target.book_id = c.book_id
+                      WHERE c.book_id = ?1 AND (c.number, c.id) {order} (target.number, target.id)"
+            ),
+            params![book_id, chapter_id],
+            |row| row.get(0),
+        )?)
+    }
+
     fn chapter_view_window(
         &self,
         book_id: &str,
@@ -851,16 +889,22 @@ impl Store {
         large: bool,
         logical_height: u32,
         demo: bool,
+        recent_start: Option<&str>,
     ) -> Result<HistoryLayoutPage> {
         let modifier = if demo { "+8 hours" } else { "localtime" };
         let mut planner = HistoryLayoutPlanner::new(page, large, logical_height);
         let mut statement = self.connection.prepare(
-            "SELECT COUNT(*) FROM progress p JOIN books b ON b.id = p.book_id
-             JOIN chapters c ON c.id = p.chapter_id
-             GROUP BY COALESCE(date(p.updated_at, 'unixepoch', ?1), '')
-             ORDER BY COALESCE(date(p.updated_at, 'unixepoch', ?1), '') DESC",
+            "WITH dated AS (
+                 SELECT COALESCE(date(p.updated_at, 'unixepoch', ?1), '') AS day
+                 FROM progress p JOIN books b ON b.id = p.book_id
+                 JOIN chapters c ON c.id = p.chapter_id)
+             SELECT COUNT(*) FROM dated
+             GROUP BY CASE WHEN day < ?2 THEN '' ELSE day END
+             ORDER BY CASE WHEN day < ?2 THEN '' ELSE day END DESC",
         )?;
-        for count in statement.query_map([modifier], |row| row.get::<_, usize>(0))? {
+        for count in statement.query_map(params![modifier, recent_start], |row| {
+            row.get::<_, usize>(0)
+        })? {
             planner.add_group(count?);
         }
         drop(statement);
@@ -1032,12 +1076,25 @@ mod tests {
             "INSERT INTO progress (chapter_id,book_id,page,total,completed,updated_at) VALUES (?1,?2,7,18,0,?3)",
             params![newer.id, book.id, progress.updated_at],
         )?;
-        store.connection.execute("DELETE FROM progress WHERE book_id=?1", [&records[1].0.id])?;
+        store
+            .connection
+            .execute("DELETE FROM progress WHERE book_id=?1", [&records[1].0.id])?;
         for query in [
             LibraryQuery::default(),
-            LibraryQuery { sort_key: Some("recent-read"), ascending: true, ..Default::default() },
-            LibraryQuery { sort_key: Some("title"), filters: [1, 0, 0, 0], ..Default::default() },
-            LibraryQuery { demo_order: true, ..Default::default() },
+            LibraryQuery {
+                sort_key: Some("recent-read"),
+                ascending: true,
+                ..Default::default()
+            },
+            LibraryQuery {
+                sort_key: Some("title"),
+                filters: [1, 0, 0, 0],
+                ..Default::default()
+            },
+            LibraryQuery {
+                demo_order: true,
+                ..Default::default()
+            },
         ] {
             for r in [1, 2, 100] {
                 let keep = |book, metadata| (book, metadata);
@@ -1048,7 +1105,10 @@ mod tests {
                 for ((b, meta), (old, prior)) in joined.items.iter().zip(rowwise.items) {
                     assert_eq!(b, &old);
                     assert_eq!(prior.book.as_ref(), Some(b));
-                    assert!(meta.book.is_none(), "The joined grid already owns its document");
+                    assert!(
+                        meta.book.is_none(),
+                        "The joined grid already owns its document"
+                    );
                     assert_eq!(meta.downloaded, prior.downloaded);
                     assert_eq!(meta.progress, prior.progress);
                     if b.id == book.id {
@@ -1305,22 +1365,23 @@ mod tests {
     #[test]
     fn history_layout_accounts_for_date_headers_and_resets_scribe_columns() -> Result<()> {
         for (large, height, groups, lengths) in [
-            (false, 824, vec![1; 9], vec![4, 4, 1]),
-            (true, 1240, vec![1; 9], vec![4, 4, 1]),
-            (false, 824, vec![4, 4, 4], vec![6, 6]),
-            (true, 1240, vec![3, 3, 3], vec![8, 1]),
-            (true, 1240, vec![5, 7, 7, 1], vec![11, 8, 1]),
-            (false, 820, vec![3, 3], vec![5, 1]),
-            (false, 821, vec![3, 3], vec![6]),
-            (true, 1225, vec![5, 5], vec![9, 1]),
-            (true, 1226, vec![5, 5], vec![10]),
+            (false, 824, vec![1; 9], vec![5, 4]),
+            (true, 1240, vec![1; 9], vec![6, 3]),
+            (false, 824, vec![4, 4, 4], vec![7, 5]),
+            (true, 1240, vec![3, 3, 3], vec![9]),
+            (true, 1240, vec![5, 7, 7, 1], vec![12, 8]),
+            (false, 719, vec![3, 3], vec![5, 1]),
+            (false, 720, vec![3, 3], vec![6]),
+            (true, 1003, vec![5, 5], vec![9, 1]),
+            (true, 1004, vec![5, 5], vec![10]),
             (false, 0, vec![3], vec![1, 1, 1]),
             (true, 0, vec![3], vec![2, 1]),
         ] {
             let (store, ids) = history_groups(&groups)?;
             let mut offset = 0;
             for (index, length) in lengths.iter().enumerate() {
-                let visible = store.history_layout_view_page(index + 1, large, height, true)?;
+                let visible =
+                    store.history_layout_view_page(index + 1, large, height, true, None)?;
                 assert_eq!(
                     (visible.total, visible.page, visible.page_count),
                     (ids.len(), index + 1, lengths.len()),
@@ -1339,10 +1400,12 @@ mod tests {
             }
             assert_eq!(offset, ids.len());
             assert_eq!(
-                store.history_layout_view_page(0, large, height, true)?.page,
+                store
+                    .history_layout_view_page(0, large, height, true, None)?
+                    .page,
                 1
             );
-            let last = store.history_layout_view_page(usize::MAX, large, height, true)?;
+            let last = store.history_layout_view_page(usize::MAX, large, height, true, None)?;
             assert_eq!(last.page, lengths.len());
             assert_eq!(
                 last.items
@@ -1354,12 +1417,35 @@ mod tests {
         }
         let store = Store::open(":memory:")?;
         for large in [false, true] {
-            let empty = store.history_layout_view_page(usize::MAX, large, 0, true)?;
+            let empty = store.history_layout_view_page(usize::MAX, large, 0, true, None)?;
             assert_eq!(
                 (empty.total, empty.page, empty.page_count, empty.items.len()),
                 (0, 1, 1, 0)
             );
         }
+        Ok(())
+    }
+
+    #[test]
+    fn earlier_days_share_one_group_and_fill_the_scribe_columns() -> Result<()> {
+        let (store, ids) = history_groups(&[2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1])?;
+        let cutoff = {
+            let latest = store.history_view_page(1, 1)?.items[0].progress.updated_at;
+            chrono::DateTime::from_timestamp(latest - 2 * 86_400, 0)
+                .unwrap()
+                .format("%Y-%m-%d")
+                .to_string()
+        };
+        let visible = store.history_layout_view_page(1, true, 1240, true, Some(&cutoff))?;
+        assert_eq!(visible.items.len(), 13);
+        assert_eq!(
+            visible
+                .items
+                .iter()
+                .map(|row| &row.book.id)
+                .collect::<Vec<_>>(),
+            ids.iter().take(13).collect::<Vec<_>>()
+        );
         Ok(())
     }
 
@@ -1378,7 +1464,7 @@ mod tests {
                 params![records[index].1.id, boundary + seconds],
             )?;
         }
-        let first = store.history_layout_view_page(1, false, 473, true)?;
+        let first = store.history_layout_view_page(1, false, 392, true, None)?;
         assert_eq!((first.total, first.page_count), (3, 2));
         assert_eq!(
             first
@@ -1388,7 +1474,7 @@ mod tests {
                 .collect::<Vec<_>>(),
             vec![records[0].0.id.clone()]
         );
-        let second = store.history_layout_view_page(2, false, 473, true)?;
+        let second = store.history_layout_view_page(2, false, 392, true, None)?;
         assert_eq!(
             second
                 .items
@@ -1403,7 +1489,7 @@ mod tests {
     #[test]
     fn large_single_date_history_decodes_only_its_requested_layout_window() -> Result<()> {
         let (store, records) = fixture(2_049)?;
-        let expected = store.history_layout_view_page(100, false, 824, true)?;
+        let expected = store.history_layout_view_page(100, false, 824, true, None)?;
         assert_eq!(
             (
                 expected.total,
@@ -1411,7 +1497,7 @@ mod tests {
                 expected.page_count,
                 expected.items.len()
             ),
-            (2_049, 100, 342, 6)
+            (2_049, 100, 293, 7)
         );
         let visible_ids = expected
             .items
@@ -1433,10 +1519,10 @@ mod tests {
         }
         transaction.commit()?;
         assert!(store.books().is_err());
-        let visible = store.history_layout_view_page(100, false, 824, true)?;
+        let visible = store.history_layout_view_page(100, false, 824, true, None)?;
         assert_eq!(
             (visible.total, visible.page, visible.page_count),
-            (2_049, 100, 342)
+            (2_049, 100, 293)
         );
         assert_eq!(
             visible

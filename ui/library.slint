@@ -2,130 +2,37 @@ import { CompactPager } from "native-controls.slint";
 import { State, Commands, BookItem } from "state.slint";
 import { Theme } from "theme.slint";
 import { Strings } from "strings.slint";
-import { BodyText, Caption, TitleText, Icon, IconButton, ActionButton, PageBar, Cover, EmptyState, DottedRule } from "widgets.slint";
+import { BodyText, Caption, TitleText, Icon, IconButton, ActionButton, Tab, Cover, EmptyState } from "widgets.slint";
 import { IdentityTextFit } from "identity-text.slint";
-
-component LibraryCategory inherits Rectangle {
-    in property <string> label;
-    in property <bool> selected;
-    callback clicked();
-    preferred-width: category-label.preferred-width + 4px;
-    height: State.large-screen ? 64px : 48px;
-    background: transparent;
-    accessible-role: tab;
-    accessible-label: root.label;
-    accessible-checkable: true;
-    accessible-checked: root.selected;
-    Rectangle {
-        x: 0px; y: 0px; width: parent.width; height: max(0px, parent.height - 1px);
-        background: touch.pressed ? Theme.ink : transparent;
-    }
-    category-label := BodyText {
-        x: 2px; y: 0px; width: self.preferred-width; height: parent.height;
-        text: root.label; font-size: State.large-screen ? 20px : 17px;
-        font-weight: root.selected ? 700 : 500;
-        color: touch.pressed ? Theme.paper : root.selected ? Theme.ink : Theme.secondary;
-    }
-    category-count := Text {
-        x: category-label.width + (State.large-screen ? 10px : 8px); y: 1px;
-        width: self.preferred-width; height: parent.height;
-        text: ""; font-family: Theme.numbers;
-        font-size: State.large-screen ? 15px : 13px; font-weight: 600;
-        color: touch.pressed ? Theme.paper : root.selected ? Theme.ink : Theme.secondary;
-        vertical-alignment: center;
-    }
-    if root.selected: Rectangle {
-        x: 0px; y: parent.height - (State.large-screen ? 3px : 2px);
-        width: parent.width; height: State.large-screen ? 4px : 3px;
-        border-radius: 2px; background: Theme.ink;
-    }
-    touch := TouchArea { x: 0px; y: 0px;
-        pointer-event(event) => {
-            if event.kind == PointerEventKind.down { Commands.refresh("ui"); }
-            else if event.kind == PointerEventKind.up || event.kind == PointerEventKind.cancel { Commands.refresh("ui"); }
-        }
-        clicked => { root.clicked(); }
-    }
-}
 
 component LibraryBookCaption inherits Rectangle {
     in property <BookItem> book;
     property <bool> same-label: State.optimized-library-projection
         && (root.book.display-title == "" || root.book.display-title == root.book.title);
-    property <length> badge-width: max(State.large-screen ? 22px : 20px, unread-label.preferred-width + (State.large-screen ? 12px : 10px));
-    property <length> item-gap: State.large-screen ? 6px : 5px;
     property <length> download-width: State.large-screen ? 16px : 15px;
-    property <bool> has-unread: !State.selection-mode && root.book.unread > 0;
     property <bool> has-download: !State.selection-mode && root.book.downloaded;
-    property <bool> suppress-click: false;
-    property <length> press-x;
-    property <length> press-y;
-    height: State.large-screen ? 22px : 20px;
-    background: touch.pressed ? Theme.ink : Theme.paper;
-    accessible-role: button;
-    accessible-label: root.book.title;
-    title-fit := IdentityTextFit { x: 0px; y: 0px;
-        // A width measurement cannot change the choice when both labels are identical.
-        full-text: root.same-label ? "" : root.book.title; compact-text: root.book.display-title;
+    height: State.large-screen ? 28px : 24px;
+    title-fit := IdentityTextFit {
+        x: 0px; y: 0px;
+        // Avoid measuring the title when both variants are identical.
+        full-text: root.same-label ? "" : root.book.title;
+        compact-text: root.book.display-title;
         available-width: title-label.width;
-        font-family: title-label.font-family; font-size: title-label.font-size;
-        font-weight: title-label.font-weight; letter-spacing: title-label.letter-spacing;
+        font-family: title-label.font-family;
+        font-size: title-label.font-size;
+        font-weight: title-label.font-weight;
+        letter-spacing: title-label.letter-spacing;
     }
     title-label := BodyText {
         x: 0px; y: 0px;
-        width: max(0px, parent.width - (root.has-unread ? root.badge-width + root.item-gap : 0px) - (root.has-download ? root.download-width + root.item-gap : 0px));
-        height: parent.height; text: root.same-label ? root.book.title : title-fit.display-text; accessible-label: root.book.title;
-        font-size: State.large-screen ? 16px : 15px; font-weight: 500;
-        color: touch.pressed ? Theme.paper : Theme.ink;
-    }
-    Rectangle {
-        visible: root.has-unread;
-        x: parent.width - root.badge-width - (root.has-download ? root.download-width + root.item-gap : 0px);
-        y: (parent.height - self.height) / 2; width: root.badge-width; height: State.large-screen ? 20px : 18px;
-        border-radius: 2px; background: Theme.ink;
-        unread-label := Text { x: 0px; y: 0px;
-            text: root.book.unread; color: Theme.paper;
-            font-family: Theme.numbers; font-size: State.large-screen ? 13px : 12px; font-weight: 700;
-            horizontal-alignment: center; vertical-alignment: center;
-        }
+        width: parent.width - (root.has-download ? root.download-width + 6px : 0px);
+        height: parent.height; text: root.same-label ? root.book.title : title-fit.display-text;
+        font-size: State.large-screen ? 19px : 17px;
     }
     if root.has-download: Icon {
         x: parent.width - root.download-width; y: (parent.height - self.height) / 2;
-        width: root.download-width; height: root.download-width; kind: "download";
-        secondary: true; inverted: touch.pressed;
-    }
-    touch := TouchArea { x: 0px;
-        y: State.large-screen ? -12px : -14px;
-        height: Theme.touch;
-        moved => {
-            if self.pressed && (abs(self.mouse-x - root.press-x) >= 12px || abs(self.mouse-y - root.press-y) >= 12px) {
-                root.suppress-click = true; hold.running = false;
-            }
-        }
-        pointer-event(event) => {
-            if event.kind == PointerEventKind.down {
-                root.press-x = self.mouse-x; root.press-y = self.mouse-y;
-                root.suppress-click = false; hold.running = true;
-                Commands.refresh("ui");
-            } else if event.kind == PointerEventKind.up || event.kind == PointerEventKind.cancel {
-                hold.running = false;
-                if event.kind == PointerEventKind.cancel { root.suppress-click = true; }
-                Commands.refresh("ui");
-            }
-        }
-        clicked => {
-            if !root.suppress-click { Commands.action("library", State.selection-mode ? "select" : "open", root.book.id); }
-        }
-    }
-    hold := Timer {
-        interval: 500ms; running: false;
-        triggered => {
-            self.running = false;
-            if touch.pressed && !root.suppress-click {
-                root.suppress-click = true;
-                Commands.action("library", "select", root.book.id);
-            }
-        }
+        width: root.download-width; height: self.width; kind: "download";
+        secondary: true;
     }
 }
 
@@ -133,49 +40,130 @@ export component LibraryPage inherits Rectangle {
     background: Theme.paper;
     clip: true;
     property <int> columns: State.large-screen ? 5 : 4;
-    property <length> toolbar-height: Theme.touch + 8px;
-    property <length> continuation-height: State.large-screen ? 136px : 112px;
-    property <length> grid-top: root.toolbar-height + (State.library-count > 0 && !State.selection-mode ? root.continuation-height + 16px : 16px);
-    property <length> grid-gap: State.large-screen ? 20px : 14px;
-    property <length> cell-width: (root.width - Theme.margin * 2 - root.grid-gap * (root.columns - 1)) / root.columns;
-    property <length> cover-height: root.cell-width * 1.36;
-    property <length> row-height: root.cover-height + (State.large-screen ? 62px : 48px);
-    Rectangle { x: 0px; y: 0px;
-        width: parent.width; height: root.toolbar-height;
-        HorizontalLayout { y: 0px;
-            x: Theme.margin; width: max(0px, pager.x - self.x - 8px); height: Theme.touch; alignment: start; spacing: State.large-screen ? 20px : 10px;
-            if !State.selection-mode: LibraryCategory { label: Strings.all; selected: State.library-filter == 0; clicked => { Commands.action("library", "filter", "0"); } }
-            if !State.selection-mode: LibraryCategory { label: State.category-reading-name; selected: State.library-filter == 1; clicked => { Commands.action("library", "filter", "1"); } }
-            if !State.selection-mode: LibraryCategory { label: State.category-planned-name; selected: State.library-filter == 2; clicked => { Commands.action("library", "filter", "2"); } }
-            if !State.selection-mode: LibraryCategory { label: State.category-completed-name; selected: State.library-filter == 3; clicked => { Commands.action("library", "filter", "3"); } }
-            if !State.selection-mode && State.large-screen: LibraryCategory { label: Strings.uncategorized; selected: State.library-filter == 4; clicked => { Commands.action("library", "filter", "4"); } }
-            if State.selection-mode: ActionButton { text: Strings.select-page; quiet: true; clicked => { Commands.action("library", "select-page", ""); } }
-            if State.selection-mode: ActionButton { text: Strings.keyboard-done; primary: true; clicked => { Commands.action("library", "finish-selection", ""); } }
+    property <int> rows: State.large-screen ? 3 : 2;
+    property <bool> continuation-visible: State.current-book.id != "" && !State.selection-mode;
+    property <bool> has-filters: State.library-filters[0] != 0 || State.library-filters[1] != 0 || State.library-filters[2] != 0 || State.library-filters[3] != 0;
+    property <length> continuation-height: State.large-screen ? 136px : 124px;
+    property <length> grid-top: Theme.toolbar-height + (root.continuation-visible ? root.continuation-height : 0px) + (State.large-screen ? 26px : 22px);
+    property <length> column-gap: State.large-screen ? 24px : 14px;
+    property <length> base-row-gap: State.large-screen ? 30px : 26px;
+    property <length> caption-height: (State.large-screen ? 28px : 24px) + 8px;
+    property <length> cell-width: (root.width - Theme.margin * 2 - root.column-gap * (root.columns - 1)) / root.columns;
+    property <length> grid-height: root.height - root.grid-top;
+    property <length> cover-height: max(1px, min(round(root.cell-width / 1px * 1.55) * 1px, (root.grid-height - root.base-row-gap * (root.rows - 1)) / root.rows - root.caption-height - 8px));
+    property <length> row-gap: root.continuation-visible
+        ? max(root.base-row-gap, (root.grid-height - 28px - root.rows * (root.cover-height + root.caption-height)) / (root.rows - 1))
+        : root.base-row-gap;
+    property <length> tile-height: root.cover-height + root.caption-height;
+    property <length> toolbar-inset: State.large-screen ? 28px : 14px;
+
+    Rectangle {
+        x: 0px; y: 0px; width: parent.width; height: Theme.toolbar-height;
+        Rectangle { x: 0px; y: parent.height - 1px; width: parent.width; height: 1px; background: Theme.line; }
+        if !State.selection-mode: HorizontalLayout {
+            x: Theme.margin; y: 0px; width: max(0px, pager.x - self.x - 4px);
+            height: parent.height; alignment: start; spacing: State.large-screen ? 18px : 8px;
+            for name[index] in [Strings.all, State.category-reading-name, State.category-planned-name, State.category-completed-name, Strings.uncategorized]: Tab {
+                visible: index < 4 || State.large-screen;
+                width: min(parent.width / (State.large-screen ? 5 : 4) - (State.large-screen ? 2px : 3px), self.preferred-width);
+                height: parent.height; text: name; text-padding: 0px;
+                selected: State.library-filter == index;
+                clicked => { Commands.action("library", "filter", index); }
+            }
         }
-        pager := CompactPager { y: 0px; x: parent.width - Theme.margin - Theme.touch * 2 - self.width; page: State.page; count: State.page-count; turn(delta) => { Commands.action("page", "turn", delta); } }
-        IconButton { y: 0px; x: parent.width - Theme.margin - Theme.touch * 2; icon: "sliders"; label: Strings.sort + Strings.filter; clicked => { Commands.action("library", "filter-menu", ""); } }
-        IconButton { y: 0px; x: parent.width - Theme.margin - Theme.touch; icon: "more"; label: Strings.more; clicked => { Commands.action("library", "more", ""); } }
+        if State.selection-mode: BodyText {
+            x: Theme.margin; y: 0px; width: max(0px, select-page.x - self.x - 8px); height: parent.height;
+            text: Strings.selected-books-prefix + State.selected-books.length + Strings.selected-books-suffix;
+        }
+        select-page := ActionButton {
+            visible: State.selection-mode; x: finish.x - self.width - 8px; y: (parent.height - self.height) / 2;
+            width: self.preferred-width; text: Strings.select-page; quiet: true;
+            clicked => { Commands.action("library", "select-page", ""); }
+        }
+        finish := ActionButton {
+            visible: State.selection-mode; x: parent.width - root.toolbar-inset - self.width; y: (parent.height - self.height) / 2;
+            width: self.preferred-width; text: Strings.keyboard-done; primary: true;
+            clicked => { Commands.action("library", "finish-selection", ""); }
+        }
+        pager := CompactPager {
+            visible: !State.selection-mode;
+            y: (parent.height - self.height) / 2; x: parent.width - root.toolbar-inset - Theme.touch * 2 - self.width;
+            page: State.page; count: State.page-count;
+            turn(delta) => { Commands.action("page", "turn", delta); }
+        }
+        if !State.selection-mode: IconButton {
+            x: parent.width - root.toolbar-inset - Theme.touch * 2; y: (parent.height - self.height) / 2;
+            icon: "sliders"; label: Strings.sort-and-filter;
+            clicked => { Commands.action("library", "filter-menu", ""); }
+            if root.has-filters: Rectangle { x: parent.width - 12px; y: 8px; width: 7px; height: 7px; background: Theme.ink; }
+        }
+        if !State.selection-mode: IconButton {
+            x: parent.width - root.toolbar-inset - Theme.touch; y: (parent.height - self.height) / 2;
+            icon: "more"; label: Strings.more;
+            clicked => { Commands.action("library", "more", ""); }
+        }
+    }
+    if root.continuation-visible: Rectangle {
+        x: Theme.margin; y: Theme.toolbar-height; width: parent.width - Theme.margin * 2; height: root.continuation-height;
+        property <length> text-left: State.large-screen ? 96px : 80px;
+        Cover {
+            x: 0px; y: (parent.height - self.height) / 2;
+            width: State.large-screen ? 76px : 64px; height: State.large-screen ? 104px : 88px;
+            book: State.current-book;
+            opened => { Commands.action("library", "open", State.current-book.id); }
+        }
+        TitleText {
+            x: parent.text-left; y: State.large-screen ? 25px : 23px; width: resume.x - self.x - 14px; height: 32px;
+            text: State.current-book.title; font-size: State.large-screen ? 23px : 19px; font-weight: 700;
+        }
+        Caption {
+            x: parent.text-left; y: State.large-screen ? 61px : 56px; width: resume.x - self.x - 14px; height: 24px;
+            text: State.current-chapter-number == "" ? "" : Strings.chapter-prefix + State.current-chapter-number + Strings.chapter-suffix + (State.current-chapter == "" ? "" : " · " + State.current-chapter);
+            font-size: State.large-screen ? 18px : 16px;
+        }
+        if State.current-chapter-number != "": Rectangle {
+            x: parent.text-left; y: State.large-screen ? 92px : 85px;
+            width: resume.x - self.x - 14px; height: 24px;
+            track := Rectangle {
+                x: 0px; y: (parent.height - self.height) / 2; width: min(parent.width * 0.53, State.large-screen ? 150px : 120px); height: 3px;
+                background: Theme.line;
+                Rectangle { x: 0px; y: 0px; height: parent.height; width: parent.width * clamp(State.reader-page / max(1.0, State.reader-total), 0, 1); background: Theme.ink; }
+            }
+            Text {
+                x: track.width + 10px; y: 0px; width: parent.width - self.x; height: parent.height;
+                text: State.reader-page + " / " + State.reader-total; font-family: Theme.numbers;
+                font-size: State.large-screen ? 18px : 16px; color: Theme.ink; vertical-alignment: center; overflow: elide;
+            }
+        }
+        resume := ActionButton {
+            x: parent.width - self.width; y: (parent.height - self.height) / 2;
+            width: self.preferred-width; horizontal-padding: State.large-screen ? 28px : 22px;
+            text: Strings.continue-reading; primary: true;
+            clicked => { Commands.action("library", "continue", ""); }
+        }
         Rectangle { x: 0px; y: parent.height - 1px; width: parent.width; height: 1px; background: Theme.line; }
     }
-    if State.library-count > 0 && !State.selection-mode: Rectangle {
-        x: Theme.margin; y: root.toolbar-height; width: parent.width - Theme.margin * 2; height: root.continuation-height;
-        Cover { x: 0px; y: 12px; width: State.large-screen ? 76px : 60px; height: parent.height - 24px; book: State.current-book; show-badge: false; show-progress: false; opened => { Commands.action("library", "continue", ""); } }
-        BodyText { x: State.large-screen ? 96px : 78px; y: 20px; width: parent.width - self.x - (State.large-screen ? 180px : 150px); height: 32px; text: State.current-book.title; font-size: State.large-screen ? 24px : 21px; font-weight: 700; }
-        Caption { x: State.large-screen ? 96px : 78px; y: 58px; width: parent.width - self.x - 150px; height: 24px; text: Strings.chapter-prefix + State.current-chapter-number + Strings.chapter-suffix + " · " + State.reader-page + " / " + State.reader-total; }
-        ActionButton { x: parent.width - self.width; y: (parent.height - Theme.touch) / 2; width: State.large-screen ? 168px : 144px; text: Strings.continue-reading; primary: true; clicked => { Commands.action("library", "continue", ""); } }
-        Rectangle { x: 0px; y: parent.height - 1px; width: parent.width; height: 1px; background: Theme.line; }
-    }
-    if State.library-count == 0 || State.books.length == 0: EmptyState { x: 0px;
-        y: root.grid-top + 32px; width: parent.width; height: 270px;
+    if State.books.length == 0: EmptyState {
+        x: 0px; y: (State.large-screen ? 400px : 300px) - Theme.status-height; width: parent.width; height: 222px;
+        icon: "";
         title: State.library-count == 0 ? Strings.empty-library : Strings.no-results;
-        action: State.library-count == 0 ? Strings.browse-sources : Strings.all;
-        clicked => { if State.library-count == 0 { Commands.action("navigation", "open", "1"); } else { Commands.action("library", "filter", "0"); } }
+        action: State.library-count == 0 ? Strings.browse-sources : Strings.clear-filters;
+        primary: false;
+        clicked => {
+            if State.library-count == 0 { Commands.action("navigation", "open", "1"); }
+            else { Commands.action("library", "clear-filters", ""); }
+        }
     }
     for book[index] in State.books: Rectangle {
-        x: Theme.margin + mod(index, root.columns) * (root.cell-width + root.grid-gap);
-        y: root.grid-top + floor(index / root.columns) * root.row-height;
-        width: root.cell-width; height: root.row-height;
-        Cover { x: 0px; y: 0px; width: parent.width; height: root.cover-height; book: book; selected: book.selected; selection-mode: State.selection-mode; show-badge: false; show-progress: false; opened => { Commands.action("library", State.selection-mode ? "select" : "open", book.id); } held => { Commands.action("library", "select", book.id); } }
+        x: Theme.margin + mod(index, root.columns) * (root.cell-width + root.column-gap);
+        y: root.grid-top + floor(index / root.columns) * (root.tile-height + root.row-gap);
+        width: root.cell-width; height: root.tile-height;
         LibraryBookCaption { x: 0px; y: root.cover-height + 8px; width: parent.width; book: book; }
+        Cover {
+            x: 0px; y: 0px; width: parent.width; height: root.cover-height; hit-height: root.tile-height;
+            book: book; selected: book.selected; selection-mode: State.selection-mode; show-badge: !State.selection-mode;
+            opened => { Commands.action("library", State.selection-mode ? "select" : "open", book.id); }
+            held => { Commands.action("library", "select", book.id); }
+        }
     }
 }

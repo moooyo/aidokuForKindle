@@ -244,9 +244,7 @@ impl App {
             "detail" if large || self.page == 1 => {
                 ids.push(state.get_current_book().id.to_string());
             }
-            "catalog" | "sources"
-                if self.route == "catalog" || large && self.source_filter == 0 =>
-            {
+            "catalog" => {
                 let books = state.get_catalog();
                 for row in 0..books.row_count() {
                     if let Some(book) = books.row_data(row) {
@@ -258,7 +256,7 @@ impl App {
                 let typing = self.keyboard_target == "search"
                     && (self.modal == "keyboard"
                         || self.modal == "choices" && self.modal_context == "search-scope:typing");
-                if typing && large {
+                if typing {
                     let books = state.get_search_local_matches();
                     for row in 0..books.row_count() {
                         if let Some(book) = books.row_data(row) {

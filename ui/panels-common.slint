@@ -13,7 +13,7 @@ export component PanelAction inherits Rectangle {
     in property <length> text-size: State.large-screen ? 17px : 16px;
     in property <length> horizontal-padding: State.large-screen ? 24px : 20px;
     callback clicked();
-    property <bool> inverted: root.enabled && (root.primary || root.selected || hit.pressed);
+    property <bool> inverted: root.enabled && (root.primary || root.selected);
     preferred-width: max(Theme.touch, label.preferred-width + root.horizontal-padding * 2);
     height: State.large-screen ? 50px : 44px;
     border-radius: Theme.control-radius;
@@ -40,10 +40,6 @@ export component PanelAction inherits Rectangle {
         y: (parent.height - max(parent.height, Theme.touch)) / 2;
         width: parent.width;
         height: max(parent.height, Theme.touch);
-        pointer-event(event) => {
-            if event.kind == PointerEventKind.down { Commands.refresh("ui"); }
-            else if event.kind == PointerEventKind.up || event.kind == PointerEventKind.cancel { Commands.refresh("ui"); }
-        }
         clicked => { root.clicked(); }
     }
 }
@@ -63,7 +59,8 @@ export component PanelHeader inherits Rectangle {
         text: root.text; font-size: root.title-size; letter-spacing: 2px;
     }
     done := PanelAction {
-        x: parent.width - self.width; y: 0px; width: self.preferred-width; height: parent.height;
+        x: parent.width - self.width; y: 0px; width: root.action-text == "" ? 0px : self.preferred-width; height: parent.height;
+        visible: root.action-text != "";
         text: root.action-text; primary: root.primary; horizontal-padding: root.action-horizontal-padding;
         clicked => { root.closed(); }
     }
@@ -74,12 +71,12 @@ export component ChoiceRow inherits Rectangle {
     y: 0px;
     in property <SettingItem> item;
     in property <string> icon;
-    in property <bool> line: true;
+    in property <bool> line: false;
     in property <bool> selected: false;
     in property <length> inset: 4px;
     in property <length> text-size: State.large-screen ? 18px : 17px;
     callback chosen();
-    property <bool> inverted: root.item.enabled && (root.selected || hit.pressed);
+    property <bool> inverted: root.item.enabled && (root.selected);
     height: State.large-screen ? 62px : 56px;
     background: root.inverted ? Theme.ink : Theme.paper;
     accessible-role: button;
@@ -103,7 +100,7 @@ export component ChoiceRow inherits Rectangle {
         y: 0px;
         width: root.item.value == "" ? 0px : min(parent.width * 0.42, self.preferred-width);
         height: parent.height; text: root.item.value;
-        font-family: Theme.numbers; font-size: State.large-screen ? 15px : 14px;
+        font-size: State.large-screen ? 15px : 14px;
         color: !root.item.enabled ? Theme.disabled : root.inverted ? Theme.paper : Theme.secondary;
         horizontal-alignment: right;
     }
@@ -114,10 +111,6 @@ export component ChoiceRow inherits Rectangle {
     hit := TouchArea {
         enabled: root.item.enabled;
         x: 0px; y: 0px; width: parent.width; height: parent.height;
-        pointer-event(event) => {
-            if event.kind == PointerEventKind.down { Commands.refresh("ui"); }
-            else if event.kind == PointerEventKind.up || event.kind == PointerEventKind.cancel { Commands.refresh("ui"); }
-        }
         clicked => { root.chosen(); }
     }
 }

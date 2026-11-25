@@ -1,38 +1,20 @@
 import { State, Commands } from "state.slint";
 import { Strings } from "strings.slint";
-import { Caption, GroupLabel } from "widgets.slint";
-import { SettingsChoice } from "settings-controls.slint";
+import { SegmentedControl } from "widgets.slint";
+import { SettingsSectionLabel } from "settings-controls.slint";
 
 export component DitherSelector inherits Rectangle {
-    in property <bool> reader: false;
-    property <length> title-height: root.reader ? 24px : (State.large-screen ? 21px : 18px);
-    property <length> choices-y: root.title-height + 8px;
-    property <length> choice-height: State.large-screen ? 56px : 48px;
-    property <length> hint-y: root.choices-y + (State.large-screen ? root.choice-height * 3 + 16px : root.choice-height) + 12px;
-    property <length> hint-height: State.large-screen ? 56px : 40px;
-    height: root.hint-y + root.hint-height;
-    GroupLabel {
-        x: 0px; y: 0px; width: parent.width; height: root.title-height;
-        text: Strings.dither; font-size: State.large-screen ? 17px : 15px;
+    height: options.y + options.height;
+    SettingsSectionLabel {
+        x: 0px; y: 0px; width: root.width; text: Strings.dither;
     }
-    for mode[index] in ["off", "bayer8", "floyd_steinberg"]: SettingsChoice {
-        x: State.large-screen ? 0px : index * (parent.width + 8px) / 3;
-        y: root.choices-y + (State.large-screen ? index * (root.choice-height + 8px) : 0px);
-        width: State.large-screen ? parent.width : (parent.width - 16px) / 3; height: root.choice-height;
-        wrap-label: !State.large-screen;
-        text: mode == "off" ? Strings.off : mode == "bayer8" ? Strings.dither-bayer8 : Strings.dither-floyd;
-        selected: mode == "off" ? !State.dither : State.dither && State.dither-method == mode;
-        accessible-role: radio-button;
-        accessible-label: Strings.dither + " " + self.text;
-        accessible-checkable: true; accessible-checked: self.selected;
-        clicked => { if !self.selected { Commands.action("settings", "set", "dither-mode=" + mode); } }
-    }
-    Caption {
-        x: 0px; y: root.hint-y; width: parent.width; height: root.hint-height;
-        wrap: word-wrap; font-size: State.large-screen ? 17px : 15px;
-        text: State.dither-pending ? Strings.dither-pending :
-            State.display-mode == "fast" ? Strings.dither-fast-hint :
-            !State.dither ? Strings.dither-off-hint :
-            State.dither-method == "floyd_steinberg" ? Strings.dither-floyd-hint : Strings.dither-bayer8-hint;
+    options := SegmentedControl {
+        x: 0px; y: State.large-screen ? 30px : 27px; width: root.width;
+        labels: [Strings.off, Strings.dither-bayer8, "Floyd–Steinberg"];
+        selected: !State.dither ? 0 : State.dither-method == "floyd_steinberg" ? 2 : 1;
+        cell-height: State.large-screen ? 50px : 44px;
+        chosen(index) => {
+            Commands.action("settings", "set", "dither-mode=" + (index == 0 ? "off" : index == 1 ? "bayer8" : "floyd_steinberg"));
+        }
     }
 }

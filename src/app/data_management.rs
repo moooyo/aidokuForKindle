@@ -12,6 +12,8 @@ pub(super) struct DataManagementState {
     pub manager: BackupManager,
     pub logs: LogManager,
     pub backups: Vec<BackupInfo>,
+    backup_list_requested: bool,
+    backup_list_loaded: bool,
     pub pending_restore: Option<PreparedRestore>,
     pub inflight: Option<u64>,
     pub last_export: Option<PathBuf>,
@@ -24,6 +26,8 @@ impl DataManagementState {
             manager: BackupManager::open(data_dir)?,
             logs: LogManager::open(data_dir, write_logs)?,
             backups: Vec::new(),
+            backup_list_requested: false,
+            backup_list_loaded: false,
             pending_restore: None,
             inflight: None,
             last_export: None,
@@ -54,7 +58,10 @@ impl DataManagementState {
 
 pub(super) enum DataManagementResult {
     BackupCreated(BackupInfo),
-    BackupsListed(Vec<BackupInfo>),
+    BackupsListed {
+        backups: Vec<BackupInfo>,
+        select: bool,
+    },
     RestorePrepared(PreparedRestore),
     RestoreApplied(RestoreReport),
     LogsExported(PathBuf),
@@ -83,13 +90,7 @@ impl App {
                     Ok(DataManagementResult::BackupCreated(info))
                 })?;
             }
-            "backup-restore" | "restore-backup" => {
-                self.ensure_data_management_idle()?;
-                let manager = self.data_management.manager.clone();
-                self.start_data_management_job(move || {
-                    Ok(DataManagementResult::BackupsListed(manager.list()?))
-                })?;
-            }
+            "backup-restore" | "restore-backup" => self.load_backup_list(true)?,
             "backup-prepare" => {
                 self.ensure_data_management_idle()?;
                 self.data_management.cancel_pending_restore();
@@ -158,32 +159,36 @@ impl App {
                 self.data_management.last_message = tr("metadata_backup_created");
                 self.notify(self.data_management.last_message.clone());
             }
-            DataManagementResult::BackupsListed(backups) => {
+            DataManagementResult::BackupsListed { backups, select } => {
                 self.data_management.backups = backups;
-                if self.route != "settings" || self.interactions.settings_section != "backup" {
-                    return Ok(());
-                } else if self.data_management.backups.is_empty() {
-                    self.notify(tr("metadata_backup_empty"));
-                } else {
-                    let mut rows = self
-                        .data_management
-                        .backups
-                        .iter()
-                        .map(|info| {
-                            (
-                                format!("data-backup:{}", info.id),
-                                backup_title(info),
-                                format!(
-                                    "{} / {} · {}",
-                                    info.counts.books,
-                                    info.counts.chapters,
-                                    tr("metadata_backup_counts")
-                                ),
-                            )
-                        })
-                        .collect::<Vec<_>>();
-                    rows.push(("close".into(), tr("cancel"), String::new()));
-                    self.show_choices(&tr("restore_backup"), "backup-select", rows)?;
+                self.data_management.backup_list_loaded = true;
+                if select
+                    && self.route == "settings"
+                    && self.interactions.settings_section == "backup"
+                {
+                    if self.data_management.backups.is_empty() {
+                        self.notify(tr("metadata_backup_empty"));
+                    } else {
+                        let mut rows = self
+                            .data_management
+                            .backups
+                            .iter()
+                            .map(|info| {
+                                (
+                                    format!("data-backup:{}", info.id),
+                                    backup_title(info),
+                                    format!(
+                                        "{} / {} · {}",
+                                        info.counts.books,
+                                        info.counts.chapters,
+                                        tr("metadata_backup_counts")
+                                    ),
+                                )
+                            })
+                            .collect::<Vec<_>>();
+                        rows.push(("close".into(), tr("cancel"), String::new()));
+                        self.show_choices(&tr("restore_backup"), "backup-select", rows)?;
+                    }
                 }
             }
             DataManagementResult::RestorePrepared(prepared) => {
@@ -274,15 +279,35 @@ impl App {
                     .backups
                     .iter()
                     .map(|info| {
-                        item(
+                        let date = chrono::DateTime::parse_from_rfc3339(&info.created_at)
+                            .map(|date| {
+                                date.with_timezone(&chrono::Local)
+                                    .format("%m · %d  %H:%M")
+                                    .to_string()
+                            })
+                            .unwrap_or_else(|_| info.created_at.clone());
+                        let automatic = info.kind == BackupKind::AutomaticRollback;
+                        let mut row = item(
                             format!("data-backup:{}", info.id),
-                            backup_title(info),
+                            if automatic {
+                                format!("{} · {date}", tr("metadata_backup_automatic"))
+                            } else {
+                                date
+                            },
                             format!("{} / {}", info.counts.books, info.counts.chapters),
                             self.data_management.inflight.is_none(),
-                        )
+                        );
+                        if automatic {
+                            row.group = "backup-auto".into();
+                        }
+                        row
                     })
                     .collect(),
-                tr("metadata_backup_scope"),
+                if self.data_management.backup_list_loaded {
+                    String::new()
+                } else {
+                    tr("unavailable")
+                },
             )),
             "logs" => {
                 let mut items = vec![item(
@@ -307,6 +332,27 @@ impl App {
             }
             _ => None,
         }
+    }
+
+    pub(super) fn load_backup_list(&mut self, select: bool) -> Result<()> {
+        // List on first entry without presenting a restore picker. The explicit
+        // restore action can always reload the list and open the picker.
+        if !select
+            && (self.data_management.backup_list_requested
+                || self.data_management.inflight.is_some())
+        {
+            return Ok(());
+        }
+        self.ensure_data_management_idle()?;
+        let manager = self.data_management.manager.clone();
+        self.start_data_management_job(move || {
+            Ok(DataManagementResult::BackupsListed {
+                backups: manager.list()?,
+                select,
+            })
+        })?;
+        self.data_management.backup_list_requested = true;
+        Ok(())
     }
 
     fn ensure_data_management_idle(&self) -> Result<()> {

@@ -239,6 +239,7 @@ pub struct App {
     pub(crate) page: usize,
     pub(crate) library_filter: i32,
     pub(crate) source_filter: i32,
+    source_management_from_catalog: bool,
     pub(crate) catalog_filter: i32,
     pub(crate) history_filter: i32,
     pub(crate) sort_title: bool,
@@ -258,6 +259,7 @@ pub struct App {
     pub(crate) catalog_listings: Vec<(String, String)>,
     pub(crate) available: Vec<RepositorySource>,
     pub(crate) source_settings: Vec<SourceSetting>,
+    source_settings_source: String,
     pub(crate) query: String,
     pub(crate) search_scope: String,
     pub(crate) search_results: Vec<SearchResult>,
@@ -288,7 +290,6 @@ pub struct App {
     pub(crate) choice_disabled: HashSet<String>,
     pub(crate) busy: bool,
     pub(crate) message: String,
-    message_until: Option<Instant>,
     pairing: Option<PairingServer>,
     pending_user_network: Option<actions::PendingUserNetwork>,
     pending_wide_navigation: i8,
@@ -426,6 +427,7 @@ impl App {
             page: 1,
             library_filter: 0,
             source_filter: 0,
+            source_management_from_catalog: false,
             catalog_filter: 0,
             history_filter: 0,
             sort_title: false,
@@ -449,6 +451,7 @@ impl App {
             ],
             available: Vec::new(),
             source_settings: Vec::new(),
+            source_settings_source: String::new(),
             query: String::new(),
             search_scope: "all".into(),
             search_results: Vec::new(),
@@ -479,7 +482,6 @@ impl App {
             choice_disabled: HashSet::new(),
             busy: false,
             message: String::new(),
-            message_until: None,
             pairing: None,
             pending_user_network: None,
             pending_wide_navigation: 0,
@@ -866,14 +868,6 @@ impl App {
             }
             changed = true;
         }
-        if self
-            .message_until
-            .is_some_and(|deadline| Instant::now() >= deadline)
-        {
-            self.message.clear();
-            self.message_until = None;
-            changed = true;
-        }
         if changed || self.background_ui_dirty {
             self.cancel_startup_cover_grace();
         }
@@ -1095,6 +1089,9 @@ impl App {
                 self.catalog_filter = self
                     .catalog_filter
                     .min(self.catalog_listings.len().saturating_sub(1) as i32);
+                if self.modal_context == "catalog-filter" {
+                    self.refresh_catalog_filter();
+                }
                 self.request_covers(&books)?;
             }
             JobResult::Detail { book, chapters } => {
@@ -1331,7 +1328,8 @@ impl App {
                         self.store.save_pages(&id, &pages)?;
                     }
                     if self.options.startup_options.import_thumbnail_idle {
-                        self.import_thumbnails.enqueue(&imported.book, Instant::now());
+                        self.import_thumbnails
+                            .enqueue(&imported.book, Instant::now());
                     }
                 }
                 self.invalidate_download_usage();
@@ -1354,7 +1352,6 @@ impl App {
             JobResult::Installed(source) => {
                 self.store.save_source(&source)?;
                 self.source_images_changed();
-                self.source_filter = 0;
                 self.notify(tr("saved"));
             }
             JobResult::SourcesInstalled { installed, errors } => {
@@ -1365,8 +1362,6 @@ impl App {
                 if installed_count > 0 {
                     self.source_images_changed();
                 }
-                self.source_filter = 0;
-                self.page = 1;
                 if errors.is_empty() {
                     self.notify(tr("saved"));
                 } else {
@@ -1383,7 +1378,7 @@ impl App {
                 }
             }
             JobResult::SourceOptionSaved(source) => {
-                let reopen = source.id == self.current_source
+                let reopen = source.id == self.source_settings_source
                     && matches!(self.route.as_str(), "sources" | "catalog")
                     && (self.modal_context == "source-settings"
                         || self.modal_context.starts_with("sourcevalue:"));
@@ -1395,7 +1390,7 @@ impl App {
             }
             JobResult::InteractionDone(message) => self.notify(message),
             JobResult::Settings(settings) => {
-                if context.source == self.current_source
+                if context.source == self.source_settings_source
                     && matches!(self.route.as_str(), "sources" | "catalog")
                     && self.modal_context == "source-settings-loading"
                 {
@@ -1628,8 +1623,24 @@ impl App {
 
     pub(crate) fn notify(&mut self, text: String) {
         self.message = text;
-        self.message_until = Some(Instant::now() + Duration::from_millis(2200));
     }
+
+    pub fn has_toast(&self) -> bool {
+        !self.message.is_empty() && self.modal.is_empty() && !self.suspended
+    }
+
+    /// Clear the toast as part of the next touch's result frame.
+    pub fn dismiss_toast(&mut self) {
+        if !self.has_toast() {
+            return;
+        }
+        self.message.clear();
+        if let Some(ui) = self.ui.upgrade() {
+            ui.global::<State>().set_message(Default::default());
+        }
+        self.platform.refresh(RefreshKind::Ui);
+    }
+
     fn show_error(&mut self, error: anyhow::Error) {
         eprintln!("aidoku: {error:#}");
         self.notify(format!("{}: {error}", tr("error")));
@@ -1692,7 +1703,8 @@ impl App {
         let media = self.platform.hardware_media_availability();
         snapshot["hardware_media_available"] = json!(media.available());
         snapshot["hardware_media_reason"] = json!(media.reason());
-        snapshot["hardware_acceleration"] = json!(media.available() && self.prefs.hardware_acceleration);
+        snapshot["hardware_acceleration"] =
+            json!(media.available() && self.prefs.hardware_acceleration);
         snapshot["native_media"] = json!(crate::native_media::statistics());
         snapshot["cache"] = json!(self.disk_cache.stats());
         snapshot["render_cache"] = json!(crate::render_cache::stats());
@@ -1978,6 +1990,7 @@ mod tests {
                 page: 1,
                 library_filter: 0,
                 source_filter: 0,
+                source_management_from_catalog: false,
                 catalog_filter: 0,
                 history_filter: 0,
                 sort_title: false,
@@ -2005,6 +2018,7 @@ mod tests {
                     Vec::new()
                 },
                 source_settings: Vec::new(),
+                source_settings_source: String::new(),
                 query: String::new(),
                 search_scope: "all".into(),
                 search_results: Vec::new(),
@@ -2035,7 +2049,6 @@ mod tests {
                 choice_disabled: HashSet::new(),
                 busy: false,
                 message: String::new(),
-                message_until: None,
                 pairing: None,
                 pending_user_network: None,
                 pending_wide_navigation: 0,
@@ -2228,6 +2241,62 @@ mod tests {
                     .collect::<Vec<_>>(),
                 ids
             );
+        }
+    }
+
+    #[test]
+    fn paperwhite_source_management_returns_to_the_open_catalog() {
+        let mut fixture = DemoRouteFixture::new("catalog", DeviceProfile::Pw5, true);
+        let source = fixture.app.current_source.clone();
+        fixture.app.dispatch("sources", "manage", "").unwrap();
+        assert_eq!(fixture.app.route, "sources");
+        fixture.app.dispatch("sources", "back", "").unwrap();
+        assert_eq!(fixture.app.route, "catalog");
+        assert_eq!(fixture.app.current_source, source);
+        fixture.app.dispatch("navigation", "open", "1").unwrap();
+        assert_eq!(fixture.app.route, "sources");
+        assert!(!fixture.app.source_management_from_catalog);
+    }
+
+    #[test]
+    fn native_server_draft_only_changes_the_configured_source_after_save() {
+        let mut fixture = DemoRouteFixture::new("sources", DeviceProfile::Pw5, false);
+        let draft_address = "http://configured.example.test/";
+        for confirm in [false, true] {
+            fixture
+                .app
+                .dispatch("sources", "preferences", "komga")
+                .unwrap();
+            assert_eq!(fixture.app.modal_context, "server-configuration");
+            fixture
+                .app
+                .dispatch("panel", "choose", "server-config:edit-address")
+                .unwrap();
+            fixture.app.keyboard.set_text(draft_address);
+            fixture.app.dispatch("keyboard", "done", "").unwrap();
+            assert_eq!(fixture.app.modal_context, "server-configuration");
+            assert!(
+                fixture
+                    .app
+                    .store
+                    .source("komga")
+                    .unwrap()
+                    .unwrap()
+                    .base_url
+                    .is_empty()
+            );
+            if confirm {
+                fixture
+                    .app
+                    .dispatch("panel", "choose", "server-config:save")
+                    .unwrap();
+            } else {
+                fixture.app.dispatch("panel", "close", "").unwrap();
+            }
+            let saved = fixture.app.store.source("komga").unwrap().unwrap();
+            assert_eq!(saved.base_url, if confirm { draft_address } else { "" });
+            assert_eq!(fixture.app.route, "sources");
+            assert_eq!(fixture.app.current_source, "mangadex");
         }
     }
 

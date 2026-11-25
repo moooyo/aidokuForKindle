@@ -70,7 +70,6 @@ impl App {
         }
         self.busy = false;
         self.message.clear();
-        self.message_until = None;
         if show_cover && self.sleep_cover_enabled() {
             self.show_sleep_cover()?;
             return Ok(true);
