@@ -80,11 +80,11 @@ pub fn observe(
             }
             reader_timing::startup_frame("startup_initial_frame_submitted", frame, None);
             if overlap && let Some(startup) = startup.upgrade() {
-                startup.borrow_mut().prepare_in_background();
-            }
-            if prepare_toolbar && frame.input_blocked {
-                platform
-                    .prepare_startup_toolbar(|| !bootstrap_lifecycle::display_activity_allowed());
+                let mut startup = startup.borrow_mut();
+                startup.prepare_in_background();
+                if prepare_toolbar && frame.input_blocked {
+                    startup.prepare_toolbar_in_background(&platform);
+                }
             }
             if prime_library
                 && frame.input_blocked

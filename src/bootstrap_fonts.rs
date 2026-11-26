@@ -263,11 +263,14 @@ mod tests {
                 )
             })
             .collect::<BTreeSet<_>>();
+        // The raw locale fallback is checked by font registration, not by
+        // the manifest of build-expanded gzip assets.
         let observed = BUNDLED_FONTS
             .iter()
+            .filter(|(family, _, _)| *family != LOCALE_FALLBACK_FAMILY)
             .map(|(_, _, bytes)| (format!("{:x}", Sha256::digest(bytes)), bytes.len() as u64))
             .collect::<BTreeSet<_>>();
-        assert_eq!(observed.len(), BUNDLED_FONTS.len());
+        assert_eq!(observed.len(), BUNDLED_FONTS.len() - 1);
         assert_eq!(observed, expected);
     }
 

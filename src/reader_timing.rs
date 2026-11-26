@@ -647,6 +647,39 @@ pub fn startup_transition(stage: StartupTransition) {
     }
 }
 
+#[cfg(feature = "startup-stage-diagnostics")]
+#[derive(Clone, Copy)]
+pub(crate) enum StartupToolbarStage {
+    ProbeBegin,
+    ProbeEnd,
+    FirstViewBegin,
+    FirstViewEnd,
+    SnapshotUsed,
+}
+
+#[cfg(feature = "startup-stage-diagnostics")]
+static STARTUP_TOOLBAR: [OnceLock<Option<u64>>; 5] = [const { OnceLock::new() }; 5];
+
+#[cfg(feature = "startup-stage-diagnostics")]
+pub(crate) fn startup_toolbar_stage(stage: StartupToolbarStage) {
+    STARTUP_TOOLBAR[stage as usize].get_or_init(boottime_us);
+}
+
+#[cfg(feature = "startup-stage-diagnostics")]
+fn write_startup_toolbar(output: &mut impl Write, submitted: u64) -> std::io::Result<()> {
+    let times = STARTUP_TOOLBAR.each_ref().map(|time| time.get().copied().flatten());
+    let [probe_begin, probe_end, view_begin, view_end, used] = times;
+    if let Some((view_begin, view_end)) = view_begin.zip(view_end) {
+        let stamp = |time: Option<u64>| time.map_or_else(|| "none".into(), |us| us.to_string());
+        writeln!(
+            output,
+            "aidoku: startup_toolbar_stage submitted_us={submitted} probe_begin_us={} probe_end_us={} view_begin_us={view_begin} view_end_us={view_end} snapshot_used={}",
+            stamp(probe_begin), stamp(probe_end), u8::from(used.is_some_and(|at| at <= view_end)),
+        )?;
+    }
+    Ok(())
+}
+
 fn write_startup_library_submitted(
     output: &mut impl Write,
     timestamp: u64,
@@ -693,7 +726,15 @@ fn emit_startup_library(
 ) {
     let timestamp = boottime_us();
     #[cfg(all(feature = "startup-draw-diagnostics", target_os = "linux"))]
-    slint_backend_kindle::draw_diagnostics::close();
+    {
+        use slint_backend_kindle::draw_diagnostics;
+        draw_diagnostics::close();
+        if measured && projection.1 && projection.2
+            && let Some(marker) = frame.marker
+        {
+            draw_diagnostics::arm_library_completion(frame.sequence, marker);
+        }
+    }
     let Some(timestamp) = timestamp else {
         return;
     };
@@ -706,6 +747,7 @@ fn emit_startup_library(
         let costs = measured.then(|| [frame.render, frame.settle, frame.write, frame.submit].map(micros));
         let mut line = Vec::with_capacity(512);
         if STARTUP_STAGES.write_transition(&mut line, timestamp, frame, costs).is_ok() {
+            let _ = write_startup_toolbar(&mut line, timestamp);
             #[cfg(all(feature = "startup-draw-diagnostics", target_os = "linux"))]
             if measured {
                 let _ = write_startup_draw(&mut line, timestamp, frame);

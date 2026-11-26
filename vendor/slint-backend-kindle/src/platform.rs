@@ -1190,6 +1190,13 @@ impl Platform for KindlePlatform {
                 };
                 input_checkpoint = Some(checkpoint);
                 self.frame_observer.checkpoint(checkpoint);
+                #[cfg(feature = "startup-draw-diagnostics")]
+                if let Some(marker) = checkpoint.marker
+                    && crate::draw_diagnostics::take_library_completion(checkpoint.frame_sequence, marker)
+                    && frame_buffer.wait_for_update_complete_checked().is_ok()
+                {
+                    crate::draw_diagnostics::library_completion(checkpoint.frame_sequence, marker);
+                }
             }
             if let Some(token) = sleep_token {
                 let receipt = sleep_submission.as_ref().ok_or_else(|| {

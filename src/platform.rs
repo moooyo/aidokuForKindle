@@ -14,6 +14,7 @@ pub use device_policy::{DevicePolicyCapabilities, DevicePolicyObservation};
 
 #[path = "platform_startup_toolbar.rs"]
 mod startup_toolbar;
+pub use startup_toolbar::StartupToolbarProbe;
 use startup_toolbar::{StartupToolbar, ViewStatus};
 
 #[cfg(all(feature = "kindle", target_os = "linux"))]
@@ -1180,19 +1181,31 @@ impl Platform {
         self.observe_status_with(|| native_status(&preferences))
     }
 
-    /// Sample only the first Library's display fields while the accepted panel update is in flight.
-    pub fn prepare_startup_toolbar(&self, cancelled: impl Fn() -> bool) {
-        #[cfg(all(feature = "kindle", target_os = "linux"))]
-        if self.kindle && !self.sleep_requested.get() && !cancelled() {
-            self.startup_toolbar
-                .borrow_mut()
-                .observe(|| startup_toolbar::query(&cancelled));
+    /// Admit the one-shot read without handing the worker any platform state.
+    pub fn begin_startup_toolbar_probe(&self) -> Option<StartupToolbarProbe> {
+        if self.kindle && !self.sleep_requested.get() {
+            self.startup_toolbar.borrow_mut().begin()
+        } else {
+            None
         }
-        #[cfg(not(all(feature = "kindle", target_os = "linux")))]
-        let _ = cancelled;
     }
 
     pub(crate) fn view_status(&self, library: bool) -> ViewStatus {
+        #[cfg(feature = "startup-stage-diagnostics")]
+        use crate::reader_timing::{StartupToolbarStage, startup_toolbar_stage};
+        #[cfg(feature = "startup-stage-diagnostics")]
+        if library && self.kindle {
+            startup_toolbar_stage(StartupToolbarStage::FirstViewBegin);
+        }
+        let status = self.read_view_status(library);
+        #[cfg(feature = "startup-stage-diagnostics")]
+        if library && self.kindle {
+            startup_toolbar_stage(StartupToolbarStage::FirstViewEnd);
+        }
+        status
+    }
+
+    fn read_view_status(&self, library: bool) -> ViewStatus {
         #[cfg(all(feature = "kindle", target_os = "linux"))]
         if library
             && self.kindle
@@ -1201,7 +1214,11 @@ impl Platform {
             && let Some(view) = self
                 .startup_toolbar
                 .borrow_mut()
-                .view(Instant::now(), native_local_status)
+                .view(
+                    Instant::now(),
+                    native_local_status,
+                    startup_toolbar::read_now,
+                )
         {
             return view;
         }
@@ -2279,11 +2296,17 @@ mod tests {
         platform
             .startup_toolbar
             .borrow_mut()
-            .observe(|| Some((false, 13)));
+            .begin()
+            .unwrap()
+            .observe(|| false, |_| Some((false, 13)));
         let expected = platform
             .startup_toolbar
             .borrow_mut()
-            .view(Instant::now(), || ("07:53".into(), 98))
+            .view(
+                Instant::now(),
+                || ("07:53".into(), 98),
+                || panic!("a fresh sample is available"),
+            )
             .unwrap();
         assert_eq!(ViewStatus::from(platform.cached_status()), expected);
         platform.begin_suspend().unwrap();
@@ -2292,9 +2315,11 @@ mod tests {
             platform
                 .startup_toolbar
                 .borrow_mut()
-                .view(Instant::now(), || panic!(
-                    "a parked status cannot be published fresh"
-                )),
+                .view(
+                    Instant::now(),
+                    || panic!("a parked status cannot be published fresh"),
+                    || panic!("a parked status cannot be queried"),
+                ),
             None
         );
     }

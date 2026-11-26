@@ -62,7 +62,32 @@ enum Window {
     Attempts(u8),
 }
 
-thread_local! { static WINDOW: Cell<Window> = const { Cell::new(Window::Closed) }; }
+thread_local! {
+    static WINDOW: Cell<Window> = const { Cell::new(Window::Closed) };
+    static LIBRARY_COMPLETION: Cell<Option<(u64, u32)>> = const { Cell::new(None) };
+}
+
+/// The application arms this synchronously from the accepted Library callback.
+pub fn arm_library_completion(sequence: u64, marker: u32) {
+    LIBRARY_COMPLETION.set(Some((sequence, marker)));
+}
+
+pub(crate) fn take_library_completion(sequence: u64, marker: u32) -> bool {
+    LIBRARY_COMPLETION.take() == Some((sequence, marker))
+}
+
+/// The driver acknowledged the exact marker, not independently observed ink.
+pub(crate) fn library_completion(sequence: u64, marker: u32) {
+    let mut time = MaybeUninit::<libc::timespec>::uninit();
+    // SAFETY: the kernel fills the timespec only on success.
+    if unsafe { libc::clock_gettime(libc::CLOCK_BOOTTIME, time.as_mut_ptr()) } == 0 {
+        let time = unsafe { time.assume_init() };
+        if let (Ok(seconds), Ok(nanos)) = (u64::try_from(time.tv_sec), u64::try_from(time.tv_nsec)) {
+            let us = seconds * 1_000_000 + nanos / 1_000;
+            eprintln!("aidoku: startup_library_wait boottime_us={us} sequence={sequence} marker={marker}");
+        }
+    }
+}
 
 pub fn permit_managed_start() {
     WINDOW.set(Window::PendingScene);
@@ -109,6 +134,16 @@ impl Before {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn library_completion_requires_the_same_accepted_frame_and_is_one_shot() {
+        arm_library_completion(4, 7);
+        assert!(!take_library_completion(4, 8));
+        assert!(!take_library_completion(4, 7));
+        arm_library_completion(4, 7);
+        assert!(take_library_completion(4, 7));
+        assert!(!take_library_completion(4, 7));
+    }
 
     #[test]
     fn a_managed_scene_can_sample_at_most_eight_draw_attempts() {

@@ -211,6 +211,24 @@ impl Startup {
         }
     }
 
+    /// Read optional radio/power fields while the accepted loading frame settles.
+    pub fn prepare_toolbar_in_background(&mut self, platform: &Platform) {
+        if self.ready || self.failed || !crate::bootstrap_lifecycle::startup_speculation_allowed() {
+            return;
+        }
+        if let Some(probe) = platform.begin_startup_toolbar_probe() {
+            // Failure to start this optional worker leaves the narrow synchronous
+            // projection available. Shutdown owns any successfully spawned job.
+            let _ = self.spawn("aidoku-toolbar", false, move |cancelled, _, _| {
+                probe.run(|| {
+                    cancelled.load(Ordering::Acquire)
+                        || !crate::bootstrap_lifecycle::startup_speculation_allowed()
+                });
+                Ok(())
+            });
+        }
+    }
+
     /// Only register immutable, delivered faces while the accepted full frame
     /// settles. In particular, never attach the controller (which applies native
     /// lighting), wait for a worker or dispatch inputs from this checkpoint.
@@ -457,12 +475,12 @@ impl Startup {
             .cover_warm
             .clone()
             .map(|(limit, closed)| (limit, closed, Instant::now() + Duration::from_millis(300)));
-        self.spawn("aidoku-fonts", |cancelled, sender, wake| {
+        self.spawn("aidoku-fonts", true, |cancelled, sender, wake| {
             Fonts::prepare_faces(cancelled, |face| {
                 publish(sender, wake, StartupEvent::Font(face))
             })
         })?;
-        self.spawn("aidoku-startup", move |cancelled, sender, wake| {
+        self.spawn("aidoku-startup", true, move |cancelled, sender, wake| {
             if cancelled.load(Ordering::Acquire) {
                 return Ok(());
             }
@@ -498,6 +516,7 @@ impl Startup {
     fn spawn(
         &mut self,
         name: &str,
+        required: bool,
         work: impl FnOnce(&AtomicBool, &Sender<StartupEvent>, &StartupWake) -> Result<()>
         + Send
         + 'static,
@@ -520,7 +539,11 @@ impl Startup {
                 if let Some(error) = error
                     && !cancelled.load(Ordering::Acquire)
                 {
-                    let _ = publish(&sender, &wake, StartupEvent::Failed(error));
+                    if required {
+                        let _ = publish(&sender, &wake, StartupEvent::Failed(error));
+                    } else {
+                        eprintln!("aidoku: optional startup toolbar probe failed: {error}");
+                    }
                 }
                 let _ = completed.send(());
             })
