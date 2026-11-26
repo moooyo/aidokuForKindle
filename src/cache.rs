@@ -2300,6 +2300,8 @@ fn reconcile(root: &Path, state: &mut CacheState) -> Result<()> {
     state.database.execute_batch("BEGIN IMMEDIATE")?;
     let result = (|| -> Result<()> {
         cleanup_process_files(root, &state.database)?;
+        // Empty caches need no artifact lookup; prepare on the first valid leaf.
+        let mut indexed_artifact = None;
         for kind in [Kind::Raw, Kind::Processed] {
             for bucket in fs::read_dir(root.join(kind.name()))? {
                 let bucket = bucket?;
@@ -2329,11 +2331,15 @@ fn reconcile(root: &Path, state: &mut CacheState) -> Result<()> {
                         continue;
                     }
                     let id = cache_id(kind, key);
-                    let indexed = state.database.query_row(
-                        "SELECT EXISTS(SELECT 1 FROM artifacts WHERE id=?1)",
-                        [&id],
-                        |row| row.get::<_, bool>(0),
-                    )?;
+                    let statement = match &mut indexed_artifact {
+                        Some(statement) => statement,
+                        empty => empty.insert(
+                            state
+                                .database
+                                .prepare("SELECT EXISTS(SELECT 1 FROM artifacts WHERE id=?1)")?,
+                        ),
+                    };
+                    let indexed = statement.query_row([&id], |row| row.get::<_, bool>(0))?;
                     if indexed {
                         continue;
                     }
@@ -3804,6 +3810,71 @@ mod tests {
         assert_eq!(cache.stats().pinned_entries, 1);
         cache.unpin_owners(&["download:keep".into()]).unwrap();
         assert_eq!(cache.stats().pinned_entries, 0);
+    }
+
+    #[test]
+    fn reconciliation_reuses_the_lookup_across_indexed_and_unindexed_leaves() {
+        let directory = tempfile::tempdir().unwrap();
+        let cache = manager(&directory, 4096);
+        let root = cache.inner.root.clone();
+        let raw_page = page("reconcile-indexed-raw");
+        let raw = publish(&cache, &raw_page, b"indexed raw", None);
+        cache.set_alias("reconcile-raw", &raw).unwrap();
+        let processed_key = render("reconcile-indexed-processed");
+        let write = cache.begin_processed(&processed_key, 20).unwrap();
+        fs::write(write.temp_path(), b"indexed processed").unwrap();
+        let processed = write.commit().unwrap();
+        cache.set_alias("reconcile-processed", &processed).unwrap();
+
+        let pinned_page = page("reconcile-unindexed-pinned");
+        let pinned = publish(&cache, &pinned_page, b"pinned", Some("download:reconcile"));
+        let pinned_id = cache_id(Kind::Raw, &CacheManager::page_key(&pinned_page));
+        let invalidated_page = page("reconcile-indexed-invalid");
+        let invalidated = publish(
+            &cache,
+            &invalidated_page,
+            b"invalidated",
+            Some("download:invalidated"),
+        );
+        cache.invalidate_raw(&invalidated_page).unwrap();
+        cache
+            .lock()
+            .unwrap()
+            .database
+            .execute("DELETE FROM artifacts WHERE id=?1", [&pinned_id])
+            .unwrap();
+        let unindexed_raw = generated_path(&root, Kind::Raw, &"a".repeat(64), true).unwrap();
+        let unindexed_processed =
+            generated_path(&root, Kind::Processed, &"a".repeat(64), true).unwrap();
+        for path in [&unindexed_raw, &unindexed_processed] {
+            fs::write(path, b"orphan").unwrap();
+        }
+        let unrelated = root.join("processed/aa/notes.txt");
+        fs::write(&unrelated, b"keep").unwrap();
+        drop(cache);
+
+        let cache = manager(&directory, 4096);
+        assert_eq!(cache.lookup_alias("reconcile-raw").unwrap(), Some(raw));
+        assert_eq!(
+            cache.lookup_alias("reconcile-processed").unwrap(),
+            Some(processed)
+        );
+        assert_eq!(fs::read(&pinned).unwrap(), b"pinned");
+        assert_eq!(fs::read(&invalidated).unwrap(), b"invalidated");
+        assert!(cache.lookup_raw(&pinned_page).unwrap().is_none());
+        assert!(cache.lookup_raw(&invalidated_page).unwrap().is_none());
+        let repaired = cache
+            .lock()
+            .unwrap()
+            .load_entry(&pinned_id)
+            .unwrap()
+            .unwrap();
+        assert_eq!(repaired.size, 6);
+        assert!(!repaired.valid);
+        assert!(!unindexed_raw.exists() && !unindexed_processed.exists());
+        assert_eq!(fs::read(&unrelated).unwrap(), b"keep");
+        assert_eq!(cache.stats().pinned_entries, 2);
+        assert_totals_match_index(&cache);
     }
 
     #[test]
