@@ -1,0 +1,125 @@
+diff --git a/src/bootstrap_metrics.rs b/src/bootstrap_metrics.rs
+index 2bb9e75..6f7bb02 100644
+--- a/src/bootstrap_metrics.rs
++++ b/src/bootstrap_metrics.rs
+@@ -81,7 +81,7 @@ pub fn observe(
+             reader_timing::startup_frame("startup_initial_frame_submitted", frame, None);
+             if overlap && let Some(startup) = startup.upgrade() {
+                 let mut startup = startup.borrow_mut();
+-                startup.prepare_in_background();
++                startup.prepare_in_background(prime_library && frame.input_blocked);
+                 if prepare_toolbar && frame.input_blocked {
+                     startup.prepare_toolbar_in_background(&platform);
+                 }
+diff --git a/src/bootstrap_startup.rs b/src/bootstrap_startup.rs
+index 9860c21..ea09059 100644
+--- a/src/bootstrap_startup.rs
++++ b/src/bootstrap_startup.rs
+@@ -197,12 +197,12 @@ impl Startup {
+         }
+     }
+ 
+-    /// Only dormant application services and immutable font bytes are prepared here.
+-    pub fn prepare_in_background(&mut self) {
++    /// Start dormant application preparation without waiting for it.
++    pub fn prepare_in_background(&mut self, direct_bundled_fonts: bool) {
+         if self.ready || self.failed || self.cancelled.load(Ordering::Acquire) {
+             return;
+         }
+-        if let Err(error) = self.start_workers() {
++        if let Err(error) = self.start_workers(direct_bundled_fonts) {
+             let _ = publish(
+                 &self.sender,
+                 &self.wake,
+@@ -310,7 +310,7 @@ impl Startup {
+             if platform.is_kindle() {
+                 aidoku_kindle::reader_timing::mark("startup_feedback_submitted");
+             }
+-            self.start_workers()?;
++            self.start_workers(false)?;
+             self.started = true;
+         }
+         self.collect_preparation()?;
+@@ -460,7 +460,7 @@ impl Startup {
+         });
+     }
+ 
+-    fn start_workers(&mut self) -> Result<()> {
++    fn start_workers(&mut self, direct_bundled_fonts: bool) -> Result<()> {
+         if self.workers_started {
+             return Ok(());
+         }
+@@ -475,11 +475,17 @@ impl Startup {
+             .cover_warm
+             .clone()
+             .map(|(limit, closed)| (limit, closed, Instant::now() + Duration::from_millis(300)));
+-        self.spawn("aidoku-fonts", true, |cancelled, sender, wake| {
+-            Fonts::prepare_faces(cancelled, |face| {
+-                publish(sender, wake, StartupEvent::Font(face))
+-            })
+-        })?;
++        if direct_bundled_fonts {
++            // These are static ELF slices. Deliver the descriptors before the
++            // bounded registration turn instead of racing a thread for them.
++            Fonts::prepare_faces(&self.cancelled, |face| self.fonts.accept(face))?;
++        } else {
++            self.spawn("aidoku-fonts", true, |cancelled, sender, wake| {
++                Fonts::prepare_faces(cancelled, |face| {
++                    publish(sender, wake, StartupEvent::Font(face))
++                })
++            })?;
++        }
+         self.spawn("aidoku-startup", true, move |cancelled, sender, wake| {
+             if cancelled.load(Ordering::Acquire) {
+                 return Ok(());
+@@ -645,6 +651,50 @@ mod tests {
+         .expect("headless startup projection")
+     }
+ 
++    #[test]
++    fn direct_bundled_faces_are_available_without_waiting_for_a_worker() -> Result<()> {
++        std::thread::spawn(|| -> Result<()> {
++            use slint::platform::software_renderer::{MinimalSoftwareWindow, RepaintBufferType};
++            slint::platform::set_platform(Box::new(TestDisplay(MinimalSoftwareWindow::new(
++                RepaintBufferType::ReusedBuffer,
++            ))))?;
++            let ui = AppWindow::new()?;
++            ui.global::<State>().set_booting(true);
++            let dir = tempfile::tempdir()?;
++            let profile = DeviceProfile::Scribe;
++            let options = AppOptions {
++                data_dir: dir.path().into(),
++                startup_options: Default::default(),
++                demo: false,
++                offline: true,
++                initial_screen: "library".into(),
++                landscape: false,
++                resume: false,
++            };
++            let mut startup = Startup::new(&ui, options, profile, None, 2, 0);
++            startup.prepare_in_background(true);
++            assert_eq!(startup.handles.len(), 1, "only metadata uses a worker");
++            assert!(startup.fonts.can_register_next());
++            startup.prime_available_fonts(&ui, || false)?;
++            assert!(!startup.fonts_registered);
++            let remaining_checks = Cell::new(2usize);
++            startup.prime_available_fonts(&ui, || {
++                let left = remaining_checks.get();
++                remaining_checks.set(left.saturating_sub(1));
++                left > 0
++            })?;
++            assert!(!startup.fonts_registered && startup.fonts.can_register_next());
++            assert!(ui.global::<State>().get_booting() && !startup.started);
++            startup.cancel();
++            startup.prime_available_fonts(&ui, || true)?;
++            assert!(!startup.fonts_registered);
++            assert!(startup.finish());
++            Ok(())
++        })
++        .join()
++        .expect("headless font delivery")
++    }
++
+     #[test]
+     fn startup_attachment_requires_a_new_native_send_and_a_yielded_turn() {
+         let mut scene = FirstScene {

@@ -17,6 +17,9 @@ evidence. Use its stable scene IDs when planning interface changes.
 
 ## Current development follow-up
 
+See the [current startup handoff](HANDOFF.md) for the latest verified Kindle
+state, first-Library-frame results and next firmware experiment.
+
 Version 0.1.3 uses one BiliComics-style startup scene, removes the exit animation,
 and keeps Reader controls on readable light surfaces in night mode. Native Gray8
 encoding distinguishes normal and inverted scanout without changing canonical

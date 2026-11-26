@@ -1,8 +1,40 @@
 # Handoff: Kindle Library startup and reopening
 
+## Start here: 2026-11-26 (Asia/Shanghai)
+
+**Resume item 3: check whether an initialized Library can be ready before the
+loading frame is drawn.** The current Kindle daily install is Aidoku 0.1.3
+from `97173d0`, not the R3 build discussed below. This handoff changes no
+runtime code or installation. The direct-frame path is not implemented.
+
+1. **Font delivery: closed, rejected.** Four alternating Scribe foreground
+   pairs showed a 19.353 ms median paired regression to the same-frame
+   driver acknowledgement despite earlier font registration. The code was
+   reverted; the patch and all ten visits are archived for reference only.
+2. **Launcher attribution: closed, no change.** On the same control batch,
+   the foreground request to Rust entry took 498 ms at the median; the
+   portrait transaction took 300 ms and display takeover 95 ms. Do not remove
+   the power, orientation, display or touch checks or the background watchdog.
+3. **Direct Library feasibility: pending.** In the firmware probe with a
+   synthetic Library that still needed initialization, the early Scribe
+   metadata was ready 1.221 s after loading SEND. PW6's early arm passed;
+   its baseline failed the framebuffer-difference check. Both guests exited
+   and cleaned up. The SSH agent refused subsequent connections before the
+   initialized-fixture follow-up, which is the next experiment to run.
+
+Open the [resume procedure, results and archived tools](docs/review/startup-sequenced-20261126/README.md#resume-item-3-on-test-env).
+The first two items used an isolated **foreground launcher**, not a stock
+Library card click; no current card-to-screen time or optical settling time
+was measured. The physical Scribe batch restored the original state, removed
+its files and verified release. Item 3 used only disposable firmware guests;
+there is no Aidoku lease to recover or resume. Any later physical work must
+coordinate a fresh lease immediately before device commands.
+
 ## Start here: 2026-11-22 (Asia/Shanghai)
 
-**Current decision: keep the daily R3, existing Library paper fill and glyph cache.** A new [ordinary-card draw-accounting study](docs/review/startup-release-draw-20261122/README.md) measured **2.960 s** at the card-to-complete-Library median (one warmup excluded, three formal openings). The first business draw was **623.075 ms elapsed** at the median, but only **96.852 ms of GUI CPU**; the median within-visit CPU share was **15.6%**. All three draws recorded 140 major faults. The elapsed difference is not a measured I/O or scheduler delay; these visits unpacked a new executable file each time. In the separate [release Gray8 A/B](docs/review/startup-release-draw-20261122/composition/README.md), removing a provable 4.18 / 1.87 MB redundant fill did not speed up either layout. Do not add a second [glyph cache](docs/review/startup-release-draw-20261122/glyph/README.md). Keep the new optional same-frame logger; the tested diagnostic was not installed. All four independent leases were returned and the last release was at **07:36:47**. The next discriminating comparison is [ordinary opens with controlled executable identity](docs/review/startup-release-draw-20261122/device/INTERPRETATION.md), not a speculative renderer rewrite or blanket prefetch.
+**Historical record. Follow the November 26 handoff above, not the R3 actions below.**
+
+**Decision at the time: keep the daily R3, existing Library paper fill and glyph cache.** A new [ordinary-card draw-accounting study](docs/review/startup-release-draw-20261122/README.md) measured **2.960 s** at the card-to-complete-Library median (one warmup excluded, three formal openings). The first business draw was **623.075 ms elapsed** at the median, but only **96.852 ms of GUI CPU**; the median within-visit CPU share was **15.6%**. All three draws recorded 140 major faults. The elapsed difference is not a measured I/O or scheduler delay; these visits unpacked a new executable file each time. In the separate [release Gray8 A/B](docs/review/startup-release-draw-20261122/composition/README.md), removing a provable 4.18 / 1.87 MB redundant fill did not speed up either layout. Do not add a second [glyph cache](docs/review/startup-release-draw-20261122/glyph/README.md). Keep the new optional same-frame logger; the tested diagnostic was not installed. All four independent leases were returned and the last release was at **07:36:47**. The next discriminating comparison is [ordinary opens with controlled executable identity](docs/review/startup-release-draw-20261122/device/INTERPRETATION.md), not a speculative renderer rewrite or blanket prefetch.
 
 **WeRead protection baseline — November 22, 07:42:22 Asia/Shanghai (WeRead operator report).** After Aidoku's 07:36:47 return, WeRead reported that all 38 deployed public files matched on readback and its ordinary stock card opened the existing grid Library. It restored native state, removed its staging files, closed its connections and released its original lease. The reported sizes are **95,228,264 bytes** for `/mnt/us/weread/app/weread` and **137,236 bytes** for `/mnt/us/weread/launch.sh`. The original `/mnt/us/documents/weread.sh` remains **43,102 bytes**; the two WeRead helpers, Aidoku and the shared entry were reported unchanged. Aidoku did not independently inspect the device. Neither project's return is a claim of current availability.
 
