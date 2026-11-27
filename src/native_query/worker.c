@@ -62,11 +62,12 @@ static int write_all(const void *buffer, size_t length) {
 
 static int reply(unsigned char opcode, unsigned char status,
                  const void *value, size_t length) {
-    const unsigned char header[4] = {
+    if (length > MAX_VALUE) return -1;
+    unsigned char frame[4 + MAX_VALUE] = {
         opcode, status, (unsigned char)(length >> 8), (unsigned char)length
     };
-    if (write_all(header, sizeof(header)) != 0) return -1;
-    return length == 0 ? 0 : write_all(value, length);
+    if (length != 0) memcpy(frame + 4, value, length);
+    return write_all(frame, 4 + length);
 }
 
 static void *load_api(struct lipc_api *api) {
