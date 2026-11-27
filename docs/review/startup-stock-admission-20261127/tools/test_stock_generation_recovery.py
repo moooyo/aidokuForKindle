@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
 """Run the integrated shell and host protocol against private Linux fixtures."""
 
+from contextlib import contextmanager
 from datetime import datetime, timedelta, timezone
+import fcntl
 import io
 import json
 import os
@@ -495,6 +497,13 @@ number() { case "$1" in ''|*[!0-9]*) return 1;; esac; }
                 d.expect('finalize','FINALIZED')
 
 
+@contextmanager
+def fixture_operation_lock(path):
+    with path.open('ab') as guard:
+        fcntl.flock(guard, fcntl.LOCK_EX | fcntl.LOCK_NB)
+        yield
+
+
 class HostFaults(unittest.TestCase):
     def fixture(self, kind, faults=(), *, timeout=800, replies=None):
         tmp = tempfile.TemporaryDirectory(prefix='stock-gen-host-')
@@ -530,7 +539,7 @@ class HostFaults(unittest.TestCase):
         if 'foreign_lease_busy' in faults:
             other = lease.LeaseRequest(base['LEASE'], root/'foreign-owner.token', 'fixture-other', 'fixture-other')
             lease.acquire(other)
-            self.addCleanup(lambda: lease.release(other, native_restored_and_connections_closed=True))
+            self.addCleanup(lease.release, other, native_restored_and_connections_closed=True)
         if faults & {'invalid_release_receipt', 'release_interrupted'}:
             release = lease.release
             def release_with_fixture_fault(*args, **kwargs):
@@ -540,6 +549,20 @@ class HostFaults(unittest.TestCase):
             lease.release = release_with_fixture_fault
         if 'queued' in faults:
             (root/'queued').touch()
+
+        def operation_lock():
+            return fixture_operation_lock(attempts/'fixture-operation.lock')
+
+        def assert_device_locked(operation):
+            def perform(*args, **kwargs):
+                with self.assertRaises(BlockingIOError), operation_lock():
+                    pass
+                return operation(*args, **kwargs)
+            return perform
+
+        lease.acquire = assert_device_locked(lease.acquire)
+        lease.status = assert_device_locked(lease.status)
+        lease.release = assert_device_locked(lease.release)
 
         def factory(request, operations):
             def exchange(action, seconds, *, payload=None, space=0, boot='-'):
@@ -568,6 +591,10 @@ class HostFaults(unittest.TestCase):
                 if action == 'close' and 'close_not_observed_by_device' in faults:
                     operations.append({'action':action,'status':'timeout','refusals':[]})
                     return 'timeout', b''
+                if action == 'finalize' and ('finalize_always_busy' in faults or
+                        ('finalize_busy' in faults and sent.count('finalize') == 1)):
+                    operations.append({'action':action,'status':1,'refusals':['operation_running']})
+                    return 1, b'partial' if 'finalize_partial' in faults else b''
                 p=d.call(action,boot)
                 status, data = p.returncode, p.stdout
                 if action+'-lost' in faults:
@@ -594,6 +621,8 @@ class HostFaults(unittest.TestCase):
 
         def decode(raw, mode):
             self.assertFalse(base['LEASE'].exists(), 'Do not decode while owning the lease')
+            with operation_lock():
+                pass  # The OS lock must also be free before decoding.
             decode_count.append(mode)
             if raw.startswith(b'bad sample'):
                 raise ValueError('malformed_returned_evidence')
@@ -603,7 +632,8 @@ class HostFaults(unittest.TestCase):
 
         def operate(recover=False):
             return RUN['operate'](attempts, attempt, kind, d.script.read_bytes(), d.payload,500,base,lease,factory,decode,
-                                  recover=recover,not_after=datetime.now(timezone.utc)+timedelta(seconds=timeout))
+                                  operation_lock=operation_lock, recover=recover,
+                                  not_after=datetime.now(timezone.utc)+timedelta(seconds=timeout))
         return d, attempt, base['LEASE'], sent, decode_count, operate, faults
 
     def test_clean_visit_hands_back_before_decoding(self):
@@ -625,6 +655,73 @@ class HostFaults(unittest.TestCase):
         self.assertEqual(decoded,[])
         self.assertFalse(lock.exists())
         self.assertEqual((d.root/'clicks').read_text(),'one click\n')
+
+    def test_shared_operation_lock_busy_touches_neither_owner_lease_nor_device(self):
+        _, attempt, lease, sent, decoded, operate, _ = self.fixture('locator')
+        with fixture_operation_lock(attempt.parent/'fixture-operation.lock'):
+            with self.assertRaises(BlockingIOError):
+                operate()
+        self.assertFalse(lease.exists() or (attempt/'owner.token').exists())
+        self.assertFalse((attempt.parent/'locator-sent.json').exists())
+        self.assertEqual((sent, decoded), ([], []))
+
+    def test_hard_timeout_closeout_requires_exact_readback_and_never_resends_input(self):
+        for exact in (True, False):
+            with self.subTest(state_restored_before_kill=exact):
+                d, a, lease, sent, decoded, operate, _ = self.fixture('measure')
+                write(d.root/'after-open-view', HOME)
+                script = d.script.read_text()
+                d.script.write_text(replace(script, 'OMP_THREAD_LIMIT=1 timeout -s KILL 13 ',
+                                            'OMP_THREAD_LIMIT=1 timeout -s KILL 1 '))
+                helper = d.input_kit/'card-input'
+                anchor = ('        printf \'library %s %s\\n\' "$2" "$3" >"$model/native-view"\n' if exact else
+                          '        printf \'nav-library\\n\' >>"$model/events"\n')
+                body = r'''        trap '' TERM
+        printf '%s\n' "$$" >"$model/blocked-helper"
+        exec sleep 15
+'''
+                helper.write_text(replace(helper.read_text(), anchor, anchor+body))
+                report = operate()
+                self.assertEqual((d.root/'clicks').read_text(), 'one click\n')
+                killed_pid = int((d.root/'blocked-helper').read_text())
+                self.assertFalse(Path(f'/proc/{killed_pid}').exists(), 'Timed-out input helper still exists')
+                self.assertEqual(report['sample_count'], 0)
+                self.assertFalse(report['complete'])
+                self.assertEqual(decoded, [])
+                self.assertEqual(d.inputs(), ['nav-library', 'restore-pointer'] if exact else ['nav-library'])
+                self.assertEqual(report['recovery_required'], not exact, report)
+                self.assertEqual(lease.exists(), not exact)
+                with fixture_operation_lock(a.parent/'fixture-operation.lock'):
+                    pass  # The OS lock is returned even if the recovery record remains.
+                if exact:
+                    self.assertEqual(sent, ['admit','reserve','run','readback','confirm-close','finalize','absent'])
+                    self.assertEqual(report['operations'][3]['readback_state'], 'exact')
+                    self.assertTrue(report['release']['lease_directory_absent_after_release'])
+                    self.assertFalse(d.state.exists() or d.stage.exists())
+                else:
+                    self.assertEqual(sent, ['admit','reserve','run','readback'])
+                    self.assertFalse((a/'released.json').exists())
+                    self.assertEqual(d.view.read_bytes(), HOME)
+                    self.assertEqual((d.state/'input-restore-intent').read_text(), 'home library 10 20\n')
+                    self.assertTrue(operate(recover=True)['recovery_required'])
+                    self.assertEqual(sent, ['admit','reserve','run','readback','readback'])
+                    self.assertEqual(d.inputs(), ['nav-library'])
+
+    def test_finalize_retries_only_an_exact_busy_refusal_and_still_proves_absence(self):
+        for fault, accepted, count in ((('finalize_busy',), True, 2),
+                                       (('finalize_busy','finalize_partial'), False, 1),
+                                       (('finalize_always_busy',), False, 2)):
+            with self.subTest(fault=fault):
+                d, a, lease, sent, decoded, operate, _ = self.fixture('measure', fault)
+                report = operate()
+                self.assertEqual(sent, ['admit','reserve','run']+['finalize']*count+(['absent'] if accepted else []))
+                self.assertEqual(report['complete'], accepted, report)
+                self.assertEqual(report['recovery_required'], not accepted, report)
+                self.assertEqual(lease.exists(), not accepted)
+                self.assertEqual((a/'released.json').exists(), accepted)
+                self.assertEqual(decoded, ['measure'] if accepted else [])
+                self.assertEqual((d.root/'clicks').read_text(), 'one click\n')
+                self.assertEqual(d.state.exists() or d.stage.exists(), not accepted)
 
     def test_exact_reserve_refusal_before_mutation_releases_without_polling_native(self):
         for kind in ('locator', 'measure'):

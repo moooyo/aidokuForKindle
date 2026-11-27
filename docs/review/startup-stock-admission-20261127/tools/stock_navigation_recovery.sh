@@ -41,8 +41,10 @@ stock_restore_input_ready() {
 
 stock_restore_input() (
     kit=$stage/input
+    # Keep FD 9 in the input helper until it exits, even if its parent is lost.
+    # BusyBox's monitor can also retain it briefly; closeout must wait for it.
     stock_restore_input_ready && regular "$kit/card-input" && regular "$kit/lib/ld-linux-armhf.so.3" &&
-        DISPLAY=:0 OMP_THREAD_LIMIT=1 timeout -k 1 12 "$kit/lib/ld-linux-armhf.so.3" --inhibit-cache --library-path "$kit/lib" \
+        DISPLAY=:0 OMP_THREAD_LIMIT=1 timeout -s KILL 13 "$kit/lib/ld-linux-armhf.so.3" --inhibit-cache --library-path "$kit/lib" \
             "$kit/card-input" "$@" >/dev/null
 )
 

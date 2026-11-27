@@ -1,0 +1,51 @@
+{
+  "source": "f3e5070577e74a29552f772491edac660ec62a53",
+  "diagnostic": "launcher-generation-v1",
+  "operator": "stock-admission-v3",
+  "host": "test-env",
+  "physical_access": false,
+  "physical_lease_acquired": false,
+  "accepted_physical_timing_samples": 0,
+  "locator_sealed_and_preflighted": true,
+  "locator_unused": true,
+  "real_measure_payload_staged": false,
+  "historical_frame_used_as_live_guard": false,
+  "shared_operation_lock_scope_verified": true,
+  "firmware_timeout_abi_profiles": [
+    "scribe-5.19.5",
+    "scribe-5.20.1",
+    "pw6-5.20.1"
+  ],
+  "verified_boundaries": {
+    "direct_kill_ends_term_ignoring_target": true,
+    "failed_native_query_stdout_does_not_authorize_navigation": true,
+    "read_only_timeout_monitor_does_not_hold_the_device_journal_lock": true,
+    "input_timeout_monitor_retires_within_the_two_second_settle_bound": true,
+    "timed_out_input_is_not_sent_again": true,
+    "exact_readback_can_close_timed_out_repair_with_independent_absence": true,
+    "unrestored_timeout_retains_durable_owner_record_and_releases_os_lock": true,
+    "only_exact_pre_cleanup_busy_refusal_allows_one_finalization_retry": true,
+    "busy_operation_lock_opens_no_device_connection": true,
+    "stale_v2_plan_or_changed_navigation_is_refused": true
+  },
+  "integrated_checks": {
+    "phase": 4,
+    "recovery": 46,
+    "sealing": 3,
+    "transport": 4,
+    "native": 3,
+    "firmware-timeout": 3,
+    "admission": 7
+  },
+  "integrated_total": 70,
+  "minimum_dispatch_seconds": {
+    "locator": 327,
+    "measure": 671
+  },
+  "additional_checks": {
+    "launcher_generation": 13,
+    "directory_lock": 5
+  },
+  "total_checks": 88,
+  "verification_scope": "Linux failure fixtures, isolated ARM Xvfb navigation and firmware BusyBox under QEMU user mode; no full-firmware boot or fresh physical visit"
+}

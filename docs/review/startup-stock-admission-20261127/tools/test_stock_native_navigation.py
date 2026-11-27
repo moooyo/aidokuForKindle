@@ -51,8 +51,8 @@ class ArmNavigation(unittest.TestCase):
         native = replace(native, 'state=/var/tmp/aidoku-native-$label', 'state=$FIXTURE/state')
         start, end = native.index('native() {'), native.index('probe() {')
         native = native[:start]+'native() { same "$state/owner" "$label" && same "$stage/owner" "$label"; }\n'+native[end:]
-        native = replace(native, 'native && timeout -k 1 12 "$kit/lib/ld-linux-armhf.so.3"',
-                         'native && timeout -k 1 12 qemu-arm -cpu cortex-a9 "$kit/lib/ld-linux-armhf.so.3"')
+        native = replace(native, 'native && timeout -s KILL 13 9<&- "$kit/lib/ld-linux-armhf.so.3"',
+                         'native && timeout -s KILL 13 9<&- qemu-arm -cpu cortex-a9 "$kit/lib/ld-linux-armhf.so.3"')
         (kit/'navigation.sh').write_text(native)
         runtime = ROOT/'tooling'
         # Only the loader and card-input must pass the production regular-file
@@ -66,8 +66,8 @@ class ArmNavigation(unittest.TestCase):
             (kit/leaf).chmod(0o700)
         (kit/'models').symlink_to(runtime/'models')
         recovery = (ROOT/'stock_navigation_recovery.sh').read_text(encoding='ascii')
-        recovery = replace(recovery, 'DISPLAY=:0 OMP_THREAD_LIMIT=1 timeout -k 1 12',
-                           'OMP_THREAD_LIMIT=1 timeout -k 1 12 qemu-arm -cpu cortex-a9')
+        recovery = replace(recovery, 'DISPLAY=:0 OMP_THREAD_LIMIT=1 timeout -s KILL 13',
+                           'OMP_THREAD_LIMIT=1 timeout -s KILL 13 qemu-arm -cpu cortex-a9')
         fence = (ROOT/'stock_lock_fence.sh').read_text(encoding='ascii')
         self.script = self.root/'case.sh'
         self.script.write_text(r'''#!/bin/sh

@@ -9,8 +9,8 @@ import runpy
 
 
 HERE = Path(__file__).resolve().parent
-private_path = runpy.run_path(str(HERE/'stock_private_inputs.py'))['private_path']
-SOURCE = 'f3e5070577e74a29552f772491edac660ec62a53'
+RUNNER = runpy.run_path(str(HERE/'run_stock_generation.py'))
+private_path, SOURCE, DIAGNOSTIC, OPERATOR = (RUNNER[key] for key in ('private_path', 'SOURCE', 'DIAGNOSTIC', 'OPERATOR'))
 
 
 def analyze(attempt):
@@ -18,7 +18,8 @@ def analyze(attempt):
         raise ValueError('Expected a closed attempt in this workspace')
     receipt = json.loads((attempt/'result.json').read_bytes())
     release = json.loads((attempt/'released.json').read_bytes())
-    if not (receipt['source'] == SOURCE and receipt['mode'] == 'measure' and receipt['complete'] is True
+    if not (receipt['source'] == SOURCE and receipt['diagnostic'] == DIAGNOSTIC and receipt['operator'] == OPERATOR
+            and receipt['mode'] == 'measure' and receipt['complete'] is True
             and receipt['published_program_identical'] is True and receipt['run_status'] == 0
             and receipt['closeout'] == 'restored' and receipt['recovery_required'] is False and receipt['release'] == release
             and release['state'] == 'released' and all(release[k] is True for k in (
@@ -39,7 +40,8 @@ def analyze(attempt):
                                      prior['SOURCE']/'assets/startup', observer['XS'], observer['YS'])
     if loading is None:
         raise ValueError('No unique loading-frame match in the private trace')
-    return {'source': SOURCE, 'scope': 'One normal-card visit with the temporary launcher-only trace', 'release': release,
+    return {'source': SOURCE, 'operator': OPERATOR, 'scope': 'One normal-card visit with the temporary launcher-only trace',
+            'release': release,
             'no_optical_result': True, 'observer': observation, 'shelf': row['library'],
             **stages['attribute'](row, loading), 'launcher_breakdown': row['launcher_breakdown'],
             'generation_breakdown': row['generation_breakdown']}

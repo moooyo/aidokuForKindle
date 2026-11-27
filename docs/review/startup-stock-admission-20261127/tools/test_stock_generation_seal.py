@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Rehearse the complete measurement packer without creating a live guard."""
 
+import io
 import json
 import os
 from pathlib import Path
@@ -28,6 +29,20 @@ class SealingTests(unittest.TestCase):
         with self.assertRaises((ValueError, FileNotFoundError)):
             RUN['verify_locator'](HERE)
         self.assertFalse((HERE/'measure').exists())
+
+    def test_retired_operator_artifacts_do_not_authorize_a_new_visit(self):
+        with tempfile.TemporaryDirectory(prefix='stock-retired-plan-fixture-') as directory:
+            root = Path(directory)
+            (root/'locator-qualified.json').write_text(json.dumps({
+                'qualified': True, 'locator_attempt': 'attempt-'+'1'*16,
+                'source': RUN['SOURCE'], 'diagnostic': RUN['DIAGNOSTIC'],
+            }))
+            with self.assertRaisesRegex(ValueError, 'invalid_locator_qualification'):
+                RUN['verify_locator'](root)
+            old = root/'device.sh'
+            old.write_bytes((HERE/'measure-template.sh').read_bytes().replace(b'stock-admission-v3', b'stock-admission-v2'))
+            with self.assertRaisesRegex(ValueError, 'wrong_device_template'):
+                RUN['script_at'](old, 'measure')
 
     def test_full_measurement_envelope_in_disposable_directory_only(self):
         frame, = (p for p in private_path('historical_fixture').glob('attempt-*/locator.frame') if (p.parent/'released').is_file()
@@ -61,7 +76,28 @@ class SealingTests(unittest.TestCase):
             self.assertNotIn(b'card-input',nav)
             self.assertNotIn(b'move_to',nav)
             self.assertIn(b'[ "$operation" = inspect ] || fail operation',nav)
-            self.assertIn(b'native && timeout -k 1 12',nav)
+            self.assertIn(b'timeout -s KILL 2 /bin/true',source)
+            self.assertIn(b'timeout -s KILL 13 "$kit/lib/ld-linux-armhf.so.3"',source)
+            self.assertEqual(nav.count(b'timeout -s KILL 3 '),3)
+            self.assertIn(b'native && timeout -s KILL 13 9<&- "$kit/lib/ld-linux-armhf.so.3"',nav)
+            self.assertEqual(nav.count(b'9<&-'),4)
+            self.assertNotIn(b'timeout -k',source+nav)
+            corrupt = root/'other-framed-payload'
+            with frame_path.open('rb') as original, corrupt.open('wb') as patched:
+                self.assertEqual(original.read(len(source)), source)
+                patched.write(source)
+                with tarfile.open(fileobj=original, mode='r|gz') as old, tarfile.open(fileobj=patched, mode='w|gz') as new:
+                    for entry in old:
+                        if entry.name == 'input/navigation.sh':
+                            # Keep the correct length and roster, but alter one deadline.
+                            data = nav.replace(b'timeout -s KILL 13 ', b'timeout -s KILL 99 ')
+                            self.assertNotEqual(data, nav)
+                            new.addfile(entry, io.BytesIO(data))
+                        else:
+                            new.addfile(entry, old.extractfile(entry) if entry.isreg() else None)
+            corrupt.replace(frame_path)
+            with self.assertRaisesRegex(ValueError, 'changed_measure_navigation'):
+                RUN['check_plan'](root, 'measure')
         self.assertFalse((HERE/'measure').exists())
         self.assertFalse((HERE/'fresh-artwork.guard').exists())
 

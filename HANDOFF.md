@@ -2,14 +2,14 @@
 
 ## Start here: 2026-11-28 (Asia/Shanghai)
 
-**Paused by the user for continuation in another session.** The Aidoku ready
-entry was withdrawn. There is no Aidoku lease, open Kindle connection, or
-native cleanup to complete. The last qualified locator package is unused on
-`test-env`; this batch has not sent locator or measurement commands, and no
-measurement package is sealed. This is not a statement that the shared device
-is currently free. Obtain current authorization and a coordinated handoff
-before any new device commands; do not inherit an older approval, slot or
-lease token.
+**Offline work only since the last handback.** The v2 locator found one whole
+Aidoku card without input. The separate v2 measurement stopped at read-only
+admission with `timeout_selftest_failed`: no upload, launcher mount, card
+opening or sample. Both visits were independently released; the last handback
+was at 03:24:35 Asia/Shanghai on November 28. No Aidoku lease, connection or
+cleanup remains. Do not retry the v2 workspace. The v3 locator on `test-env`
+is a new, unused plan; it has no live guard or measurement payload. Obtain
+fresh authorization and a coordinated handback before any device commands.
 
 **The last independently verified Scribe daily install is Aidoku 0.1.3 from
 `f3e5070`.** It includes `97173d0` (background toolbar reads), `83cac53`
@@ -17,29 +17,29 @@ lease token.
 query response write). The last change was explicitly approved despite
 missing its performance screen. The installed GUI and launcher did not
 change in that delivery; both query helper copies and KPM metadata were
-verified. This handoff archives diagnostic sources only, not a new product
+verified. The current changes are diagnostic tooling only, not a new product
 build, startup optimization, or deployment. See the [delivery receipt](docs/review/startup-stock-admission-20261127/evidence/f3e5070-delivery.json).
 
 **Next experiment:** get one accepted ordinary-card Scribe sample with
-`launcher-generation-v1` and `stock-admission-v2`. The temporary launcher
-probe passed on both firmware profiles. The archive passed [82 off-device
-checks](docs/review/startup-stock-admission-20261127/evidence/archive-verification.json),
-including 64 integrated operator checks.
-An older measurement opened the card but failed native closeout; the original
-owner restored and released it. The next measurement was refused during
-read-only admission, before upload, overlay or input. It was independently
-released. Both yielded **zero accepted timing samples**; the older refusal
-still does not identify a failed admission predicate.
+`launcher-generation-v1` and `stock-admission-v3`. The [same-version firmware
+replay](docs/review/startup-stock-admission-20261127/evidence/timeout-abi-20261128.json)
+reproduced the latest refusal: Scribe 5.19.5 BusyBox rejects `timeout -k`.
+The updated operator uses one direct-process KILL deadline on all tested
+firmware. It refuses failed state queries even if stdout looks plausible,
+and does not retry input after a timeout. [88 checks passed on `test-env`](docs/review/startup-stock-admission-20261127/evidence/stock-admission-v3-qualification.json),
+including the three original firmware applets and interrupted closeout. No v3
+physical access or timing sample exists. Older unclassified refusals remain
+unclassified.
 
-1. Read the [experiment archive](docs/review/startup-stock-admission-20261127/README.md)
-   and use its host-only resume procedure. Recheck that the private locator
-   is unused and that its source still matches the installation to be tested.
-2. Follow the [ready queue](docs/review/startup-stock-admission-20261127/READY_QUEUE.md):
-   announce ready only with approval and complete material, acquire the same
-   shared lease just before commands, and verify return immediately. First
-   take one no-input locator from the native Library. Release before
-   classifying its fresh frame or sealing the measurement. When ready again,
-   use a new lease; open the ordinary card at most once and only after
+1. Use the [host-only v3 resume procedure](docs/review/startup-stock-admission-20261127/README.md#resume-off-device-first).
+   Recheck that the private locator is unused and its reference installation
+   still applies. Never use the earlier v2 frame or package as the live guard.
+2. Follow the [ready queue](docs/review/startup-stock-admission-20261127/READY_QUEUE.md).
+   Announce ready only with approval and complete material. The actual
+   operator takes the shared OS lock immediately before the owner/token lease.
+   First take one no-input locator from the native Library. Verify return
+   before classifying its fresh frame or sealing the measurement. When ready
+   again, use a new lease; open the ordinary card at most once and only after
    admission. If either visit is refused, stop and retain the precise reason.
 3. Evaluate only a same-visit, closed and independently released sample. The
    historical 150–170 ms preparation stage is actionable only if it

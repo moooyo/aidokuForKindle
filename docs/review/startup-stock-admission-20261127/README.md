@@ -2,10 +2,39 @@
 
 This diagnostic archive accompanies the [current handoff](../../../HANDOFF.md).
 The last verified Scribe daily development delivery is [`f3e5070`](evidence/f3e5070-delivery.json).
-`stock-admission-v2` is test tooling only; it is not part of the installed
-launcher, helper or GUI. No Scribe `f3e5070` ordinary-card timing sample has
-been accepted. No schedule, authorization or shared lease is transferred by
-this document.
+`stock-admission-v3` is test tooling only; it is not part of the installed
+launcher, helper or GUI. It supersedes the archived `stock-admission-v2`
+operator for fresh plans. No Scribe `f3e5070` ordinary-card timing sample
+has been accepted. No schedule, authorization or shared lease is transferred
+by this document.
+
+## Timeout correction and handback: November 28
+
+The v2 locator found one whole official card without input. The separate
+measurement was refused at read-only admission with `timeout_selftest_failed`;
+it staged no files, mounted no launcher, and opened no card. Both visits were
+independently released. The [timeout replay](evidence/timeout-abi-20261128.json)
+reproduces the refusal using Amazon's Scribe 5.19.5 build 479432: BusyBox
+1.34.1 does not accept `-k`, unlike the two original 5.20.1 test images.
+
+V3 uses one syntax for all checked firmware: `timeout -s KILL`. It bounds the
+actual property query, status, OCR or input process, never an intervening
+shell with children. The short self-test still has a two-second deadline;
+property and status commands have three seconds, and the ARM helpers have
+thirteen, the original outer kill bounds. Do not remove the read-only self-test
+or use TERM alone. Do not trust stdout from a failed state query. Read-only
+watchdogs cannot retain the device journal descriptor. Input keeps that
+protection, and an exact busy refusal before finalization can wait two seconds
+and retry the cleanup once. There is no retry for uncertain cleanup or input.
+Only exact independent readback can complete a timed-out input repair;
+otherwise the durable owner/token record blocks new visits. The OS operation
+lock is released when the timed-out batch exits even if that record remains.
+
+The host runner loads the approved cross-project `device_lock.py` on
+`test-env`. The same process holds it from owner/token acquire or recovery through
+device cleanup and verified release, not through evidence decoding. Preflight
+loads the module without taking the lock. The old v2 workspace remains an
+archive; a v3 measurement requires its own v3 locator and newly sealed guard.
 
 ## What the evidence says
 
@@ -34,7 +63,7 @@ this document.
   was refused at read-only admission before upload, overlay or a card
   opening. Its release was verified; the failure predicate remains unknown.
   Neither result becomes a sample after verified handback.
-- The [latest operator qualification](evidence/stock-admission-qualified.json)
+- The [historical v2 operator qualification](evidence/stock-admission-qualified.json)
   and [fixture results](evidence/stock-admission-fixtures.log) record 63
   off-device checks: six admission, 42 recovery/custody, four transport,
   four typed phase, two sealing, three ARM native-navigation and two firmware
@@ -51,15 +80,14 @@ this document.
 
 ## Resume off-device first
 
-The operator is paused. The previously announced ready entry was withdrawn.
-On `test-env`, the owner's private state directory
-`$HOME/.local/state/aidoku-stock-admission-20261127` holds `resume.json` (the
-verified private workspace pointer and pause status) and `inputs.json` (lab
-bindings). They contain neither a credential nor an authorization. Do not
-copy them into Git or print their contents in chat. The previously staged
-locator is unused; there is no measurement payload or live guard for that
-workspace. A missing workspace is a reason to rebuild and preflight a fresh
-plan, not to dispatch a historical frame or reuse an earlier attempt.
+No ready entry is active. On `test-env`, the owner's private state directory
+`$HOME/.local/state/aidoku-stock-admission-20261127` holds `resume-v3.json`
+(the unused v3 locator workspace pointer) and `inputs.json` (lab bindings).
+`resume.json` still identifies the historical v2 workspace. None of these
+records contains a credential or an authorization. Do not copy them into Git
+or print their contents in chat. The v3 workspace has no measurement payload
+or live guard. A missing workspace is a reason to rebuild and preflight a
+fresh plan, not to dispatch a historical frame or reuse an earlier attempt.
 
 After syncing `main`, use the configured SSH agent and start with a host-only
 check on `test-env`. The code is meant to run in the private work directory,
@@ -68,7 +96,7 @@ not in the checkout. Read these values locally and do not echo private paths:
 ```sh
 state="$HOME/.local/state/aidoku-stock-admission-20261127"
 export AIDOKU_STOCK_INPUTS="$state/inputs.json"
-work=$(python3 -I -c 'import json,sys; print(json.load(open(sys.argv[1]))["workspace"])' "$state/resume.json")
+work=$(python3 -I -c 'import json,sys; print(json.load(open(sys.argv[1]))["workspace"])' "$state/resume-v3.json")
 python3 -I "$work/run_stock_generation.py" preflight locator
 ```
 
@@ -80,17 +108,18 @@ an old receipt or relax the comparisons; the retained plan no longer applies.
 
 When the user authorizes continuation, follow the [ready queue](READY_QUEUE.md).
 A single explicit approval can include the locator and one conditional
-opening. Report ready only with approval and complete material, take a fresh
-lease just before commands, and verify release immediately. First run the
-no-input locator from an already active native Library: no wake, pointer,
-page/tab action or launcher mount. The later offline `seal` step requires its
-closed fresh frame, checks unambiguous Library and one whole official card,
-and tests the match independently with the ARM selector. Only then preflight
-`measure` and announce ready again; there is no reservation while sealing.
+opening. Report ready only with approval and complete material. The runner
+holds the cross-project OS lock while acquiring and using the owner/token
+record; verify release immediately. First run the no-input locator from an
+already active native Library: no wake, pointer, page/tab action or launcher
+mount. The offline `seal` step requires its own v3 closed fresh frame, checks
+unambiguous Library and one whole official card, and tests the match with the
+ARM selector. Only then preflight `measure` and announce ready again; there
+is no reservation while sealing.
 
 The physical runner takes the approved expiry and per-visit budget through
 `--approval-expires` and `--max-visit-seconds`. The respective minimums are
-299 and 641 seconds, including bounded recovery, not booked slots. It also
+327 and 671 seconds, including bounded recovery, not booked slots. It also
 requires an explicit `--confirmed-one-physical-visit` and the private stdin
 credential transport; do not put credentials in command arguments or source.
 A busy lease opens no connection. On a refusal, stop: do not wake, navigate,
@@ -127,15 +156,19 @@ Run `test_stock_admission.py`, `test_stock_generation_recovery.py`,
 Pass the retained `phase_records.py` to `test_generation_phase_records.py`.
 `test_generation_probe.py` takes the repository root at `f3e5070` for its
 13 targeted launcher checks; `test_stock_lock_fence.py` exercises a real
-Linux flock with a removed or replaced journal directory. The ARM input simulation needs the existing
-OCR/library kit on an isolated Xvfb display; the timeout tests take the two
-firmware applets from the local images and run them under QEMU. These are not
-new full firmware or physical visits. The final `qualify_stock_operator.py`
+Linux flock with a removed or replaced journal directory. The ARM input
+simulation uses the existing OCR/library kit on an isolated Xvfb display.
+Run `test_stock_timeout_abi.py` through `ubuntu-run` with three firmware
+sets under `tooling/firmware-timeout`: `scribe-5.19.5`, `scribe-5.20.1`, and
+`pw6-5.20.1`. Each contains its original `busybox`, `ld-linux-armhf.so.3`
+and required libraries, with the two ELF programs executable. This replays
+firmware ash, timeout, true and sleep under QEMU user mode; it is not a full
+firmware startup or physical visit. The final `qualify_stock_operator.py`
 requires the seven integrated suites' real logs and regenerated templates.
-The archived qualification is historical documentation, not the preflight or
-approval for a different payload. The archived reports contain aggregates
-and refusal/release states, not raw frames, traces, device identities or lease
-credentials.
+The [v3 qualification](evidence/stock-admission-v3-qualification.json) is
+historical evidence, not the preflight or approval for a different payload.
+The archived reports contain aggregates and refusal/release states, not raw
+frames, traces, device identities or lease credentials.
 
 ## Choose the next experiment from a valid sample
 

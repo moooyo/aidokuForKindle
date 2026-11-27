@@ -180,6 +180,48 @@ class AdmissionTests(unittest.TestCase):
             m.stub_timeout('printf "unexpected stdout\\n"; exit 0')
             self.refuse(m,'timeout_selftest_failed')
 
+    def test_read_only_navigation_rejects_failed_queries_with_plausible_stdout(self):
+        prepare = FIXTURE['PREPARE']
+        original = (prepare['private_path']('classifier')/'navigation.sh').read_bytes()
+        generated = prepare['measure_navigation'](original).decode('ascii')
+        with tempfile.TemporaryDirectory(prefix='stock-timed-query-') as directory:
+            root = Path(directory)
+            for name in ('state', 'stage'):
+                (root/name).mkdir()
+                (root/name/'owner').write_text(LABEL+'\n')
+            commands = root/'bin'
+            commands.mkdir()
+            timeout = commands/'timeout'
+            timeout.write_text(r'''#!/bin/sh
+[ ! -e /proc/$$/fd/9 ] && [ "$1 $2 $3" = '-s KILL 3' ] || exit 92
+case "$*" in
+    *'lipc-get-prop -s com.lab126.powerd state') query=power; printf 'active\n';;
+    *'lipc-get-prop -s com.lab126.appmgrd activeApp') query=app; printf 'com.lab126.KPPMainApp\n';;
+    *'status statusbar') query=bar; printf 'statusbar start/running\n';;
+    *) exit 93;;
+esac
+printf '%s\n' "$query" >>"$FIXTURE/queries"
+[ "$query" != "$FAULT" ] || exit 137
+''')
+            timeout.chmod(0o700)
+            script = root/'navigation.sh'
+            generated = FIXTURE['replace'](generated, 'stage=/mnt/us/.aidoku-native-$label', 'stage=$FIXTURE/stage')
+            generated = FIXTURE['replace'](generated, 'state=/var/tmp/aidoku-native-$label', 'state=$FIXTURE/state')
+            # None of the three truncated queries may reach the WM guard or OCR.
+            generated = FIXTURE['replace'](generated, '    pids=$(pidof awesome)',
+                                          '    printf "reached\\n" >"$FIXTURE/unexpected"\n    pids=$(pidof awesome)')
+            script.write_text(generated)
+            for failure, expected in (('power', ('power',)), ('app', ('power', 'app')), ('bar', ('power', 'app', 'bar'))):
+                with self.subTest(failure=failure):
+                    (root/'queries').unlink(missing_ok=True)
+                    env = dict(os.environ, PATH=f'{commands}:{os.environ["PATH"]}', FIXTURE=directory, FAULT=failure)
+                    result = subprocess.run(['/bin/sh', '-c', 'exec 9<"$FIXTURE/state"; exec /bin/sh "$@"',
+                                             'fixture', str(script), 'inspect', LABEL], env=env,
+                                            capture_output=True, timeout=8)
+                    self.assertEqual((result.returncode, result.stdout, result.stderr), (1, b'', b'refused stock_tabs\n'))
+                    self.assertEqual(tuple((root/'queries').read_text().splitlines()), expected)
+                    self.assertFalse((root/'unexpected').exists())
+
     def test_boot_reads_require_one_full_typed_line(self):
         for kind in ('locator','measure'):
             m = self.fixture(kind)

@@ -24,7 +24,8 @@ _private = runpy.run_path(str(HERE/'stock_private_inputs.py'))
 private_path, device_hostname = (_private[k] for k in ('private_path', 'device_hostname'))
 SOURCE = 'f3e5070577e74a29552f772491edac660ec62a53'
 DIAGNOSTIC = 'launcher-generation-v1'
-OPERATOR = 'stock-admission-v2'
+OPERATOR = 'stock-admission-v3'
+OPERATION_LOCK_MODULE = Path('/usr/local/lib/kindle-physical/device_lock.py')
 KINDS = ('locator', 'measure')
 COMMON_TOOLS = ('flock', 'usleep', 'cmp', 'stat', 'readlink', 'gzip', 'base64', 'sqlite3')
 MEASURE_TOOLS = ('mount', 'umount', 'timeout')
@@ -47,9 +48,12 @@ TIMEOUT = {'admit': 20, 'reserve': 20, 'close': 34, 'readback': 20, 'confirm-clo
            'finalize': 25, 'absent': 20}
 REPAIR_TIMEOUT = 94  # Bound exit + native restore and up to five guarded navigation operations.
 RUN_TIMEOUT = {'locator': 115, 'measure': 281}
-SETTLE = 1
+# A firmware timeout monitor can briefly retain the input helper's inherited
+# journal FD after the helper exits. Give its one-second probe time to retire.
+SETTLE = 2
 READBACK_BUDGET = 2*TIMEOUT['readback'] + SETTLE
-FINALIZE_BUDGET = TIMEOUT['finalize'] + TIMEOUT['absent'] + 20
+FINALIZE_IO_BUDGET = 2*TIMEOUT['finalize'] + SETTLE + TIMEOUT['absent']
+FINALIZE_BUDGET = FINALIZE_IO_BUDGET + 20
 AFTER_REPAIR_BUDGET = 2*READBACK_BUDGET + TIMEOUT['confirm-close'] + FINALIZE_BUDGET
 CLOSE_BUDGET = {
     'locator': 2*TIMEOUT['close'] + SETTLE + FINALIZE_BUDGET,
@@ -116,6 +120,10 @@ def check_plan(root, kind):
                 (name in shared|measure_leaves or re.fullmatch(r'input/(?:lib|models)/[A-Za-z0-9_.+-]+|input/(?:native-target|card-input)', name)),
                 'unexpected_payload_file')
     allowed_dirs = {'fixture/imports'} | {p.as_posix() for name in roster for p in PurePosixPath(name).parents if p != PurePosixPath('.')}
+    if kind == 'measure':
+        prepare = runpy.run_path(str(HERE/'prepare_stock_generation.py'))
+        base = runpy.run_path(str(private_path('base_runner')))
+        navigation = prepare['measure_navigation'](base['stock_input']()['input/navigation.sh'])
     seen, files = set(), set()
     with payload.open('rb') as stream:
         require(stream.read(len(source)) == source, 'changed_framed_device_source')
@@ -134,6 +142,8 @@ def check_plan(root, kind):
                     require(archive.extractfile(member).read() == plain(root/'diagnostic-launch.sh'), 'changed_scoped_launcher')
                 if member.name == 'input/artwork.guard':
                     require(archive.extractfile(member).read() == plain(root/'fresh-artwork.guard', 2_000_000), 'changed_artwork_guard')
+                if kind == 'measure' and member.name == 'input/navigation.sh':
+                    require(archive.extractfile(member).read() == navigation, 'changed_measure_navigation')
     require(files == roster.keys(), 'incomplete_payload')
     text = plain(home/'space-kib', 16)
     require(re.fullmatch(rb'[1-9][0-9]{0,5}\n', text) is not None, 'bad_space_budget')
@@ -146,7 +156,7 @@ def verify_locator(root):
     proof = load(root/'locator-qualified.json')
     name = proof.get('locator_attempt', '')
     require(ATTEMPT.fullmatch(name) and proof == {'qualified': True, 'locator_attempt': name, 'source': SOURCE,
-                                                 'diagnostic': DIAGNOSTIC}, 'invalid_locator_qualification')
+                                                 'diagnostic': DIAGNOSTIC, 'operator': OPERATOR}, 'invalid_locator_qualification')
     make = runpy.run_path(str(root/'prepare_stock_generation.py'))
     observed = make['locator_receipt'](root, root/name)
     require(observed.is_file() and not observed.is_symlink(), 'missing_fresh_card_observation')
@@ -179,6 +189,24 @@ def pin(base):
     askpass = private_path('askpass')
     require(askpass.is_file() and os.access(askpass, os.X_OK), 'unexpected_password_adapter')
     return argv
+
+
+def load_operation_lock():
+    # Use the same host module as the other Kindle projects, never a private
+    # substitute. Do not let the workspace or PYTHONPATH select the lock.
+    path = OPERATION_LOCK_MODULE
+    require(path.resolve(strict=True) == path, 'invalid_shared_operation_lock_module')
+    info = path.lstat()
+    require(stat.S_ISREG(info.st_mode) and info.st_uid == 0 and info.st_nlink == 1
+            and not info.st_mode & 0o022, 'invalid_shared_operation_lock_module')
+    for parent in path.parents:
+        info = parent.lstat()
+        require(stat.S_ISDIR(info.st_mode) and info.st_uid == 0 and not info.st_mode & 0o022,
+                'invalid_shared_operation_lock_module')
+    module = runpy.run_path(str(path))
+    require(callable(module['operation_lock']) and issubclass(module['DeviceBusy'], Exception),
+            'invalid_shared_operation_lock_module')
+    return module
 
 
 def ssh_transport(lease, request, argv, source, kind, label, env, operations):
@@ -315,7 +343,8 @@ def untouched_reserve(attempt, kind, label, boot):
     return True
 
 
-def operate(root, attempt, kind, source, payload, space, base, lease, exchange_factory, decoder, *, recover=False, not_after=None):
+def operate(root, attempt, kind, source, payload, space, base, lease, exchange_factory, decoder, *, operation_lock,
+            recover=False, not_after=None):
     # Serialize the same attempt before inspecting lease ownership or its
     # mutable intent. Never unlink this lock while the attempt can be opened.
     path = attempt/'operator.lock'
@@ -331,7 +360,7 @@ def operate(root, attempt, kind, source, payload, space, base, lease, exchange_f
         named = path.lstat()
         require((identity.st_dev, identity.st_ino) == (named.st_dev, named.st_ino), 'attempt_operator_lock_replaced')
         return operate_locked(root, attempt, kind, payload, space, base, lease, exchange_factory, decoder,
-                              recover=recover, not_after=not_after)
+                              operation_lock=operation_lock, recover=recover, not_after=not_after)
     finally:
         os.close(fd)
 
@@ -347,7 +376,8 @@ def rejected_run_evidence(attempt, raw, report, restored_line):
     return result is not None
 
 
-def operate_locked(root, attempt, kind, payload, space, base, lease, exchange_factory, decoder, *, recover, not_after):
+def operate_locked(root, attempt, kind, payload, space, base, lease, exchange_factory, decoder, *, operation_lock,
+                   recover, not_after):
     label = ATTEMPT.fullmatch(attempt.name)[1]
     owner = f'aidoku-stock-generation-{label}'
     request = lease.LeaseRequest(base['LEASE'], attempt/'owner.token', owner, owner)
@@ -393,115 +423,124 @@ def operate_locked(root, attempt, kind, payload, space, base, lease, exchange_fa
         save(path, intent)
         return True
 
-    try:
-        if recover:
-            require(lease.status(request)['ownership_verified'] is True, 'same_owner_recovery_not_verified')
-            held = True
-            # Stay fail-closed even if a malformed durable journal cannot be read.
-            mutate = mutable_path.exists() or mutable_path.is_symlink()
-            if mutate:
-                require(journal_matches(root, attempt, kind), 'mutable_journal_belongs_to_another_attempt')
-                boot = load(boot_record)['boot_id']
-                require(type(boot) is str and BOOT.fullmatch(boot.encode('ascii')), 'invalid_admitted_boot')
-        else:
-            with payload.open('rb') as wire:
-                require_budget(TIMEOUT['admit'])
-                with base['block_interrupts']():
-                    try:
-                        lease.acquire(request)
-                    except Exception as exc:
-                        details = getattr(exc, 'details', {})
-                        creation = ('lease_directory_created', 'private_token_created', 'owner_record_created')
-                        if all(details.get(key) is False for key in creation):
-                            if getattr(exc, 'code', None) == 'lease_exists':
-                                report['equipment_busy'] = True
-                        else:
-                            report['partial_acquire'] = True
-                            try:
-                                held = lease.status(request)['ownership_verified'] is True
-                            except Exception:
-                                pass
-                        raise
-                    held = True
-                # The CLI's off-lease check may precede another successful
-                # dispatch. The authoritative lease now serializes this check
-                # with all possible writers of the one-use intent.
-                unsent_plan(root, kind)
-                _, offered = perform('admit', TIMEOUT['admit'], space=space)
-                require(operations[-1]['admission_state'] == 'passed', 'read_only_admission_failed')
-                boot = offered[:-1].rsplit(b' ', 1)[-1].decode('ascii')
-                save(boot_record, {'boot_id': boot})
-                require_budget(TIMEOUT['reserve'] + RUN_TIMEOUT[kind] + CLOSE_BUDGET[kind])
-                # Mark potential mutation even if an interrupt lands during
-                # the fsync: no unsafe release on an uncertain local journal.
-                mutate = True
-                send_journal(root, attempt, kind)
-                perform('reserve', TIMEOUT['reserve'], space=space, boot=boot)
-                reserved = operations[-1]
-                require(reserved['admission_state'] == 'passed', 'reservation_not_acknowledged')
-                require_budget(RUN_TIMEOUT[kind] + CLOSE_BUDGET[kind])
-                save(attempt/'run-intent.json', {'mode': kind, 'run_may_have_been_sent': True})
-                status, raw = perform('run', RUN_TIMEOUT[kind], payload=wire, space=space, boot=boot)
-                positive = type(status) is int and 0 <= status < 255 and has_terminal(raw, entry('RESTORED'))
-    except (Exception, KeyboardInterrupt) as exc:
-        report['error'] = base['safe_reason'](exc)
-        if recover and not held:
-            report['unresolved_recovery'] = True
-    finally:
-        if held:
-            try:
-                with base['block_interrupts']():
-                    refused_before_reserve = False
-                    if mutate:
-                        require(journal_matches(root, attempt, kind) and type(boot) is str and
-                                BOOT.fullmatch(boot.encode('ascii')) and load(boot_record) == {'boot_id':boot}, 'mutable_intent_not_durable')
-                        # Persist a fully validated refusal here, with signals
-                        # blocked, even if interrupted just after the reply.
-                        if operations and operations[-1]['action'] == 'reserve' and operations[-1].get('admission_state') == 'refused':
-                            save(attempt/'reserve-refused.json', untouched_reserve_proof(kind, label, boot, operations[-1]['admission_reason']))
-                        refused_before_reserve = untouched_reserve(attempt, kind, label, boot)
-                    if mutate and not refused_before_reserve:
-                        receipt = attempt/'positive-device-closeout.json'
-                        proof = {'outcome':'restored', 'mode':kind, 'label':label, 'source':SOURCE, 'boot_id':boot}
-                        if receipt.exists() or receipt.is_symlink():
-                            require(load(receipt) == proof, 'wrong_saved_native_restoration')
-                            positive = True
-                        if not positive and kind == 'measure':
-                            positive = close_measure(perform, operations, entry, boot, begin_repair)
-                        elif not positive:
-                            for turn in range(2):
-                                code, restored = perform('close', TIMEOUT['close'], boot=boot)
-                                if code == 0 and restored == entry('RESTORED'):
-                                    positive = True
-                                    break
-                                if turn or operations[-1].get('refusals') not in (['operation_running'], ['no_owned_journal']):
-                                    break
+    # Keep one host lock from legacy acquire through device cleanup and release.
+    # Evidence decoding and reporting below run after the OS lock is closed.
+    with operation_lock():
+        try:
+            if recover:
+                require(lease.status(request)['ownership_verified'] is True, 'same_owner_recovery_not_verified')
+                held = True
+                # Stay fail-closed even if a malformed durable journal cannot be read.
+                mutate = mutable_path.exists() or mutable_path.is_symlink()
+                if mutate:
+                    require(journal_matches(root, attempt, kind), 'mutable_journal_belongs_to_another_attempt')
+                    boot = load(boot_record)['boot_id']
+                    require(type(boot) is str and BOOT.fullmatch(boot.encode('ascii')), 'invalid_admitted_boot')
+            else:
+                with payload.open('rb') as wire:
+                    require_budget(TIMEOUT['admit'])
+                    with base['block_interrupts']():
+                        try:
+                            lease.acquire(request)
+                        except Exception as exc:
+                            details = getattr(exc, 'details', {})
+                            creation = ('lease_directory_created', 'private_token_created', 'owner_record_created')
+                            if all(details.get(key) is False for key in creation):
+                                if getattr(exc, 'code', None) == 'lease_exists':
+                                    report['equipment_busy'] = True
+                            else:
+                                report['partial_acquire'] = True
+                                try:
+                                    held = lease.status(request)['ownership_verified'] is True
+                                except Exception:
+                                    pass
+                            raise
+                        held = True
+                    # The CLI's off-lease check may precede another successful
+                    # dispatch. The authoritative lease now serializes this check
+                    # with all possible writers of the one-use intent.
+                    unsent_plan(root, kind)
+                    _, offered = perform('admit', TIMEOUT['admit'], space=space)
+                    require(operations[-1]['admission_state'] == 'passed', 'read_only_admission_failed')
+                    boot = offered[:-1].rsplit(b' ', 1)[-1].decode('ascii')
+                    save(boot_record, {'boot_id': boot})
+                    require_budget(TIMEOUT['reserve'] + RUN_TIMEOUT[kind] + CLOSE_BUDGET[kind])
+                    # Mark potential mutation even if an interrupt lands during
+                    # the fsync: no unsafe release on an uncertain local journal.
+                    mutate = True
+                    send_journal(root, attempt, kind)
+                    perform('reserve', TIMEOUT['reserve'], space=space, boot=boot)
+                    reserved = operations[-1]
+                    require(reserved['admission_state'] == 'passed', 'reservation_not_acknowledged')
+                    require_budget(RUN_TIMEOUT[kind] + CLOSE_BUDGET[kind])
+                    save(attempt/'run-intent.json', {'mode': kind, 'run_may_have_been_sent': True})
+                    status, raw = perform('run', RUN_TIMEOUT[kind], payload=wire, space=space, boot=boot)
+                    positive = type(status) is int and 0 <= status < 255 and has_terminal(raw, entry('RESTORED'))
+        except (Exception, KeyboardInterrupt) as exc:
+            report['error'] = base['safe_reason'](exc)
+            if recover and not held:
+                report['unresolved_recovery'] = True
+        finally:
+            if held:
+                try:
+                    with base['block_interrupts']():
+                        refused_before_reserve = False
+                        if mutate:
+                            require(journal_matches(root, attempt, kind) and type(boot) is str and
+                                    BOOT.fullmatch(boot.encode('ascii')) and load(boot_record) == {'boot_id':boot}, 'mutable_intent_not_durable')
+                            # Persist a fully validated refusal here, with signals
+                            # blocked, even if interrupted just after the reply.
+                            if operations and operations[-1]['action'] == 'reserve' and operations[-1].get('admission_state') == 'refused':
+                                save(attempt/'reserve-refused.json', untouched_reserve_proof(kind, label, boot, operations[-1]['admission_reason']))
+                            refused_before_reserve = untouched_reserve(attempt, kind, label, boot)
+                        if mutate and not refused_before_reserve:
+                            receipt = attempt/'positive-device-closeout.json'
+                            proof = {'outcome':'restored', 'mode':kind, 'label':label, 'source':SOURCE, 'boot_id':boot}
+                            if receipt.exists() or receipt.is_symlink():
+                                require(load(receipt) == proof, 'wrong_saved_native_restoration')
+                                positive = True
+                            if not positive and kind == 'measure':
+                                positive = close_measure(perform, operations, entry, boot, begin_repair)
+                            elif not positive:
+                                for turn in range(2):
+                                    code, restored = perform('close', TIMEOUT['close'], boot=boot)
+                                    if code == 0 and restored == entry('RESTORED'):
+                                        positive = True
+                                        break
+                                    if turn or operations[-1].get('refusals') not in (['operation_running'], ['no_owned_journal']):
+                                        break
+                                    time.sleep(SETTLE)
+                            require(positive, 'positive_owned_restoration_missing')
+                            if not receipt.exists():
+                                save(receipt, proof)
+                            require_budget(FINALIZE_IO_BUDGET + 5)
+                            code, removed = perform('finalize', TIMEOUT['finalize'], boot=boot)
+                            # Only this exact refusal means the cleanup never
+                            # ran. Do not retry an uncertain cleanup reply.
+                            if (code == 1 and not removed
+                                    and operations[-1].get('refusals') == ['operation_running']):
                                 time.sleep(SETTLE)
-                        require(positive, 'positive_owned_restoration_missing')
-                        if not receipt.exists():
-                            save(receipt, proof)
-                        require_budget(TIMEOUT['finalize'] + TIMEOUT['absent'] + 5)
-                        code, removed = perform('finalize', TIMEOUT['finalize'], boot=boot)
-                        exact = code == 0 and removed == entry('FINALIZED')
-                        ambiguous = code in (255, 'timeout') or (code == 1 and operations[-1].get('refusals') == ['no_owned_journal'])
-                        require(exact or ambiguous, 'owned_finalization_failed')
-                        code, empty = perform('absent', TIMEOUT['absent'], boot=boot)
-                        require(code == 0 and empty == entry('ABSENT'), 'independent_owned_absence_failed')
-                        closeout = 'restored'
-                    elif refused_before_reserve:
-                        closeout = 'untouched_reservation_refused'
-                    else:
-                        closeout = 'untouched_read_only_admission'
-                    report['release_unverified'] = True
-                    full = lease.release(request, native_restored_and_connections_closed=True)
-                    held = False
-                    released = {k:full[k] for k in ('state','released_at_utc',*RELEASE_PROOFS)}
-                    require(released['state'] == 'released' and all(released[k] is True for k in RELEASE_PROOFS), 'lease_release_unverified')
-                    save(attempt/'released.json', released)
-                    report['release'] = released
-                    report.pop('release_unverified')
-            except (Exception, KeyboardInterrupt) as exc:
-                report['close_error'] = base['safe_reason'](exc)
+                                code, removed = perform('finalize', TIMEOUT['finalize'], boot=boot)
+                            exact = code == 0 and removed == entry('FINALIZED')
+                            ambiguous = code in (255, 'timeout') or (code == 1 and operations[-1].get('refusals') == ['no_owned_journal'])
+                            require(exact or ambiguous, 'owned_finalization_failed')
+                            code, empty = perform('absent', TIMEOUT['absent'], boot=boot)
+                            require(code == 0 and empty == entry('ABSENT'), 'independent_owned_absence_failed')
+                            closeout = 'restored'
+                        elif refused_before_reserve:
+                            closeout = 'untouched_reservation_refused'
+                        else:
+                            closeout = 'untouched_read_only_admission'
+                        report['release_unverified'] = True
+                        full = lease.release(request, native_restored_and_connections_closed=True)
+                        held = False
+                        released = {k:full[k] for k in ('state','released_at_utc',*RELEASE_PROOFS)}
+                        require(released['state'] == 'released' and all(released[k] is True for k in RELEASE_PROOFS), 'lease_release_unverified')
+                        save(attempt/'released.json', released)
+                        report['release'] = released
+                        report.pop('release_unverified')
+                except (Exception, KeyboardInterrupt) as exc:
+                    report['close_error'] = base['safe_reason'](exc)
     report.update(closeout=closeout, run_status=status,
                   recovery_required=(held or report.get('release_unverified', False) or report.get('unresolved_recovery', False)
                                      or (report.get('partial_acquire', False) and 'release' not in report)))
@@ -563,6 +602,7 @@ def main():
     args = parser.parse_args()
     base = runpy.run_path(str(private_path('base_runner')))
     argv = pin(base)
+    shared = load_operation_lock()
     recovering = args.action == 'recover'
     if recovering:
         attempt = args.attempt
@@ -571,7 +611,8 @@ def main():
                 not (attempt/'released.json').exists(), 'invalid_same_owner_attempt')
         stored = load(attempt/'identity.json')
         kind = stored['kind']
-        require(kind in KINDS and stored == {'label':match[1], 'kind':kind, 'source':SOURCE}, 'recovery_identity_changed')
+        require(kind in KINDS and stored == {'label':match[1], 'kind':kind, 'source':SOURCE, 'operator':OPERATOR},
+                'recovery_identity_changed')
         source, payload, space = script_at(attempt/'device.sh', kind), None, 0
     else:
         kind = args.kind
@@ -580,23 +621,27 @@ def main():
         source, payload, space = check_plan(HERE, kind)
         if args.action == 'preflight':
             subprocess.run(['sh','-n'], input=source, check=True)
-            print(json.dumps({'source':SOURCE, 'diagnostic':DIAGNOSTIC, 'kind':kind, 'host_preflight':True,
+            print(json.dumps({'source':SOURCE, 'diagnostic':DIAGNOSTIC, 'operator':OPERATOR, 'kind':kind, 'host_preflight':True,
                               'physical_access':False, 'lease_acquired':False, 'space_kib':space, 'framed_bytes':payload.stat().st_size,
-                              'minimum_visit_seconds':minimum_visit_seconds(kind), 'device_reserved':False}))
+                              'minimum_visit_seconds':minimum_visit_seconds(kind), 'device_reserved':False,
+                              'shared_operation_lock_module_available':True}))
             return 0
         qualification = load(HERE/QUALIFICATION)
         require(qualification['source'] == SOURCE and qualification['diagnostic'] == DIAGNOSTIC
                 and qualification['operator'] == OPERATOR and qualification['physical_access'] is False
                 and all(qualification[key] is True for key in ('both_integrated_device_variants_verified',
                     'linux_disconnection_fixtures_passed', 'guarded_arm_home_to_library_recovery_verified',
-                    'read_only_admission_fixtures_passed')), 'operator_not_qualified_off_device')
+                    'read_only_admission_fixtures_passed', 'scribe_5195_direct_kill_verified',
+                    'hard_timeout_closeout_fixture_passed', 'firmware_watchdog_journal_fd_scope_verified',
+                    'bounded_busy_finalization_fixture_passed', 'shared_operation_lock_scope_verified')),
+                'operator_not_qualified_off_device')
         require(args.max_visit_seconds >= minimum_visit_seconds(kind), 'invalid_visit_budget')
         require_permission_deadline(args.approval_expires, kind, datetime.now(timezone.utc))
         unsent_plan(HERE, kind)
         label = secrets.token_hex(8)
         attempt = HERE/f'attempt-{label}'
         attempt.mkdir(mode=0o700)
-        save(attempt/'identity.json', {'label':label, 'kind':kind, 'source':SOURCE})
+        save(attempt/'identity.json', {'label':label, 'kind':kind, 'source':SOURCE, 'operator':OPERATOR})
         durable(attempt/'device.sh', source)
     secret = sys.stdin.buffer.readline(128)
     value = secret.rstrip(b'\r\n')
@@ -616,9 +661,15 @@ def main():
     lease = base['load_lease']()
     factory = lambda request, ops: ssh_transport(lease, request, argv, source, kind,
                                                 ATTEMPT.fullmatch(attempt.name)[1], env, ops)
-    report = operate(HERE, attempt, kind, source, payload, space, base, lease, factory,
-                     lambda raw, visit_kind: frame_decode(HERE, raw, visit_kind), recover=recovering,
-                     not_after=deadline)
+    try:
+        report = operate(HERE, attempt, kind, source, payload, space, base, lease, factory,
+                         lambda raw, visit_kind: frame_decode(HERE, raw, visit_kind),
+                         operation_lock=shared['operation_lock'], recover=recovering, not_after=deadline)
+    except shared['DeviceBusy']:
+        report = {'source': SOURCE, 'diagnostic': DIAGNOSTIC, 'operator': OPERATOR, 'mode': kind,
+                  'action': args.action, 'equipment_busy': True, 'complete': False, 'sample_count': 0,
+                  'operations': [], 'recovery_required': recovering}
+        save(attempt/(f'recovery-{secrets.token_hex(4)}.json' if recovering else 'result.json'), report)
     print(json.dumps(report), flush=True)
     return 0 if report['complete'] else 1
 

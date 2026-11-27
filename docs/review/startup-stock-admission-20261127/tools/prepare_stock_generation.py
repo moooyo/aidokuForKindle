@@ -18,7 +18,7 @@ HERE = Path(__file__).resolve().parent
 private_path = runpy.run_path(str(HERE/'stock_private_inputs.py'))['private_path']
 SOURCE = 'f3e5070577e74a29552f772491edac660ec62a53'
 DIAGNOSTIC = 'launcher-generation-v1'
-OPERATOR = 'stock-admission-v2'
+OPERATOR = 'stock-admission-v3'
 QUERY = 'aidoku/app/aidoku-native-query'
 APP = 'aidoku/app/aidoku'
 RELEASE_PROOFS = ('owner_and_token_checked', 'native_restored_and_connections_closed', 'lease_directory_absent_after_release')
@@ -174,7 +174,7 @@ def make_device(original, kind):
     no_tap = 'absent "$state/active-slot" && absent "$state/tap-intent" || exit 1'
     protocol = (protocol.replace('@TOOLS@', 'flock usleep cmp stat readlink gzip base64 sqlite3'+(' mount umount timeout' if measurement else ''))
                 .replace('@CHECK_TIMEOUT@', '''[ -x /bin/true ] || admission_reason timeout_probe_target_missing
-    probe=$(timeout -k 1 2 /bin/true && printf '.') && [ "$probe" = . ] || admission_reason timeout_selftest_failed''' if measurement else ':')
+    probe=$(timeout -s KILL 2 /bin/true && printf '.') && [ "$probe" = . ] || admission_reason timeout_selftest_failed''' if measurement else ':')
                 .replace('@CLOSE_TAP@', 'finish_one_owned_tap || exit 1' if measurement else no_tap)
                 .replace('@INSPECT_TAP@', 'inspect_owned_tap || exit 1' if measurement else no_tap)
                 .replace('@RESTORE_LAUNCHER@', 'restore_launcher && ' if measurement else '')
@@ -259,17 +259,19 @@ def artwork(data):
 
 def measure_navigation(original):
     # Preserve the qualified parser and native foreground guard, but strip the
-    # old tab-changing interface from this reader. Bound the actual blocking
-    # programs: BusyBox timeout on the shell would leave its children alive.
+    # old tab-changing interface from this reader. Send KILL directly to each
+    # blocking program at the existing hard deadline, never to a wrapper shell.
+    # The read-only helper and its watchdog do not need the journal descriptor.
     text = original.decode('ascii')
     text = text[:text.index('await_tab() {\n')]
-    text = change(text, '$(lipc-get-prop -s com.lab126.powerd state)',
-                  '$(timeout -k 1 2 lipc-get-prop -s com.lab126.powerd state)')
-    text = change(text, '$(lipc-get-prop -s com.lab126.appmgrd activeApp)',
-                  '$(timeout -k 1 2 lipc-get-prop -s com.lab126.appmgrd activeApp)')
-    text = change(text, '$(status statusbar)', '$(timeout -k 1 2 status statusbar)')
+    text = change(text, '[ "$(lipc-get-prop -s com.lab126.powerd state)" = active ]',
+                  'power_state=$(timeout -s KILL 3 lipc-get-prop -s com.lab126.powerd state 9<&-) && [ "$power_state" = active ]')
+    text = change(text, '[ "$(lipc-get-prop -s com.lab126.appmgrd activeApp)" = com.lab126.KPPMainApp ]',
+                  'active_app=$(timeout -s KILL 3 lipc-get-prop -s com.lab126.appmgrd activeApp 9<&-) && [ "$active_app" = com.lab126.KPPMainApp ]')
+    text = change(text, '    case "$(status statusbar)" in',
+                  '    bar_status=$(timeout -s KILL 3 status statusbar 9<&-) || return 1\n    case "$bar_status" in')
     text = change(text, 'native && "$kit/lib/ld-linux-armhf.so.3"',
-                  'native && timeout -k 1 12 "$kit/lib/ld-linux-armhf.so.3"')
+                  'native && timeout -s KILL 13 9<&- "$kit/lib/ld-linux-armhf.so.3"')
     return (text + '[ "$operation" = inspect ] || fail operation\ninspect || fail stock_tabs\n').encode('ascii')
 
 
@@ -352,7 +354,8 @@ def seal(root, attempt):
     write(guard, artwork(reply.stdout))
     evidence = stage(root, 'measure', guard)
     write(root/'locator-qualified.json', (json.dumps({'qualified': True, 'locator_attempt': attempt.name,
-                                                     'source': SOURCE, 'diagnostic': DIAGNOSTIC})+'\n').encode('ascii'))
+                                                     'source': SOURCE, 'diagnostic': DIAGNOSTIC,
+                                                     'operator': OPERATOR})+'\n').encode('ascii'))
     return evidence
 
 

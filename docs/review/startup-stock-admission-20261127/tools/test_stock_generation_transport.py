@@ -49,6 +49,7 @@ exec sleep 20
                 def reject(_raw, _kind):
                     self.fail('An unfinished admission transport must not launch a visit')
                 r = RUN['operate'](host, attempt, 'measure', source, model.payload, 500, base, lease, factory, reject,
+                                   operation_lock=lambda: FIX['fixture_operation_lock'](host/'fixture-operation.lock'),
                                    not_after=datetime.now(timezone.utc)+timedelta(seconds=800))
                 self.assertTrue(log.read_bytes().startswith(b'AB_ADMITTED ' if accepted else b'AB_ADMISSION_REFUSED '))
                 row, = r['operations']
@@ -94,6 +95,7 @@ esac
             def reject(_raw, _kind):
                 self.fail('A transport-interrupted response is not a sample')
             receipt = RUN['operate'](host, attempt, 'measure', source, model.payload,500,base,lease,factory,reject,
+                                     operation_lock=lambda: FIX['fixture_operation_lock'](host/'fixture-operation.lock'),
                                      not_after=datetime.now(timezone.utc)+timedelta(seconds=800))
             self.assertEqual([step['action'] for step in receipt['operations']],
                              ['admit','reserve','run','readback','finalize','absent'])
@@ -146,8 +148,9 @@ esac
                 return lambda action, timeout, **params: exchange(action, 4 if action == 'close' else timeout, **params)
             def reject(_raw, _kind):
                 self.fail('No timing decoder is allowed after the failed run')
+            operation_lock = lambda: FIX['fixture_operation_lock'](host/'fixture-operation.lock')
             report = RUN['operate'](host, attempt, 'measure', source, model.payload, 500, base, lease, factory, reject,
-                                    not_after=datetime.now(timezone.utc)+timedelta(seconds=800))
+                                    operation_lock=operation_lock, not_after=datetime.now(timezone.utc)+timedelta(seconds=800))
             self.assertEqual((root/'wire-actions').read_text(),'closed wire without receipt\n')
             self.assertEqual((report['operations'][4]['action'], report['operations'][4]['status']), ('close', 'timeout'))
             self.assertEqual((root/'clicks').read_text(),'one click\n')
@@ -167,7 +170,7 @@ esac
                 self.assertTrue(model.stage.exists() and model.state.exists() and base['LEASE'].exists())
                 self.assertFalse((attempt/'positive-device-closeout.json').exists() or (attempt/'released.json').exists())
                 recovered = RUN['operate'](host, attempt, 'measure', source, model.payload, 500, base, lease,
-                                            factory, reject, recover=True)
+                                           factory, reject, operation_lock=operation_lock, recover=True)
                 self.assertTrue(recovered['recovery_required'], recovered)
                 self.assertEqual([row['action'] for row in recovered['operations']], ['readback'])
                 self.assertEqual(model.inputs(), ['nav-library'])
