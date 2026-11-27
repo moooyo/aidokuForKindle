@@ -1,11 +1,13 @@
 # First Library screen: sequential startup experiments
 
-**Resume the initialized-Library readiness probe on `test-env`.** No runtime
-change from the three experiments is ready to ship. The Kindle daily install
-remains Aidoku 0.1.3 from `97173d0`; see the
-[verified installation receipt](daily-deployment-97173d0.json). The already
-shipped [background toolbar read](../startup-toolbar-overlap-20261126.md) is
-unchanged. This handoff is a documentation and test-material archive only.
+**Historical protocol, not the current handoff.** The initialized-Library
+follow-up completed on both profiles; [its outcome](../startup-stock-admission-20261127/evidence/initialized-library-readiness.json)
+rejects this direct-frame approach. Keep the loading path and do not rerun
+item 3 as pending work. See the [current handoff](../../../HANDOFF.md) for the
+last verified installation and next action. The historical daily install was
+Aidoku 0.1.3 from `97173d0`; its [receipt](daily-deployment-97173d0.json)
+and [background toolbar read](../startup-toolbar-overlap-20261126.md) remain
+part of the record.
 
 ## Font delivery candidate
 
@@ -139,8 +141,8 @@ No physical Kindle was contacted or reserved for this step.
 
 After the first run, the configured SSH key agent again refused new
 `test-env` connections. The
-[initialized-fixture follow-up](tools/prepare-initialized-readiness.py) has
-not run, and the complete traces and screenshots have not been retrieved.
+[initialized-fixture follow-up](tools/prepare-initialized-readiness.py) had
+not yet run, and the complete traces and screenshots had not yet been retrieved.
 The follow-up uses an actual completed startup to seed the same initialized
 synthetic Library for both arms. For that follow-up, require the owned app,
 verified Library projection, native Settings and return input, update and
@@ -159,12 +161,16 @@ full update still owns the input epoch through the driver's acknowledgement,
 portrait recheck and touch resynchronization. Sleep, cancellation and rotation
 must fall back or restore without admitting stale input. Require both device
 profiles and real-user-equivalent input on firmware before a new Scribe A/B.
-Until then, keep the current loading path and the installed `97173d0` daily
-build. This experiment did not modify or take a second lease on the device.
+At the time, the decision was to keep the loading path and the then-installed
+`97173d0` daily build. This experiment did not modify or take a second lease on
+the device.
 
 ## Resume item 3 on `test-env`
 
-Start from a checkout of `main` containing this handoff. No files from the
+**Historical recipe only.** The initialized comparison was subsequently
+closed on both profiles; it is not the next experiment.
+
+The original procedure started from a checkout containing this archive. No files from the
 previous computer's ignored `artifacts` directory are required. Follow the
 [project instructions](../../../AGENTS.md) and
 [firmware emulator guide](../../FIRMWARE_EMULATOR.md). Use the configured

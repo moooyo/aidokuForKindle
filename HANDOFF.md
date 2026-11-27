@@ -1,11 +1,64 @@
 # Handoff: Kindle Library startup and reopening
 
-## Start here: 2026-11-26 (Asia/Shanghai)
+## Start here: 2026-11-28 (Asia/Shanghai)
 
-**Resume item 3: check whether an initialized Library can be ready before the
-loading frame is drawn.** The current Kindle daily install is Aidoku 0.1.3
-from `97173d0`, not the R3 build discussed below. This handoff changes no
-runtime code or installation. The direct-frame path is not implemented.
+**Paused by the user for continuation in another session.** The Aidoku ready
+entry was withdrawn. There is no Aidoku lease, open Kindle connection, or
+native cleanup to complete. The last qualified locator package is unused on
+`test-env`; this batch has not sent locator or measurement commands, and no
+measurement package is sealed. This is not a statement that the shared device
+is currently free. Obtain current authorization and a coordinated handoff
+before any new device commands; do not inherit an older approval, slot or
+lease token.
+
+**The last independently verified Scribe daily install is Aidoku 0.1.3 from
+`f3e5070`.** It includes `97173d0` (background toolbar reads), `83cac53`
+(reuse the cache reconciliation lookup), and `f3e5070` (coalesce each native
+query response write). The last change was explicitly approved despite
+missing its performance screen. The installed GUI and launcher did not
+change in that delivery; both query helper copies and KPM metadata were
+verified. This handoff archives diagnostic sources only, not a new product
+build, startup optimization, or deployment. See the [delivery receipt](docs/review/startup-stock-admission-20261127/evidence/f3e5070-delivery.json).
+
+**Next experiment:** get one accepted ordinary-card Scribe sample with
+`launcher-generation-v1` and `stock-admission-v2`. The temporary launcher
+probe passed on both firmware profiles. The archive passed [82 off-device
+checks](docs/review/startup-stock-admission-20261127/evidence/archive-verification.json),
+including 64 integrated operator checks.
+An older measurement opened the card but failed native closeout; the original
+owner restored and released it. The next measurement was refused during
+read-only admission, before upload, overlay or input. It was independently
+released. Both yielded **zero accepted timing samples**; the older refusal
+still does not identify a failed admission predicate.
+
+1. Read the [experiment archive](docs/review/startup-stock-admission-20261127/README.md)
+   and use its host-only resume procedure. Recheck that the private locator
+   is unused and that its source still matches the installation to be tested.
+2. Follow the [ready queue](docs/review/startup-stock-admission-20261127/READY_QUEUE.md):
+   announce ready only with approval and complete material, acquire the same
+   shared lease just before commands, and verify return immediately. First
+   take one no-input locator from the native Library. Release before
+   classifying its fresh frame or sealing the measurement. When ready again,
+   use a new lease; open the ordinary card at most once and only after
+   admission. If either visit is refused, stop and retain the precise reason.
+3. Evaluate only a same-visit, closed and independently released sample. The
+   historical 150–170 ms preparation stage is actionable only if it
+   reproducibly explains a long segment *and* the observer record was
+   published early enough to leave usable slack. Otherwise, investigate the
+   release-to-worker interval (0.51–0.58 s in older ordinary-card visits)
+   without bypassing the normal entry. Framebuffer and driver timestamps are
+   not the loading-excluded, actual visible Library endpoint.
+
+**Do not rerun initialized-Library direct-frame feasibility.** It is closed:
+metadata worker completion missed the latest loading draw start by 379.755 ms
+on Scribe and 367.411 ms on the independent PW6 recheck. Keep the loading
+frame and existing display/input checks. See the [closure evidence](docs/review/startup-stock-admission-20261127/evidence/initialized-library-readiness.json).
+
+## Historical 2026-11-26 handoff (Asia/Shanghai)
+
+The following entries retain what was known at the time. The daily install
+was then Aidoku 0.1.3 from `97173d0`. Item 3 was pending at that point; the
+November 28 entry above records its closure and the current next action.
 
 1. **Font delivery: closed, rejected.** Four alternating Scribe foreground
    pairs showed a 19.353 ms median paired regression to the same-frame
@@ -32,7 +85,7 @@ coordinate a fresh lease immediately before device commands.
 
 ## Start here: 2026-11-22 (Asia/Shanghai)
 
-**Historical record. Follow the November 26 handoff above, not the R3 actions below.**
+**Historical record. Follow the November 28 handoff above, not the R3 actions below.**
 
 **Decision at the time: keep the daily R3, existing Library paper fill and glyph cache.** A new [ordinary-card draw-accounting study](docs/review/startup-release-draw-20261122/README.md) measured **2.960 s** at the card-to-complete-Library median (one warmup excluded, three formal openings). The first business draw was **623.075 ms elapsed** at the median, but only **96.852 ms of GUI CPU**; the median within-visit CPU share was **15.6%**. All three draws recorded 140 major faults. The elapsed difference is not a measured I/O or scheduler delay; these visits unpacked a new executable file each time. In the separate [release Gray8 A/B](docs/review/startup-release-draw-20261122/composition/README.md), removing a provable 4.18 / 1.87 MB redundant fill did not speed up either layout. Do not add a second [glyph cache](docs/review/startup-release-draw-20261122/glyph/README.md). Keep the new optional same-frame logger; the tested diagnostic was not installed. All four independent leases were returned and the last release was at **07:36:47**. The next discriminating comparison is [ordinary opens with controlled executable identity](docs/review/startup-release-draw-20261122/device/INTERPRETATION.md), not a speculative renderer rewrite or blanket prefetch.
 
